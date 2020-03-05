@@ -772,6 +772,10 @@ components:
           description: Name of the user.
           minLength: 1
           type: string
+        password:
+          description: Password of the user.
+          minLength: 1
+          type: string
         photo:
           description: Raw photo field value from the user record.
           minLength: 0

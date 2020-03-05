@@ -10,7 +10,6 @@ import {
     absolutePosition,
     colorOut,
     flexHelper,
-    margins,
     negative,
     paddings,
     unit,
@@ -19,12 +18,12 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
+    const titleBarVars = titleBarVariables();
 
     const border = makeThemeVars("border", {
         verticalWidth: 3,
@@ -41,8 +40,22 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
-        bg: globalVars.mainColors.primary,
+        bg: titleBarVars.colors.fg,
         bottomSpace: 1,
+    });
+
+    const navLinks = makeThemeVars("navLinks", {
+        fontSize: 14,
+        padding: {
+            left: 8,
+            right: 8,
+        },
+    });
+
+    const navPadding = makeThemeVars("navPadding", {
+        padding: {
+            bottom: 4,
+        },
     });
 
     return {
@@ -50,14 +63,16 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         item,
         linkActive,
         padding,
+        navLinks,
+        navPadding,
     };
 });
 
-export default function titleBarNavClasses() {
+const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBarNav");
 
@@ -67,12 +82,24 @@ export default function titleBarNavClasses() {
             position: "relative",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const navigation = style("navigation", {});
+    const navigation = style(
+        "navigation",
+        titleBarVars.logo.doubleLogoStrategy === "hidden"
+            ? {
+                  marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
+              }
+            : {},
+    );
+
+    const navigationCentered = style("navigationCentered", {
+        ...absolutePosition.middleOfParent(true),
+        display: "inline-flex",
+    });
 
     const items = style(
         "items",
@@ -81,7 +108,7 @@ export default function titleBarNavClasses() {
             height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumnDown({
+        mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),
@@ -98,14 +125,19 @@ export default function titleBarNavClasses() {
         justifyContent: "center",
         minHeight: unit(vars.item.size),
         textDecoration: "none",
+        paddingLeft: unit(vars.navLinks.padding.left),
+        paddingRight: unit(vars.navLinks.padding.right),
         $nest: {
             "&.focus-visible": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:focus": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:hover": {
+                color: colorOut(titleBarVars.colors.fg),
                 backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
         },
@@ -128,7 +160,14 @@ export default function titleBarNavClasses() {
     });
 
     const linkContent = style("linkContent", {
+        fontSize: unit(vars.navLinks.fontSize),
+        fontWeight: globalVars.fonts.weights.normal,
         position: "relative",
+        display: "flex",
+        alignItems: "center",
+        minHeight: unit(vars.item.size),
+        lineHeight: unit(vars.item.size),
+        height: 0, // IE11 Fix.
     });
 
     const firstItem = style("lastItem", {
@@ -138,15 +177,24 @@ export default function titleBarNavClasses() {
     const lastItem = style("lastItem", {
         zIndex: 2,
     });
+    const navContiner = style("navContiner", {
+        paddingBottom: unit(vars.navPadding.padding.bottom),
+    });
+    const navLinks = style("navLinks", {});
 
     return {
         root,
         navigation,
+        navigationCentered,
         items,
         link,
         linkActive,
         linkContent,
         lastItem,
         firstItem,
+        navLinks,
+        navContiner,
     };
-}
+});
+
+export default titleBarNavClasses;

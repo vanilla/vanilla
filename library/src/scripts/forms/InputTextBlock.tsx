@@ -8,7 +8,6 @@ import React from "react";
 import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
-import { Omit } from "@library/@types/utils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { OverflowProperty, ResizeProperty } from "csstype";
@@ -19,23 +18,26 @@ export enum InputTextBlockBaseClass {
     CUSTOM = "",
 }
 
+export interface IInputProps {
+    value?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onKeyPress?: React.KeyboardEventHandler;
+    inputClassNames?: string;
+    type?: string;
+    defaultValue?: string;
+    placeholder?: string;
+    valid?: boolean;
+    required?: boolean;
+    disabled?: boolean;
+    inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
+    multiline?: boolean;
+    maxLength?: number;
+    className?: string;
+    autoComplete?: boolean;
+}
+
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
-    inputProps: {
-        value?: string;
-        onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-        onKeyPress?: React.KeyboardEventHandler;
-        inputClassNames?: string;
-        type?: string;
-        defaultValue?: string;
-        placeholder?: string;
-        valid?: boolean;
-        required?: boolean;
-        disabled?: boolean;
-        inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
-        multiline?: boolean;
-        maxLength?: number;
-        className?: string;
-    };
+    inputProps?: IInputProps;
     multiLineProps?: {
         onResize?: (event) => {};
         rows?: number;
@@ -59,7 +61,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
     private id: string;
     private ownInputRef = React.createRef<HTMLInputElement | HTMLTextAreaElement>();
     private get inputRef() {
-        return this.props.inputProps.inputRef || this.ownInputRef;
+        const { inputProps = {} } = this.props;
+        return inputProps.inputRef || this.ownInputRef;
     }
 
     public constructor(props) {
@@ -71,7 +74,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const classesInput = inputClasses();
         const classesInputBlock = inputBlockClasses();
 
-        const { inputProps, multiLineProps = {}, ...blockProps } = this.props;
+        const { inputProps = {}, multiLineProps = {}, ...blockProps } = this.props;
         const classes = classNames(classesInputBlock.inputText, "inputText", inputProps.inputClassNames, {
             InputBox: this.props.legacyMode,
             [classesInput.text]: !this.props.legacyMode,
@@ -103,6 +106,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             onChange={this.onChange}
                             ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
                             onKeyPress={inputProps.onKeyPress}
+                            autoComplete={inputProps.autoComplete ? "on" : "off"}
                         />
                     ) : (
                         <TextareaAutosize
@@ -169,8 +173,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
     }
 
     private onChange = event => {
-        if (this.props.inputProps.onChange) {
-            this.props.inputProps.onChange(event);
+        const { inputProps = {} } = this.props;
+        if (inputProps.onChange) {
+            inputProps.onChange(event);
         }
     };
 }

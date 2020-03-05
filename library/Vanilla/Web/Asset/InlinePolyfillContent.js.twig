@@ -1,0 +1,29 @@
+{%- autoescape false -%}
+var supportsAllFeatures =
+    window.Promise &&
+    window.fetch &&
+    window.Symbol &&
+    window.CustomEvent &&
+    Element.prototype.remove &&
+    Element.prototype.closest &&
+    window.NodeList &&
+    NodeList.prototype.forEach
+;
+
+if (!supportsAllFeatures) {
+    {{ debugModeLiteral }} && console.log("Older browser detected. Initiating polyfills.");
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = "{{ polyfillAsset.getWebPath() }}";
+
+    {#
+    // Without this script execution order is inconsistent.
+    // IE11 does not seem to respect https://html.spec.whatwg.org/multipage/scripting.html#script-processing-src-sync
+    // Which means we HAVE to set the element, even if it should be defaulted.
+    #}
+    script.async = false;
+    head.appendChild(script);
+} else {
+    {{ debugModeLiteral }} && console.log("Modern browser detected. No polyfills necessary");
+}
+{%- endautoescape -%}

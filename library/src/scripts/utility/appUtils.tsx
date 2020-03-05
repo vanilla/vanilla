@@ -83,6 +83,22 @@ export function isAllowedUrl(input: string): boolean {
     return isUrl(input, options);
 }
 
+interface ISiteSection {
+    basePath: string;
+    contentLocale: string;
+    sectionGroup: string;
+    sectionID: string;
+    name: string;
+    apps: { [key: string]: boolean };
+}
+
+/**
+ * Get the current site section.
+ */
+export function getSiteSection(): ISiteSection {
+    return getMeta("siteSection");
+}
+
 /**
  * Format a URL in the format passed from the controller.
  *
@@ -95,12 +111,35 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
         return path;
     } // this is an absolute path.
 
+    // Subcommunity slug OR subcommunity
+    let siteRoot = getMeta("context.basePath", "");
+
+    if (path.startsWith("~")) {
+        path = path.replace(/^~/, "");
+        siteRoot = getMeta("context.host", "");
+    }
+
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
-    const urlBase = withDomain
-        ? window.location.origin + getMeta("context.basePath", "")
-        : getMeta("context.basePath", "");
+    const urlBase = withDomain ? window.location.origin + siteRoot : siteRoot;
+    return urlBase + path;
+}
+
+/**
+ * Generate a URL from the site's web root.
+ *
+ * No site section will be included.
+ */
+export function siteUrl(path: string): string {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
+
+    // The context paths that come down are expect to have no / at the end of them.
+    // Normally a domain like so: https://someforum.com
+    // When we don't have that we want to fallback to "" so that our path with a / can get passed.
+    const urlBase = window.location.origin + getMeta("context.host", "");
     return urlBase + path;
 }
 
@@ -131,8 +170,9 @@ export function assetUrl(path: string): string {
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
+    const staticPathFolder = getMeta("context.staticPathFolder", "");
     const urlFormat = getMeta("context.assetPath", "");
-    return urlFormat + path;
+    return staticPathFolder + urlFormat + path;
 }
 
 /**

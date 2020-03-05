@@ -9,8 +9,10 @@ import { initCodeHighlighting } from "@library/content/code";
 import { initEmojiSupport } from "@library/content/emoji";
 import { initSpoilers } from "@library/content/spoilers";
 import { mountAllEmbeds } from "@library/embeddedContent/embedService";
+import { autoWrapCollapsableContent } from "@library/content/CollapsableContent";
 
 export async function initAllUserContent() {
+    await autoWrapCollapsableContent();
     initEmojiSupport();
     initSpoilers();
     await mountAllEmbeds();

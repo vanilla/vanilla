@@ -9,8 +9,10 @@ namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Contracts;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Addon;
+use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * A class for gathering particular data about the site.
@@ -29,6 +31,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var bool */
     private $debugModeEnabled;
 
+    /** @var bool */
+    private $translationDebugModeEnabled;
+
     /** @var string */
     private $siteTitle;
 
@@ -38,11 +43,27 @@ class SiteMeta implements \JsonSerializable {
     /** @var int */
     private $maxUploadSize;
 
+    /** @var int */
+    private $maxUploads;
+
     /** @var string */
     private $localeKey;
 
-    /** @var Addon */
-    private $activeTheme;
+
+    /** @var ThemeModel */
+    private $themeModel;
+
+    /** @var string */
+    private $activeThemeKey;
+
+    /** @var string */
+    private $activeThemeViewPath;
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
+
+    /** @var array $themePreview */
+    private $themePreview;
 
     /** @var string */
     private $favIcon;
@@ -50,18 +71,51 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $mobileAddressBarColor;
 
+    /** @var string|null */
+    private $shareImage;
+
+    /** @var string|null */
+    private $bannerImage;
+
     /** @var array */
     private $featureFlags;
+
+    /** @var Contracts\Site\SiteSectionInterface */
+    private $currentSiteSection;
+
+    /** @var string */
+    private $logo;
+
+    /** @var string */
+    private $orgName;
+
+    /** @var string */
+    private $cacheBuster;
+
+    /** @var string */
+    private $staticPathFolder = '';
+
+    /** @var string */
+    private $dynamicPathFolder = '';
 
     /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param \Gdn_Locale $locale
-     * @param Addon $activeTheme
+     * @param SiteSectionModel $siteSectionModel
+     * @param DeploymentCacheBuster $deploymentCacheBuster
+     * @param ThemeFeatres $themeFeatures
+     * @param ThemeModel $themeModel
      */
-    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config, \Gdn_Locale $locale, Addon $activeTheme) {
+    public function __construct(
+        RequestInterface $request,
+        Contracts\ConfigurationInterface $config,
+        SiteSectionModel $siteSectionModel,
+        DeploymentCacheBuster $deploymentCacheBuster,
+        ThemeFeatures $themeFeatures,
+        ThemeModel $themeModel
+    ) {
         $this->host = $request->getHost();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -69,13 +123,19 @@ class SiteMeta implements \JsonSerializable {
         $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+        $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
 
         $this->featureFlags = $config->get('Feature', []);
+        $this->themeFeatures = $themeFeatures;
+
+        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
         $this->siteTitle = $config->get('Garden.Title', "");
+
+        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
 
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
@@ -84,14 +144,30 @@ class SiteMeta implements \JsonSerializable {
         $this->maxUploads = (int)$config->get('Garden.Upload.maxFileUploads', ini_get('max_file_uploads'));
 
         // localization
-        $this->localeKey = $locale->current();
+        $this->localeKey = $this->currentSiteSection->getContentLocale();
+
+        // DeploymentCacheBuster
+        $this->cacheBuster = $deploymentCacheBuster->value();
 
         // Theming
-        $this->activeTheme = $activeTheme;
+        $themeKey = $themeModel->getViewThemeKey();
+        $this->activeThemeKey = $themeKey;
+        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
+        $this->themePreview =  $themeModel->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
         }
+
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
+        }
+
+        if ($shareImage = $config->get("Garden.ShareImage")) {
+            $this->shareImage = \Gdn_Upload::url($shareImage);
+        }
+
+        $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
@@ -113,12 +189,20 @@ class SiteMeta implements \JsonSerializable {
                 'basePath' => $this->basePath,
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
+                'translationDebug' => $this->translationDebugModeEnabled,
+                'cacheBuster' => $this->cacheBuster,
+                'staticPathFolder' => $this->staticPathFolder,
+                'dynamicPathFolder' => $this->dynamicPathFolder,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
-                'themeKey' => $this->activeTheme->getKey(),
+                'themeKey' => $this->activeThemeKey,
+                'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
+                'shareImage' => $this->shareImage,
+                'bannerImage' => $this->bannerImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
@@ -127,6 +211,9 @@ class SiteMeta implements \JsonSerializable {
                 'allowedExtensions' => $this->allowedExtensions,
             ],
             'featureFlags' => $this->featureFlags,
+            'themeFeatures' => $this->themeFeatures->allFeatures(),
+            'siteSection' => $this->currentSiteSection,
+            'themePreview' => $this->themePreview,
         ];
     }
 
@@ -135,6 +222,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getSiteTitle(): string {
         return $this->siteTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgName(): string {
+        return $this->orgName;
     }
 
     /**
@@ -187,10 +281,17 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
-     * @return Addon
+     * @return string
      */
-    public function getActiveTheme(): Addon {
-        return $this->activeTheme;
+    public function getActiveThemeKey(): string {
+        return $this->activeThemeKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveThemeViewPath(): string {
+        return $this->activeThemeViewPath;
     }
 
     /**
@@ -203,11 +304,41 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
+     * Get the configured "Share Image" for the site.
+     *
+     * @return string|null
+     */
+    public function getShareImage(): ?string {
+        return $this->shareImage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo(): ?string {
+        return $this->logo;
+    }
+
+    /**
      * Get the configured "theme color" for the site.
      *
      * @return string|null
      */
     public function getMobileAddressBarColor(): ?string {
         return $this->mobileAddressBarColor;
+    }
+
+    /**
+     * @param string $staticPathFolder
+     */
+    public function setStaticPathFolder(string $staticPathFolder) {
+        $this->staticPathFolder = $staticPathFolder;
+    }
+
+    /**
+     * @param string $dynamicPathFolder
+     */
+    public function setDynamicPathFolder(string $dynamicPathFolder) {
+        $this->dynamicPathFolder = $dynamicPathFolder;
     }
 }

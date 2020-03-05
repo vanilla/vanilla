@@ -82,7 +82,7 @@ trait HtmlNormalizeTrait {
      * @param string $actual
      * @param string|null $message
      */
-    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = null) {
+    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = '') {
         $expected = $this->normalizeHtml($expected);
         $actual = $this->normalizeHtml($actual);
         $this->assertEquals($expected, $actual, $message);

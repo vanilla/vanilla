@@ -43,8 +43,10 @@ class SchemaFilters {
             if ($value === null) {
                 try {
                     $value = unserialize($value);
+                    // @codeCoverageIgnoreStart
                 } catch (\Exception $e) {
                     $value = null;
+                    // @codeCoverageIgnoreEnd
                 }
             }
         }

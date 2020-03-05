@@ -12,7 +12,12 @@ import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyl
 import merge from "lodash/merge";
 import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
-import produce from "immer";
+
+export enum BorderType {
+    BORDER = "border",
+    NONE = "none",
+    SHADOW = "shadow",
+}
 
 export interface ISimpleBorderStyle {
     color?: ColorValues | ColorHelper;
@@ -52,14 +57,16 @@ type IRadiusInput = IRadiusShorthand | IBorderRadiusOutput | IRadiusValue;
 export type IBorderRadiusValue = BorderRadiusProperty<TLength> | number | string | undefined;
 
 export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
-    all?: ISimpleBorderStyle;
-    topBottom?: ISimpleBorderStyle;
-    leftRight?: ISimpleBorderStyle;
-    top?: ISimpleBorderStyle;
-    bottom?: ISimpleBorderStyle;
-    left?: ISimpleBorderStyle;
-    right?: ISimpleBorderStyle;
+    all?: ISimpleBorderStyle & IRadiusFlex;
+    topBottom?: ISimpleBorderStyle & IRadiusFlex;
+    leftRight?: ISimpleBorderStyle & IRadiusFlex;
+    top?: ISimpleBorderStyle & IRadiusFlex;
+    bottom?: ISimpleBorderStyle & IRadiusFlex;
+    left?: ISimpleBorderStyle & IRadiusFlex;
+    right?: ISimpleBorderStyle & IRadiusFlex;
 }
+
+export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
 
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
     if (variable != null) {
@@ -72,11 +79,18 @@ const typeIsStringOrNumber = (variable: unknown): variable is number | string =>
 
 const setAllRadii = (radius: BorderRadiusProperty<TLength>) => {
     return {
-        borderTopRightRadius: radius,
-        borderBottomRightRadius: radius,
-        borderBottomLeftRadius: radius,
-        borderTopLeftRadius: radius,
+        borderTopRightRadius: unit(radius),
+        borderBottomRightRadius: unit(radius),
+        borderBottomLeftRadius: unit(radius),
+        borderTopLeftRadius: unit(radius),
     };
+};
+
+export const EMPTY_BORDER = {
+    color: undefined,
+    style: undefined,
+    radius: undefined,
+    width: undefined,
 };
 
 /**
@@ -95,10 +109,10 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
     if (typeIsStringOrNumber(radii)) {
         const value = unit(radii as number | string);
         return {
-            borderTopRightRadius: value,
-            borderBottomRightRadius: value,
-            borderBottomLeftRadius: value,
-            borderTopLeftRadius: value,
+            borderTopRightRadius: unit(value),
+            borderBottomRightRadius: unit(value),
+            borderBottomLeftRadius: unit(value),
+            borderTopLeftRadius: unit(value),
         };
     }
 
@@ -122,10 +136,10 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(top);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(top) : top;
+            const value = !isShorthand ? unit(top) : top;
             merge(output, {
-                borderTopRightRadius: value,
-                borderTopLeftRadius: value,
+                borderTopRightRadius: unit(value),
+                borderTopLeftRadius: unit(value),
             });
         } else {
             merge(
@@ -140,10 +154,10 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(bottom);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(bottom) : bottom;
+            const value = !isShorthand ? unit(bottom) : bottom;
             merge(output, {
-                borderBottomRightRadius: value,
-                borderBottomLeftRadius: value,
+                borderBottomRightRadius: unit(value),
+                borderBottomLeftRadius: unit(value),
             });
         } else {
             merge(
@@ -158,13 +172,13 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(left);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(left) : left;
+            const value = !isShorthand ? unit(left) : left;
             merge(output, {
-                borderTopLeftRadius: value,
-                borderBottomLeftRadius: value,
+                borderTopLeftRadius: unit(value),
+                borderBottomLeftRadius: unit(value),
             });
         } else {
-            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
+            const topStyles = top !== undefined ? { borderTopLeftRadius: unit(top) } : {};
             const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
             merge(
                 output,
@@ -177,14 +191,14 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         const isShorthand = typeIsStringOrNumber(right);
 
         if (isShorthand) {
-            const value = isShorthand ? unit(right) : right;
+            const value = !isShorthand ? unit(right) : right;
             merge(output, {
-                borderTopRightRadius: value,
-                borderBottomRightRadius: value,
+                borderTopRightRadius: unit(value),
+                borderBottomRightRadius: unit(value),
             });
         } else {
-            const topStyles = top !== undefined ? { borderBottomRightRadius: unit(top) } : {};
-            const bottomStyles = bottom !== undefined ? { borderBottomLeftRadius: unit(bottom) } : {};
+            const topStyles = top !== undefined ? { borderTopRightRadius: unit(top) } : {};
+            const bottomStyles = bottom !== undefined ? { borderBottomRightRadius: unit(bottom) } : {};
             merge(
                 output,
                 !typeIsStringOrNumber(topStyles) ? topStyles : {},
@@ -282,10 +296,6 @@ const setAllBorders = (
         });
     }
 
-    if (typeof radius === "object") {
-        merge(output, radius);
-    }
-
     return output;
 };
 
@@ -310,7 +320,7 @@ const singleBorderStyle = (
 };
 
 export const borders = (
-    detailedStyles?: IBorderStyles | ISimpleBorderStyle | undefined,
+    detailedStyles?: IBorderStyles | ISimpleBorderStyle | IMixedBorderStyles | undefined,
     fallbackBorderVariables: IGlobalBorderStyles = globalVariables().border,
     debug = false,
 ): NestedCSSProperties => {
@@ -330,6 +340,14 @@ export const borders = (
         detailedStyles = fallbackBorderVariables;
     }
 
+    const all = getValueIfItExists(detailedStyles, "all");
+    if (all !== undefined) {
+        const allStyles = singleBorderStyle(all, fallbackBorderVariables);
+        if (allStyles !== undefined) {
+            merge(output, setAllBorders(color, width, style, radius, debug));
+        }
+    }
+
     const top = getValueIfItExists(detailedStyles, "top");
     if (top !== undefined) {
         const topStyles = singleBorderStyle(top, fallbackBorderVariables);
@@ -337,6 +355,8 @@ export const borders = (
             output.borderTopWidth = getValueIfItExists(topStyles, "width", width);
             output.borderTopStyle = getValueIfItExists(topStyles, "style", style);
             output.borderTopColor = getValueIfItExists(topStyles, "color", color);
+            output.borderTopLeftRadius = getValueIfItExists(topStyles, "radius", radius);
+            output.borderTopRightRadius = getValueIfItExists(topStyles, "radius", radius);
         }
     }
 
@@ -347,6 +367,8 @@ export const borders = (
             output.borderRightWidth = getValueIfItExists(rightStyles, "width", width);
             output.borderRightStyle = getValueIfItExists(rightStyles, "style", style);
             output.borderRightColor = getValueIfItExists(rightStyles, "color", color);
+            output.borderBottomRightRadius = getValueIfItExists(rightStyles, "radius", radius);
+            output.borderTopRightRadius = getValueIfItExists(rightStyles, "radius", radius);
         }
     }
 
@@ -357,6 +379,8 @@ export const borders = (
             output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", width);
             output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", style);
             output.borderBottomColor = getValueIfItExists(bottomStyles, "color", color);
+            output.borderBottomLeftRadius = getValueIfItExists(bottomStyles, "radius", radius);
+            output.borderBottomRightRadius = getValueIfItExists(bottomStyles, "radius", radius);
         }
     }
 
@@ -367,6 +391,8 @@ export const borders = (
             output.borderLeftWidth = getValueIfItExists(leftStyles, "width", width);
             output.borderLeftStyle = getValueIfItExists(leftStyles, "style", style);
             output.borderLeftColor = getValueIfItExists(leftStyles, "color", color);
+            output.borderBottomLeftRadius = getValueIfItExists(leftStyles, "radius", radius);
+            output.borderTopLeftRadius = getValueIfItExists(leftStyles, "radius", radius);
         }
     }
 

@@ -8,22 +8,38 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Attributes;
+use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
     use StaticInitializer;
+
     use \Vanilla\FloodControlTrait;
+
+    use FormatFieldTrait;
 
     use UpdateMediaTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
+
+    /** @var string Thus userID of whomever closed the discussion. */
+    const CLOSED_BY_USER_ID = 'ClosedByUserID';
 
     /** @var string Default column to order by. */
     const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
@@ -106,6 +122,11 @@ class DiscussionModel extends Gdn_Model {
     protected $floodGate;
 
     /**
+     * @var DateTimeInterface
+     */
+    private $archiveDate;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
@@ -123,6 +144,12 @@ class DiscussionModel extends Gdn_Model {
             'Sink',
             'Score',
         ]);
+
+        try {
+            $this->setArchiveDate(Gdn::config('Vanilla.Archive.Date', ''));
+        } catch (\Exception $ex) {
+            trigger_error($ex->getMessage(), E_USER_NOTICE);
+        }
     }
 
     /**
@@ -135,6 +162,22 @@ class DiscussionModel extends Gdn_Model {
             self::$instance = new DiscussionModel();
         }
         return self::$instance;
+    }
+
+    /**
+     * Forces a date string into a DateTimeImmutable object. If the string is not a valid date string,
+     * it returns null.
+     *
+     * @param ?string $date
+     * @return DateTimeImmutable|null
+     */
+    private static function forceDateTime($date): ?DateTimeImmutable {
+        try {
+            $date = empty($date) ? null : new DateTimeImmutable($date);
+        } catch (\Exception $ex) {
+            $date = null;
+        }
+        return $date;
     }
 
     /**
@@ -254,10 +297,44 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Determines whether or not the current user can close a discussion.
+     *
+     * @param object|array $discussion
+     * @return bool Returns true if the user can close or false otherwise.
+     */
+    public static function canClose($discussion): bool {
+        if (is_object($discussion)) {
+            $categoryID = $discussion->CategoryID ?? null;
+            $insertUserID = $discussion->InsertUserID ?? 0;
+            $isClosed = $discussion->Closed ?? null;
+            $attributes = $discussion->Attributes ?? [];
+        } else {
+            $categoryID = $discussion['CategoryID'] ?? null;
+            $insertUserID = $discussion['InsertUserID'] ?? 0;
+            $isClosed = $discussion['Closed'] ?? null;
+            $attributes = $discussion['Attributes'] ?? [];
+        }
+
+        if (CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close')) {
+            return true;
+        }
+
+        if ($isClosed && $attributes[self::CLOSED_BY_USER_ID] !== Gdn::session()->UserID) {
+            return false;
+        }
+
+        if (Gdn::session()->UserID === $insertUserID && Gdn::session()->checkPermission('Vanilla.Discussions.CloseOwn')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Determines whether or not the current user can edit a discussion.
      *
      * @param object|array $discussion The discussion to examine.
-     * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
+     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
      * @return bool Returns true if the user can edit or false otherwise.
      */
     public static function canEdit($discussion, &$timeLeft = 0) {
@@ -363,6 +440,7 @@ class DiscussionModel extends Gdn_Model {
      * @access public
      *
      * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+     * @param bool $join
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
@@ -479,8 +557,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('0', '', 'Read')
                 ->select('d.Announce', '', 'IsAnnounce');
         }
-
-        $this->addArchiveWhere($this->SQL);
 
         if ($offset !== false && $limit !== false) {
             $this->SQL->limit($limit, $offset);
@@ -716,9 +792,8 @@ class DiscussionModel extends Gdn_Model {
         $sql = $this->SQL;
 
         // Build up the base query. Self-join for optimization.
-        $sql->select('d2.*')
+        $sql->select('d.DiscussionID')
             ->from('Discussion d')
-            ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($limit, $offset);
 
         foreach ($orderBy as $field => $direction) {
@@ -765,6 +840,12 @@ class DiscussionModel extends Gdn_Model {
             $safeWheres[$this->addFieldPrefix($key)] = $value;
         }
         $sql->where($safeWheres);
+        $subQuery = $sql->getSelect(true);
+
+        $sql->reset();
+        $sql->select('d2.*')
+            ->from('Discussion d2')
+            ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
 
         // Add the UserDiscussion query.
         if (($userID = Gdn::session()->UserID) > 0) {
@@ -776,7 +857,14 @@ class DiscussionModel extends Gdn_Model {
                 ->select('w.Participated');
         }
 
-        $data = $sql->get();
+        $outerQuery = $sql->getSelect();
+        $finalQuery = str_replace(
+            '`'.$this->Database->DatabasePrefix.'_TBL_`',
+            '('.$subQuery.')',
+            $outerQuery
+        );
+
+        $data = $sql->query($finalQuery);
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -867,9 +955,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('0', '', 'Participated')
                 ->select('d.Announce', '', 'IsAnnounce');
         }
-
-        $this->addArchiveWhere($this->SQL);
-
 
         $this->SQL->limit($limit, $offset);
 
@@ -1005,11 +1090,14 @@ class DiscussionModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Massage the data on a discussion row.
+     *
+     * @param object $discussion
+     */
     public function calculate(&$discussion) {
-        $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
-
         // Fix up output
-        $discussion->Name = htmlspecialchars($discussion->Name);
+        $discussion->Name = htmlspecialchars(trim($discussion->Name) ?: t('(Untitled)'));
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
         $discussion->CanonicalUrl = $discussion->Attributes['CanonicalUrl'] ?? $discussion->Url;
@@ -1018,7 +1106,12 @@ class DiscussionModel extends Gdn_Model {
         // Join in the category.
         $category = CategoryModel::categories($discussion->CategoryID);
         if (empty($category)) {
-            $category = false;
+            $category = [
+                'Name' => '',
+                'UrlCode' => '',
+                'PermissionCategoryID' => -1,
+                'DateMarkedRead' => null,
+            ];
         }
         $discussion->Category = $category['Name'];
         $discussion->CategoryUrlCode = $category['UrlCode'];
@@ -1041,57 +1134,36 @@ class DiscussionModel extends Gdn_Model {
             $discussion->CountCommentWatch = null;
         }
 
-        // Allow for discussions to be archived
-        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
-        if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
+        // Allow for discussions to be archived.
+        if ($this->isArchived($discussion->DateLastComment)) {
             $discussion->Closed = '1';
-            if ($discussion->CountCommentWatch) {
-                $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-            } else {
-                $discussion->CountUnreadComments = 0;
-            }
-            // Allow for discussions to just be new.
-        } elseif ($discussion->CountCommentWatch === null) {
-            $discussion->CountUnreadComments = true;
+        }
 
+        // Discussions are always unread to guests. Otherwise check Read status and Unread count.
+        if (!Gdn::session()->isValid()) {
+            $discussion->Read = false;
+            $discussion->CountUnreadComments = true;
         } else {
-            $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
-        }
-
-        if (!property_exists($discussion, 'Read')) {
-            $discussion->Read = !(bool)$discussion->CountUnreadComments;
+            // If the category was marked explicitly read at some point, see if that applies here
             if ($category && !is_null($category['DateMarkedRead'])) {
-                // If the category was marked explicitly read at some point, see if that applies here
-                if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
-                    $discussion->Read = true;
+                // If the discussion hasn't been viewed or was created after the category was marked read,
+                // leave CountCountCommentWatch and DateLastViewed null. Otherwise, calculate the correct DateLastViewed.
+                if (!is_null($discussion->DateLastViewed) ||
+                    self::maxDate($category['DateMarkedRead'], $discussion->DateInserted) === $category['DateMarkedRead']) {
+                    // If it's not a newly created discussion, set DateLastViewed to whichever is most recent.
+                    $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
                 }
-
-                if ($discussion->Read) {
-                    $discussion->CountUnreadComments = 0;
-                }
             }
 
-            // Discussions are always unread to guests.
-            if (!Gdn::session()->isValid()) {
-                $discussion->Read = false;
-            }
+            list($read, $count) = $this->calculateCommentReadData(
+                $discussion->CountComments,
+                $discussion->DateLastComment,
+                $discussion->CountCommentWatch,
+                $discussion->DateLastViewed
+            );
+            $discussion->Read = $read;
+            $discussion->CountUnreadComments = $count;
         }
-
-        // Logic for incomplete comment count.
-        if ($discussion->CountCommentWatch == 0 && $dateLastViewed = val('DateLastViewed', $discussion)) {
-            $discussion->CountUnreadComments = true;
-            if (Gdn_Format::toTimestamp($dateLastViewed) >= Gdn_Format::toTimestamp($discussion->LastDate)) {
-                $discussion->CountCommentWatch = $discussion->CountComments;
-                $discussion->CountUnreadComments = 0;
-            }
-        }
-        if ($discussion->CountUnreadComments === null) {
-            $discussion->CountUnreadComments = 0;
-        } elseif ($discussion->CountUnreadComments < 0) {
-            $discussion->CountUnreadComments = 0;
-        }
-
-        $discussion->CountCommentWatch = is_numeric($discussion->CountCommentWatch) ? $discussion->CountCommentWatch : null;
 
         if ($discussion->LastUserID == null) {
             $discussion->LastUserID = $discussion->InsertUserID;
@@ -1118,25 +1190,94 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * Add SQL Where to account for archive date.
+     * Calculate if the user has read all the Comments in a discussion. If the data in the UserDiscussion Table
+     * and the Discussion Table conflict, it returns the best guess of what the read status and number of
+     * unread comments are. The data in the Discussion table
+     * is more likely to be reliable, so when in doubt, rely on that data.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param object $sql Gdn_SQLDriver
+     * @param int $discussionCommentCount Number of Comments according to the Discussion table.
+     * @param string $discussionLastCommentDate Date of the last comment according to the Discussion table.
+     * @param int|null $userReadComments Number of Comments the user has read according to the UserDiscussion table.
+     * @param string|null $userLastReadDate Date the user last viewed the discussion or marked the
+     * category read (or null), according to the UserDiscussion table.
+     * @return array Returns an array where the first item is a boolean value and the second is a int > 0 or true.
      */
-    public function addArchiveWhere($sql = null) {
-        if (is_null($sql)) {
-            $sql = $this->SQL;
-        }
+    public function calculateCommentReadData(
+        int $discussionCommentCount,
+        ?string $discussionLastCommentDate,
+        ?int $userReadComments,
+        ?string $userLastReadDate
+    ): array {
+        $discussionLastCommentDate = self::forceDateTime($discussionLastCommentDate);
+        $userLastReadDate = self::forceDateTime($userLastReadDate);
+        $isRead = true;
+        $unreadCommentCount = $discussionCommentCount - $userReadComments;
+        if ($discussionLastCommentDate > $userLastReadDate) {
+            $isRead = false;
 
-        $exclude = Gdn::config('Vanilla.Archive.Exclude');
-        if ($exclude) {
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
-            if ($archiveDate) {
-                $sql->where('d.DateLastComment >', $archiveDate);
+            // If the latest comment is later than last viewed and there are more comments read than comments
+            // or read comments is null, set unread count to 1.
+            if ($discussionCommentCount > 0 && ($userReadComments >= $discussionCommentCount) | $userReadComments === null) {
+                $unreadCommentCount = 1;
             }
         }
+
+        // If the user has viewed the discussion more recently than the last comment, but there are unread comments,
+        // and the discussion is only one page long, set unread comments to 0.
+        if ($userLastReadDate >= $discussionLastCommentDate && $unreadCommentCount >= 0) {
+            $unreadCommentCount = 0;
+        }
+
+        // If the calculated number of unread comments is negative, set it to 0.
+        if ($unreadCommentCount < 0 && $isRead) {
+            $unreadCommentCount = 0;
+        }
+
+        // If the discussion has no comments and read status is false or both user categories are null,
+        // set unread comments to true unless the discussion is archived (in which case, we don't want it showing up as new).
+        if (($discussionCommentCount === 0 && !$isRead) | ($userReadComments === null && $userLastReadDate === null)) {
+            if (!is_null($discussionLastCommentDate)) {
+                $this->isArchived($discussionLastCommentDate->format(MYSQL_DATE_FORMAT)) ? $unreadCommentCount = 0 : $unreadCommentCount = true;
+            }
+        }
+
+        return [$isRead, $unreadCommentCount];
+    }
+
+    /**
+     * Decide which of two dates is the most recent.
+     *
+     * @param string|null $dateOne
+     * @param string|null $dateTwo
+     * @return string|null Returns most recent date.
+     * @throws Exception Emits Exception in case of an error.
+     */
+    public static function maxDate(?string $dateOne, ?string $dateTwo): ?string {
+        $dateOne = self::forceDateTime($dateOne);
+        $dateTwo = self::forceDateTime($dateTwo);
+        $result = null;
+
+        if ($dateOne < $dateTwo) {
+            $result = $dateTwo;
+        } elseif (empty($dateOne) && empty($dateTwo)) {
+            $result = null;
+            return $result;
+        } else {
+            $result = $dateOne;
+        }
+
+        $maxDate = $result->format(MYSQL_DATE_FORMAT);
+        return $maxDate;
+    }
+
+    /**
+     * Add SQL Where to account for archive date.
+     *
+     * @param Gdn_SQLDriver $sql
+     * @deprecated
+     */
+    public function addArchiveWhere($sql = null) {
+        deprecated('DiscussionModel::addArchiveWhere()');
     }
 
 
@@ -1270,6 +1411,8 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Get announcement cache key.
+     *
      * @param int $categoryID Category ID,
      * @return string $key CacheKey name to be used for cache.
      */
@@ -1300,7 +1443,6 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
      * Get discussions for a user.
      *
      * Events: BeforeGetByUser
@@ -1418,6 +1560,7 @@ class DiscussionModel extends Gdn_Model {
 
     /**
      * Get all the users that have participated in the discussion.
+     *
      * @param int $discussionID
      * @return Gdn_DataSet
      */
@@ -1839,7 +1982,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get views fallback.
      *
      * @param int $discussionID
      * @return mixed|null
@@ -1957,16 +2100,22 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'plainTextLength');
             }
 
-            // Add min length if body is required.
-            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
-                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+            if ($minCommentLength && is_numeric($minCommentLength)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
                 $this->Validation->applyRule('Body', 'MinTextLength');
+            } else {
+                // Add min length if body is required.
+                if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                    $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                    $this->Validation->applyRule('Body', 'MinTextLength');
+                }
             }
         }
 
@@ -2097,9 +2246,9 @@ class DiscussionModel extends Gdn_Model {
                     // Updating
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
 
-                    // Block Format change if we're forcing the formatter.
+                    // Make sure that the discussion get formatted in the method defined by Garden.
                     if (c('Garden.ForceInputFormatter')) {
-                        unset($fields['Format']);
+                        $fields['Format'] = Gdn::config('Garden.InputFormatter', '');
                     }
 
                     $isValid = true;
@@ -2142,10 +2291,6 @@ class DiscussionModel extends Gdn_Model {
                     // Inserting.
                     if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
                         $fields['Format'] = c('Garden.InputFormatter', '');
-                    }
-
-                    if (c('Vanilla.QueueNotifications')) {
-                        $fields['Notified'] = ActivityModel::SENT_PENDING;
                     }
 
                     // Check for approval
@@ -2216,6 +2361,12 @@ class DiscussionModel extends Gdn_Model {
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
 
+                $discussionEvent = $this->eventFromRow(
+                    (array)$discussion,
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
+                );
+                $this->getEventManager()->dispatch($discussionEvent);
+
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
@@ -2228,6 +2379,28 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Generate a discussion event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return DiscussionEvent
+     */
+    private function eventFromRow(array $row, string $action): DiscussionEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+
+        $userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
+        $discussion = $this->normalizeRow($row, true);
+        $discussion = $this->schema()->validate($discussion);
+        $result = new DiscussionEvent(
+            $action,
+            ["discussion" => $discussion]
+        );
+        return $result;
+    }
+
+    /**
+     * Notify users of new discussions.
      *
      * @param int|array|stdClass $discussion
      * @param ActivityModel $activityModel
@@ -2277,13 +2450,17 @@ class DiscussionModel extends Gdn_Model {
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
-            ]
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $format,
+                    "Story" => $body,
+                ],
+            ],
         ];
 
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowDiscussionBody", false)) {
-            $data["Story"] = $body;
-            $data["Format"] = $format;
+        if (!Gdn::config("Vanilla.Email.FullPost")) {
+            $data["Ext"]["Email"] = $activityModel->setStoryExcerpt($data["Ext"]["Email"]);
         }
 
         // Notify all of the users that were mentioned in the discussion.
@@ -2317,11 +2494,9 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments["Activity"] = $data;
 
         // Notify everyone that has advanced notifications.
-        if (!c("Vanilla.QueueNotifications")) {
-            $advancedActivity = $data;
-            $advancedActivity["Data"]["Reason"] = "advanced";
-            $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-        }
+        $advancedActivity = $data;
+        $advancedActivity["Data"]["Reason"] = "advanced";
+        $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
 
         // Throw an event for users to add their own events.
         $this->EventArguments["Discussion"] = $discussion;
@@ -2416,15 +2591,8 @@ class DiscussionModel extends Gdn_Model {
     public function updateDiscussionCount($categoryID, $discussion = false) {
         $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
-            $exclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-            $archiveDate = Gdn::config('Vanilla.Archive.Date');
             $params = [];
             $where = '';
-
-            if ($exclude && $archiveDate) {
-                $where = 'where d.DateLastComment > :ArchiveDate';
-                $params[':ArchiveDate'] = $archiveDate;
-            }
 
             // Update all categories.
             $sql = "update :_Category c
@@ -2450,8 +2618,6 @@ class DiscussionModel extends Gdn_Model {
                 ->select('d.CountComments', 'sum', 'CountComments')
                 ->from('Discussion d')
                 ->where('d.CategoryID', $categoryID);
-
-            $this->addArchiveWhere();
 
             $data = $this->SQL->get()->firstRow();
             $countDiscussions = (int)getValue('CountDiscussions', $data, 0);
@@ -2900,6 +3066,12 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
+        if ($data) {
+            $dataObject = (object)$data;
+            $this->calculate($dataObject);
+            $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($discussionEvent);
+        }
         return true;
     }
 
@@ -2957,6 +3129,24 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Tests whether a user has permission to view a specific discussion, with consideration for mod permissions.
+     *
+     * @param object $discussion
+     * @return bool whether the user can view a discussion.
+     */
+    public function canViewDiscussion($discussion): bool {
+        $canViewDiscussion = false;
+        $session = $this->sessionInterface;
+        $userID = $session->UserID;
+        $canView = $this->canView($discussion, $userID);
+        $isModerator = $session->checkRankedPermission('Garden.Moderation.Manage');
+        if ($canView || $isModerator) {
+            $canViewDiscussion = true;
+        }
+        return $canViewDiscussion;
+    }
+
+    /**
      * Tests whether a user has permission for a discussion by checking category-specific permissions.
      *
      * Fires an event that can override the calculated permission.
@@ -2994,7 +3184,7 @@ class DiscussionModel extends Gdn_Model {
             $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, $categoryID, $permission);
         }
         // Check if we've timed out.
-        if (strpos(strtolower($permission), 'edit' !== false)) {
+        if (strpos(strtolower($permission), 'edit') !== false) {
             $hasPermission &= self::editContentTimeout($discussion);
         }
         // Fire event to override permission ruling.
@@ -3089,6 +3279,37 @@ class DiscussionModel extends Gdn_Model {
             );
             return '';
         }
+    }
+
+    /**
+     * Get the auto-archive date for discussions.
+     *
+     * @return DateTimeInterface|null
+     */
+    public function getArchiveDate(): ?DateTimeInterface {
+        return $this->archiveDate;
+    }
+
+    /**
+     * Set the archive date.
+     *
+     * @param DateTimeInterface|string $archiveDate A datetime or a string that can be converted to a date.
+     */
+    public function setArchiveDate($archiveDate): void {
+        if (empty($archiveDate)) {
+            $archiveDate = null;
+        } elseif (is_string($archiveDate)) {
+            $utc = new DateTimeZone('UTC');
+            $now = new DateTimeImmutable('now', $utc);
+            $archiveDate = new DateTimeImmutable($archiveDate, $utc);
+            if ($archiveDate > $now) {
+                // The date is in the future. Assume the user entered something like '3 days' instead of '-3 days'.
+                $archiveDate = $now->sub($now->diff($archiveDate));
+            }
+        } elseif (!($archiveDate instanceof DateTimeInterface)) {
+            throw new \InvalidArgumentException("DiscussionModel::setArchiveDate() expects a string or DateTimeInterface");
+        }
+        $this->archiveDate = $archiveDate;
     }
 
     /**
@@ -3383,6 +3604,60 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        $row['Announce'] = (bool)$row['Announce'];
+        $row['Url'] = discussionUrl($row);
+        $this->formatField($row, "Body", $row["Format"]);
+        $row['Attributes'] = new Attributes($row['Attributes']);
+
+        if (array_key_exists("Bookmarked", $row)) {
+            $row["Bookmarked"] = (bool)$row["Bookmarked"];
+        }
+
+        if (ModelUtils::isExpandOption('lastPost', $expand)) {
+            $lastPost = [
+                'discussionID' => $row['DiscussionID'],
+                'dateInserted' => $row['DateLastComment'],
+                "insertUserID" => $row["LastUserID"],
+            ];
+            if ($row['LastCommentID']) {
+                $lastPost['CommentID'] = $row['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $row['Name']);
+                $lastPost['url'] = commentUrl($lastPost, true);
+            } else {
+                $lastPost['name'] = $row['Name'];
+                $lastPost['url'] = $row['Url'];
+            }
+
+            if (ModelUtils::isExpandOption('lastPost.insertUser', $expand) || ModelUtils::isExpandOption('lastUser', $expand) && array_key_exists('LastUser', $row)) {
+                $lastPost['insertUser'] = $row['LastUser'];
+                if (!ModelUtils::isExpandOption('lastUser', $expand)) {
+                    unset($row['LastUser']);
+                }
+            }
+
+            $row['lastPost'] = $lastPost;
+        }
+
+        // This shouldn't be necessary, but the db allows nulls for dateLastComment.
+        if (empty($row['DateLastComment'])) {
+            $row['DateLastComment'] = $row['DateInserted'];
+        }
+
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
+
+        return $result;
+    }
+
+    /**
      * Method to prevent encoding data twice.
      *
      * DiscussionModel::calculate applies htmlspecialchars to discussion name which could conflict when
@@ -3398,5 +3673,228 @@ class DiscussionModel extends Gdn_Model {
             $row['Name'] = htmlspecialchars_decode($row['Name']);
         }
         return $row;
+    }
+
+    /**
+     * Determine whether or not the discussion is archived based on its last comment date.
+     *
+     * @param string|null $dateLastComment
+     * @return bool
+     */
+    public function isArchived($dateLastComment): bool {
+        if (empty($dateLastComment) || $this->getArchiveDate() === null) {
+            return false;
+        }
+        try {
+            $dt = new DateTimeImmutable($dateLastComment, $this->getArchiveDate()->getTimezone());
+        } catch (\Exception $ex) {
+            trigger_error('DiscussionModel::isArchived() got an invalid dateLastComment.', E_USER_WARNING);
+            return false;
+        }
+        if ($dt < $this->getArchiveDate()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get a schema instance comprised of standard discussion fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'discussionID:i' => 'The ID of the discussion.',
+            'type:s|n' => [
+                'description' => 'The type of this discussion if any.',
+            ],
+            'name:s' => 'The title of the discussion.',
+            'body:s' => 'The body of the discussion.',
+            'categoryID:i' => 'The category the discussion is in.',
+            'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'dateLastComment:dt|n' => 'When the last comment was posted.',
+            'insertUserID:i' => 'The user that created the discussion.',
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
+            'pinLocation:s|n' => [
+                'enum' => ['category', 'recent'],
+                'description' => 'The location for the discussion, if pinned. '
+                    . '"category" are pinned to their own category. '
+                    . '"recent" are pinned to the recent discussions list, as well as their own category.',
+            ],
+            'closed:b' => 'Whether the discussion is closed or open.',
+            'sink:b' => 'Whether or not the discussion has been sunk.',
+            'countComments:i' => 'The number of comments on the discussion.',
+            'countViews:i' => 'The number of views on the discussion.',
+            'score:i|n' => 'Total points associated with this post.',
+            'url:s?' => 'The full URL to the discussion.',
+            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
+            'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
+        ]);
+        return $result;
+    }
+
+    /**
+     * Get a schema representing ser-specific discussion fields.
+     *
+     * @return Schema
+     */
+    public function userDiscussionSchema(): Schema {
+        $result = Schema::parse([
+            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
+        ]);
+        return $result;
+    }
+
+    /**
+     * Decide whether to update a record, insert a new record, or do nothing.
+     *
+     * @param object|array $discussion Discussion being watched.
+     * @param int $limit Max number to get.
+     * @param int $offset Number to skip.
+     * @param int $totalComments Total in entire discussion (hard limit).
+     * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
+     * @return array Returns a 3-item array of types int, string|null, string|null.
+     * @throws Exception Throws an exception if given an invalid timestamp.
+     */
+    public function calculateWatch($discussion, int $limit, int $offset, int $totalComments, ?string $maxDateInserted) {
+        $newComments = false;
+        // Max comments we could have seen.
+        $countWatch = $limit + $offset;
+        // If the conversation doesn't have any comments, use the date the discussion started.
+        $maxDateInserted = is_null($maxDateInserted) ? $discussion->DateInserted : $maxDateInserted;
+//        $dateLastViewed = self::maxDate($discussion->DateLastViewed, $maxDateInserted);
+        if ($countWatch > $totalComments) {
+            $countWatch = $totalComments;
+        }
+
+        // This discussion looks familiar...
+        if ($discussion->CountCommentWatch > 0 | !is_null($discussion->DateLastViewed)) {
+            if ($countWatch < $discussion->CountCommentWatch) {
+                $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
+            }
+
+            if (isset($discussion->DateLastViewed)) {
+                $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
+            }
+
+            if ($totalComments > $discussion->CountCommentWatch || $countWatch != $discussion->CountCommentWatch) {
+                $newComments = true;
+            }
+
+            $operation = $newComments ? 'update' : null;
+        } else {
+            $operation = 'insert';
+        }
+
+        $dateLastViewed = self::maxDate($discussion->DateLastViewed, $maxDateInserted);
+
+        return [$countWatch, $dateLastViewed, $operation];
+    }
+
+    /**
+     * Record the user's watch data.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param object|array $discussion Discussion being watched.
+     * @param int $limit Max number to get.
+     * @param int $offset Number to skip.
+     * @param int $totalComments Total in entire discussion (hard limit).
+     * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
+     * @throws Exception Throws an exception if given an invalid timestamp.
+     */
+    public function setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted = null) {
+        $userID = Gdn::session()->UserID;
+        if (!$userID) {
+            return;
+        }
+
+        list($countWatch, $dateLastViewed, $op) = $this->calculateWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
+
+        switch ($op) {
+            case 'update':
+                $this->SQL->put(
+                    'UserDiscussion',
+                    [
+                        'CountComments' => $countWatch,
+                        'DateLastViewed' => $dateLastViewed,
+                    ],
+                    [
+                        'UserID' => $userID,
+                        'DiscussionID' => $discussion->DiscussionID,
+                    ]
+                );
+                break;
+            case 'insert':
+                // Insert watch data.
+                $this->SQL->options('Ignore', true);
+                $this->SQL->insert(
+                    'UserDiscussion',
+                    [
+                        'UserID' => $userID,
+                        'DiscussionID' => $discussion->DiscussionID,
+                        'CountComments' => $countWatch,
+                        'DateLastViewed' => $dateLastViewed,
+                    ]
+                );
+                break;
+        }
+
+        // If there is a discrepancy between $countWatch and $discussion->CountCommentWatch,
+        // update CountCommentWatch with the correct value.
+        $discussion->CountCommentWatch = $countWatch;
+
+        /**
+         * Fuzzy way of trying to automatically mark a category read again
+         * if the user reads all the comments on the first few pages.
+         */
+
+        // If this discussion is in a category that has been marked read,
+        // check if reading this thread causes it to be completely read again.
+        $categoryID = $discussion->CategoryID;
+        if (!$categoryID) {
+            return;
+        }
+        $category = CategoryModel::categories($categoryID);
+        if (!$category) {
+            return;
+        }
+        $wheres = ['CategoryID' => $categoryID];
+        $dateMarkedRead = $category['DateMarkedRead'];
+        if ($dateMarkedRead) {
+            $wheres['DateLastComment>'] = $dateMarkedRead;
+        }
+        // Fuzzy way of looking back about 2 pages into the past.
+        $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
+
+        // Find all discussions with content from after DateMarkedRead.
+        $discussionModel = new DiscussionModel();
+        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
+        unset($discussionModel);
+
+        // Abort if we get back as many as we asked for, meaning a
+        // lot has happened.
+        if ($discussions->numRows() > $lookBackCount) {
+            return;
+        }
+
+        // Loop over these discussions and exit if there are any unread discussions
+        while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
+            if (!$discussion['Read']) {
+                return;
+            }
+        }
+
+        // Mark this category read if all the new content is read.
+        $categoryModel = new CategoryModel();
+        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
+        unset($categoryModel);
     }
 }

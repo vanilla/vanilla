@@ -22,7 +22,7 @@ class SSOAuthenticatorTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         /** @var AuthenticatorModel $authenticatorModel */
@@ -32,7 +32,7 @@ class SSOAuthenticatorTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Gdn_SQLDriver $driver */
         $driver = self::container()->get('SqlDriver');
         $driver->truncate('UserAuthenticationProvider');

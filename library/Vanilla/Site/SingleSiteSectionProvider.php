@@ -30,49 +30,16 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getAll(): array {
         return [$this->defaultSite];
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getByID(int $id): ?SiteSectionInterface {
-        if ($id === $this->defaultSite->getSectionID()) {
-            return $this->defaultSite;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getByBasePath(string $basePath): ?SiteSectionInterface {
-        if ($basePath === $this->defaultSite->getBasePath()) {
-            return $this->defaultSite;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getForLocale(string $localeKey): array {
-        if ($localeKey === $this->defaultSite->getContentLocale()) {
-            return [$this->defaultSite];
-        } else {
-            return [];
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrentSiteSection(): SiteSectionInterface {
-        return $this->defaultSite;
+    public function getCurrentSiteSection(): ?SiteSectionInterface {
+        return null;
     }
 }

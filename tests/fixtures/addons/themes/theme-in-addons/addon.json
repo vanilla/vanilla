@@ -1,0 +1,11 @@
+{
+    "key": "theme-in-addons",
+    "name": "Theme in the addons directory",
+    "type": "theme",
+    "assets": {
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        }
+    }
+}

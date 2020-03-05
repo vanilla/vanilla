@@ -11,23 +11,32 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Formatting\FormatService;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\SchemaFactory;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\UASniffer;
+use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -46,6 +55,10 @@ class Bootstrap {
      */
     public function __construct($baseUrl) {
         $this->baseUrl = str_replace('\\', '/', $baseUrl);
+        if (!defined('CLIENT_NAME')) {
+            define('CLIENT_NAME', 'vanilla');
+        }
+
     }
 
 
@@ -112,9 +125,29 @@ class Bootstrap {
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 
+            ->rule(SiteSectionProviderInterface::class)
+            ->setFactory(function () {
+                return MockSiteSectionProvider::fromLocales();
+            })
+            ->setShared(true)
+
             // Site sections
-            ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(SingleSiteSectionProvider::class)
+            ->rule(SiteSectionModel::class)
+            ->addCall('addProvider', [new Reference(SiteSectionProviderInterface::class)])
+            ->setShared(true)
+
+            // Translation model
+            ->rule(\Vanilla\Site\TranslationModel::class)
+            ->addCall('addProvider', [new Reference(\Vanilla\Site\TranslationProvider::class)])
+            ->setShared(true)
+
+            // Site applications
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->setClass(\Vanilla\Site\ApplicationProvider::class)
+            ->addCall('add', [new Reference(
+                \Vanilla\Site\Application::class,
+                ['garden', ['api', 'entry', 'sso', 'utility']]
+            )])
             ->setShared(true)
 
             // AddonManager
@@ -122,15 +155,18 @@ class Bootstrap {
             ->setShared(true)
             ->setConstructorArgs([
                 [
-                    Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                    Addon::TYPE_THEME => '/themes',
+                    Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+                    Addon::TYPE_THEME => ['/addons/themes', '/themes'],
                     Addon::TYPE_LOCALE => '/locales'
                 ],
-                PATH_CACHE
+                PATH_ROOT.'/tests/cache/bootstrap'
             ])
             ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
+
+            ->rule(ThemeFeatures::class)
+            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
             // ApplicationManager
             ->rule(\Gdn_ApplicationManager::class)
@@ -157,6 +193,9 @@ class Bootstrap {
 
             // EventManager
             ->rule(\Garden\EventManager::class)
+            ->addAlias(EventListenerConfigInterface::class)
+            ->addAlias(EventDispatcherInterface::class)
+            ->addAlias(ListenerProviderInterface::class)
             ->setShared(true)
 
             ->rule(InjectableInterface::class)
@@ -166,6 +205,9 @@ class Bootstrap {
             ->setShared(true)
             ->addAlias('Request')
             ->addAlias(RequestInterface::class)
+
+            ->rule(UASnifferInterface::class)
+            ->setClass(UASniffer::class)
 
             // Database.
             ->rule('Gdn_Database')
@@ -185,6 +227,9 @@ class Bootstrap {
             ->addAlias('Gdn_MySQLDriver')
             ->addAlias('MySQLDriver')
             ->addAlias(Gdn::AliasSqlDriver)
+
+            ->rule(\Vanilla\Contracts\Models\UserProviderInterface::class)
+            ->setClass(\UserModel::class)
 
             // Locale
             ->rule(\Gdn_Locale::class)
@@ -225,6 +270,10 @@ class Bootstrap {
             ->rule(SearchModel::class)
             ->setShared(true)
 
+            // File base theme api provider
+            ->rule(\Vanilla\Models\ThemeModel::class)
+            ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
             ->rule(SSOModel::class)
             ->setShared(true)
 
@@ -241,6 +290,7 @@ class Bootstrap {
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
@@ -294,6 +344,13 @@ class Bootstrap {
 
             ->rule('HtmlFormatter')
             ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
+
+            ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
+            ->setClass(\VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
+            ->addCall('addDriver', [\Vanilla\Scheduler\Driver\LocalDriver::class])
+            ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+            ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
             ->setShared(true)
             ;
     }
@@ -378,17 +435,36 @@ class Bootstrap {
     public function setGlobals(Container $container) {
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
-        $_SERVER['X_REWRITE'] = true;
-        $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
-        $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
-        $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;
-        $_SERVER['SCRIPT_NAME'] = parse_url($baseUrl, PHP_URL_PATH);
-        $_SERVER['PATH_INFO'] = '';
-        $_SERVER['HTTPS'] = parse_url($baseUrl, PHP_URL_SCHEME) === 'https';
 
+        $this->setServerGlobal('X_REWRITE', true);
+        $this->setServerGlobal('REMOTE_ADDR', '::1'); // Simulate requests from local IPv6 address.
+        $this->setServerGlobal('HTTP_HOST', parse_url($baseUrl, PHP_URL_HOST));
+        $this->setServerGlobal('SERVER_PORT', parse_url($baseUrl, PHP_URL_PORT) ?: null);
+        $this->setServerGlobal('SCRIPT_NAME', parse_url($baseUrl, PHP_URL_PATH));
+        $this->setServerGlobal('PATH_INFO', '');
+        $this->setServerGlobal('HTTPS', parse_url($baseUrl, PHP_URL_SCHEME) === 'https');
 
         $GLOBALS['dic'] = $container;
         Gdn::setContainer($container);
+    }
+
+    /**
+     * Set a `$_SERVER` global variable and backup its previous value.
+     *
+     * @param string $key The key to set.
+     * @param mixed $value The new value.
+     * @return mixed Returns the previous value.
+     */
+    private function setServerGlobal(string $key, $value) {
+        if (empty($_SERVER['__BAK'][$key]) && array_key_exists($key, $_SERVER)) {
+            if (!array_key_exists('__BAK', $_SERVER)) {
+                $_SERVER['__BAK'] = [];
+            }
+
+            $_SERVER['__BAK'][$key] = $_SERVER[$key];
+        }
+        $r = $_SERVER[$key] = $value;
+        return $r;
     }
 
     /**
@@ -402,6 +478,13 @@ class Bootstrap {
     public static function cleanup(Container $container) {
         self::cleanUpContainer($container);
         self::cleanUpGlobals();
+
+        if (!empty($_SERVER['__BAK']) && is_array($_SERVER['__BAK'])) {
+            foreach ($_SERVER['__BAK'] as $key => $value) {
+                $_SERVER[$key] = $value;
+            }
+            unset($_SERVER['__BAK']);
+        }
     }
 
     /**
@@ -430,6 +513,9 @@ class Bootstrap {
         if (class_exists(\CategoryModel::class)) {
             \CategoryModel::$Categories = null;
         }
+
+        SchemaFactory::setContainer(null);
+        SchemaFactory::setEventManager(null);
 
         unset($GLOBALS['dic']);
         Gdn::setContainer(new NullContainer());

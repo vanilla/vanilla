@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { Configuration } from "webpack";
+import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
 // tslint:disable
@@ -32,6 +32,10 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
     baseConfig.optimization = {
         splitChunks: false,
     };
-    // baseConfig.plugins!.push(new TSDocgenPlugin());
+    baseConfig.plugins?.push(
+        new webpack.DefinePlugin({
+            ["process.env.NODE_ENV"]: "'test'",
+        }),
+    );
     return merge(baseStorybookConfig, baseConfig as any);
 }

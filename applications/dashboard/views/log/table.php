@@ -38,7 +38,7 @@ include $this->fetchViewLocation('helper_functions');
                 } elseif ($Row['Operation'] === 'Delete') {
                     switch (strtolower($Row['RecordType'])) {
                         case 'comment':
-                            $Url = "/discussion/{$Row['ParentRecordID']}/x/p1";
+                            $Url = "/log/filter?recordType=comment&recordID={$Row['RecordID']}";
                     }
                 }
 
@@ -63,7 +63,7 @@ include $this->fetchViewLocation('helper_functions');
                             echo $authorBlock;
                         }
 
-                        echo '<div class="post-content userContent Expander">', $this->formatContent($Row), '</div>';
+                        echo '<div class="post-content js-collapsable" data-className="userContent">', $this->formatContent($Row), '</div>';
 
                         // Write the other record counts.
 

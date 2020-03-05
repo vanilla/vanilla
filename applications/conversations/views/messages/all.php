@@ -21,7 +21,7 @@ echo '</div>';
     <div class="DataListWrap">
         <ul class="Condensed DataList Conversations">
             <?php
-            if (count($this->data('Conversations') > 0)):
+            if (count($this->data('Conversations')) > 0):
                 $ViewLocation = $this->fetchViewLocation('conversations');
                 include $ViewLocation;
             else:

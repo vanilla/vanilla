@@ -26,7 +26,7 @@ class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new ImgurEmbedFactory($this->httpClient);

@@ -32,10 +32,11 @@ foreach ($this->data('Conversations') as $Conversation) {
     $CssClass .= ' '.($Conversation->CountNewMessages <= 0 ? 'Read' : 'Unread');
 
     $JumpToItem = $Conversation->CountMessages - $Conversation->CountNewMessages;
-    $Message = (sliceString(Gdn::formatService()->renderExcerpt($Conversation->LastBody, $Conversation->LastFormat), 100));
 
-    if (stringIsNullOrEmpty(trim($Message))) {
+    if (stringIsNullOrEmpty(trim($Conversation->LastBody))) {
         $Message = t('Blank Message');
+    } else {
+        $Message = (sliceString(Gdn::formatService()->renderExcerpt($Conversation->LastBody, $Conversation->LastFormat), 100));
     }
 
     $this->EventArguments['Conversation'] = $Conversation;

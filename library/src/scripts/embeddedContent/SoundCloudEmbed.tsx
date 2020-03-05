@@ -23,8 +23,8 @@ export function SoundCloudEmbed(props: IProps): JSX.Element {
     const frameSource = soundCloudPlayerUrl(props);
 
     return (
-        <EmbedContainer inEditor={props.inEditor}>
-            <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+        <EmbedContainer>
+            <EmbedContent type={props.embedType}>
                 <div className="embedExternal embedSoundCloud">
                     <div className="embedExternal-content">
                         <iframe width="100%" scrolling="no" src={frameSource} />

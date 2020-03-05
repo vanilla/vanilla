@@ -37,7 +37,7 @@ class ModerationControllerTest extends BaseTest {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$api->saveToConfig([
             'Garden.Registration.Method' => 'Basic',

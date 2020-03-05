@@ -989,7 +989,8 @@ $(document).on('contentLoad', function(e) {
             '.avatar-delete-input',
             '.jcrop-keymgr',
             '.checkbox-painted-wrapper input',
-            '.radio-painted-wrapper input'
+            '.radio-painted-wrapper input',
+            '.exclude-icheck',
         ];
 
         var selector = 'input';
@@ -1248,7 +1249,7 @@ $(document).on('contentLoad', function(e) {
             filename = filename.substring(12);
         }
         if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
+            $(this).parent().find('.file-upload-choose').text(filename);
         }
     });
 

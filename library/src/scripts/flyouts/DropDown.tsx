@@ -19,6 +19,8 @@ import classNames from "classnames";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
 import { props } from "bluebird";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -34,7 +36,7 @@ interface IOpenDirectionProps {
     renderLeft?: boolean; // @deprecated
 }
 
-export interface IProps extends IOpenDirectionProps {
+export interface IDropDownProps extends IOpenDirectionProps {
     name?: string;
     children: React.ReactNode;
     className?: string;
@@ -51,10 +53,13 @@ export interface IProps extends IOpenDirectionProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
+    mobileTitle?: string;
     flyoutType: FlyoutType;
     selfPadded?: boolean;
     isSmall?: boolean;
     id?: string;
+    horizontalOffset?: boolean;
+    tag?: string;
 }
 
 export enum FlyoutType {
@@ -69,12 +74,13 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-export default function DropDown(props: IProps) {
+export default function DropDown(props: IDropDownProps) {
     const ownID = useUniqueID("dropDown");
     const id = props.id || ownID;
     const device = useDevice();
 
     const { title } = props;
+    const mobileTitle = props.mobileTitle ?? title;
     const classesDropDown = dropDownClasses();
     const classesFrameHeader = frameHeaderClasses();
     const classes = dropDownClasses();
@@ -98,6 +104,7 @@ export default function DropDown(props: IProps) {
             onVisibilityChange={props.onVisibilityChange}
             openAsModal={openAsModal}
             initialFocusElement={props.initialFocusElement}
+            tag={props.tag}
         >
             {params => {
                 return (
@@ -121,41 +128,14 @@ export default function DropDown(props: IProps) {
                                 ? DropDownContentSize.MEDIUM
                                 : DropDownContentSize.SMALL
                         }
+                        horizontalOffset={props.horizontalOffset}
                     >
-                        {title ? (
-                            <header className={classNames("frameHeader", classesFrameHeader.root)}>
-                                {openAsModal && (
-                                    <FlexSpacer
-                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
-                                    />
-                                )}
-                                {openAsModal && (
-                                    <SmartAlign>
-                                        (
-                                        <Heading
-                                            title={title}
-                                            className={classNames(
-                                                "dropDown-title",
-                                                classesDropDown.title,
-                                                classes.title,
-                                            )}
-                                        />
-                                    </SmartAlign>
-                                )}
-
-                                {!openAsModal && (
-                                    <Heading
-                                        title={title}
-                                        className={classNames("dropDown-title", classesDropDown.title, classes.title)}
-                                    />
-                                )}
-
-                                <CloseButton
-                                    className={classNames(classesFrameHeader.action, classesFrameHeader.categoryIcon)}
-                                    onClick={params.closeMenuHandler}
-                                />
-                            </header>
-                        ) : null}
+                        {!openAsModal && title && <FrameHeader title={title} closeFrame={params.closeMenuHandler} />}
+                        {openAsModal && mobileTitle && (
+                            <FrameHeaderMinimal onClose={params.closeMenuHandler}>
+                                {mobileTitle ?? title}
+                            </FrameHeaderMinimal>
+                        )}
                         <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
                     </DropDownContents>
                 );

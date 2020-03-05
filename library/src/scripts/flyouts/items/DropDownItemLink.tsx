@@ -11,14 +11,16 @@ import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import React from "react";
+import { CheckIcon, DropDownMenuIcon } from "@library/icons/common";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
     name?: string;
-    isModalLink?: boolean;
     children?: React.ReactNode;
     className?: string;
     lang?: string;
+    isCurrent?: boolean;
+    isActive?: boolean;
 }
 
 /**
@@ -26,15 +28,19 @@ export interface IDropDownItemLink {
  */
 export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
-        const { children, name, isModalLink, className, to } = this.props;
+        const { children, name, className, to } = this.props;
         const linkContents = children ? children : name;
-        const LinkComponent = isModalLink ? ModalLink : SmartLink;
-        const classesDropDown = dropDownClasses();
+        const classes = dropDownClasses();
         return (
-            <DropDownItem className={classNames(className, classesDropDown.item)}>
-                <LinkComponent to={to} title={name} lang={this.props.lang} className={classesDropDown.action}>
+            <DropDownItem className={classNames(className, classes.item)}>
+                <SmartLink
+                    to={to}
+                    title={name}
+                    lang={this.props.lang}
+                    className={classNames(classes.action, this.props.isActive && classes.actionActive)}
+                >
                     {linkContents}
-                </LinkComponent>
+                </SmartLink>
             </DropDownItem>
         );
     }

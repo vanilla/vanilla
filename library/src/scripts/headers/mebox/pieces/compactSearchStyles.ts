@@ -5,31 +5,160 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit, modifyColorBasedOnLightness, IButtonStates } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, px } from "csx";
+import { ColorHelper, important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { SearchBarPresets } from "@library/banner/bannerStyles";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
-    const makeVars = variableFactory("compactSearch");
-    const titleBarVars = titleBarVariables();
     const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("compactSearch");
+    const titleBarVars = titleBarVariables();
+    const formElVars = formElementsVariables();
+    const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPresets.TRANSPARENT });
+    const searchInputOptions = makeThemeVars("searchInputOptions", { preset: SearchBarPresets.NO_BORDER });
 
-    const baseColor = titleBarVars.colors.bg.darken(0.05);
-    const colors = makeVars("colors", {
-        bg: baseColor.fade(0.8),
-        fg: titleBarVars.colors.fg,
+    const isUnifiedBorder = searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER;
+    const isTransparentButton = searchButtonOptions.preset === ButtonPresets.TRANSPARENT;
+    const isSolidButton = searchButtonOptions.preset === ButtonPresets.SOLID || isUnifiedBorder; // force solid button when using unified border
+
+    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
+    if (titleBarVars.colors.bgImage !== null) {
+        // If we have a BG image, make sure we have some opacity so it shines through.
+        baseColor = baseColor.fade(0.3);
+    }
+    // Main colors
+    const colors = makeThemeVars("colors", {
+        primary: globalVars.mainColors.primary,
+        secondary: globalVars.mainColors.secondary,
+        contrast: globalVars.elementaryColors.white,
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+        borderColor: globalVars.mainColors.fg.fade(0.4),
         placeholder: titleBarVars.colors.fg.fade(0.8),
         active: {
             bg: baseColor,
         },
     });
 
-    return { colors };
+    const isContrastLight = colors.contrast.lightness() >= 0.5;
+    const backgrounds = makeThemeVars("backgrounds", {
+        useOverlay: false,
+        overlayColor: isContrastLight
+            ? globalVars.elementaryColors.black.fade(0.3)
+            : globalVars.elementaryColors.white.fade(0.3),
+    });
+
+    const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.primary;
+    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
+    const fgColor = isTransparentButton ? colors.contrast : colors.fg;
+    const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
+
+    const inputAndButton = makeThemeVars("inputAndButton", {
+        borderRadius: globalVars.border.radius,
+    });
+
+    const searchBar = makeThemeVars("searchBar", {
+        sizing: {
+            height: formElVars.giantInput.height,
+            width: 705,
+        },
+        font: {
+            color: colors.fg,
+            size: formElVars.giantInput.fontSize,
+        },
+        border: {
+            leftColor: isTransparentButton ? colors.contrast : colors.borderColor,
+            width: globalVars.border.width,
+        },
+    });
+
+    const searchButton: IButtonType = makeThemeVars("searchButton", {
+        name: "heroSearchButton",
+        spinnerColor: colors.contrast,
+        colors: {
+            fg: fgColor,
+            bg: bgColor,
+        },
+        borders: {
+            ...(isTransparentButton
+                ? {
+                      color: colors.contrast,
+                      width: 1,
+                  }
+                : { color: colors.bg, width: 0 }),
+            left: {
+                color: searchBar.border.leftColor,
+                width: searchBar.border.width,
+            },
+            radius: {
+                left: important(0),
+                right: important(unit(inputAndButton.borderRadius) as string),
+            },
+        },
+        fonts: {
+            color: fgColor,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+        },
+        hover: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        active: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        focus: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                fg: colors.contrast,
+                bg: bgColorActive,
+            },
+            borders: {
+                color: activeBorderColor,
+            },
+            fonts: {
+                color: colors.contrast,
+            },
+        },
+    });
+
+    return { colors, inputAndButton, searchBar, searchButton, backgrounds };
 });
+
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementsVars = formElementsVariables();
@@ -49,11 +178,7 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
-            },
-            ".hasFocus .searchBar-valueContainer": {
-                backgroundColor: colorOut(vars.colors.active.bg),
             },
             ".searchBar__placeholder": {
                 color: colorOut(vars.colors.placeholder),
@@ -101,6 +226,7 @@ export const compactSearchClasses = useThemeCache(() => {
     });
 
     const searchAndResults = style("searchAndResults", {
+        flex: 1,
         position: "relative",
         width: percent(100),
         height: unit(formElementsVars.sizing.height),

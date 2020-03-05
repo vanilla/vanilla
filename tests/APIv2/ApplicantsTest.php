@@ -39,7 +39,7 @@ class ApplicantsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get('Config');
@@ -51,11 +51,11 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * Approving a user application.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The applicant specified is already an active user.
      */
     public function testApprove() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The applicant specified is already an active user.');
+
         $row = $this->testPost();
 
         // This user isn't in the Member role...
@@ -83,12 +83,12 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * Approving a user application.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Applicant not found.
      */
     public function testDecline() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Applicant not found.');
+
         $row = $this->testPost();
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}",

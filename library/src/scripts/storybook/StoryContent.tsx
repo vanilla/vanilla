@@ -7,6 +7,7 @@
 import React, { useEffect } from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { clearUniqueIDCache } from "@library/utility/idUtils";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 
 export interface IStoryHeadingProps {
     depth?: number;
@@ -24,5 +25,9 @@ export function StoryContent(props: IStoryHeadingProps) {
     }, []);
 
     const classes = storyBookClasses();
-    return <div className={classes.content}>{props.children}</div>;
+    return (
+        <DeviceProvider>
+            <div className={classes.content}>{props.children}</div>
+        </DeviceProvider>
+    );
 }

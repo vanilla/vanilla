@@ -7,62 +7,21 @@
 
 namespace Vanilla\Web;
 
-use Gdn_Upload;
+use Garden\Web\Exception\HttpException;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Navigation\Breadcrumb;
-use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\JsInterpop\PhpAsJsVariable;
-use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
  * Class representing a single page in the application.
  */
-abstract class Page implements InjectableInterface, CustomExceptionHandler {
+abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface {
 
-    use TwigRenderTrait, ReduxActionPreloadTrait;
-
-    /** @var string */
-    private $canonicalUrl;
-
-    /** @var string */
-    private $favIcon;
-
-    /** @var string */
-    private $seoTitle;
-
-    /** @var string */
-    private $seoDescription;
-
-    /** @var Breadcrumb[]|null */
-    private $seoBreadcrumbs;
-
-    /** @var string|null */
-    private $seoContent;
-
-    /** @var array */
-    private $metaTags = [];
-
-    /** @var AssetInterface[] */
-    protected $scripts = [];
-
-    /** @var AssetInterface[] */
-    protected $styles = [];
-
-    /** @var string[] */
-    protected $inlineScripts = [];
-
-    /** @var string[] */
-    protected $inlineStyles = [];
+    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait;
 
     /** @var bool */
     private $requiresSeo = true;
@@ -77,6 +36,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     abstract public function initialize();
 
+    /**
+     * Get the section of the site we are serving assets for.
+     */
+    abstract public function getAssetSection(): string;
+
     /** @var SiteMeta */
     protected $siteMeta;
 
@@ -86,23 +50,20 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var \Gdn_Session */
     protected $session;
 
-    /** @var WebpackAssetProvider */
-    protected $assetProvider;
-
-    /** @var BreadcrumbModel */
-    protected $breadcrumbModel;
-
     /** @var string */
     protected $headerHtml = '';
 
     /** @var string */
     protected $footerHtml = '';
 
-    /** @var ContentSecurityPolicyModel */
-    protected $cspModel;
+    /** @var string|null */
+    protected $seoContent;
 
-    /** @var AssetPreloadModel */
-    protected $preloadModel;
+    /** @var PageHead */
+    private $pageHead;
+
+    /** @var MasterViewRenderer */
+    private $masterViewRenderer;
 
     /**
      * Dependendency Injection.
@@ -110,35 +71,23 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param SiteMeta $siteMeta
      * @param \Gdn_Request $request
      * @param \Gdn_Session $session
-     * @param WebpackAssetProvider $assetProvider
-     * @param BreadcrumbModel $breadcrumbModel
-     * @param ContentSecurityPolicyModel $cspModel
-     * @param AssetPreloadModel $preloadModel
+     * @param PageHead $pageHead
+     * @param MasterViewRenderer $masterViewRenderer
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel
+        PageHead $pageHead,
+        MasterViewRenderer $masterViewRenderer
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
-        $this->assetProvider = $assetProvider;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->cspModel = $cspModel;
-        $this->preloadModel = $preloadModel;
-
-        if ($favIcon = $this->siteMeta->getFavIcon()) {
-            $this->setFavIcon($favIcon);
-        }
-
-        if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
-            $this->addMetaTag("theme-color", ["name" => "theme-color", "content" => $mobileAddressBarColor]);
-        }
+        $this->pageHead = $pageHead;
+        $this->masterViewRenderer = $masterViewRenderer;
+        $this->pageHead->setAssetSection($this->getAssetSection());
+        $this->setPageHeadProxy($this->pageHead);
     }
 
     /**
@@ -147,36 +96,42 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @return Data Data object for global dispatcher.
      */
     public function render(): Data {
-        $this->validateSeo();
+        return $this->renderMasterView();
+    }
 
-        $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
-            'meta' => $this->siteMeta,
-        ]);
-        $this->inlineScripts[] = $this->getReduxActionsAsJsVariable();
-        $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
+    /**
+     * @return PageHead
+     */
+    public function getHead(): PageHead {
+        return $this->pageHead;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeoContent(): ?string {
+        return $this->seoContent;
+    }
+
+    /**
+     * Render the page content and wrap it in a data object for the dispatcher.
+     *
+     * This method is kept private so that it can be called internally for error pages without being overridden.
+     *
+     * @return Data Data object for global dispatcher.
+     */
+    private function renderMasterView(): Data {
+        $this->validateSeo();
+        $this->addInlineScript($this->getReduxActionsAsJsVariable());
+
         $viewData = [
-            'nonce' => $this->cspModel->getNonce(),
-            'title' => $this->seoTitle,
-            'description' => $this->seoDescription,
-            'canonicalUrl' => $this->canonicalUrl,
-            'locale' => $this->siteMeta->getLocaleKey(),
-            'debug' => $this->siteMeta->getDebugModeEnabled(),
-            'scripts' => $this->scripts,
-            'inlineScripts' => $this->inlineScripts,
-            'styles' => $this->styles,
-            'inlineStyles' => $this->inlineStyles,
-            'seoContent' => $this->seoContent,
-            'metaTags' => $this->metaTags,
             'header' => $this->headerHtml,
             'footer' => $this->footerHtml,
-            'preloadModel' => $this->preloadModel,
             'cssClasses' => ['isLoading'],
-            'breadcrumbsJson' => $this->seoBreadcrumbs ?
-                $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
-                null,
-            'favIcon' => $this->favIcon,
+            'seoContent' => $this->seoContent,
         ];
-        $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
+
+        $viewContent = $this->masterViewRenderer->renderPage($this, $viewData);
 
         return new Data($viewContent, $this->statusCode);
     }
@@ -191,11 +146,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             $this->siteMeta->getDebugModeEnabled() &&
             $this->requiresSeo &&
             (
-                $this->seoTitle === null ||
-                $this->seoBreadcrumbs === null ||
+                $this->getSeoTitle() === null ||
+                $this->getSeoBreadcrumbs() === null ||
                 $this->seoContent === null ||
-                $this->seoDescription === null ||
-                $this->canonicalUrl === null
+                $this->getSeoDescription() === null ||
+                $this->getCanonicalUrl() === null
             );
         if ($hasInvalidSeo) {
             throw new ServerException('Page SEO data is not fully implemented');
@@ -209,28 +164,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     public function blockRobots(): self {
         header('X-Robots-Tag: noindex', true);
-        $this->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex']);
+        $this->addMetaTag(['name' => 'robots', 'content' => 'noindex']);
 
-        return $this;
-    }
-
-    /**
-     * Get the page's "favorite icon".
-     *
-     * @return string|null
-     */
-    protected function getFavIcon(): ?string {
-        return $this->favIcon;
-    }
-
-    /**
-     * Set the "favorite icon" for the page.
-     *
-     * @param string $favIcon
-     * @return self
-     */
-    protected function setFavIcon(string $favIcon): self {
-        $this->favIcon = $favIcon;
         return $this;
     }
 
@@ -244,65 +179,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     protected function setSeoRequired(bool $required = true): self {
         $this->requiresSeo = $required;
 
-        return $this;
-    }
-
-    /**
-     * Set the page title (in the browser tab).
-     *
-     * @param string $title The title to set.
-     * @param bool $withSiteTitle Whether or not to append the global site title.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoTitle(string $title, bool $withSiteTitle = true): self {
-        if ($withSiteTitle) {
-            if ($title === "") {
-                $title = $this->siteMeta->getSiteTitle();
-            } else {
-                $title .= " - " . $this->siteMeta->getSiteTitle();
-            }
-        }
-        $this->seoTitle = $title;
-
-        return $this;
-    }
-
-    /**
-     * Set an the site meta description.
-     *
-     * @param string $description
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoDescription(string $description): self {
-        $this->seoDescription = $description;
-
-        return $this;
-    }
-
-    /**
-     * Set an the canonical URL for the page.
-     *
-     * @param string $path Either a partial path or a full URL.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setCanonicalUrl(string $path): self {
-        $this->canonicalUrl = $this->request->url($path, true);
-
-        return $this;
-    }
-
-    /**
-     * Set an array of breadcrumbs.
-     *
-     * @param Breadcrumb[] $crumbs
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function setSeoBreadcrumbs(array $crumbs): self {
-        $this->seoBreadcrumbs = $crumbs;
         return $this;
     }
 
@@ -327,31 +203,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     }
 
     /**
-     * Set page meta tag attributes.
-     *
-     * @param string $tag Tag name.
-     * @param array $attributes Array of attributes to set for tag.
-     *
-     * @return $this Own instance for chaining.
-     */
-    protected function addMetaTag(string $tag, array $attributes): self {
-        $this->metaTags[$tag] = $attributes;
-
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function hasExceptionHandler(\Throwable $e): bool {
-        switch ($e->getCode()) {
-            case 404:
-            case 403:
-                return true;
-                break;
-            default:
-                return false;
-        }
+        return $e instanceof HttpException;
     }
 
     /**
@@ -362,14 +217,14 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->statusCode = $e->getCode();
         $this->addReduxAction(new ReduxErrorAction($e))
             ->setSeoTitle($e->getMessage())
-            ->addMetaTag('robots', ['name' => 'robots', 'content' => 'noindex'])
+            ->addMetaTag(['name' => 'robots', 'content' => 'noindex'])
             ->setSeoContent('resources/views/error.twig', [
                 'errorMessage' => $e->getMessage(),
                 'errorCode' => $e->getCode()
             ])
         ;
 
-        return $this->render();
+        return $this->renderMasterView();
     }
 
     /**

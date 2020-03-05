@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\RichFormat;
 
@@ -15,6 +16,19 @@ use Vanilla\Formatting\Formats\RichFormat;
  * Class for filtering Rich content before it gets inserted into the database.
  */
 class Filterer {
+
+    /** @var EmbedService */
+    private $embedService;
+
+    /**
+     * DI.
+     *
+     * @param EmbedService $embedService
+     */
+    public function __construct(EmbedService $embedService) {
+        $this->embedService = $embedService;
+    }
+
 
     /**
      * Filter the contents of a quill post.
@@ -65,77 +79,9 @@ class Filterer {
                 continue;
             }
             $embedData = &$embed['data'];
-
-
-            if (!$embedData) {
-                // Clean up that messed up operation.
-                $operations[$key];
-                continue;
-            }
-
-            // Remove the rendered bodies. The raw bodies are the source of truth.
-            $format = &$embedData['format'] ?? null;
-            $bodyRaw = &$embedData['bodyRaw'] ?? null;
-            $type = $embedData['embedType'] ?? $embedData['type'] ?? null;
-
-            if ($type !== QuoteEmbed::TYPE) {
-                // We only care about quote embeds specifically.
-                continue;
-            }
-
-            $stringBodyRaw = $bodyRaw;
-
-            // Remove nested external embed data. We don't want it rendered and this will prevent it from being
-            // searched.
-            if (strtolower($format) === RichFormat::FORMAT_KEY && is_array($bodyRaw)) {
-                // Iterate through the nested embed.
-                foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
-                    $insert = &$subInsertOp['insert'];
-                    if (is_array($insert)) {
-                        $url = $insert['embed-external']['data']['url'] ?? null;
-                        if ($url !== null) {
-                            // Replace the embed with just a link.
-                            $linkEmbedOps = $this->makeLinkEmbedInserts($url);
-                            array_splice($bodyRaw, $subInsertIndex, 1, $linkEmbedOps);
-                        }
-                    }
-                }
-                $stringBodyRaw = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
-            }
-
-            // Fix improperly encoded unicode:
-            if (strstr($stringBodyRaw, "\\u") !== false) {
-                $decoded = json_decode($stringBodyRaw);
-                $stringBodyRaw = json_encode($decoded, JSON_UNESCAPED_UNICODE);
-                $embedData['bodyRaw'] = $stringBodyRaw;
-            }
-
-            // Finally render the new body to overwrite the previous HTML body.
-            if ($embedData['displayOptions']['renderFullContent'] ?? null) {
-                $embedData['body'] = \Gdn::formatService()->renderHTML($stringBodyRaw, $format);
-            } else {
-                $embedData['body'] = \Gdn::formatService()->renderQuote($stringBodyRaw, $format);
-            }
+            $embed['data'] = $this->embedService->filterEmbedData($embedData);
         }
 
         return array_values($operations);
-    }
-
-    /**
-     * Make the contents of a link embed.
-     *
-     * @param string $url
-     * @return array
-     */
-    private function makeLinkEmbedInserts(string $url): array {
-        return [
-            [
-                'insert' => $url,
-                'attributes' => [
-                    'link' => $url,
-                ],
-            ],
-            [ 'insert' => "\n" ],
-        ];
     }
 }

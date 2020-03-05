@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 
-storiesOf("User Content", module).add("Text", () => {
+storiesOf("User Content", module).add("Content", () => {
     const content = `
         <h1>h1</h1>
         <h2>h2</h2>
@@ -74,7 +74,31 @@ storiesOf("User Content", module).add("Text", () => {
        </div>
        <h2>Block quote</h2>
        <div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">asfasdfadsfa</p></div></div>
-       
+
+       <div class="embedExternal embedImage">
+          <div class="embedExternal-content">
+              <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+                 <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" alt="image.png">
+              </a>
+          </div>
+       </div>
+
+       <div class="embedExternal embedImage">
+          <div class="embedExternal-content">
+              <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+                 <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" alt="image.png">
+              </a>
+          </div>
+       </div>
+
+       <div class="embedExternal embedImage">
+          <div class="embedExternal-content">
+             <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" rel="nofollow noreferrer noopener ugc" target="_blank">
+                <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" alt="Untitled Image">
+             </a>
+          </div>
+       </div>
+
        <h2>Inline operations</h2>
        <p>
          Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxy rise the sky calls to us! Descended from astronomers?</p><p>Some Text Here. <code class="code codeInline" spellcheck="false">Code Inline</code> Some More Text
@@ -109,7 +133,7 @@ storiesOf("User Content", module).add("Text", () => {
              <li>Line 5 item with <strong>bold and a </strong>
                <a href="https://vanillaforums.com" rel="nofollow"><strong>link</strong></a><strong>.</strong>
              </li>
-             <li>               
+             <li>
                Nested List
              <ul>
                  <li>Line 1</li>
@@ -123,7 +147,7 @@ storiesOf("User Content", module).add("Text", () => {
            </ul>
         </li>
        </ul>
-         
+
        <p>Ordered List</p>
        <ol>
          <li>Number 1</li>
@@ -155,9 +179,5 @@ storiesOf("User Content", module).add("Text", () => {
          </li>
        </ol>
        `;
-    return (
-        <StoryContent>
-            <UserContent content={content} />{" "}
-        </StoryContent>
-    );
+    return <UserContent content={content} />;
 });

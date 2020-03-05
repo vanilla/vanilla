@@ -17,7 +17,7 @@ import {
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { percent, px } from "csx";
 import { unit } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
@@ -48,18 +48,30 @@ export const absolutePosition = {
             left: unit(left),
         };
     },
-    middleOfParent: () => {
-        return {
-            position: "absolute" as PositionProperty,
-            display: "block",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            maxHeight: percent(100),
-            maxWidth: percent(100),
-            margin: "auto",
-        };
+    middleOfParent: (shrink: boolean = false) => {
+        if (shrink) {
+            return {
+                position: "absolute" as PositionProperty,
+                display: "inline-block",
+                top: percent(50),
+                left: percent(50),
+                right: "initial",
+                bottom: "initial",
+                transform: "translate(-50%, -50%)",
+            };
+        } else {
+            return {
+                position: "absolute" as PositionProperty,
+                display: "block",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                maxHeight: percent(100),
+                maxWidth: percent(100),
+                margin: "auto",
+            };
+        }
     },
     middleLeftOfParent: (left: LeftProperty<TLength> = px(0)) => {
         return {
@@ -136,11 +148,12 @@ export function fullSizeOfParent(): NestedCSSProperties {
     };
 }
 
-export const inheritHeightClass = () => {
+export const inheritHeightClass = useThemeCache(() => {
     const style = styleFactory("inheritHeight");
     return style({
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
+        position: "relative",
     });
-};
+});

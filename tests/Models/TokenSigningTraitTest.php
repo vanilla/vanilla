@@ -29,11 +29,11 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
 
     /**
      * An expired token shouldn't verify.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your nonce has expired.
      */
     public function testExpiryDate() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Your nonce has expired.');
+
         $model = new TokenTestingModel();
         $token = $model->signToken($model->randomToken(), 'last year');
         $model->verifyTokenSignature($token, true);
@@ -41,11 +41,11 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
 
     /**
      * An altered token signature shouldn't verify.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your nonce has an invalid signature.
      */
     public function testBadSignature() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Your nonce has an invalid signature.');
+
         $model = new TokenTestingModel();
         $token = $model->signToken($model->randomToken(), '2 months').'!';
         $model->verifyTokenSignature($token, true);
@@ -53,11 +53,11 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
 
     /**
      * A nonsense token shouldn't verify.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your nonce missing parts.
      */
     public function testBadToken() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Your nonce missing parts.');
+
         $model = new TokenTestingModel();
         $token = 'hr.df.ee';
         $model->verifyTokenSignature($token, true);

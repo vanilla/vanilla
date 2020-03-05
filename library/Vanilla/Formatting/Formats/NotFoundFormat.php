@@ -60,6 +60,13 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
+    public function getPlainTextLength(string $content): int {
+        return 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function renderQuote(string $content): string {
         return $this->renderHTML($content);
     }
@@ -82,6 +89,13 @@ class NotFoundFormat implements FormatInterface {
      * @inheritdoc
      */
     public function parseHeadings(string $content): array {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function parseImageUrls(string $content): array {
         return [];
     }
 

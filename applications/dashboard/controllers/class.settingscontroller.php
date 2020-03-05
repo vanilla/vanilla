@@ -9,6 +9,8 @@
  */
 use Vanilla\Addon;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
+use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Models\FsThemeProvider;
 
 /**
  * Handles /settings endpoint.
@@ -473,9 +475,8 @@ class SettingsController extends DashboardController {
     public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->setHighlightRoute('dashboard/settings/branding');
-        $this->title(t('Branding'));
-        $configurationModule = new ConfigurationModule($this);
-        $configurationModule->initialize([
+        $this->title(t('Branding & SEO'));
+        $items = [
             'Garden.HomepageTitle' => [
                 'LabelCode' => t('Homepage Title'),
                 'Control' => 'textbox',
@@ -494,23 +495,32 @@ class SettingsController extends DashboardController {
                 'Control' => 'textbox',
                 'Description' => t("The banner title appears on your site's banner and in your browser's title bar.",
                     "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
-
+            ],
+            'Garden.OrgName' => [
+                'LabelCode' => t('Organization'),
+                'Control' => 'textbox',
+                'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
             ],
             'Garden.Logo' => [
-                'LabelCode' => t('Banner Logo'),
-                'Control' => 'imageupload',
-                'Description' => t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('banner logo'))
-                ]
+                'Label' => t('Banner Logo'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'LogoDescription',
+                    'The banner logo appears at the top of your site. Some themes may not display this logo.'
+                ),
             ],
             'Garden.MobileLogo' => [
-                'LabelCode' => t('Mobile Banner Logo'),
-                'Control' => 'imageupload',
-                'Description' => t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('mobile banner logo'))
-                ]
+                'Label' => t('Mobile Banner Logo'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'MobileLogoDescription',
+                    'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'
+                ),
+            ],
+            'Garden.BannerImage' => [
+                'Label' => t('Banner Image'),
+                'Control' => 'imageUploadReact',
+                'Description' => t('The default banner image across the site. This can be overriden on a per category basis.'),
             ],
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
@@ -524,8 +534,6 @@ class SettingsController extends DashboardController {
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
                 ]
             ],
-
-
             'Garden.TouchIcon' => [
                 'LabelCode' => t('Touch Icon'),
                 'Control' => 'imageupload',
@@ -538,14 +546,15 @@ class SettingsController extends DashboardController {
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('Touch Icon'))
                 ]
             ],
-
             'Garden.ShareImage' => [
-                'LabelCode' => t('Share Image'),
-                'Control' => 'imageupload',
-                'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('share image'))
-                ]
+                'Label' => t('Share Image'),
+                'Control' => 'imageUploadReact',
+                'Description' => t(
+                    'ShareImageDescription',
+                    "When someone shares a link from your site we try and grab an image from the page. "
+                    . "If there isn't an image on the page then we'll use this image instead. "
+                    . "The image should be at least 50×50, but we recommend 200×200."
+                ),
             ],
             'Garden.MobileAddressBarColor' => [
                 'LabelCode' => t('Mobile Address Bar Color'),
@@ -554,8 +563,34 @@ class SettingsController extends DashboardController {
                 'Options' => [
                     'AllowEmpty' => true,
                 ]
+            ],
+            'Feature.DeferredLegacyScripts.Enabled' => [
+                'LabelCode' => t('Defer Javascript Loading'),
+                'Control' => 'toggle',
+                'Default' => true,
+                'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.<br>
+                    <strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ' .
+                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature')),
+                'Options' => [
+                    'UseRealBoolean' => true
+                ]
             ]
-        ]);
+        ];
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $options = $siteSectionModel->getDefaultRoutes();
+        if (count($options) > 0) {
+            $items['Vanilla.Forum.Disabled'] = [
+                'LabelCode' => t('Disable forum pages'),
+                'Control' => 'toggle',
+                'Description' => t("Remove discussion and categories links from menus.<br /> Set discussion and category related pages to return not found page 404."),
+                'Options' => [
+                    'ForumDisabled' => true,
+                ]
+            ];
+        }
+        $configurationModule = new ConfigurationModule($this);
+        $configurationModule->initialize($items);
         $this->setData('ConfigurationModule', $configurationModule);
         $this->render();
     }
@@ -669,6 +704,10 @@ class SettingsController extends DashboardController {
 
             $this->informMessage(t("Your changes were saved successfully."));
         }
+
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        $this->setData('defaultRouteOptions', $siteSectionModel->getDefaultRoutes());
 
         // Add warnings for layouts that have been specified by the theme.
         $themeManager = Gdn::themeManager();
@@ -891,20 +930,24 @@ class SettingsController extends DashboardController {
                 ]
             ],
             'Garden.EmailTemplate.TextColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Text Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.BackgroundColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Background Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.ContainerBackgroundColor' => [
                 'Control' => 'color',
-                'LabelCode' => 'Page Color'
+                'LabelCode' => 'Page Color',
             ],
             'Garden.EmailTemplate.ButtonTextColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Button Text Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.ButtonBackgroundColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Button Background Color',
+                'Control' => 'color',
             ],
         ]);
 
@@ -1381,9 +1424,7 @@ class SettingsController extends DashboardController {
 
         // Retrieve all available plugins from the plugins directory
         $this->EnabledPlugins = Gdn::pluginManager()->enabledPlugins();
-        self::sortAddons($this->EnabledPlugins);
         $this->AvailablePlugins = Gdn::pluginManager()->availablePlugins();
-        self::sortAddons($this->AvailablePlugins);
 
         if ($pluginName != '') {
             if (in_array(strtolower($pluginName), array_map('strtolower', array_keys($this->EnabledPlugins)))) {
@@ -1392,6 +1433,8 @@ class SettingsController extends DashboardController {
                 $this->enablePlugin($pluginName, $filter);
             }
         } else {
+            self::sortAddons($this->EnabledPlugins);
+            self::sortAddons($this->AvailablePlugins);
             $this->render();
         }
     }
@@ -1577,9 +1620,9 @@ class SettingsController extends DashboardController {
             $configurationModel->Validation->applyRule('Garden.Registration.Method', 'Required');
 
             // Define the Garden.Registration.RoleInvitations setting based on the postback values
-            $invitationRoleIDs = $this->Form->getValue('InvitationRoleID');
-            $invitationCounts = $this->Form->getValue('InvitationCount');
-            $this->ExistingRoleInvitations = arrayCombine($invitationRoleIDs, $invitationCounts);
+            $invitationRoleIDs = (array)$this->Form->getValue('InvitationRoleID');
+            $invitationCounts = (array)$this->Form->getValue('InvitationCount');
+            $this->ExistingRoleInvitations = array_combine($invitationRoleIDs, $invitationCounts);
             $configurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
             if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {
@@ -2161,28 +2204,10 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            $themeInfo = Gdn::themeManager()->getThemeInfo($themeName);
-            $previewThemeName = $themeName;
-            $displayName = val('Name', $themeInfo);
-            $isMobile = val('IsMobile', $themeInfo);
-
-            // If we failed to get the requested theme, cancel preview
-            if ($themeInfo === false) {
-                $previewThemeName = '';
-            }
-
-            if ($isMobile) {
-                Gdn::session()->setPreference(
-                    ['PreviewMobileThemeFolder' => $previewThemeName,
-                    'PreviewMobileThemeName' => $displayName]
-                );
-            } else {
-                Gdn::session()->setPreference(
-                    ['PreviewThemeFolder' => $previewThemeName,
-                    'PreviewThemeName' => $displayName]
-                );
-            }
-
+            /** @var ThemeModelHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            $themeProvider = Gdn::getContainer()->get(FsThemeProvider::class);
+            $themeInfo = $themeHelper->setSessionPreviewTheme($themeName, $themeProvider);
             $this->fireEvent('PreviewTheme', ['ThemeInfo' => $themeInfo]);
 
             redirectTo('/');
@@ -2205,20 +2230,9 @@ class SettingsController extends DashboardController {
         $isMobile = false;
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            $themeInfo = Gdn::themeManager()->getThemeInfo($previewThemeFolder);
-            $isMobile = val('IsMobile', $themeInfo);
-
-            if ($isMobile) {
-                Gdn::session()->setPreference(
-                    ['PreviewMobileThemeFolder' => '',
-                    'PreviewMobileThemeName' => '']
-                );
-            } else {
-                Gdn::session()->setPreference(
-                    ['PreviewThemeFolder' => '',
-                    'PreviewThemeName' => '']
-                );
-            }
+            /** @var ThemeModelHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            $themeHelper->cancelSessionPreviewTheme();
         }
 
         if ($isMobile) {

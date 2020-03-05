@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{ pageHead }}
+        <noscript>
+            <style>
+                .fullPageLoader { display: none }
+
+                body.isLoading .page {
+                    max-height: initial;
+                    height: initial;
+                }
+            </style>
+        </noscript>
+    </head>
+    <body class="{{ cssClasses }}">
+    <div id="page" class="page">
+            {%- if themeHeader -%}
+                <noscript id="themeHeader">
+                    {{ themeHeader }}
+                </noscript>
+            {%- endif -%}
+            {%- if bodyContent|default(false) -%}
+                <header id="titleBar" data-react="title-bar-hamburger"></header>
+                {{ bodyContent }}
+            {%- else -%}
+                <header id="titleBar"></header>
+                <div id="app" class="page-minHeight">
+                    {%- if seoContent|default(false) -%}
+                        <noscript>
+                            <h1 class="heading heading-1 pageTitle">
+                                {{- title -}}
+                            </h1>
+                            {{- seoContent -}}
+                        </noscript>
+                    {%- endif -%}
+                    <div class="fullPageLoader"></div>
+                </div>
+            {%- endif -%}
+            {%- if themeFooter -%}
+                <noscript id="themeFooter">{{ themeFooter }}</noscript>
+            {%- endif -%}
+        </div>
+        <div id="modals"></div>
+    </body>
+</html>

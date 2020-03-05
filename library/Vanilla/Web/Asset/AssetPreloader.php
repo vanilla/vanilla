@@ -17,6 +17,7 @@ class AssetPreloader {
     const AS_SCRIPT = "script";
     const AS_STYLE = "style";
     const AS_FONT = "font";
+    const AS_IMAGE = "image";
 
     // `rel` parameter values.
     const REL_FULL = "full-file-include"; // Add it as an actual script/style. More than a preload. Use sparingly.

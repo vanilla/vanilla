@@ -1,2 +1,4 @@
 bolditalicstrikeAll inline formats:D  :(  :o  :s
 Link
+Code Inline
+Code Inline

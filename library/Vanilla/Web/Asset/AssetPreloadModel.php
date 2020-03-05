@@ -82,6 +82,15 @@ class AssetPreloadModel {
     }
 
     /**
+     * Preload an asset.
+     *
+     * @param AssetPreloader $preload
+     */
+    public function addPreload(AssetPreloader $preload) {
+        $this->preloads[] = $preload;
+    }
+
+    /**
      * Render HTMLf or the head element using all of the registered assets in the model.
      */
     public function renderHtml(): string {

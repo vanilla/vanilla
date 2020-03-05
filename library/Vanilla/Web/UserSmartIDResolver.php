@@ -20,6 +20,20 @@ class UserSmartIDResolver {
     private $viewEmail = false;
 
     /**
+     * @var \Gdn_Session
+     */
+    private $session;
+
+    /**
+     * UserSmartIDResolver constructor.
+     *
+     * @param \Gdn_Session $session
+     */
+    public function __construct(\Gdn_Session $session) {
+        $this->session = $session;
+    }
+
+    /**
      * Lookup the user ID from the smart ID.
      *
      * @param SmartIDMiddleware $sender The middleware invoking the lookup.
@@ -38,7 +52,13 @@ class UserSmartIDResolver {
             }
         }
 
-        if (in_array($column, ['name', 'email'])) {
+        if ($column === 'me' && empty($value)) {
+            if ($this->session->isValid()) {
+                return $this->session->UserID;
+            } else {
+                throw new ForbiddenException('You must sign in.');
+            }
+        } elseif (in_array($column, ['name', 'email'])) {
             // These are basic field lookups on the user table.
             return $sender->fetchValue('User', $pk, [$column => $value]);
         } else {

@@ -7,3 +7,5 @@ export * from "./LocaleDisplayer";
 export * from "./localeStore";
 export * from "./translationStore";
 export * from "./LocaleProvider";
+export * from "./ContentTranslationProvider";
+export * from "./ContentTranslator";

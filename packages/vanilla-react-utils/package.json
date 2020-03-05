@@ -5,6 +5,7 @@
     "version": "3.0.1",
     "dependencies": {
         "@vanilla/dom-utils": "^3.0.1",
+        "lodash": "^4.17.11",
         "resize-observer-polyfill": "1.5.1"
     },
     "peerDependencies": {

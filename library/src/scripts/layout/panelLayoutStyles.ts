@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { calc, color, percent, px, viewHeight } from "csx";
+import { calc, color, percent, px, translateY, viewHeight } from "csx";
 import { cssRule, media } from "typestyle";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -13,16 +13,24 @@ import { important } from "csx/lib/strings";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 
 export const layoutVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("globalVariables");
+
+    const colors = makeThemeVars("colors", {
+        leftColumnBg: globalVars.mainColors.bg,
+    });
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
-        fullGutter: 48,
+        fullGutter: globalVars.constants.fullGutter,
         panelWidth: 216,
-        middleColumnWidth: 672,
-        minimalMiddleColumnWidth: 500, // Will break if middle column width is smaller than this value.
+        middleColumnWidth: 700,
+        minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
         breakPoints: {
             // Other break points are calculated
@@ -68,34 +76,45 @@ export const layoutVariables = useThemeCache(() => {
     const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", {
         margin: {
             top: 0,
-            bottom: 50,
+            bottom: 0,
         },
         padding: {
             top: gutter.halfSize * 1.5,
         },
         extraPadding: {
             top: 32,
-            noBreadcrumbs: {
-                top: 16,
+            bottom: 32,
+            noBreadcrumbs: {},
+            mobile: {
+                noBreadcrumbs: {
+                    top: 16,
+                },
             },
         },
         largePadding: {
             top: 64,
         },
+        offset: {
+            left: -44,
+            right: -36,
+        },
+        withPanelBackground: {
+            gutter: 70,
+        },
     });
 
     const mediaQueries = () => {
-        const noBleed = styles => {
+        const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.noBleed),
-                    minWidth: px(panelLayoutBreakPoints.twoColumn + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.twoColumn + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const noBleedDown = styles => {
+        const noBleedDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.noBleed),
@@ -104,7 +123,7 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const twoColumnsDown = styles => {
+        const twoColumnsDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.twoColumn),
@@ -113,27 +132,27 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const twoColumns = styles => {
+        const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.twoColumn),
-                    minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.oneColumn + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumn = styles => {
+        const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.oneColumn),
-                    minWidth: px(panelLayoutBreakPoints.xs + 1),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.xs + 1) : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumnDown = styles => {
+        const oneColumnDown = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.oneColumn),
@@ -142,7 +161,7 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        const xs = styles => {
+        const xs = (styles: NestedCSSProperties) => {
             return media(
                 {
                     maxWidth: px(panelLayoutBreakPoints.xs),
@@ -163,6 +182,7 @@ export const layoutVariables = useThemeCache(() => {
     };
 
     return {
+        colors,
         foundationalWidths,
         gutter,
         panel,
@@ -181,42 +201,50 @@ export const panelLayoutClasses = useThemeCache(() => {
     const style = styleFactory("panelLayout");
     const classesPanelArea = panelAreaClasses();
     const classesPanelList = panelListClasses();
-    const titleBarVars = titleBarVariables();
 
     const main = style("main", {
         minHeight: viewHeight(20),
         width: percent(100),
     });
 
-    const root = style({
-        ...margins(vars.panelLayoutSpacing.margin),
-        width: percent(100),
-        $nest: {
-            [`&.noBreadcrumbs > .${main}`]: {
-                paddingTop: unit(globalVars.gutter.size),
-                ...mediaQueries.oneColumnDown({
-                    paddingTop: 0,
-                }),
-            },
-            "&.isOneCol": {
-                width: unit(vars.middleColumn.paddedWidth),
-                maxWidth: percent(100),
-                margin: "auto",
-                ...mediaQueries.oneColumnDown({
-                    width: percent(100),
-                }),
-            },
-            "&.hasTopPadding": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
-            },
-            "&.hasTopPadding.noBreadcrumbs": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.noBreadcrumbs.top),
-            },
-            "&.hasLargePadding": {
-                ...paddings(vars.panelLayoutSpacing.largePadding),
+    const root = style(
+        {
+            ...margins(vars.panelLayoutSpacing.margin),
+            width: percent(100),
+            $nest: {
+                [`&.noBreadcrumbs > .${main}`]: {
+                    paddingTop: unit(globalVars.gutter.size),
+                    ...mediaQueries.oneColumnDown({
+                        paddingTop: 0,
+                    }),
+                },
+                "&.isOneCol": {
+                    width: unit(vars.middleColumn.paddedWidth),
+                    maxWidth: percent(100),
+                    margin: "auto",
+                    ...mediaQueries.oneColumnDown({
+                        width: percent(100),
+                    }),
+                },
+                "&.hasTopPadding": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
+                },
+                "&.hasTopPadding.noBreadcrumbs": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                },
+                "&.hasLargePadding": {
+                    ...paddings(vars.panelLayoutSpacing.largePadding),
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&.hasTopPadding.noBreadcrumbs": {
+                    paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                },
+            },
+        }),
+    );
 
     const content = style("content", {
         display: "flex",
@@ -254,11 +282,16 @@ export const panelLayoutClasses = useThemeCache(() => {
         padding: 0,
     });
 
+    const offset = panelBackgroundVariables().config.render
+        ? layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
+        : 0;
+
     const leftColumn = style("leftColumn", {
         position: "relative",
         width: unit(vars.panel.paddedWidth),
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
+        paddingRight: unit(offset),
     });
 
     const rightColumn = style("rightColumn", {
@@ -267,6 +300,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexBasis: unit(vars.panel.paddedWidth),
         minWidth: unit(vars.panel.paddedWidth),
         overflow: "initial",
+        paddingLeft: unit(offset),
     });
 
     const middleColumn = style("middleColumn", {
@@ -274,6 +308,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexGrow: 1,
         width: percent(100),
         maxWidth: percent(100),
+        paddingBottom: unit(vars.panelLayoutSpacing.extraPadding.bottom),
         ...mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
     });
 
@@ -304,8 +339,8 @@ export const panelLayoutClasses = useThemeCache(() => {
         "isSticky",
         {
             ...sticky(),
-            top: titleBarVars.sizing.height * 2,
             height: percent(100),
+            $unique: true,
         },
         mediaQueries.oneColumnDown({
             position: "relative",
@@ -318,6 +353,10 @@ export const panelLayoutClasses = useThemeCache(() => {
     // To remove when we have overlay styles converted
     cssRule(`.overlay .${root}.noBreadcrumbs .${main}`, {
         paddingTop: 0,
+    });
+
+    const breadcrumbsContainer = style("breadcrumbs", {
+        paddingBottom: unit(10),
     });
 
     return {
@@ -334,5 +373,6 @@ export const panelLayoutClasses = useThemeCache(() => {
         panel,
         isSticky,
         breadcrumbs,
+        breadcrumbsContainer,
     };
 });

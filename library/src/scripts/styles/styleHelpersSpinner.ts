@@ -9,6 +9,7 @@ import { ColorHelper, deg, percent, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ContentProperty, DisplayProperty, PositionProperty } from "csstype";
 import { debugHelper, defaultTransition, unit } from "@library/styles/styleHelpers";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 const spinnerOffset = 73;
 const spinnerLoaderAnimation = keyframes({
@@ -24,6 +25,18 @@ export interface ISpinnerProps {
     speed?: string;
 }
 
+const DEFAULT_SPEED = "0.7s";
+
+export function spinnerLoaderAnimationProperties(): NestedCSSProperties {
+    return {
+        ...defaultTransition("opacity"),
+        animationName: spinnerLoaderAnimation,
+        animationDuration: DEFAULT_SPEED,
+        animationIterationCount: "infinite",
+        animationTimingFunction: "ease-in-out",
+    };
+}
+
 export const spinnerLoader = (props: ISpinnerProps) => {
     const debug = debugHelper("spinnerLoader");
     const globalVars = globalVariables();
@@ -31,14 +44,12 @@ export const spinnerLoader = (props: ISpinnerProps) => {
         color: props.color || globalVars.mainColors.primary,
         size: props.size || 18,
         thickness: props.thickness || 3,
-        speed: "0.7s",
         ...props,
     };
     return {
         ...debug.name("spinner"),
         position: "relative" as PositionProperty,
         content: quote("") as ContentProperty,
-        ...defaultTransition("opacity"),
         display: "block" as DisplayProperty,
         width: unit(spinnerVars.size),
         height: unit(spinnerVars.size),
@@ -48,10 +59,6 @@ export const spinnerLoader = (props: ISpinnerProps) => {
         borderBottom: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.fade(0.3).toString()}`,
         borderLeft: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.fade(0.3).toString()}`,
         transform: "translateZ(0)",
-        animation: `spillerLoader ${spinnerVars.speed} infinite ease-in-out`,
-        animationName: spinnerLoaderAnimation,
-        animationDuration: spinnerVars.speed,
-        animationIterationCount: "infinite",
-        animationTimingFunction: "ease-in-out",
+        ...spinnerLoaderAnimationProperties(),
     };
 };

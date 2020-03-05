@@ -1,4 +1,9 @@
-<a href="{{ sanitizeUrl(url) }}" data-embedJson="{{ data|json_encode }}" class="embedLinkLoader">
+<a
+    href="{{ sanitizeUrl(url) }}"
+    data-embedJson="{{ data|json_encode }}"
+    class="embedLinkLoader"
+    rel="nofollow noreferrer ugc"
+>
     {{ url }}
     <svg class="embedLinkLoader-failIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
         <title>{{ t('There was an error displaying this embed.') }}</title>

@@ -6,52 +6,66 @@
 
 namespace Vanilla\Models;
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Addon;
+use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
+use Garden\Schema\ValidationField;
 
 /**
  * Handle custom themes.
  */
 class ThemeModel {
+    const HEADER = 'header';
+    const FOOTER = 'footer';
+    const VARIABLES = 'variables';
+    const FONTS = 'fonts';
+    const SCRIPTS = 'scripts';
+    const STYLES = 'styles';
+    const JAVASCRIPT = 'javascript';
+
     const ASSET_LIST = [
-        "header" => [
+        self::HEADER => [
             "type" => "html",
             "file" => "header.html",
             "default" => "",
             "mime-type" => "text/html"
         ],
-        "footer" => [
+        self::FOOTER => [
             "type" => "html",
             "file" => "footer.html",
             "default" => "",
             "mime-type" => "text/html"
         ],
-        "variables" => [
+        self::VARIABLES => [
             "type" => "json",
             "file" => "variables.json",
             "default" => "{}",
             "mime-type" => "application/json"
         ],
-        "fonts" => [
+        self::FONTS => [
             "type" => "json",
             "file" => "fonts.json",
             "default" => "[]",
             "mime-type" => "application/json"
         ],
-        "scripts" => [
+        self::SCRIPTS => [
             "type" => "json",
             "file" => "scripts.json",
             "default" => "[]",
             "mime-type" => "application/json"
         ],
-        "styles" => [
+        self::STYLES => [
             "type" => "css",
             "file" => "styles.css",
             "default" => "",
             "mime-type" => "text/css"
         ],
-        "javascript" => [
+        self::JAVASCRIPT => [
             "type" => "js",
             "file" => "javascript.js",
             "default" => "",
@@ -67,6 +81,37 @@ class ThemeModel {
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
 
+    /** @var ConfigurationInterface $config */
+    private $config;
+
+    /** @var AddonProviderInterface $addonManager */
+    private $addonManager;
+
+    /** @var ThemeModelHelper $themeHelper */
+    private $themeHelper;
+
+    /** @var string $themeManagePageUrl */
+    private $themeManagePageUrl = '/dashboard/settings/themes';
+
+    /**
+     * ThemeModel constructor.
+     *
+     * @param ConfigurationInterface $config
+     * @param \Gdn_Session $session
+     * @param AddonProviderInterface $addonManager
+     * @param ThemeModelHelper $themeHelper
+     */
+    public function __construct(
+        ConfigurationInterface $config,
+        \Gdn_Session $session,
+        AddonProviderInterface $addonManager,
+        ThemeModelHelper $themeHelper
+    ) {
+        $this->config = $config;
+        $this->session = $session;
+        $this->addonManager = $addonManager;
+        $this->themeHelper = $themeHelper;
+    }
 
     /**
      * Add a theme-variable provider.
@@ -108,6 +153,23 @@ class ThemeModel {
     }
 
     /**
+     * Get all available themes.
+     *
+     * @return array
+     */
+    public function getThemes(): array {
+        $allThemes = [];
+        foreach ($this->themeProviders as $themeProvider) {
+            $themes = $themeProvider->getAllThemes();
+            foreach ($themes as &$theme) {
+                $theme['preview'] = $this->generateThemePreview($theme) ?? null;
+                $allThemes[] = $theme;
+            }
+        }
+        return $allThemes;
+    }
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.
@@ -145,14 +207,129 @@ class ThemeModel {
     }
 
     /**
+     * Get master theme key
+     *
+     * @param int|string $themeKey
+     * @return string
+     */
+    public function getMasterThemeKey($themeKey): string {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->getMasterThemeKey($themeKey);
+    }
+
+    /**
      * Set current theme.
      *
      * @param int $themeID Theme ID to set current.
      * @return array
      */
-    public function setCurrentTheme(int $themeID): array {
+    public function setCurrentTheme($themeID): array {
         $provider = $this->getThemeProvider($themeID);
-        return $provider->setCurrent($themeID);
+
+        if ($theme = $provider->setCurrent($themeID)) {
+            if ($provider->themeKeyType() === 0) {
+                try {
+                    $dbThemeProvider = $this->getThemeProvider(1);
+                    $dbThemeProvider->resetCurrent();
+                } catch (ClientException $e) {
+                    if ($e->getMessage() !== 'No custom theme provider found!') {
+                        throw $e;
+                    }
+                    //do nothing if db provider does not exist
+                }
+            }
+        }
+
+        $theme['preview'] = $this->generateThemePreview($theme) ?? null;
+        return $theme;
+    }
+
+    /**
+     * Set theme as preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param int|string $themeID Theme ID to set current.
+     * @return array
+     */
+    public function setPreviewTheme($themeID): array {
+        if (empty($themeID)) {
+            $theme = $this->getCurrentTheme();
+            $this->themeHelper->cancelSessionPreviewTheme();
+        } else {
+            $provider = $this->getThemeProvider($themeID);
+            $theme = $provider->setPreviewTheme($themeID);
+        }
+        return $theme;
+    }
+
+    /**
+     * Get view theme key
+     *
+     * @return string
+     */
+    public function getViewThemeKey(): string {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            $themeKey = $previewTheme;
+        }
+        return $themeKey;
+    }
+
+    /**
+     * Get preview theme properties if exists.
+     *
+     * @return array
+     */
+    public function getPreviewTheme(): array {
+        $previewTheme = [];
+        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+            $previewTheme['themeID'] = $previewThemeKey;
+            $provider = $this->getThemeProvider($previewThemeKey);
+            $previewTheme['name'] = $provider->getName($previewThemeKey);
+            $previewTheme['redirect']= $this->getThemeManagePageUrl();
+        }
+        return $previewTheme;
+    }
+
+    /**
+     * Set theme manage page url
+     *
+     * @param string $url
+     */
+    public function setThemeManagePageUrl(string $url) {
+        $this->themeManagePageUrl = $url;
+    }
+
+    /**
+     * Get theme manage page url
+     *
+     * @return string
+     */
+    private function getThemeManagePageUrl() {
+        return $this->themeManagePageUrl;
+    }
+
+    /**
+     * Get view theme addon
+     *
+     * @return string
+     */
+    public function getThemeAddon(): Addon {
+        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $provider = $this->getThemeProvider($themeKey);
+        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
+        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
+            try {
+                $provider = $this->getThemeProvider($previewTheme);
+                $addonThemeKey = $provider->getMasterThemeKey($previewTheme);
+            } catch (NotFoundException $e) {
+                // if we store wrong preview key store in session, lets reset it
+                $this->themeHelper->cancelSessionPreviewTheme();
+            }
+        }
+        $addon = $this->addonManager->lookupTheme($addonThemeKey ?? $themeKey);
+        return $addon;
     }
 
     /**
@@ -161,8 +338,35 @@ class ThemeModel {
      * @return array|void If no currnt theme set returns null
      */
     public function getCurrentTheme(): ?array {
-        $provider = $this->getThemeProvider(1);
-        return $provider->getCurrent();
+        $current = null;
+        try {
+            $provider = $this->getThemeProvider(1);
+            $current = $provider->getCurrent();
+        } catch (ClientException $e) {
+            if ($e->getMessage() !== 'No custom theme provider found!') {
+                throw $e;
+            }
+            //do nothing if db provider does not exist
+        }
+
+        if (is_null($current)) {
+            $provider = $this->getThemeProvider("FILE");
+            $current = $provider->getCurrent();
+        }
+        $current['preview'] = $this->generateThemePreview($current) ?? null;
+        return $current;
+    }
+
+    /**
+     * Get theme view folder path
+     *
+     * @param string|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getThemeViewPath($themeKey): string {
+        $provider = $this->getThemeProvider($themeKey);
+        $path = $provider->getThemeViewPath($themeKey);
+        return $path;
     }
 
     /**
@@ -232,5 +436,63 @@ class ThemeModel {
     public function deleteAsset(string $themeKey, string $assetKey) {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * Basic input string validation function for html and json assets
+     *
+     * @param array $data
+     * @param ValidationField $field
+     * @return bool
+     */
+    public static function validator(array $data, ValidationField $field) {
+        $asset = self::ASSET_LIST[$field->getName()];
+        $data = $data['data'];
+        switch ($asset['type']) {
+            case 'json':
+                $valid = true;
+                if ($asset['default'] === '[]') {
+                    $valid = substr($data, 0, 1) === '[';
+                    $valid = $valid && substr($data, -1) === ']';
+                } elseif ($asset['default'] === '{}') {
+                    $valid = substr($data, 0, 1) === '{';
+                    $valid = $valid && substr($data, -1) === '}';
+                }
+                $json = json_decode($data, true);
+                $valid = $valid && $json !== null;
+                break;
+            case 'html':
+            case 'css':
+            case 'js':
+            default:
+                $valid = true;
+                break;
+        }
+        return $valid;
+    }
+
+    /**
+     * Generate a theme preview from the variables.
+     *
+     * @param array $theme
+     * @return array
+     */
+    public function generateThemePreview(array $theme): array {
+        $preview = $theme['preview'] ?? [];
+
+        if (!($theme["assets"]["variables"] instanceof JsonAsset)) {
+            return $preview;
+        }
+
+        $variables = $theme["assets"]["variables"]->getDataArray();
+        if ($variables) {
+            $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
+            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
+            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
+            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
+            $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
+            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+        }
+        return $preview;
     }
 }

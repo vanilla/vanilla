@@ -33,9 +33,10 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         }
 
         // Get an ID for the body.
-        $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName.'_'.Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod)));
+        $methodStr = Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod));
+        $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName).'_'.$methodStr;
         $smarty->assign('BodyID', htmlspecialchars($bodyIdentifier));
-        //$Smarty->assign('Config', Gdn::config());
+        $smarty->assign('DataDrivenTitleBar', Gdn::config("Feature.DataDrivenTitleBar.Enabled", false));
 
         // Assign some information about the user.
         $session = Gdn::session();
@@ -73,7 +74,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             }
         }
 
-        $bodyClass = val('CssClass', $controller->Data, '', true);
+        $bodyClass = val('CssClass', $controller->Data, '');
         $sections = Gdn_Theme::section(null, 'get');
         if (is_array($sections)) {
             foreach ($sections as $section) {
@@ -140,7 +141,6 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         );
 
         $smarty->enableSecurity($security);
-
     }
 
     /**
@@ -157,7 +157,20 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $compileID = CLIENT_NAME;
         }
 
-        $smarty->setTemplateDir(dirname($path));
+        if (strpos($path, ':') === false) {
+            $smarty->setTemplateDir(dirname($path));
+        } else {
+            list($type, $arg) = explode(':', $path, 2);
+            if ($type === 'file') {
+                $smarty->setTemplateDir(dirname($arg));
+            } elseif (!empty($controller->Theme)) {
+                $smarty->setTemplateDir([
+                    PATH_THEMES."/{$controller->Theme}/views",
+                    PATH_ADDONS_THEMES."/{$controller->Theme}/views",
+                ]);
+            }
+        }
+
         $smarty->display($path, null, $compileID);
     }
 
@@ -173,6 +186,8 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $smarty->setCacheDir(PATH_CACHE.'/Smarty/cache');
             $smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');
             $smarty->addPluginsDir(PATH_LIBRARY.'/SmartyPlugins');
+            $smarty->setDebugTemplate(PATH_APPLICATIONS.'/dashboard/views/debug.tpl');
+            $smarty->registerPlugin('function', 'debug_vars', [$this, 'debugVars'], false);
 
 //         Gdn::pluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($smarty, 'Gdn_Smarty', 'Init');
@@ -205,5 +220,56 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $return = false;
         }
         return $return;
+    }
+
+    /**
+     * Output template variables.
+     *
+     * @param mixed $params
+     * @param Smarty_Internal_TemplateBase $smarty
+     * @return string
+     */
+    public function debugVars($params, $smarty) {
+        $debug = new Smarty_Internal_Debug();
+        $ptr = $debug->get_debug_vars($smarty);
+        $vars = self::sanitizeVariables($ptr->tpl_vars);
+        ksort($vars);
+
+        $sm = new Smarty();
+        $sm->assign('assigned_vars', $vars);
+        return $sm->fetch(PATH_APPLICATIONS.'/dashboard/views/debug_vars.tpl');
+    }
+
+    /**
+     * Sanitize template variables to remove or obscure sensitive information.
+     *
+     * @param array $vars
+     * @param int $level
+     * @return array
+     */
+    public static function sanitizeVariables(array $vars, int $level = 0): array {
+        $remove = ['password', 'accesstoken', 'fingerprint', 'updatetoken'];
+        $obscure = [
+            'insertipaddress', 'updateipaddress', 'lastipaddress', 'allipaddresses', 'dateofbirth', 'hashmethod',
+            'email', 'firstemail', 'lastemail',
+        ];
+
+        $r = [];
+
+        foreach ($vars as $key => $value) {
+            $lkey = strtolower($key);
+            if (in_array($lkey, $remove, true) || ($level === 0 && $key === 'Assets')) {
+                continue;
+            } elseif (in_array($lkey, $obscure, true)) {
+                $r[$key] = '***OBSCURED***';
+            } elseif (is_array($value)) {
+                $r[$key] = self::sanitizeVariables($value, $level + 1);
+            } elseif ($value instanceof stdClass) {
+                $r[$key] = (object)self::sanitizeVariables((array)$value, $level + 1);
+            } else {
+                $r[$key] = $value;
+            }
+        }
+        return $r;
     }
 }

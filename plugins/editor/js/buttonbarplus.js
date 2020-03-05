@@ -771,7 +771,7 @@
                                         : GuessText;
 
                                     $(TextArea).focus();
-                                    $(TextArea).replaceSelectedText('[' + CurrentSelectText + '](' + val + ' "' + CurrentSelectText + '")', 'select');
+                                    $(TextArea).replaceSelectedText('[' + CurrentSelectText + '](' + val + ')', 'select');
 
                                     // Close dropdowns
                                     $('.editor-dialog-fire-close').trigger('mouseup.fireclose');

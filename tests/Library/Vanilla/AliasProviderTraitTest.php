@@ -24,7 +24,7 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      * - Verify that the we are starting with a fresh set of classes. Eg. The classes we're testing have not been
      * autoloaded yet. $runTestInSeparateProcess should handle this.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
 
         // Our alias autoloader throws deprecated notices. Disable the error reporting for these tests.
         // Since this test runs in a separate process it shouldn't affect the rest of the tests.

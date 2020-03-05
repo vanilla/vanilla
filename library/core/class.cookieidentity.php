@@ -83,7 +83,10 @@ class Gdn_CookieIdentity {
         $currentHost = Gdn::request()->host();
         if (!stringEndsWith($currentHost, trim($this->CookieDomain, '.'))) {
             $this->CookieDomain = '';
-            trigger_error('Config "Garden.Cookie.Domain" is incompatible with the current host.', E_USER_WARNING);
+            trigger_error(
+                sprintf('Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).', $currentHost, $this->CookieDomain),
+                E_USER_WARNING
+            );
         }
 
         $this->CookieHashMethod = val('HashMethod', $config, $defaultConfig['HashMethod']);

@@ -6,12 +6,16 @@
 import React from "react";
 import { useDashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import RadioButton from "@library/forms/RadioButton";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
+import classNames from "classnames";
 
 interface IProps {
     disabled?: boolean;
     className?: string;
     label: string;
     value: string;
+    name?: string;
+    note?: string;
 }
 
 export function DashboardRadioButton(props: IProps) {
@@ -25,5 +29,12 @@ export function DashboardRadioButton(props: IProps) {
               }
             : {};
 
-    return <RadioButton {...props} {...controlledProps} isHorizontal={isInline} />;
+    return (
+        <RadioButton
+            {...props}
+            {...controlledProps}
+            isHorizontal={isInline}
+            className={classNames(props.className, checkRadioClasses().isDashboard)}
+        />
+    );
 }

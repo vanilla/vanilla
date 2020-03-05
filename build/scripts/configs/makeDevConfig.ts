@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
+const ReactRefreshPlugin = require("react-refresh-webpack-plugin");
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
-import { getOptions } from "../options";
+import { getOptions } from "../buildOptions";
 
 /**
  * Create the development config. Eg. Hot build.
@@ -33,6 +34,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         splitChunks: false,
     };
     baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
+    baseConfig.plugins!.push(new ReactRefreshPlugin());
 
     return baseConfig;
 }

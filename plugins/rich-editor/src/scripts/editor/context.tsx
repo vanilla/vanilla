@@ -11,6 +11,7 @@ import React, { useContext } from "react";
 export interface IEditorProps {
     isPrimaryEditor: boolean;
     isLoading: boolean;
+    onFocus?: (isFocused: boolean) => void;
     onChange?: (newContent: DeltaOperation[]) => void;
     allowUpload: boolean;
     initialValue?: DeltaOperation[];
@@ -26,6 +27,7 @@ interface IContextProps extends IEditorProps {
     quill: Quill | null;
     isMobile: boolean;
     setQuillInstance: (quill: Quill | null) => void;
+    onFocus?: (isFocused: boolean) => void;
 }
 
 interface IEditorReduxValue extends IEditorInstance {

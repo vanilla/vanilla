@@ -48,7 +48,7 @@ class ContainerUtils {
      */
     public static function currentTheme(): ReferenceInterface {
         return new Callback(function (ContainerInterface $dic) {
-            /** @type AddonManager addonManager */
+            /** @type AddonManager $addonManager */
             $addonManager = $dic->get(AddonManager::class);
             return $addonManager->getTheme();
         });

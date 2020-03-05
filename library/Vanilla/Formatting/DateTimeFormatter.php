@@ -218,14 +218,18 @@ class DateTimeFormatter {
      * @param string $dateTime The Mysql-formatted datetime to convert to a timestamp. Should be in one
      * of the following formats: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
      * @param mixed $fallback The value to return if the value couldn't be properly converted.
-     * @return int A timestamp or now if it couldn't be parsed properly.
+     * @param mixed $emptyFallback The fallback for an empty value. If not supplied then the `$fallback` will be used.
+     * @return int|null A timestamp or now if it couldn't be parsed properly.
      */
-    public static function dateTimeToTimeStamp(?string $dateTime = '', $fallback = null): int {
-        if (($testTime = strtotime($dateTime)) !== false) {
+    public static function dateTimeToTimeStamp(?string $dateTime, $fallback = false, $emptyFallback = false): ?int {
+        if (empty($dateTime)) {
+            $emptyFallback = $emptyFallback !== false ? $emptyFallback : $fallback;
+            return $emptyFallback !== false ? $emptyFallback : time();
+        } elseif (($testTime = strtotime($dateTime)) !== false) {
             return $testTime;
         } else {
-            $fallback = $fallback ?? time();
-            trigger_error(__FUNCTION__ . 'called with bad input ' . $dateTime, E_USER_WARNING);
+            $fallback = $fallback !== false ? $fallback : time();
+            trigger_error(__FUNCTION__ . 'called with bad input ' . $dateTime, E_USER_NOTICE);
             return $fallback;
         }
     }

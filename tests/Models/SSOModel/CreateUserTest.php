@@ -35,7 +35,7 @@ class CreateUserTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         self::$ssoModel = self::container()->get(SSOModel::class);
@@ -52,7 +52,7 @@ class CreateUserTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         /** @var \Gdn_SQLDriver $driver */
         $driver = self::container()->get('SqlDriver');
         $driver->truncate('User');

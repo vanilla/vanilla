@@ -26,7 +26,9 @@
                 <div class="ItemContent">
                     <b class="Subject"><?php echo anchor(htmlspecialchars($Subject), "/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?></b>
                     <?php
-                    $Excerpt = sliceString(Gdn::formatService()->renderExcerpt($Row['LastBody'], $Row['LastFormat']), 80);
+                    $Excerpt = isset($Row['LastBody'])
+                        ? sliceString(Gdn::formatService()->renderExcerpt($Row['LastBody'], $Row['LastFormat']), 80)
+                        : t('Blank Message');
                     echo wrap(nl2br(htmlspecialchars($Excerpt)), 'div', ['class' => 'Excerpt']);
                     ?>
                     <div class="Meta">

@@ -354,8 +354,9 @@ class AuthenticateApiController extends AbstractApiController {
         $response = $this->fillSSOUser([], $ssoData);
         $response = $this->fillAuthenticator($response, $ssoData);
         $response = $this->fillConfig($response);
-
-        return $out->validate($response);
+        $result = $out->validate($response);
+        $result = new Data($result, ['api-allow' => ['email']]);
+        return $result;
     }
 
     /**
@@ -708,7 +709,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         $result = $out->validate($response);
 
-        return new Data($result, ['status' => $statusCode]);
+        return new Data($result, ['status' => $statusCode, 'api-allow' => ['email']]);
     }
 
     /**

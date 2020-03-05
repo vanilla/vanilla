@@ -7,8 +7,10 @@ import React, { useState, useMemo } from "react";
 import { IEditorProps, EditorContext } from "@rich-editor/editor/context";
 import Quill from "quill/core";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { EditorContentContextProvider } from "@rich-editor/editor/contentContext";
+import { t } from "@vanilla/library/src/scripts/utility/appUtils";
+import { visibility } from "@vanilla/library/src/scripts/styles/styleHelpers";
 
 /**
  * The editor root.
@@ -21,18 +23,15 @@ export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const ID = useMemo(() => uniqueIDFromPrefix("editor"), []);
-    const descriptionID = ID + "-description";
 
     return (
         <EditorContext.Provider
             value={{
                 ...props,
+                onFocus: props.onFocus,
                 quill,
                 setQuillInstance,
                 isMobile,
-                editorID: ID,
-                descriptionID,
             }}
         >
             <EditorContentContextProvider quill={quill}>{props.children}</EditorContentContextProvider>

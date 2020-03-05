@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
 
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
@@ -115,6 +116,23 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * You shouldn't be allowed to post with a bad format.
+     */
+    public function testPostBadFormat(): void {
+        $record = $this->record();
+        if (!array_key_exists('format', $record)) {
+            // The test doesn't apply to this resource so just arbitrarily pass.
+            $this->assertTrue(true);
+            return;
+        }
+        $record['format'] = 'invalid';
+
+        $this->expectException(ClientException::class);
+        $this->expectExceptionCode(422);
+        $result = $this->api()->post($this->baseUrl, $record);
+    }
+
+    /**
      * Test PATCH /resource/<id> with a full record overwrite.
      */
     public function testPatchFull() {
@@ -131,6 +149,24 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertRowsEqual($newRow, $r->getBody());
 
         return $r->getBody();
+    }
+
+    /**
+     * A PATCH with an invalid format should have validation problems.
+     *
+     * @depends testGetEdit
+     */
+    public function testPatchInvalidFormat(): void {
+        $row = $this->testGetEdit();
+        if (!array_key_exists('format', $row)) {
+            $this->assertTrue(true);
+            return;
+        }
+        $row['format'] = 'invalid';
+
+        $this->expectException(ClientException::class);
+        $this->expectExceptionCode(422);
+        $r = $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", $row);
     }
 
     /**

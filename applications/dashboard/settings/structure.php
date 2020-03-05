@@ -797,8 +797,17 @@ $Construct->table('Spammer')
     ->column('CountDeletedSpam', 'usmallint', 0)
     ->set($Explicit, $Drop);
 
+$Construct->table('Media');
+
+// There used to be a required storage method column in the table.
+// It was removed in https://github.com/vanilla/vanilla/pull/3389
+// Clean it up so it doesn't cause problems during upgrades
+$transientKeyExists = $Construct->columnExists('StorageMethod');
+if ($transientKeyExists) {
+    $Construct->dropColumn('StorageMethod');
+}
+
 $Construct
-    ->table('Media')
     ->primaryKey('MediaID')
     ->column('Name', 'varchar(255)')
     ->column('Path', 'varchar(255)')

@@ -212,9 +212,10 @@ export function DropDownMenuIcon(props: { className?: string }) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <circle cx="5.7" cy="12" r="2" fill="currentColor" />
-            <circle cx="18.3" cy="12" r="2" fill="currentColor" />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <path
+                fill="currentColor"
+                d="M5.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+            />
         </svg>
     );
 }
@@ -241,23 +242,69 @@ export function NewFolderIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function WarningIcon(props: { className?: string; warningMessage: string }) {
+export function WarningIcon(props: { className?: string; warningMessage?: string; hidden?: boolean }) {
     const classes = iconClasses();
+    const { className, warningMessage = t("Warning"), hidden = true } = props;
 
     return (
         <svg
-            className={classNames(classes.warning, props.className)}
-            aria-label={props.warningMessage}
+            className={classNames(classes.warning, className)}
+            aria-label={warningMessage}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
+            aria-hidden={hidden ? "true" : "false"}
         >
-            <title>{props.warningMessage}</title>
-            <circle cx="8" cy="8" r="8" style={currentColorFill} />
-            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "#000", strokeOpacity: 0.122 }} />
+            <title>{warningMessage}</title>
             <path
-                d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z"
+                d="M12.709,13.405H11.314l-.291-5.9H13ZM11,15.472a1.048,1.048,0,0,1,.257-.767,1.01,1.01,0,0,1,.749-.26.982.982,0,0,1,.734.266,1.226,1.226,0,0,1,0,1.514.964.964,0,0,1-.731.275.993.993,0,0,1-.743-.269A1.042,1.042,0,0,1,11,15.472Z"
                 transform="translate(-4 -4)"
-                style={{ fill: "#fff" }}
+                style={{ fill: "currentColor" }}
+            />
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
+export function ErrorIcon(props: { className?: string; errorMessage?: string; hidden?: boolean }) {
+    const classes = iconClasses();
+    const { className, errorMessage = t("Error"), hidden = true } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            aria-label={errorMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 17 17"
+            aria-hidden={hidden ? "true" : "false"}
+        >
+            <title>{errorMessage}</title>
+            <path
+                d="M11.753,4.247a.843.843,0,0,1,0,1.19L9.191,8l2.562,2.562a.842.842,0,0,1,.076,1.105l-.076.086a.843.843,0,0,1-1.19,0L8,9.191,5.438,11.753a.842.842,0,0,1-1.191-1.19L6.809,8,4.247,5.438a.842.842,0,0,1-.076-1.1l.076-.086a.843.843,0,0,1,1.19,0L8,6.809l2.562-2.562a.842.842,0,0,1,1.191,0Z"
+                transform="translate(0.5 0.5)"
+                style={{ fill: "currentColor", fillRule: "evenodd" }}
+            />
+            <circle cx="8.5" cy="8.5" r="8" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
+export function InformationIcon(props: { className?: string; informationMessage?: string; hidden?: boolean }) {
+    const classes = iconClasses();
+    const { className, informationMessage = t("Information"), hidden = true } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            aria-label={informationMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            aria-hidden={hidden ? "true" : "false"}
+        >
+            <title>{informationMessage}</title>
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "currentColor" }} />
+            <path
+                d="M9,12H7V7H9ZM7,5.006a1.063,1.063,0,0,1,.236-.757A1.006,1.006,0,0,1,8,4a1.012,1.012,0,0,1,.764.254A1.058,1.058,0,0,1,9,5.006.883.883,0,0,1,8,6,.879.879,0,0,1,7,5.006Z"
+                style={{ fill: "currentColor", fillRule: "evenodd" }}
             />
         </svg>
     );
@@ -283,7 +330,7 @@ export function CategoryIcon(props: { className?: string }) {
     );
 }
 
-export function CheckCompactIcon(props: { className?: string }) {
+export function CheckCompactIcon(props: { className?: string; "aria-hidden"?: true }) {
     const title = `✓`;
     const classes = iconClasses();
     return (
@@ -320,7 +367,6 @@ export function DownTriangleIcon(props: { className?: string; title?: string; de
 
     const transform = [rotation, translate].filter(item => item !== undefined).join(", ");
 
-    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -460,7 +506,8 @@ export function SearchErrorIcon(props: { message?: string; className?: string })
     );
 }
 
-export function accessibleImageMenu(message?: string, className?: string) {
+export function AccessibleImageMenuIcon(props: { message?: string; className?: string }) {
+    const { message, className } = props;
     const title = message ? message : t("Accessibility");
     const classes = iconClasses();
     return (
@@ -484,18 +531,20 @@ export function accessibleImageMenu(message?: string, className?: string) {
     );
 }
 
-export function EditIcon(props: { className?: string; title?: string }) {
+export function EditIcon(props: { className?: string; title?: string; small?: boolean }) {
     const classes = iconClasses();
     return (
         <svg viewBox="0 0 24 24" className={classNames(classes.editIcon, props.className)}>
             <title>{props.title ? props.title : t("Edit")}</title>
-            <g transform="translate(4, 3)">
-                <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
-                <path
-                    d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
-                    stroke="currentColor"
-                    fill="none"
-                />
+            <g className={classNames({ [classes.isSmall]: props.small })}>
+                <g transform="translate(4, 3)">
+                    <polygon fill="currentColor" points="1.05405405 14 3 15.9736842 0 17" />
+                    <path
+                        d="M1.53965611,12.8579964 L14.2200643,0.146669161 C14.4151476,-0.0488897203 14.6102308,-0.0488897203 14.805314,0.146669161 L16.8536876,2.20003741 C17.0487708,2.39559629 17.0487708,2.59115517 16.8536876,2.78671406 L4.17327936,15.4980413 L0.466698493,16.9647329 C0.076532086,17.0625124 -0.118551118,16.9647329 0.076532086,16.5736152 L1.53965611,12.8579964 Z"
+                        stroke="currentColor"
+                        fill="none"
+                    />
+                </g>
             </g>
         </svg>
     );
@@ -542,17 +591,139 @@ export function DiscussionIcon(props: { className?: string; title?: string }) {
     );
 }
 
-export function AlertIcon(props: { className?: string; title?: string }) {
+export function GlobeIcon(props: { className?: string; title?: string }) {
     const classes = iconClasses();
     return (
-        <svg className={classNames(classes.alertIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">
-            <title>{props.title ? props.title : t("Alert")}</title>
-
-            <circle cx="12" cy="12" r="7" style={{ fill: "#d0021b" }} />
+        <svg className={classNames(classes.globeIcon, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+            <title>{props.title ? props.title : t("Globe")}</title>
             <path
-                d="M12.709,12.905H11.314L11.023,7H13ZM11,14.972a1.048,1.048,0,0,1,.257-.767,1.01,1.01,0,0,1,.749-.26.982.982,0,0,1,.734.266,1.226,1.226,0,0,1,0,1.514.964.964,0,0,1-.731.275.993.993,0,0,1-.743-.269A1.042,1.042,0,0,1,11,14.972Z"
-                style={{ fill: "#fff" }}
+                d="M18.75,6.055A8.983,8.983,0,0,0,12.082,3l-.019,0H12a8.994,8.994,0,0,0-.035,17.988.415.415,0,0,0,.207,0A8.979,8.979,0,0,0,18.689,18a.382.382,0,0,0,.045-.052,8.966,8.966,0,0,0,.016-11.9ZM18.3,17.089a10.836,10.836,0,0,0-1.975-.815,15.225,15.225,0,0,0,.593-4.06h3.215A7.994,7.994,0,0,1,18.3,17.089ZM3.868,12.214H7.083A15.44,15.44,0,0,0,7.676,16.3a10.707,10.707,0,0,0-1.975.762A7.924,7.924,0,0,1,3.868,12.214ZM5.7,6.794a10.707,10.707,0,0,0,1.975.762,15.667,15.667,0,0,0-.589,3.8H3.879A8.027,8.027,0,0,1,5.7,6.794Zm5.844.577a16.12,16.12,0,0,1-2.829-.33C9.4,5.3,10.47,4.108,11.545,3.893Zm0,.857v3.13h-3.6A13.983,13.983,0,0,1,8.478,7.8,15.459,15.459,0,0,0,11.545,8.228Zm0,3.986v3.547a15.492,15.492,0,0,0-3.066.32,14.064,14.064,0,0,1-.537-3.867Zm0,4.4V20.1c-1.075-.215-2.15-1.41-2.829-3.148A16.312,16.312,0,0,1,11.545,16.618Zm.86,0a13.668,13.668,0,0,1,2.7.327c-.653,1.672-1.628,2.842-2.7,3.119V16.62Zm0-.857v-3.55h3.653a13.891,13.891,0,0,1-.625,3.867,15.962,15.962,0,0,0-3.029-.318Zm0-4.407V8.225A15.634,15.634,0,0,0,15.433,7.8a13.924,13.924,0,0,1,.62,3.555H12.405Zm0-3.99V3.922c1.074.277,2.049,1.446,2.7,3.118a13.521,13.521,0,0,1-2.7.327Zm2.153-3.1A8.164,8.164,0,0,1,17.7,6.19a10.084,10.084,0,0,1-1.648.633A7.94,7.94,0,0,0,14.558,4.271ZM7.95,6.823A10.016,10.016,0,0,1,6.3,6.19a8.166,8.166,0,0,1,3.14-1.92A7.95,7.95,0,0,0,7.95,6.823Zm0,10.342a7.952,7.952,0,0,0,1.492,2.553A8.14,8.14,0,0,1,6.3,17.8,10.177,10.177,0,0,1,7.95,17.165Zm8.1,0A10.129,10.129,0,0,1,17.7,17.8a8.14,8.14,0,0,1-3.14,1.919A7.91,7.91,0,0,0,16.05,17.165Zm.863-5.808a15.454,15.454,0,0,0-.589-3.775A10.7,10.7,0,0,0,18.3,6.767a8.107,8.107,0,0,1,1.822,4.59Z"
+                style={{ fill: "currentColor" }}
             />
+        </svg>
+    );
+}
+
+export function TranslateIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.standard, props.className)} viewBox="0 0 24 24" aria-hidden="true">
+            <title>{props.title ? props.title : t("Translate")}</title>
+            <path
+                d="M9.836,13.2l-.455-1.495H7.09L6.635,13.2H5.2L7.417,6.892H9.046L11.27,13.2Zm-.773-2.612q-.359-1.149-.711-2.3-.065-.209-.114-.42-.142.549-.812,2.72Zm9.472,1.626a.5.5,0,0,0,0-1h-2.07V10a.466.466,0,1,0-.93,0v1.214h-1.9c-.256,0-.088.22,0,.5s0,.5.255.5h.216a4.936,4.936,0,0,0,1.164,2.75c-.528.34.31.329-.35.329-.256,0,0,.077,0,.353s.093.508.35.508c.614,0,.01.03.73-.508a4.216,4.216,0,0,0,2.535.854.5.5,0,0,0,0-1,3.319,3.319,0,0,1-1.8-.536,4.936,4.936,0,0,0,1.164-2.75h.641ZM16,14.34a3.893,3.893,0,0,1-.956-2.125h1.912A3.893,3.893,0,0,1,16,14.34Z"
+                style={{ fill: "currentColor" }}
+            />
+            <path
+                d="M11.271,2.709H4.017q-1.418,0-1.417,1.9V16.445q0,1.575,1.733,1.575H16.1Z"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+            <path
+                d="M12.348,6.116h7.7q1.313,0,1.312,1.234v12.7q0,1.47-1.312,1.47H13.635L12,18.02h4.1Zm1.287,15.4,2.817-3.287"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+        </svg>
+    );
+}
+
+export function HamburgerIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg className={classNames(classes.hamburger, props.className)} viewBox="0 0 21.999 15.871" aria-hidden="true">
+            <title>{props.title ? props.title : t("Menu")}</title>
+            <path
+                d="M21.111,8.9H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849m0-7.012H.89A.906.906,0,0,1,0,.97.907.907,0,0,1,.889.045H21.11A.907.907,0,0,1,22,.969a.907.907,0,0,1-.889.924m0,14.023H.89a.925.925,0,0,1,0-1.849H21.11a.925.925,0,0,1,0,1.849"
+                transform="translate(0 -0.045)"
+                style={{ fill: "currentcolor" }}
+            />
+        </svg>
+    );
+}
+export function DarkThemeIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g fill="none" fillRule="evenodd" transform="translate(2 2)">
+                <circle cx="10" cy="10" r="10" fill="#42464C" stroke="#DDDEE0" transform="rotate(-180 10 10)" />
+                <path fill="#DDDEE0" d="M10 19.986V.014C15.573.288 20 4.654 20 10c0 5.346-4.428 9.712-10 9.986z" />
+                <circle cx="4.444" cy="4.444" r="3.951" stroke="#DDDEE0" transform="rotate(-90 10 4.444)" />
+                <path
+                    fill="#D8D8D8"
+                    d="M6.097 5.564l-.305-1.392-1.348-.279 1.348-.318.305-1.353.239 1.353 1.462.314-1.462.283zM3.875 8.898L3.57 7.506l-1.348-.28 1.348-.318.305-1.352.238 1.352 1.462.314-1.462.284z"
+                />
+            </g>
+        </svg>
+    );
+}
+
+export function LightThemeIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g fill="none" fillRule="evenodd" transform="translate(2 2)">
+                <circle cx="10" cy="10" r="10" fill="#555A62" stroke="#555A62" />
+                <path fill="#DDDEE0" d="M10 .556v18.888A9.444 9.444 0 1 1 10 .556z" />
+                <g transform="rotate(90 8.889 10)">
+                    <path
+                        fill="#555A62"
+                        fillRule="nonzero"
+                        d="M17.18 7.901h-1.768c-.322 0-.597.228-.597.494s.275.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494zM8.395 14.815c-.266 0-.494.275-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597v-1.769c0-.322-.228-.597-.494-.597zM8.395 0c-.266 0-.494.276-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597V.597C8.889.276 8.66 0 8.395 0zM12.71 12.779c-.184.182-.145.535.084.763l1.255 1.256c.229.228.581.267.764.084.183-.183.144-.535-.084-.763l-1.256-1.256c-.228-.229-.58-.267-.764-.084zM2.484 2.553c-.183.183-.144.536.084.764l1.256 1.256c.228.228.581.267.764.084.183-.183.144-.535-.084-.764L3.248 2.638c-.228-.229-.58-.268-.764-.085zM4.588 12.779c-.183-.183-.536-.145-.764.084l-1.256 1.256c-.228.228-.267.58-.084.763.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.763zM14.813 2.553c-.183-.183-.535-.144-.764.085l-1.255 1.255c-.229.229-.268.581-.085.764.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.764zM2.366 7.901H.597c-.321 0-.597.228-.597.494s.253.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494z"
+                    />
+                    <circle cx="8.889" cy="8.889" r="3.951" stroke="#555A62" />
+                </g>
+                <circle cx="10" cy="10" r="10" fill="#555A62" stroke="#555A62" />
+                <path fill="#FFF" d="M10 .556v18.888A9.444 9.444 0 1 1 10 .556z" />
+                <g transform="rotate(90 8.889 10)">
+                    <path
+                        fill="#555A62"
+                        fillRule="nonzero"
+                        d="M17.18 7.901h-1.768c-.322 0-.597.228-.597.494s.275.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494zM8.395 14.815c-.266 0-.494.275-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597v-1.769c0-.322-.228-.597-.494-.597zM8.395 0c-.266 0-.494.276-.494.597v1.769c0 .321.228.597.494.597s.494-.276.494-.597V.597C8.889.276 8.66 0 8.395 0zM12.71 12.779c-.184.182-.145.535.084.763l1.255 1.256c.229.228.581.267.764.084.183-.183.144-.535-.084-.763l-1.256-1.256c-.228-.229-.58-.267-.764-.084zM2.484 2.553c-.183.183-.144.536.084.764l1.256 1.256c.228.228.581.267.764.084.183-.183.144-.535-.084-.764L3.248 2.638c-.228-.229-.58-.268-.764-.085zM4.588 12.779c-.183-.183-.536-.145-.764.084l-1.256 1.256c-.228.228-.267.58-.084.763.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.763zM14.813 2.553c-.183-.183-.535-.144-.764.085l-1.255 1.255c-.229.229-.268.581-.085.764.183.183.536.144.764-.084l1.256-1.256c.228-.228.267-.58.084-.764zM2.366 7.901H.597c-.321 0-.597.228-.597.494s.253.494.597.494h1.769c.321 0 .597-.228.597-.494s-.276-.494-.597-.494z"
+                    />
+                    <circle cx="8.889" cy="8.889" r="3.951" stroke="#555A62" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
+export function PlusIcon(props: { className?: string; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="81" viewBox="0 0 80 81">
+            <g fill="#EFEFF0" fillRule="evenodd">
+                <path d="M32 0h16v80.762H32zM80 32.381v16H48v-16zM32 32.381v16H0v-16z" />
+            </g>
+        </svg>
+    );
+}
+
+export function LoaderIcon(props: { className?: string }) {
+    return (
+        <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18px"
+            height="18px"
+            viewBox="0 0 18 18"
+            version="1.1"
+            className={props.className}
+        >
+            <title>{t("Loader")}</title>
+            <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <g id="Artboard" fill="currentColor">
+                    <g id="Loader">
+                        <path
+                            d="M9,0 C13.9705627,0 18,4.02943725 18,9 C18,13.9705627 13.9705627,18 9,18 C4.07738737,18 0,13.97 0,9 C0,8.99144674 1,8.99144674 3,9 C3,12.3137085 5.6862915,15 9,15 C12.3137085,15 15,12.3137085 15,9 C15,5.6862915 12.3137085,3 9,3 L9,0 Z"
+                            id="Path"
+                            opacity="0.3"
+                        ></path>
+                        <path
+                            d="M9,5.1159077e-13 C9,5 4.97,9 1.42108547e-14,9 C1.42108547e-14,9 1.42108547e-14,6 1.42108547e-14,6 C3.31,6 5.95313475,3.31 6,5.1159077e-13 C6,5.1159077e-13 9,5.1159077e-13 9,5.1159077e-13 Z"
+                            id="Path"
+                            transform="translate(4.500000, 4.500000) rotate(180.000000) translate(-4.500000, -4.500000) "
+                        ></path>
+                    </g>
+                </g>
+            </g>
         </svg>
     );
 }

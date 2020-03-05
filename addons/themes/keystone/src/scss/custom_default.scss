@@ -1,0 +1,19 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* ------------------ Theme ------------------ */
+
+@import "base/variables";
+
+/* --------------- Boilerplate --------------- */
+
+@import "components/kbicons";
+@import "~@vanilla/theme-core/scss/static.scss";
+
+/* ------------------ Sections ------------------ */
+
+@import "sections/header_default";
+@import "sections/themeoptions";

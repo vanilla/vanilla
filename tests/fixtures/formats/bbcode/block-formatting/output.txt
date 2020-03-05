@@ -15,4 +15,3 @@ Image
 <script>var thing = $('#HelloWorld');</script>
 
 (Spoiler)
-

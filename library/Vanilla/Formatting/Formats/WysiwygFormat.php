@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Formatting\FormatUtil;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -21,11 +22,9 @@ class WysiwygFormat extends HtmlFormat {
     const ALT_FORMAT_KEY = "raw";
 
     /**
-     * Constructor for dependency Injection.
+     * Constructor for dependency Injection
      *
-     * @param HtmlSanitizer $htmlSanitizer
-     * @param HtmlEnhancer $htmlEnhancer
-     * @param HtmlPlainTextConverter $plainTextConverter
+     * @inheritdoc
      */
     public function __construct(
         HtmlSanitizer $htmlSanitizer,
@@ -33,6 +32,14 @@ class WysiwygFormat extends HtmlFormat {
         HtmlPlainTextConverter $plainTextConverter
     ) {
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderHtml(string $content, bool $enhance = true): string {
+        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', '', $content);
+        return parent::renderHtml($result, $enhance);
     }
 
     /**

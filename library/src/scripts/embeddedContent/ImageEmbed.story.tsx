@@ -10,6 +10,7 @@ import { formatUrl } from "@library/utility/appUtils";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
+import { EmbedContext } from "@library/embeddedContent/embedService";
 
 const reactionsStory = storiesOf("Embeds", module);
 
@@ -37,15 +38,16 @@ reactionsStory.add("ImageEmbed", () => {
             />
 
             <StoryHeading>In Editor</StoryHeading>
-            <ImageEmbed
-                type="image/png"
-                size={1000000}
-                name="hero image.png"
-                embedType="image"
-                dateInserted={date}
-                url="https://success.vanillaforums.com/themes/success/design/images/home_bg_image.jpeg"
-                inEditor={true}
-            />
+            <EmbedContext.Provider value={{ inEditor: true, isSelected: true }}>
+                <ImageEmbed
+                    type="image/png"
+                    size={1000000}
+                    name="hero image.png"
+                    embedType="image"
+                    dateInserted={date}
+                    url="https://success.vanillaforums.com/themes/success/design/images/home_bg_image.jpeg"
+                />
+            </EmbedContext.Provider>
         </>
     );
 });

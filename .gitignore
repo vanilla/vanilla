@@ -1,3 +1,8 @@
+/addons/themes/*
+/addons/addons/*
+!/addons/themes/theme-foundation/
+!/addons/themes/theme-boilerplate/
+!/addons/themes/keystone/
 /applications/*
 !/applications/conversations/
 !/applications/dashboard/
@@ -62,9 +67,6 @@
 !/themes/bittersweet/
 !/themes/default/
 !/themes/mobile/
-!/themes/theme-boilerplate/
-!/themes/keystone/
-!/themes/theme-api-test/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*
@@ -96,3 +98,5 @@ yarn-error.log
 lerna-debug.log
 git-diff.txt
 phpcs-diff.json
+phpunit.xml.dist
+.phpunit.result.cache

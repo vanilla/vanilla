@@ -11,6 +11,9 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\SchemaFactory;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -40,21 +43,27 @@ class DiscussionsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CommentModel */
+    private $commentModel;
+
     /**
      * DiscussionsApiController constructor.
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
      * @param CategoryModel $categoryModel
+     * @param CommentModel $commentModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
         UserModel $userModel,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        CommentModel $commentModel
     ) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->commentModel = $commentModel;
     }
 
     /**
@@ -79,7 +88,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
         ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -94,13 +103,13 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
         );
 
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand'] ?? []);
         }
+        $this->expandLastCommentBody($rows, $query['expand']);
 
         $result = $out->validate($rows);
 
@@ -154,7 +163,7 @@ class DiscussionsApiController extends AbstractApiController {
                 Schema::parse([
                     'name',
                     'body',
-                    'format:s' => 'The input format of the discussion.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'categoryID',
                     'closed?',
                     'sink?',
@@ -204,38 +213,13 @@ class DiscussionsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return Schema::parse([
-            'discussionID:i' => 'The ID of the discussion.',
-            'type:s|n' => [
-                //'enum' => [] // Let's find a way to fill that properly.
-                'description' => 'The type of this discussion if any.',
-            ],
-            'name:s' => 'The title of the discussion.',
-            'body:s' => 'The body of the discussion.',
-            'categoryID:i' => 'The category the discussion is in.',
-            'category?' => $this->getCategoryFragmentSchema(),
-            'dateInserted:dt' => 'When the discussion was created.',
-            'dateUpdated:dt|n' => 'When the discussion was last updated.',
-            'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'lastUser?' => $this->getUserFragmentSchema(),
-            'pinned:b?' => 'Whether or not the discussion has been pinned.',
-            'pinLocation:s|n' => [
-                'enum' => ['category', 'recent'],
-                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
-            ],
-            'closed:b' => 'Whether the discussion is closed or open.',
-            'sink:b' => 'Whether or not the discussion has been sunk.',
-            'countComments:i' => 'The number of comments on the discussion.',
-            'countViews:i' => 'The number of views on the discussion.',
-            'score:i|n' => 'Total points associated with this post.',
-            'url:s?' => 'The full URL to the discussion.',
-            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
-            'lastPost?' => $this->getPostFragmentSchema(),
-            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
-            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
-            'countUnread:i?' => 'The number of unread comments.',
-        ]);
+        $result = $this->discussionModel
+            ->schema()
+            ->merge($this->discussionModel->userDiscussionSchema())
+            ->merge(Schema::parse([
+                'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
+            ]));
+        return $result;
     }
 
     /**
@@ -251,7 +235,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema([
-            'expand?' => ApiUtils::getExpandDefinition([]) // Allow addons to expand additional fields.
+            'expand?' => ApiUtils::getExpandDefinition(['lastPost', 'lastPost.body', 'lastPost.insertUser']) // Allow addons to expand additional fields.
         ], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
@@ -266,8 +250,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
         $row = $this->normalizeOutput($row, $query["expand"] ?? []);
+        $rows = [&$row];
+        $this->expandLastCommentBody($rows, $query['expand'] ?? []);
 
         $result = $out->validate($row);
 
@@ -284,12 +270,6 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord, $expand = []) {
-        $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
-        $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
-        $dbRecord['Url'] = discussionUrl($dbRecord);
-        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
-        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
-
         if ($this->getSession()->User) {
             $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
                 && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
@@ -300,36 +280,21 @@ class DiscussionsApiController extends AbstractApiController {
             $dbRecord['unread'] = false;
         }
 
-        if ($this->isExpandField('lastPost', $expand)) {
-            $lastPost = [
-                'discussionID' => $dbRecord['DiscussionID'],
-                'dateInserted' => $dbRecord['DateLastComment'],
-                'insertUser' => $dbRecord['LastUser'],
-                "insertUserID" => $dbRecord["LastUserID"],
-            ];
-            if ($dbRecord['LastCommentID']) {
-                $lastPost['CommentID'] = $dbRecord['LastCommentID'];
-                $lastPost['name'] = sprintft('Re: %s', $dbRecord['Name']);
-                $lastPost['url'] = commentUrl($lastPost, true);
-            } else {
-                $lastPost['name'] = $dbRecord['Name'];
-                $lastPost['url'] = $dbRecord['Url'];
-            }
-
-            $dbRecord['lastPost'] = $lastPost;
-        }
-
         // The Category key will hold a category fragment in API responses. Ditch the default string.
         if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
             unset($dbRecord['Category']);
         }
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
+        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
 
         // Allow addons to hook into the normalization process.
         $options = ['expand' => $expand];
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
+        $result = $this->getEventManager()->fireFilter(
+            'discussionsApiController_normalizeOutput',
+            $normalizedRow,
+            $this,
+            $options
+        );
 
         return $result;
     }
@@ -360,10 +325,11 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $isRich = $discussion['Format'] === 'Rich';
+        $isRich = strcasecmp($$discussion['Format'], RichFormat::FORMAT_KEY) === 0;
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
+        $discussion = $this->discussionModel->fixRow($discussion);
 
-        $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
+        $this->userModel->expandUsers($discussion, ['InsertUserID']);
         $result = $out->validate($discussion);
         return $result;
     }
@@ -382,7 +348,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
-            'format:s' => 'The original format of the discussion',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ]);
     }
 
@@ -402,14 +368,15 @@ class DiscussionsApiController extends AbstractApiController {
                 'discussionID',
                 'name',
                 'body',
-                'format:s' => 'The input format of the discussion.',
+                'format' => new \Vanilla\Models\FormatSchema(true),
                 'categoryID',
                 'sink',
                 'closed',
                 'pinned',
                 'pinLocation',
-            ])->add($this->fullSchema()
-        ), ['DiscussionGetEdit', 'out']);
+            ])->add($this->fullSchema()),
+            ['DiscussionGetEdit', 'out']
+        )->addFilter('', [\Vanilla\Formatting\Formats\RichFormat::class, 'editBodyFilter']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -469,6 +436,13 @@ class DiscussionsApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'dateLastComment?' => new DateFilterSchema([
+                'description' => 'When the last comment was posted.',
+                'x-filter' => [
+                    'field' => 'd.DateLastComment',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'type:s?' => [
                 'description' => 'Filter by discussion type.',
                 'x-filter' => [
@@ -503,7 +477,7 @@ class DiscussionsApiController extends AbstractApiController {
                     'field' => 'd.InsertUserID',
                 ],
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost'])
+            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
         ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -545,8 +519,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
         );
         if ($this->isExpandField('category', $query['expand'])) {
             $this->categoryModel->expandCategories($rows);
@@ -555,6 +528,7 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
+        $this->expandLastCommentBody($rows, $query['expand']);
 
         $result = $out->validate($rows, true);
 
@@ -735,6 +709,41 @@ class DiscussionsApiController extends AbstractApiController {
         if (!empty($attributes['CanonicalUrl'] ?? '')) {
             unset($attributes['CanonicalUrl']);
             $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
+        }
+    }
+
+    /**
+     * Expand the body of the last comment.
+     *
+     * @param array $rows
+     * @param array|bool $expand
+     */
+    private function expandLastCommentBody(array &$rows, $expand): void {
+        if (!$this->isExpandField('lastPost', $expand) || !$this->isExpandField('lastPost.body', $expand)) {
+            return;
+        }
+
+        $commentIDs = [];
+        foreach ($rows as $row) {
+            $id = $row['lastPost']['commentID'] ?? null;
+            if (is_int($id)) {
+                $commentIDs[] = $id;
+            }
+        }
+        if (!empty($commentIDs)) {
+            $comments = $this->commentModel->getWhere(['commentID' => $commentIDs], '', 'asc', count($commentIDs))->resultArray();
+            $comments = array_column($comments, null, 'CommentID');
+        } else {
+            $comments = [];
+        }
+
+        foreach ($rows as &$row) {
+            $id = $row['lastPost']['commentID'] ?? null;
+            if (isset($comments[$id])) {
+                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format']);
+            } else {
+                $row['lastPost']['body'] = $row['body'];
+            }
         }
     }
 }

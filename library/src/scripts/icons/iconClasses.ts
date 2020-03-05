@@ -4,8 +4,8 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { em } from "csx";
-import { margins, unit, colorOut } from "@library/styles/styleHelpers";
+import { scale } from "csx";
+import { unit, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const iconVariables = useThemeCache(() => {
@@ -44,7 +44,6 @@ export const iconVariables = useThemeCache(() => {
     const warning = themeVars("warning", {
         width: 16,
         height: 16,
-        color: "#f5af15",
     });
 
     const settings = themeVars("settings", {
@@ -163,6 +162,7 @@ export const iconVariables = useThemeCache(() => {
 
 export const iconClasses = useThemeCache(() => {
     const vars = iconVariables();
+    const globalVars = globalVariables();
     const style = styleFactory("iconSizes");
 
     const standard = style("defaultIcon", {
@@ -204,7 +204,6 @@ export const iconClasses = useThemeCache(() => {
     const warning = style("warning", {
         width: unit(vars.warning.width),
         height: unit(vars.warning.height),
-        color: colorOut(vars.warning.color),
     });
 
     const search = style("search", {
@@ -288,6 +287,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.deleteIcon.height),
     });
 
+    const isSmall = style("isSmall", {
+        transform: scale(0.85),
+        transformOrigin: "50% 50%",
+    });
+
     const editIcon = style("editIcon", {
         width: unit(vars.editIcon.width),
         height: unit(vars.editIcon.height),
@@ -298,15 +302,30 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
-    const alertIcon = style("alertIcon", {
+    const globeIcon = style("globeIcon", {
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
+    });
+
+    const hamburger = style("alertIconCompact", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
+    const errorFgColor = style("errorFgColor", {
+        color: colorOut(globalVars.messageColors.error.fg),
+    });
+
+    const warningFgColor = style("warningFgColor", {
+        color: colorOut(globalVars.messageColors.warning.fg),
     });
 
     return {
         standard,
         newFolder,
         warning,
+        errorFgColor,
+        warningFgColor,
         fileType,
         attachmentError,
         vanillaLogo,
@@ -329,6 +348,8 @@ export const iconClasses = useThemeCache(() => {
         deleteIcon,
         editIcon,
         discussionIcon,
-        alertIcon,
+        globeIcon,
+        isSmall,
+        hamburger,
     };
 });

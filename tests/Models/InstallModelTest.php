@@ -23,14 +23,14 @@ class InstallTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::bootstrapBeforeClass();
     }
 
     /**
      * @inheritdoc
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         /* @var TestInstallModel $installer */
         $installer = self::container()->get(TestInstallModel::class);
         $installer->uninstall();

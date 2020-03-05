@@ -9,8 +9,10 @@
  */
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\SchemaFactory;
 
 /**
  * Manages discussion categories' data.
@@ -219,9 +221,9 @@ class CategoryModel extends Gdn_Model {
         if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
             $userCategories = $this->getUserCategories();
 
-            $dateMarkedRead = ($category['DateMarkedRead'] ?? false );
-            $userData = ($userCategories[$category['CategoryID']] ?? false);
-            if ($userData) {
+            $dateMarkedRead = $category['DateMarkedRead'] ?? false;
+            $userData = $userCategories[$category['CategoryID']] ?? [];
+            if (!empty($userData)) {
                 $userDateMarkedRead = $userData['DateMarkedRead'];
 
                 if (!$dateMarkedRead ||
@@ -240,7 +242,7 @@ class CategoryModel extends Gdn_Model {
             $following = !((bool)($category['Archived'] ?? false) || (bool)($userData['Unfollow'] ?? false));
             $category['Following'] = $following;
 
-            $category['Followed'] = boolval($userData['Followed']);
+            $category['Followed'] = boolval($userData['Followed'] ?? false);
 
             // Calculate the read field.
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
@@ -1746,8 +1748,8 @@ class CategoryModel extends Gdn_Model {
                 $category = $categories[$iD];
 
                 $dateMarkedRead = ($category['DateMarkedRead'] ?? false);
-                $row = ($userData[$iD] ?? false);
-                if ($row) {
+                $row = ($userData[$iD] ?? []);
+                if (!empty($row)) {
                     $userDateMarkedRead = $row['DateMarkedRead'];
 
                     if (!$dateMarkedRead || ($userDateMarkedRead && Gdn_Format::toTimestamp($userDateMarkedRead) > Gdn_Format::toTimestamp($dateMarkedRead))) {
@@ -1764,7 +1766,7 @@ class CategoryModel extends Gdn_Model {
                 $following = !((bool)($category['Archived'] ?? false) || (bool)($row['Unfollow'] ?? false));
                 $categories[$iD]['Following'] = $following;
 
-                $categories[$iD]['Followed'] = boolval($row['Followed']);
+                $categories[$iD]['Followed'] = boolval($row['Followed'] ?? false);
 
                 // Calculate the read field.
                 if ($category['DisplayAs'] == 'Heading') {
@@ -2534,11 +2536,15 @@ class CategoryModel extends Gdn_Model {
         if (!is_array($category) && !is_object($category)) {
             $category = self::categories($category);
         }
-
-        $category = self::categories(val('PermissionCategoryID', $category));
+        
+        $permissionCategory = self::categories(val('PermissionCategoryID', $category));
+        if (empty($permissionCategory)) {
+            return self::categories(-1);
+        }
+        
         // Ensure all of our values are processed properly.
-        self::calculate($category);
-        return $category;
+        self::calculate($permissionCategory);
+        return $permissionCategory;
     }
 
     /**
@@ -3693,5 +3699,19 @@ SQL;
             $targetID = val('CategoryID', $current);
             self::instance()->setField($targetID, ['LastCategoryID' => $categoryID]);
         }
+    }
+
+    /**
+     * Get the schema for categories joined to records.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function fragmentSchema(): Schema {
+        $result = SchemaFactory::parse([
+            'categoryID:i' => 'The ID of the category.',
+            'name:s' => 'The name of the category.',
+            'url:s' => 'Full URL to the category.',
+        ], 'CategoryFragment');
+        return $result;
     }
 }

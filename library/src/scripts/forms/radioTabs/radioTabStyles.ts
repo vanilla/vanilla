@@ -106,7 +106,6 @@ export const radioTabClasses = useThemeCache(() => {
     const tabs = style("tabs", {
         display: "flex",
         position: "relative",
-        flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "center",
     });

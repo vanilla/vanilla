@@ -17,18 +17,6 @@ use Vanilla\Formatting\Formats;
  */
 class BodyFormatValidator {
 
-    /** @var FormatService */
-    private $formatService;
-
-    /**
-     * BodyFormatValidator constructor.
-     *
-     * @param FormatService $formatService
-     */
-    public function __construct(FormatService $formatService) {
-        $this->formatService = $formatService;
-    }
-
     /**
      * Validate richly formatted text.
      *
@@ -38,7 +26,7 @@ class BodyFormatValidator {
      */
     private function validate($value, string $format) {
         try {
-            $result = $this->formatService->filter($value, $format);
+            $result = \Gdn::formatService()->filter($value, $format);
         } catch (FormattingException $e) {
             $result = new Invalid($e->getMessage());
         } catch (FormatterNotFoundException $e) {

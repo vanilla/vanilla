@@ -72,7 +72,7 @@ abstract class SanitizeTest extends TestCase {
         $result = $this->render($operations);
 
         // The contents should've been removed or encoded.
-        $this->assertNotContains($badValue, $result);
+        $this->assertStringNotContainsString($badValue, $result);
     }
 
     protected function assertSanitizedLinks() {
@@ -88,7 +88,7 @@ abstract class SanitizeTest extends TestCase {
             "href='".htmlentities($jsUrl)."'",
         ];
         foreach ($badLinks as $badLink) {
-            $this->assertNotContains($badLink, $linkResult);
+            $this->assertStringNotContainsString($badLink, $linkResult);
         }
     }
 }

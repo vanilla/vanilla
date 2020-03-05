@@ -8,17 +8,29 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Attributes;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Community\Events\CommentEvent;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends Gdn_Model {
+class CommentModel extends Gdn_Model implements FormatFieldInterface {
 
     use \Vanilla\FloodControlTrait;
 
     use UpdateMediaTrait;
+
+    use FormatFieldTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -577,14 +589,14 @@ class CommentModel extends Gdn_Model {
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
-            ]
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $format,
+                    "Story" => $body,
+                ],
+            ],
         ];
-
-        // Allow simple fulltext notifications
-        if (c("Vanilla.Activity.ShowCommentBody", false)) {
-            $data["Story"] = $comment["Body"] ?? null;
-            $data["Format"] = $comment["Format"] ?? null;
-        }
 
         // Pass generic activity to events.
         $this->EventArguments["Activity"] = $data;
@@ -593,6 +605,10 @@ class CommentModel extends Gdn_Model {
         $activityModel = Gdn::getContainer()->get(ActivityModel::class);
         /** @var DiscussionModel $discussionModel */
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+
+        if (!Gdn::config("Vanilla.Email.FullPost")) {
+            $data["Ext"]["Email"] = $activityModel->setStoryExcerpt($data["Ext"]["Email"]);
+        }
 
         $notificationGroups = [
             "bookmark" => [
@@ -603,6 +619,18 @@ class CommentModel extends Gdn_Model {
                 "options" => ['CheckRecord' => true],
                 "preference" => "BookmarkComment",
             ],
+            "mine" => [
+                "notifyUserIDs" => [$discussionUserID],
+                "preference" => "DiscussionComment",
+            ],
+            "participated" => [
+                "notifyUserIDs" => array_column(
+                    $discussionModel->getParticipatedUsers($discussionID)->resultArray(),
+                    "UserID"
+                ),
+                "options" => ['CheckRecord' => true],
+                "preference" => "ParticipateComment",
+            ],
             "mention" => [
                 "headlineFormat" => t(
                     "HeadlineFormat.Mention",
@@ -610,17 +638,6 @@ class CommentModel extends Gdn_Model {
                 ),
                 "notifyUserIDs" => [],
                 "preference" => "Mention",
-            ],
-            "mine" => [
-                "notifyUserIDs" => [$discussionUserID],
-                "preference" => "DiscussionComment",
-            ],
-            "participated" => [
-                "notifyUserIDs" => array_column(
-                    $discussionModel->getParticipatedUsers($discussionID),
-                    "UserID"
-                ),                "options" => ['CheckRecord' => true],
-                "preference" => "ParticipateComment",
             ],
         ];
 
@@ -821,115 +838,15 @@ class CommentModel extends Gdn_Model {
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
      * @param int $totalComments Total in entire discussion (hard limit).
+     * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
+     * @deprecated Use `DiscussionModel::setWatch()` instead.
      */
-    public function setWatch($discussion, $limit, $offset, $totalComments) {
-        $userID = Gdn::session()->UserID;
-        if (!$userID) {
-            return;
-        }
+    public function setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted = null) {
+        deprecated('CommentModel::setWatch()', 'DiscussionModel::setWatch()');
 
-        $newComments = false;
-        // Max comments we could have seen.
-        $countWatch = $limit + $offset;
-        if ($countWatch > $totalComments) {
-            $countWatch = $totalComments;
-        }
-
-        // This discussion looks familiar...
-        if (is_numeric($discussion->CountCommentWatch)) {
-            if ($countWatch < $discussion->CountCommentWatch) {
-                $countWatch = $discussion->CountCommentWatch;
-            }
-
-            if (isset($discussion->DateLastViewed)) {
-                $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
-            }
-
-            if ($totalComments > $discussion->CountCommentWatch) {
-                $newComments |= true;
-            }
-
-            // Update the watch data.
-            if ($newComments) {
-                // Only update the watch if there are new comments.
-                $this->SQL->put(
-                    'UserDiscussion',
-                    [
-                        'CountComments' => $countWatch,
-                        'DateLastViewed' => Gdn_Format::toDateTime()
-                    ],
-                    [
-                        'UserID' => $userID,
-                        'DiscussionID' => $discussion->DiscussionID
-                    ]
-                );
-            }
-
-        } else {
-            // Make sure the discussion isn't archived.
-            $archiveDate = Gdn::config('Vanilla.Archive.Date', false);
-            if (!$archiveDate || (Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($archiveDate))) {
-                $newComments = true;
-
-                // Insert watch data.
-                $this->SQL->options('Ignore', true);
-                $this->SQL->insert(
-                    'UserDiscussion',
-                    [
-                        'UserID' => $userID,
-                        'DiscussionID' => $discussion->DiscussionID,
-                        'CountComments' => $countWatch,
-                        'DateLastViewed' => Gdn_Format::toDateTime()
-                    ]
-                );
-            }
-        }
-
-        /**
-         * Fuzzy way of trying to automatically mark a category read again
-         * if the user reads all the comments on the first few pages.
-         */
-
-        // If this discussion is in a category that has been marked read,
-        // check if reading this thread causes it to be completely read again.
-        $categoryID = $discussion->CategoryID;
-        if (!$categoryID) {
-            return;
-        }
-        $category = CategoryModel::categories($categoryID);
-        if (!$category) {
-            return;
-        }
-        $wheres = ['CategoryID' => $categoryID];
-        $dateMarkedRead = $category->DateMarkedRead ?? null;
-        if ($dateMarkedRead) {
-            $wheres['DateLastComment>'] = $dateMarkedRead;
-        }
-        // Fuzzy way of looking back about 2 pages into the past.
-        $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
-
-        // Find all discussions with content from after DateMarkedRead.
-        $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
-        unset($discussionModel);
-
-        // Abort if we get back as many as we asked for, meaning a
-        // lot has happened.
-        if ($discussions->numRows() > $lookBackCount) {
-            return;
-        }
-
-        // Loop over these discussions and exit if there are any unread discussions
-        while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
-            if (!$discussion['Read']) {
-                return;
-            }
-        }
-
-        // Mark this category read if all the new content is read.
-        $categoryModel = new CategoryModel();
-        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
-        unset($categoryModel);
+        /* @var DiscussionModel $discussionModel */
+        $discussionModel = gdn::getContainer()->get(DiscussionModel::class);
+        $discussionModel->setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
     }
 
     /**
@@ -942,6 +859,26 @@ class CommentModel extends Gdn_Model {
         }
 
         return parent::getCount($wheres);
+    }
+
+    /**
+     * Get a schema instance comprised of standard comment fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'commentID:i' => 'The ID of the comment.',
+            'discussionID:i' => 'The ID of the discussion.',
+            'body:s' => 'The body of the comment.',
+            'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
+            'insertUserID:i' => 'The user that created the comment.',
+            'score:i|n' => 'Total points associated with this post.',
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'url:s?' => 'The full URL to the comment.'
+        ]);
+        return $result;
     }
 
     /**
@@ -1187,8 +1124,8 @@ class CommentModel extends Gdn_Model {
         $this->Validation->applyRule('Body', 'MeAction');
         $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-            $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-            $this->Validation->applyRule('Body', 'Length');
+            $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+            $this->Validation->applyRule('Body', 'plainTextLength');
         }
         $minCommentLength = c('Vanilla.Comment.MinLength');
         if ($minCommentLength && is_numeric($minCommentLength)) {
@@ -1223,8 +1160,16 @@ class CommentModel extends Gdn_Model {
             if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
                 $fields = $this->Validation->schemaValidationFields();
                 unset($fields[$this->PrimaryKey]);
+                if (!isset($fields['InsertUserID']) || !isset($fields['DateInserted'])) {
+                    $comment = $this->getID($commentID, DATASET_TYPE_ARRAY);
+                    $insertUserID = $comment['InsertUserID'] ?? null;
+                    $dateInserted = $comment['DateInserted'] ?? null;
+                } else {
+                    $insertUserID = $fields['InsertUserID'];
+                    $dateInserted = $fields['DateInserted'];
+                }
 
-                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID]) : $fields;
+                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) : $fields;
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', $commentData);
                 if ($spam) {
@@ -1245,6 +1190,11 @@ class CommentModel extends Gdn_Model {
                 if ($insert === false) {
                     // Log the save.
                     LogModel::logChange('Edit', 'Comment', array_merge($fields, ['CommentID' => $commentID]));
+
+                    if (c('Garden.ForceInputFormatter')) {
+                        $fields['Format'] = Gdn::config('Garden.InputFormatter', '');
+                    }
+
                     // Save the new value.
                     $this->serializeRow($fields);
                     $this->SQL->put($this->Name, $fields, ['CommentID' => $commentID]);
@@ -1282,15 +1232,57 @@ class CommentModel extends Gdn_Model {
                     $this->fireEvent('AfterSaveComment');
                 }
             }
+
+            // Update discussion's comment count.
+            if (isset($formPostValues['DiscussionID'])) {
+                $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+            }
         }
-
-        // Update discussion's comment count
-        $discussionID = val('DiscussionID', $formPostValues);
-        $this->updateCommentCount($discussionID, ['Slave' => false]);
-
+        $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
+        if ($comment) {
+            $commentEvent = $this->eventFromRow(
+                $comment,
+                $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE
+            );
+            $this->getEventManager()->dispatch($commentEvent);
+        }
         return $commentID;
     }
 
+    /**
+     * Generate a comment event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return CommentEvent
+     */
+    private function eventFromRow(array $row, string $action): CommentEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $userModel->expandUsers($row, ["InsertUserID"]);
+        $comment = $this->normalizeRow($row, true);
+        $comment = $this->schema()->validate($comment);
+        $result = new CommentEvent(
+            $action,
+            ["comment" => $comment]
+        );
+        return $result;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @return array
+     */
+    public function normalizeRow(array $row): array {
+        $this->formatField($row, "Body", $row["Format"]);
+        $row['Url'] = commentUrl($row);
+        $row['Attributes'] = new Attributes($row['Attributes']);
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
     /**
      * Update the attachment status of attachemnts in particular comment.
      *
@@ -1344,10 +1336,10 @@ class CommentModel extends Gdn_Model {
         // discussion author.
         $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
-        // Mark the user as participated.
+        // Mark the user as participated and update DateLastViewed.
         $this->SQL->replace(
             'UserDiscussion',
-            ['Participated' => 1],
+            ['Participated' => 1, 'DateLastViewed' => $Fields['DateInserted']],
             ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 
@@ -1643,6 +1635,13 @@ class CommentModel extends Gdn_Model {
 
         // Clear the page cache.
         $this->removePageCache($comment['DiscussionID']);
+
+        if ($comment) {
+            $dataObject = (object)$comment;
+            $this->calculate($dataObject);
+            $commentEvent = $this->eventFromRow((array)$dataObject, CommentEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($commentEvent);
+        }
         return true;
     }
 

@@ -12,12 +12,20 @@ import { IUsersStoreState, usersReducer } from "@library/features/users/userMode
 import { Reducer, ReducersMapObject, combineReducers } from "redux";
 import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
 import getStore from "@library/redux/getStore";
+import NotificationsModel from "@library/features/notifications/NotificationsModel";
+import ConversationsModel from "@library/features/conversations/ConversationsModel";
 
-const dynamicReducers = {};
+let dynamicReducers = {};
 
 export function registerReducer(name: string, reducer: Reducer) {
     dynamicReducers[name] = reducer;
-    getStore().replaceReducer(combineReducers(getReducers()));
+    const store = getStore();
+    store.replaceReducer(combineReducers(getReducers()));
+
+    const initialActions = window.__ACTIONS__ || [];
+
+    // Re-apply initial actions.
+    initialActions.forEach(store.dispatch);
 }
 
 export interface ICoreStoreState extends IUsersStoreState {
@@ -31,8 +39,14 @@ export function getReducers(): ReducersMapObject<any, any> {
         users: usersReducer,
         theme: themeReducer,
         locales: localeReducer,
+        notifications: new NotificationsModel().reducer,
+        conversations: new ConversationsModel().reducer,
         ...dynamicReducers,
     };
+}
+
+export function resetReducers() {
+    dynamicReducers = {};
 }
 
 /**

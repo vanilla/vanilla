@@ -6,28 +6,46 @@
 
 .embedImage {
     width: 100%;
-    max-width: $embed_width;
+    max-width: 100%;
     display: inline-block;
 }
 
 .Message img .embedImage-img, // Compatibility
 .embedImage-img {
-    display: block;
+    display: inline-flex;
     position: relative;
     margin: {
         left: auto;
         right: auto;
     }
     max-width: 100%;
-    max-height: 400px;
+    max-height: $embed_image_max_height;
+}
+
+.bbcode_left {
+    .embedImage-img {
+        margin-left: 0;
+        display: inline-block;
+    }
+}
+.bbcode_right {
+    .embedImage-img {
+        margin-right: 0;
+        display: inline-block;
+    }
+}
+
+.embedImage-link {
+    display: inline-flex;
+    flex-direction: column;
 }
 
 .richEditor .embedImage-img {
     &:hover {
         box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5);
     }
+}
 
-    &:focus {
-        box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
-    }
+.richEditor .embed-isSelected .embedImage-img {
+    box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
 }

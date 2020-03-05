@@ -21,7 +21,7 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
     /**
      * Setup.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $container = \Gdn::getContainer();
         $container->rule(FormatService::class)

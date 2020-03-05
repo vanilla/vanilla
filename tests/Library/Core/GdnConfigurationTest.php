@@ -15,6 +15,17 @@ use PHPUnit\Framework\TestCase;
 class GdnConfigurationTest extends TestCase {
 
     /**
+     * Get a new configuration instance to test.
+     *
+     * @return \Gdn_Configuration
+     */
+    private function config(): \Gdn_Configuration {
+        $config = new \Gdn_Configuration();
+        $config->autoSave(false);
+        return $config;
+    }
+
+    /**
      * Test if some configuraton key exists.
      *
      * @param array $configData
@@ -24,10 +35,10 @@ class GdnConfigurationTest extends TestCase {
      * @dataProvider provideConfigKeyExistsData
      */
     public function testConfigKeyExists(array $configData, string $keyToCheck, bool $expectedResult) {
-        $config = new \Gdn_Configuration();
+        $config = $this->config();
         $config->loadArray($configData, "test");
 
-        $this->assertEquals($expectedResult, $config->configKeyExists($keyToCheck));
+        $this->assertSame($expectedResult, $config->configKeyExists($keyToCheck));
     }
 
     /**
@@ -75,10 +86,10 @@ class GdnConfigurationTest extends TestCase {
      * @dataProvider provideConfigGetData
      */
     public function testConfigGet(array $configData, string $keyToCheck, $expectedResult) {
-        $config = new \Gdn_Configuration();
+        $config = $this->config();
         $config->loadArray($configData, "test");
 
-        $this->assertEquals($expectedResult, $config->get($keyToCheck));
+        $this->assertSame($expectedResult, $config->get($keyToCheck));
     }
 
     /**
@@ -108,9 +119,14 @@ class GdnConfigurationTest extends TestCase {
                 'Nested.Value',
                 "",
             ],
-            "Value is undefined" =>[
+            "Value is undefined" => [
                 [],
                 'Nested.Value',
+                false,
+            ],
+            "Value is empty string" => [
+                [],
+                "",
                 false,
             ],
         ];
@@ -121,7 +137,7 @@ class GdnConfigurationTest extends TestCase {
      */
     public function testTouchConfig() {
         // Quick check with falsy value.
-        $config = new \Gdn_Configuration();
+        $config = $this->config();
         $config->loadArray(["Nested" => ["Value" => false]], "test");
         $config->touch("Nested.Value", "myValue");
 

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { getOptions } from "./options";
+import { getOptions } from "./buildOptions";
 import { KarmaRunner } from "./KarmaRunner";
 
 /**

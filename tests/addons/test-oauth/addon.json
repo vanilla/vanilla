@@ -1,0 +1,9 @@
+{
+    "key": "test-oauth",
+    "name": "Test OAuth",
+    "type": "addon",
+    "version": "0.1",
+    "settingsUrl": "/settings/test-oauth",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true
+}

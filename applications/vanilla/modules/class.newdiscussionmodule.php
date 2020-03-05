@@ -2,16 +2,20 @@
 /**
  * New Discussion module
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
  */
 
+use Vanilla\Contracts\LocaleInterface;
+
 /**
  * Renders the "Start a New Discussion" button.
  */
 class NewDiscussionModule extends Gdn_Module {
+    /** @var LocaleInterface */
+    private $locale;
 
     /** @var int Which category we are viewing (if any). */
     public $CategoryID = null;
@@ -34,6 +38,9 @@ class NewDiscussionModule extends Gdn_Module {
     /** @var string Where to send users without permission when $SkipPermissions is enabled. */
     public $GuestUrl = '/entry/signin';
 
+    /** @var boolean Reorder HTML for easier styling */
+    public $reorder = false;
+
     /**
      * Set default button.
      *
@@ -42,6 +49,7 @@ class NewDiscussionModule extends Gdn_Module {
      */
     public function __construct($sender = '', $applicationFolder = false) {
         parent::__construct($sender, 'Vanilla');
+        $this->locale = Gdn::getContainer()->get(\Vanilla\Contracts\LocaleInterface::class);
         // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
         $this->DefaultButton = c('Vanilla.DefaultNewButton', false);
     }
@@ -58,11 +66,12 @@ class NewDiscussionModule extends Gdn_Module {
     /**
      * Add a button to the collection.
      *
-     * @param $text
-     * @param $url
+     * @param string $text
+     * @param string $url
+     * @param bool $asOwnButton Whether to display as a separate button or not.
      */
-    public function addButton($text, $url) {
-        $this->Buttons[] = ['Text' => $text, 'Url' => $url];
+    public function addButton($text, $url, $asOwnButton = false) {
+        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asOwnButton' => $asOwnButton];
     }
 
     /**
@@ -99,6 +108,7 @@ class NewDiscussionModule extends Gdn_Module {
 
         // Grab the allowed discussion types.
         $discussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, isset($category) ? $category : []);
+        $buttonsConfig = c('NewDiscussionModule.Types', []);
 
         foreach ($discussionTypes as $key => $type) {
             if (isset($type['AddPermission']) && !Gdn::session()->checkPermission($type['AddPermission'])) {
@@ -120,7 +130,14 @@ class NewDiscussionModule extends Gdn_Module {
                 $url = $this->GuestUrl.'?Target='.$url;
             }
 
-            $this->addButton(t(val('AddText', $type)), $url);
+            // Check whether to display in dropdown or as a separate button.
+            $asOwnButton = $buttonsConfig[$type['Singular']]['AsOwnButton'] ?? false;
+
+            $this->addButton(
+                $this->locale->translate($type['AddText'] ?? ''),
+                $url,
+                $asOwnButton
+            );
         }
 
         // Add QueryString to URL if one is defined.
@@ -131,5 +148,26 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         return parent::toString();
+    }
+
+    /**
+     * Groups buttons according to whether they are standalone or part of a dropdown.
+     *
+     * @return array Returns buttons grouped by whether they are standalone or part of a dropdown.
+     */
+    public function getButtonGroups(): array {
+        $allButtons = [];
+        $groupedButtons = [];
+        foreach ($this->Buttons as $key => $button) {
+            if ($button['asOwnButton']) {
+                $allButtons[] = [$button];
+            } else {
+                $groupedButtons[] = $button;
+            }
+        }
+        if (!empty($groupedButtons)) {
+            array_unshift($allButtons, $groupedButtons);
+        }
+        return $allButtons;
     }
 }

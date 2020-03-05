@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { logWarning } from "@vanilla/utils";
+import React, { useState, useContext } from "react";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 
@@ -18,9 +18,18 @@ interface ISiteNavCtx {
     };
 }
 
+interface IProps {
+    children: React.ReactNode;
+    categoryRecordType: string;
+}
+
 const noop = () => {
     logWarning("It looks like you forgot to initialize your SiteNavContext. Be sure to use `<SiteNavProvider />`");
 };
+
+interface IOpenRecords {
+    [recordType: string]: Set<number>;
+}
 
 const defaultContext: ISiteNavCtx = {
     categoryRecordType: "item",
@@ -32,15 +41,8 @@ const defaultContext: ISiteNavCtx = {
 
 export const SiteNavContext = React.createContext<ISiteNavCtx>(defaultContext);
 
-interface IProps {
-    children: React.ReactNode;
-    categoryRecordType: string;
-}
-
-interface IState {
-    openRecords: {
-        [recordType: string]: Set<number>;
-    };
+export function useSiteNavContext() {
+    return useContext(SiteNavContext);
 }
 
 /**
@@ -49,72 +51,61 @@ interface IState {
  *
  * This helps to keep nav toggles consistent across page navigations.
  */
-export default class SiteNavProvider extends React.Component<IProps, IState> {
-    public state: IState = {
-        openRecords: {},
-    };
-
-    /**
-     * @inheritdoc
-     */
-    public render() {
-        return (
-            <SiteNavContext.Provider
-                value={{
-                    categoryRecordType: this.props.categoryRecordType,
-                    openItem: this.openItem,
-                    closeItem: this.closeItem,
-                    toggleItem: this.toggleItem,
-                    openRecords: this.state.openRecords,
-                }}
-            >
-                {this.props.children}
-            </SiteNavContext.Provider>
-        );
-    }
+export default function SiteNavProvider(props: IProps) {
+    const [openRecords, setOpenRecords] = useState<IOpenRecords>({});
 
     /**
      * Open an item in the nav.
      */
-    private openItem = (recordType: string, recordID: number) => {
-        const records = this.state.openRecords[recordType] || new Set();
+    const openItem = (recordType: string, recordID: number) => {
+        const records = openRecords[recordType] || new Set();
         records.add(recordID);
-        this.setState({
-            openRecords: {
-                ...this.state.openRecords,
-                [recordType]: records,
-            },
+        setOpenRecords({
+            ...openRecords,
+            [recordType]: records,
         });
     };
 
     /**
      * Close an item in the nav.
      */
-    private closeItem = (recordType: string, recordID: number) => {
-        const records = this.state.openRecords[recordType];
+    const closeItem = (recordType: string, recordID: number) => {
+        const records = openRecords[recordType];
         if (!records) {
             return;
         }
         if (records.has(recordID)) {
             records.delete(recordID);
         }
-        this.setState({
-            openRecords: {
-                ...this.state.openRecords,
-                [recordType]: records,
-            },
+        setOpenRecords({
+            ...openRecords,
+            [recordType]: records,
         });
     };
 
     /**
      * Toggle an item in the nav.
      */
-    private toggleItem = (recordType: string, recordID: number) => {
-        const records = this.state.openRecords[recordType];
+    const toggleItem = (recordType: string, recordID: number) => {
+        const records = openRecords[recordType];
         if (records && records.has(recordID)) {
-            this.closeItem(recordType, recordID);
+            closeItem(recordType, recordID);
         } else {
-            this.openItem(recordType, recordID);
+            openItem(recordType, recordID);
         }
     };
+
+    return (
+        <SiteNavContext.Provider
+            value={{
+                categoryRecordType: props.categoryRecordType,
+                openItem: openItem,
+                closeItem: closeItem,
+                toggleItem: toggleItem,
+                openRecords: openRecords,
+            }}
+        >
+            {props.children}
+        </SiteNavContext.Provider>
+    );
 }

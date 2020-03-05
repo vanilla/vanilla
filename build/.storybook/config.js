@@ -8,36 +8,19 @@
 
 'use strict';
 
+import { forceRenderStyles } from "typestyle";
 import { configure, addDecorator, addParameters } from '@storybook/react';
-import {checkA11y, withA11y} from '@storybook/addon-a11y';
-import { withKnobs } from '@storybook/addon-knobs';
+import { checkA11y, withA11y } from '@storybook/addon-a11y';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
 import { layoutVariables } from '@library/layout/panelLayoutStyles';
 import 'storybook-chromatic';
-
-/**
- * Utility for importing everything from a wepback require.context
- * https://webpack.js.org/guides/dependency-management/#context-module-api
- */
-function importAll(r) {
-    r.keys().forEach(r);
-}
-
-require('../../library/src/scripts/storybookConfig');
-
-function loadStories() {
-    const storyFiles = require.context(
-        '../..',
-        true,
-        /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
-    importAll(storyFiles);
-}
+const { applyStoryContext } = require('../../library/src/scripts/storybookConfig');
 
 addParameters({
     chromatic: {
-        delay: 1500, // Add a slight delay to ensure everything has rendered properly.
-        diffThreshold: 0.2, // Default is 0.67. Lower numbers are more accurate.
+        delay: 2000, // Add a slight delay to ensure everything has rendered properly.
+        diffThreshold: 0.7, // Default is 0.67. Lower numbers are more accurate.
                             // Set to prevent diffs like this https://www.chromaticqa.com/snapshot?appId=5d5eba16c782b600204ba187&id=5d8cef8dbc622e00202a6edd
                             // From triggering
     }
@@ -45,7 +28,6 @@ addParameters({
 
 addDecorator(checkA11y);
 addDecorator(withA11y);
-addDecorator(withKnobs);
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 
@@ -97,6 +79,23 @@ addParameters({
     },
 });
 
-// Load Stories
-configure(loadStories, module);
+addParameters({
+    options: {
+      storySort: (a, b) =>
+        a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, { numeric: true }),
+    },
+});
 
+// Load Stories
+const storyFiles = require.context(
+    '../..',
+    true,
+    /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
+configure(storyFiles, module);
+
+applyStoryContext();
+
+module.hot?.accept(() => {
+    forceRenderStyles();
+    applyStoryContext();
+})

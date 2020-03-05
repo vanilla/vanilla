@@ -31,7 +31,6 @@ import {
     FileTypePowerPointIcon,
     FileTypePDFIcon,
     FileTypeZipIcon,
-    AttachmentErrorIcon,
 } from "@library/icons/fileTypes";
 import {
     RevisionStatusPublishedIcon,
@@ -40,6 +39,7 @@ import {
 } from "@library/icons/revision";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
+import { ErrorIcon, WarningIcon, InformationIcon } from "@library/icons/common";
 
 const story = storiesOf("Components", module);
 
@@ -127,6 +127,18 @@ story.add("Icons", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`DiscussionIcon`}>
                     <CommonIcons.DiscussionIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`GlobeIcon`}>
+                    <CommonIcons.GlobeIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`ErrorIcon`}>
+                    <ErrorIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`WarningIcon`}>
+                    <WarningIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`InformationIcon`}>
+                    <InformationIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
@@ -248,15 +260,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`FileTypeZipIcon`}>
                     <FileTypeZipIcon />
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`AttachmentErrorIcon`}>
-                    <AttachmentErrorIcon />
-                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>title Bar</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`CheckIcon`}>
-                    <titleBarIcons.CheckIcon />
-                </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`HelpIcon`}>
                     <titleBarIcons.HelpIcon />
                 </StoryTileAndTextCompact>

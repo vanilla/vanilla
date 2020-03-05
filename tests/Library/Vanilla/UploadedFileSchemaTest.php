@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Gdn_Upload;
 use Vanilla\UploadedFile;
@@ -22,9 +23,10 @@ class UploadedFileSchemaTest extends TestCase {
      * Test an upload possessing an invalid file extension.
      *
      * @throws \Garden\Schema\ValidationException
-     * @expectedException \Garden\Schema\ValidationException
      */
     public function testBadExtension() {
+        $this->expectException(ValidationException::class);
+
         $schema = new UploadedFileSchema(['validateContentTypes' => true]);
         $schema->setAllowedExtensions(['jpg']);
 
@@ -43,10 +45,11 @@ class UploadedFileSchemaTest extends TestCase {
      * Test an upload that exceeds the file size restrictions.
      *
      * @throws \Garden\Schema\ValidationException
-     * @expectedException \Garden\Schema\ValidationException
-     * @expectedExceptionMessageRegExp `exceeds the maximum file size`
      */
     public function testBadSize() {
+        $this->expectException(ValidationException::class);
+        $this->getExpectedExceptionMessageRegExp('`exceeds the maximum file size`');
+
         $schema = new UploadedFileSchema();
         $schema->setMaxSize(100);
 
@@ -65,10 +68,11 @@ class UploadedFileSchemaTest extends TestCase {
      * Test an upload possessing no extension.
      *
      * @throws \Garden\Schema\ValidationException
-     * @expectedException \Garden\Schema\ValidationException
-     * @expectedExceptionMessageRegExp `does not contain a file extension`
      */
     public function testNoExtension() {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('does not contain a file extension');
+
         $schema = new UploadedFileSchema();
 
         $schema->validate(new UploadedFile(

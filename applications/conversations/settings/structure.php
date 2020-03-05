@@ -173,7 +173,3 @@ $PermissionModel->define([
     'Conversations.Moderation.Manage' => 0,
     'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
 ]);
-
-// Set current Conversations.Version
-$appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'conversations'.DS.'addon.json'), true);
-saveToConfig('Conversations.Version', val('version', $appInfo, 'Undefined'));

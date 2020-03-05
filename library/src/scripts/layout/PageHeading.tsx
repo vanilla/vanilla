@@ -14,7 +14,7 @@ import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadin
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 interface IPageHeading {
-    title: string;
+    title: React.ReactNode;
     children?: React.ReactNode;
     className?: string;
     headingClassName?: string;
@@ -30,10 +30,6 @@ interface IPageHeading {
 
 export function PageHeading(props: IPageHeading) {
     const { includeBackLink = true, actions, children, headingClassName, title, className } = props;
-
-    // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
-    // public titleRef: React.RefObject<HTMLHeadingElement>;
-    const ref = useRef<HTMLHeadingElement>(null);
     const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
@@ -42,9 +38,9 @@ export function PageHeading(props: IPageHeading) {
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(fontSize)} />}
+                {includeBackLink && <BackLink className={linkClasses.inHeading(fontSize)} />}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                    <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
+                    <Heading depth={1} title={title} className={headingClassName}>
                         {children}
                     </Heading>
                 </ConditionalWrap>

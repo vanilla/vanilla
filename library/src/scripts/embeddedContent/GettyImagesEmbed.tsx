@@ -31,7 +31,7 @@ export function GettyImagesEmbed(props: IProps): JSX.Element {
     });
 
     return (
-        <EmbedContent type={props.embedType} inEditor={props.inEditor}>
+        <EmbedContent type={props.embedType}>
             <a
                 className="embedExternal-content gie-single js-gettyEmbed"
                 href={`https://www.gettyimages.com/detail/${props.photoID}`}

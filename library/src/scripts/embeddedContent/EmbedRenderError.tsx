@@ -10,6 +10,7 @@ import { embedErrorClasses } from "@library/embeddedContent/embedErrorStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import classNames from "classnames";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IProps {
     url: string;
@@ -27,7 +28,7 @@ export function EmbedRenderError(props: IProps) {
                 {props.url}
             </SmartLink>
             <SmartLink className={classes.renderErrorIconLink} to={helpUrl}>
-                <WarningIcon warningMessage={warningTitle} />
+                <WarningIcon className={iconClasses().errorFgColor} warningMessage={warningTitle} />
             </SmartLink>
         </div>
     );

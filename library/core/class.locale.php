@@ -10,6 +10,7 @@
  */
 
 use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 
 /**
@@ -35,6 +36,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @var AddonManager
      */
     private $addonManager = null;
+
+    /** @var ConfigurationInterface $config */
+    private $config;
 
     /** @var array  */
     public static $SetLocales = [
@@ -92,18 +96,17 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * Setup the default locale.
      *
      * @param $localeName
-     * @param $ApplicationWhiteList
-     * @param $PluginWhiteList
-     * @param bool $ForceRemapping
+     * @param AddonManager|null $addonManager
+     * @param ConfigurationInterface $config
      */
-    public function __construct($localeName, AddonManager $addonManager = null) {
+    public function __construct($localeName, AddonManager $addonManager = null, ConfigurationInterface $config) {
         parent::__construct();
         $this->ClassName = __CLASS__;
 
         if ($addonManager instanceof AddonManager) {
             $this->addonManager = $addonManager;
         }
-
+        $this->config = $config;
         $this->set($localeName);
     }
 
@@ -379,6 +382,10 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         $this->LocaleContainer = new Gdn_Configuration();
         $this->LocaleContainer->splitting(false);
         $this->LocaleContainer->caching(false);
+
+        if ($this->config->get("TranslationDebug")) {
+            $this->LocaleContainer->setFallbackDecorator("☢️☢️");
+        }
     }
 
     /**

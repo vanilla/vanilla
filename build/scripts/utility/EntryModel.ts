@@ -15,8 +15,11 @@ import {
     LIBRARY_SRC_DIRECTORY,
     PACKAGES_DIRECTORY,
     VANILLA_ROOT,
+    VANILLA_THEMES,
+    VANILLA_ADDONS,
+    VANILLA_THEMES_LEGACY,
 } from "../env";
-import { BuildMode, IBuildOptions } from "../options";
+import { BuildMode, IBuildOptions } from "../buildOptions";
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
 
@@ -73,7 +76,14 @@ export default class EntryModel {
      * This is where ALL files lookups should be started from.
      */
     public async init() {
-        await Promise.all([this.initAddons(VANILLA_APPS), this.initAddons(VANILLA_PLUGINS), this.initPackages()]);
+        await Promise.all([
+            this.initAddons(VANILLA_APPS),
+            this.initAddons(VANILLA_PLUGINS),
+            this.initAddons(VANILLA_ADDONS),
+            this.initAddons(VANILLA_THEMES),
+            this.initAddons(VANILLA_THEMES_LEGACY),
+            this.initPackages(),
+        ]);
         await this.initEntries();
     }
 
@@ -88,13 +98,13 @@ export default class EntryModel {
         for (const entryDir of this.entryDirs) {
             const commonEntry = await this.lookupEntry(entryDir, "common");
             if (commonEntry !== null) {
-                const addonName = path.basename(commonEntry.addonPath);
+                const addonName = path.basename(commonEntry.addonPath).toLowerCase();
                 entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
             }
 
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
-                const addonName = path.basename(entry.addonPath);
+                const addonName = path.basename(entry.addonPath).toLowerCase();
                 entries[`addons/${addonName}`] = [PUBLIC_PATH_SOURCE_FILE, entry.entryPath];
             }
         }
@@ -137,7 +147,13 @@ export default class EntryModel {
     public async getSections(): Promise<string[]> {
         let names: string[] = [];
         for (const dir of this.entryDirs) {
-            const entryNameList = await readDir(path.resolve(dir));
+            const resolvedPath = path.resolve(dir);
+            const dirExists = await fileExists(resolvedPath);
+            if (!dirExists) {
+                continue;
+            }
+
+            const entryNameList = await readDir(resolvedPath);
             names.push(...entryNameList);
         }
 
@@ -206,16 +222,20 @@ export default class EntryModel {
      * @param rootDir The directory to find addons in.
      */
     private async initAddons(rootDir: string) {
+        const dirExists = await fileExists(path.resolve(rootDir));
+        if (!dirExists) {
+            return;
+        }
         let addonKeyList = await readDir(path.resolve(rootDir));
 
         // Filter only the enabled addons for a development build.
         if (this.options.mode === BuildMode.DEVELOPMENT) {
             addonKeyList = addonKeyList.filter(addonPath => {
-                const addonKey = path.basename(addonPath);
+                const addonKey = path.basename(addonPath).toLowerCase();
 
                 // Check if we have a case-insensitive addon key match.
                 return this.options.enabledAddonKeys.some(val => {
-                    if (val.toLowerCase() === addonKey.toLowerCase()) {
+                    if (val.toLowerCase() === addonKey) {
                         return true;
                     }
                     return false;

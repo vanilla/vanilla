@@ -32,15 +32,3 @@ export interface IAuthenticateResponse {
     authSessionID?: string;
     targetUrl?: string;
 }
-
-export interface IAuthenticatePasswordParams {
-    username: string;
-    password: string;
-    persist?: boolean;
-}
-
-export interface IAuthenticatePasswordResponseData extends IUserFragment {}
-
-export interface IRequestPasswordOptions {
-    email: string;
-}

@@ -12,9 +12,8 @@ export * from "@library/styles/styleHelpersButtons";
 export * from "@library/styles/styleHelpersColors";
 export * from "@library/styles/styleHelpersDropShadow";
 export * from "@library/styles/styleHelpersFeedback";
-export * from "@library/styles/styleHelpersfPadding";
+export * from "@library/styles/styleHelpersSpacing";
 export * from "@library/styles/styleHelpersLinks";
-export * from "@library/styles/styleHelpersMargin";
 export * from "@library/styles/styleHelpersPositioning";
 export * from "@library/styles/styleHelpersReset";
 export * from "@library/styles/styleHelpersSpinner";
@@ -61,6 +60,15 @@ export const importantUnit = (val: string | number | undefined, unitFunction = p
     return withUnit ? important(withUnit.toString()) : withUnit;
 };
 
+export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
+    const withUnit = unit(val);
+    return withUnit ? important(negative(withUnit).toString()) : withUnit;
+};
+
+export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
+    return negative(unit(val));
+};
+
 export const negative = val => {
     if (typeof val === "string") {
         val = val.trim();
@@ -75,14 +83,3 @@ export const negative = val => {
         return val;
     }
 };
-
-// export interface IStates {
-//     hover?: object;
-//     focus?: object;
-//     active?: object;
-//     accessibleFocus?: object;
-// }
-//
-// export interface IStatesAll {
-//     allStates?: object;
-// }

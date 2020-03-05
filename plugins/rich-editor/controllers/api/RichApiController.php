@@ -34,7 +34,7 @@ class RichApiController extends AbstractApiController {
 
         $in = $this->schema([
             'body:s' => 'Raw post text to render as a rich post quote.',
-            'format:s' => 'The format to be used for rendering the text.',
+            'format' => new \Vanilla\Models\FormatSchema(true),
         ], 'in')->setDescription('Create a rich-compatible HTML representation of a string for quoting.');
         $out = $this->schema([
             'quote:s' => 'A quoted representation of the text, rendered as HTML.',

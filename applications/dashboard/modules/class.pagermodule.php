@@ -265,20 +265,27 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
+     * Format a URL for the pager.
      *
-     *
-     * @param $url
-     * @param $page
-     * @param string $limit
-     * @return mixed|string
+     * @param string $url The URL format. Use either `{Page}` or `%s` to specify the page.
+     * @param string $page The page number string.
+     * @param string $limit The limit for specifying the size.
+     * @return string Returns a pager URL.
      */
     public static function formatUrl($url, $page, $limit = '') {
         // Check for new style page.
         if (strpos($url, '{Page}') !== false) {
-            return str_replace(['{Page}', '{Size}'], [$page, $limit], $url);
+            $r = str_replace(['{Page}', '{Size}'], [$page, $limit], $url);
         } else {
-            return sprintf($url, $page, $limit);
+            $r = sprintf($url, $page, $limit);
         }
+
+        // It's not our standard to have a trailing slash on URLs so this will fix page 1 style URLs.
+        if (empty($page) && substr($url, -1) !== '/') {
+            $r = rtrim($r, '/');
+        }
+
+        return $r;
     }
 
     /**

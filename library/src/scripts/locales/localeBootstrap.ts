@@ -4,14 +4,15 @@
  */
 
 import { fetchLocalesFromApi } from "@library/locales/localeActions";
-import { setCurrentLocale, loadLocales } from "@vanilla/i18n";
+import { setCurrentLocale, loadLocales, loadTranslations } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
+import gdn from "@library/gdn";
 
 export async function bootstrapLocales() {
     // Fetch the current locale from meta.
     const currentLocaleValue = getMeta("ui.localeKey", getMeta("ui.locale", null));
     setCurrentLocale(currentLocaleValue);
-
+    loadTranslations(gdn.translations);
     // Register the redux reducer for locales and attempt to fetch them.
     // They may already be preloaded.
     const locales = await fetchLocalesFromApi();

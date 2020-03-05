@@ -8,19 +8,12 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import {
-    borders,
-    colorOut,
-    fullSizeOfParent,
-    margins,
-    sticky,
-    unit,
-    absolutePosition,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, sticky, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,9 +31,13 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const sizing = makeThemeVars("sizing", {
+        xl: 1022, // from legacy back-end modals
         large: 720,
         medium: 516,
         small: 375,
+        height: viewHeight(96),
+        zIndex: 1050, // Sorry it's so high. Our dashboard uses some bootstrap which specifies 1040 for the old modals.
+        // When nesting our modals on top we need to be higher.
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -48,7 +45,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        radius: globalVars.border.radius,
+        radius: globalVars.borderType.modals.radius,
     });
 
     const dropDown = makeThemeVars("dropDown", {
@@ -67,6 +64,10 @@ export const modalVariables = useThemeCache(() => {
         boxShadow: `0 -1px 2px 0 ${colorOut(globalVars.overlay.bg)}`,
     });
 
+    const fullScreenTitleSpacing = makeThemeVars("fullScreenModalTitle", {
+        gap: 52,
+    });
+
     return {
         colors,
         sizing,
@@ -75,6 +76,7 @@ export const modalVariables = useThemeCache(() => {
         dropDown,
         header,
         footer,
+        fullScreenTitleSpacing,
     };
 });
 
@@ -92,7 +94,7 @@ export const modalClasses = useThemeCache(() => {
         // When nesting our modals on top we need to be higher.
     });
 
-    const overlay = style("overlay", {
+    const overlayMixin: NestedCSSProperties = {
         position: "fixed",
         // Viewport units are useful here because
         // we're actually fine this being taller than the initially visible viewport.
@@ -102,18 +104,45 @@ export const modalClasses = useThemeCache(() => {
         left: 0,
         right: 0,
         bottom: 0,
-        background: colorOut(vars.colors.overlayBg),
         zIndex: 10,
+    };
+
+    const overlayScrim = style("overlayScrim", {
+        ...overlayMixin,
+        background: colorOut(vars.colors.overlayBg),
     });
+
+    const overlayContent = style("overlayContent", {
+        ...overlayMixin,
+    });
+
+    const sidePanelMixin: NestedCSSProperties = {
+        left: unit(vars.dropDown.padding),
+        width: calc(`100% - ${unit(vars.dropDown.padding)}`),
+        display: "flex",
+        flexDirection: "column",
+        top: 0,
+        bottom: 0,
+        transform: "none",
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+        maxWidth: 400,
+        $nest: {
+            [`& .${dropDownClasses().action}`]: {
+                fontWeight: globalVars.fonts.weights.normal,
+            },
+        },
+    };
 
     const root = style({
         display: "flex",
         flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: viewHeight(80),
+        maxHeight: unit(vars.sizing.height),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
+        color: colorOut(vars.colors.fg),
         position: "fixed",
         top: percent(50),
         left: percent(50),
@@ -140,6 +169,11 @@ export const modalClasses = useThemeCache(() => {
                 left: 0,
                 right: 0,
             },
+            "&.isXL": {
+                width: unit(vars.sizing.xl),
+                height: percent(100),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+            },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
                 maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
@@ -152,34 +186,35 @@ export const modalClasses = useThemeCache(() => {
                 width: unit(vars.sizing.small),
                 maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
-            "&&&.isSidePanel": {
-                left: unit(vars.dropDown.padding),
-                width: calc(`100% - ${unit(vars.dropDown.padding)}`),
-                display: "flex",
-                flexDirection: "column",
-                top: 0,
-                bottom: 0,
+            "&&&.isSidePanelRight": {
+                ...sidePanelMixin,
                 right: 0,
-                transform: "none",
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                left: "initial",
+            },
+            "&&&.isSidePanelLeft": {
+                ...sidePanelMixin,
+                left: 0,
+                right: "initial",
             },
             "&&.isDropDown": {
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: globalVars.gutter.size,
                 width: percent(100),
                 marginBottom: "auto",
                 transform: "none",
-                maxHeight: percent(100),
+                maxHeight: calc(`100% - ${unit(globalVars.gutter.size)}`),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
                 border: "none",
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
-                ...borders(),
+                ...borders(globalVars.borderType.modals),
+            },
+            "& .form-group": {
+                marginLeft: unit(-16),
+                marginRight: unit(-16),
             },
         },
     } as NestedCSSProperties);
@@ -187,6 +222,7 @@ export const modalClasses = useThemeCache(() => {
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),
         width: percent(100),
+        height: percent(100),
         maxHeight: percent(100),
         overflow: "auto",
     });
@@ -218,11 +254,23 @@ export const modalClasses = useThemeCache(() => {
         }),
     );
 
+    const frameWrapper = style("frameWrapper", {
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        height: percent(100),
+        maxHeight: percent(100),
+        minHeight: percent(0),
+        width: percent(100),
+    });
+
     return {
         root,
         scroll,
         content,
         pageHeader,
-        overlay,
+        overlayScrim,
+        overlayContent,
+        frameWrapper,
     };
 });

@@ -4,15 +4,31 @@
  */
 
 import React from "react";
-import "@dashboard/legacy";
 import { initAllUserContent } from "@library/content";
-import { onContent } from "@library/utility/appUtils";
+import { onContent, onReady } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
+import { mountReact, applySharedPortalContext } from "@vanilla/react-utils/src";
+import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import "@library/theming/reset";
+import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { roleReducer } from "@dashboard/roles/roleReducer";
+
+addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
+registerReducer("roles", roleReducer);
+
+applySharedPortalContext(props => {
+    return (
+        <AppContext noTheme errorComponent={ErrorPage}>
+            {props.children}
+        </AppContext>
+    );
+});
 
 // Routing
 addComponent("App", () => (
@@ -20,3 +36,18 @@ addComponent("App", () => (
         <Router disableDynamicRouting />
     </AppContext>
 ));
+
+const render = () => {
+    const app = document.querySelector("#app") as HTMLElement;
+
+    if (app) {
+        mountReact(
+            // Error component is set as null until we can refactor a non-kb specific Error page.
+            <AppContext errorComponent={<ErrorPage /> || null}>
+                <Router disableDynamicRouting />
+            </AppContext>,
+            app,
+        );
+    }
+};
+onReady(render);

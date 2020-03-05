@@ -12,6 +12,7 @@
  */
 
 use Vanilla\Formatting\FormatService;
+use Vanilla\Theme\ThemeFeatures;
 
 /**
  * Framework superobject.
@@ -70,22 +71,19 @@ class Gdn {
      */
     private static $container;
 
-    /** @var object  */
-    protected static $_Config = null;
-
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
     protected static $_FactoryOverwrite = true;
 
-    /** @var object  */
+    /** @var Gdn_Locale  */
     protected static $_Locale = null;
 
-    /** @var object  */
+    /** @var Gdn_Request  */
     protected static $_Request = null;
 
-    /** @var object  */
+    /** @var Gdn_PluginManager  */
     protected static $_PluginManager = null;
 
-    /** @var object  */
+    /** @var Gdn_Session  */
     protected static $_Session = null;
 
     /**
@@ -142,10 +140,8 @@ class Gdn {
      * @return Gdn_Configuration|mixed The configuration setting.
      */
     public static function config($name = false, $default = false) {
-        if (self::$_Config === null) {
-            self::$_Config = static::getContainer()->get(self::AliasConfig);
-        }
-        $config = self::$_Config;
+        $config = static::getContainer()->get(self::AliasConfig);
+
         if ($name === false) {
             $result = $config;
         } else {
@@ -426,7 +422,7 @@ class Gdn {
         $request = self::$_Request; //self::factory(self::AliasRequest);
         if (!is_null($newRequest)) {
             if (is_string($newRequest)) {
-                $request->withURI($newRequest);
+                $request->setURI($newRequest);
             } elseif (is_object($newRequest))
                 $request->fromImport($newRequest);
         }
@@ -510,6 +506,13 @@ class Gdn {
     }
 
     /**
+     * Get the theme features instance.
+     */
+    public static function themeFeatures(): ThemeFeatures {
+        return self::getContainer()->get(ThemeFeatures::class);
+    }
+
+    /**
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
@@ -582,7 +585,6 @@ class Gdn {
         /**
          * Reset all of the cached objects that are fetched from the container.
          */
-        self::$_Config = null;
         self::$_FactoryOverwrite = true;
         self::$_Locale = null;
         self::$_Request = null;

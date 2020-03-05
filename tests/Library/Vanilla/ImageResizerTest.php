@@ -19,7 +19,7 @@ class ImageResizerTest extends SharedBootstrapTestCase {
     /**
      * Clear the test cache before tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         if (file_exists(self::$cachePath)) {
@@ -204,6 +204,22 @@ class ImageResizerTest extends SharedBootstrapTestCase {
         $this->assertEquals($r['width'], $dw);
         $this->assertEquals($r['height'], $dh);
         $this->assertEquals($resizer->imageTypeFromExt($r['path']), $type);
+    }
+
+    /**
+     * Verify ability to save an animated GIF without rewriting, causing ths loss of animation.
+     *
+     * @return void
+     */
+    public function testNoGifRewrite() {
+        $resizer = new ImageResizer();
+        $resizer->setAlwaysRewriteGif(false);
+
+        $source = PATH_ROOT."/tests/fixtures/animated.gif";
+        $destination = PATH_ROOT."/tests/cache/image-resizer/animated-copy.gif";
+
+        $r = $resizer->resize($source, $destination, ["width" => 256, "height" => 256]);
+        $this->assertFileEquals($source, $destination);
     }
 
     /**

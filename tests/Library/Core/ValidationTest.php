@@ -8,13 +8,13 @@
 namespace VanillaTests\Library\Core;
 
 use Gdn_Validation;
-use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Invalid;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Tests for the **Gdn_Validation** object.
  */
-class ValidationTest extends SharedBootstrapTestCase {
+class ValidationTest extends MinimalContainerTestCase {
 
     /**
      * Test the ability to validate a post body's formatting.

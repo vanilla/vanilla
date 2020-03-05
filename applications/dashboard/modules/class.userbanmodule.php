@@ -50,7 +50,7 @@ class UserBanModule extends GDN_Module {
 
             // Add a link to identify the corresponding ban rule.
             if ($bit === 2) {
-                $text = sprintf(t('Find the corresponding ban rule for %s'), val('Name', $user));
+                $text = t('Find the matching ban rule(s).');
                 $reasons[$bit] .= ' '.anchor($text, 'settings/bans/find/'.$userID);
             }
         }

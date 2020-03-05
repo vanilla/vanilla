@@ -9,7 +9,6 @@ import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
 import { useUniqueID } from "@library/utility/idUtils";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { Omit } from "@library/@types/utils";
 
 interface IProps extends Omit<IStoryTileAndTextProps, "children"> {}
 
@@ -33,25 +32,22 @@ export function StoryExampleModalConfirm(props: IProps) {
             >
                 Confirm Modal
             </Button>
-            {open && (
-                <ModalConfirm
-                    title={"Do you agree?"}
-                    onCancel={() => {
-                        /* do something before closing */
-                        setOpen(false);
-                    }}
-                    onConfirm={() => {
-                        /* do something on confirm */
-                        setOpen(false);
-                    }}
-                    confirmTitle={"I Concur!"}
-                    elementToFocusOnExit={
-                        openButtonRef.current ? (openButtonRef.current as HTMLButtonElement) : undefined
-                    }
-                >
-                    {"Do you agree with this statement?"}
-                </ModalConfirm>
-            )}
+            <ModalConfirm
+                isVisible={open}
+                title={"Do you agree?"}
+                onCancel={() => {
+                    /* do something before closing */
+                    setOpen(false);
+                }}
+                onConfirm={() => {
+                    /* do something on confirm */
+                    setOpen(false);
+                }}
+                confirmTitle={"I Concur!"}
+                elementToFocusOnExit={openButtonRef.current ? (openButtonRef.current as HTMLButtonElement) : undefined}
+            >
+                {"Do you agree with this statement?"}
+            </ModalConfirm>
         </>
     );
 }

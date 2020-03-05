@@ -12,7 +12,9 @@ import { resolve } from "path";
 export const VANILLA_ROOT = resolve(__dirname, "../../");
 export const VANILLA_PLUGINS = resolve(VANILLA_ROOT, "plugins");
 export const VANILLA_APPS = resolve(VANILLA_ROOT, "applications");
-export const VANILLA_THEMES = resolve(VANILLA_ROOT, "themes");
+export const VANILLA_THEMES_LEGACY = resolve(VANILLA_ROOT, "themes");
+export const VANILLA_THEMES = resolve(VANILLA_ROOT, "addons/themes");
+export const VANILLA_ADDONS = resolve(VANILLA_ROOT, "addons/addons");
 
 export const PACKAGES_DIRECTORY = resolve(VANILLA_ROOT, "packages");
 export const DIST_DIRECTORY = resolve(VANILLA_ROOT, "dist");

@@ -59,7 +59,7 @@ class CacheControlMiddleware {
     }
 
     /**
-     * Invoke the smart ID middleware on a request.
+     * Invoke the cache control middleware on a request.
      *
      * @param RequestInterface $request The incoming request.
      * @param callable $next The next middleware.
@@ -76,7 +76,7 @@ class CacheControlMiddleware {
         }
 
         if ($response->getHeader('Cache-Control') !== self::NO_CACHE) {
-            // Unless we havy NO_CACHE set make sure to set the vary header.
+            // Unless we have NO_CACHE set make sure to set the vary header.
             $response->setHeader('Vary', self::VARY_COOKIE);
         }
 
@@ -96,6 +96,9 @@ class CacheControlMiddleware {
         safeHeader("Cache-Control: $cacheControl");
         foreach (static::getHttp10Headers($cacheControl) as $key => $value) {
             safeHeader("$key: $value");
+        }
+        if ($cacheControl === self::NO_CACHE) {
+            header('Vary: '.self::VARY_COOKIE);
         }
     }
 }

@@ -1,0 +1,27 @@
+{
+    "key": "theme-boilerplate",
+    "name": "Theme Boilerplate",
+    "description": "A SCSS boilerplate for vanilla responsive themes.",
+    "hidden": true,
+    "version": "1.4.2",
+    "authors": [
+        {
+            "name": "Adam (charrondev) Charron",
+            "email": "adam.c@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        },
+        {
+            "name": "Isis (igraziatto) Graziatto",
+            "email": "isis.g@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "isResponsive": true,
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "priority": 1000,
+    "type": "theme",
+    "build": {
+        "process": "v1"
+    }
+}

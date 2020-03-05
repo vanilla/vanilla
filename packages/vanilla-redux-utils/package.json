@@ -1,0 +1,17 @@
+{
+    "name": "@vanilla/redux-utils",
+    "main": "./src/index.ts",
+    "module": "./src/index.ts",
+    "version": "3.0.1",
+    "license": "gpl-2.0-only",
+    "peerDependencies": {
+        "redux": "^4.0.0",
+        "lodash": "^4.17.0"
+    },
+    "devDependencies": {
+        "@vanilla/tsconfig": "^3.0.1"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

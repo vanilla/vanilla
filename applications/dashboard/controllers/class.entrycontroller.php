@@ -396,7 +396,8 @@ class EntryController extends Gdn_Controller {
         $this->View = 'connect';
         $this->addDefinition('Username already exists.', t('Username already exists.'));
         $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
-
+        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $this->setHeader('Vary', \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE);
         // Determine what step in the process we're at.
         $isPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
         $userSelect = $this->Form->getFormValue('UserSelect');
@@ -502,13 +503,13 @@ class EntryController extends Gdn_Controller {
         }
 
         $isTrustedProvider = $this->data('Trusted');
+        $roles = $this->Form->getFormValue('Roles', $this->Form->getFormValue('roles', null));
 
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
+        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $roles !== null) {
             $saveRoles = $saveRolesRegister = true;
 
             // Translate the role names to IDs.
-            $roles = $this->Form->getFormValue('Roles', null);
             $roles = RoleModel::getByName($roles);
             $roleIDs = array_keys($roles);
 
@@ -704,11 +705,6 @@ class EntryController extends Gdn_Controller {
                     ['UserID' => 'current', 'Name' => sprintf(t('%s (Current)'), Gdn::session()->User->Name)],
                     $existingUsers
                 );
-            }
-
-            // Pre-populate our ConnectName field with the passed name if we couldn't match it.
-            if (!isset($nameFound) && !$isPostBack) {
-                $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
             // Block connecting to an existing user if it's disallowed.
@@ -1036,12 +1032,16 @@ class EntryController extends Gdn_Controller {
      * @return string Rendered XHTML template.
      */
     public function signIn($method = false, $arg1 = false) {
+        $this->canonicalUrl(url('/entry/signin', true));
         if (!$this->Request->isPostBack()) {
             $this->checkOverride('SignIn', $this->target());
         }
 
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));
+        // Add open graph description in case a restricted page is shared.
+        $this->description(Gdn::config('Garden.Description'));
+
         $this->Form->addHidden('Target', $this->target());
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
@@ -1057,9 +1057,19 @@ class EntryController extends Gdn_Controller {
             $this->Form->validateRule('Email', 'ValidateRequired', sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
             $this->Form->validateRule('Password', 'ValidateRequired');
 
-            if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
-                $this->Form->addError('Please try again.');
-                Gdn::session()->ensureTransientKey();
+            if (!$this->Request->isAuthenticatedPostBack()) {
+                $legacyLogin = \Vanilla\FeatureFlagHelper::featureEnabled('legacyEmbedLogin');
+                if ($legacyLogin && c('Garden.Embed.Allow')) {
+                    Logger::event(
+                        'legacy_embed_signin',
+                        Logger::INFO,
+                        'Signed in using the legacy embed method',
+                        ['login' => $this->Form->getFormValue('Email')]
+                    );
+                } else {
+                    $this->Form->addError('Please try again.');
+                    Gdn::session()->ensureTransientKey();
+                }
             }
 
             // Check the user.
@@ -1130,9 +1140,6 @@ class EntryController extends Gdn_Controller {
                                 'Reason' => 'Password',
                             ]);
                         }
-                    } catch (Gdn_SanitizedUserException $ex) {
-                        $errorMessage = $ex->getMessage();
-                        $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
                     }
@@ -1172,12 +1179,12 @@ class EntryController extends Gdn_Controller {
             // Try to grab the authenticator data
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
-                Gdn::request()->withURI('dashboard/entry/auth/password');
+                Gdn::request()->setURI('dashboard/entry/auth/password');
 
                 return Gdn::dispatcher()->dispatch();
             }
         } catch (Exception $e) {
-            Gdn::request()->withURI('/entry/signin');
+            Gdn::request()->setURI('/entry/signin');
 
             return Gdn::dispatcher()->dispatch();
         }
@@ -1772,6 +1779,7 @@ class EntryController extends Gdn_Controller {
      * @since 2.0.0
      */
     public function passwordRequest() {
+        $this->canonicalUrl(url('/entry/passwordrequest', true));
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
             Gdn::locale()->setTranslation('Email', t('Username'));
         }

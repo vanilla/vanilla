@@ -13,16 +13,17 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables, IButtonPresets } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonPresets, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
+import { storyWithConfig } from "@library/storybook/StoryContext";
 
-const buttonStory = storiesOf("Components", module);
+export default {
+    title: "Buttons",
+};
 
-buttonStory.add("Buttons", () => {
-    const globalVars = globalVariables();
-    const classesButtonUtility = buttonUtilityClasses();
+function StoryButton() {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Buttons</StoryHeading>
@@ -43,12 +44,14 @@ buttonStory.add("Buttons", () => {
                 .
             </StoryParagraph>
             <StoryTiles>
-                <StoryTileAndTextCompact text={"Most common button"}>
+                <StoryTileAndTextCompact type="titleBar" text={"Standard"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={"Call to action"}>
+
+                <StoryTileAndTextCompact text={"Primary"}>
                     <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
+
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
@@ -62,18 +65,29 @@ buttonStory.add("Buttons", () => {
                     <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    text={`Icon (${unit(globalVars.buttonIcon.size)} x ${unit(globalVars.buttonIcon.size)})`}
+                    text={`Icon (${unit(globalVariables().buttonIcon.size)} x ${unit(
+                        globalVariables().buttonIcon.size,
+                    )})`}
                 >
                     <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
                         <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
-                    text={`Icon Compact (${unit(globalVars.icon.sizes.default)}px x ${unit(
-                        globalVars.icon.sizes.default,
+                    text={`Icon Compact (${unit(globalVariables().icon.sizes.default)}px x ${unit(
+                        globalVariables().icon.sizes.default,
                     )})`}
                 >
                     <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                        <CheckCompactIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact
+                    text={`Icon Compact (Disabled) (${unit(globalVariables().icon.sizes.default)}px x ${unit(
+                        globalVariables().icon.sizes.default,
+                    )})`}
+                >
+                    <Button disabled baseClass={ButtonTypes.ICON_COMPACT}>
                         <CheckCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
@@ -85,6 +99,36 @@ buttonStory.add("Buttons", () => {
                     <Button baseClass={ButtonTypes.CUSTOM}>Custom</Button>
                 </StoryTileAndTextCompact>
             </StoryTiles>
+            <StoryHeading>Disabled Buttons</StoryHeading>
+            <StoryTiles>
+                <StoryTileAndTextCompact text={"Most common button (Disabled)"}>
+                    <Button disabled>Standard (Disabled)</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Call to action (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.PRIMARY}>
+                        Primary (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Simple text button (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.TEXT}>
+                        Text (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Text with primary color (Disabled)"}>
+                    <Button disabled baseClass={ButtonTypes.TEXT_PRIMARY}>
+                        Text Primary (Disabled)
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact
+                    text={`Icon (Disabled) (${unit(globalVariables().buttonIcon.size)} x ${unit(
+                        globalVariables().buttonIcon.size,
+                    )})`}
+                >
+                    <Button disabled baseClass={ButtonTypes.ICON} title={"Icon"}>
+                        <CloseCompactIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+            </StoryTiles>
 
             <StoryHeading>Button With Icon</StoryHeading>
             <StoryParagraph>
@@ -94,11 +138,46 @@ buttonStory.add("Buttons", () => {
             <StoryTiles>
                 <StoryTileAndTextCompact text={"Icon and Text Example"}>
                     <Button baseClass={ButtonTypes.STANDARD}>
-                        <ComposeIcon className={classesButtonUtility.buttonIconRightMargin} />
+                        <ComposeIcon className={buttonUtilityClasses().buttonIconRightMargin} />
                         {"Icon and Text"}
                     </Button>
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>
     );
-});
+}
+
+export const Standard = storyWithConfig({}, () => <StoryButton />);
+export const PresetsOutline = storyWithConfig(
+    {
+        themeVars: {
+            global: {
+                buttonPreset: ({
+                    style: ButtonPresets.OUTLINE,
+                } as unknown) as IButtonPresets,
+            },
+            button: {
+                primary: {
+                    colors: {
+                        fg: globalVariables().mainColors.primary,
+                        bg: "#fff",
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryButton />,
+);
+
+export const PresetsSolid = storyWithConfig(
+    {
+        themeVars: {
+            global: {
+                buttonPreset: ({
+                    preset: ButtonPresets.SOLID,
+                } as unknown) as IButtonPresets,
+            },
+        },
+    },
+    () => <StoryButton />,
+);

@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
 
@@ -19,6 +19,9 @@ interface IProps extends IOptionalComponentID {
     label: string;
     name?: string;
     isHorizontal?: boolean;
+    note?: string;
+    defaultChecked?: boolean;
+    fakeFocus?: boolean;
 }
 
 interface IState {
@@ -31,33 +34,42 @@ interface IState {
 export default function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
-    const { isHorizontal } = props;
+    const { isHorizontal, note } = props;
+
+    const noteID = useUniqueID("radioButtonNote");
 
     return (
-        <label className={classNames(classes.root, props.className, { isHorizontal })}>
-            <input
-                className={classes.input}
-                onChange={props.onChange}
-                aria-disabled={props.disabled}
-                name={props.name}
-                disabled={props.disabled}
-                type="radio"
-                checked={props.checked}
-                tabIndex={0}
-            />
-            <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
-                <span className={classes.state}>
+        <>
+            <label className={classNames(classes.root, props.className, { isHorizontal })}>
+                <input
+                    className={classNames(classes.input, "exclude-icheck", props.fakeFocus && "focus-visible")}
+                    onChange={props.onChange}
+                    aria-disabled={props.disabled}
+                    name={props.name}
+                    disabled={props.disabled}
+                    type="radio"
+                    checked={props.checked}
+                    defaultChecked={props.defaultChecked}
+                    tabIndex={0}
+                    aria-describedby={note ? noteID : undefined}
+                />
+                <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
                     <svg className={classes.diskIcon}>
                         <title>{t("Radio Button")}</title>
                         <circle fill="currentColor" cx="3" cy="3" r="3" />
                     </svg>
                 </span>
-            </span>
-            {props.label && (
-                <span id={labelID} className={classes.label}>
-                    {props.label}
-                </span>
+                {props.label && (
+                    <span id={labelID} className={classes.label}>
+                        {props.label}
+                    </span>
+                )}
+            </label>
+            {note && (
+                <div id={noteID} className={"info"}>
+                    {note}
+                </div>
             )}
-        </label>
+        </>
     );
 }

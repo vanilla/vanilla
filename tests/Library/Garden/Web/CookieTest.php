@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Vanilla Forums Inc.
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -31,6 +31,35 @@ class CookieTest extends SharedBootstrapTestCase {
         }
 
         return $cookies;
+    }
+
+    /**
+     * Test domain accessors.
+     */
+    public function testGetSetDomain() {
+        $cookie = new Cookie();
+        $cookie->setDomain('example.com');
+        $this->assertSame('example.com', $cookie->getDomain());
+    }
+
+    /**
+     * Test the flush all accessors.
+     */
+    public function testGetSetFlushAll() {
+        $cookie = new Cookie();
+        $f = !$cookie->getFlushAll();
+        $cookie->setFlushAll($f);
+        $this->assertSame($f, $cookie->getFlushAll());
+    }
+
+    /**
+     * Test secure accessors.
+     */
+    public function testGetSetSecure() {
+        $cookie = new Cookie();
+        $c = !$cookie->isSecure();
+        $cookie->setSecure($c);
+        $this->assertSame($c, $cookie->isSecure());
     }
 
     /**
@@ -169,6 +198,13 @@ class CookieTest extends SharedBootstrapTestCase {
     /**
      * Test setting a cookie with limited options.
      *
+     * @param string $name
+     * @param mixed $value
+     * @param int $expire
+     * @param string $path
+     * @param string $domain
+     * @param bool $secure
+     * @param bool $httpOnly
      * @dataProvider provideCookieSet
      */
     public function testSet($name, $value, $expire, $path, $domain, $secure, $httpOnly) {
@@ -184,12 +220,19 @@ class CookieTest extends SharedBootstrapTestCase {
         $this->assertArrayHasKey($name, $result);
         $this->assertEquals($value, $result[$name][0]);
         $this->assertEquals($testExpire, $result[$name][1]);
-        $this->assertEquals($httpOnly, $result[$name][5]);
+        $this->assertSame($httpOnly, $result[$name][5]);
     }
 
     /**
      * Test setting a cookie with full options.
      *
+     * @param string $name
+     * @param mixed $value
+     * @param int $expire
+     * @param string $path
+     * @param string $domain
+     * @param bool $secure
+     * @param bool $httpOnly
      * @dataProvider provideCookieSet
      */
     public function testSetCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly) {
@@ -209,5 +252,16 @@ class CookieTest extends SharedBootstrapTestCase {
         $this->assertEquals($testDomain, $result[$name][3]);
         $this->assertEquals($secure, $result[$name][4]);
         $this->assertEquals($httpOnly, $result[$name][5]);
+    }
+
+    /**
+     * Setting a cookie with a null value deletes it.
+     */
+    public function testDeleteWithSet(): void {
+        $cookie = new Cookie(['foo' => 'bar']);
+        $cookie->setCookie('foo', null);
+
+        $r = $cookie->makeDeleteCookieCalls();
+        $this->assertArrayHasKey('foo', $r);
     }
 }

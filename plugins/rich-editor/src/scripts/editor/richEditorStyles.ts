@@ -12,11 +12,10 @@ import {
     srOnly,
     unit,
     userSelect,
-    sticky,
     pointerEvents,
-    allButtonStates,
     borders,
-    negative,
+    paddings,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -25,12 +24,14 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: boolean) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
@@ -94,10 +95,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         justifyContent: "center",
         top: unit(vars.pilcrow.offset),
         left: 0,
-        marginLeft: unit(-globalVars.gutter.quarter + (!legacyMode ? -(globalVars.gutter.size + 6) : 0)),
+        marginLeft: unit(-globalVars.gutter.quarter - (!legacyMode ? globalVars.gutter.size * 2 : 0)),
         transform: `translateX(-100%) translateY(-50%)`,
         height: unit(vars.paragraphMenuHandle.size),
-        width: unit(globalVars.icon.sizes.default),
+        width: unit(vars.paragraphMenuHandle.size),
         animationName: vars.pilcrow.animation.name,
         animationDuration: vars.pilcrow.animation.duration,
         animationTimingFunction: vars.pilcrow.animation.timing,
@@ -166,24 +167,30 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         minWidth: unit(vars.menuButton.size),
     });
 
-    const text = style("text", {
-        position: "relative",
-        whiteSpace: important("pre-wrap"),
-        outline: 0,
-        paddingBottom: 24, // So the user has room to click.
-        $nest: {
-            // When the editor is empty we should be displaying a placeholder.
-            "&.ql-blank::before": {
-                content: `attr(placeholder)`,
-                display: "block",
-                color: colorOut(vars.text.placeholder.color),
-                position: "absolute",
-                top: vars.text.offset,
-                left: 0,
-                cursor: "text",
+    const text = style(
+        "text",
+        {
+            position: "relative",
+            whiteSpace: important("pre-wrap"),
+            outline: 0,
+            paddingBottom: 24, // So the user has room to click.
+            $nest: {
+                // When the editor is empty we should be displaying a placeholder.
+                "&.ql-blank::before": {
+                    content: `attr(placeholder)`,
+                    display: "block",
+                    color: colorOut(vars.text.placeholder.color),
+                    position: "absolute",
+                    top: vars.text.offset,
+                    left: 0,
+                    cursor: "text",
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            fontSize: importantUnit(16), // for iOS
+        }),
+    );
 
     const menuItems = style("menuItems", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
@@ -316,7 +323,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const embedBar = style("embedBar", {
         display: "block",
         width: percent(100),
-        padding: unit(vars.embedMenu.padding),
+        ...paddings({
+            horizontal: legacyMode ? 0 : (vars.menuButton.size - globalVars.icon.sizes.small) / 2,
+            vertical: vars.embedMenu.padding,
+        }),
         background: legacyMode ? undefined : colorOut(vars.colors.bg),
     });
 
@@ -355,6 +365,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         cursor: "pointer",
         border: 0,
         outline: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
     });
 
     const flyoutDescription = style("flyoutDescription", {
@@ -367,9 +380,11 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const position = style("position", {
-        position: "absolute",
-        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
         $nest: {
+            "&&": {
+                position: "absolute",
+                left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
+            },
             "&.isUp": {
                 bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
             },
@@ -391,6 +406,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
 
     const flyoutOffset = style("flyoutOffset", {
         marginTop: unit((vars.menuButton.size - vars.iconWrap.width) / -2 + 1),
+    });
+
+    const placeholder = style("placeholder", {
+        $nest: {
+            "&&&:before": {
+                margin: 0,
+            },
+        },
     });
 
     return {
@@ -418,5 +441,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         iconWrap,
         flyoutOffset,
         emojiGroup,
+        placeholder,
     };
 });

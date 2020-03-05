@@ -31,7 +31,7 @@ class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->pageScraper = new MockPageScraper();
         $this->httpClient = new MockHttpClient();

@@ -336,10 +336,9 @@ class EventManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
-     *
-     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testMaxPriority() {
+        $this->expectNotice();
         $em = new EventManager();
 
         $arr = [];

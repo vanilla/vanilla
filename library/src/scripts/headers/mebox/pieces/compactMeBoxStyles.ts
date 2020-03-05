@@ -8,6 +8,7 @@ import { absolutePosition, flexHelper, unit, sticky, colorOut } from "@library/s
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, viewHeight } from "csx";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const compactMeBoxVariables = useThemeCache(() => {
     const themeVars = variableFactory("compactMeBox");
@@ -76,6 +77,7 @@ export const compactMeBoxClasses = useThemeCache(() => {
     });
 
     const tabButton = style("tabButton", {
+        ...buttonResetMixin(),
         ...flexHelper().middle(),
     });
 

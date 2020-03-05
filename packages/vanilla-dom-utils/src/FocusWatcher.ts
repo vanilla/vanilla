@@ -102,7 +102,11 @@ export class FocusWatcher {
                     (activeElement === this.rootNode || this.rootNode.contains(activeElement));
 
                 // We will only invalidate based on something actually getting focus.
-                callback(!!hasFocus);
+                // Make sure we are still mounted before calling this.
+                // It could happen that our flyout is unmounted in between the setTimeout call.
+                if (document.body.contains(this.rootNode)) {
+                    callback(!!hasFocus);
+                }
             }
         }, 0);
     }

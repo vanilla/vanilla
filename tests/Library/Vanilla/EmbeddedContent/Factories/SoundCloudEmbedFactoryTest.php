@@ -26,7 +26,7 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new SoundCloudEmbedFactory($this->httpClient);

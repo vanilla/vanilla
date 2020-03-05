@@ -11,7 +11,7 @@ if (!function_exists('extendedProfileFields')) {
     function extendedProfileFields($profileFields, $allFields, $magicLabels = []) {
         foreach ($profileFields as $name => $value) {
             // Skip empty and hidden fields.
-            if (!$value || !val('OnProfile', $allFields[$name])) {
+            if (!$value || !($allFields[$name]['OnProfile'] ?? false)) {
                 continue;
             }
 

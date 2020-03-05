@@ -5,7 +5,7 @@
     "mobileFriendly": true,
     "settingsUrl": "/dashboard/social/googleplus",
     "settingsPermission": "Garden.Settings.Manage",
-    "hidden": false,
+    "hidden": true,
     "socialConnect": true,
     "requiresRegistration": false,
     "icon": "google_social_connect.png",

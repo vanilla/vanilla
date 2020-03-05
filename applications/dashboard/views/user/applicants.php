@@ -35,7 +35,7 @@ if ($NumApplicants == 0) : ?>
                     <td>
                         <div class="user-info">
                             <div class="username"><?php echo htmlspecialchars($User->Name); ?></div>
-                            <div class="info user-email"><?php echo anchor($User->Email, 'mailto:'.$User->Email); ?></div>
+                            <div class="info user-email"><?php echo anchor(htmlspecialchars($User->Email), 'mailto:'.$User->Email); ?></div>
                         </div>
                     </td>
                     <td>

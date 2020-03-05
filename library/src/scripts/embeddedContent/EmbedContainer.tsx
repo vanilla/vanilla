@@ -3,9 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import React, { DetailedHTMLProps } from "react";
+import { useEmbedContext } from "@library/embeddedContent/embedService";
 import { embedContainerClasses } from "@library/embeddedContent/embedStyles";
 import classNames from "classnames";
+import React, { DetailedHTMLProps } from "react";
 
 export enum EmbedContainerSize {
     SMALL = "small",
@@ -17,20 +18,20 @@ interface IProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>,
     className?: string;
     children?: React.ReactNode;
     size?: EmbedContainerSize;
-    inEditor?: boolean;
     withPadding?: boolean;
 }
 
 export function EmbedContainer(props: IProps) {
-    const { size, inEditor, withPadding, ...htmlProps } = props;
+    const { size, withPadding, ...htmlProps } = props;
     const classes = embedContainerClasses();
 
+    const { inEditor } = useEmbedContext();
     return (
         <div
             {...htmlProps}
             className={classNames(
                 "embedExternal",
-                classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!props.inEditor, !!withPadding),
+                classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!inEditor, !!withPadding),
                 props.className,
             )}
         >

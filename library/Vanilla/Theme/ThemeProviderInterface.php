@@ -6,6 +6,8 @@
 
  namespace Vanilla\Theme;
 
+ use Garden\Web\Exception\NotFoundException;
+
  /**
   * Interface for providing variables on a theme.
   */
@@ -19,6 +21,13 @@ interface ThemeProviderInterface {
      * @return bool When theme key is numeric return TRUE if alphanumeric FALSE
      */
     public function themeKeyType(): int;
+
+    /**
+     * Return all themes available.
+     *
+     * @return array
+     */
+    public function getAllThemes(): array;
 
     /**
      * Returns type of theme with all assets
@@ -74,10 +83,19 @@ interface ThemeProviderInterface {
     /**
      * Set current theme.
      *
-     * @param int $themeID Theme ID to set current.
+     * @param int|string $themeID Theme ID to set current.
      * @return array
      */
-    public function setCurrent(int $themeID): array;
+    public function setCurrent($themeID): array;
+
+    /**
+     * Set preview theme.
+     * (pseudo current theme for current session user only)
+     *
+     * @param int|string $themeID Theme ID to set current.
+     * @return array
+     */
+    public function setPreviewTheme($themeID): array;
 
     /**
      * Get "current" theme.
@@ -85,6 +103,31 @@ interface ThemeProviderInterface {
      * @return array
      */
     public function getCurrent(): ?array;
+
+    /**
+     * Get theme view folder path
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getThemeViewPath($themeKey): string;
+
+    /**
+     * Get master (parent) theme key.
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @throws NotFoundException Throws an exception when theme is not found.
+     * @return string
+     */
+    public function getMasterThemeKey($themeKey): string;
+
+    /**
+     * Get theme name.
+     *
+     * @param strig|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getName($themeKey): string;
 
     /**
      * Set theme asset (replace existing or create new if asset does not exist).

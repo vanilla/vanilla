@@ -8,6 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionModel;
+
 /**
  * Handles displaying categories via /categoris endpoint.
  */
@@ -260,6 +263,12 @@ class CategoriesController extends VanillaController {
      * @param int $offset Number of discussions to skip.
      */
     public function index($categoryIdentifier = '', $page = '0') {
+        if (!$categoryIdentifier) {
+            /** @var SiteSectionInterface $siteSection */
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['CategoryID'] ?? '';
+        }
+
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
 
@@ -580,7 +589,8 @@ class CategoriesController extends VanillaController {
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
-        $this->canonicalUrl(url('/categories', true));
+        $canonicalUrl = $this->calculateCanonicalUrl($this->Data);
+        $this->canonicalUrl($canonicalUrl);
 
         if ($this->View === 'all' && $displayAs === 'Flat') {
             $this->View = 'flat_all';
@@ -673,7 +683,9 @@ class CategoriesController extends VanillaController {
         // Set view and render
         $this->View = 'discussions';
 
-        $this->canonicalUrl(url('/categories', true));
+        $canonicalUrl = $this->calculateCanonicalUrl($this->Data);
+        $this->canonicalUrl($canonicalUrl);
+
         $Path = $this->fetchViewLocation('helper_functions', 'discussions', false, false);
         if ($Path) {
             include_once $Path;
@@ -766,5 +778,15 @@ class CategoriesController extends VanillaController {
             default:
                 return parent::data($path, $default);
         }
+    }
+
+    /**
+     * Return URL based on 'isHomepage'
+     *
+     * @param array $data
+     * @return string
+     */
+    private function calculateCanonicalUrl($data) {
+        return empty($data['isHomepage']) ? url(Gdn::request()->path(), true) : url('/', true);
     }
 }

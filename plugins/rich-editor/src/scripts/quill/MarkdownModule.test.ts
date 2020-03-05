@@ -41,7 +41,7 @@ describe("NewLineClickInsertionModule", () => {
             code: true,
         },
         type: MarkdownMacroType.INLINE,
-        trailingCharacter: " ",
+        trailingCharacter: "", // The space is actually inserted by quill automatically. No need for an extra
     });
 
     testInlineFormat({

@@ -3,19 +3,23 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
 use Vanilla\Web\Page;
 use Vanilla\Web\TwigEnhancer;
+use Vanilla\Web\UASniffer;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -65,9 +69,26 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
+    ->rule(\Vanilla\ImageResizer::class)
+    ->addCall('setAlwaysRewriteGif', [false])
+
     // Site sections
-    ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-    ->setClass(SingleSiteSectionProvider::class)
+    ->rule(\Vanilla\Site\SiteSectionModel::class)
+    ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])
+    ->setShared(true)
+
+    // Translation model
+    ->rule(\Vanilla\Site\TranslationModel::class)
+    ->addCall('addProvider', [new Reference(\Vanilla\Site\TranslationProvider::class)])
+    ->setShared(true)
+
+    // Site applications
+    ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+    ->setClass(\Vanilla\Site\ApplicationProvider::class)
+    ->addCall('add', [new Reference(
+        \Vanilla\Site\Application::class,
+        ['garden', ['api', 'entry', 'sso', 'utility']]
+    )])
     ->setShared(true)
 
     // AddonManager
@@ -75,8 +96,8 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->setConstructorArgs([
         [
-            Addon::TYPE_ADDON => ['/applications', '/plugins'],
-            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
             Addon::TYPE_LOCALE => '/locales'
         ],
         PATH_CACHE
@@ -122,6 +143,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     // EventManager
     ->rule(\Garden\EventManager::class)
+    ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
+    ->addAlias(\Psr\EventDispatcher\EventDispatcherInterface::class)
+    ->addAlias(\Psr\EventDispatcher\ListenerProviderInterface::class)
     ->setShared(true)
 
     // Locale
@@ -140,6 +164,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('fromEnvironment')
     ->addAlias('Request')
     ->addAlias(\Garden\Web\RequestInterface::class)
+
+    ->rule(UASnifferInterface::class)
+    ->setClass(UASniffer::class)
 
     // Database.
     ->rule('Gdn_Database')
@@ -247,6 +274,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
     ->rule('@view-application/json')
     ->setClass(\Vanilla\Web\JsonView::class)
@@ -258,8 +286,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Gdn_Model')
     ->setShared(true)
 
+    ->rule(Contracts\Models\UserProviderInterface::class)
+    ->setClass(UserModel::class)
+
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
+
+    ->rule(Gdn_Validation::class)
+    ->addCall('addRule', ['plainTextLength', new Reference(\Vanilla\PlainTextLengthValidator::class)])
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
@@ -326,16 +360,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Emoji::class)
     ->setShared(true)
 
-    ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
-    ->addCall('addCoreEmbeds')
-    ->setShared(true)
-
     ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
-
-    ->rule(Vanilla\Models\SiteMeta::class)
-    ->setConstructorArgs(['activeTheme' => ContainerUtils::currentTheme()])
 
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
@@ -376,6 +403,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
 ;
 
 // Run through the bootstrap with dependencies.

@@ -4,27 +4,23 @@
  */
 import React from "react";
 import { LeftChevronCompactIcon } from "@library/icons/common";
-import { withRouter, RouteComponentProps } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
-interface IProps extends RouteComponentProps<{}> {
+interface IProps {
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;
 }
 
-function DashboardHeaderBlock(props: IProps) {
+export function DashboardHeaderBlock(props: IProps) {
+    const history = useHistory();
     return (
         <header className="header-block">
             <div className="title-block">
-                {props.showBackLink && (
-                    <Button
-                        baseClass={ButtonTypes.ICON}
-                        // className="btn btn-icon btn-return"
-                        aria-label="Return"
-                        onClick={props.history.goBack}
-                    >
+                {props.showBackLink && history && (
+                    <Button baseClass={ButtonTypes.ICON} aria-label="Return" onClick={history.goBack}>
                         <LeftChevronCompactIcon />
                     </Button>
                 )}
@@ -34,5 +30,3 @@ function DashboardHeaderBlock(props: IProps) {
         </header>
     );
 }
-
-export default withRouter(DashboardHeaderBlock);

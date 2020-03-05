@@ -8,18 +8,34 @@
 namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Addon;
 use Vanilla\Contracts;
+use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ThemeModel;
+use Vanilla\Contracts\AddonInterface;
 
 /**
  * Class to provide assets from the webpack build process.
  */
 class WebpackAssetProvider {
 
+    use TwigRenderTrait;
+
     /** @var RequestInterface */
     private $request;
 
     /** @var Contracts\AddonProviderInterface */
     private $addonProvider;
+
+    /** @var \Gdn_Session */
+    private $session;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var ThemeModel */
+    private $themeModel;
 
     /** @var string */
     private $cacheBustingKey = '';
@@ -41,13 +57,20 @@ class WebpackAssetProvider {
      *
      * @param RequestInterface $request
      * @param Contracts\AddonProviderInterface $addonProvider
+     * @param \Gdn_Session $session
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\AddonProviderInterface $addonProvider
+        Contracts\AddonProviderInterface $addonProvider,
+        \Gdn_Session $session,
+        ConfigurationInterface $config,
+        ThemeModel $themeModel
     ) {
         $this->request = $request;
         $this->addonProvider = $addonProvider;
+        $this->session = $session;
+        $this->config = $config;
+        $this->themeModel = $themeModel;
     }
 
     /**
@@ -134,6 +157,7 @@ class WebpackAssetProvider {
 
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+            $addon = $this->checkReplacePreview($addon);
             // See if we have a common bundle
             $commonAsset = new WebpackAddonAsset(
                 $this->request,
@@ -170,6 +194,26 @@ class WebpackAssetProvider {
     }
 
     /**
+     * Check if current theme need to be replaced by some preview theme
+     *
+     * @param Addon $addon
+     * @return Addon
+     */
+    private function checkReplacePreview(AddonInterface $addon): AddonInterface {
+        $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
+        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+            if ($addon->getKey() === $currentThemeKey) {
+                $addonKey = $this->themeModel->getMasterThemeKey($previewThemeKey);
+                if ($previewTheme = $this->addonProvider->lookupTheme($addonKey)) {
+                    $addon = $previewTheme;
+                }
+            }
+        }
+        return $addon;
+    }
+
+    /**
      * Get all stylesheets for a particular site section.
      *
      * @param string $section
@@ -181,10 +225,10 @@ class WebpackAssetProvider {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
-
         $styles = [];
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
+            $addon = $this->checkReplacePreview($addon);
             $asset = new WebpackAddonAsset(
                 $this->request,
                 WebpackAsset::STYLE_EXTENSION,
@@ -250,24 +294,9 @@ class WebpackAssetProvider {
      * @return string The contents of the script.
      */
     public function getInlinePolyfillContents(): string {
-        $polyfillAsset = new PolyfillAsset($this->request, $this->cacheBustingKey);
-        $debug = debug();
-        $logAdding = $debug ? 'console.log("Older browser detected. Initiating polyfills.");' : '';
-        $logNotAdding = $debug ? 'console.log("Modern browser detected. No polyfills necessary");' : '';
-
-        // Add the polyfill loader.
-        $scriptContent =
-            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
-            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
-            ."&& window.NodeList && NodeList.prototype.forEach;"
-            ."if (!supportsAllFeatures) {"
-            .$logAdding
-            ."var head = document.getElementsByTagName('head')[0];"
-            ."var script = document.createElement('script');"
-            ."script.src = '".$polyfillAsset->getWebPath()."';"
-            ."head.appendChild(script);"
-            ."} else { $logNotAdding }";
-
-        return $scriptContent;
+        return $this->renderTwig("library/Vanilla/Web/Asset/InlinePolyfillContent.js.twig", [
+            'debugModeLiteral' => debug() ? "true" : "false",
+            'polyfillAsset' => new PolyfillAsset($this->request, $this->cacheBustingKey),
+        ]);
     }
 }

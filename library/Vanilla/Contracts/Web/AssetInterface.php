@@ -12,6 +12,15 @@ namespace Vanilla\Contracts\Web;
  */
 interface AssetInterface {
     /**
+     * It tells if the asset is static or not
+     * Static means that the asset is inmutable during the build's lifecycle
+     * The value can be used for Caching purposes
+     *
+     * @return bool
+     */
+    public function isStatic(): bool;
+
+    /**
      * Get the full web ready URL of the asset.
      *
      * @return string

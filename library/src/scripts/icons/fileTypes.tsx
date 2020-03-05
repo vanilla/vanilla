@@ -182,24 +182,3 @@ export function FileTypeZipIcon(props: { className?: string }) {
         </svg>
     );
 }
-
-export function AttachmentErrorIcon(props: { className?: string }) {
-    const title = t("Error");
-    const classes = iconClasses();
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 18"
-            className={classNames("attachmentIcon-error", classes.attachmentError, props.className)}
-            role="img"
-            aria-label={title}
-        >
-            <title>{title}</title>
-            <path
-                d="M.9,18a.917.917,0,0,1-.9-.86.9.9,0,0,1,.107-.449L9.17.474A.976.976,0,0,1,10.445.107a.906.906,0,0,1,.381.36V.474l9.061,16.215a.889.889,0,0,1-.378,1.2l-.036.018a.951.951,0,0,1-.416.093Zm.021-1ZM9.985,1.012,1.081,17H18.919Z"
-                fill="currentColor"
-            />
-            <path d="M9,8.4V6h2V8.4L10.8,12H9.3ZM9,13h2v2H9Z" fill="currentColor" />
-        </svg>
-    );
-}

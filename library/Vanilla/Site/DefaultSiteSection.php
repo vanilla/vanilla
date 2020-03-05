@@ -18,7 +18,7 @@ class DefaultSiteSection implements SiteSectionInterface {
 
     const DEFAULT_ID = 0;
 
-    const EMPTY_BASE_PATH = "/";
+    const EMPTY_BASE_PATH = "";
 
     const DEFAULT_SECTION_GROUP = "vanilla";
 
@@ -28,14 +28,23 @@ class DefaultSiteSection implements SiteSectionInterface {
     /** @var string */
     private $configLocaleKey;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
+    /** @var array $apps */
+    private $apps;
+
     /**
      * DI.
      *
      * @param ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config, \Gdn_Router $router) {
         $this->configSiteName = $config->get('Garden.Title', 'Vanilla');
         $this->configLocaleKey = $config->get('Garden.Locale', 'en');
+        $configDefaultController = $config->get('Routes.DefaultController');
+        $this->defaultRoute = $router->parseRoute($configDefaultController);
+        $this->apps = ['forum' => !(bool)$config->get('Vanilla.Forum.Disabled')];
     }
 
     /**
@@ -62,7 +71,7 @@ class DefaultSiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
-    public function getSectionID(): int {
+    public function getSectionID(): string {
         return self::DEFAULT_ID;
     }
 
@@ -71,5 +80,47 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getSectionGroup(): string {
         return self::DEFAULT_SECTION_GROUP;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributes(): array {
+        return [];
     }
 }

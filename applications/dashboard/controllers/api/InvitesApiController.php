@@ -92,7 +92,7 @@ class InvitesApiController extends AbstractApiController {
      * Get a single invite.
      *
      * @param int $id The ID of the invite.
-     * @return array
+     * @return Data
      */
     public function get($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -110,6 +110,7 @@ class InvitesApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -182,7 +183,7 @@ class InvitesApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo($this->invitationModel->getCount(['InsertUserID' => $userID]), '/api/v2/invites', $query, $in);
 
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
     }
 
     /**
@@ -221,6 +222,7 @@ class InvitesApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 

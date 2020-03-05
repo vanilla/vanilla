@@ -1,1 +1,1 @@
-heading 1 heading 2 heading 2 (Quote) <script>alert("xss");</script>(Spoiler) [spoiler]Legacy Spoiler's Don't Apply[/spoiler]
+heading 1 heading 2 heading 2 (Quote) <script>alert("xss");</script>(Spoiler) [spoiler]Legacy Spoiler's Don't Apply[/spoiler](Quote)

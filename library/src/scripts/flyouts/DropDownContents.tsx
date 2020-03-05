@@ -22,6 +22,7 @@ export interface IProps {
     openAsModal?: boolean;
     selfPadded?: boolean;
     size: DropDownContentSize;
+    horizontalOffset?: boolean;
 }
 
 export enum DropDownContentSize {
@@ -34,6 +35,8 @@ export enum DropDownContentSize {
  * Note that it renders an empty, hidden div when closed so that the aria-labelledby points to an element in the DOM.
  */
 export default class DropDownContents extends React.Component<IProps> {
+    private selfRef = React.createRef<HTMLDivElement>();
+
     public render() {
         const classes = dropDownClasses();
         const asDropDownClasses = !this.props.openAsModal
@@ -43,29 +46,29 @@ export default class DropDownContents extends React.Component<IProps> {
             : undefined;
         const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
 
-        if (this.props.isVisible) {
-            return (
-                <div
-                    id={this.props.id}
-                    aria-labelledby={this.props.parentID}
-                    className={classNames(
-                        asDropDownClasses,
-                        asModalClasses,
-                        this.props.className,
-                        !this.props.selfPadded ? classes.verticalPadding : "",
-                    )}
-                    style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
-                    onClick={this.doNothing}
-                    onMouseDown={this.forceTryFocus}
-                >
-                    {this.props.children}
-                </div>
-            );
-        } else {
-            return (
-                <div id={this.props.id} aria-hidden={true} aria-labelledby={this.props.parentID} className="sr-only" />
-            ); // for accessibility
-        }
+        return (
+            <div
+                ref={this.selfRef}
+                id={this.props.id}
+                aria-labelledby={this.props.parentID}
+                className={classNames(
+                    asDropDownClasses,
+                    asModalClasses,
+                    this.props.className,
+                    !this.props.selfPadded ? classes.verticalPadding : "",
+                    {
+                        [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
+                        [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
+                    },
+                )}
+                style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
+                onClick={this.doNothing}
+                tabIndex={-1}
+                onMouseDown={this.forceTryFocus}
+            >
+                {this.props.children}
+            </div>
+        );
     }
 
     /**
@@ -79,8 +82,8 @@ export default class DropDownContents extends React.Component<IProps> {
     private forceTryFocus = (e: React.MouseEvent) => {
         if (e.target instanceof HTMLElement) {
             if (!TabHandler.isTabbable(e.target)) {
-                e.preventDefault();
-                document.body.focus();
+                // this.doNothing(e);
+                // this.selfRef.current && this.selfRef.current.focus();
             }
         }
     };

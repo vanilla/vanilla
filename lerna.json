@@ -4,12 +4,12 @@
         "library",
         "applications/dashboard",
         "applications/vanilla",
-        "plugins/*"
+        "plugins/*",
+        "addons/themes/*",
+        "addons/addons/*"
     ],
     "version": "3.0.1",
     "npmClient": "yarn",
     "useWorkspaces": true,
-    "npmClientArgs": [
-        "--pure-lockfile"
-    ]
+    "npmClientArgs": ["--pure-lockfile"]
 }

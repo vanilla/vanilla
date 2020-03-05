@@ -9,6 +9,7 @@ import {
     fonts,
     importantUnit,
     margins,
+    negative,
     paddings,
     singleBorder,
     unit,
@@ -19,6 +20,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
 import { iconVariables } from "@library/icons/iconClasses";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,18 +52,26 @@ export const storyBookVariables = useThemeCache(() => {
         wideWidth: 240,
     });
 
+    const outerContainer = makeThemeVars("outerContainer", {
+        paddings: {
+            vertical: 50,
+            horizontal: 55,
+        },
+    });
+
     return {
         gaps,
         spacing,
         colors,
         tiles,
+        outerContainer,
     };
 });
 
 export const storyBookClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = storyBookVariables();
-    const style = styleFactory("storyBookStyles");
+    const style = styleFactory("storyBook");
 
     const paragraph = style("paragraph", {
         display: "block",
@@ -155,10 +165,7 @@ export const storyBookClasses = useThemeCache(() => {
         position: "relative",
         display: "block",
         maxWidth: percent(100),
-        ...paddings({
-            vertical: 50,
-            horizontal: 55,
-        }),
+        ...paddings(vars.outerContainer.paddings),
     });
 
     const containerInner = style("containerInner", {
@@ -188,8 +195,18 @@ export const storyBookClasses = useThemeCache(() => {
         alignItems: "stretch",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        width: calc(`100% + ${unit(vars.gaps.tile * 2)}`),
-        transform: translateX(`-${unit(vars.gaps.tile)}`),
+        width: calc(`100% + ${unit(vars.gaps.tile * 8)}`),
+        transform: translateX(`-${unit(vars.gaps.tile * 3.5)}`),
+        ...layoutVariables()
+            .mediaQueries()
+            .oneColumn(
+                {
+                    display: "block",
+                    width: percent(100),
+                    transform: "none",
+                },
+                false,
+            ),
     });
 
     const tile = style("tile", {
@@ -250,7 +267,7 @@ export const storyBookClasses = useThemeCache(() => {
                 fg = globalVars.mainColors.bg;
                 break;
             case "titleBar":
-                bg = titleBarVars.colors.bg;
+                bg = titleBarVars.colors.bg.mix(titleBarVars.colors.fg, 0.5);
                 fg = titleBarVars.colors.fg;
                 break;
         }
@@ -291,6 +308,13 @@ export const storyBookClasses = useThemeCache(() => {
         width: importantUnit(iconVars.vanillaLogo.width / 2),
     });
 
+    const fullPage = style("fullPage", {
+        ...margins({
+            vertical: negative(vars.outerContainer.paddings.vertical),
+            horizontal: negative(vars.outerContainer.paddings.horizontal),
+        }),
+    });
+
     return {
         heading,
         headingH1,
@@ -315,5 +339,6 @@ export const storyBookClasses = useThemeCache(() => {
         tileTextPaddingLeft,
         compactTilesAndText,
         smallerLogo,
+        fullPage,
     };
 });

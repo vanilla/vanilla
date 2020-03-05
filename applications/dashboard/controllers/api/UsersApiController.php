@@ -134,43 +134,16 @@ class UsersApiController extends AbstractApiController {
 
         $this->userModel->removePicture($id);
     }
+
     /**
      * Get a schema instance comprised of all available user fields.
      *
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        $schema = Schema::parse([
-            'userID:i' => 'ID of the user.',
-            'name:s' => 'Name of the user.',
-            'password:s' => 'Password of the user.',
-            'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => [
-                'description' => 'Email address of the user.',
-                'minLength' => 0,
-            ],
-            'photo:s|n' => [
-                'minLength' => 0,
-                'description' => 'Raw photo field value from the user record.'
-            ],
-            'photoUrl:s|n' => [
-                'minLength' => 0,
-                'description' => 'URL to the user photo.'
-            ],
-            'points:i',
-            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
-            'showEmail:b' => 'Is the email address visible to other users?',
-            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
-            'banned:i' => 'Is the user banned?',
-            'dateInserted:dt' => 'When the user was created.',
-            'dateLastActive:dt|n' => 'Time the user was last active.',
-            'dateUpdated:dt|n' => 'When the user was last updated.',
-            'roles:a?' => $this->schema([
-                'roleID:i' => 'ID of the role.',
-                'name:s' => 'Name of the role.'
-            ], 'RoleFragment'),
-        ]);
-        return $schema;
+        $result = $this->userModel
+            ->schema();
+        return $result;
     }
 
     /**
@@ -193,7 +166,7 @@ class UsersApiController extends AbstractApiController {
      * @param int $id The ID of the user.
      * @param array $query The request query.
      * @throws NotFoundException if the user could not be found.
-     * @return array
+     * @return Data
      */
     public function get($id, array $query) {
         $this->permission([
@@ -214,6 +187,7 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -222,7 +196,7 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @throws NotFoundException if the user could not be found.
-     * @return array
+     * @return Data
      */
     public function get_edit($id) {
         $this->permission('Garden.Users.Edit');
@@ -233,6 +207,7 @@ class UsersApiController extends AbstractApiController {
         $row = $this->userByID($id);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -499,7 +474,7 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
 
     }
 
@@ -510,32 +485,8 @@ class UsersApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     protected function normalizeOutput(array $dbRecord) {
-        if (array_key_exists('UserID', $dbRecord)) {
-            $userID = $dbRecord['UserID'];
-            $roles = $this->userModel->getRoles($userID)->resultArray();
-            $dbRecord['roles'] = $roles;
-        }
-        if (array_key_exists('Photo', $dbRecord)) {
-            $photo = userPhotoUrl($dbRecord);
-            $dbRecord['Photo'] = $photo;
-            $dbRecord['PhotoUrl'] = $photo;
-        }
-        if (array_key_exists('Verified', $dbRecord)) {
-            $dbRecord['bypassSpam'] = $dbRecord['Verified'];
-            unset($dbRecord['Verified']);
-        }
-        if (array_key_exists('Confirmed', $dbRecord)) {
-            $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
-            unset($dbRecord['Confirmed']);
-        }
-        if (array_key_exists('Admin', $dbRecord)) {
-            // The site creator is 1, System is 2.
-            $dbRecord['isAdmin'] = in_array($dbRecord['Admin'], [1, 2]);
-            unset($dbRecord['Admin']);
-        }
-
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        $result = $this->userModel->normalizeRow($dbRecord, []);
+        return $result;
     }
 
     /**
@@ -544,7 +495,7 @@ class UsersApiController extends AbstractApiController {
      * @param int $id The ID of the user.
      * @param array $body The request body.
      * @throws NotFoundException if unable to find the user.
-     * @return array
+     * @return Data
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Edit');
@@ -568,6 +519,7 @@ class UsersApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -603,7 +555,8 @@ class UsersApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        $result = new Data($result, ['api-allow' => ['email']]);
+        return $result;
     }
 
     /**
@@ -715,7 +668,7 @@ class UsersApiController extends AbstractApiController {
             $result = $out->validate($row);
             $result = new Data($result, 201);
         }
-
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -772,7 +725,7 @@ class UsersApiController extends AbstractApiController {
      * @throws ClientException if email has been confirmed.
      * @throws Exception if confirmationCode doesn't match.
      * @throws NotFoundException if unable to find the user.
-     * @return array the response body.
+     * @return Data
      */
     public function post_confirmEmail($id, array $body) {
         $this->permission(\Vanilla\Permissions::BAN_CSRF);
@@ -793,6 +746,7 @@ class UsersApiController extends AbstractApiController {
         $this->validateModel($this->userModel);
 
         $result = $out->validate($this->userByID($id));
+        $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
     }
 
@@ -891,7 +845,7 @@ class UsersApiController extends AbstractApiController {
 
         if ($schema === null) {
             $schema = $this->schema(Schema::parse([
-                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?', 'password?',
                 'roleID?' => [
                     'type' => 'array',
                     'items' => ['type' => 'integer'],

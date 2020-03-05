@@ -139,43 +139,6 @@ class DashboardHooks extends Gdn_Plugin {
             Gdn::statistics()->check();
         }
 
-        // Inform user of theme previewing
-        if ($session->isValid()) {
-            $previewThemeFolder = htmlspecialchars($session->getPreference('PreviewThemeFolder', ''));
-            $previewMobileThemeFolder = htmlspecialchars($session->getPreference('PreviewMobileThemeFolder', ''));
-            $previewThemeName = htmlspecialchars($session->getPreference(
-                'PreviewThemeName',
-                $previewThemeFolder
-            ));
-            $previewMobileThemeName = htmlspecialchars($session->getPreference(
-                'PreviewMobileThemeName',
-                $previewMobileThemeFolder
-            ));
-
-            if ($previewThemeFolder != '') {
-                $sender->informMessage(
-                    sprintf(t('You are previewing the %s desktop theme.'), wrap($previewThemeName, 'em'))
-                    .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/themes/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .'</div>',
-                    'DoNotDismiss'
-                );
-            }
-
-            if ($previewMobileThemeFolder != '') {
-                $sender->informMessage(
-                    sprintf(t('You are previewing the %s mobile theme.'), wrap($previewMobileThemeName, 'em'))
-                    .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/mobilethemes/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
-                    .'</div>',
-                    'DoNotDismiss'
-                );
-            }
-        }
-
-
         if ($session->isValid()) {
             $confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$confirmed) {
@@ -298,9 +261,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
         $isDefaultMaster = $sender->MasterView == 'default' || $sender->MasterView == '';
         if ($theme != '' && $isDefaultMaster) {
-            $htmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
-            if (file_exists($htmlFile)) {
-                $sender->EventArguments['MasterViewPath'] = $htmlFile;
+            $themeHtmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
+            $themeAddonHtmlFile = paths(PATH_ADDONS_THEMES, $theme, 'views', 'default.master.tpl');
+            if (file_exists($themeHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeHtmlFile;
+            } elseif (file_exists($themeAddonHtmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $themeAddonHtmlFile;
             } else {
                 // for default theme
                 $sender->EventArguments['MasterViewPath'] = $sender->fetchViewLocation('default.master', '', 'dashboard');
@@ -338,7 +304,14 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false), 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
 
             ->addGroup(t('Appearance'), 'appearance', '', -1)
-            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Branding'), '/dashboard/settings/branding', 'appearance.banner', '', $sort)
+            ->addLinkIf(
+                $session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false),
+                t('Branding & SEO'),
+                '/dashboard/settings/branding',
+                'appearance.banner',
+                '',
+                $sort
+            )
             ->addLinkIf('Garden.Settings.Manage', t('Layout'), '/dashboard/settings/layout', 'appearance.layout', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
@@ -387,13 +360,19 @@ class DashboardHooks extends Gdn_Plugin {
      */
     public function settingsController_render_before($sender) {
         // Set this in your config to dismiss our upgrade warnings. Not recommended.
-        if (c('Vanilla.WarnedMeToUpgrade') === 'PHP 7.0') {
+        $warning = c('Vanilla.WarnedMeToUpgrade');
+        if ($warning && version_compare(ENVIRONMENT_PHP_NEXT_VERSION, $warning) <= 0) {
             return;
         }
 
         $phpVersion = phpversion();
-        if (version_compare($phpVersion, '7.1') < 0) {
-            $upgradeMessage = ['Content' => 'We recommend using at least PHP 7.1. Support for PHP '.htmlspecialchars($phpVersion).' may be dropped in upcoming releases.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+        if (version_compare($phpVersion, ENVIRONMENT_PHP_NEXT_VERSION) < 0) {
+            $versionStr = htmlspecialchars($phpVersion);
+
+            $upgradeMessage = [
+                'Content' => 'We recommend using at least PHP '.ENVIRONMENT_PHP_NEXT_VERSION.'. Support for PHP '.$versionStr.' may be dropped in upcoming releases.',
+                'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'
+            ];
             $messageModule = new MessageModule($sender, $upgradeMessage);
             $sender->addModule($messageModule);
         }
@@ -929,6 +908,11 @@ class DashboardHooks extends Gdn_Plugin {
         // Sanitize $parsed['Name'] to prevent path traversal.
         $parsed['Name'] = str_replace('..', '', $parsed['Name']);
         $remotePath = PATH_ROOT.'/'.$parsed['Name'];
+
+        // Make sure we are copying a file from uploads.
+        if (strpos($remotePath, PATH_UPLOADS) !== 0 || strpos($remotePath, PATH_UPLOADS.'/import/' === 0)) {
+            throw new \Exception("Can only copy from the uploads folder.", 403);
+        }
 
         // Since this is just a temp file we don't want to nest it in a bunch of subfolders.
         $localPath = paths(PATH_UPLOADS, 'tmp-static', str_replace('/', '-', $parsed['Name']));

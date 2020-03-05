@@ -166,7 +166,7 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
      * Handle changes in the native input.
      */
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.updateDate(event.target.valueAsDate, event.target.value === "");
+        this.updateDate(event.target.valueAsDate ? moment(event.target.valueAsDate) : null, event.target.value === "");
     };
 
     /**

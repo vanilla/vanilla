@@ -6,20 +6,13 @@
 
 import ModalSizes from "@library/modal/ModalSizes";
 import { ModalView } from "@library/modal/ModalView";
-import { logWarning } from "@vanilla/utils";
+import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
+import { mountPortal } from "@vanilla/react-utils";
 
-interface IHeadingDescription {
-    titleID: string;
-}
-
-interface ITextDescription {
-    label: string; // Necessary if there's no proper title
-}
-
-interface IModalCommonProps {
+interface IProps {
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element | null;
@@ -29,46 +22,28 @@ interface IModalCommonProps {
     elementToFocus?: HTMLElement;
     size: ModalSizes;
     scrollable?: boolean;
-    elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
+    elementToFocusOnExit?: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
+    isVisible: boolean;
+    afterContent?: React.ReactNode;
+    titleID?: string;
+    label?: string; // Necessary if there's no proper title
 }
 
-interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
-
-interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
-
-type IProps = IModalTextDescription | IModalHeadingDescription;
-
 interface IState {
-    exitElementSet: boolean;
+    wasDestroyed: boolean;
 }
 
 export const MODAL_CONTAINER_ID = "modals";
 export const PAGE_CONTAINER_ID = "page";
 
 /**
- * Mount a modal with ReactDOM. This is only needed at the top level context.
+ * Mount a modal from a top level context.
  *
  * If you are already in a react context, just use `<Modal />`.
- * Note: Using this will clear any other modals mounted with this component.
- *
- * @param element The <Modal /> element to render.
  */
-export function mountModal(element: ReactElement<any>) {
-    // Ensure we have our modal container.
-    let modals = document.getElementById(MODAL_CONTAINER_ID);
-    if (!modals) {
-        modals = document.createElement("div");
-        modals.id = MODAL_CONTAINER_ID;
-        document.body.appendChild(modals);
-    } else {
-        ReactDOM.unmountComponentAtNode(modals);
-    }
-
-    ReactDOM.render(
-        element,
-        modals, // Who cares where we go. This is a portal anyways.
-    );
+export function mountModal(node: ReactElement<any>) {
+    return mountPortal(node, MODAL_CONTAINER_ID);
 }
 
 /**
@@ -82,39 +57,44 @@ export function mountModal(element: ReactElement<any>) {
  * - Focuses the first focusable element in the Modal.
  */
 export default class Modal extends React.Component<IProps, IState> {
-    public static defaultProps: Partial<IProps> = {
-        isWholePage: false,
-    };
-
-    public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
+    private closeFocusElement: HTMLElement | null = null;
     private selfRef = React.createRef<HTMLDivElement>();
 
-    public state = {
-        exitElementSet: false,
+    public state: IState = {
+        wasDestroyed: !this.props.isVisible,
     };
 
     /**
      * Render the contents into a portal.
      */
     public render() {
-        const portal = ReactDOM.createPortal(
-            <ModalView
-                scrollable={this.props.scrollable}
-                onKeyDown={this.handleTabbing}
-                onModalClick={this.handleModalClick}
-                onOverlayClick={this.handleScrimClick}
-                description={this.props.description}
-                size={this.props.size}
-                modalRef={this.selfRef}
-                titleID={"titleID" in this.props ? this.props.titleID : undefined}
-                label={"label" in this.props ? this.props.label : undefined}
-            >
-                {this.props.children}
-            </ModalView>,
-            this.getModalContainer(),
+        if (this.state.wasDestroyed) {
+            return null;
+        }
+
+        return mountPortal(
+            <>
+                <ModalView
+                    onDestroyed={this.handleDestroyed}
+                    scrollable={this.props.scrollable}
+                    onKeyDown={this.handleTabbing}
+                    onModalClick={this.handleModalClick}
+                    onOverlayClick={this.handleScrimClick}
+                    description={this.props.description}
+                    size={this.props.size}
+                    modalRef={this.selfRef}
+                    titleID={"titleID" in this.props ? this.props.titleID : undefined}
+                    label={"label" in this.props ? this.props.label : undefined}
+                    isVisible={this.props.isVisible}
+                >
+                    {this.props.children}
+                </ModalView>
+                {this.props.afterContent}
+            </>,
+            MODAL_CONTAINER_ID,
+            true,
         );
-        return portal;
     }
 
     /**
@@ -123,8 +103,8 @@ export default class Modal extends React.Component<IProps, IState> {
      * Since the contents of the modal could be changing constantly
      * we are creating a new instance every time we need it.
      */
-    private get tabHandler(): TabHandler {
-        return new TabHandler(this.selfRef.current!);
+    private get tabHandler(): TabHandler | null {
+        return this.selfRef.current ? new TabHandler(this.selfRef.current) : null;
     }
 
     /**
@@ -140,7 +120,11 @@ A modal was mounted, but the page container could not be found.
 Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
             `);
         }
+    }
 
+    public onMountIn = () => {
+        const pageContainer = this.getPageContainer();
+        this.setCloseFocusElement();
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
 
@@ -149,23 +133,15 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
-        this.forceUpdate();
-    }
+    };
 
-    /**
-     * We need to check again for focus if the focus is by ref
-     */
-    public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.elementToFocus !== this.props.elementToFocus) {
-            this.focusInitialElement();
-        }
-        this.setCloseFocusElement();
-    }
+    public handleDestroyed = () => {
+        // Do some quick state updates to bump the modal to the top of the portal stack.
+        // When we set this to true we render null once.
+        // The in the update we set back to false.
+        // The second render will re-create the portal.
+        this.setState({ wasDestroyed: true });
 
-    /**
-     * Tear down setup from componentDidMount
-     */
-    public componentWillUnmount() {
         const pageContainer = this.getPageContainer();
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
         Modal.stack.pop();
@@ -178,21 +154,23 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
-        const prevFocussedElement = Modal.focusHistory.pop() || document.body;
-        prevFocussedElement.focus();
-        setImmediate(() => {
-            prevFocussedElement.focus();
-        });
-    }
 
-    private getModalContainer(): HTMLElement {
-        let container = document.getElementById(MODAL_CONTAINER_ID)!;
-        if (container === null) {
-            container = document.createElement("div");
-            container.id = MODAL_CONTAINER_ID;
-            document.body.appendChild(container);
+        // We were destroyed so we should focus back to the last element.
+        this.closeFocusElement?.focus();
+    };
+
+    public componentDidUpdate(prevProps: IProps, prevState: IState) {
+        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
+            this.setCloseFocusElement();
         }
-        return container;
+
+        if (prevState.wasDestroyed && !this.state.wasDestroyed) {
+            this.onMountIn();
+        }
+
+        if (!prevProps.isVisible && this.props.isVisible) {
+            this.setState({ wasDestroyed: false });
+        }
     }
 
     private getPageContainer(): HTMLElement | null {
@@ -203,7 +181,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      * Focus the initial element in the Modal.
      */
     private focusInitialElement() {
-        const focusElement = this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler.getInitial();
+        const focusElement = this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler?.getInitial();
         if (focusElement) {
             focusElement!.focus();
         }
@@ -214,11 +192,19 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      */
     private setCloseFocusElement() {
         // if we need to rerender the component, we don't want to include a bad value in the focus history
-        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
-            Modal.focusHistory.push(this.props.elementToFocusOnExit);
-            this.setState({
-                exitElementSet: true,
-            });
+        if (this.props.elementToFocusOnExit) {
+            this.closeFocusElement = this.props.elementToFocusOnExit;
+        } else {
+            // Get the last focused element
+            this.closeFocusElement = document.activeElement as HTMLElement;
+        }
+
+        if (debug() && (!this.closeFocusElement || this.closeFocusElement === document.documentElement)) {
+            const message = `
+Dev Mode Error: Could not detect an element to focus on <Modal /> close.
+
+It seems auto-detection isn't working, so you'll need to specify the "elementToFocusOnExit" props.`;
+            throw new Error(message);
         }
     }
 
@@ -287,7 +273,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      * @param event The react event.
      */
     private handleShiftTab(event: React.KeyboardEvent) {
-        const nextElement = this.tabHandler.getNext(undefined, true);
+        const nextElement = this.tabHandler?.getNext(undefined, true);
         if (nextElement) {
             event.preventDefault();
 
@@ -305,7 +291,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      * @param event The react event.
      */
     private handleTab(event: React.KeyboardEvent) {
-        const previousElement = this.tabHandler.getNext();
+        const previousElement = this.tabHandler?.getNext();
         if (previousElement) {
             event.preventDefault();
             event.stopPropagation();

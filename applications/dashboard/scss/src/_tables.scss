@@ -181,8 +181,9 @@
         }
     }
 
+    .media + .post-content,
     .media + .userContent {
-        margin-top: $table-padding-y;
+        margin-top: $table-padding-y * 2;
     }
 }
 
@@ -199,7 +200,16 @@
 
     tr {
         &:hover {
+            $hoverColor: #f9fdfe;
             background-color: #f9fdfe;
+
+            .collapsableContent {
+                background-color: $hoverColor;
+            }
+
+            .collapsableContent-gradient {
+                background: linear-gradient(to bottom, rgba($hoverColor, 0), $hoverColor);
+            }
         }
     }
 }
@@ -213,7 +223,10 @@
     th,
     td {
         width: 100px;
-        padding: ($spacer / 2) ($spacer * .75);
+        padding: ($spacer / 2) $table-padding-x;
+
+        // 1px offset to account for previous border sizes.
+        padding-left: $table-padding-x - 1px;
 
         border-right: $table-border-width solid #eee;
         border-top: $table-border-width solid #ddd;
@@ -223,6 +236,10 @@
         font-weight: 600;
         font-size: $font-size-sm;
         line-height: $line-height-lg;
+
+        &:first-child {
+            padding-left: $table-padding-x;
+        }
 
         &:last-child {
             border-right: 0;
@@ -406,7 +423,7 @@
 
     tbody {
         td {
-            padding: ($spacer / 2) ($spacer * .75);
+            padding: ($spacer / 2) ($grid-gutter-width / 2);
             text-align: center;
         }
     }

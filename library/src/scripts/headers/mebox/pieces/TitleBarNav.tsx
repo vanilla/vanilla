@@ -7,17 +7,21 @@
 import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
 import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import Permission from "@library/features/users/Permission";
+import { navigationVariables } from "@library/headers/navigationVariables";
+import FlexSpacer from "@library/layout/FlexSpacer";
 
 export interface ITitleBarNavProps {
     className?: string;
     linkClassName?: string;
     linkContentClassName?: string;
     listClassName?: string;
-    data?: ITitleBarNav[];
     children?: React.ReactNode;
     wrapper?: JSX.Element;
+    excludeExtraNavItems?: boolean;
+    containerRef?: React.RefObject<HTMLElement | null>;
+    isCentered?: boolean;
 }
 
 /**
@@ -39,11 +43,13 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
     private static extraNavItems: React.ComponentType[] = [];
 
     public render() {
+        const data = navigationVariables().getNavItemsForLocale();
+
         const classes = titleBarNavClasses();
-        const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
-        const content = this.props.data
-            ? this.props.data.map((item, key) => {
-                  return (
+        const dataLength = data ? Object.keys(data!).length - 1 : 0;
+        const content = data
+            ? data.map((item, key) => {
+                  const component = (
                       <TitleBarNavItem
                           {...item}
                           className={classNames(
@@ -55,21 +61,45 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                               key === dataLength ? classes.lastItem : false,
                           )}
                           linkClassName={this.props.linkClassName}
-                          key={`headerNavItem-${key}`}
+                          key={key}
                       />
                   );
+
+                  if (item.permission) {
+                      return (
+                          <Permission key={key} permission={item.permission}>
+                              {component}
+                          </Permission>
+                      );
+                  } else {
+                      return component;
+                  }
               })
             : null;
 
         return (
-            <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
-                <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
-                    {this.props.children ? this.props.children : content}
-                    {TitleBarNav.extraNavItems.map((ComponentClass, i) => (
-                        <ComponentClass key={i} />
-                    ))}
-                </ul>
-            </nav>
+            <>
+                {this.props.isCentered && <FlexSpacer actualSpacer />}
+                <nav
+                    ref={this.props.containerRef as any}
+                    className={classNames(
+                        "headerNavigation",
+                        this.props.className,
+                        classes.navigation,
+                        this.props.isCentered && classes.navigationCentered,
+                    )}
+                >
+                    <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
+                        {this.props.children ? this.props.children : content}
+                        <>
+                            {this.props.excludeExtraNavItems ??
+                                TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                                    return <ComponentClass key={i} />;
+                                })}
+                        </>
+                    </ul>
+                </nav>
+            </>
         );
     }
 }

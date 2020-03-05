@@ -6,17 +6,21 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { cssRule } from "typestyle";
-import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { cssRule, style } from "typestyle";
+import { colorOut, backgroundHelper, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { homePageVariables } from "@library/layout/homePageStyles";
+import isEmpty from "lodash/isEmpty";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
+
     cssRule("html", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
     });
 
-    cssRule("html, body", {
-        backgroundColor: colorOut(globalVars.body.backgroundImage.color),
+    const htmlBodyMixin: NestedCSSProperties = {
+        background: colorOut(globalVars.body.backgroundImage.color),
         ...fonts({
             size: globalVars.fonts.size.medium,
             family: globalVars.fonts.families.body,
@@ -24,7 +28,15 @@ export const bodyCSS = useThemeCache(() => {
         }),
         wordBreak: "break-word",
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+        $unique: true, // This doesn't refresh without this for some reason.
+    };
+
+    cssRule("html", htmlBodyMixin);
+    const bodyClass = style({
+        ...htmlBodyMixin,
+        $debugName: "vanillaBodyReset",
     });
+    document.body.classList.add(bodyClass);
 
     cssRule("*", {
         // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
@@ -72,6 +84,21 @@ export const bodyCSS = useThemeCache(() => {
         flexDirection: "column",
     });
 
+    cssRule(`input[type="number"]`, {
+        [`-webkit-appearance`]: "none",
+        [`-moz-appearance`]: "textfield",
+        $nest: {
+            [`&::-webkit-inner-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+            [`&::-webkit-outer-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+        },
+    });
+
     cssRule(
         `input::-webkit-search-decoration,
         input::-webkit-search-cancel-button,
@@ -84,10 +111,13 @@ export const bodyCSS = useThemeCache(() => {
     );
 });
 
-export const bodyClasses = useThemeCache(() => {
+export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
     const image = globalVars.body.backgroundImage;
+    const homePageVars = homePageVariables();
+    const source = isRootPage && !isEmpty(homePageVars.backgroundImage) ? homePageVariables() : globalVars.body;
+
     const root = style(
         {
             display: !image ? "none" : "block",
@@ -98,7 +128,7 @@ export const bodyClasses = useThemeCache(() => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        background(image),
+        backgroundHelper(source.backgroundImage),
     );
 
     return { root };

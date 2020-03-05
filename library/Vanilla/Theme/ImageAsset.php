@@ -23,7 +23,7 @@ class ImageAsset extends Asset {
      * @param string $url Absolute URL to the image asset.
      */
     public function __construct(string $url) {
-        $this->url = $url;
+        $this->url = asset($url, true, true);
     }
 
     /**

@@ -13,9 +13,8 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { t } from "@library/utility/appUtils";
+import { getSiteSection, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
@@ -25,6 +24,7 @@ import { connect } from "react-redux";
  */
 function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
+    const siteSection = getSiteSection();
     if (!userInfo) {
         return null;
     }
@@ -41,21 +41,26 @@ function UserDropDownContents(props: IProps) {
             <DropDownUserCard className="userDropDown-userCard" />
             <DropDownItemSeparator />
             <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
-            <DropDownSection title={t("Discussions")}>
-                <DropDownItemLinkWithCount
-                    to={"/discussions/bookmarked"}
-                    name={t("Bookmarks")}
-                    count={getCountByName("Bookmarks")}
-                />
-                <Permission permission="articles.add">
-                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
-                </Permission>
-                <DropDownItemLinkWithCount
-                    to="/discussions/mine"
-                    name={t("My Discussions")}
-                    count={getCountByName("Discussions")}
-                />
-            </DropDownSection>
+            {UserDropDownContents.extraUserDropDownComponents.map((ComponentName, index) => {
+                return <ComponentName key={index} getCountByName={getCountByName} />;
+            })}
+            {siteSection.apps.forum ? (
+                <DropDownSection title={t("Discussions")}>
+                    <DropDownItemLinkWithCount
+                        to={"/discussions/bookmarked"}
+                        name={t("Bookmarks")}
+                        count={getCountByName("Bookmarks")}
+                    />
+                    <Permission permission="discussions.add">
+                        <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                    </Permission>
+                    <DropDownItemLinkWithCount
+                        to="/discussions/mine"
+                        name={t("My Discussions")}
+                        count={getCountByName("Discussions")}
+                    />
+                </DropDownSection>
+            ) : null}
             <Permission permission={["community.moderate"]}>
                 <DropDownSection title={t("Moderation")}>
                     <DropDownItemLinkWithCount
@@ -84,6 +89,23 @@ function UserDropDownContents(props: IProps) {
     );
 }
 
+/** Hold the extra user dropdown menu components before rendering. */
+UserDropDownContents.extraUserDropDownComponents = [];
+
+interface IExtraDropDownProps {
+    getCountByName: (name: string) => number;
+}
+
+/**
+ * Register an extra component to be rendered before the user dropdown menu.
+ * This will only affect larger screen sizes.
+ *
+ * @param component The component class to be render.
+ */
+UserDropDownContents.registerBeforeUserDropDown = (component: React.ComponentType<IExtraDropDownProps>) => {
+    UserDropDownContents.extraUserDropDownComponents.push(component);
+};
+
 interface IOwnProps {
     className?: string;
 }
@@ -105,7 +127,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(UserDropDownContents);
+export default connect(mapStateToProps, mapDispatchToProps)(UserDropDownContents);

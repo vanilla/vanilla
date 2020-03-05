@@ -17,7 +17,7 @@ import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -31,48 +31,46 @@ interface IProps extends IFileAttachment {
     type: AttachmentType;
     size: number; // bytes
     url: string;
-    inEditor?: boolean;
 }
 
-export default class Attachment extends React.Component<IProps> {
-    public render() {
-        const { title, name, url, dateUploaded, type, mimeType, size } = this.props;
-        const label = title || name;
-        const classes = attachmentClasses();
-        const iconClasses = attachmentIconClasses();
-        const classesMetas = metasClasses();
+export default function Attachment(props) {
+    const { title, name, url, dateUploaded, type, mimeType, size } = props;
+    const label = title || name;
+    const classes = attachmentClasses();
+    const iconClasses = attachmentIconClasses();
+    const classesMetas = metasClasses();
+    const { inEditor } = useEmbedContext();
 
-        return (
-            <EmbedContainer size={EmbedContainerSize.SMALL}>
-                <EmbedContent inEditor={this.props.inEditor} type={this.props.type}>
-                    <SmartLink
-                        to={url}
-                        className={classNames(classes.link, classes.box)}
-                        type={mimeType}
-                        download={name}
-                        tabIndex={1}
-                    >
-                        {type && (
-                            <div className={classNames(classes.format)}>
-                                <GetAttachmentIcon type={type} className={iconClasses.root} />
-                            </div>
-                        )}
-                        <div className={classNames(classes.main)}>
-                            <div className={classNames(classes.title)}>{label}</div>
-                            <div className={classNames(classes.metas, classesMetas.root)}>
-                                {dateUploaded && (
-                                    <span className={classesMetas.meta}>
-                                        <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
-                                    </span>
-                                )}
-                                <span className={classesMetas.meta}>
-                                    <HumanFileSize numBytes={size} />
-                                </span>
-                            </div>
+    return (
+        <EmbedContainer size={EmbedContainerSize.SMALL}>
+            <EmbedContent type={props.type}>
+                <SmartLink
+                    to={url}
+                    className={classNames(classes.link, classes.box)}
+                    type={mimeType}
+                    download={name}
+                    tabIndex={inEditor ? -1 : 0}
+                >
+                    {type && (
+                        <div className={classNames(classes.format)}>
+                            <GetAttachmentIcon type={type} className={iconClasses.root} />
                         </div>
-                    </SmartLink>
-                </EmbedContent>
-            </EmbedContainer>
-        );
-    }
+                    )}
+                    <div className={classNames(classes.main)}>
+                        <div className={classNames(classes.title)}>{label}</div>
+                        <div className={classNames(classes.metas, classesMetas.root)}>
+                            {dateUploaded && (
+                                <span className={classesMetas.meta}>
+                                    <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
+                                </span>
+                            )}
+                            <span className={classesMetas.meta}>
+                                <HumanFileSize numBytes={size} />
+                            </span>
+                        </div>
+                    </div>
+                </SmartLink>
+            </EmbedContent>
+        </EmbedContainer>
+    );
 }

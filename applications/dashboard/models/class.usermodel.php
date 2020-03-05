@@ -9,15 +9,31 @@
  */
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
+use Vanilla\Community\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model {
+class UserModel extends Gdn_Model implements UserProviderInterface {
 
     /** @var int */
     const GUEST_USER_ID = 0;
+
+    /** @var int This happens to be the same as the guest ID because it's just been that way for so long. */
+    const UNKNOWN_USER_ID = 0;
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_UNKNOWN = "unknown";
+
+    /** @var string */
+    const GENERATED_FRAGMENT_KEY_GUEST = "guest";
 
     /** Deprecated. */
     const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
@@ -856,10 +872,23 @@ class UserModel extends Gdn_Model {
      * @param string $providerKey The key of the system providing the authentication.
      * @param array $userData Data to go in the user table.
      * @param array $options Additional connect options.
-     * @return int The new/existing user ID.
+     * @return int|false The new/existing user ID or **false** if there was an error connecting.
      */
     public function connect($uniqueID, $providerKey, $userData, $options = []) {
         trace('UserModel->Connect()');
+
+        $options += [
+            'CheckCaptcha' => false,
+            'NoConfirmEmail' => isset($userData['Email']) || !UserModel::requireConfirmEmail(),
+            'NoActivity' => true,
+            'SyncExisting' => true,
+        ];
+
+        if (empty($uniqueID)) {
+            $this->Validation->addValidationResult('UniqueID', 'ValidateRequired');
+            return false;
+        }
+
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 
         $isTrustedProvider = $provider['Trusted'] ?? false;
@@ -885,7 +914,9 @@ class UserModel extends Gdn_Model {
 
         if ($userID) {
             // Save the user.
-            $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            if ($options['SyncExisting']) {
+                $this->syncUser($userID, $userData, false, $isTrustedProvider);
+            }
             return $userID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -912,9 +943,6 @@ class UserModel extends Gdn_Model {
                     $userData['RoleID'] = $this->lookupRoleIDs($userData['Roles']);
                 }
 
-                $options['CheckCaptcha'] = $options['CheckCaptcha'] ?? false;
-                $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
-                $options['NoActivity'] = $options['NoActivity'] ?? true;
                 $options['SaveRoles'] = $saveRolesRegister;
                 $options['ValidateName'] = !$isTrustedProvider;
 
@@ -1115,13 +1143,52 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getAllowedGeneratedRecordKeys(): array {
+        return [self::GENERATED_FRAGMENT_KEY_GUEST, self::GENERATED_FRAGMENT_KEY_UNKNOWN];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGeneratedFragment(string $key): array {
+        $unknownFragment = [
+            'userID' => self::UNKNOWN_USER_ID,
+            'name' => 'unknown',
+            'email' => 'unknown@example.com',
+            'photoUrl' => self::getDefaultAvatarUrl(),
+            'dateLastActive' => time(),
+        ];
+        switch ($key) {
+            case self::GENERATED_FRAGMENT_KEY_GUEST:
+                return [
+                    'userID' => self::GUEST_USER_ID,
+                    'name' => 'guest',
+                    'email' => 'guest@example.com',
+                    'photoUrl' => self::getDefaultAvatarUrl(),
+                    'dateLastActive' => null,
+                ];
+            case self::GENERATED_FRAGMENT_KEY_UNKNOWN:
+                return $unknownFragment;
+            default:
+                trigger_error(
+                    'Called '.__CLASS__.'::'.__METHOD__.'($key) with an non-matching key. Supported values are: '
+                    . "\n" . implode(", ", $this->getAllowedGeneratedRecordKeys())
+                );
+                return $unknownFragment;
+        }
+    }
+
+    /**
      * Add multi-dimensional user data to an array.
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
      * @param array $options Additional options. Passed to filter event.
+     *        [bool asFragments] - Expand as user fragments.
      */
-    public function expandUsers(array &$rows, array $columns, array $options = []) {
+    public function expandUsers(array &$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
@@ -1172,16 +1239,10 @@ class UserModel extends Gdn_Model {
                         setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
-                    } else {
-                        $user = [
-                            'userID' => 0,
-                            'name' => 'unknown',
-                            'email' => 'unknown@example.com'
-                        ];
-                        $user['photoUrl'] = self::getDefaultAvatarUrl($user);
                     }
                 }
-
+                $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
+                $user =  UserFragmentSchema::normalizeUserFragment($user);
                 setValue($destination, $row, $user);
             }
         };
@@ -1193,15 +1254,6 @@ class UserModel extends Gdn_Model {
             foreach ($rows as &$row) {
                 $populate($row);
             }
-        }
-
-        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
-        if ($single) {
-            $rows = [$rows];
-        }
-        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $options);
-        if ($single) {
-            $rows = reset($rows);
         }
     }
 
@@ -1503,6 +1555,23 @@ class UserModel extends Gdn_Model {
         return $data === false ? 0 : $data->UserCount;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array {
+        $record = $this->getID($id, DATASET_TYPE_ARRAY);
+        if ($record === false) {
+            if ($useUnknownFallback) {
+                $record = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
+            } else {
+                throw new NoResultsException("No user found for ID: " . $id);
+            }
+        }
+
+        return UserFragmentSchema::normalizeUserFragment($record);
+    }
+
     /**
      * Get a user by ID.
      *
@@ -1752,9 +1821,10 @@ class UserModel extends Gdn_Model {
      * Get the roles for a user.
      *
      * @param int $userID The user to get the roles for.
+     * @param bool $includeInvalid Include invalid (e.g. non-existent) roles.
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
-    public function getRoles($userID) {
+    public function getRoles($userID, bool $includeInvalid = true) {
         $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
         $rolesDataArray = Gdn::cache()->get($userRolesKey);
 
@@ -1767,7 +1837,10 @@ class UserModel extends Gdn_Model {
 
         $result = [];
         foreach ($rolesDataArray as $roleID) {
-            $result[] = RoleModel::roles($roleID, true);
+            $role = RoleModel::roles($roleID, $includeInvalid);
+            if ($role !== null) {
+                $result[] = $role;
+            }
         }
 
         return new Gdn_DataSet($result, DATASET_TYPE_ARRAY);
@@ -2031,7 +2104,7 @@ class UserModel extends Gdn_Model {
                 break;
         }
 
-        if ($userID) {
+        if ($userID && is_numeric($userID)) {
             $this->EventArguments['UserID'] = $userID;
             $this->fireEvent('AfterRegister');
         }
@@ -2266,7 +2339,6 @@ class UserModel extends Gdn_Model {
                     }
                 }
             }
-
             $this->EventArguments['SaveRoles'] = &$saveRoles;
             $this->EventArguments['RoleIDs'] = &$roleIDs;
             $this->EventArguments['Fields'] = &$fields;
@@ -2435,8 +2507,107 @@ class UserModel extends Gdn_Model {
         } else {
             $userID = false;
         }
-
+        if ($userID) {
+            $user = $this->getID($userID);
+            $userEvent = $this->eventFromRow(
+                (array)$user,
+                $insert ? UserEvent::ACTION_INSERT : UserEvent::ACTION_UPDATE
+            );
+            $this->getEventManager()->dispatch($userEvent);
+        }
         return $userID;
+    }
+
+    /**
+     * Generate a user event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return UserEvent
+     */
+    private function eventFromRow(array $row, string $action): UserEvent {
+        $user = $this->normalizeRow($row, false);
+        $user = $this->schema()->validate($user);
+        $result = new UserEvent(
+            $action,
+            ["user" => $user]
+        );
+        return $result;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        if (array_key_exists('UserID', $row)) {
+            $userID = $row['UserID'];
+            $roles = $this->getRoles($userID, false)->resultArray();
+            $row['roles'] = $roles;
+        }
+        if (array_key_exists('Photo', $row)) {
+            $photo = userPhotoUrl($row);
+            $row['Photo'] = $photo;
+            $row['photoUrl'] = $photo;
+        }
+        if (array_key_exists('Verified', $row)) {
+            $row['bypassSpam'] = $row['Verified'];
+            unset($row['Verified']);
+        }
+        if (array_key_exists('Confirmed', $row)) {
+            $row['emailConfirmed'] = $row['Confirmed'];
+            unset($row['Confirmed']);
+        }
+        if (array_key_exists('Admin', $row)) {
+            // The site creator is 1, System is 2.
+            $row['isAdmin'] = in_array($row['Admin'], [1, 2]);
+            unset($row['Admin']);
+        }
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
+
+    /**
+     * Get a schema instance comprised of standard user fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'userID:i' => 'ID of the user.',
+            'name:s' => 'Name of the user.',
+            'password:s' => 'Password of the user.',
+            'hashMethod:s' => 'Hash method for the password.',
+            'email:s' => [
+                'description' => 'Email address of the user.',
+                'minLength' => 0,
+            ],
+            'photo:s|n' => [
+                'minLength' => 0,
+                'description' => 'Raw photo field value from the user record.'
+            ],
+            'photoUrl:s|n' => [
+                'minLength' => 0,
+                'description' => 'URL to the user photo.'
+            ],
+            'points:i',
+            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
+            'showEmail:b' => 'Is the email address visible to other users?',
+            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
+            'banned:i' => 'Is the user banned?',
+            'dateInserted:dt' => 'When the user was created.',
+            'dateLastActive:dt|n' => 'Time the user was last active.',
+            'dateUpdated:dt|n' => 'When the user was last updated.',
+            'roles:a?' => SchemaFactory::parse([
+                'roleID:i' => 'ID of the role.',
+                'name:s' => 'Name of the role.'
+            ], 'RoleFragment'),
+        ]);
+        return $result;
     }
 
     /**
@@ -3717,7 +3888,10 @@ class UserModel extends Gdn_Model {
 
         // Remove user's cache rows
         $this->clearCache($userID);
-
+        if ($userData) {
+            $userEvent = $this->eventFromRow((array)$userData, UserEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($userEvent);
+        }
         return true;
     }
 
@@ -5154,8 +5328,10 @@ class UserModel extends Gdn_Model {
         }
 
         $user = $this->getID($userID);
-        $preferences = val('Preferences', $user, []);
-        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+        $preferences = $user->Preferences ?? [];
+        $landingPages = $preferences['DashboardNav.SectionLandingPages'] ?? [];
+        $sectionPreference = $preferences['DashboardNav.DashboardLandingPage'] ?? '';
+        $sectionReset = false;
 
         // Run through the user's saved landing page per section and if the url matches the passed url,
         // remove that preference.
@@ -5163,13 +5339,16 @@ class UserModel extends Gdn_Model {
             $url = strtolower(trim($url, '/'));
             $landingPage = strtolower(trim($landingPage, '/'));
             if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                $sectionReset = true;
                 unset($landingPages[$section]);
             }
         }
 
-        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        if ($sectionReset) {
+            $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+        }
 
-        if ($resetSectionPreference) {
+        if ($resetSectionPreference && $sectionPreference !== '') {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
     }

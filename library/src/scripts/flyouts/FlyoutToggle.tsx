@@ -42,6 +42,7 @@ interface IProps {
     buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
     initialFocusElement?: HTMLElement | null;
+    tag?: string;
 }
 
 export default function FlyoutToggle(props: IProps) {
@@ -165,8 +166,11 @@ export default function FlyoutToggle(props: IProps) {
     };
 
     const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
+    const Tag = (props.tag ?? `div`) as "div";
+
+    const isContentVisible = !props.disabled && isVisible;
     return (
-        <div
+        <Tag
             id={ID}
             className={classNames(classesDropDown, props.className, {
                 asModal: props.openAsModal,
@@ -189,22 +193,21 @@ export default function FlyoutToggle(props: IProps) {
                 {props.buttonContents}
             </Button>
 
-            {!props.disabled && isVisible && (
-                <React.Fragment>
-                    {props.openAsModal ? (
-                        <Modal
-                            label={t("title")}
-                            size={ModalSizes.SMALL}
-                            exitHandler={closeMenuHandler}
-                            elementToFocusOnExit={buttonRef.current!}
-                        >
-                            {props.children(childrenData)}
-                        </Modal>
-                    ) : (
-                        props.children(childrenData)
-                    )}
-                </React.Fragment>
-            )}
-        </div>
+            <React.Fragment>
+                {props.openAsModal ? (
+                    <Modal
+                        label={t("title")}
+                        size={ModalSizes.SMALL}
+                        exitHandler={closeMenuHandler}
+                        elementToFocusOnExit={buttonRef.current!}
+                        isVisible={isContentVisible}
+                    >
+                        {props.children(childrenData)}
+                    </Modal>
+                ) : (
+                    isContentVisible && props.children(childrenData)
+                )}
+            </React.Fragment>
+        </Tag>
     );
 }

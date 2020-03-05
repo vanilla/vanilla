@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -170,6 +170,8 @@ class Cookie {
 
     /**
      * Flush the cookies to the response.
+     *
+     * @codeCoverageIgnore
      */
     public function flush() {
         $calls = array_merge($this->makeNewCookieCalls(), $this->makeDeleteCookieCalls());
@@ -233,16 +235,6 @@ class Cookie {
      */
     public function makeCookieHeader() {
         return $this->cookieEncode($this->cookies);
-    }
-
-    /**
-     * Return the cookies that will be set in a format suitable for "Set-Cookie" HTTP headers.
-     *
-     * @return array Returns an array of "Set-Cookie" header values.
-     * @throws \Exception TODO.
-     */
-    public function makeSetCookieHeader() {
-        throw new \Exception('Not implemented.', 501);
     }
 
     /**

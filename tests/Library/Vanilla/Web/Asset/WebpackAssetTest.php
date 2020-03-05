@@ -22,7 +22,7 @@ class WebpackAssetTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->fs = vfsStream::setup();
     }
 
@@ -56,6 +56,20 @@ class WebpackAssetTest extends TestCase {
         );
         $asset->setFsRoot($fs->url());
         $this->assertFalse($asset->existsOnFs());
+    }
+
+    /**
+     * Test our static property.
+     */
+    public function testStatic() {
+        $asset = new WebpackAsset(
+            new Request(),
+            ".min.js",
+            "test",
+            "asset"
+        );
+
+        $this->assertTrue($asset->isStatic());
     }
 
     /**

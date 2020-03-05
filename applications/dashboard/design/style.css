@@ -601,6 +601,13 @@ div.FileUpload .CurrentImage {
   padding: 8px 10px;
 }
 
+.Panel .BoxButtons .ButtonGroup + .BigButton {
+  margin-top: 10px;
+}
+.Panel .BoxButtons :last-child {
+  margin-bottom: 0;
+}
+
 .Buttons {
   margin-top: 10px;
 }

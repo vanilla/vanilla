@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use VanillaTests\SharedBootstrapTestCase;
 use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
@@ -17,19 +16,23 @@ use Test\OldApplication\arbitraryLowercase;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the AddonManager
  */
 class AddonManagerTest extends SharedBootstrapTestCase {
 
+    const FIXTURE_ROOT = '/tests/fixtures';
+
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 
     /**
      * Clear the cache before doing tests.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache/am');
+        parent::setUpBeforeClass();
     }
 
     /**
@@ -52,12 +55,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
      * @return AddonManager Returns the manager.
      */
     private static function createTestManager() {
-        $root = '/tests/fixtures';
+        $root = self::FIXTURE_ROOT;
 
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_ADDON => ["$root/addons/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => ["$root/addons/themes", "$root/themes"],
                 Addon::TYPE_LOCALE => "$root/locales"
             ],
             PATH_ROOT.'/tests/cache/am/test-manager'
@@ -92,8 +95,8 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         }
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
+                Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+                Addon::TYPE_THEME => ['/addons/themes', '/themes'],
                 Addon::TYPE_LOCALE => '/locales'
             ],
             PATH_ROOT.'/tests/cache/am/vanilla-manager'
@@ -107,22 +110,54 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test some addons where we know that plugins exist.
+     *
+     * @param string $addonKey
+     * @param string $addonType
+     * @param string $addonSubDir
+     *
+     * @dataProvider provideAddonExistsTest
      */
-    public function testPluginExists() {
+    public function testAddonExists(string $addonKey, string $addonType, string $addonSubDir = '') {
         $tm = $this->createTestManager();
 
-        $keys = [
-            'test-old-application' => Addon::TYPE_ADDON,
-            'test-old-plugin' => Addon::TYPE_ADDON,
-            'test-old' => Addon::TYPE_THEME
-        ];
+        $addon = $tm->lookupByType($addonKey, $addonType);
+        $this->assertNotNull($addon);
+        $this->assertInstanceOf('\Vanilla\Addon', $addon);
+        $this->assertNotEmpty($addon->getPluginClass());
 
-        foreach ($keys as $key => $type) {
-            $addon = $tm->lookupByType($key, $type);
-            $this->assertNotNull($addon);
-            $this->assertInstanceOf('\Vanilla\Addon', $addon);
-            $this->assertNotEmpty($addon->getPluginClass());
+        if ($addonSubDir) {
+            $this->assertEquals($addonSubDir, $addon->getSubdir());
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideAddonExistsTest(): array {
+        return [
+            'test-old-application' => [
+                'test-old-application',
+                Addon::TYPE_ADDON,
+            ],
+            'test-old-plugin' => [
+                'test-old-plugin',
+                Addon::TYPE_ADDON,
+            ],
+            'test-old' => [
+                'test-old',
+                Addon::TYPE_THEME,
+            ],
+            'theme-in-addons' => [
+                'theme-in-addons',
+                Addon::TYPE_THEME,
+                self::FIXTURE_ROOT.'/addons/themes/theme-in-addons',
+            ],
+            'plugin-in-addons' => [
+                'plugin-in-addons',
+                ADDON::TYPE_ADDON,
+                self::FIXTURE_ROOT.'/addons/addons/plugin-in-addons',
+            ],
+        ];
     }
 
     /**
@@ -746,12 +781,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test **AddonManager::checkConflicts()**.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessage Parent conflicts with: Grandparent.
      */
     public function testCheckConflicts() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(409);
+        $this->expectExceptionMessage('Parent conflicts with: Grandparent.');
+
         $am = $this->makeConflictedAddonManager();
         $am->startAddon($am->lookupAddon('grand-parent'));
 
@@ -804,10 +839,9 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test addon type checking.
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testBadType() {
+        $this->expectException(\InvalidArgumentException::class);
         $am = $this->createTestManager();
 
         $addons = $am->lookupAllByType('../../../fixtures/error');
@@ -815,10 +849,10 @@ class AddonManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Test a bad theme key.
-     *
-     * @expectedException PHPUnit\Framework\Error\Notice
      */
     public function testBadThemeKey() {
+        $this->expectNotice();
+
         $am = $this->createTestManager();
 
         $theme = $am->lookupTheme('../../../../fixtures/error-index');

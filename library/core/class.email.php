@@ -180,6 +180,30 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     /**
+     * Get the site's default from address.
+     *
+     * @return string
+     */
+    public function getDefaultFromAddress(): string {
+        $result = c('Garden.Email.SupportAddress', '');
+        if (!$result) {
+            $result = $this->getNoReplyAddress();
+        }
+        return $result;
+    }
+
+    /**
+     * Get an address suitable for no-reply-style emails.
+     *
+     * @return string
+     */
+    public function getNoReplyAddress(): string {
+        $host = Gdn::request()->host();
+        $result = "noreply@{$host}";
+        return $result;
+    }
+
+    /**
      * Allows the explicit definition of the email's sender address & name.
      * Defaults to the applications Configuration 'SupportEmail' & 'SupportName' settings respectively.
      *
@@ -190,10 +214,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
      */
     public function from($senderEmail = '', $senderName = '', $bOverrideSender = false) {
         if ($senderEmail == '') {
-            $senderEmail = c('Garden.Email.SupportAddress', '');
-            if (!$senderEmail) {
-                $senderEmail = 'noreply@'.Gdn::request()->host();
-            }
+            $senderEmail = $this->getDefaultFromAddress();
         }
 
         if ($senderName == '') {
@@ -236,9 +257,6 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     public function formatMessage($message) {
-        // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::text()
-        // which, untreated, would result in &#039; in the message in place of single quotes.
-
         if ($this->PhpMailer->ContentType == 'text/html') {
             $textVersion = false;
             if (stristr($message, '<!-- //TEXT VERSION FOLLOWS//')) {
@@ -249,13 +267,13 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
                 $message = trim($message);
             }
 
-            $this->PhpMailer->msgHTML(htmlspecialchars_decode($message, ENT_QUOTES));
+            $this->PhpMailer->msgHTML($message);
             if ($textVersion !== false && !empty($textVersion)) {
                 $textVersion = html_entity_decode($textVersion);
                 $this->PhpMailer->AltBody = $textVersion;
             }
         } else {
-            $this->PhpMailer->Body = htmlspecialchars_decode($message, ENT_QUOTES);
+            $this->PhpMailer->Body = $message;
         }
         return $this;
     }

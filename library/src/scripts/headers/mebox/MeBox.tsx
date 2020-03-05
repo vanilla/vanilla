@@ -31,7 +31,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
         }
         const classes = meBoxClasses();
         return (
-            <div className={classNames("meBox", this.props.className, classes.root, classes.rootFlexClass(3))}>
+            <div className={classNames("meBox", this.props.className, classes.root)}>
                 <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
                 <MessagesDropDown />
                 <UserDropdown />

@@ -11,19 +11,21 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
             if ($Category->CategoryID <= 0)
                 continue;
 
-            $this->Category = $Category;
-            $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
+                $this->Category = $Category;
+                $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
+            ?>
 
-            if ($this->DiscussionData->numRows() > 0) : ?>
-
-                <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
-                    <?php echo getOptions($Category); ?>
-                    <h2 class="H"><?php
+            <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
+                <?php echo getOptions($Category); ?>
+                <h2 class="H">
+                    <?php
                         echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category));
                         Gdn::controller()->EventArguments['Category'] = $Category;
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
-                        ?></h2>
+                    ?>
+                </h2>
 
+                <?php if ($this->DiscussionData->numRows() > 0) : ?>
                     <ul class="DataList Discussions">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>
                     </ul>
@@ -34,10 +36,10 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                         </div>
                     <?php endif; ?>
 
-                </div>
-
-            <?php endif; ?>
-
+                <?php else: ?>
+                    <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+                <?php endif; ?>
+            </div>
         <?php endforeach; ?>
     <?php else: ?>
         <div class="Empty"><?php echo t('No categories were found.'); ?></div>

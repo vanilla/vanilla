@@ -28,11 +28,11 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
 
     /**
      * That a nonce can be consumed.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Nonce was already used.
      */
     public function testConsume() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Nonce was already used.');
+
         $model = new UserAuthenticationNonceModel('hhh');
         $issuedNonce = $model->issue();
         $model->consume($issuedNonce);

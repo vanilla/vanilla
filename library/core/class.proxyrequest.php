@@ -424,7 +424,7 @@ class ProxyRequest {
         curl_setopt($handler, CURLOPT_HEADER, false);
         curl_setopt($handler, CURLINFO_HEADER_OUT, true);
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
+        curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.APPLICATION_VERSION));
         curl_setopt($handler, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
         curl_setopt($handler, CURLOPT_HEADERFUNCTION, [$this, 'CurlHeader']);
         curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);

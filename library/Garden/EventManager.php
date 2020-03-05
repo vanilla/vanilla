@@ -8,6 +8,10 @@
 namespace Garden;
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
+use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 
 /**
  * Contains methods for binding and firing to events.
@@ -15,7 +19,7 @@ use Psr\Container\ContainerInterface;
  * Addons can create callbacks that bind to events which are called throughout the code to allow extension of the
  * application and framework.
  */
-class EventManager {
+class EventManager implements EventDispatcherInterface, ListenerProviderInterface, EventListenerConfigInterface {
     const PRIORITY_LOW = 10;
     const PRIORITY_NORMAL = 100;
     const PRIORITY_HIGH = 1000;
@@ -457,11 +461,42 @@ class EventManager {
     }
 
     /**
-     * For debugging.
-     *
-     * @return array
+     * {@inheritDoc}
      */
-//    public function dumpAllHandlers() {
-//        return $this->handlers;
-//    }
+    public function dispatch(object $event) {
+        foreach ($this->getListenersForEvent($event) as $listener) {
+            $event = $listener($event);
+            if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+                return $event;
+            }
+        }
+        return $event;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getListenersForEvent(object $event): iterable {
+        $class = new \ReflectionClass($event);
+
+        do {
+            $handlers = $this->getHandlers($class->getName());
+            yield from $handlers;
+        } while ($class = $class->getParentClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addListenerMethod(string $class, string $method): EventListenerConfigInterface {
+        $method = new \ReflectionMethod($class, $method);
+        $params = $method->getParameters();
+        if (count($params) === 0 || null === $rType = $params[0]->getType()) {
+            throw new \InvalidArgumentException('Listeners must declare an object type they can accept.');
+        }
+        $type = $rType->getName();
+
+        $this->bindLazy($type, $class, $method->getName());
+        return $this;
+    }
 }

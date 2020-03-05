@@ -30,7 +30,7 @@ class TokensTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->accessTokenModel = static::container()->get(AccessTokenModel::class);
     }
@@ -133,7 +133,7 @@ class TokensTest extends AbstractAPIv2Test {
         $this->assertTrue($body[$this->pk] > 0);
         $this->assertEquals($row['name'], $body['name']);
         $this->assertArrayHasKey('dateInserted', $body);
-        $this->assertInternalType('int', strtotime($body['dateInserted']));
+        $this->assertIsInt(strtotime($body['dateInserted']));
 
         $this->accessTokenModel->verify($body['accessToken'], true);
 

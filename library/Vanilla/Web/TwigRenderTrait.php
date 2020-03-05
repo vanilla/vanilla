@@ -66,4 +66,20 @@ trait TwigRenderTrait {
         $path = str_replace(PATH_ROOT, '', $path);
         return $this->twig->render($path, $data);
     }
+
+    /**
+     * Render a
+     *
+     * @param string $templateString
+     * @param array $data
+     * @return string
+     */
+    public function renderTwigFromString(string $templateString, array $data): string {
+        if (!$this->twig) {
+            $this->twig = $this->prepareTwig();
+        }
+
+        $template = $this->twig->createTemplate($templateString);
+        return $template->render($data);
+    }
 }

@@ -103,7 +103,7 @@ class Akismet {
         $this->wordPressAPIKey = $wordPressAPIKey;
 
         // Set some default values
-        $this->apiPort = 80;
+        $this->apiPort = 443;
         $this->akismetServer = 'rest.akismet.com';
         $this->akismetVersion = '1.1';
 

@@ -19,7 +19,7 @@ paths:
     get:
       summary: Get all of the application's translation strings.
       tags:
-      - Locales
+      - Translations
       parameters:
       - $ref: '#/components/parameters/LocaleCodeParameter'
       - $ref: '#/components/parameters/CacheBusterParameter'
@@ -40,7 +40,7 @@ paths:
         This endpoint is intended for application optimization where translations are requested within a `<script>` tag
         rather than as an external API call.
       tags:
-      - Locales
+      - Translations
       parameters:
       - $ref: '#/components/parameters/LocaleCodeParameter'
       - $ref: '#/components/parameters/CacheBusterParameter'

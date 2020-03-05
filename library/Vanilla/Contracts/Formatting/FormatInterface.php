@@ -44,7 +44,15 @@ interface FormatInterface {
     public function renderPlainText(string $content): string;
 
     /**
-     * Render a version of the content suitable to be quoted in other content.
+     * Calculate the length of content with formatting and metadata removed.
+     *
+     * @param string $content
+     * @return int
+     */
+    public function getPlainTextLength(string $content): int;
+
+    /**
+     * Render a version of the content   suitable to be quoted in other content.
      *
      * @param string $content The raw content to render.
      *
@@ -79,6 +87,15 @@ interface FormatInterface {
      * @return Heading[]
      */
     public function parseHeadings(string $content): array;
+
+    /**
+     * Parse images out of the post contents.
+     *
+     * @param string $content
+     *
+     * @return string[]
+     */
+    public function parseImageUrls(string $content): array;
 
     /**
      * Parse out a list of usernames mentioned in the post contents.

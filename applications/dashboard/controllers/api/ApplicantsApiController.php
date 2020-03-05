@@ -89,7 +89,7 @@ class ApplicantsApiController extends AbstractApiController {
      *
      * @param int $id The ID of the applicant.
      * @throws NotFoundException if the applicant could not be found.
-     * @return array
+     * @return Data
      */
     public function get($id) {
         $this->permission('Garden.Users.Approve');
@@ -101,6 +101,7 @@ class ApplicantsApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
         return $result;
     }
 
@@ -159,7 +160,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo($this->userModel->getApplicantCount(), '/api/v2/applicants', $query, $in);
 
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ['paging' => $paging, 'api-allow' => ['email', 'insertipaddress']]);
     }
 
     /**
@@ -168,7 +169,7 @@ class ApplicantsApiController extends AbstractApiController {
      * @param int $id
      * @param array $body
      * @throws ClientException if the user record is not an applicant.
-     * @return array
+     * @return Data
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Approve');
@@ -209,6 +210,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
         return $result;
     }
 
@@ -247,6 +249,7 @@ class ApplicantsApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
         return $result;
     }
 

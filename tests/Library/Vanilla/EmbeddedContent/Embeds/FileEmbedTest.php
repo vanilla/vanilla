@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
+use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -45,7 +46,7 @@ class FileEmbedTest extends MinimalContainerTestCase {
 JSON;
 
         $oldData = json_decode($oldDataJSON, true);
-        $dataEmbed = new FileEmbedTest($oldData);
-        $this->assertInstanceOf(FileEmbedTest::class, $dataEmbed);
+        $dataEmbed = new FileEmbed($oldData);
+        $this->assertInstanceOf(FileEmbed::class, $dataEmbed);
     }
 }

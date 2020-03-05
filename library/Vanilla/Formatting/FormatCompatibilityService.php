@@ -72,6 +72,6 @@ class FormatCompatibilityService {
                 $operations[$key] = $operation;
             }
         }
-        return json_encode($operations);
+        return json_encode($operations, JSON_UNESCAPED_UNICODE);
     }
 }

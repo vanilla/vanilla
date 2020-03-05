@@ -62,6 +62,11 @@ class DummyScheduler implements SchedulerInterface {
     protected $dispatchedEventName = null;
 
     /**
+     * @var bool
+     */
+    protected $finalizeRequest = true;
+
+    /**
      * DummyScheduler constructor.
      *
      * @param ContainerInterface $container
@@ -149,17 +154,19 @@ class DummyScheduler implements SchedulerInterface {
                 return false;
             }
 
-            // Finish Flushes all response data to the client
-            // so that job payloads can run without affecting the browser experience
-            session_write_close();
+            if ($this->getFinalizeRequest()) {
+                // Finish Flushes all response data to the client
+                // so that job payloads can run without affecting the browser experience
+                session_write_close();
 
-            // we assume fastCgi. If that fails, go old-school
-            if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
-                // need to calculate content length *after* URL rewrite!
-                if (headers_sent() === false) {
-                    header("Content-length: " . ob_get_length());
+                // We assume fastCgi. If that fails, go old-school.
+                if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
+                    // need to calculate content length *after* URL rewrite!
+                    if (headers_sent() === false) {
+                        header("Content-length: " . ob_get_length());
+                    }
+                    ob_end_flush();
                 }
-                ob_end_flush();
             }
 
             $this->dispatchAll();
@@ -261,7 +268,7 @@ class DummyScheduler implements SchedulerInterface {
      * @return void
      */
     protected function dispatchAll() {
-        foreach ($this->trackingSlips as $trackingSlip) {
+        foreach ($this->generateTrackingSlips() as $trackingSlip) {
             try {
                 $jobInterface = $trackingSlip->getJobInterface();
                 $driverSlip = $trackingSlip->getDriverSlip();
@@ -281,5 +288,42 @@ class DummyScheduler implements SchedulerInterface {
         if ($this->dispatchedEventName != null) {
             $this->eventManager->fire($this->dispatchedEventName, $this->trackingSlips);
         }
+    }
+
+    /**
+     * Tracking slip generator.
+     */
+    private function generateTrackingSlips() {
+        // Ensure we're starting at the start.
+        reset($this->trackingSlips);
+        while (($key = key($this->trackingSlips)) !== null) {
+            // Get the value. Advance the internal pointer.
+            $slip = $this->trackingSlips[$key];
+            next($this->trackingSlips);
+
+            yield $slip;
+        }
+        // Reset the internal pointer to hopefully avoid unexpected behavior.
+        reset($this->trackingSlips);
+    }
+
+    /**
+     * Whether or not to finalize the request and flush output buffers.
+     *
+     * In a web request, you probably want to flush buffers, however in other environments, it's best not to flush buffers you didn't start.
+     *
+     * @return bool
+     */
+    public function getFinalizeRequest(): bool {
+        return $this->finalizeRequest;
+    }
+
+    /**
+     * Set the finalize request flag.
+     *
+     * @param bool $finalizeRequest
+     */
+    public function setFinalizeRequest(bool $finalizeRequest): void {
+        $this->finalizeRequest = $finalizeRequest;
     }
 }

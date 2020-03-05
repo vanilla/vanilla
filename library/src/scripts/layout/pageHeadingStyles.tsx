@@ -7,9 +7,7 @@
 import { em, percent, px } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, margins, unit } from "@library/styles/styleHelpers";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
+import { unit } from "@library/styles/styleHelpers";
 
 export const pageHeadingVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -113,36 +111,5 @@ export const pageHeadingClasses = useThemeCache(() => {
         titleWrap,
         actionButton,
         lineHeightCentering,
-    };
-});
-
-export const pageTitleClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const vars = pageHeadingVariables();
-    const style = styleFactory("pageTitle");
-
-    const root = style({
-        lineHeight: vars.font.lineHeight,
-        display: "block",
-        ...margins({
-            vertical: 0,
-        }),
-        $nest: lineHeightAdjustment(),
-    } as NestedCSSProperties);
-
-    const pageSmallTitle = style("pageSmallTitle", {
-        $nest: lineHeightAdjustment(),
-        lineHeight: vars.font.lineHeight,
-        fontSize: globalVars.fonts.size.smallTitle,
-        fontWeight: globalVars.fonts.weights.bold,
-        display: "block",
-        ...margins({
-            vertical: 0,
-        }),
-    } as NestedCSSProperties);
-
-    return {
-        root,
-        pageSmallTitle,
     };
 });

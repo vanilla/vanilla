@@ -18,7 +18,6 @@ import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
-import { IAutoHighlightResult } from "highlight.js";
 import { userContentClasses } from "@library/content/userContentStyles";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
@@ -26,6 +25,7 @@ const DEFAULT_CONTENT = [{ insert: "\n" }];
 interface IProps {
     legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
+    placeholderClassName?: string;
 }
 
 /**
@@ -38,7 +38,7 @@ export default function EditorContent(props: IProps) {
     useQuillInstance(quillMountRef);
     useLegacyTextAreaSync(props.legacyTextArea);
     useDebugPasteListener(props.legacyTextArea);
-    useQuillAttributeSync(props.placeholder);
+    useQuillAttributeSync(props.placeholder, props.placeholderClassName);
     useLoadStatus();
     useInitialValue();
     useOperationsQueue();
@@ -49,29 +49,6 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
-let highLightJs: any;
-
-/**
- * Use a dynamically imported highlight.js to highlight text synchronously.
- *
- * Ideally with a rewrite of the SyntaxModule we would have this working async all the time
- * but until then we need this hack.60FPS
- *
- * - If highLightJs is loaded, run it.
- * - Otherwise return the text back and start loading highLightJs.
- */
-function highLightText(text: string): IAutoHighlightResult | string {
-    if (!highLightJs) {
-        void import("highlight.js" /* webpackChunkName: "highlightJs" */).then(imported => {
-            highLightJs = imported.default;
-            highLightJs.highlightAuto(text).value;
-        });
-        return text;
-    } else {
-        return highLightJs.highlightAuto(text).value;
-    }
-}
-
 /**
  * Manage and construct a quill instance ot some ref.
  *
@@ -79,7 +56,7 @@ function highLightText(text: string): IAutoHighlightResult | string {
  */
 export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extraOptions?: QuillOptionsStatic) {
     const ref = useRef<Quill>();
-    const { setQuillInstance } = useEditor();
+    const { setQuillInstance, onFocus } = useEditor();
 
     useEffect(() => {
         registerQuill();
@@ -87,12 +64,17 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
             theme: "vanilla",
             modules: {
                 syntax: {
-                    highlight: highLightText,
+                    highlight: () => {}, // Unused but required to satisfy
+                    // https://github.com/quilljs/quill/blob/1.3.7/modules/syntax.js#L43
+                    // We have overridden the highlight method ourselves.
                 },
             },
         };
         if (mountRef.current) {
             const quill = new Quill(mountRef.current, options);
+            quill.on("selection-change", () => {
+                onFocus?.(quill.hasFocus());
+            });
             quill.setContents(DEFAULT_CONTENT);
             setQuillInstance(quill);
             ref.current = quill;
@@ -113,17 +95,17 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
 /**
  * Apply our CSS classes/styles and other attributes to quill's root. (Not a react component).
  */
-function useQuillAttributeSync(placeholder?: string) {
+function useQuillAttributeSync(placeholder?: string, placeholderClass?: string) {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
     const quillRootClasses = useMemo(
         () =>
-            classNames("richEditor-text", "userContent", classesRichEditor.text, {
+            classNames("richEditor-text", "userContent", placeholderClass, classesRichEditor.text, {
                 // These classes shouln't be applied until the forum is converted to the new styles.
                 [classesUserContent.root]: !legacyMode,
             }),
-        [classesRichEditor.text, classesUserContent.root, legacyMode],
+        [classesRichEditor.text, classesUserContent.root, legacyMode, placeholderClass],
     );
 
     useEffect(() => {
@@ -170,8 +152,11 @@ function useInitialValue() {
 
     useEffect(() => {
         if (quill && initialValue && initialValue.length > 0) {
-            if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
+            const initializeChangedToTrue = !prevReinitialize && reinitialize;
+            if (prevInitialValue !== initialValue && initializeChangedToTrue) {
                 quill.setContents(initialValue);
+                quill.setSelection(0, 0);
+                quill.history.clear();
             }
         }
     }, [quill, initialValue, reinitialize, prevInitialValue, prevReinitialize]);
@@ -344,6 +329,7 @@ function useDebugPasteListener(textArea?: HTMLInputElement | HTMLTextAreaElement
 function useUpdateHandler() {
     const { onChange, quill } = useEditor();
     const editorContents = useEditorContents();
+    const { updateSelection } = editorContents;
 
     const getOperations = useCallback((): DeltaOperation[] => {
         if (!quill) {
@@ -362,28 +348,22 @@ function useUpdateHandler() {
         return quill.getContents().ops!;
     }, [quill]);
 
-    const handleUpdate = useCallback(
-        throttle((type: string, newValue, oldValue, source: Sources) => {
+    const handleUpdate = useMemo(() => {
+        const updateFn = (type: string, newValue, oldValue, source: Sources) => {
             if (!quill) {
                 return;
             }
-            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+            if (source === Quill.sources.SILENT) {
+                return;
+            }
+            if (onChange && type === Quill.events.TEXT_CHANGE) {
                 onChange(getOperations());
             }
 
-            let shouldDispatch = false;
-            if (type === Quill.events.SELECTION_CHANGE) {
-                shouldDispatch = true;
-            } else if (source !== Quill.sources.SILENT) {
-                shouldDispatch = true;
-            }
-
-            if (shouldDispatch) {
-                editorContents.updateSelection(quill.getSelection());
-            }
-        }, 1000 / 60), // Throttle to 60 FPS.
-        [quill, onChange, getOperations],
-    );
+            updateSelection(quill.getSelection());
+        };
+        return throttle(updateFn, 1000 / 60); // Throttle to 60 FPS.
+    }, [quill, onChange, getOperations, updateSelection]);
 
     return handleUpdate;
 }

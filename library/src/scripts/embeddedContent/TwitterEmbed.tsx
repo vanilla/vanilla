@@ -53,7 +53,6 @@ export function TwitterEmbed(props: IProps): JSX.Element {
             )}
             <EmbedContent
                 type={props.embedType}
-                inEditor={props.inEditor}
                 isSmall
                 className={twitterLoaded ? undefined : visibility().displayNone}
             >
@@ -62,7 +61,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
                     data-tweeturl={props.url}
                     data-tweetid={props.statusID}
                 >
-                    <a href={props.url} className="tweet-url" rel="nofollow">
+                    <a href={props.url} className="tweet-url" rel="nofollow noreferrer ugc">
                         {props.url}
                     </a>
                 </div>

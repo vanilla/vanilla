@@ -6,9 +6,9 @@
 
 import * as path from "path";
 import webpack from "webpack";
-import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
+import { DIST_DIRECTORY, PRETTIER_FILE, VANILLA_ROOT } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
-import { BuildMode, getOptions } from "../options";
+import { BuildMode, getOptions } from "../buildOptions";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -38,9 +38,7 @@ ${chalk.green(aliases)}`;
     const hotLoaders: any[] = [];
     const hotAliases: any = {};
     if (options.mode === BuildMode.DEVELOPMENT) {
-        babelPlugins.push(require.resolve("react-hot-loader/babel"));
-        hotLoaders.push(require.resolve("react-hot-loader/webpack"));
-        hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
+        babelPlugins.push(require.resolve("react-refresh/babel"));
     }
 
     // Leaving this out until we get the docs actually generating. Huge slowdown.
@@ -101,15 +99,14 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        [
-                            BuildMode.DEVELOPMENT,
-                            BuildMode.TEST,
-                            BuildMode.TEST_DEBUG,
-                            BuildMode.TEST_WATCH,
-                            BuildMode.DEVELOPMENT,
-                        ].includes(options.mode) || section === "storybook"
-                            ? "style-loader"
-                            : MiniCssExtractPlugin.loader,
+                        BuildMode.PRODUCTION === options.mode
+                            ? MiniCssExtractPlugin.loader
+                            : {
+                                  loader: "style-loader",
+                                  options: {
+                                      injectType: "singletonStyleTag",
+                                  },
+                              },
                         {
                             loader: "css-loader",
                             options: {
@@ -150,6 +147,7 @@ ${chalk.green(aliases)}`;
                 ...hotAliases,
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
+                "react-select": require.resolve("react-select/dist/react-select.esm.js"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.
@@ -172,7 +170,7 @@ ${chalk.green(aliases)}`;
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
-                filename: "[name].min.css",
+                filename: "[name].min.css?[chunkhash]",
             }),
         );
     }
@@ -180,8 +178,6 @@ ${chalk.green(aliases)}`;
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());
     }
-
-    // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
     config.plugins.push(
         new WebpackBar({
             name: section,

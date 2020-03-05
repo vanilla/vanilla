@@ -39,7 +39,7 @@ class Link extends AbstractFormat {
         $sanitizedLink = \Gdn_Format::sanitizeUrl(htmlspecialchars($this->currentOperation["attributes"]["link"]));
         return [
             "href" => $sanitizedLink,
-            "rel" => "nofollow",
+            "rel" => "nofollow noreferrer ugc",
         ];
     }
 }

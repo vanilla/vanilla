@@ -331,7 +331,8 @@ abstract class Gdn_SQLDriver {
      * @param mixed $table The table (or array of table names) to delete from.
      * @param mixed $where The string on the left side of the where comparison, or an associative
      * array of Field => Value items to compare.
-     * @param int $limit The number of records to limit the query to.
+     * @param int|false $limit The number of records to limit the query to.
+     * @return int|false Returns the number of rows deleted or **false** on failure.
      */
     public function delete($table = '', $where = '', $limit = false) {
         if ($table == '') {
@@ -754,8 +755,10 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $tableName The name of the table to delete from.
      * @param array $wheres An array of where conditions.
+     * @param int $limit Limit the number of records to delete.
+     * @return string Returns an DML statement.
      */
-    public function getDelete($tableName, $wheres = []) {
+    public function getDelete($tableName, $wheres = [], $limit = 0) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetDelete'), E_USER_ERROR);
     }
 
@@ -786,7 +789,7 @@ abstract class Gdn_SQLDriver {
      * object. This method should not be called directly; it is called by
      * $this->get() and $this->getWhere().
      */
-    public function getSelect() {
+    public function getSelect(bool $prepared = false) {
         // Close off any open query elements.
         $this->_endQuery();
 
@@ -872,6 +875,10 @@ abstract class Gdn_SQLDriver {
             $sql = $this->getLimit($sql, $this->_Limit, $this->_Offset);
         }
 
+        if ($prepared) {
+            $parameters = $this->calculateParameters($this->_NamedParameters);
+            $sql = $this->applyParameters($sql, $parameters);
+        }
         return $sql;
     }
 
@@ -1565,9 +1572,7 @@ abstract class Gdn_SQLDriver {
      * @return string The parsed expression.
      */
     protected function _parseExpr($expr, $name = null, $escapeExpr = false) {
-        $result = '';
-
-        $c = substr($expr, 0, 1);
+        $c = is_string($expr) ? substr($expr, 0, 1) : '';
 
         if ($c === '=' && $escapeExpr === false) {
             // This is a function call. Each parameter has to be parsed.
@@ -1593,7 +1598,7 @@ abstract class Gdn_SQLDriver {
                 // This is a named parameter.
 
                 // Check to see if the named parameter is valid.
-                if (in_array(substr($expr, 0, 1), ['=', '@'])) {
+                if (in_array($c, ['=', '@'])) {
                     // The parameter has to be a default name.
                     $result = $this->namedParameter('Param', true);
                 } else {
@@ -2114,13 +2119,12 @@ abstract class Gdn_SQLDriver {
      * @param string $field The field to search in for $values.
      * @param array $values An array of values to look for in $field.
      * @param string $op Either 'in' or 'not in' for the respective operation.
-     * @param string $escape Whether or not to escape the items in $values.
-     * clause.
-     * @return Gdn_SQLDriver $this
+     * @param bool $escape Whether or not to escape the items in $values.
+     * @return $this
      */
     public function _whereIn($field, $values, $op = 'in', $escape = true) {
         if (is_null($field) || !is_array($values)) {
-            return;
+            return $this;
         }
 
         $fieldExpr = $this->_parseExpr($field);
@@ -2140,16 +2144,20 @@ abstract class Gdn_SQLDriver {
         }
         if (count($in) > 0) {
             $inExpr = '('.implode(', ', $in).')';
-        } else {
-            if ($op == 'not in') {
-                deprecated('Gdn_SQLDriver::whereNotIn() was called with empty $values array. This will no longer be supported in a future release.');
-                \Vanilla\Utility\Deprecation::log();
-            }
-            $inExpr = '(null)';
-        }
 
-        // Set the final expression.
-        $expr = $fieldExpr.' '.$op.' '.$inExpr;
+            // Set the final expression.
+            $expr = $fieldExpr.' '.$op.' '.$inExpr;
+        } else {
+            // We have an empty set.
+            if ($op === 'not in') {
+                // This is necessarily true.
+                // This is a statement just in case their are any boolean expressions depending on this being here.
+                $expr = '1 = 1';
+            } else {
+                // This is necessarily false.
+                $expr = '1 = 0';
+            }
+        }
         $this->_where($expr);
 
         return $this;

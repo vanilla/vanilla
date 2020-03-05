@@ -24,10 +24,25 @@ module.exports = {
         },
     },
     rules: {
+        // Just distasteful
+        "no-prototype-builtins": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/ban-ts-ignore": "off",
+        "no-self-assign": "off",
+        "no-case-declarations": "off",
+        "prefer-const": "off",
+        "require-atomic-updates": "off",
+        "react/prop-types": "off", // We use typescript
+
         // We have typescript for these.
         "no-undef": "off",
         "getter-return": "off",
         "no-dupe-class-members": "off",
+
+        // General JS restrictions
+        "no-console": ["error", { allow: ["warn", "error"] }],
+        "no-debugger": ["error"],
+        "no-alert": ["error"],
 
         // Typescript specific rules
         "@typescript-eslint/ban-types": [
@@ -44,7 +59,7 @@ module.exports = {
             },
         ],
         "@typescript-eslint/camelcase": "off",
-        "@typescript-eslint/array-type": ["error", "array-simple"],
+        "@typescript-eslint/array-type": ["error", { default: 'array-simple' }],
         "@typescript-eslint/interface-name-prefix": ["error", "always"],
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-parameter-properties": "off",

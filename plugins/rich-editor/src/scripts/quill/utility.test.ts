@@ -14,10 +14,10 @@ import {
     getMentionRange,
     expandRange,
 } from "@rich-editor/quill/utility";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { _executeReady } from "@library/utility/appUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 
@@ -250,7 +250,7 @@ describe("insertBlockBlotAt()", () => {
             },
         ];
 
-        const newBlot = new FocusableEmbedBlot(FocusableEmbedBlot.create());
+        const newBlot = new SelectableEmbedBlot(SelectableEmbedBlot.create());
         const quill = new Quill(document.body);
         quill.setContents(content);
 

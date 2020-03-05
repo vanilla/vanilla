@@ -145,6 +145,11 @@ class ConfigurationModule extends Gdn_Module {
                     $value = '';
                 }
 
+                if ((strtolower($row['Control']) === strtolower('toggle'))
+                    && ($row['Options']['UseRealBoolean'] ?? false)) {
+                    $value = $value ? true : false;
+                }
+
                 $data[$config] = $value;
                 $this->controller()->setData($name, $value);
             }

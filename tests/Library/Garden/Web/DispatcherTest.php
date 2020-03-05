@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,9 @@ namespace VanillaTests\Library\Garden\Web;
 
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\RequestInterface;
+use Garden\Web\ResourceRoute;
 use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\Fixtures\ExactRoute;
@@ -59,6 +61,9 @@ class DispatcherTest extends SharedBootstrapTestCase {
         $this->assertEquals('(bar)', $data->getHeader('test'));
     }
 
+    /**
+     * Test basic middleware dispatching.
+     */
     public function testDispatcherMiddleware() {
         $dis = $this->makeDispatcher();
         $dis->addMiddleware($this->makeMiddleware('d'));
@@ -110,5 +115,35 @@ class DispatcherTest extends SharedBootstrapTestCase {
                 return $response;
             }));
         return $dis;
+    }
+
+    /**
+     * Test some basic route accessors.
+     */
+    public function testRouteAccessors() {
+        $dis = new Dispatcher();
+
+        $r = new ResourceRoute();
+
+        $dis->addRoute($r, 'foo');
+        $this->assertSame($r, $dis->getRoute('foo'));
+
+        $dis->removeRoute('foo');
+        $this->assertNull($dis->getRoute('foo'));
+    }
+
+    /**
+     * Test the conversion of an exception to a response.
+     */
+    public function testDispatchException() {
+        $dis = new Dispatcher();
+        $dis->addMiddleware(function (RequestInterface $r, callable  $next) {
+            throw new ClientException('foo');
+        });
+
+        $r = $dis->dispatch(new Request());
+
+        $this->assertSame(400, $r->getStatus());
+        $this->assertSame('foo', $r['message']);
     }
 }

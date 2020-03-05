@@ -43,4 +43,22 @@ class DraftModel extends PipelineModel {
         $jsonProcessor->setFields(["attributes"]);
         $this->addPipelineProcessor($jsonProcessor);
     }
+
+    /**
+     * Get draft count for particular user
+     *
+     * @param int $userID
+     * @return int
+     */
+    public function draftsCount(int $userID): int {
+
+        $countRecord = $this->sql()
+            ->from($this->getTable())
+            ->select('*', 'COUNT', 'draftCount')
+            ->where('insertUserID', $userID)
+            ->groupBy('insertUserID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+
+         return $countRecord['draftCount'];
+    }
 }

@@ -9,12 +9,12 @@ import Quill, { RangeStatic, Blot, DeltaOperation } from "quill/core";
 import Delta from "quill-delta";
 import { matchAtMention } from "@vanilla/utils";
 import uniqueId from "lodash/uniqueId";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { logDebug } from "@vanilla/utils";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import Link from "quill/formats/link";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 interface IBoundary {
     start: number;
@@ -378,13 +378,13 @@ export function insertBlockBlotAt(quill: Quill, index: number, blot: Blot) {
 }
 
 /**
- * Determine if and Embed inside of this class is focused.
+ * Determine if an Embed inside of this class is focused.
  */
 export function isEmbedSelected(quill: Quill, selection?: RangeStatic | null) {
     if (!selection) {
         return false;
     }
-    const potentialEmbedBlot = getBlotAtIndex(quill, selection.index, FocusableEmbedBlot);
+    const potentialEmbedBlot = getBlotAtIndex(quill, selection.index, SelectableEmbedBlot);
     return !!potentialEmbedBlot;
 }
 

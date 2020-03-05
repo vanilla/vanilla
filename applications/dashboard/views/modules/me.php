@@ -1,4 +1,4 @@
-<?php 
+<?php
 use Vanilla\FeatureFlagHelper;
 if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
@@ -27,7 +27,7 @@ if ($Session->checkPermission('Garden.Users.Approve')) {
     $ApplicantCount = null;
 }
 
-$useNewFlyouts = FeatureFlagHelper::featureEnabled('NewFlyouts');
+$useNewFlyouts = Gdn::themeFeatures()->useNewFlyouts();
 
 $this->EventArguments['DashboardCount'] = &$DashboardCount;
 $this->fireEvent('BeforeFlyoutMenu');

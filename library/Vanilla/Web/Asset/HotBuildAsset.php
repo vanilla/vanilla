@@ -41,4 +41,11 @@ class HotBuildAsset implements Contracts\Web\AssetInterface {
     public function getWebPath(): string {
         return "http://$this->ip:3030/$this->section-hot-bundle.js";
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStatic(): bool {
+        return false;
+    }
 }

@@ -38,6 +38,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     errors?: IFieldError[];
     baseClass?: InputTextBlockBaseClass;
     legacyMode?: boolean;
+    noMargin?: boolean;
 }
 
 interface IState {
@@ -90,9 +91,12 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 )}
 
                 <span
-                    className={classNames(classesInputBlock.inputWrap, this.props.wrapClassName, [
-                        classesInputBlock.fieldsetGroup,
-                    ])}
+                    className={classNames(
+                        classesInputBlock.inputWrap,
+                        this.props.wrapClassName,
+                        [classesInputBlock.fieldsetGroup],
+                        { noMargin: this.props.noMargin },
+                    )}
                 >
                     {children}
                 </span>

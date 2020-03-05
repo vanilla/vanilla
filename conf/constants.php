@@ -17,6 +17,8 @@ if (!defined('PATH_UPLOADS')) {
 }
 
 // You should not change these paths.
+define('PATH_ADDONS_THEMES', PATH_ROOT.'/addons/themes');
+define('PATH_ADDONS_ADDONS', PATH_ROOT.'/addons/addons');
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
 define('PATH_PLUGINS', PATH_ROOT.'/plugins');
 define('PATH_THEMES', PATH_ROOT.'/themes');
@@ -64,9 +66,6 @@ define('TRACE_INFO', 'Info');
 define('TRACE_ERROR', 'Error');
 define('TRACE_WARNING', 'Warning');
 define('TRACE_NOTICE', 'Notice');
-
-// Environment
-define('ENVIRONMENT_PHP_VERSION', '7.1');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);

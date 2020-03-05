@@ -6,18 +6,8 @@
 
 namespace Vanilla\Web;
 
-use Garden\Web\Data;
-use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\ThemePreloadProvider;
-use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Theme\JavascriptAsset;
-use Vanilla\Theme\JsonAsset;
-use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\JsInterpop\ReduxAction;
-use Vanilla\Theme\FontsAsset;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -34,13 +24,11 @@ abstract class ThemedPage extends Page {
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel,
+        PageHead $pageHead,
+        MasterViewRenderer $masterViewRenderer,
         ThemePreloadProvider $themeProvider = null // Default required to conform to interface
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel);
+        parent::setDependencies($siteMeta, $request, $session, $pageHead, $masterViewRenderer);
         $this->themeProvider = $themeProvider;
         $this->initAssets();
     }
@@ -59,7 +47,7 @@ abstract class ThemedPage extends Page {
         // Add the theme's script asset if it exists.
         $script = $this->themeProvider->getThemeScript();
         if ($script !== null) {
-            $this->scripts[] = $script;
+            $this->addScript($script);
         }
     }
 }

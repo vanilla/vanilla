@@ -1,0 +1,35 @@
+{
+    "key": "keystone",
+    "name": "Keystone",
+    "type": "theme",
+    "assets": {
+        "fonts": {
+            "type": "data",
+            "file": "fonts.json"
+        },
+        "footer": {
+            "type": "html",
+            "file": "footer.html"
+        },
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        },
+        "javascript": {
+            "type": "js",
+            "file": "javascript.js"
+        },
+        "scripts": {
+            "type": "data",
+            "file": "scripts.json"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
+        }
+    }
+}

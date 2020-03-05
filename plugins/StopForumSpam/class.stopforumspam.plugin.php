@@ -7,6 +7,8 @@
  * @package StopForumSpam
  */
 
+use Vanilla\Web\CurlWrapper;
+
 /**
  * Class StopForumSpamPlugin
  */
@@ -54,14 +56,15 @@ class StopForumSpamPlugin extends Gdn_Plugin {
 
         $get['f'] = 'json';
 
-        $url = "http://www.stopforumspam.com/api?".http_build_query($get);
+        $url = "https://www.stopforumspam.com/api?".http_build_query($get);
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_TIMEOUT, 4);
         curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-        $resultString = curl_exec($curl);
+
+        $resultString = CurlWrapper::curlExec($curl, false);
         curl_close($curl);
 
         if ($resultString) {

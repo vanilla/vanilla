@@ -75,7 +75,7 @@ export function QuoteEmbed(props: IProps) {
 
     return (
         <EmbedContainer withPadding={false} className={classes.root}>
-            <EmbedContent type="Quote" inEditor={props.inEditor}>
+            <EmbedContent type="Quote">
                 <article className={classes.body}>
                     {showHeader && (
                         <header className={classes.header}>
@@ -117,7 +117,6 @@ export function QuoteEmbed(props: IProps) {
                     <CollapsableContent
                         className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
                         isExpandedDefault={!!expandByDefault}
-                        firstChild={!showUserLabel && !name && !showCompactUserInfo}
                     >
                         <blockquote className={classes.blockquote} cite={url}>
                             <UserContent content={body} />

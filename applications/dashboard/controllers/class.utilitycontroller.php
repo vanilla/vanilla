@@ -292,6 +292,7 @@ class UtilityController extends DashboardController {
             $updateModel->runStructure();
             $this->setData('Success', true);
         } catch (Exception $ex) {
+            $this->statusCode(500);
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
             if (debug()) {
@@ -344,6 +345,7 @@ class UtilityController extends DashboardController {
     public function updateWithToken() {
         $this->ApplicationFolder = 'dashboard';
         $this->MasterView = 'setup';
+        $this->setData('Success', null);
 
         // Do some checks for backwards for behavior for CD.
         if ($this->Request->isPostBack()) {
@@ -363,9 +365,11 @@ class UtilityController extends DashboardController {
         $this->addJsFile('jquery.js');
         Gdn_Theme::section('Utility');
 
-        $this->setData('_isAdmin', Gdn::session()->checkPermission('Garden.Settings.Manager'));
-        $this->setData("form", $this->Form);
-        $this->setData("headerImage", asset("/applications/dashboard/design/images/vanilla_logo.png"));
+        if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            $this->setData('_isAdmin', Gdn::session()->checkPermission('Garden.Settings.Manage'));
+            $this->setData("form", $this->Form);
+            $this->setData("headerImage", asset("/applications/dashboard/design/images/vanilla_logo.png"));
+        }
         $this->render($this->View, 'utility', 'dashboard');
     }
 
@@ -688,12 +692,14 @@ class UtilityController extends DashboardController {
             $updateModel->runStructure();
             $this->setData('Success', true);
         } catch (Exception $ex) {
+            $this->statusCode(500);
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
 
             if (debug()) {
                 throw $ex;
             }
+            return false;
         }
         saveToConfig('Garden.Version', APPLICATION_VERSION);
 

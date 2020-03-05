@@ -5,10 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { paddings, unit, importantUnit } from "@library/styles/styleHelpers";
+import { paddings, unit, importantUnit, colorOut } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { percent } from "csx";
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -18,6 +19,7 @@ export const frameBodyClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        width: percent(100),
         ...paddings({
             left: vars.spacing.padding,
             right: vars.spacing.padding,
@@ -42,6 +44,13 @@ export const frameBodyClasses = useThemeCache(() => {
         },
     });
 
+    const framePaddings = style("framePaddings", {
+        ...paddings({
+            left: vars.spacing.padding,
+            right: vars.spacing.padding,
+        }),
+    });
+
     const noContentMessage = style("noContentMessage", {
         ...paddings({
             top: vars.header.spacing * 2,
@@ -59,9 +68,11 @@ export const frameBodyClasses = useThemeCache(() => {
         }),
         fontSize: importantUnit(globalVars.fonts.size.medium),
         minHeight: unit(50),
+        color: colorOut(globalVars.mainColors.fg),
     });
     return {
         root,
+        framePaddings,
         noContentMessage,
         contents,
     };

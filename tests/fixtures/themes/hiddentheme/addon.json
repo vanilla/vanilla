@@ -1,0 +1,12 @@
+{
+    "key": "hiddentheme",
+    "name": "Test Theme",
+    "type": "theme",
+    "hidden": true,
+    "assets": {
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        }
+    }
+}

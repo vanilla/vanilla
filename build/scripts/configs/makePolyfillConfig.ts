@@ -9,7 +9,7 @@ import { makeBaseConfig } from "./makeBaseConfig";
 import { POLYFILL_SOURCE_FILE, DIST_DIRECTORY } from "../env";
 import TerserWebpackPlugin from "terser-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
-import { getOptions } from "../options";
+import { getOptions } from "../buildOptions";
 
 /**
  * Create a config for building the polyfills file. This should be built entirely on its own.

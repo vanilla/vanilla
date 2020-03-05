@@ -11,6 +11,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
+import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -232,19 +234,25 @@ export const userContentClasses = useThemeCache(() => {
 
     const linkColors = setAllLinkColors();
     const linkStyle = {
-        color: linkColors.color,
-        $nest: {
-            ...linkColors.nested,
-            "&:hover, &:focus": {
-                textDecoration: "underline",
-            },
+        "& a": {
+            color: colorOut(linkColors.color),
         },
-    };
-
-    const linkStyles: NestedCSSSelectors = {
-        a: linkStyle,
-        "p a": linkStyle,
-        "li a": linkStyle,
+        "& a:hover": {
+            color: colorOut(globalVars.links.colors.hover),
+            textDecoration: "underline",
+        },
+        "& a:focus": {
+            color: colorOut(globalVars.links.colors.focus),
+            textDecoration: "underline",
+        },
+        "& a.focus-visible": {
+            color: colorOut(globalVars.links.colors.accessibleFocus),
+            textDecoration: "underline",
+        },
+        "& a:active": {
+            color: colorOut(globalVars.links.colors.active),
+            textDecoration: "underline",
+        },
     };
 
     const codeStyles: NestedCSSSelectors = {
@@ -335,6 +343,14 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
+    const blockQuoteVars = blockQuoteVariables();
+
+    const blockquotes: NestedCSSSelectors = {
+        ".blockquote": {
+            color: colorOut(blockQuoteVars.colors.fg),
+        },
+    };
+
     const root = style({
         // These CAN'T be flexed. That breaks margin collapsing.
         display: important("block"),
@@ -351,11 +367,32 @@ export const userContentClasses = useThemeCache(() => {
             ...headings,
             ...lists,
             ...paragraphSpacing,
-            ...linkStyles,
             ...codeStyles,
             ...spoilersAndQuotes,
+            ...blockquotes,
+            ...linkStyle,
         },
     });
 
     return { root };
 });
+
+export const userContentCSS = () => {
+    const globalVars = globalVariables();
+    cssOut(
+        `
+        .Container .userContent h1,
+        .Container .userContent h2,
+        .Container.userContent h3,
+        .Container .userContent h4,
+        .Container .userContent h5,
+        .Container .userContent h6`,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
+
+    cssOut(`body.Vanilla .userContent`, {
+        fontSize: unit(globalVars.fonts.size.medium),
+    });
+};

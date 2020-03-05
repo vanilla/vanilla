@@ -58,11 +58,16 @@ export const frameFooterClasses = useThemeCache(() => {
         paddingRight: important(0),
     });
 
+    const forDashboard = style({
+        minHeight: unit(65),
+    });
+
     return {
         root,
         markRead,
         selfPadded,
         actionButton,
         justifiedRight,
+        forDashboard,
     };
 });

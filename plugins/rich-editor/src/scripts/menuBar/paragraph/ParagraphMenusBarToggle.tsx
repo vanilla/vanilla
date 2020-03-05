@@ -161,11 +161,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 </button>
                 <div
                     id={this.menuID}
-                    className={classNames(
-                        this.dropDownClasses,
-                        classes.menuBar,
-                        this.isMenuVisible ? "" : style(srOnly()),
-                    )}
+                    className={classNames(this.dropDownClasses, this.isMenuVisible ? "" : style(srOnly()))}
                     style={this.toolbarStyles}
                     role="menu"
                 >

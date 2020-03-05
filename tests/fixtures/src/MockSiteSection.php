@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\fixtures;
+namespace VanillaTests\Fixtures;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionSchema;
 
 /**
  * Mock site-section.
@@ -28,6 +29,12 @@ class MockSiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
+    /** @var array $apps */
+    private $apps;
+
     /**
      * MockSiteSection constructor.
      *
@@ -42,13 +49,16 @@ class MockSiteSection implements SiteSectionInterface {
         string $locale,
         string $basePath,
         string $sectionID,
-        string $sectionGroup
+        string $sectionGroup,
+        array $defaultRoute
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
         $this->siteSectionPath = $basePath;
         $this->sectionID = $sectionID;
         $this->sectionGroup = $sectionGroup;
+        $this->defaultRoute = $defaultRoute;
+        $this->apps = ['forum' => true];
     }
     /**
      * @inheritdoc
@@ -74,7 +84,7 @@ class MockSiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
-    public function getSectionID(): int {
+    public function getSectionID(): string {
         return $this->sectionID;
     }
 
@@ -83,5 +93,47 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function getSectionGroup(): string {
         return $this->sectionGroup;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return SiteSectionSchema::toArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributes(): array {
+        return [];
     }
 }

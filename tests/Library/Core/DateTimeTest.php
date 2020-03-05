@@ -7,12 +7,43 @@
 
 namespace VanillaTests\Library\Core;
 
-use VanillaTests\SharedBootstrapTestCase;
 use DateTime;
 use DateTimeZone;
+use VanillaTests\MinimalContainerTestCase;
 
+/**
+ * Tests for some date time utilities.
+ */
+class DateTimeTest extends MinimalContainerTestCase {
 
-class DateTimeTest extends SharedBootstrapTestCase {
+    /**
+     * Test dateCompare.
+     *
+     * @param mixed $date1
+     * @param mixed $date2
+     * @param int $expected
+     *
+     * @dataProvider provideDateComparisons
+     */
+    public function testDateCompare($date1, $date2, int $expected) {
+        $result = dateCompare($date1, $date2);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideDateComparisons(): array {
+        $now = time();
+        return [
+            ['2015-12-24 12:12:12', '2015-12-24 12:12:11', 1],
+            ['2015-12-24 12:12:12', '2015-12-24 12:12:12', 0],
+            ['2015-12-24 12:12:12', '2015-12-24 12:12:13', -1],
+            [$now, $now - 1, 1],
+            [$now, $now, 0],
+            [$now, $now + 1, -1],
+        ];
+    }
 
     /**
      * Test that different named timezones in the same place produce equivalent dates.

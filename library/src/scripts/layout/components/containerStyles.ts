@@ -9,15 +9,32 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
-    const spacing = makeThemeVars("spacing", {
+    const smallPadding = panelWidgetVariables().spacing.padding;
+
+    let spacingInit = makeThemeVars("spacing", {
         padding: {
             horizontal: vars.gutter.size,
+        },
+        paddingMobile: {
+            horizontal: smallPadding,
+        },
+    });
+
+    const spacing = makeThemeVars("spacing", {
+        ...spacingInit,
+        paddingFull: {
+            horizontal: vars.gutter.size + smallPadding,
+        },
+        paddingFullMobile: {
+            horizontal: smallPadding * 2,
         },
     });
 
@@ -37,30 +54,46 @@ export const containerVariables = useThemeCache(() => {
     };
 });
 
-export const containerClasses = useThemeCache(() => {
-    const style = styleFactory("container");
+export const containerMainStyles = (): NestedCSSProperties => {
     const globalVars = globalVariables();
     const vars = containerVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    return {
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        boxSizing: "border-box",
+        width: percent(100),
+        maxWidth: globalVars.content.width,
+        marginLeft: "auto",
+        marginRight: "auto",
+        ...paddings(vars.spacing.padding),
 
-    const root = style(
-        {
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            boxSizing: "border-box",
-            width: percent(100),
-            maxWidth: globalVars.content.width,
-            marginLeft: "auto",
-            marginRight: "auto",
-            ...paddings(vars.spacing.padding),
+        $nest: {
+            "&.isNarrow": {
+                maxWidth: vars.sizing.narrowContentSize,
+            },
         },
+    };
+};
+
+export const containerClasses = useThemeCache(() => {
+    const style = styleFactory("container");
+    const mediaQueries = layoutVariables().mediaQueries();
+    const vars = containerVariables();
+    const root = style(
+        containerMainStyles() as NestedCSSProperties,
         mediaQueries.oneColumnDown({
-            ...paddings({
-                horizontal: 8,
-            }),
+            ...paddings(vars.spacing.paddingMobile),
         }),
     );
 
-    return { root };
+    const fullGutter = style(
+        "fullGutter",
+        { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
+        mediaQueries.oneColumnDown({
+            ...paddings(vars.spacing.paddingFullMobile),
+        }),
+    );
+
+    return { root, fullGutter };
 });

@@ -198,9 +198,11 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             if ($themeFolder != '') {
                 // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
                 $viewPaths[] = combinePaths([PATH_THEMES, $themeFolder, $applicationFolder, 'views', 'modules', $view.'.php']);
+                $viewPaths[] = combinePaths([PATH_ADDONS_THEMES, $themeFolder, $applicationFolder, 'views', 'modules', $view.'.php']);
 
                 // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
                 $viewPaths[] = combinePaths([PATH_THEMES, $themeFolder, 'views', 'modules', $view.'.php']);
+                $viewPaths[] = combinePaths([PATH_ADDONS_THEMES, $themeFolder, 'views', 'modules', $view.'.php']);
             }
 
             // 3. Application default. eg. /path/to/application/app_name/views/controller_name/

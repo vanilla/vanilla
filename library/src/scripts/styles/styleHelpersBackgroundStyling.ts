@@ -11,6 +11,7 @@ import {
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
     ObjectFitProperty,
+    OpacityProperty,
     PositionProperty,
 } from "csstype";
 import { percent, px, quote, url, viewHeight, viewWidth } from "csx";
@@ -20,14 +21,26 @@ import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { styleFactory } from "@library/styles/styleUtils";
 
 export interface IBackground {
-    color: ColorValues;
+    color?: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;
     size?: BackgroundSizeProperty<TLength>;
     image?: BackgroundImageProperty;
     fallbackImage?: BackgroundImageProperty;
+    opacity?: OpacityProperty;
 }
+
+export const EMPTY_BACKGROUND: IBackground = {
+    color: undefined,
+    attachment: undefined,
+    position: undefined,
+    repeat: undefined,
+    size: undefined,
+    image: undefined,
+    fallbackImage: undefined,
+    opacity: undefined,
+};
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
     // Get either image or fallback
@@ -41,16 +54,20 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
         return themeAsset(workingImage.substr(1, workingImage.length - 1));
     }
 
-    if (workingImage.startsWith('"data:image/')) {
+    if (workingImage.startsWith("data:image/")) {
+        return `url(${workingImage})`;
+    }
+
+    if (workingImage.startsWith("linear-gradient(")) {
         return workingImage;
     }
 
     // Fallback to a general asset URL.
-    const assetImage = assetUrl(workingImage);
+    const assetImage = `url(${assetUrl(workingImage)})`;
     return assetImage;
 };
 
-export const background = (props: IBackground) => {
+export const backgroundHelper = (props: IBackground) => {
     const image = getBackgroundImage(props.image, props.fallbackImage);
     return {
         backgroundColor: props.color ? colorOut(props.color) : undefined,
@@ -58,7 +75,8 @@ export const background = (props: IBackground) => {
         backgroundPosition: props.position || `50% 50%`,
         backgroundRepeat: props.repeat || "no-repeat",
         backgroundSize: props.size || "cover",
-        backgroundImage: image ? url(image) : undefined,
+        background: image,
+        opacity: props.opacity ?? undefined,
     };
 };
 

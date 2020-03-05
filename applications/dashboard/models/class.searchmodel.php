@@ -142,6 +142,8 @@ class SearchModel extends Gdn_Model {
         $this->_SearchMode = $searchMode;
 
         $this->EventArguments['Search'] = $search;
+        $this->EventArguments['Limit'] = $limit;
+        $this->EventArguments['Offset'] = $offset;
         $this->fireEvent('Search');
 
         if (count($this->_SearchSql) == 0) {

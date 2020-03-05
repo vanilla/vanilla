@@ -10,6 +10,8 @@
 @import "../../../library/src/scss/social/socialMediaVariables";
 @import "../../../library/src/scss/mixins/mixins";
 
+$staticVariables: true;
+
 // Compatibility
 @import "compatibility/mixins";
 @import "compatibility/scaffolding";
@@ -38,6 +40,11 @@
 // Embeds
 @import "../../../library/src/scss/embeds/embeds";
 @import "../../../library/src/scss/utility/icons";
+
+// Legacy video styles
+.VideoWrap video {
+    max-width: 100%;
+}
 
 // User content
 @import "../../../library/src/scss/userContent/animations";

@@ -1,0 +1,33 @@
+{
+    "global": {
+        "mainColors": {
+            "primary": "#9966b2",
+            "fg": "#fff",
+            "bg": "#323639",
+            "primaryContrast": "#fff"
+        },
+        "fonts": {
+            "families": {
+                "body": ["Nunito"]
+            }
+        }
+    },
+    "banner": {
+        "backgrounds": {
+            "useOverlay": false
+        },
+        "outerBackground": {
+            "backgroundPosition": "0% 50%"
+        },
+        "inputAndButton": "36px"
+    },
+    "titleBar": {
+        "colors": {
+            "fg": "#fff",
+            "bg": "#6c1794"
+        },
+        "border": {
+            "type": "border"
+        }
+    }
+}

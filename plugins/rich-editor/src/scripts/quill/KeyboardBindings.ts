@@ -19,7 +19,6 @@ import {
 import { isAllowedUrl } from "@library/utility/appUtils";
 import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
@@ -28,6 +27,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = [
@@ -110,10 +110,15 @@ export default class KeyboardBindings {
      */
     public handleCodeBlockEnter = (range: RangeStatic) => {
         const [line] = this.quill.getLine(range.index);
+        if (!(line instanceof CodeBlockBlot)) {
+            return;
+        }
 
         const { textContent } = line.domNode;
-        const currentLineIsEmpty = /\n\n\n$/.test(textContent);
-        if (!currentLineIsEmpty) {
+        const codeEndsWithNewlines = /\n\n\n$/.test(textContent ?? "");
+        const endOfLine = line.offset(this.quill.scroll) + line.length() - 1;
+
+        if (!codeEndsWithNewlines || range.index !== endOfLine) {
             return true;
         }
 
@@ -242,7 +247,7 @@ export default class KeyboardBindings {
         const isFirstLineSelected = selection.index === 0;
         const selectionIsEntireScroll = isFirstLineSelected;
         const blotMatches =
-            line instanceof LineBlot || line instanceof CodeBlockBlot || line instanceof FocusableEmbedBlot;
+            line instanceof LineBlot || line instanceof CodeBlockBlot || line instanceof SelectableEmbedBlot;
 
         if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
             let delta = new Delta();

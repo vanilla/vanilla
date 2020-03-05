@@ -179,6 +179,7 @@
                 </div>
             {/if}
             <div class="Frame-body">
+                
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList", "CategoryDiscussionList"])}
                     <div class="Herobanner">

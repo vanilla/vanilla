@@ -1515,6 +1515,11 @@ if (!function_exists('betterRandomString')) {
             $randomChars = unpack('C*', mcrypt_create_iv($length));
             $cryptoStrong = true;
             // @codeCoverageIgnoreEnd
+        } elseif (function_exists("random_bytes")) {
+            // @codeCoverageIgnoreStart
+            $randomChars = unpack("C*", random_bytes($length));
+            $cryptoStrong = true;
+            // @codeCoverageIgnoreEnd
         } else {
             // @codeCoverageIgnoreStart
             for ($i = 0; $i < $length; $i++) {

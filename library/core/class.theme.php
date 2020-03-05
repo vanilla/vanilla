@@ -385,6 +385,10 @@ class Gdn_Theme {
         $logo = c('Garden.Logo');
         $title = c('Garden.Title', 'Title');
 
+        if (!$logo && isset($properties['fallbackLogo']) && isUrl($properties['fallbackLogo'])) {
+            $logo = $properties['fallbackLogo'];
+        }
+
         if ($logo) {
             $properties += ['alt' => $title];
 
@@ -413,11 +417,16 @@ class Gdn_Theme {
      * Returns the mobile banner logo. If there is no mobile logo defined then this will just return
      * the regular logo or the mobile title.
      *
+     * @param array $properties
      * @return string
      */
-    public static function mobileLogo() {
+    public static function mobileLogo($properties = []) {
         $logo = c('Garden.MobileLogo', c('Garden.Logo'));
         $title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
+
+        if (!$logo && isset($properties['fallbackLogo']) && isUrl($properties['fallbackLogo'])) {
+            $logo = $properties['fallbackLogo'];
+        }
 
         if ($logo) {
             return img(Gdn_Upload::url($logo), ['alt' => $title]);

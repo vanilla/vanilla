@@ -20,7 +20,6 @@ import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { HashOffsetReporter, useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import BackLink from "@library/routing/links/BackLink";

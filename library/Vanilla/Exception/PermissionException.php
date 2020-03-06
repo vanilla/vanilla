@@ -31,7 +31,7 @@ class PermissionException extends ForbiddenException {
             $description = sprintft(\Gdn::translate('You need one of %s permissions to do that.'), implode(', ', $permissions));
         }
         $context['description'] = $description;
-        $message = \Gdn::translate('No Permission');
+        $message = \Gdn::translate('Permission Problem');
 
         parent::__construct($message, $context);
     }

@@ -19,7 +19,7 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent, translateY } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
+import { inputVariables, inputMixin } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const inputCSS = () => {
@@ -105,9 +105,8 @@ export const inputCSS = () => {
     mixinInputStyles(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
     mixinInputStyles(".AdvancedSearch .InputBox", false, false);
-    cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
+    cssOut(".InputBox.InputBox.InputBox", inputMixin());
     cssOut(`.richEditor-frame.InputBox.InputBox.InputBox `, { padding: 0 });
-    // cssOut(".token-input-list", inputClasses().inputMixin);
     cssOut("select", {
         $nest: {
             "&:hover, &:focus, &.focus-visible, &:active": {

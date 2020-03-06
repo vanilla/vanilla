@@ -34,7 +34,8 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { ButtonPresets } from "@library/forms/buttonStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -363,6 +364,7 @@ export const bannerVariables = useThemeCache(() => {
         title,
         description,
         paragraph,
+        state,
         searchBar,
         buttonShadow,
         searchButton,
@@ -588,10 +590,10 @@ export const bannerClasses = useThemeCache(() => {
     }
 
     const content = style("content", {
+        ...inputMixin({ sizing: vars.searchBar.sizing }),
         boxSizing: "border-box",
         zIndex: 1,
         boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
-
         borderTopLeftRadius: unit(leftRadius),
         borderBottomLeftRadius: unit(leftRadius),
         borderTopRightRadius: unit(rightRadius),

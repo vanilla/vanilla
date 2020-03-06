@@ -363,7 +363,6 @@ class Parser {
             throw new \Exception($newFormatClass . " should be a subclass of " . $existingFormatClass);
         }
 
-
         $key = array_search($existingFormatClass, $this->formatClasses);
 
         if ($key !== false) {

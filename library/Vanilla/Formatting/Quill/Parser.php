@@ -314,38 +314,71 @@ class Parser {
     }
 
     /**
-     * Get all registered blot classes.
+     * Replace a registered blot class.
      *
-     * @return array
+     * @return bool
      */
-    public function getBlotClasses(): array {
-        return $this->blotClasses;
+    public function replaceBlot(string $newBlotClass, string $existingBlotClass): bool {
+        $key = array_search($existingBlotClass, $this->blotClasses);
+
+        if ($key !== false) {
+            $this->blotClasses[$key] = $newBlotClass;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Replace all registered blot classes.
+     * Remove a registered blot class.
      *
-     * @param array
+     * @return bool
      */
-    public function setBlotClasses(array $blotClasses) {
-        $this->blotClasses = $blotClasses;
+    public function removeBlot(string $existingBlotClass): bool {
+        $key = array_search($existingBlotClass, $this->blotClasses);
+
+        if ($key !== false) {
+            unset($this->blotClasses[$key]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Get all registered format classes.
+     * Replace a registered format class.
      *
-     * @return array
+     * @return bool
      */
-    public function getFormatClasses(): array {
-        return $this->formatClasses;
+    public function replaceFormat(string $newFormatClass, string $existingFormatClass): bool {
+        $key = array_search($existingFormatClass, $this->formatClasses);
+
+        if ($key !== false) {
+            $this->formatClasses[$key] = $newFormatClass;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Replace all registered format classes.
+     * Remove a registered format class.
      *
-     * @param array
+     * @return bool
      */
-    public function setFormatClasses(array $formatClasses) {
-        $this->formatClasses = $formatClasses;
+    public function removeFormat(string $existingFormatClass): bool {
+        $key = array_search($existingFormatClass, $this->formatClasses);
+
+        if ($key !== false) {
+            unset($this->formatClasses[$key]);
+
+            return true;
+        }
+
+        return false;
     }
+
 }

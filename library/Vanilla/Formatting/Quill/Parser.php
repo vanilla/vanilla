@@ -317,8 +317,13 @@ class Parser {
      * Replace a registered blot class.
      *
      * @return bool
+     * @throws \Exception If the replacement class isn't a subclass of the existing blot class.
      */
     public function replaceBlot(string $newBlotClass, string $existingBlotClass): bool {
+       if (!is_subclass_of($newBlotClass, $existingBlotClass)) {
+            throw new \Exception($newBlotClass . " should be a subclass of " . $existingBlotClass);
+        }
+
         $key = array_search($existingBlotClass, $this->blotClasses);
 
         if ($key !== false) {
@@ -351,8 +356,14 @@ class Parser {
      * Replace a registered format class.
      *
      * @return bool
+     * @throws \Exception If the replacement class isn't a subclass of the existing format class.
      */
     public function replaceFormat(string $newFormatClass, string $existingFormatClass): bool {
+        if (!is_subclass_of($newFormatClass, $existingFormatClass)) {
+            throw new \Exception($newFormatClass . " should be a subclass of " . $existingFormatClass);
+        }
+
+
         $key = array_search($existingFormatClass, $this->formatClasses);
 
         if ($key !== false) {

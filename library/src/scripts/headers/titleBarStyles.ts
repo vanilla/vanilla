@@ -210,8 +210,8 @@ export const titleBarVariables = useThemeCache(() => {
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
-        desktop: {}, // add "url" if you want to set in theme
-        mobile: {}, // add "url" if you want to set in theme
+        desktop: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        mobile: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
     });
 
     const mobileLogo = makeThemeVars("mobileLogo", {

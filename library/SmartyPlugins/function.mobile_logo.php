@@ -14,6 +14,10 @@
  * @return string The url.
  */
 function smarty_function_mobile_logo($params, &$smarty) {
-    $result = Gdn_Theme::mobileLogo('Title');
+    $options = [];
+    if (isset($params['fallbackLogo'])) {
+        $options['fallbackLogo']  = $params['fallbackLogo'];
+    }
+    $result = Gdn_Theme::mobileLogo($params);
 	return $result;
 }

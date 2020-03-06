@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { onContent, getMeta } from "@library/utility/appUtils";
+import { onContent, getMeta, onReady } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -27,7 +27,7 @@ import { applySharedPortalContext } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import CommunityBanner from "@vanilla/library/src/scripts/banner/CommunityBanner";
 
-initAllUserContent();
+onReady(initAllUserContent);
 onContent(convertAllUserContent);
 
 // Redux

@@ -94,7 +94,7 @@ export function messageFromErrorCode(errorCode?: string | number) {
     switch (errorCode) {
         case 403:
         case DefaultError.PERMISSION:
-            return t("No Permission");
+            return t("Permission Problem");
         case 404:
         case DefaultError.GENERIC:
         default:

@@ -75,7 +75,7 @@ export function IndependentSearch(props: IProps) {
                 resultsRef={resultsRef}
                 buttonClassName={props.buttonClass}
                 buttonBaseClass={props.buttonBaseClass}
-                isBigInput={props.isLarge}
+                isLarge={props.isLarge}
                 buttonLoaderClassName={props.buttonLoaderClassName}
                 hideSearchButton={props.hideSearchButton}
                 contentClass={props.contentClass}

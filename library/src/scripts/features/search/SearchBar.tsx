@@ -40,7 +40,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     loadOptions?: (inputValue: string) => Promise<any>;
     value: string;
     onChange: (value: string) => void;
-    isBigInput?: boolean;
+    isLarge?: boolean;
     noHeading: boolean;
     title: string;
     titleAsComponent?: React.ReactNode;
@@ -78,7 +78,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
 
     public static defaultProps: Partial<IProps> = {
         disabled: false,
-        isBigInput: false,
+        isLarge: false,
         noHeading: false,
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
@@ -277,7 +277,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 {
                                     ["focus-visible"]: props.isFocused,
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
-                                    isLarge: this.props.isBigInput,
+                                    isLarge: this.props.isLarge,
                                     noSearchButton: !!this.props.hideSearchButton,
                                 },
                             )}
@@ -299,7 +299,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                     "searchBar-submitButton",
                                     this.props.buttonClassName ?? classes.actionButton,
                                     {
-                                        isLarge: this.props.isBigInput,
+                                        isLarge: this.props.isLarge,
                                     },
                                 )}
                                 tabIndex={this.props.hideSearchButton ? -1 : 0}
@@ -317,7 +317,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         <div
                             onClick={this.focus}
                             className={classNames("searchBar-iconContainer", classes.iconContainer, {
-                                [classes.iconContainerBigInput]: this.props.isBigInput,
+                                [classes.iconContainerBigInput]: this.props.isLarge,
                             })}
                         >
                             <SearchIcon className={classNames("searchBar-icon", classes.icon)} />

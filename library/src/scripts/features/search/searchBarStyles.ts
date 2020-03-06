@@ -372,6 +372,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
         cursor: "text",
+        outline: 0,
         $nest: {
             [`.${icon}`]: {
                 width: unit(vars.searchIcon.width),

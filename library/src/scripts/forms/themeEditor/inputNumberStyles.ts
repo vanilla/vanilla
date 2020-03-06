@@ -76,7 +76,6 @@ export const inputNumberClasses = useThemeCache(() => {
             vars.sizing.height,
             vars.label.fonts.size,
             builderVariables.border.width * 2, // 2
-            vars.sizing.height,
         ),
         height: unit(vars.sizing.height),
         width: unit(vars.input.width - vars.spinner.width),

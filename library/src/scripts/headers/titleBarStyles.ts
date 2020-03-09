@@ -343,8 +343,10 @@ export const titleBarClasses = useThemeCache(() => {
                     boxShadow: shadowHelper().makeShadow(),
                 };
             case BorderType.SHADOW_AS_BORDER:
-            // Note that this is empty because this option is set on the background elsewhere.
+                // Note that this is empty because this option is set on the background elsewhere.
+                return {};
             case BorderType.NONE:
+                return {};
             default:
                 return {};
         }

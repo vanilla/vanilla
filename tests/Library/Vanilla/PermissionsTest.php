@@ -107,12 +107,15 @@ class PermissionsTest extends SharedBootstrapTestCase {
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.View'));
         $this->assertFalse($permissions->has('Garden.Settings.Manage'));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add'));
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10, Permissions::CHECK_MODE_RESOURCE_ONLY));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Add', 100));
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', null));
         $this->assertTrue($permissions->has('Vanilla.Discussions.View', null));
+        $this->assertFalse($permissions->has('Vanilla.Discussions.Add', null, Permissions::CHECK_MODE_GLOBAL_ONLY));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Edit'));
     }
 

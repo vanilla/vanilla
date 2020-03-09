@@ -391,8 +391,4 @@ export const userContentCSS = () => {
             color: colorOut(globalVars.mainColors.fg),
         },
     );
-
-    cssOut(`body.Vanilla .userContent`, {
-        fontSize: unit(globalVars.fonts.size.medium),
-    });
 };

@@ -96,6 +96,7 @@ export default function TitleBar(_props: IProps) {
                         aria-hidden={true}
                     />
                 )}
+                {vars.overlay && <div className={classes.overlay}></div>}
             </animated.div>
             <Container fullGutter>
                 <div className={classNames(classes.bar, { isHome: showSubNav })}>

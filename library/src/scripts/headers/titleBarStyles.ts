@@ -22,9 +22,9 @@ import {
     BorderType,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url, translate, rgba } from "csx";
+import { ColorHelper, percent, px, quote, viewHeight, url, translate, rgba, calc, linearGradient } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -33,6 +33,7 @@ import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { BackgroundProperty } from "csstype";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -46,6 +47,11 @@ export const titleBarVariables = useThemeCache(() => {
             height: 44,
             width: formElementVars.sizing.height,
         },
+    });
+
+    // Note that this overlay will go on top of the bg image, if you have one.
+    const overlay = makeThemeVars("overlay", {
+        background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
     });
 
     const colors = makeThemeVars("colors", {
@@ -252,6 +258,7 @@ export const titleBarVariables = useThemeCache(() => {
         border,
         sizing,
         colors,
+        overlay,
         signIn,
         resister,
         guest,
@@ -814,6 +821,23 @@ export const titleBarClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
+    const overlay = style("overlay", {
+        ...absolutePosition.fullSizeOfParent(),
+        background: vars.overlay.background,
+    });
+
+    const curvedBackground = style("curvedBackground", {
+        content: quote(``),
+        background: `linear-gradient(-180deg,#fdfcfa,#f0e8de)`,
+        borderRadius: `0 0 100% 100%/0 0 60% 60%`,
+        boxShadow: `0 4px 0 #e2d5c7`,
+        height: calc(`100% - 5px`),
+        left: `-10vw`,
+        margin: `0 auto`,
+        position: "absolute",
+        width: `120vw`,
+    });
+
     return {
         root,
         bg1,
@@ -854,6 +878,7 @@ export const titleBarClasses = useThemeCache(() => {
         hamburger,
         isSticky,
         logoAnimationWrap,
+        overlay,
     };
 });
 
@@ -899,19 +924,24 @@ export const titleBarLogoClasses = useThemeCache(() => {
 });
 
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
-    const gradient = (direction: "right" | "left") => {
-        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(
-            color.fade(0.3),
-        )} 20%, ${colorOut(color)} 90%)`;
-    };
     return {
         "&:after": {
             ...absolutePosition.topRight(),
-            background: gradient("right"),
+            background: linearGradient(
+                "right",
+                `${colorOut(color.fade(0))} 0%`,
+                `${colorOut(color.fade(0.3))} 20%`,
+                `${colorOut(color)} 90%`,
+            ),
         },
         "&:before": {
             ...absolutePosition.topLeft(),
-            background: gradient("left"),
+            background: linearGradient(
+                "left",
+                `${colorOut(color.fade(0))} 0%`,
+                `${colorOut(color.fade(0.3))} 20%`,
+                `${colorOut(color)} 90%`,
+            ),
         },
         "&:before, &:after": {
             ...pointerEvents(),

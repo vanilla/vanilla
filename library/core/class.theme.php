@@ -58,7 +58,7 @@ class Gdn_Theme {
      * @return string
      */
     public static function breadcrumbs($data, $homeLink = true, $options = []) {
-        $format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
+        $format = '<a href="{Url,html}" itemprop="item"><span itemprop="name">{Name,html}</span></a>';
 
         $result = '';
 
@@ -73,7 +73,7 @@ class Gdn_Theme {
                 $homeUrl = url('/', true);
             }
 
-            $row = ['Name' => $homeLink, 'Url' => $homeUrl, 'CssClass' => 'CrumbLabel HomeCrumb'];
+            $row = ['Name' => $homeLink, 'Url' => $homeUrl, 'CssClass' => 'HomeCrumb'];
             if (!is_string($homeLink)) {
                 $row['Name'] = t('Home');
             }
@@ -91,6 +91,7 @@ class Gdn_Theme {
         $count = 0;
         $dataCount = 0;
         $homeLinkFound = false;
+        $position = 1;
 
         foreach ($data as $row) {
             $dataCount++;
@@ -103,7 +104,8 @@ class Gdn_Theme {
 
             // Add the breadcrumb wrapper.
             if ($count > 0) {
-                $result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
+                $result .= '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">';
+                $result .= '<meta itemprop="position" content="'.$position++.'" />';
             }
 
             $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
@@ -123,7 +125,7 @@ class Gdn_Theme {
             $result .= '</span>';
         }
 
-        $result = '<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$result.'</span>';
+        $result = '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.$result.'</span>';
         return $result;
     }
 

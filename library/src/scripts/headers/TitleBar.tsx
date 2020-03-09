@@ -84,9 +84,12 @@ export default function TitleBar(_props: IProps) {
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
 
     const headerContent = (
-        <HashOffsetReporter>
-            <animated.div {...bgProps} className={classes.bg1}></animated.div>
-            <animated.div {...bg2Props} className={classes.bg2}>
+        <HashOffsetReporter className={classes.bgContainer}>
+            <animated.div
+                {...bgProps}
+                className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+            ></animated.div>
+            <animated.div {...bg2Props} className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}>
                 {/* Cannot be a background image there will be flickering. */}
                 {vars.colors.bgImage && (
                     <img

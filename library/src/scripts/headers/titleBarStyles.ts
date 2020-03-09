@@ -7,22 +7,34 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    absolutePosition,
     allButtonStates,
     borders,
+    BorderType,
     colorOut,
-    offsetLightness,
     flexHelper,
     modifyColorBasedOnLightness,
-    unit,
-    userSelect,
-    absolutePosition,
+    offsetLightness,
     pointerEvents,
     singleBorder,
     sticky,
-    BorderType,
+    unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url, translate, rgba, calc, linearGradient } from "csx";
+import {
+    calc,
+    ColorHelper,
+    linearGradient,
+    percent,
+    px,
+    quote,
+    rgba,
+    translate,
+    translateX,
+    translateY,
+    viewHeight,
+} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -42,10 +54,19 @@ export const titleBarVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
+        padding: {
+            bottom: 0,
+        },
         spacer: 12,
         mobile: {
             height: 44,
             width: formElementVars.sizing.height,
+        },
+    });
+
+    const spacing = makeThemeVars("spacing", {
+        padding: {
+            bottom: 0, // This is to add extra padding under the content of the title bar.
         },
     });
 
@@ -60,6 +81,21 @@ export const titleBarVariables = useThemeCache(() => {
         bgImage: null as string | null,
     });
 
+    const border = makeThemeVars("border", {
+        type: BorderType.NONE,
+        color: globalVars.border.color,
+        width: globalVars.border.width,
+    });
+
+    // sizing.height gives you the height of the contents of the titleBar.
+    // If spacing.paddingBottom is set, this value will be different than the height. To be used if you need to get the full height, not just the contents height.
+    const fullHeight =
+        sizing.height + spacing.padding.bottom + border.type == BorderType.SHADOW_AS_BORDER ? border.width : 0;
+
+    const swoop = makeThemeVars("swoop", {
+        amount: 0,
+    });
+
     const fullBleed = makeThemeVars("fullBleed", {
         enabled: false,
         startingOpacity: 0,
@@ -72,10 +108,6 @@ export const titleBarVariables = useThemeCache(() => {
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
-    });
-
-    const border = makeThemeVars("border", {
-        type: BorderType.NONE,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -277,6 +309,9 @@ export const titleBarVariables = useThemeCache(() => {
         breakpoints,
         navAlignment,
         mobileLogo,
+        spacing,
+        swoop,
+        fullHeight,
     };
 });
 
@@ -292,12 +327,17 @@ export const titleBarClasses = useThemeCache(() => {
         switch (vars.border.type) {
             case BorderType.BORDER:
                 return {
-                    borderBottom: singleBorder(),
+                    borderBottom: singleBorder({
+                        color: vars.border.color,
+                        width: vars.border.width,
+                    }),
                 };
             case BorderType.SHADOW:
                 return {
                     boxShadow: shadowHelper().makeShadow(),
                 };
+            case BorderType.SHADOW_AS_BORDER:
+            // Note that this is empty because this option is set on the background elsewhere.
             case BorderType.NONE:
             default:
                 return {};
@@ -350,16 +390,51 @@ export const titleBarClasses = useThemeCache(() => {
         }).$nest,
     });
 
+    const swoopStyles = {
+        top: 0,
+        left: 0,
+        margin: `0 auto`,
+        position: `absolute`,
+        height: calc(`100% - ${unit(vars.border.width + 1)}`),
+        transform: translateX(`-10vw`),
+        width: `120vw`,
+        borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
+    };
+
+    const swoop = style("swoop", {});
+
+    const shadowAsBorder =
+        vars.border.type === BorderType.SHADOW_AS_BORDER
+            ? { boxShadow: `0 ${unit(vars.border.width)} 0 ${colorOut(vars.border.color)}` }
+            : {};
+
     const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
         backgroundColor: colorOut(vars.colors.bg),
+        ...shadowAsBorder,
+        overflow: "hidden",
+        $nest: {
+            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        },
     });
 
     const bg2 = style("bg2", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
         backgroundColor: colorOut(vars.colors.bg),
+        ...shadowAsBorder,
+        overflow: "hidden",
+        $nest: {
+            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        },
+    });
+
+    const bgContainer = style("bgContainer", {
+        position: "relative",
+        height: percent(100),
+        width: percent(100),
+        paddingBottom: unit(vars.spacing.padding.bottom),
     });
 
     const bgImage = style("bgImage", {
@@ -842,6 +917,7 @@ export const titleBarClasses = useThemeCache(() => {
         root,
         bg1,
         bg2,
+        bgContainer,
         bgImage,
         negativeSpacer,
         spacer,
@@ -879,6 +955,7 @@ export const titleBarClasses = useThemeCache(() => {
         isSticky,
         logoAnimationWrap,
         overlay,
+        swoop,
     };
 });
 

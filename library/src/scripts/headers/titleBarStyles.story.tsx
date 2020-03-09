@@ -20,6 +20,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
 import { BannerContextProvider } from "@library/banner/BannerContext";
 import { colorOut } from "@library/styles/styleHelpersColors";
+import { BorderType } from "@library/styles/styleHelpersBorders";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -612,6 +613,9 @@ export const WithGradient = storyWithConfig(
                 },
             },
             titleBar: {
+                sizing: {
+                    height: 60,
+                },
                 fullBleed: {
                     enabled: true,
                 },
@@ -624,6 +628,19 @@ export const WithGradient = storyWithConfig(
                 },
                 overlay: {
                     background: linearGradient(`-180deg`, `#fdfcfa,#f0e8de`),
+                },
+                border: {
+                    type: BorderType.SHADOW_AS_BORDER,
+                    color: color("#e2d5c7"),
+                    width: 4,
+                },
+                spacing: {
+                    padding: {
+                        bottom: 20,
+                    },
+                },
+                swoop: {
+                    amount: 60,
                 },
             },
         },

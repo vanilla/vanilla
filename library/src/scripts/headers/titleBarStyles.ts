@@ -54,9 +54,6 @@ export const titleBarVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
-        padding: {
-            bottom: 0,
-        },
         spacer: 12,
         mobile: {
             height: 44,

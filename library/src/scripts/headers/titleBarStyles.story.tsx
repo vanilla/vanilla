@@ -601,7 +601,7 @@ function StoryTitleBar(props: { title: string }) {
 
 export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryTitleBar title="Standard" />);
 
-export const WithGradient = storyWithConfig(
+export const WithGradientAndSwoop = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
@@ -615,6 +615,9 @@ export const WithGradient = storyWithConfig(
             titleBar: {
                 sizing: {
                     height: 60,
+                },
+                mobile: {
+                    height: 50,
                 },
                 fullBleed: {
                     enabled: true,
@@ -636,11 +639,19 @@ export const WithGradient = storyWithConfig(
                 },
                 spacing: {
                     padding: {
-                        bottom: 20,
+                        top: 6,
+                        bottom: 15,
                     },
                 },
                 swoop: {
                     amount: 60,
+                },
+                logo: {
+                    offsetVertical: {
+                        mobile: {
+                            amount: 3,
+                        },
+                    },
                 },
             },
         },

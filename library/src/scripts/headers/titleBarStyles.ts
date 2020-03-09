@@ -66,6 +66,7 @@ export const titleBarVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         padding: {
+            top: 0, // This is to add extra padding under the content of the title bar.
             bottom: 0, // This is to add extra padding under the content of the title bar.
         },
     });
@@ -90,7 +91,9 @@ export const titleBarVariables = useThemeCache(() => {
     // sizing.height gives you the height of the contents of the titleBar.
     // If spacing.paddingBottom is set, this value will be different than the height. To be used if you need to get the full height, not just the contents height.
     const fullHeight =
-        sizing.height + spacing.padding.bottom + border.type == BorderType.SHADOW_AS_BORDER ? border.width : 0;
+        sizing.height + spacing.padding.bottom + spacing.padding.top + border.type == BorderType.SHADOW_AS_BORDER
+            ? border.width
+            : 0;
 
     const swoop = makeThemeVars("swoop", {
         amount: 0,
@@ -250,6 +253,12 @@ export const titleBarVariables = useThemeCache(() => {
         tablet: {},
         desktop: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         mobile: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        offsetVertical: {
+            amount: 0,
+            mobile: {
+                amount: 0,
+            },
+        },
     });
 
     const mobileLogo = makeThemeVars("mobileLogo", {
@@ -434,7 +443,9 @@ export const titleBarClasses = useThemeCache(() => {
         position: "relative",
         height: percent(100),
         width: percent(100),
+        paddingTop: unit(vars.spacing.padding.top),
         paddingBottom: unit(vars.spacing.padding.bottom),
+        boxSizing: "content-box",
     });
 
     const bgImage = style("bgImage", {
@@ -482,6 +493,18 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const logoOffsetDesktop = vars.logo.offsetVertical.amount
+        ? {
+              transform: translateY(`${unit(vars.logo.offsetVertical.amount)}`),
+          }
+        : {};
+
+    const logoOffsetMobile = vars.logo.offsetVertical.mobile.amount
+        ? {
+              transform: translateY(`${unit(vars.logo.offsetVertical.mobile.amount)}`),
+          }
+        : {};
+
     const logoContainer = style(
         "logoContainer",
         {
@@ -490,6 +513,7 @@ export const titleBarClasses = useThemeCache(() => {
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
             justifyContent: vars.mobileLogo.justifyContent,
+            ...logoOffsetDesktop,
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -508,6 +532,7 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
             marginRight: unit(0),
+            ...logoOffsetMobile,
         }),
     );
 

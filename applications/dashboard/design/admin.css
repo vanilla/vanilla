@@ -11897,6 +11897,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   content: "";
   transition: 0.2s ease box-shadow;
+  pointer-events: none;
 }
 .richEditor .embedExternal-content:hover:after,
 .richEditor .embedLinkLoader-link:hover:after {
@@ -11905,7 +11906,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embed-isSelected .embedExternal-content:after,
 .richEditor .embed-isSelected .embedLinkLoader-link:after {
   box-shadow: 0 0 0 2px #0291db inset;
-  pointer-events: none;
 }
 
 .embed-focusableElement {

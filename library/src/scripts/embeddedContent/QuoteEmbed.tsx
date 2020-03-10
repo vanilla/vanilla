@@ -128,6 +128,7 @@ export function QuoteEmbed(props: IProps) {
                             </blockquote>
                         </CollapsableContent>
                     </div>
+
                     {(linkToDiscussion || linkToPost) && (
                         <footer className={classes.footer}>
                             <hr className={classes.footerSeparator} aria-hidden={true} />

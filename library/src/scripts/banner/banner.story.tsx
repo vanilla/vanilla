@@ -374,7 +374,7 @@ export const searchPositionBottom = storyWithConfig(
     },
     () => <StoryBanner title="Search on bottom" />,
 );
-export const searchPositionBottomWithOverlay = storyWithConfig(
+export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
@@ -407,7 +407,87 @@ export const searchPositionBottomWithOverlay = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Search on bottom" />,
+    () => <StoryBanner title="Search on bottom with negative offset" />,
+);
+
+export const searchBarNoImage = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
+            banner: {
+                options: {
+                    hideDescription: true,
+                    hideTitle: true,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: color("#54367c"),
+                    unsetBackground: true,
+                },
+                contentContainer: {
+                    padding: {
+                        top: 12,
+                        bottom: 12,
+                    },
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Only search bar, no image" />,
+);
+
+export const bannerImageOnly = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
+            banner: {
+                options: {
+                    hideSearch: true,
+                    hideDescription: true,
+                    hideTitle: true,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    position: "50% 100%",
+                    color: color("#54367c"),
+                    image: "https://us.v-cdn.net/5022541/uploads/330/6J25XXRJ5G24.png",
+                },
+                innerBackground: {
+                    image: "https://us.v-cdn.net/6031163/uploads/3021ecca7cc7a015f582d8c2ce56fa09.png",
+                },
+                contentContainer: {
+                    minHeight: 500,
+                    padding: {
+                        top: 12,
+                        bottom: 12,
+                    },
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Banner Image Only" />,
 );
 
 // Only works with button

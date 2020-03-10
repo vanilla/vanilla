@@ -29,6 +29,7 @@ export interface IBackground {
     image?: BackgroundImageProperty;
     fallbackImage?: BackgroundImageProperty;
     opacity?: OpacityProperty;
+    unsetBackground?: boolean; // do not apply background.
 }
 
 export const EMPTY_BACKGROUND: IBackground = {
@@ -40,6 +41,7 @@ export const EMPTY_BACKGROUND: IBackground = {
     image: undefined,
     fallbackImage: undefined,
     opacity: undefined,
+    unsetBackground: false,
 };
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {

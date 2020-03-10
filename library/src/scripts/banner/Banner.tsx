@@ -17,6 +17,7 @@ import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     action?: React.ReactNode;
@@ -25,6 +26,7 @@ interface IProps {
     className?: string;
     backgroundImage?: string;
     contentImage?: string;
+    searchBarNoTopMargin?: boolean;
 }
 
 /**
@@ -46,8 +48,13 @@ export default function Banner(props: IProps) {
     imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
     const description = props.description ?? vars.description.text;
 
+    const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch;
+    const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch;
+    const searchAloneInContainer =
+        showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
+
     const searchComponent = (
-        <div className={classes.searchContainer}>
+        <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
             <IndependentSearch
                 buttonClass={classes.searchButton}
                 buttonBaseClass={ButtonTypes.CUSTOM}
@@ -76,28 +83,35 @@ export default function Banner(props: IProps) {
         >
             <div className={classes.middleContainer}>
                 <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
-                    {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
+                    {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
+                        <DefaultBannerBg />
+                    )}
                 </div>
                 {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
                     <div className={imageElementSrc ? classes.imagePositioner : ""}>
-                        <div className={classes.contentContainer}>
-                            <div className={classes.titleWrap}>
-                                <FlexSpacer className={classes.titleFlexSpacer} />
-                                {title && (
-                                    <Heading className={classes.title} depth={1} isLarge>
-                                        {title}
-                                    </Heading>
-                                )}
-                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                            </div>
+                        <ConditionalWrap
+                            condition={options.hideTitle && options.hideDescription}
+                            className={classes.contentContainer}
+                        >
+                            {!options.hideTitle && (
+                                <div className={classes.titleWrap}>
+                                    <FlexSpacer className={classes.titleFlexSpacer} />
+                                    {title && (
+                                        <Heading className={classes.title} depth={1} isLarge>
+                                            {title}
+                                        </Heading>
+                                    )}
+                                    <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                                </div>
+                            )}
                             {!options.hideDescription && description && (
                                 <div className={classes.descriptionWrap}>
                                     <p className={classNames(classes.description, classes.text)}>{description}</p>
                                 </div>
                             )}
-                            {options.searchPlacement === "middle" && !options.hideSearch && searchComponent}
-                        </div>
+                            {showMiddleSearch && searchComponent}
+                        </ConditionalWrap>
                         {imageElementSrc && (
                             <div className={classes.imageElementContainer}>
                                 <img className={classes.imageElement} src={imageElementSrc}></img>
@@ -106,11 +120,11 @@ export default function Banner(props: IProps) {
                     </div>
                 </Container>
             </div>
-            <div className={classes.searchStrip}>
-                <Container fullGutter>
-                    {options.searchPlacement === "bottom" && !options.hideSearch && searchComponent}
-                </Container>
-            </div>
+            {showBottomSearch && (
+                <div className={classes.searchStrip}>
+                    <Container fullGutter>{searchComponent}</Container>
+                </div>
+            )}
         </div>
     );
 }

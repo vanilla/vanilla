@@ -7,6 +7,7 @@
 import { LoadStatus } from "@library/@types/api/core";
 import getStore from "@library/redux/getStore";
 import React from "react";
+import { usePermissions } from "@library/features/users/userModel";
 
 export enum PermissionMode {
     GLOBAL = "global",
@@ -29,6 +30,8 @@ interface IProps {
  * Conditionally renders either it's children or a fallback based on if the user has a permission.
  */
 export default function Permission(props: IProps) {
+    usePermissions();
+
     if (!props.permission) {
         return <>{props.children}</>;
     }

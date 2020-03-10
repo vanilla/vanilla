@@ -103,6 +103,7 @@
             @include absolute-fullSizeOfParent;
             content: "";
             transition: 0.2s ease box-shadow;
+            pointer-events: none;
         }
 
         &:hover {

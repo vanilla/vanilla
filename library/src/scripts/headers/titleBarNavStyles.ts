@@ -163,10 +163,9 @@ const titleBarNavClasses = useThemeCache(() => {
         fontSize: unit(vars.navLinks.fontSize),
         fontWeight: globalVars.fonts.weights.normal,
         position: "relative",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        minHeight: unit(vars.item.size),
-        lineHeight: unit(vars.item.size),
+        alignSelf: "center",
         height: 0, // IE11 Fix.
     });
 

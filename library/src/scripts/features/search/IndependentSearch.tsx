@@ -30,6 +30,8 @@ interface IProps extends IWithSearchProps, RouteComponentProps<{}> {
     hideSearchButton?: boolean;
     isLarge?: boolean;
     buttonBaseClass?: ButtonTypes;
+    iconContainerClasses?: string;
+    resultsAsModalClasses?: string;
 }
 
 interface IState {
@@ -75,17 +77,18 @@ export function IndependentSearch(props: IProps) {
                 resultsRef={resultsRef}
                 buttonClassName={props.buttonClass}
                 buttonBaseClass={props.buttonBaseClass}
-                isBigInput={props.isLarge}
                 buttonLoaderClassName={props.buttonLoaderClassName}
                 hideSearchButton={props.hideSearchButton}
                 contentClass={props.contentClass}
                 valueContainerClasses={props.valueContainerClasses}
+                iconContainerClasses={props.iconContainerClasses}
             />
             <div
                 ref={resultsRef}
                 className={classNames("search-results", {
                     [classesSearchBar.results]: !!query,
                     [classesSearchBar.resultsAsModal]: !!query,
+                    [props.resultsAsModalClasses ?? ""]: !!query,
                 })}
             />
         </div>

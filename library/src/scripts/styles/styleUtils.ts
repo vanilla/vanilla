@@ -239,6 +239,20 @@ export function stringIsValidColor(colorValue) {
         (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
     );
 }
+/**
+ * Check if string is linear gradient
+ * @param colorString
+ */
+export function stringIsLinearGradient(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        !stringIsValidColor(colorValue) &&
+        colorValue
+            .toString()
+            .trim()
+            .startsWith("linear-gradient(")
+    );
+}
 
 /**
  * Check if string or ColorHelper is valid
@@ -291,6 +305,8 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         } else {
             return hsl(h, s, l);
         }
+    } else if (stringIsLinearGradient(colorString)) {
+        return colorString.toString();
     } else {
         if (throwOnFailure) {
             throw new Error(`Invalid color detected: ${colorString}`);

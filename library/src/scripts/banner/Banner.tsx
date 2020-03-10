@@ -46,6 +46,27 @@ export default function Banner(props: IProps) {
     imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
     const description = props.description ?? vars.description.text;
 
+    const searchComponent = (
+        <div className={classes.searchContainer}>
+            <IndependentSearch
+                buttonClass={classes.searchButton}
+                buttonBaseClass={ButtonTypes.CUSTOM}
+                isLarge={true}
+                placeholder={t("Search")}
+                inputClass={classes.input}
+                iconClass={classes.icon}
+                buttonLoaderClassName={classes.buttonLoader}
+                hideSearchButton={
+                    device === Devices.MOBILE ||
+                    device === Devices.XS ||
+                    presetsBanner().button.preset === ButtonPresets.HIDE
+                }
+                contentClass={classes.content}
+                valueContainerClasses={classes.valueContainer}
+            />
+        </div>
+    );
+
     return (
         <div
             ref={ref}
@@ -53,55 +74,43 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
-                {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
-            </div>
-            {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-            <Container fullGutter>
-                <div className={imageElementSrc ? classes.imagePositioner : ""}>
-                    <div className={classes.contentContainer}>
-                        <div className={classes.titleWrap}>
-                            <FlexSpacer className={classes.titleFlexSpacer} />
-                            {title && (
-                                <Heading className={classes.title} depth={1} isLarge>
-                                    {title}
-                                </Heading>
-                            )}
-                            <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                        </div>
-                        {!options.hideDesciption && description && (
-                            <div className={classes.descriptionWrap}>
-                                <p className={classNames(classes.description, classes.text)}>{description}</p>
+            <div className={classes.middleContainer}>
+                <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
+                    {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
+                </div>
+                {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
+                <Container fullGutter>
+                    <div className={imageElementSrc ? classes.imagePositioner : ""}>
+                        <div className={classes.contentContainer}>
+                            <div className={classes.titleWrap}>
+                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                {title && (
+                                    <Heading className={classes.title} depth={1} isLarge>
+                                        {title}
+                                    </Heading>
+                                )}
+                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
                             </div>
-                        )}
-                        {!options.hideSearch && (
-                            <div className={classes.searchContainer}>
-                                <IndependentSearch
-                                    buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    isLarge={true}
-                                    placeholder={t("Search")}
-                                    inputClass={classes.input}
-                                    iconClass={classes.icon}
-                                    buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={
-                                        device === Devices.MOBILE ||
-                                        device === Devices.XS ||
-                                        presetsBanner().button.preset === ButtonPresets.HIDE
-                                    }
-                                    contentClass={classes.content}
-                                    valueContainerClasses={classes.valueContainer}
-                                />
+                            {!options.hideDescription && description && (
+                                <div className={classes.descriptionWrap}>
+                                    <p className={classNames(classes.description, classes.text)}>{description}</p>
+                                </div>
+                            )}
+                            {options.searchPlacement === "middle" && !options.hideSearch && searchComponent}
+                        </div>
+                        {imageElementSrc && (
+                            <div className={classes.imageElementContainer}>
+                                <img className={classes.imageElement} src={imageElementSrc}></img>
                             </div>
                         )}
                     </div>
-                    {imageElementSrc && (
-                        <div className={classes.imageElementContainer}>
-                            <img className={classes.imageElement} src={imageElementSrc}></img>
-                        </div>
-                    )}
-                </div>
-            </Container>
+                </Container>
+            </div>
+            <div className={classes.searchStrip}>
+                <Container fullGutter>
+                    {options.searchPlacement === "bottom" && !options.hideSearch && searchComponent}
+                </Container>
+            </div>
         </div>
     );
 }

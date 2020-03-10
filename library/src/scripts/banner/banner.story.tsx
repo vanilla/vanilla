@@ -6,17 +6,15 @@
 import React from "react";
 import { MemoryRouter } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
-import { StoryContent } from "@library/storybook/StoryContent";
-import { StoryHeading } from "@library/storybook/StoryHeading";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { color, rgb } from "csx";
+import { color, linearGradient } from "csx";
 import Banner from "@library/banner/Banner";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export default {
     title: "Banner",
@@ -50,7 +48,7 @@ export const NoDescription = storyWithConfig(
         themeVars: {
             banner: {
                 options: {
-                    hideDesciption: true,
+                    hideDescription: true,
                 },
                 colors: {
                     primary: color("#9279a8"),
@@ -343,6 +341,77 @@ export const SearchShadowNoSearchButton = storyWithConfig(
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
 );
 
+export const searchPositionBottom = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
+            banner: {
+                options: {
+                    searchPlacement: "bottom",
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: "#980013",
+
+                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                },
+                searchStrip: {
+                    bg: color("#980013"),
+                    minHeight: 100,
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search on bottom" />,
+);
+export const searchPositionBottomWithOverlay = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
+            banner: {
+                options: {
+                    searchPlacement: "bottom",
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: "#980013",
+                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                },
+                searchStrip: {
+                    bg: linearGradient(
+                        "215.7deg",
+                        "rgba(32, 223, 11, 0.5) 16.08%, rgba(32, 223, 11, 0) 63.71%, rgba(0, 0, 0, 0.44)",
+                    ),
+                    minHeight: 100,
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search on bottom" />,
+);
+
 // Only works with button
 export const unifiedBorder = storyWithConfig(
     {
@@ -355,12 +424,12 @@ export const unifiedBorder = storyWithConfig(
             banner: {
                 outerBackground: {
                     color: "#980013",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
                 },
             },
             presetsBanner: {
                 input: {
-                    preset: SearchBarPresets.UNIFIED_BORDER,
+                    preset: SearchBarPresets.BORDER,
                 },
             },
         },

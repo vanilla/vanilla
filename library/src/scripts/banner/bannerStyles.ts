@@ -35,6 +35,7 @@ import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { ButtonPresets } from "@library/forms/buttonStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import isNumeric from "validator/lib/isNumeric";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -67,8 +68,9 @@ export const bannerVariables = useThemeCache(() => {
 
     const options = makeThemeVars("options", {
         alignment: BannerAlignment.CENTER,
-        hideDesciption: false,
+        hideDescription: false,
         hideSearch: false,
+        searchPlacement: "middle" as "middle" | "bottom",
     });
     const compactSearchVars = compactSearchVariables();
 
@@ -352,6 +354,11 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
+    const searchStrip = makeThemeVars("searchStrip", {
+        bg: colors.bg,
+        minHeight: 60,
+    });
+
     return {
         options,
         outerBackground,
@@ -372,6 +379,7 @@ export const bannerVariables = useThemeCache(() => {
         border,
         isTransparentButton,
         unifiedBannerOptions,
+        searchStrip,
     };
 });
 
@@ -442,7 +450,7 @@ export const bannerClasses = useThemeCache(() => {
         top: px(0),
         left: px(0),
         width: percent(100),
-        height: percent(100),
+        height: calc(`100% + 2px`),
         background: colorOut(vars.backgrounds.overlayColor),
     });
 
@@ -697,6 +705,28 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
+    const middleContainer = style("middleContainer", {
+        position: "relative",
+    });
+
+    const searchStrip = style("searchStrip", {
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1,
+        background: colorOut(vars.searchStrip.bg),
+        ...paddings({
+            vertical: 12,
+        }),
+        minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
+        $nest: {
+            [`.${searchContainer}`]: {
+                marginTop: 0,
+            },
+        },
+    });
+
     return {
         root,
         outerBackground,
@@ -719,6 +749,8 @@ export const bannerClasses = useThemeCache(() => {
         backgroundOverlay,
         imageElementContainer,
         imageElement,
+        middleContainer,
         imagePositioner,
+        searchStrip,
     };
 });

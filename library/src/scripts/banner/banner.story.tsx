@@ -11,7 +11,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
 import Banner from "@library/banner/Banner";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
+import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonPresets } from "@library/forms/buttonStyles";
@@ -385,21 +385,20 @@ export const searchPositionBottomWithOverlay = storyWithConfig(
             },
             banner: {
                 options: {
-                    searchPlacement: "bottom",
+                    searchPlacement: "bottom" as SearchPlacement,
                 },
                 backgrounds: {
                     useOverlay: true,
                 },
                 outerBackground: {
-                    color: "#980013",
-                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                    position: "50% 100%",
+                    color: color("#54367c"),
+                    image: "https://us.v-cdn.net/5022541/uploads/330/6J25XXRJ5G24.png",
                 },
                 searchStrip: {
-                    bg: linearGradient(
-                        "215.7deg",
-                        "rgba(32, 223, 11, 0.5) 16.08%, rgba(32, 223, 11, 0) 63.71%, rgba(0, 0, 0, 0.44)",
-                    ),
+                    bg: linearGradient("to bottom", "rgb(84,54,124, 0) 0%,rgba(84,54,124, 1) 50%"),
                     minHeight: 100,
+                    offset: "-60",
                 },
             },
             presetsBanner: {

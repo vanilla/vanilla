@@ -7,7 +7,18 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import {
+    BackgroundAttachmentProperty,
+    BackgroundColorProperty,
+    BackgroundImageProperty,
+    BackgroundPositionProperty,
+    BackgroundRepeatProperty,
+    BackgroundSizeProperty,
+    FontWeightProperty,
+    OpacityProperty,
+    PaddingProperty,
+    TextShadowProperty,
+} from "csstype";
 import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
@@ -15,6 +26,7 @@ import {
     borders,
     centeredBackgroundProps,
     colorOut,
+    ColorValues,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
     EMPTY_FONTS,
@@ -59,6 +71,8 @@ export const presetsBanner = useThemeCache(() => {
     };
 });
 
+export type SearchPlacement = "middle" | "bottom";
+
 export const bannerVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory(["banner", "splash"]);
     const globalVars = globalVariables();
@@ -70,7 +84,7 @@ export const bannerVariables = useThemeCache(() => {
         alignment: BannerAlignment.CENTER,
         hideDescription: false,
         hideSearch: false,
-        searchPlacement: "middle" as "middle" | "bottom",
+        searchPlacement: "middle" as SearchPlacement,
     });
     const compactSearchVars = compactSearchVariables();
 
@@ -153,10 +167,10 @@ export const bannerVariables = useThemeCache(() => {
     const outerBackground = makeThemeVars("outerBackground", {
         ...EMPTY_BACKGROUND,
         color: colors.primary.lighten("12%"),
-        backgroundPosition: "50% 50%",
-        backgroundSize: "cover",
+        repeat: "no-repeat",
+        position: "50% 50%",
+        size: "cover",
     });
-
     const innerBackground = makeThemeVars("innerBackground", {
         bg: undefined,
         padding: {
@@ -357,6 +371,7 @@ export const bannerVariables = useThemeCache(() => {
     const searchStrip = makeThemeVars("searchStrip", {
         bg: colors.bg,
         minHeight: 60,
+        offset: undefined,
     });
 
     return {
@@ -427,6 +442,8 @@ export const bannerClasses = useThemeCache(() => {
             image: finalUrl,
         };
 
+        console.log("outerBackground: ", vars.outerBackground);
+
         return style("outerBackground", {
             position: "absolute",
             top: 0,
@@ -434,7 +451,6 @@ export const bannerClasses = useThemeCache(() => {
             width: percent(100),
             height: calc(`100% + 2px`),
             transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
-            ...centeredBackgroundProps(),
             display: "block",
             ...backgroundHelper(finalVars),
         });
@@ -720,6 +736,7 @@ export const bannerClasses = useThemeCache(() => {
             vertical: 12,
         }),
         minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
+        marginTop: unit(vars.searchStrip.offset),
         $nest: {
             [`.${searchContainer}`]: {
                 marginTop: 0,

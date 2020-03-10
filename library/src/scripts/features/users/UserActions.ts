@@ -6,8 +6,11 @@
 
 import { IApiError, LoadStatus } from "@library/@types/api/core";
 import { IMe, IMeCounts } from "@library/@types/api/users";
-import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
+import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
+import { IPermission } from "@library/features/users/userModel";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { useSelector } from "react-redux";
 
 const createAction = actionCreatorFactory("@@users");
 
@@ -36,6 +39,24 @@ export default class UserActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
+    public static getPermissionsACs = createAction.async<{}, IPermission[], IApiError>("GET_PERMISSIONS");
+    /**
+     * Request the currently signed in user data if it's not loaded.
+     */
+    public getPermissions = () => {
+        const permissions = this.getState().users.permissions;
+        if (permissions.status === LoadStatus.LOADING) {
+            // Don't request the user more than once.
+            return;
+        }
+        const apiThunk = bindThunkAction(UserActions.getPermissionsACs, async () => {
+            const response = await this.api.get("/users/$me/permissions");
+            return response.data;
+        })();
+
+        return this.dispatch(apiThunk);
+    };
+
     public static getCountsACs = createAction.async<{}, { counts: IMeCounts }, IApiError>("GET_ME_COUNTS");
 
     /**
@@ -56,4 +77,8 @@ export default class UserActions extends ReduxActions {
 
         return this.dispatch(apiThunk);
     };
+}
+
+export function useUserActions() {
+    return useReduxActions(UserActions);
 }

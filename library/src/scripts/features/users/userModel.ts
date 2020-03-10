@@ -149,7 +149,7 @@ export function usePermissions() {
     const { status } = permissions;
 
     useEffect(() => {
-        if (![LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
+        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             void getPermissions();
         }
     }, [status, getPermissions]);

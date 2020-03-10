@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\PermissionsTranslationTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
@@ -231,13 +232,7 @@ class RolesApiController extends AbstractApiController {
         static $permissionsFragment;
 
         if ($permissionsFragment === null) {
-            $permissionsFragment = $this->schema([
-                'id:i?',
-                'type:s' => [
-                    'enum' => ['global', 'category'],
-                ],
-                'permissions:o',
-            ], 'PermissionFragment');
+            $permissionsFragment = new PermissionFragmentSchema();
         }
 
         return $permissionsFragment;

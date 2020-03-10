@@ -325,6 +325,10 @@ class UsersApiController extends AbstractApiController {
     public function get_permissions(int $id): Data {
         $requestedUserID = $id;
         $this->permission();
+        $out = $this->schema([
+            "isAdmin:b",
+            'permissions:a' => new PermissionFragmentSchema(),
+        ]);
 
         if (is_object($this->getSession()->User)) {
             $sessionUser = (array)$this->getSession()->User;
@@ -343,21 +347,19 @@ class UsersApiController extends AbstractApiController {
             ]);
         }
 
-        $requestedUser = $this->userByID($requestedUserID);
-        $requestedUser = $this->normalizeOutput($requestedUser);
+        $requestedUser = $requestedUserID === UserModel::GUEST_USER_ID
+            ? $this->getGuestFragment()
+            : $this->normalizeOutput($this->userByID($requestedUserID));
 
         // Build the permissions
         // This endpoint is heavily used (every page request), so we rely on caching in the model.
         $permissions = $this->userModel->getPermissions($requestedUserID);
 
-        $out = $this->schema([
-            'permissions:a' => new PermissionFragmentSchema(),
-            "isAdmin:b",
-        ]);
         $result = ([
             'isAdmin' => $requestedUser['isAdmin'],
             'permissions' => $permissions->asPermissionFragments(),
         ]);
+        $result = $out->validate($result);
 
         return Data::box($result);
     }

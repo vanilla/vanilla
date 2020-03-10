@@ -358,7 +358,6 @@ export const searchPositionBottom = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#980013",
-
                     image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
                 },
                 searchStrip: {

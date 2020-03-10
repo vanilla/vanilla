@@ -13,10 +13,6 @@ import React from "react";
 
 // tslint:disable:jsx-use-translation-function
 
-const noop = () => {
-    return;
-};
-
 describe("<Permission />", () => {
     describe("with no data loaded yet", () => {
         it("returns nothing if the data isn't loaded yet.", () => {
@@ -100,7 +96,7 @@ describe("<Permission />", () => {
             );
         }
 
-        it("renders children if the user has one of the given permissions", () => {
+        it.only("renders children if the user has one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
             let result = mount(
                 <Wrapper>

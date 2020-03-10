@@ -999,10 +999,6 @@ export const titleBarLogoClasses = useThemeCache(() => {
             "&.isCentred": {
                 margin: "auto",
             },
-            [`.${iconClasses().vanillaLogo}`]: {
-                height: logoHeight,
-                width: "auto",
-            },
         },
     });
 

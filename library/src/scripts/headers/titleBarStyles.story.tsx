@@ -19,6 +19,7 @@ import { BannerContextProvider } from "@library/banner/BannerContext";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import Container from "@library/layout/components/Container";
+import { PanelArea } from "@library/layout/PanelLayout";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -82,7 +83,9 @@ function StoryTitleBar(props: { title: string }) {
                     <TitleBarDeviceProvider>
                         <StoryHeading depth={2}>{props.title}</StoryHeading>
                         <TitleBar useMobileBackButton={false} isFixed={true} />
-                        <Container>{dummyData}</Container>
+                        <Container>
+                            <PanelArea>{dummyData}</PanelArea>
+                        </Container>
                     </TitleBarDeviceProvider>
                 </BannerContextProvider>
             </MemoryRouter>

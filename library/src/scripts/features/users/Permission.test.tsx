@@ -96,7 +96,7 @@ describe("<Permission />", () => {
             );
         }
 
-        it.only("renders children if the user has one of the given permissions", () => {
+        it("renders children if the user has one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
             let result = mount(
                 <Wrapper>

@@ -782,8 +782,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $orderBy = [$orderFields => $orderDirection];
         }
 
+        $selects = [];
         $this->EventArguments['OrderBy'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$where;
+        $this->EventArguments['Selects'] = &$selects;
         $this->fireEvent('BeforeGet');
 
         // Verify permissions (restricting by category if necessary)
@@ -855,6 +857,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated');
+        }
+
+        // Add select of addition fields to the SQL object.
+        if (!empty($selects)) {
+            if (!is_array($selects)) {
+                $selects = [$selects];
+            }
+
+            foreach ($selects as $select) {
+                $sql->select($select);
+            }
         }
 
         $outerQuery = $sql->getSelect();

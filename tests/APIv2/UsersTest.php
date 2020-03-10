@@ -341,7 +341,6 @@ class UsersTest extends AbstractResourceTest {
             'permissions' => [
                 [
                     'type' => PermissionFragmentSchema::TYPE_GLOBAL,
-                    'id' => null,
                     'permissions' => [
                         'community.manage' => true,
                     ],

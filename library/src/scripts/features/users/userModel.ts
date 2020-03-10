@@ -26,7 +26,7 @@ export interface IPermission {
     permissions: Record<string, boolean>;
 }
 
-interface IPermissions {
+export interface IPermissions {
     isAdmin?: boolean;
     permissions: IPermission[];
 }

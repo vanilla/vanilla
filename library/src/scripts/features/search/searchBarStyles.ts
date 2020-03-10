@@ -368,6 +368,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     });
 
     const iconContainer = style("iconContainer", {
+        ...buttonResetMixin(),
         position: "absolute",
         top: 0,
         bottom: 0,

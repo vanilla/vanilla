@@ -7,26 +7,13 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {
-    BackgroundAttachmentProperty,
-    BackgroundColorProperty,
-    BackgroundImageProperty,
-    BackgroundPositionProperty,
-    BackgroundRepeatProperty,
-    BackgroundSizeProperty,
-    FontWeightProperty,
-    OpacityProperty,
-    PaddingProperty,
-    TextShadowProperty,
-} from "csstype";
+import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
 import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
     backgroundHelper,
     borders,
-    centeredBackgroundProps,
     colorOut,
-    ColorValues,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
     EMPTY_FONTS,
@@ -371,7 +358,7 @@ export const bannerVariables = useThemeCache(() => {
     const searchStrip = makeThemeVars("searchStrip", {
         bg: colors.bg,
         minHeight: 60,
-        offset: undefined,
+        offset: undefined as number | string | undefined,
     });
 
     return {
@@ -441,8 +428,6 @@ export const bannerClasses = useThemeCache(() => {
             ...vars.outerBackground,
             image: finalUrl,
         };
-
-        console.log("outerBackground: ", vars.outerBackground);
 
         return style("outerBackground", {
             position: "absolute",

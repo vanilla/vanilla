@@ -253,14 +253,13 @@ class SmartIDMiddlewareTest extends TestCase {
     }
 
     /**
-     * The `$me` smart ID without a session should be an exception.
+     * The `$me` smart ID without a session should give the guest ID.
      */
-    public function testInvalidMe() {
-        $this->expectException(ForbiddenException::class);
-
+    public function testGuestMe() {
         $this->session->UserID = 0;
 
         $request = new Request('/users/$me');
         $r = $this->callMiddleware($request);
+        $this->assertEquals($r->getPath(), '/users/0');
     }
 }

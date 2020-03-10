@@ -8,7 +8,7 @@ import { IApiError, LoadStatus } from "@library/@types/api/core";
 import { IMe, IMeCounts } from "@library/@types/api/users";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IPermission } from "@library/features/users/userModel";
+import { IPermission, IPermissions } from "@library/features/users/userModel";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { useSelector } from "react-redux";
 
@@ -39,7 +39,7 @@ export default class UserActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public static getPermissionsACs = createAction.async<{}, IPermission[], IApiError>("GET_PERMISSIONS");
+    public static getPermissionsACs = createAction.async<{}, IPermissions, IApiError>("GET_PERMISSIONS");
     /**
      * Request the currently signed in user data if it's not loaded.
      */

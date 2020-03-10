@@ -9,6 +9,7 @@ import {
     borders,
     colorOut,
     EMPTY_BORDER,
+    fonts,
     IBorderRadiusValue,
     IBordersWithRadius,
     placeholderStyles,
@@ -19,6 +20,7 @@ import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { percent } from "csx";
+import merge from "lodash/merge";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -40,6 +42,7 @@ export const inputVariables = useThemeCache(() => {
 
     const font = makeThemeVars("font", {
         size: globalVars.fonts.size.large,
+        weight: globalVars.fonts.weights.normal,
     });
 
     const border: IBordersWithRadius = makeThemeVars("borders", {
@@ -55,42 +58,54 @@ export const inputVariables = useThemeCache(() => {
     };
 });
 
-export const inputClasses = useThemeCache(() => {
-    const vars = inputVariables();
-    const style = styleFactory("input");
-    const formElementVars = formElementsVariables();
-    const globalVars = globalVariables();
+export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+    const inputVars = inputVariables();
+    const variables = {
+        sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
+        font: merge(inputVars.font, vars?.font ?? {}),
+        colors: merge(inputVars.colors, vars?.colors ?? {}),
+        border: merge(inputVars.border, vars?.border ?? {}),
+    };
 
-    const inputMixin: NestedCSSProperties = {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.width * 2),
-        backgroundColor: colorOut(vars.colors.bg),
-        color: colorOut(vars.colors.fg),
-        ...borders(vars.border),
+    const { sizing, font, colors, border } = variables;
+
+    return {
+        ...textInputSizingFromFixedHeight(sizing.height, font.size, border.width * 2),
+        backgroundColor: colorOut(colors.bg),
+        color: colorOut(colors.fg),
+        ...borders(border),
+        ...fonts(font),
         outline: 0,
-        fontWeight: globalVars.fonts.weights.normal,
         $nest: {
             ...placeholderStyles({
-                color: colorOut(vars.colors.placeholder),
+                color: colorOut(colors.placeholder),
             }),
             "&. .SelectOne__input": {
                 width: percent(100),
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
-                    color: vars.colors.state.fg,
+                    color: colors.state.fg,
                 }),
             },
         },
-    };
+    } as NestedCSSProperties;
+};
+
+export const inputClasses = useThemeCache(() => {
+    const vars = inputVariables();
+    const style = styleFactory("input");
+    const formElementVars = formElementsVariables();
+    const globalVars = globalVariables();
 
     // Use as assignable unique style.
-    const text = style("text", inputMixin);
+    const text = style("text", inputMixin());
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin);
+    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin());
 
     const inputText = style("inputText", {
-        ...inputMixin,
+        ...inputMixin(),
         marginBottom: 0,
         $nest: {
             "&&": {
@@ -99,5 +114,5 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, inputMixin, applyInputCSSRules };
+    return { text, inputText, applyInputCSSRules };
 });

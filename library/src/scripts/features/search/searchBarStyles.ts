@@ -14,9 +14,8 @@ import {
     unit,
     paddings,
     importantUnit,
-    IBorderRadiusValue,
     getVerticalPaddingForTextInput,
-    textInputSizingFromFixedHeight,
+    fonts,
 } from "@library/styles/styleHelpers";
 import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -147,7 +146,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 "& .searchBar__control": {
                     border: 0,
                     backgroundColor: "transparent",
-                    height: percent(100),
                     width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {
@@ -186,6 +184,8 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     width: percent(100),
                 },
                 "& .searchBar__input input": {
+                    height: "auto",
+                    minHeight: 0,
                     width: important(`100%`),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
@@ -222,6 +222,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     vertical: 9,
                     horizontal: 12,
                 }),
+                ...fonts({
+                    size: globalVars.fonts.size.medium,
+                }),
                 textAlign: "left",
                 display: "block",
                 color: "inherit",
@@ -237,6 +240,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 padding: 0,
             },
             "& .suggestedTextInput-item": {
+                ...fonts({
+                    size: globalVars.fonts.size.medium,
+                }),
                 listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
@@ -255,6 +261,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         ...borders({
             radius: vars.results.borderRadius,
         }),
+        boxSizing: "border-box",
         ...shadow.dropDown(),
         zIndex: 1,
     });
@@ -361,6 +368,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     });
 
     const iconContainer = style("iconContainer", {
+        ...buttonResetMixin(),
         position: "absolute",
         top: 0,
         bottom: 0,
@@ -372,6 +380,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
         cursor: "text",
+        outline: 0,
         $nest: {
             [`.${icon}`]: {
                 width: unit(vars.searchIcon.width),

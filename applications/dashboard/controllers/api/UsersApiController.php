@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use Vanilla\PermissionsTranslationTrait;
@@ -30,6 +31,8 @@ class UsersApiController extends AbstractApiController {
     use PermissionsTranslationTrait;
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
+    const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
+
 
     /** @var ActivityModel */
     private $activityModel;
@@ -281,10 +284,10 @@ class UsersApiController extends AbstractApiController {
         ], 'out');
 
         $query = $in->validate($query);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         if ($query['order'] == 'mention') {
-            list($sortField, $sortDirection) = $this->userModel->getMentionsSort();
+            [$sortField, $sortDirection] = $this->userModel->getMentionsSort();
         } else {
             $sortField = $query['order'];
             switch ($sortField) {
@@ -310,6 +313,55 @@ class UsersApiController extends AbstractApiController {
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Get a user's permissions.
+     *
+     * @param int $id The user's ID.
+     *
+     * @return Data
+     */
+    public function get_permissions(int $id): Data {
+        $requestedUserID = $id;
+        $this->permission();
+        $out = $this->schema([
+            "isAdmin:b",
+            'permissions:a' => new PermissionFragmentSchema(),
+        ]);
+
+        if (is_object($this->getSession()->User)) {
+            $sessionUser = (array)$this->getSession()->User;
+            $sessionUser = $this->normalizeOutput($sessionUser);
+        } else {
+            $sessionUser = $this->getGuestFragment();
+        }
+
+        // If it's not our own user, then we need to check for a stronger permissions.
+
+        if ($sessionUser['userID'] !== $requestedUserID) {
+            $this->permission([
+                'Garden.Users.Add',
+                'Garden.Users.Edit',
+                'Garden.Users.Delete'
+            ]);
+        }
+
+        $requestedUser = $requestedUserID === UserModel::GUEST_USER_ID
+            ? $this->getGuestFragment()
+            : $this->normalizeOutput($this->userByID($requestedUserID));
+
+        // Build the permissions
+        // This endpoint is heavily used (every page request), so we rely on caching in the model.
+        $permissions = $this->userModel->getPermissions($requestedUserID);
+
+        $result = ([
+            'isAdmin' => $requestedUser['isAdmin'],
+            'permissions' => $permissions->asPermissionFragments(),
+        ]);
+        $result = $out->validate($result);
+
+        return Data::box($result);
     }
 
     /**
@@ -447,7 +499,7 @@ class UsersApiController extends AbstractApiController {
         $query = $in->validate($query);
         $where = ApiUtils::queryToFilters($in, $query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {

@@ -6,6 +6,7 @@
 
 namespace Vanilla;
 
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 
@@ -443,6 +444,78 @@ class Permissions implements \JsonSerializable {
                     return $hasGlobal || $hasAnyResourceSpecific;
             }
         }
+    }
+
+    /**
+     * @return array[] An array of permission fragemnts. See PermissionFragmentSchema
+     */
+    public function asPermissionFragments(): array {
+        $resultsByTypeAndID = [
+            'global' => [
+                'type' => 'global',
+                'id' => null,
+                'permissions' => [],
+            ],
+        ];
+
+        /**
+         * Push an item into the permission array.
+         *
+         * @param string $permissionName
+         * @param int|null $resourceID
+         */
+        $pushItem = function (string $permissionName, ?int $resourceID = null) use (&$resultsByTypeAndID) {
+            // Map permission name to API style.
+            $permissionName = $this->renamePermission($permissionName);
+
+            // Handle root resourceIDs.
+            if ($resourceID === -1) {
+                $resourceID = null;
+            }
+
+            $junctionTable = $this->getJunctionTableForPermission($permissionName) ?? PermissionFragmentSchema::TYPE_GLOBAL;
+            $type = $junctionTable && $resourceID !== null ? $junctionTable : PermissionFragmentSchema::TYPE_GLOBAL;
+            $typeAndID = $type . $resourceID;
+
+            if (!empty($resultsByTypeAndID[$typeAndID])) {
+                $resultsByTypeAndID[$typeAndID]['permissions'][$permissionName] = true;
+            } else {
+                $resultsByTypeAndID[$typeAndID] = [
+                    'type' => $type,
+                    'id' => $resourceID,
+                    'permissions' => [$permissionName => true],
+                ];
+            }
+        };
+
+        // Push all of the permissions in.
+        foreach ($this->permissions as $key => $value) {
+            if (is_array($value)) {
+                // We have some resource specific information.
+                $permissionName = $key;
+                if ($this->isPermissionDeprecated($permissionName)) {
+                    continue;
+                }
+                foreach ($value as $resourceID) {
+                    $pushItem($permissionName, $resourceID);
+                }
+            } else {
+                // This is a global permission.
+                $permissionName = $value;
+                if ($this->isPermissionDeprecated($value)) {
+                    continue;
+                }
+                $pushItem($permissionName);
+            }
+        }
+
+        foreach ($resultsByTypeAndID as &$result) {
+            $permissions = $this->consolidatePermissions($result['permissions']);
+            ksort($permissions);
+            $result['permissions'] = $permissions;
+        }
+
+        return array_values($resultsByTypeAndID);
     }
 
     /**

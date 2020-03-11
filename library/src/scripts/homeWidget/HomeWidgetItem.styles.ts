@@ -117,6 +117,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
 
     const borderStyling: NestedCSSProperties = (() => {
         switch (vars.options.borderType) {
+            case BorderType.SHADOW_AS_BORDER:
             case BorderType.NONE:
                 return {};
             case BorderType.BORDER:

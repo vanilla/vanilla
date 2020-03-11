@@ -11,13 +11,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import {
-    BannerAlignment,
-    bannerClasses,
-    bannerVariables,
-    ImageElementPlacement,
-    presetsBanner,
-} from "@library/banner/bannerStyles";
+import { bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -110,7 +104,6 @@ export default function Banner(props: IProps) {
                                 {title}
                             </Heading>
                         )}
-
                         <ConditionalWrap
                             className={classes.contentContainer}
                             condition={
@@ -145,6 +138,29 @@ export default function Banner(props: IProps) {
                             <div className={classes.imageElementContainer}>
                                 {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
                                 <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
+                            </div>
+                        )}
+
+                        {!options.hideSearch && (
+                            <div className={classes.searchContainer}>
+                                <IndependentSearch
+                                    buttonClass={classes.searchButton}
+                                    buttonBaseClass={ButtonTypes.CUSTOM}
+                                    isLarge={true}
+                                    placeholder={t("Search")}
+                                    inputClass={classes.input}
+                                    iconClass={classes.icon}
+                                    buttonLoaderClassName={classes.buttonLoader}
+                                    hideSearchButton={
+                                        device === Devices.MOBILE ||
+                                        device === Devices.XS ||
+                                        presetsBanner().button.preset === ButtonPresets.HIDE
+                                    }
+                                    contentClass={classes.content}
+                                    valueContainerClasses={classes.valueContainer}
+                                    iconContainerClasses={classes.iconContainer}
+                                    resultsAsModalClasses={classes.resultsAsModal}
+                                />
                             </div>
                         )}
                     </ConditionalWrap>

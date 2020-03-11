@@ -107,7 +107,7 @@ export default function Banner(props: IProps) {
                             </Heading>
                         )}
                         <ConditionalWrap
-                            className={classes.contentContainer}
+                            className={classes.contentContainer(!rightImageSrc && !!logoImageSrc)}
                             condition={
                                 showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
                             }

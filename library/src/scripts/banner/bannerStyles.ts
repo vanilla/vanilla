@@ -161,8 +161,8 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const logo = makeThemeVars("logo", {
-        height: "auto",
-        width: 300,
+        height: "auto" as number | string,
+        width: 300 as number | string,
         padding: {
             all: 12,
         },
@@ -499,33 +499,37 @@ export const bannerClasses = useThemeCache(() => {
         background: colorOut(vars.backgrounds.overlayColor),
     });
 
-    const contentContainer = style(
-        "contentContainer",
-        {
-            ...paddings(vars.contentContainer.padding),
-            ...backgroundHelper(vars.innerBackground),
-            minWidth: unit(vars.contentContainer.minWidth),
-            minHeight: unit(vars.contentContainer.minHeight),
-            maxWidth: percent(100),
-            width: percent(100),
-        },
-        media(
+    const contentContainer = (hasFullWidth = false) => {
+        return style(
+            "contentContainer",
             {
-                maxWidth: calc(
-                    `${unit(vars.contentContainer.minWidth)} + ${unit(vars.contentContainer.padding.horizontal)} * 4`,
-                ),
+                ...paddings(vars.contentContainer.padding),
+                ...backgroundHelper(vars.innerBackground),
+                minWidth: unit(vars.contentContainer.minWidth),
+                minHeight: unit(vars.contentContainer.minHeight),
+                maxWidth: percent(100),
+                width: hasFullWidth ? percent(100) : undefined,
             },
-            {
-                width: percent(100),
-                minWidth: "initial",
-            },
-        ),
-        mediaQueries.oneColumnDown({
-            minWidth: percent(100),
-            maxWidth: percent(100),
-            ...paddings(vars.spacing.paddingMobile),
-        }),
-    );
+            media(
+                {
+                    maxWidth: calc(
+                        `${unit(vars.contentContainer.minWidth)} + ${unit(
+                            vars.contentContainer.padding.horizontal,
+                        )} * 4`,
+                    ),
+                },
+                {
+                    width: percent(100),
+                    minWidth: "initial",
+                },
+            ),
+            mediaQueries.oneColumnDown({
+                minWidth: percent(100),
+                maxWidth: percent(100),
+                ...paddings(vars.spacing.paddingMobile),
+            }),
+        );
+    };
 
     const text = style("text", {
         color: colorOut(vars.colors.primaryContrast),
@@ -723,7 +727,7 @@ export const bannerClasses = useThemeCache(() => {
         width: percent(100),
         height: unit(vars.logo.height),
         maxWidth: percent(100),
-        minHeight: unit(vars.logo.minHeight),
+        minHeight: unit(vars.logo.height),
         alignItems: "center",
         justifyContent: "center",
         position: "relative",

@@ -315,6 +315,62 @@ export const LogoSmall = storyWithConfig(
     },
     () => <StoryBanner title="Logo - Small" />,
 );
+export const LogoAndRightImage = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                    primaryContrast: color("#fff"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                colors: {
+                    bg: "#fff",
+                    primaryContrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                rightImage: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                logo: {
+                    width: 150,
+                    image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image-o-rama!" />,
+);
 
 (ImageAsElement as any).story = {
     parameters: {

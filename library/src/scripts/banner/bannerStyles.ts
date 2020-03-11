@@ -74,12 +74,14 @@ export const bannerVariables = useThemeCache(() => {
         hideSearch: false,
         searchPlacement: "middle" as SearchPlacement,
     });
+
     const compactSearchVars = compactSearchVariables();
 
     const topPadding = 69;
     const horizontalPadding = unit(
         widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter,
     ) as PaddingProperty<TLength>;
+
     const spacing = makeThemeVars("spacing", {
         padding: {
             ...EMPTY_SPACING,
@@ -93,6 +95,10 @@ export const bannerVariables = useThemeCache(() => {
             bottom: globalVars.gutter.size,
             horizontal: horizontalPadding,
         },
+    });
+
+    const dimensions = makeThemeVars("dimensions", {
+        minHeight: 200,
     });
 
     const inputAndButton = makeThemeVars("inputAndButton", {
@@ -110,19 +116,6 @@ export const bannerVariables = useThemeCache(() => {
         borderColor: globalVars.mixPrimaryAndFg(0.4),
     });
 
-    const state = makeThemeVars("state", {
-        colors: {
-            fg: colors.secondaryContrast,
-            bg: colors.secondary,
-        },
-        borders: {
-            color: colors.bg,
-        },
-        fonts: {
-            color: colors.secondaryContrast,
-        },
-    });
-
     const border = {
         width: globalVars.border.width,
         radius: globalVars.borderType.formElements.default.radius,
@@ -136,9 +129,9 @@ export const bannerVariables = useThemeCache(() => {
         minWidth: 550,
         minHeight: 0,
         padding: {
-            ...spacing.padding,
-            left: 0,
-            right: 0,
+            top: spacing.padding.top,
+            bottom: spacing.padding.bottom,
+            horizontal: 0,
         },
     });
 
@@ -364,6 +357,10 @@ export const bannerVariables = useThemeCache(() => {
         bg: colors.bg,
         minHeight: 60 as number | string,
         offset: undefined as number | string | undefined,
+        padding: {
+            top: 12,
+            bottom: 12,
+        },
     });
 
     return {
@@ -373,6 +370,7 @@ export const bannerVariables = useThemeCache(() => {
         spacing,
         innerBackground,
         contentContainer,
+        dimensions,
         text,
         title,
         description,
@@ -464,7 +462,7 @@ export const bannerClasses = useThemeCache(() => {
         "contentContainer",
         {
             ...paddings(vars.contentContainer.padding),
-            backgroundColor: colorOut(vars.innerBackground.bg),
+            ...backgroundHelper(vars.innerBackground),
             minWidth: unit(vars.contentContainer.minWidth),
             minHeight: unit(vars.contentContainer.minHeight),
         },
@@ -643,7 +641,7 @@ export const bannerClasses = useThemeCache(() => {
     const makeImageMinWidth = (rootUnit, padding) =>
         calc(
             `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
-                vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
+                vars.contentContainer.padding.horizontal,
             )} - ${unit(padding)}`,
         );
 
@@ -722,6 +720,7 @@ export const bannerClasses = useThemeCache(() => {
 
     const middleContainer = style("middleContainer", {
         position: "relative",
+        minHeight: unit(vars.dimensions.minHeight),
     });
 
     const searchStrip = style("searchStrip", {
@@ -731,9 +730,7 @@ export const bannerClasses = useThemeCache(() => {
         justifyContent: "center",
         zIndex: 1,
         background: colorOut(vars.searchStrip.bg),
-        ...paddings({
-            vertical: 12,
-        }),
+        ...paddings(vars.searchStrip.padding),
         minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
         marginTop: unit(vars.searchStrip.offset),
     });

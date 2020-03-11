@@ -39,38 +39,34 @@ export const EMPTY_BACKGROUND: IBackground = {
     repeat: undefined,
     size: undefined,
     image: undefined,
-    fallbackImage: undefined,
     opacity: undefined,
     unsetBackground: false,
 };
 
-export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
-    // Get either image or fallback
-    const workingImage = image ? image : fallbackImage;
-    if (!workingImage) {
-        return;
+export const getBackgroundImage = (image?: BackgroundImageProperty) => {
+    if (!image) {
+        return undefined;
     }
-
-    if (workingImage.charAt(0) === "~") {
+    image = image.toString();
+    if (image.charAt(0) === "~") {
         // Relative path to theme folder
-        return themeAsset(workingImage.substr(1, workingImage.length - 1));
+        return themeAsset(image.substr(1, image.length - 1));
     }
 
-    if (workingImage.startsWith("data:image/")) {
-        return `url(${workingImage})`;
+    if (image.startsWith("data:image/")) {
+        return `url(${image})`;
     }
 
-    if (workingImage.startsWith("linear-gradient(")) {
-        return workingImage;
+    if (image.startsWith("linear-gradient(")) {
+        return image;
     }
 
     // Fallback to a general asset URL.
-    const assetImage = `url(${assetUrl(workingImage)})`;
-    return assetImage;
+    return `url(${assetUrl(image)})`;
 };
 
 export const backgroundHelper = (props: IBackground) => {
-    const image = getBackgroundImage(props.image, props.fallbackImage);
+    const image = getBackgroundImage(props.image);
     return {
         backgroundColor: props.color ? colorOut(props.color) : undefined,
         backgroundAttachment: props.attachment || undefined,

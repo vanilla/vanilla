@@ -358,7 +358,7 @@ export const searchPositionBottom = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#980013",
-                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
                 searchStrip: {
                     bg: color("#980013"),
@@ -386,18 +386,27 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                 options: {
                     searchPlacement: "bottom" as SearchPlacement,
                 },
+                contentContainer: {
+                    padding: {
+                        bottom: 140,
+                    },
+                },
                 backgrounds: {
                     useOverlay: true,
                 },
                 outerBackground: {
                     position: "50% 100%",
                     color: color("#54367c"),
-                    image: "https://us.v-cdn.net/5022541/uploads/330/6J25XXRJ5G24.png",
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
                 searchStrip: {
-                    bg: linearGradient("to bottom", "rgb(84,54,124, 0) 0%,rgba(84,54,124, 1) 50%"),
-                    minHeight: 100,
-                    offset: "-60",
+                    bg: linearGradient("to bottom", "rgb(0,0,0,0) 0%,rgba(0,0,0, .4) 50%"),
+                    minHeight: 140,
+                    offset: -140,
+                    padding: {
+                        top: 0,
+                        bottom: 70,
+                    },
                 },
             },
             presetsBanner: {
@@ -467,7 +476,7 @@ export const bannerImageOnly = storyWithConfig(
                 outerBackground: {
                     position: "50% 100%",
                     color: color("#54367c"),
-                    image: "https://us.v-cdn.net/5022541/uploads/330/6J25XXRJ5G24.png",
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
                 innerBackground: {
                     image: "https://us.v-cdn.net/6031163/uploads/3021ecca7cc7a015f582d8c2ce56fa09.png",
@@ -495,24 +504,19 @@ export const unifiedBorder = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            colors: {
-                primary: "#ff5b64",
-                primaryContrast: "#e3e3e3",
-            },
             banner: {
                 outerBackground: {
-                    color: "#980013",
-                    image: "https://us.v-cdn.net/5022541/uploads/726/MNT0DAGT2S4K.jpg",
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
             },
             presetsBanner: {
                 input: {
-                    preset: SearchBarPresets.BORDER,
+                    preset: SearchBarPresets.UNIFIED_BORDER,
                 },
             },
         },
     },
-    () => <StoryBanner title="Search with shadow" />,
+    () => <StoryBanner title="Unified Border" />,
 );
 
 (ImageAsElementWide as any).story = {

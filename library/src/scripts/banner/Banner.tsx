@@ -18,6 +18,7 @@ import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { visibility } from "@library/styles/styleHelpersVisibility";
 
 interface IProps {
     action?: React.ReactNode;
@@ -90,9 +91,16 @@ export default function Banner(props: IProps) {
                 {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
                     <div className={imageElementSrc ? classes.imagePositioner : ""}>
+                        {/*For SEO & accessibility*/}
+                        {options.hideTitle && (
+                            <Heading className={visibility().visuallyHidden} depth={1}>
+                                {title}
+                            </Heading>
+                        )}
+
                         <ConditionalWrap
-                            condition={options.hideTitle && options.hideDescription}
                             className={classes.contentContainer}
+                            condition={showMiddleSearch || !options.hideTitle || !options.hideDescription}
                         >
                             {!options.hideTitle && (
                                 <div className={classes.titleWrap}>

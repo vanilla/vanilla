@@ -98,7 +98,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     const dimensions = makeThemeVars("dimensions", {
-        minHeight: 200,
+        minHeight: 50,
     });
 
     const inputAndButton = makeThemeVars("inputAndButton", {

@@ -345,10 +345,6 @@ export const searchPositionBottom = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            colors: {
-                primary: "#ff5b64",
-                primaryContrast: "#e3e3e3",
-            },
             banner: {
                 options: {
                     searchPlacement: "bottom",
@@ -357,11 +353,11 @@ export const searchPositionBottom = storyWithConfig(
                     useOverlay: true,
                 },
                 outerBackground: {
-                    color: "#980013",
+                    color: "#4b496e",
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
                 searchStrip: {
-                    bg: color("#980013"),
+                    bg: color("#4b496e"),
                     minHeight: 100,
                 },
             },
@@ -378,10 +374,6 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
-            colors: {
-                primary: "#ff5b64",
-                primaryContrast: "#e3e3e3",
-            },
             banner: {
                 options: {
                     searchPlacement: "bottom" as SearchPlacement,
@@ -470,8 +462,8 @@ export const bannerImageOnly = storyWithConfig(
                     hideDescription: true,
                     hideTitle: true,
                 },
-                backgrounds: {
-                    useOverlay: true,
+                dimensions: {
+                    minHeight: 300,
                 },
                 outerBackground: {
                     position: "50% 100%",

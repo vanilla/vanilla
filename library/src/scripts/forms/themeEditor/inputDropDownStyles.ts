@@ -39,7 +39,7 @@ export const inputDropDownClasses = useThemeCache(() => {
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
-                backgroundColor: colorOut(builderVariables.panel.bg),
+                backgroundColor: colorOut(globalVars.elementaryColors.white),
                 ...borders(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),

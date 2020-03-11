@@ -1071,12 +1071,6 @@ if (!function_exists('hasViewProfile')) {
 
         $result = checkPermission('Garden.Profiles.View');
 
-        $result = $result && (
-                c('Garden.Profile.Titles') ||
-                c('Garden.Profile.Locations', false) ||
-                c('Garden.Registration.Method') != 'Connect'
-            );
-
         return $result;
     }
 }

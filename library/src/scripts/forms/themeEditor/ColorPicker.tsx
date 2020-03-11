@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback, ChangeEvent } from "react";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
@@ -16,6 +16,7 @@ import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
+import debounce from "lodash/debounce";
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
 export interface IColorPicker {
@@ -45,7 +46,6 @@ export default function ColorPicker(props: IColorPicker) {
         props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : undefined;
 
     const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
-    const { setFieldError } = useFormikContext();
 
     const [validColor, setValidColor] = useState(initialValidColor);
     const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
@@ -68,18 +68,29 @@ export default function ColorPicker(props: IColorPicker) {
         }
     };
 
-    const onPickerChange = e => {
+    const updatePickerColor = useCallback(
+        debounce(
+            (newColor: string) => {
+                helpers.setTouched(true);
+                helpers.setValue(newColor);
+                setValidColor(
+                    color(newColor)
+                        .toRGB()
+                        .toString(),
+                );
+                errorHelpers.setValue(undefined);
+            },
+            300,
+            { trailing: true },
+        ),
+        [errorHelpers, setValidColor, helpers],
+    );
+
+    const onPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Will always be valid color, since it's a real picker
         const newColor: string = e.target.value;
         if (newColor) {
-            helpers.setTouched(true);
-            helpers.setValue(newColor);
-            setValidColor(
-                color(newColor)
-                    .toRGB()
-                    .toString(),
-            );
-            errorHelpers.setValue(undefined);
+            updatePickerColor(newColor);
         }
     };
 

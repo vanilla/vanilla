@@ -10,11 +10,12 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
+import { color, rgba, rgb, hsla, hsl, ColorHelper, list } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
 import isNumeric from "validator/lib/isNumeric";
+import { useEffect, useState } from "react";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -69,11 +70,32 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
-let themeUniqueness = hashString(Math.random().toString());
+// A unique identifier that represents the current state of the theme.
+let _themeCacheID = hashString(Math.random().toString());
 
-export function clearThemeCache() {
-    themeUniqueness = hashString(Math.random().toString());
-    return themeUniqueness;
+// Event name for resetting the theme cacheID.
+const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
+
+export function resetThemeCache() {
+    _themeCacheID = hashString(Math.random().toString());
+    document.dispatchEvent(new CustomEvent(THEME_CACHE_EVENT, { detail: _themeCacheID }));
+    return _themeCacheID;
+}
+
+export function useThemeCacheID() {
+    const [cacheID, setCacheID] = useState(_themeCacheID);
+    useEffect(() => {
+        const listener = (e: CustomEvent) => {
+            setCacheID(e.detail);
+        };
+        document.addEventListener(THEME_CACHE_EVENT, listener);
+
+        return () => {
+            document.removeEventListener(THEME_CACHE_EVENT, listener);
+        };
+    });
+
+    return { cacheID, resetThemeCache };
 }
 
 /**
@@ -86,7 +108,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status + themeUniqueness;
+        const cacheKey = themeKey + status + _themeCacheID;
         const result = cacheKey + JSON.stringify(args);
         return result;
     };

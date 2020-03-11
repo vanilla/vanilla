@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Toast from "@library/features/toaster/Toast";
 import { getMeta } from "@library/utility/appUtils";
-import { useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
+import { useThemeActions, PreviewStatusType } from "@library/theming/ThemeActions";
 import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
@@ -16,7 +16,7 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 export function ThemePreviewToast() {
     const { applyStatus, cancelStatus } = useThemePreviewToasterState();
     const [showToaster, setShowToast] = useState(getMeta("themePreview", true));
-    const { putCurrentTheme, putPreviewTheme } = useThemesActions();
+    const { putCurrentTheme, putPreviewTheme } = useThemeActions();
 
     const handleApply = async () => {
         putCurrentTheme(showToaster.themeID);

@@ -30,18 +30,18 @@ export interface IThemeExternalAsset {
     url: string;
 }
 
-export interface IThemeVariables {
-    [key: string]: string;
-}
+export type IThemeVariables = Record<string, any>;
 
 export interface IThemeState {
     assets: ILoadable<IThemeAssets>;
+    forcedVariables: IThemeVariables | null;
 }
 
 export const INITIAL_STATE: IThemeState = {
     assets: {
         status: LoadStatus.PENDING,
     },
+    forcedVariables: null,
 };
 
 export const themeReducer = produce(
@@ -66,5 +66,9 @@ export const themeReducer = produce(
                 state.assets.error = payload.error;
                 return state;
             }
+        })
+        .case(ThemeActions.forceVariablesAC, (state, payload) => {
+            state.forcedVariables = state;
+            return state;
         }),
 );

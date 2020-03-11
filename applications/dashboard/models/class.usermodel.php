@@ -5037,10 +5037,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             $this->updateUserCache($rowID, $property, $value);
         }
 
-        if (!is_array($property)) {
-            $property = [$property => $value];
-        }
-
         $this->EventArguments['UserID'] = $rowID;
         $this->EventArguments['Fields'] = $property;
         $this->fireEvent('AfterSetField');

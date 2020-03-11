@@ -18,6 +18,7 @@ use Garden\Web\RequestInterface;
  */
 class SmartIDMiddleware {
     const SMART = '$';
+    private const FULL_SMART_REGEX = '`^\$([^:]+)\.([^:]+:.+)$`';
 
     /**
      * @var string The base path to match in order to apply smart IDs.
@@ -40,9 +41,19 @@ class SmartIDMiddleware {
     private $pks = [];
 
     /**
-     * @var string a cached regular expression to match a field against the known smart ID PK columns.
+     * @var array An array of field name suffixes that allow for fully qualified smart IDs.
+     */
+    private $fullSuffixes = [];
+
+    /**
+     * @var string A cached regular expression to match a field against the known smart ID PK columns.
      */
     private $pksRegex;
+
+    /**
+     * @var string A cached regular expression to match a field against a smart ID suffix.
+     */
+    private $fullSuffixesRegex;
 
     /**
      * SmartIDMiddleware constructor.
@@ -51,8 +62,9 @@ class SmartIDMiddleware {
      * @param \Gdn_SQLDriver $sql Used to look up smart IDs.
      */
     public function __construct(string $basePath = '/', \Gdn_SQLDriver $sql) {
-        $this->basePath = $basePath;
+        $this->setBasePath($basePath);
         $this->sql = clone $sql;
+        $this->addFullSuffix('ID');
     }
 
     /**
@@ -194,11 +206,27 @@ class SmartIDMiddleware {
      *
      * @return string Returns a regular expression string.
      */
-    private function getPKsRegex() {
+    private function getPKsRegex(): string {
         if (!$this->pksRegex) {
             $this->pksRegex = '`('.implode('|', array_keys($this->pks)).')$`i';
         }
         return $this->pksRegex;
+    }
+
+    /**
+     * Get a regular expression that matches fields that allow fully qualified regular expressions.
+     *
+     * @return string
+     */
+    private function getFullRegex(): string {
+        if (!$this->fullSuffixesRegex) {
+            if (empty($this->fullSuffixes)) {
+                $this->fullSuffixesRegex = '`^$`';
+            } else {
+                $this->fullSuffixesRegex = '`(' . implode('|', array_keys($this->fullSuffixes)) . ')$`';
+            }
+        }
+        return $this->fullSuffixesRegex;
     }
 
     /**
@@ -213,11 +241,18 @@ class SmartIDMiddleware {
         }
 
         $regex = $this->getPKsRegex();
+        $fullRegex = $this->getFullRegex();
 
-        array_walk_recursive($arr, function (&$value, $key) use ($regex, &$changed) {
-            if ($value && is_string($value) && $value[0] === static::SMART && preg_match($regex, $key, $m)) {
-                $value = $this->replaceSmartID($m[1], $value);
-                $changed = true;
+        array_walk_recursive($arr, function (&$value, $key) use ($regex, $fullRegex, &$changed) {
+            if ($value && is_string($value) && $value[0] === static::SMART) {
+                if (preg_match($regex, $key, $m)) {
+                    // This is a column based smart ID.
+                    $value = $this->replaceSmartID($m[1], $value);
+                    $changed = true;
+                } elseif (preg_match($fullRegex, $key) && preg_match(self::FULL_SMART_REGEX, $value, $m)) {
+                    $value = $this->replaceSmartID($m[1], self::SMART.$m[2]);
+                    $changed = true;
+                }
             }
         });
 
@@ -270,5 +305,39 @@ class SmartIDMiddleware {
     public function setBasePath(string $basePath) {
         $this->basePath = $basePath;
         return $this;
+    }
+
+    /**
+     * Add a column name suffix that is allowed for specifying a fully qualified smart ID.
+     *
+     * @param string $suffix
+     * @return $this
+     */
+    public function addFullSuffix(string $suffix) {
+        $this->fullSuffixes[$suffix] = true;
+        $this->fullSuffixesRegex = '';
+        return $this;
+    }
+
+    /**
+     * Remove a column suffix that is allowed for specifying a fully qualified smart UD.
+     *
+     * @param string $suffix
+     * @return $this
+     */
+    public function removeFullSuffix(string $suffix) {
+        unset($this->fullSuffixes[$suffix]);
+        $this->fullSuffixesRegex = '';
+        return $this;
+    }
+
+    /**
+     * Whether or not the middleware has a fully qualified suffix defined.
+     *
+     * @param string $suffix
+     * @return bool
+     */
+    public function hasFullSuffix(string $suffix): bool {
+        return isset($this->fullSuffixes[$suffix]);
     }
 }

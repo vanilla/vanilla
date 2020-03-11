@@ -9,6 +9,7 @@ import { IApiError } from "@library/@types/api/core";
 import { ITheme } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
+import { reinit, forceRenderStyles } from "typestyle";
 
 const createAction = actionCreatorFactory("@@themes");
 
@@ -68,6 +69,7 @@ export default class ThemeActions extends ReduxActions {
 
         // Clear the cache of variables.
         resetThemeCache();
+        forceRenderStyles();
     };
 
     public static readonly getAllThemes_ACS = createAction.async<{}, IGetAllThemeResponse, IApiError>("GET_ALL_THEMES");

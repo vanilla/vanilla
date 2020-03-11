@@ -107,7 +107,7 @@ export default function InputNumber(props: IInputNumber) {
         if (validatedMin !== undefined && newValue < validatedMin) {
             newValue = validatedMin;
         }
-        helpers.setValue(newValue.toString());
+        helpers.setValue(newValue);
     };
 
     const hasError = number.value ? !!errorField.value || (!isValidValue(number.value) && number.value === "") : false;

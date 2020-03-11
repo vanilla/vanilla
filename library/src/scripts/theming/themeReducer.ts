@@ -68,7 +68,7 @@ export const themeReducer = produce(
             }
         })
         .case(ThemeActions.forceVariablesAC, (state, payload) => {
-            state.forcedVariables = state;
+            state.forcedVariables = payload;
             return state;
         }),
 );

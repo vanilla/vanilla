@@ -11,8 +11,8 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, SearchBarPresets, presetsBanner } from "@library/banner/bannerStyles";
-import { t, assetUrl } from "@library/utility/appUtils";
+import { BannerAlignment, bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
+import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
@@ -44,11 +44,18 @@ export default function Banner(props: IProps) {
     const classes = bannerClasses();
     const vars = bannerVariables();
     const { options } = vars;
-
-    let imageElementSrc = props.contentImage || vars.imageElement.image || null;
-    imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
     const description = props.description ?? vars.description.text;
 
+    // Image element
+    let imageElementSrc = props.contentImage || vars.imageElement.image || null;
+    imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
+
+    // Banner Alignment
+    const isBannerLeftAligned = options.alignment === BannerAlignment.LEFT;
+    const isBannerCenterAligned = options.alignment === BannerAlignment.CENTER;
+    const hasImageElementMiddle = !!imageElementSrc && isBannerCenterAligned;
+
+    // Search placement
     const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch;
     const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch;
     const searchAloneInContainer =
@@ -100,8 +107,19 @@ export default function Banner(props: IProps) {
 
                         <ConditionalWrap
                             className={classes.contentContainer}
-                            condition={showMiddleSearch || !options.hideTitle || !options.hideDescription}
+                            condition={
+                                showMiddleSearch ||
+                                !options.hideTitle ||
+                                !options.hideDescription ||
+                                hasImageElementMiddle
+                            }
                         >
+                            {hasImageElementMiddle && imageElementSrc && (
+                                <div className={classes.imageElementContainer}>
+                                    {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                    <img className={classes.imageElement} src={imageElementSrc} aria-hidden={true} />
+                                </div>
+                            )}
                             {!options.hideTitle && (
                                 <div className={classes.titleWrap}>
                                     <FlexSpacer className={classes.titleFlexSpacer} />
@@ -120,9 +138,10 @@ export default function Banner(props: IProps) {
                             )}
                             {showMiddleSearch && searchComponent}
                         </ConditionalWrap>
-                        {imageElementSrc && (
+                        {imageElementSrc && isBannerLeftAligned && (
                             <div className={classes.imageElementContainer}>
-                                <img className={classes.imageElement} src={imageElementSrc}></img>
+                                {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                <img className={classes.imageElement} src={imageElementSrc} aria-hidden={true} />
                             </div>
                         )}
                     </div>

@@ -211,6 +211,63 @@ export const ImageAsElement = storyWithConfig(
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
 );
 
+export const ImageAsElementCentered = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                    primaryContrast: color("#fff"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                // options: {
+                //     alignment: BannerAlignment.CENTER,
+                // },
+                colors: {
+                    bg: "#fff",
+                    primaryContrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                imageElement: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image as Element - (Centered)" />,
+);
+
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {

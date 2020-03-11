@@ -135,7 +135,7 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const imageElement = makeThemeVars("imageElement", {
+    const rightImage = makeThemeVars("rightImage", {
         image: undefined as string | undefined,
         minWidth: 500,
         disappearingWidth: 500,
@@ -144,6 +144,16 @@ export const bannerVariables = useThemeCache(() => {
             all: globalVars.gutter.size,
             right: 0,
         },
+    });
+
+    const logoContainer = makeThemeVars("rightImage", {
+        height: 300,
+        maxHeight: 300,
+    });
+
+    const logo = makeThemeVars("logo", {
+        image: undefined as string | undefined,
+        width: undefined,
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
@@ -380,11 +390,13 @@ export const bannerVariables = useThemeCache(() => {
         searchButton,
         colors,
         inputAndButton,
-        imageElement,
+        rightImage,
         border,
         isTransparentButton,
         unifiedBannerOptions,
         searchStrip,
+        logoContainer,
+        logo,
     };
 });
 
@@ -673,12 +685,28 @@ export const bannerClasses = useThemeCache(() => {
         ),
     );
 
-    const imageElement = style(
-        "imageElement",
+    const logoContainer = style("logoContainer", {
+        display: "flex",
+        height: unit(vars.logoContainer.height),
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+    });
+
+    const logo = style("logo", {
+        maxHeight: percent(100),
+        maxWidth: percent(100),
+        height: "auto",
+        width: vars.logo.width ? unit(vars.logo.width) : undefined,
+    });
+
+    const rightImage = style(
+        "rightImage",
         {
             ...absolutePosition.middleRightOfParent(),
-            minWidth: unit(vars.imageElement.minWidth),
-            ...paddings(vars.imageElement.padding),
+            minWidth: unit(vars.rightImage.minWidth),
+            ...paddings(vars.rightImage.padding),
             objectPosition: "100% 50%",
             objectFit: "contain",
             marginLeft: "auto",
@@ -687,8 +715,8 @@ export const bannerClasses = useThemeCache(() => {
         media(
             {
                 maxWidth: calc(
-                    `${unit(vars.imageElement.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
-                        vars.imageElement.padding.horizontal ?? vars.imageElement.padding.all,
+                    `${unit(vars.rightImage.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
+                        vars.rightImage.padding.horizontal ?? vars.rightImage.padding.all,
                     )} * 2`,
                 ),
             },
@@ -756,10 +784,12 @@ export const bannerClasses = useThemeCache(() => {
         valueContainer,
         backgroundOverlay,
         imageElementContainer,
-        imageElement,
+        rightImage,
         middleContainer,
         imagePositioner,
         searchStrip,
         noTopMargin,
+        logoContainer,
+        logo,
     };
 });

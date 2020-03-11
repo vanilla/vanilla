@@ -186,7 +186,7 @@ export const ImageAsElement = storyWithConfig(
                         color: "#323232",
                     },
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
@@ -243,7 +243,10 @@ export const ImageAsElementCentered = storyWithConfig(
                         color: "#323232",
                     },
                 },
-                imageElement: {
+                logo: {
+                    image: "https://us.v-cdn.net/5022541/uploads/1fd8f254a13a3a6312e897c94abcd8a1.png",
+                },
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
@@ -265,7 +268,7 @@ export const ImageAsElementCentered = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Image as Element - (Centered)" />,
+    () => <StoryBanner title="Logo - small" />,
 );
 
 (ImageAsElement as any).story = {
@@ -310,7 +313,7 @@ export const ImageAsElementWide = storyWithConfig(
                         color: "#323232",
                     },
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
@@ -373,7 +376,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                 options: {
                     alignment: BannerAlignment.LEFT,
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },

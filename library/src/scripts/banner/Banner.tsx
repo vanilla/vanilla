@@ -11,7 +11,13 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { BannerAlignment, bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
+import {
+    BannerAlignment,
+    bannerClasses,
+    bannerVariables,
+    ImageElementPlacement,
+    presetsBanner,
+} from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -27,6 +33,7 @@ interface IProps {
     className?: string;
     backgroundImage?: string;
     contentImage?: string;
+    logoImage?: string;
     searchBarNoTopMargin?: boolean;
 }
 
@@ -46,14 +53,13 @@ export default function Banner(props: IProps) {
     const { options } = vars;
     const description = props.description ?? vars.description.text;
 
-    // Image element
-    let imageElementSrc = props.contentImage || vars.imageElement.image || null;
-    imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
+    // Image element (right)
+    let rightImageSrc = props.contentImage || vars.rightImage.image || null;
+    rightImageSrc = rightImageSrc ? assetUrl(rightImageSrc) : null;
 
-    // Banner Alignment
-    const isBannerLeftAligned = options.alignment === BannerAlignment.LEFT;
-    const isBannerCenterAligned = options.alignment === BannerAlignment.CENTER;
-    const hasImageElementMiddle = !!imageElementSrc && isBannerCenterAligned;
+    // Logo (Image in middle)
+    let logoImageSrc = props.logoImage || vars.logo.image || null;
+    logoImageSrc = logoImageSrc ? assetUrl(logoImageSrc) : null;
 
     // Search placement
     const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch;
@@ -97,7 +103,7 @@ export default function Banner(props: IProps) {
                 </div>
                 {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
-                    <div className={imageElementSrc ? classes.imagePositioner : ""}>
+                    <ConditionalWrap className={classes.imagePositioner} condition={!!rightImageSrc}>
                         {/*For SEO & accessibility*/}
                         {options.hideTitle && (
                             <Heading className={visibility().visuallyHidden} depth={1}>
@@ -108,16 +114,13 @@ export default function Banner(props: IProps) {
                         <ConditionalWrap
                             className={classes.contentContainer}
                             condition={
-                                showMiddleSearch ||
-                                !options.hideTitle ||
-                                !options.hideDescription ||
-                                hasImageElementMiddle
+                                showMiddleSearch || !options.hideTitle || !options.hideDescription || !!rightImageSrc
                             }
                         >
-                            {hasImageElementMiddle && imageElementSrc && (
-                                <div className={classes.imageElementContainer}>
+                            {!!logoImageSrc && (
+                                <div className={classes.logoContainer}>
                                     {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                    <img className={classes.imageElement} src={imageElementSrc} aria-hidden={true} />
+                                    <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
                                 </div>
                             )}
                             {!options.hideTitle && (
@@ -138,13 +141,13 @@ export default function Banner(props: IProps) {
                             )}
                             {showMiddleSearch && searchComponent}
                         </ConditionalWrap>
-                        {imageElementSrc && isBannerLeftAligned && (
+                        {rightImageSrc && (
                             <div className={classes.imageElementContainer}>
                                 {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                <img className={classes.imageElement} src={imageElementSrc} aria-hidden={true} />
+                                <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
                             </div>
                         )}
-                    </div>
+                    </ConditionalWrap>
                 </Container>
             </div>
             {showBottomSearch && (

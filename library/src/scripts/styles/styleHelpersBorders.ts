@@ -17,6 +17,7 @@ export enum BorderType {
     BORDER = "border",
     NONE = "none",
     SHADOW = "shadow",
+    SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
 }
 
 export interface ISimpleBorderStyle {

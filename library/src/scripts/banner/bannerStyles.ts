@@ -712,6 +712,9 @@ export const bannerClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.outerBackground.color),
         $nest: {
             [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
+            "& .searchBar": {
+                height: unit(vars.searchBar.sizing.height),
+            },
         },
     });
 

@@ -102,8 +102,8 @@ export const WithGradientAndSwoop = storyWithConfig(
             global: {
                 mainColors: {
                     fg: color("#858585"),
-                    bg: color("#f7f4ef"),
-                    primary: color("#e8e0d6"),
+                    bg: color("#fff"),
+                    primary: color("#ccd8e8"),
                 },
             },
             titleBar: {
@@ -124,7 +124,7 @@ export const WithGradientAndSwoop = storyWithConfig(
                     state: color("#e8e0d6"),
                 },
                 overlay: {
-                    background: linearGradient(`-180deg`, `#fdfcfa,#f0e8de`),
+                    background: linearGradient(`-180deg`, `#f7f4ef,#ccd8e8`),
                 },
                 border: {
                     type: BorderType.SHADOW_AS_BORDER,
@@ -150,7 +150,7 @@ export const WithGradientAndSwoop = storyWithConfig(
             },
         },
     },
-    () => <StoryTitleBar title="With Gradient" />,
+    () => <StoryTitleBar title="With Gradient and Swoop" />,
 );
 
 export const WithGradientAndImageOnSticky = storyWithConfig(

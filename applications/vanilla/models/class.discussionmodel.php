@@ -2064,7 +2064,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         }
 
         $this->EventArguments['DiscussionID'] = $rowID;
-		$this->EventArguments['SetField'] = $property;
+        $this->EventArguments['SetField'] = $property;
 
         parent::setField($rowID, $property);
         $this->fireEvent('AfterSetField');

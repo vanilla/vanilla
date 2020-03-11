@@ -162,7 +162,6 @@ export const bannerVariables = useThemeCache(() => {
 
     const logo = makeThemeVars("logo", {
         height: "auto",
-        minHeight: 300,
         width: 300,
         padding: {
             all: 12,
@@ -736,22 +735,10 @@ export const bannerClasses = useThemeCache(() => {
     });
 
     const logo = style("logo", {
+        height: unit(vars.logo.height),
+        width: unit(vars.logo.width),
         maxHeight: percent(100),
         maxWidth: percent(100),
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        height: vars.logo.height ? unit(vars.logo.height) : "auto",
-        width: vars.logo.width ? unit(vars.logo.width) : "auto",
-        margin: "auto",
-        $nest: {
-            "@supports (object-fit: cover)": {
-                objectFit: "contain",
-                objectPosition: "center",
-            },
-        },
     });
 
     const rightImage = style(

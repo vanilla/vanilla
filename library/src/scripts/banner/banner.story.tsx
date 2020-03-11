@@ -241,6 +241,7 @@ export const LogoLarge = storyWithConfig(
                 },
                 logo: {
                     image: "https://us.v-cdn.net/5022541/uploads/594/57SO4ULTV3HP.png",
+                    width: "50%",
                 },
                 spacing: {
                     padding: {
@@ -292,7 +293,7 @@ export const LogoSmall = storyWithConfig(
                     },
                 },
                 logo: {
-                    width: 300,
+                    width: 150,
                     image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
                 },
                 spacing: {

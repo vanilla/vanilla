@@ -52,8 +52,13 @@ trait SphinxTrait {
         $client->setServer($sphinxHost, $sphinxPort);
 
         // Set some defaults
-        $client->setMatchMode(SPH_MATCH_EXTENDED2);
-        $client->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+        if (method_exists($client, "setMatchMode")) {
+            $client->setMatchMode(SPH_MATCH_EXTENDED2);
+            $client->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+        } else {
+            // SPH_SORT_TIME_SEGMENTS is not a valid sort mode in Sphinx 3.2.1.
+            $client->setSortMode(SPH_SORT_RELEVANCE);
+        }
         $client->setMaxQueryTime(5000);
 
         return $client;

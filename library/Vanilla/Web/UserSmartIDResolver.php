@@ -53,11 +53,7 @@ class UserSmartIDResolver {
         }
 
         if ($column === 'me' && empty($value)) {
-            if ($this->session->isValid()) {
-                return $this->session->UserID;
-            } else {
-                throw new ForbiddenException('You must sign in.');
-            }
+            return $this->session->UserID; // Could be 0 for a guest.
         } elseif (in_array($column, ['name', 'email'])) {
             // These are basic field lookups on the user table.
             return $sender->fetchValue('User', $pk, [$column => $value]);

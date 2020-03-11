@@ -18,6 +18,50 @@ trait PermissionsTranslationTrait {
     /** @var NameScheme */
     private $nameScheme;
 
+    /**
+     * TECH DEBT HERE
+     * Currently our permission caches and main permission object do not keep the junction table that a permission maps to.
+     *
+     * TEMPORARY ASSUMPTION
+     * This _assumes_ that each permission name only has 1 junction table to map to. This may not hold true in the future.
+     * If that ever becomes the case, this mapping will need to be removed, and the junction tables stored in Permission object & cache.
+     *
+     * @var array [ JunctionTable => [permission.name, permission.otherName] ]
+     */
+    private $junctionTableMappings = [
+        'knowledgeBase' => ['kb.view', 'articles.add'],
+        'category' => [
+            "comments.add",
+            "comments.delete",
+            "comments.edit",
+            "discussions.add",
+            "discussions.manage",
+            "discussions.moderate",
+            "discussions.view",
+            "discussions.edit",
+            "discussions.announce",
+            "discussions.sink",
+            "discussions.close",
+            "discussions.delete"
+        ],
+    ];
+
+    /**
+     * Get the "assumed" junction table name
+     *
+     * @param string $permissionName
+     * @return string|null
+     */
+    private function getJunctionTableForPermission(string $permissionName): ?string {
+        foreach ($this->junctionTableMappings as $table => $permissions) {
+            if (in_array($permissionName, $permissions)) {
+                return $table;
+            }
+        }
+
+        return null;
+    }
+
     /** @var array Groups of permissions that can be consolidated into one. */
     private $consolidatedPermissions = [
         'discussions.moderate' => ['discussions.announce', 'discussions.close', 'discussions.sink'],

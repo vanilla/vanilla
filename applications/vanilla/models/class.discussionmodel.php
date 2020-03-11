@@ -860,14 +860,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         }
 
         // Add select of addition fields to the SQL object.
-        if (!empty($selects)) {
-            if (!is_array($selects)) {
-                $selects = [$selects];
-            }
-
-            foreach ($selects as $select) {
-                $sql->select($select);
-            }
+        foreach ($selects as $select) {
+            $sql->select($select);
         }
 
         $outerQuery = $sql->getSelect();

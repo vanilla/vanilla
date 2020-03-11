@@ -37,7 +37,7 @@ export interface IThemeState {
     forcedVariables: IThemeVariables | null;
 }
 
-export const INITIAL_STATE: IThemeState = {
+export const INITIAL_THEME_STATE: IThemeState = {
     assets: {
         status: LoadStatus.PENDING,
     },
@@ -45,7 +45,7 @@ export const INITIAL_STATE: IThemeState = {
 };
 
 export const themeReducer = produce(
-    reducerWithInitialState(INITIAL_STATE)
+    reducerWithInitialState(INITIAL_THEME_STATE)
         .case(ThemeActions.getAssets.started, state => {
             state.assets.status = LoadStatus.LOADING;
             return state;

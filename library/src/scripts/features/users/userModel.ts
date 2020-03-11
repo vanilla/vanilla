@@ -61,12 +61,6 @@ export const INITIAL_USERS_STATE: IUsersState = {
     suggestions: suggestionReducer(undefined, "" as any),
 };
 
-export const INITIAL_THEMES_STATE: IThemeState = {
-    assets: { status: LoadStatus.PENDING },
-};
-export const INITIAL_LOCALE_STATE: ILocaleState = {
-    locales: { status: LoadStatus.PENDING },
-};
 export const GUEST_USER_ID = 0;
 
 /**

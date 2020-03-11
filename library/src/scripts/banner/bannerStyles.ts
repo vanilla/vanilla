@@ -22,6 +22,7 @@ import {
     fonts,
     IFont,
     modifyColorBasedOnLightness,
+    textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -34,7 +35,8 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { ButtonPresets } from "@library/forms/buttonStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -240,10 +242,11 @@ export const bannerVariables = useThemeCache(() => {
         },
         sizing: {
             maxWidth: 705,
+            height: 40,
         },
         font: {
             color: colors.fg,
-            size: formElVars.giantInput.fontSize,
+            size: globalVars.fonts.size.large,
         },
         margin: {
             ...EMPTY_SPACING,
@@ -317,6 +320,9 @@ export const bannerVariables = useThemeCache(() => {
         name: "searchButton",
         preset: presets.button.preset,
         spinnerColor: colors.primaryContrast,
+        sizing: {
+            minHeight: searchBar.sizing.height,
+        },
         colors: {
             bg: searchButtonBg,
             fg: colors.primaryContrast,
@@ -325,7 +331,7 @@ export const bannerVariables = useThemeCache(() => {
         fonts: {
             color: colors.primaryContrast,
             size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.semiBold,
+            weight: globalVars.fonts.weights.bold,
         },
         state: buttonStateStyles,
     } as IButtonType);
@@ -363,6 +369,7 @@ export const bannerVariables = useThemeCache(() => {
         title,
         description,
         paragraph,
+        state,
         searchBar,
         buttonShadow,
         searchButton,
@@ -384,11 +391,25 @@ export const bannerClasses = useThemeCache(() => {
     const presets = presetsBanner();
 
     const isCentered = vars.options.alignment === "center";
-    const searchButton = style("searchButton", generateButtonStyleProperties(vars.searchButton), { left: -1 });
+    const searchButton = style("searchButton", {
+        $nest: {
+            "&.searchBar-submitButton": {
+                ...generateButtonStyleProperties(vars.searchButton),
+                left: -1,
+            },
+        },
+    });
 
     const valueContainer = style("valueContainer", {
         $nest: {
-            "&&": {
+            "&&.inputText": {
+                ...textInputSizingFromFixedHeight(
+                    vars.searchBar.sizing.height,
+                    vars.searchBar.font.size,
+                    vars.searchBar.border.width * 2,
+                ),
+                boxSizing: "border-box",
+                paddingLeft: unit(searchBarVariables().searchIcon.gap),
                 backgroundColor: colorOut(vars.searchBar.colors.bg),
                 ...borders({
                     color: vars.searchBar.border.color,
@@ -398,12 +419,11 @@ export const bannerClasses = useThemeCache(() => {
                         ...borders(vars.searchBar.border),
                     },
                 },
-            },
-            ".inputText": {
                 borderColor: colorOut(vars.searchBar.border.color),
             },
             ".searchBar__control": {
                 cursor: "text",
+                position: "relative",
             },
             "& .searchBar__placeholder": {
                 color: colorOut(vars.searchBar.font.color),
@@ -590,12 +610,11 @@ export const bannerClasses = useThemeCache(() => {
         boxSizing: "border-box",
         zIndex: 1,
         boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
-
         borderTopLeftRadius: unit(leftRadius),
         borderBottomLeftRadius: unit(leftRadius),
         borderTopRightRadius: unit(rightRadius),
         borderBottomRightRadius: unit(rightRadius),
-
+        height: unit(vars.searchBar.sizing.height),
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {
                 boxShadow: `0 0 0 1px ${colorOut(vars.colors.primary)} inset`,
@@ -696,6 +715,25 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
+    const iconContainer = style("iconContainer", {
+        $nest: {
+            "&&": {
+                height: unit(vars.searchBar.sizing.height),
+                outline: 0,
+                border: 0,
+                background: "transparent",
+            },
+        },
+    });
+
+    const resultsAsModal = style("resultsAsModalClasses", {
+        $nest: {
+            "&&": {
+                top: unit(vars.searchBar.sizing.height),
+            },
+        },
+    });
+
     return {
         root,
         outerBackground,
@@ -715,6 +753,8 @@ export const bannerClasses = useThemeCache(() => {
         descriptionWrap,
         content,
         valueContainer,
+        iconContainer,
+        resultsAsModal,
         backgroundOverlay,
         imageElementContainer,
         imageElement,

@@ -5,7 +5,7 @@
  */
 
 import { color, ColorHelper, important } from "csx";
-import { logError } from "@vanilla/utils/src/debugUtils";
+import { logError, logDebug, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
 
 export type ColorValues = ColorHelper | undefined;
 
@@ -68,20 +68,44 @@ export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) =>
  * Color modification based on colors lightness.
  * @param color - The color we're checking and modifying
  * @param weight - The amount you want to mix the two colors (value from 0 to 1)
- * @param flip - By default we darken light colours and lighten dark colors, but if you want to get the opposite result, use this param
+ * @param inverse - By default we darken light colours and lighten dark colors, but if you want to get the inverse result, use this param
+ * @param flipWeightForDark - For dark themes, flip ratio. Example, a weight of ".2" for a light theme would be ".8" for a dark theme.
+ * @param debug - Turn on debug logs
  * Note, however, that we do not check if you've reached a maximum. Example: If you want to darken pure black, you get back pure black.
  */
-export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, flip: boolean = false) => {
+export const modifyColorBasedOnLightness = (
+    color: ColorHelper,
+    weight: number,
+    inverse: boolean = false,
+    flipWeightForDark = false,
+    debug = false,
+) => {
+    logDebugConditionnal(debug, "=== start modifyColorBasedOnLightness debug ===");
+    logDebugConditionnal(debug, "initial color: ", color);
+    logDebugConditionnal(debug, "initial weight: ", weight);
+    logDebugConditionnal(debug, "inverse: ", inverse);
+    logDebugConditionnal(debug, "flipWeightForDark: ", flipWeightForDark);
+    logDebugConditionnal(debug, ": ");
+
     let output;
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
+
     const isLight = isLightColor(color);
-    if ((isLight && !flip) || (!isLight && flip)) {
+    logDebugConditionnal(debug, "is light: ", isLight);
+    if (flipWeightForDark && !isLight) {
+        weight = 1 - weight;
+    }
+    logDebugConditionnal(debug, "final weight: ", weight);
+    if ((isLight && !inverse) || (!isLight && inverse)) {
         output = color.darken(weight) as ColorHelper;
     } else {
         output = color.lighten(weight) as ColorHelper;
     }
+    logDebugConditionnal(debug, "output: ", output);
+    logDebugConditionnal(debug, "output: ");
+    logDebugConditionnal(debug, "=== end modifyColorBasedOnLightness debug ===");
     return output;
 };
 

@@ -25,7 +25,7 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                     ?>
                 </h2>
 
-                <?php if ($this->DiscussionData->numRows() > 0) : ?>
+                <?php if (isset($this->DiscussionData) && $this->DiscussionData->numRows() > 0) : ?>
                     <ul class="DataList Discussions">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>
                     </ul>

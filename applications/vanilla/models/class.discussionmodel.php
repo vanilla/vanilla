@@ -782,8 +782,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $orderBy = [$orderFields => $orderDirection];
         }
 
+        $selects = [];
         $this->EventArguments['OrderBy'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$where;
+        $this->EventArguments['Selects'] = &$selects;
         $this->fireEvent('BeforeGet');
 
         // Verify permissions (restricting by category if necessary)
@@ -855,6 +857,11 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated');
+        }
+
+        // Add select of addition fields to the SQL object.
+        foreach ($selects as $select) {
+            $sql->select($select);
         }
 
         $outerQuery = $sql->getSelect();
@@ -1144,10 +1151,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $discussion->Read = false;
             $discussion->CountUnreadComments = true;
         } else {
+            // If the category was marked explicitly read at some point, see if that applies here
             if ($category && !is_null($category['DateMarkedRead'])) {
-                // If the category was marked explicitly read at some point, see if that applies here
-                $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
+                // If the discussion hasn't been viewed or was created after the category was marked read,
+                // leave CountCountCommentWatch and DateLastViewed null. Otherwise, calculate the correct DateLastViewed.
+                if (!is_null($discussion->DateLastViewed) ||
+                    self::maxDate($category['DateMarkedRead'], $discussion->DateInserted) === $category['DateMarkedRead']) {
+                    // If it's not a newly created discussion, set DateLastViewed to whichever is most recent.
+                    $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
+                }
             }
+
             list($read, $count) = $this->calculateCommentReadData(
                 $discussion->CountComments,
                 $discussion->DateLastComment,
@@ -3643,7 +3657,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $row['DateLastComment'] = $row['DateInserted'];
         }
 
-        $scheme = new CamelCaseScheme;
+        $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
 

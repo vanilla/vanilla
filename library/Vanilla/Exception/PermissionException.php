@@ -26,11 +26,13 @@ class PermissionException extends ForbiddenException {
         $context['permissions'] = $permissions;
 
         if (count($permissions) === 1) {
-            $msg = sprintft('You need the %s permission to do that.', $permissions[0]);
+            $description = sprintft(\Gdn::translate('You need the %s permission to do that.'), $permissions[0]);
         } else {
-            $msg = sprintft('You need one of %s permissions to do that.', implode(', ', $permissions));
+            $description = sprintft(\Gdn::translate('You need one of %s permissions to do that.'), implode(', ', $permissions));
         }
+        $context['description'] = $description;
+        $message = \Gdn::translate('Permission Problem');
 
-        parent::__construct($msg, $context);
+        parent::__construct($message, $context);
     }
 }

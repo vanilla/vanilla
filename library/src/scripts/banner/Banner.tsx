@@ -91,6 +91,8 @@ export default function Banner(props: IProps) {
                                     }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}
+                                    iconContainerClasses={classes.iconContainer}
+                                    resultsAsModalClasses={classes.resultsAsModal}
                                 />
                             </div>
                         )}

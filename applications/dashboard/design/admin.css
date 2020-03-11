@@ -11897,6 +11897,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   content: "";
   transition: 0.2s ease box-shadow;
+  pointer-events: none;
 }
 .richEditor .embedExternal-content:hover:after,
 .richEditor .embedLinkLoader-link:hover:after {

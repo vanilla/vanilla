@@ -662,7 +662,7 @@ class CategoriesController extends VanillaController {
         $Discussions = [];
 
         foreach ($this->CategoryData->result() as $Category) {
-            if ($Category->CategoryID > 0) {
+            if ($Category->CategoryID > 0 && $Category->CountDiscussions > 0) {
                 $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->get(0, $this->DiscussionsPerCategory, ['d.CategoryID' => $Category->CategoryID, 'Announce' => 'all']);
 
                 $Discussions = array_merge(

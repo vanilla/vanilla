@@ -160,14 +160,14 @@ export const bannerVariables = useThemeCache(() => {
         },
     });
 
-    const logoContainer = makeThemeVars("rightImage", {
-        height: 300,
-        maxHeight: 300,
-    });
-
     const logo = makeThemeVars("logo", {
+        height: "auto",
+        minHeight: 300,
+        width: 300,
+        padding: {
+            all: 12,
+        },
         image: undefined as string | undefined,
-        width: undefined,
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
@@ -414,7 +414,6 @@ export const bannerVariables = useThemeCache(() => {
         isTransparentButton,
         unifiedBannerOptions,
         searchStrip,
-        logoContainer,
         logo,
     };
 });
@@ -508,6 +507,8 @@ export const bannerClasses = useThemeCache(() => {
             ...backgroundHelper(vars.innerBackground),
             minWidth: unit(vars.contentContainer.minWidth),
             minHeight: unit(vars.contentContainer.minHeight),
+            maxWidth: percent(100),
+            width: percent(100),
         },
         media(
             {
@@ -521,6 +522,8 @@ export const bannerClasses = useThemeCache(() => {
             },
         ),
         mediaQueries.oneColumnDown({
+            minWidth: percent(100),
+            maxWidth: percent(100),
             ...paddings(vars.spacing.paddingMobile),
         }),
     );
@@ -678,6 +681,7 @@ export const bannerClasses = useThemeCache(() => {
         flexDirection: "row",
         flexWrap: "nowrap",
         alignItems: "center",
+        maxWidth: percent(100),
     });
 
     const makeImageMinWidth = (rootUnit, padding) =>
@@ -717,18 +721,37 @@ export const bannerClasses = useThemeCache(() => {
 
     const logoContainer = style("logoContainer", {
         display: "flex",
-        height: unit(vars.logoContainer.height),
-        width: "100%",
+        width: percent(100),
+        height: unit(vars.logo.height),
+        maxWidth: percent(100),
+        minHeight: unit(vars.logo.minHeight),
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
+        overflow: "hidden",
+    });
+
+    const logoSpacer = style("logoSpacer", {
+        ...paddings(vars.logo.padding),
     });
 
     const logo = style("logo", {
         maxHeight: percent(100),
         maxWidth: percent(100),
-        height: "auto",
-        width: vars.logo.width ? unit(vars.logo.width) : undefined,
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        height: vars.logo.height ? unit(vars.logo.height) : "auto",
+        width: vars.logo.width ? unit(vars.logo.width) : "auto",
+        margin: "auto",
+        $nest: {
+            "@supports (object-fit: cover)": {
+                objectFit: "contain",
+                objectPosition: "center",
+            },
+        },
     });
 
     const rightImage = style(
@@ -844,6 +867,7 @@ export const bannerClasses = useThemeCache(() => {
         searchStrip,
         noTopMargin,
         logoContainer,
+        logoSpacer,
         logo,
     };
 });

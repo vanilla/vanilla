@@ -99,7 +99,7 @@ export default function Banner(props: IProps) {
                 </div>
                 {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
-                    <ConditionalWrap className={classes.imagePositioner} condition={!!rightImageSrc}>
+                    <ConditionalWrap className={classes.imagePositioner} condition={!!logoImageSrc}>
                         {/*For SEO & accessibility*/}
                         {options.hideTitle && (
                             <Heading className={visibility().visuallyHidden} depth={1}>
@@ -109,13 +109,15 @@ export default function Banner(props: IProps) {
                         <ConditionalWrap
                             className={classes.contentContainer}
                             condition={
-                                showMiddleSearch || !options.hideTitle || !options.hideDescription || !!rightImageSrc
+                                showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
                             }
                         >
                             {!!logoImageSrc && (
-                                <div className={classes.logoContainer}>
-                                    {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                    <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
+                                <div className={classes.logoSpacer}>
+                                    <div className={classes.logoContainer}>
+                                        {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                        <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
+                                    </div>
                                 </div>
                             )}
                             {!options.hideTitle && (

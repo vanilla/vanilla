@@ -24,6 +24,20 @@ export const discussionCSS = () => {
         },
     );
 
+    cssOut(
+        `
+        .userContent.userContent h1,
+        .userContent.userContent h2,
+        .userContent.userContent h3,
+        .userContent.userContent h4,
+        .userContent.userContent h5,
+        .userContent.userContent h6
+    `,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
+
     // Polls
 
     cssOut(

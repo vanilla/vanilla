@@ -78,6 +78,8 @@ export default function Banner(props: IProps) {
                 }
                 contentClass={classes.content}
                 valueContainerClasses={classes.valueContainer}
+                iconContainerClasses={classes.iconContainer}
+                resultsAsModalClasses={classes.resultsAsModal}
             />
         </div>
     );
@@ -138,29 +140,6 @@ export default function Banner(props: IProps) {
                             <div className={classes.imageElementContainer}>
                                 {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
                                 <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
-                            </div>
-                        )}
-
-                        {!options.hideSearch && (
-                            <div className={classes.searchContainer}>
-                                <IndependentSearch
-                                    buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    isLarge={true}
-                                    placeholder={t("Search")}
-                                    inputClass={classes.input}
-                                    iconClass={classes.icon}
-                                    buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={
-                                        device === Devices.MOBILE ||
-                                        device === Devices.XS ||
-                                        presetsBanner().button.preset === ButtonPresets.HIDE
-                                    }
-                                    contentClass={classes.content}
-                                    valueContainerClasses={classes.valueContainer}
-                                    iconContainerClasses={classes.iconContainer}
-                                    resultsAsModalClasses={classes.resultsAsModal}
-                                />
                             </div>
                         )}
                     </ConditionalWrap>

@@ -505,7 +505,6 @@ class Gdn_Model extends Gdn_Pluggable {
         $resetData = false;
         if ($options === true || val('reset', $options)) {
             deprecated('Gdn_Model->delete() with reset true');
-            $resetData = true;
         } elseif (is_numeric($options)) {
             deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
             $limit = $options;
@@ -514,11 +513,8 @@ class Gdn_Model extends Gdn_Pluggable {
             $limit = $options['limit'];
         }
 
-        if ($resetData) {
-            $result = $this->SQL->delete($this->Name, $where, $limit);
-        } else {
-            $result = $this->SQL->noReset()->delete($this->Name, $where, $limit);
-        }
+        $result = $this->SQL->delete($this->Name, $where, $limit);
+
         return $result;
     }
 

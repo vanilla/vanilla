@@ -610,12 +610,6 @@ export const searchBarNoImage = storyWithConfig(
                     color: color("#54367c"),
                     unsetBackground: true,
                 },
-                contentContainer: {
-                    padding: {
-                        top: 12,
-                        bottom: 12,
-                    },
-                },
             },
             presetsBanner: {
                 input: {
@@ -653,12 +647,6 @@ export const bannerImageOnly = storyWithConfig(
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                     mobile: {
                         image: "https://us.v-cdn.net/5022541/uploads/470/U68ZI0LRPRBQ.png",
-                    },
-                },
-                contentContainer: {
-                    padding: {
-                        top: 12,
-                        bottom: 12,
                     },
                 },
             },

@@ -162,7 +162,8 @@ export const bannerVariables = useThemeCache(() => {
         },
         mobile: {
             padding: {
-                ...EMPTY_SPACING,
+                top: 12,
+                bottom: 12,
             },
         },
     });

@@ -748,13 +748,6 @@ export const bannerClasses = useThemeCache(() => {
         } else {
             return unit(simplifiedNumberOutput);
         }
-
-        //
-        // return calc(
-        //     `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
-        //         vars.contentContainer.padding.horizontal,
-        //     )} - ${unit(padding)}`,
-        // );
     };
 
     const imageElementContainer = style(
@@ -847,6 +840,8 @@ export const bannerClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        maxWidth: percent(100),
+        overflow: "hidden",
         backgroundColor: colorOut(vars.outerBackground.color),
         $nest: {
             [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,

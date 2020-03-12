@@ -99,7 +99,7 @@ export default function Banner(props: IProps) {
                 </div>
                 {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
-                    <ConditionalWrap className={classes.imagePositioner} condition={!!logoImageSrc}>
+                    <div className={classes.imagePositioner}>
                         {/*For SEO & accessibility*/}
                         {options.hideTitle && (
                             <Heading className={visibility().visuallyHidden} depth={1}>
@@ -107,7 +107,7 @@ export default function Banner(props: IProps) {
                             </Heading>
                         )}
                         <ConditionalWrap
-                            className={classes.contentContainer(!rightImageSrc && !!logoImageSrc)}
+                            className={classes.contentContainer(!rightImageSrc)}
                             condition={
                                 showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
                             }
@@ -144,7 +144,7 @@ export default function Banner(props: IProps) {
                                 <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
                             </div>
                         )}
-                    </ConditionalWrap>
+                    </div>
                 </Container>
             </div>
             {showBottomSearch && (

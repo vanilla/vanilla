@@ -28,6 +28,7 @@ import {
     fonts,
     IFont,
     modifyColorBasedOnLightness,
+    negative,
     textInputSizingFromFixedHeight,
     unit,
     unitIfDefined,
@@ -547,7 +548,6 @@ export const bannerClasses = useThemeCache(() => {
                 ...backgroundHelper(vars.innerBackground),
                 minWidth: unit(vars.contentContainer.minWidth),
                 minHeight: unit(vars.dimensions.minHeight),
-                maxWidth: percent(100),
                 width: hasFullWidth ? percent(100) : undefined,
             },
             mediaQueries.oneColumnDown({
@@ -715,21 +715,57 @@ export const bannerClasses = useThemeCache(() => {
         maxWidth: percent(100),
     });
 
-    const makeImageMinWidth = (rootUnit, padding) =>
-        calc(
-            `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
-                vars.contentContainer.padding.horizontal,
-            )} - ${unit(padding)}`,
-        );
+    const makeImageMinWidth = (rootUnit, padding) => {
+        const values = [
+            rootUnit,
+            negative(vars.contentContainer.minWidth),
+            negative(vars.contentContainer.padding.horizontal),
+            negative(padding),
+        ];
+
+        const stringValues = [];
+        let simplifiedNumber = 0;
+
+        values.forEach(value => {
+            if (typeof value === "number") {
+                simplifiedNumber += value;
+            } else {
+                if (value) {
+                    stringValues.push(unit(value) as never);
+                }
+            }
+        });
+
+        // @ts-ignore
+        let simplifiedNumberOutput = simplifiedNumber ? unit(simplifiedNumber.toString()).toString() : "";
+
+        if (simplifiedNumberOutput.startsWith("-")) {
+            simplifiedNumberOutput = simplifiedNumberOutput.replace("-", "- ");
+        }
+
+        if (stringValues.length > 0) {
+            return calc(`${stringValues.join(" + ")} + ${unit(simplifiedNumberOutput)}`.replace("+ -", "-").trim());
+        } else {
+            return unit(simplifiedNumberOutput);
+        }
+
+        //
+        // return calc(
+        //     `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
+        //         vars.contentContainer.padding.horizontal,
+        //     )} - ${unit(padding)}`,
+        // );
+    };
 
     const imageElementContainer = style(
         "imageElementContainer",
         {
             alignSelf: "stretch",
-            minWidth: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
+            width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
             flexGrow: 1,
             position: "relative",
             overflow: "hidden",
+            ...paddings(vars.rightImage.padding),
         },
         media(
             { maxWidth: globalVars.content.width },
@@ -740,7 +776,7 @@ export const bannerClasses = useThemeCache(() => {
         layoutVariables()
             .mediaQueries()
             .oneColumnDown({
-                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
+                width: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
             }),
         media(
             { maxWidth: 500 },
@@ -778,7 +814,6 @@ export const bannerClasses = useThemeCache(() => {
         {
             ...absolutePosition.middleRightOfParent(),
             minWidth: unit(vars.rightImage.minWidth),
-            ...paddings(vars.rightImage.padding),
             objectPosition: "100% 50%",
             objectFit: "contain",
             marginLeft: "auto",

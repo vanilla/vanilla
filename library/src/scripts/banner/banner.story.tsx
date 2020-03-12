@@ -539,11 +539,6 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                 options: {
                     searchPlacement: "bottom" as SearchPlacement,
                 },
-                contentContainer: {
-                    padding: {
-                        bottom: 140,
-                    },
-                },
                 backgrounds: {
                     useOverlay: true,
                 },
@@ -552,6 +547,11 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                     color: color("#54367c"),
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
+                contentContainer: {
+                    padding: {
+                        bottom: 140,
+                    },
+                },
                 searchStrip: {
                     bg: linearGradient("to bottom", "rgb(0,0,0,0) 0%,rgba(0,0,0, .4) 50%"),
                     minHeight: 140,
@@ -559,6 +559,13 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                     padding: {
                         top: 0,
                         bottom: 70,
+                    },
+                    mobile: {
+                        minHeight: 0,
+                        offset: -50,
+                        padding: {
+                            bottom: 0,
+                        },
                     },
                 },
             },
@@ -639,6 +646,9 @@ export const bannerImageOnly = storyWithConfig(
                     padding: {
                         top: 12,
                         bottom: 12,
+                    },
+                    mobile: {
+                        minHeight: 300,
                     },
                 },
             },

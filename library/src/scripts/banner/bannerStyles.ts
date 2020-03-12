@@ -90,11 +90,13 @@ export const bannerVariables = useThemeCache(() => {
             bottom: topPadding as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
-        paddingMobile: {
-            ...EMPTY_SPACING,
-            top: 0,
-            bottom: globalVars.gutter.size,
-            horizontal: horizontalPadding,
+        mobile: {
+            padding: {
+                ...EMPTY_SPACING,
+                top: 0,
+                bottom: globalVars.gutter.size,
+                horizontal: horizontalPadding,
+            },
         },
     });
 
@@ -146,6 +148,12 @@ export const bannerVariables = useThemeCache(() => {
             top: spacing.padding.top,
             bottom: spacing.padding.bottom,
             horizontal: 0,
+        },
+        mobile: {
+            minHeight: 0,
+            padding: {
+                ...EMPTY_SPACING,
+            },
         },
     });
 
@@ -388,6 +396,14 @@ export const bannerVariables = useThemeCache(() => {
             top: 12,
             bottom: 12,
         },
+        mobile: {
+            bg: undefined as BackgroundColorProperty | undefined,
+            minHeight: undefined as "string" | number | undefined,
+            offset: undefined as "string" | number | undefined,
+            padding: {
+                ...EMPTY_SPACING,
+            },
+        },
     });
 
     return {
@@ -510,23 +526,24 @@ export const bannerClasses = useThemeCache(() => {
                 maxWidth: percent(100),
                 width: hasFullWidth ? percent(100) : undefined,
             },
-            media(
-                {
-                    maxWidth: calc(
-                        `${unit(vars.contentContainer.minWidth)} + ${unit(
-                            vars.contentContainer.padding.horizontal,
-                        )} * 4`,
-                    ),
-                },
-                {
-                    width: percent(100),
-                    minWidth: "initial",
-                },
-            ),
+            // media(
+            //     {
+            //         maxWidth: calc(
+            //             `${unit(vars.contentContainer.minWidth)} + ${unit(
+            //                 vars.contentContainer.padding.horizontal,
+            //             )} * 4`,
+            //         ),
+            //     },
+            //     {
+            //         width: percent(100),
+            //         minWidth: "initial",
+            //     },
+            // ),
             mediaQueries.oneColumnDown({
                 minWidth: percent(100),
                 maxWidth: percent(100),
-                ...paddings(vars.spacing.paddingMobile),
+                minHeight: unit(vars.contentContainer.mobile.minHeight),
+                ...paddings(vars.spacing.mobile.padding),
             }),
         );
     };
@@ -712,7 +729,7 @@ export const bannerClasses = useThemeCache(() => {
         layoutVariables()
             .mediaQueries()
             .oneColumnDown({
-                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingMobile.horizontal),
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
             }),
         media(
             { maxWidth: 500 },
@@ -817,17 +834,27 @@ export const bannerClasses = useThemeCache(() => {
         minHeight: unit(vars.dimensions.minHeight),
     });
 
-    const searchStrip = style("searchStrip", {
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1,
-        background: colorOut(vars.searchStrip.bg),
-        ...paddings(vars.searchStrip.padding),
-        minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
-        marginTop: unit(vars.searchStrip.offset),
-    });
+    const searchStrip = style(
+        "searchStrip",
+        {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1,
+            background: colorOut(vars.searchStrip.bg),
+            ...paddings(vars.searchStrip.padding),
+            minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
+            marginTop: unit(vars.searchStrip.offset),
+        },
+        mediaQueries.oneColumnDown({
+            background: vars.searchStrip.mobile.bg !== undefined ? colorOut(vars.searchStrip.mobile.bg) : undefined,
+            ...paddings(vars.searchStrip.mobile.padding),
+            minHeight:
+                vars.searchStrip.mobile.minHeight !== undefined ? unit(vars.searchStrip.mobile.minHeight) : undefined,
+            marginTop: vars.searchStrip.mobile.offset !== undefined ? unit(vars.searchStrip.mobile.offset) : undefined,
+        }),
+    );
 
     return {
         root,

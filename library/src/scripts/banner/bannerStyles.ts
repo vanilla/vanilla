@@ -111,7 +111,7 @@ export const bannerVariables = useThemeCache(() => {
     const dimensions = makeThemeVars("dimensions", {
         minHeight: 50,
         mobile: {
-            minHeight: undefined,
+            minHeight: undefined as undefined | number | string,
         },
     });
 
@@ -195,7 +195,7 @@ export const bannerVariables = useThemeCache(() => {
         position: "50% 50%",
         size: "cover",
         mobile: {
-            image: undefined,
+            image: undefined as undefined | string,
         },
     });
 

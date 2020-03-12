@@ -20,13 +20,13 @@ export interface ISpacing {
 }
 
 export const EMPTY_SPACING = {
-    top: undefined,
-    right: undefined,
-    bottom: undefined,
-    left: undefined,
-    horizontal: undefined,
-    vertical: undefined,
-    all: undefined,
+    top: undefined as undefined | number | string,
+    right: undefined as undefined | number | string,
+    bottom: undefined as undefined | number | string,
+    left: undefined as undefined | number | string,
+    horizontal: undefined as undefined | number | string,
+    vertical: undefined as undefined | number | string,
+    all: undefined as undefined | number | string,
 };
 
 function spacings(property: "margin" | "padding", spacings?: ISpacing) {

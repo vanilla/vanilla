@@ -85,3 +85,7 @@ export const negative = val => {
         return val;
     }
 };
+
+export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {
+    return val !== undefined ? unit(val) : undefined;
+};

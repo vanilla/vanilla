@@ -7,13 +7,20 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import {
+    BackgroundColorProperty,
+    BackgroundImageProperty,
+    FontWeightProperty,
+    PaddingProperty,
+    TextShadowProperty,
+} from "csstype";
 import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
     backgroundHelper,
     borders,
     colorOut,
+    colorOutIfDefined,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
     EMPTY_FONTS,
@@ -23,6 +30,7 @@ import {
     modifyColorBasedOnLightness,
     textInputSizingFromFixedHeight,
     unit,
+    unitIfDefined,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -102,6 +110,9 @@ export const bannerVariables = useThemeCache(() => {
 
     const dimensions = makeThemeVars("dimensions", {
         minHeight: 50,
+        mobile: {
+            minHeight: undefined,
+        },
     });
 
     const inputAndButton = makeThemeVars("inputAndButton", {
@@ -143,14 +154,13 @@ export const bannerVariables = useThemeCache(() => {
 
     const contentContainer = makeThemeVars("contentContainer", {
         minWidth: 550,
-        minHeight: 0,
         padding: {
+            ...EMPTY_SPACING,
             top: spacing.padding.top,
             bottom: spacing.padding.bottom,
             horizontal: 0,
         },
         mobile: {
-            minHeight: 0,
             padding: {
                 ...EMPTY_SPACING,
             },
@@ -183,6 +193,9 @@ export const bannerVariables = useThemeCache(() => {
         repeat: "no-repeat",
         position: "50% 50%",
         size: "cover",
+        mobile: {
+            image: undefined,
+        },
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -489,16 +502,22 @@ export const bannerClasses = useThemeCache(() => {
             image: finalUrl,
         };
 
-        return style("outerBackground", {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: percent(100),
-            height: calc(`100% + 2px`),
-            transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
-            display: "block",
-            ...backgroundHelper(finalVars),
-        });
+        return style(
+            "outerBackground",
+            {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: percent(100),
+                height: calc(`100% + 2px`),
+                transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
+                display: "block",
+                ...backgroundHelper(finalVars),
+            },
+            mediaQueries.oneColumnDown({
+                image: vars.outerBackground.mobile.image,
+            } as NestedCSSProperties),
+        );
     };
 
     const defaultBannerSVG = style("defaultBannerSVG", {
@@ -519,31 +538,22 @@ export const bannerClasses = useThemeCache(() => {
         return style(
             "contentContainer",
             {
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
                 ...paddings(vars.contentContainer.padding),
                 ...backgroundHelper(vars.innerBackground),
                 minWidth: unit(vars.contentContainer.minWidth),
-                minHeight: unit(vars.contentContainer.minHeight),
+                minHeight: unit(vars.dimensions.minHeight),
                 maxWidth: percent(100),
                 width: hasFullWidth ? percent(100) : undefined,
             },
-            // media(
-            //     {
-            //         maxWidth: calc(
-            //             `${unit(vars.contentContainer.minWidth)} + ${unit(
-            //                 vars.contentContainer.padding.horizontal,
-            //             )} * 4`,
-            //         ),
-            //     },
-            //     {
-            //         width: percent(100),
-            //         minWidth: "initial",
-            //     },
-            // ),
             mediaQueries.oneColumnDown({
                 minWidth: percent(100),
                 maxWidth: percent(100),
-                minHeight: unit(vars.contentContainer.mobile.minHeight),
-                ...paddings(vars.spacing.mobile.padding),
+                minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+                ...paddings(vars.contentContainer.mobile.padding),
             }),
         );
     };
@@ -829,10 +839,16 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
-    const middleContainer = style("middleContainer", {
-        position: "relative",
-        minHeight: unit(vars.dimensions.minHeight),
-    });
+    const middleContainer = style(
+        "middleContainer",
+        {
+            position: "relative",
+            minHeight: unit(vars.dimensions.minHeight),
+        },
+        mediaQueries.oneColumnDown({
+            minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+        }),
+    );
 
     const searchStrip = style(
         "searchStrip",
@@ -844,15 +860,14 @@ export const bannerClasses = useThemeCache(() => {
             zIndex: 1,
             background: colorOut(vars.searchStrip.bg),
             ...paddings(vars.searchStrip.padding),
-            minHeight: unit(isNumeric(vars.searchStrip.minHeight.toString()) ? vars.searchStrip.minHeight : 0),
-            marginTop: unit(vars.searchStrip.offset),
+            minHeight: unitIfDefined(vars.searchStrip.minHeight),
+            marginTop: unitIfDefined(vars.searchStrip.offset),
         },
         mediaQueries.oneColumnDown({
-            background: vars.searchStrip.mobile.bg !== undefined ? colorOut(vars.searchStrip.mobile.bg) : undefined,
+            background: colorOutIfDefined(vars.searchStrip.mobile.bg),
             ...paddings(vars.searchStrip.mobile.padding),
-            minHeight:
-                vars.searchStrip.mobile.minHeight !== undefined ? unit(vars.searchStrip.mobile.minHeight) : undefined,
-            marginTop: vars.searchStrip.mobile.offset !== undefined ? unit(vars.searchStrip.mobile.offset) : undefined,
+            minHeight: unitIfDefined(vars.searchStrip.mobile.minHeight),
+            marginTop: unitIfDefined(vars.searchStrip.mobile.offset),
         }),
     );
 

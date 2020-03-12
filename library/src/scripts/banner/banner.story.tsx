@@ -547,9 +547,20 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                     color: color("#54367c"),
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
+                dimensions: {
+                    mobile: {
+                        minHeight: 200,
+                    },
+                },
                 contentContainer: {
                     padding: {
                         bottom: 140,
+                    },
+                    mobile: {
+                        padding: {
+                            top: 30,
+                            bottom: 100,
+                        },
                     },
                 },
                 searchStrip: {
@@ -561,10 +572,10 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                         bottom: 70,
                     },
                     mobile: {
-                        minHeight: 0,
-                        offset: -50,
+                        minHeight: 100,
+                        offset: -100,
                         padding: {
-                            bottom: 0,
+                            bottom: 15,
                         },
                     },
                 },
@@ -632,23 +643,22 @@ export const bannerImageOnly = storyWithConfig(
                 },
                 dimensions: {
                     minHeight: 300,
+                    mobile: {
+                        minHeight: 200,
+                    },
                 },
                 outerBackground: {
                     position: "50% 100%",
                     color: color("#54367c"),
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
-                },
-                innerBackground: {
-                    image: "https://us.v-cdn.net/6031163/uploads/3021ecca7cc7a015f582d8c2ce56fa09.png",
+                    mobile: {
+                        image: "https://us.v-cdn.net/5022541/uploads/470/U68ZI0LRPRBQ.png",
+                    },
                 },
                 contentContainer: {
-                    minHeight: 500,
                     padding: {
                         top: 12,
                         bottom: 12,
-                    },
-                    mobile: {
-                        minHeight: 300,
                     },
                 },
             },

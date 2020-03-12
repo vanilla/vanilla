@@ -80,7 +80,7 @@ export default function ColorPicker(props: IColorPicker) {
                 );
                 errorHelpers.setValue(undefined);
             },
-            300,
+            16,
             { trailing: true },
         ),
         [errorHelpers, setValidColor, helpers],

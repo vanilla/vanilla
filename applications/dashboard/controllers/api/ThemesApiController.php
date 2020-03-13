@@ -56,11 +56,20 @@ class ThemesApiController extends AbstractApiController {
      * Get a theme assets.
      *
      * @param string $themeKey The unique theme key or theme ID.
+     * @param array $query
      * @return array
      */
-    public function get(string $themeKey): array {
+    public function get(string $themeKey, array $query): array {
         $this->permission();
         $out = $this->themeResultSchema('out');
+        $in = $this->schema([
+            'allowAddonVariables:b?'
+        ]);
+        $params = $in->validate($query);
+
+        if (!($params['allowAddonVariables'] ?? true)) {
+            $this->themeModel->clearVariableProviders();
+        }
 
         $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey);
         $result = $out->validate($themeWithAssets);

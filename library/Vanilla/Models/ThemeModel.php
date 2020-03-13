@@ -123,6 +123,13 @@ class ThemeModel {
     }
 
     /**
+     * Clear all variable providers.
+     */
+    public function clearVariableProviders() {
+        $this->variableProviders = [];
+    }
+
+    /**
      * Get all configured theme-variable providers.
      *
      * @return array

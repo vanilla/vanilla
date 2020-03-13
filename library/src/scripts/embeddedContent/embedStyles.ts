@@ -17,7 +17,7 @@ export const embedContainerVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         bg: globalVars.mainColors.bg,
-        fg: globalVars.mainColors.fg
+        fg: globalVars.mainColors.fg,
     });
 
     const border = makeThemeVars("border", {

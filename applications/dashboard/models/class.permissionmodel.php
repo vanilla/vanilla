@@ -542,8 +542,9 @@ class PermissionModel extends Gdn_Model {
      * @return array Returns a permission array suitable for use in a session.
      */
     protected function cachePermissions2($roleID): array {
+        asort($roleID);
         $roleIDKey = implode(',', $roleID);
-        $roleIDKey = sha1(sort($roleIDKey));
+        $roleIDKey = sha1($roleIDKey);
         $inc = Gdn::userModel()->getPermissionsIncrement();
         $key = "perms:$inc:role:$roleIDKey";
         $permissions = $this->getCachedRoles($key);
@@ -569,36 +570,35 @@ class PermissionModel extends Gdn_Model {
     /**
      * Save role permissions in the cache.
      *
-     * @param array $permissions Role permissions
      * @param string $key The cache key
+     * @param array $permissions Role permissions
      */
-    protected function setCachedRoles($key, $permissions){
+    protected function setCachedRoles($key, $permissions) {
         Gdn::cache()->store($key, $permissions);
     }
 
     /**
      * Get role permission from the database.
      *
-     * @param $roleID
+     * @param array $roleID
      * @return array|bool $permissions
      */
     protected function getRolesPermissionsDB($roleID) {
         $sql = clone $this->SQL;
-            $sql->reset();
+        $sql->reset();
+        // Select all of the permission columns.
+        $permissionColumns = $this->permissionColumns();
+        foreach ($permissionColumns as $columnName => $value) {
+            $sql->select('p.`' . $columnName . '`', 'MAX');
+        }
 
-            // Select all of the permission columns.
-            $permissionColumns = $this->permissionColumns();
-            foreach ($permissionColumns as $columnName => $value) {
-                $sql->select('p.`' . $columnName . '`', 'MAX');
-            }
+        $sql->from('Permission p')
+            ->where('p.RoleID', $roleID)
+            ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
+            ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
 
-            $sql->from('Permission p')
-                ->where('p.RoleID', $roleID)
-                ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
-                ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-
-            $permissions = $sql->get()->resultArray();
-            return $permissions;
+        $permissions = $sql->get()->resultArray();
+        return $permissions;
     }
 
     /**

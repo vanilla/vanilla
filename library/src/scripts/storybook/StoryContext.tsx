@@ -13,7 +13,7 @@ import { Provider } from "react-redux";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 import isEqual from "lodash/isEqual";
-import { clearThemeCache } from "@library/styles/styleUtils";
+import { resetThemeCache } from "@library/styles/styleUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import { resetStoreState } from "@library/__tests__/testStoreState";
 import merge from "lodash/merge";
@@ -101,7 +101,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
             if (!isEqual(newState, contextState)) {
                 setContextState(newState);
                 resetStoreState(newState.storeState);
-                setThemeKey(clearThemeCache().toString());
+                setThemeKey(resetThemeCache().toString());
             }
         },
         [contextState],

@@ -12,6 +12,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 
 // Intentionally not overwritable.
 export const themeEditorVariables = () => {
+    const frameContainer = {
+        width: 100,
+    };
     const frame = {
         width: 100,
     };
@@ -19,10 +22,21 @@ export const themeEditorVariables = () => {
     const panel = {
         width: 376,
     };
+    const styleOptions = {
+        width: 376,
+        mobile: {
+            margin: {
+                top: 12,
+            },
+        },
+        borderRaduis: 6,
+    };
 
     return {
         frame,
         panel,
+        frameContainer,
+        styleOptions,
     };
 };
 
@@ -52,7 +66,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const frame = style(
         "frame",
         {
-            width: calc(`${percent(vars.frame.width)} - ${unit(vars.panel.width)}`),
             flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.panel.width)}`),
             height: percent(100),
         },
@@ -91,10 +104,22 @@ export const themeEditorClasses = useThemeCache(() => {
             width: percent(100),
         }),
     );
+    const frameContainer = style(
+        "frameContainer",
+        {
+            flexBasis: calc(`${percent(vars.frameContainer.width)} - ${unit(vars.styleOptions.width)}`),
+            height: percent(100),
+        },
+
+        mediaQueries.oneColumnDown({
+            width: percent(100),
+        }),
+    );
 
     return {
         frame,
         wrapper,
+        frameContainer,
         panel,
     };
 });

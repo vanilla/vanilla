@@ -13,14 +13,14 @@ export interface ILocaleState {
     locales: ILoadable<ILocale[]>;
 }
 
-const DEFAULT_LOCALE_STATE = {
+export const INITIAL_LOCALE_STATE = {
     locales: {
         status: LoadStatus.PENDING,
     },
 };
 
 export const localeReducer = produce(
-    reducerWithInitialState<ILocaleState>(DEFAULT_LOCALE_STATE)
+    reducerWithInitialState<ILocaleState>(INITIAL_LOCALE_STATE)
         .case(getAllLocalesACs.started, (nextState, payload) => {
             nextState.locales.status = LoadStatus.LOADING;
             return nextState;

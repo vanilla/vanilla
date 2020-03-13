@@ -5,7 +5,7 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemesActions, { IManageTheme, ThemeType } from "@library/theming/ThemesActions";
+import ThemeActions, { IManageTheme, ThemeType } from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
@@ -41,11 +41,11 @@ const DEFAULT_THEMES_STATE: IThemesState = {
 
 export const themeSettingsReducer = produce(
     reducerWithInitialState<IThemesState>(DEFAULT_THEMES_STATE)
-        .case(ThemesActions.getAllThemes_ACS.started, (nextState, payload) => {
+        .case(ThemeActions.getAllThemes_ACS.started, (nextState, payload) => {
             nextState.themes.status = LoadStatus.LOADING;
             return nextState;
         })
-        .case(ThemesActions.getAllThemes_ACS.done, (nextState, payload) => {
+        .case(ThemeActions.getAllThemes_ACS.done, (nextState, payload) => {
             let currentTheme;
             let templates: IManageTheme[] = [];
             let themes: IManageTheme[] = [];
@@ -69,19 +69,19 @@ export const themeSettingsReducer = produce(
             };
             return nextState;
         })
-        .case(ThemesActions.getAllThemes_ACS.failed, (nextState, payload) => {
+        .case(ThemeActions.getAllThemes_ACS.failed, (nextState, payload) => {
             nextState.themes.status = LoadStatus.ERROR;
             nextState.themes.error = payload.error;
             return nextState;
         })
-        .case(ThemesActions.putCurrentThemeACs.started, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.started, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.LOADING;
             nextState.applyStatus.data = {
                 themeID: payload.themeID,
             };
             return nextState;
         })
-        .case(ThemesActions.putCurrentThemeACs.done, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.done, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.SUCCESS;
             nextState.applyStatus.error = undefined;
 
@@ -105,36 +105,36 @@ export const themeSettingsReducer = produce(
 
             return nextState;
         })
-        .case(ThemesActions.putCurrentThemeACs.failed, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.failed, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.ERROR;
             nextState.applyStatus.error = payload.error;
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.started, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.started, (nextState, payload) => {
             nextState.previewStatus.status = LoadStatus.LOADING;
             nextState.previewStatus.data = {
                 themeID: payload.themeID,
             };
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.done, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.done, (nextState, payload) => {
             nextState.previewStatus.status = LoadStatus.SUCCESS;
             nextState.previewStatus.error = undefined;
 
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.failed, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.failed, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.ERROR;
             nextState.applyStatus.error = payload.error;
             return nextState;
         })
-        .case(ThemesActions.deleteThemeACs.started, (nextState, payload) => {
+        .case(ThemeActions.deleteThemeACs.started, (nextState, payload) => {
             nextState.deleteThemeByID[payload.themeID] = {
                 status: LoadStatus.LOADING,
             };
             return nextState;
         })
-        .case(ThemesActions.deleteThemeACs.done, (nextState, payload) => {
+        .case(ThemeActions.deleteThemeACs.done, (nextState, payload) => {
             nextState.deleteThemeByID[payload.params.themeID] = {
                 status: LoadStatus.SUCCESS,
             };
@@ -149,7 +149,7 @@ export const themeSettingsReducer = produce(
             }
             return nextState;
         })
-        .case(ThemesActions.deleteThemeACs.failed, (nextState, payload) => {
+        .case(ThemeActions.deleteThemeACs.failed, (nextState, payload) => {
             nextState.deleteThemeByID[payload.params.themeID] = {
                 status: LoadStatus.ERROR,
                 error: payload.error,

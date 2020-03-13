@@ -39,6 +39,7 @@ export const inputDropDownClasses = useThemeCache(() => {
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
+                backgroundColor: colorOut(globalVars.elementaryColors.white),
                 ...borders(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),
@@ -54,16 +55,10 @@ export const inputDropDownClasses = useThemeCache(() => {
                     },
                 },
             },
-
-            // ...borders({
-            //     ...globalVars.borderType.formElements.default,
-            //
-            // }),
-
             "& .SelectOne__indicators": {
                 height: unit(builderVariables.input.height),
             },
-            "& .SelectOne__single-value": {
+            "& .SelectOne__single-value.SelectOne__single-value": {
                 ...fonts(builderVariables.input.fonts),
             },
         },

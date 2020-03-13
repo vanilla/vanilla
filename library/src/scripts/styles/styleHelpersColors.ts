@@ -27,6 +27,10 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
     }
 };
 
+export const ensureColorHelper = (colorValue: string | ColorHelper) => {
+    return typeof colorValue === "string" ? color(colorValue) : colorValue;
+};
+
 export const importantColorOut = (colorValue: ColorValues | string) => {
     return colorOut(colorValue, true);
 };

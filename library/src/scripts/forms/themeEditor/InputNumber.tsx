@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { useField } from "formik";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { getDefaultOrCustomErrorMessage } from "@library/styles/styleUtils";
+import { getDefaultOrCustomErrorMessage, isValidColor } from "@library/styles/styleUtils";
 import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -29,12 +29,14 @@ export interface IInputNumber {
     step?: number;
     min?: number;
     max?: number;
+    errorMessage?: string;
 }
 
 export default function InputNumber(props: IInputNumber) {
     const classes = inputNumberClasses();
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
+    const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid Number"));
 
     const { step = 1, min = 0, max } = props;
 
@@ -47,7 +49,7 @@ export default function InputNumber(props: IInputNumber) {
      * @param number
      */
     const isValidValue = (numberVal: number | string) => {
-        if (numberVal.toString() && Number.isInteger(ensureInteger(numberVal))) {
+        if (numberVal !== undefined && Number.isInteger(ensureInteger(numberVal))) {
             const validatedNumber = parseInt(numberVal.toString());
             return (
                 validatedNumber % validatedStep === 0 &&
@@ -67,22 +69,26 @@ export default function InputNumber(props: IInputNumber) {
     };
 
     const [number, numberMeta, helpers] = useField(props.variableID);
+    const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
 
-    if (number.value === undefined) {
-        if (props.defaultValue && Number.isInteger(ensureInteger(props.defaultValue))) {
-            helpers.setValue(props.defaultValue);
-        } else {
-            helpers.setValue("");
+    // Check initial value for errors
+    useEffect(() => {
+        if (number.value === undefined) {
+            if (props.defaultValue !== undefined && Number.isInteger(ensureInteger(props.defaultValue))) {
+                helpers.setValue(props.defaultValue);
+            } else {
+                helpers.setValue("");
+            }
         }
-    }
+    }, []);
 
     const onTextChange = e => {
         helpers.setTouched(true);
         let newVal = e.target.value;
-
         if (Number.isInteger(newVal)) {
             newVal = ensureInteger(newVal);
             helpers.setValue(newVal);
+            errorHelpers.setValue(false);
         } else {
             e.preventDefault();
         }
@@ -101,10 +107,19 @@ export default function InputNumber(props: IInputNumber) {
         if (validatedMin !== undefined && newValue < validatedMin) {
             newValue = validatedMin;
         }
-        helpers.setValue(newValue.toString());
+        helpers.setValue(newValue);
     };
 
-    const hasError = number.value ? numberMeta.error || (!isValidValue(number.value) && number.value === "") : false;
+    const hasError = number.value ? !!errorField.value || (!isValidValue(number.value) && number.value === "") : false;
+
+    // Check initial value for errors
+    useEffect(() => {
+        if (hasError) {
+            helpers.setError(true);
+        } else {
+            helpers.setError(false);
+        }
+    }, []);
 
     return (
         <>
@@ -147,11 +162,9 @@ export default function InputNumber(props: IInputNumber) {
                     </span>
                 </span>
             </span>
-            {numberMeta.error && (
+            {hasError && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    <li className={builderClasses.error}>
-                        {getDefaultOrCustomErrorMessage(builderClasses.error, t("Invalid Number"))}
-                    </li>
+                    <li className={builderClasses.error}>{errorMessage}</li>
                 </ul>
             )}
         </>

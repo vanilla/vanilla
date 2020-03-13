@@ -49,7 +49,6 @@ export const colorPickerClasses = useThemeCache(() => {
         $nest: {
             [`&.${builderClasses.invalidField}`]: {
                 color: colorOut(builderVariables.error.color),
-                background: colorOut(builderVariables.error.backgroundColor),
             },
         },
     });

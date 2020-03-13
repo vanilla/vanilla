@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo } from "react";
-import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import ColorPicker, { IColorPicker } from "@library/forms/themeEditor/ColorPicker";
+import ThemeBuilderBlock, { IThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
+
 import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { ColorHelper } from "csx";
+import React, { useMemo } from "react";
 
 export interface IPresetColorPicker extends Omit<IColorPicker, "inputID" | "labelID"> {
     defaultValue?: ColorHelper;

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useReducer, useCallback } from "react";
 import classNames from "classnames";
 import { useField } from "formik";
 import { t } from "@vanilla/i18n/src";
@@ -14,6 +14,7 @@ import { getDefaultOrCustomErrorMessage, isValidColor } from "@library/styles/st
 import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { useInterval } from "@vanilla/react-utils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
@@ -30,6 +31,11 @@ export interface IInputNumber {
     min?: number;
     max?: number;
     errorMessage?: string;
+}
+
+enum StepAction {
+    INCR = "incr",
+    DECR = "decr",
 }
 
 export default function InputNumber(props: IInputNumber) {
@@ -94,21 +100,26 @@ export default function InputNumber(props: IInputNumber) {
         }
     };
 
-    const stepUp = () => {
-        let newValue = ensureInteger(number.value || 0) + validatedStep;
-        if (validatedMax !== undefined && newValue > validatedMax) {
-            newValue = validatedMax;
+    const [internalCount, dispatch] = useReducer((state: number, action: StepAction) => {
+        switch (action) {
+            case StepAction.DECR: {
+                const value = Math.max(props.min ?? 0, state - 1);
+                helpers.setValue(value);
+                return value;
+            }
+            case StepAction.INCR: {
+                const value = Math.min(props.max ?? 100000, state + 1);
+                helpers.setValue(value);
+                return value;
+            }
         }
-        helpers.setValue(newValue);
-    };
+    }, props.defaultValue ?? 0);
 
-    const stepDown = () => {
-        let newValue = ensureInteger(number.value || 0) - validatedStep;
-        if (validatedMin !== undefined && newValue < validatedMin) {
-            newValue = validatedMin;
-        }
-        helpers.setValue(newValue);
-    };
+    const stepUp = useCallback(() => dispatch(StepAction.INCR), []);
+    const stepDown = useCallback(() => dispatch(StepAction.DECR), []);
+
+    const stepUpIntervalProps = usePressInterval(stepUp);
+    const stepDownIntervalProps = usePressInterval(stepDown);
 
     const hasError = number.value ? !!errorField.value || (!isValidValue(number.value) && number.value === "") : false;
 
@@ -145,6 +156,7 @@ export default function InputNumber(props: IInputNumber) {
                     <span className={classes.spinnerSpacer}>
                         <Button
                             onClick={stepUp}
+                            {...stepUpIntervalProps}
                             disabled={!max && number.value && number.value >= max!}
                             className={classes.stepUp}
                             baseClass={ButtonTypes.CUSTOM}
@@ -153,6 +165,7 @@ export default function InputNumber(props: IInputNumber) {
                         </Button>
                         <Button
                             onClick={stepDown}
+                            {...stepDownIntervalProps}
                             disabled={number.value === min}
                             className={classes.stepDown}
                             baseClass={ButtonTypes.CUSTOM}
@@ -169,4 +182,29 @@ export default function InputNumber(props: IInputNumber) {
             )}
         </>
     );
+}
+
+function usePressInterval(callback: () => void) {
+    const [isHolding, setIsHolding] = useState(false);
+
+    const onMouseDown = (event: React.MouseEvent) => {
+        setIsHolding(true);
+    };
+
+    const onMouseUp = (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsHolding(false);
+    };
+
+    useInterval(
+        () => {
+            if (isHolding) {
+                callback();
+            }
+        },
+        isHolding ? 120 : null,
+    );
+
+    return { onMouseDown, onMouseUp };
 }

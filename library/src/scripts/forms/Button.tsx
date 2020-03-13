@@ -10,7 +10,7 @@ import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 
-interface IProps extends IOptionalComponentID {
+interface IProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
     className?: string;
     disabled?: boolean;
@@ -99,30 +99,30 @@ export default class Button extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const componentClasses = classNames(
-            getButtonStyleFromBaseClass(this.props.baseClass),
-            { Button: this.props.legacyMode },
-            this.props.className,
-        );
+        const {
+            baseClass,
+            legacyMode,
+            className,
+            id,
+            submit,
+            ariaLabel,
+            ariaHidden,
+            controls,
+            buttonRef,
+            ...restProps
+        } = this.props;
+        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass), { Button: legacyMode }, className);
 
         return (
             <button
                 id={this.state.id}
-                disabled={this.props.disabled}
-                type={this.props.submit ? "submit" : "button"}
+                type={submit ? "submit" : "button"}
                 className={componentClasses}
-                onClick={this.props.onClick}
-                title={this.props.title}
-                aria-label={this.props.ariaLabel || this.props.title}
-                aria-hidden={this.props.ariaHidden}
-                tabIndex={this.props.tabIndex}
-                ref={this.props.buttonRef}
-                onKeyDown={this.props.onKeyDown}
-                lang={this.props.lang}
-                role={this.props.role}
-                onKeyDownCapture={this.props.onKeyDownCapture}
-                aria-controls={this.props.controls}
-                style={this.props.style}
+                aria-label={ariaLabel ?? restProps.title}
+                aria-hidden={ariaHidden}
+                ref={buttonRef}
+                aria-controls={controls}
+                {...restProps}
             >
                 {this.props.children}
             </button>

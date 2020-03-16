@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { t } from "@vanilla/i18n/src";
 
-export default function ThemeBuilderTitle() {
+export function ThemeBuilderTitle() {
     return <h2 className={themeBuilderClasses().title}>{t("Global Styles")}</h2>;
 }

@@ -11,6 +11,6 @@ export interface IInputHidden extends Omit<React.InputHTMLAttributes<HTMLInputEl
     value: string;
 }
 
-export default function InputHidden(props: IInputHidden) {
+export function InputHidden(props: IInputHidden) {
     return <input type="hidden" name={props.variableID} value={props.value} />;
 }

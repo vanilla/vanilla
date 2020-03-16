@@ -16,7 +16,7 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes } from "@library/forms/buttonStyles";
 
 export default {
     title: "Banner",
@@ -94,7 +94,7 @@ export const NoBackground = storyWithConfig(
             },
             presetsBanner: {
                 button: {
-                    preset: ButtonPresets.SOLID,
+                    preset: ButtonPreset.SOLID,
                 },
             },
         },
@@ -130,7 +130,7 @@ export const BackgroundImage = storyWithConfig(
             },
             presetsBanner: {
                 searchButtonOptions: {
-                    preset: ButtonPresets.TRANSPARENT,
+                    preset: ButtonPreset.TRANSPARENT,
                 },
             },
         },
@@ -202,7 +202,7 @@ export const ImageAsElement = storyWithConfig(
             },
             presetsBanner: {
                 button: {
-                    preset: ButtonPresets.HIDE,
+                    preset: ButtonPreset.HIDE,
                 },
                 input: {
                     preset: SearchBarPresets.BORDER,
@@ -268,7 +268,7 @@ export const ImageAsElementWide = storyWithConfig(
             },
             presetsBanner: {
                 button: {
-                    preset: ButtonPresets.HIDE,
+                    preset: ButtonPreset.HIDE,
                 },
                 input: {
                     preset: SearchBarPresets.BORDER,
@@ -332,7 +332,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
             },
             presetsBanner: {
                 button: {
-                    preset: ButtonPresets.HIDE,
+                    preset: ButtonPreset.HIDE,
                 },
                 input: {
                     preset: SearchBarPresets.BORDER,

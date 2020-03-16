@@ -5,7 +5,7 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
@@ -87,7 +87,7 @@ export default function Banner(props: IProps) {
                                     hideSearchButton={
                                         device === Devices.MOBILE ||
                                         device === Devices.XS ||
-                                        presetsBanner().button.preset === ButtonPresets.HIDE
+                                        presetsBanner().button.preset === ButtonPreset.HIDE
                                     }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}

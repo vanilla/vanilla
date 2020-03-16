@@ -16,10 +16,10 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
-export const inputNumberVariables = useThemeCache(() => {
+export const themeInputNumberVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
     const builderVars = themeBuilderVariables();
     return {
@@ -43,9 +43,9 @@ export const inputNumberVariables = useThemeCache(() => {
     };
 });
 
-export const inputNumberClasses = useThemeCache(() => {
-    const vars = inputNumberVariables();
-    const style = styleFactory("numberInput");
+export const themeInputNumberClasses = useThemeCache(() => {
+    const vars = themeInputNumberVariables();
+    const style = styleFactory("themeInputNumber");
     const builderVariables = themeBuilderVariables();
     const builderClasses = themeBuilderClasses();
 

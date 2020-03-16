@@ -19,15 +19,12 @@ import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes, ButtonPreset } from "@library/forms/buttonStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export interface IButtonPresets {
-    style: undefined | ButtonTypes;
-}
-
-export const globalVariables = useThemeCache(() => {
+export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#0291db");
-    const makeThemeVars = variableFactory("global");
+    const makeThemeVars = variableFactory("global", forcedVars);
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -371,12 +368,12 @@ export const globalVariables = useThemeCache(() => {
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
-    // Sets global "style" for buttons. Use "ButtonPresets" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // Sets global "style" for buttons. Use "ButtonPreset" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
     // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
     // the style of them.
     const buttonPreset = makeThemeVars("buttonPreset", {
-        style: undefined,
-    } as IButtonPresets);
+        style: undefined as ButtonPreset | undefined,
+    });
 
     const separator = makeThemeVars("separator", {
         color: border.color,

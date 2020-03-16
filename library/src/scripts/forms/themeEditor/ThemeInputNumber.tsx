@@ -9,16 +9,16 @@ import classNames from "classnames";
 import { useField } from "formik";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { getDefaultOrCustomErrorMessage, isValidColor } from "@library/styles/styleUtils";
-import { inputNumberClasses } from "@library/forms/themeEditor/inputNumberStyles";
+import { themeInputNumberClasses } from "@library/forms/themeEditor/ThemeInputNumber.styles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useInterval } from "@vanilla/react-utils";
 
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
-export interface IInputNumber {
+interface IProps {
     inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex" | "step" | "min" | "max">;
     inputID: string;
     variableID: string;
@@ -38,8 +38,8 @@ enum StepAction {
     DECR = "decr",
 }
 
-export default function InputNumber(props: IInputNumber) {
-    const classes = inputNumberClasses();
+export function ThemeInputNumber(props: IProps) {
+    const classes = themeInputNumberClasses();
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
     const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid Number"));
@@ -76,17 +76,6 @@ export default function InputNumber(props: IInputNumber) {
 
     const [number, numberMeta, helpers] = useField(props.variableID);
     const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
-
-    // Check initial value for errors
-    useEffect(() => {
-        if (number.value === undefined) {
-            if (props.defaultValue !== undefined && Number.isInteger(ensureInteger(props.defaultValue))) {
-                helpers.setValue(props.defaultValue);
-            } else {
-                helpers.setValue("");
-            }
-        }
-    }, []);
 
     const onTextChange = e => {
         helpers.setTouched(true);
@@ -125,6 +114,17 @@ export default function InputNumber(props: IInputNumber) {
 
     // Check initial value for errors
     useEffect(() => {
+        if (number.value === undefined) {
+            if (props.defaultValue !== undefined && Number.isInteger(ensureInteger(props.defaultValue))) {
+                helpers.setValue(props.defaultValue);
+            } else {
+                helpers.setValue("");
+            }
+        }
+    }, []);
+
+    // Check initial value for errors
+    useEffect(() => {
         if (hasError) {
             helpers.setError(true);
         } else {
@@ -150,7 +150,6 @@ export default function InputNumber(props: IInputNumber) {
                     step={validatedStep}
                     min={validatedMin}
                     max={validatedMax}
-                    // defaultValue={props.defaultValue}
                 />
                 <span className={classes.spinner}>
                     <span className={classes.spinnerSpacer}>

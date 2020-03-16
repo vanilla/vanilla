@@ -13,9 +13,9 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-import { globalVariables, IButtonPresets } from "@library/styles/globalStyleVars";
+import { globalVariables, IButtonPreset } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
-import { ButtonPresets, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 
@@ -153,8 +153,8 @@ export const PresetsOutline = storyWithConfig(
         themeVars: {
             global: {
                 buttonPreset: ({
-                    style: ButtonPresets.OUTLINE,
-                } as unknown) as IButtonPresets,
+                    style: ButtonPreset.OUTLINE,
+                } as unknown) as IButtonPreset,
             },
             button: {
                 primary: {
@@ -174,8 +174,8 @@ export const PresetsSolid = storyWithConfig(
         themeVars: {
             global: {
                 buttonPreset: ({
-                    preset: ButtonPresets.SOLID,
-                } as unknown) as IButtonPresets,
+                    preset: ButtonPreset.SOLID,
+                } as unknown) as IButtonPreset,
             },
         },
     },

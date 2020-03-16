@@ -7,7 +7,7 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, translateX } from "csx";
 import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
-import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const colorPickerVariables = useThemeCache(() => {

@@ -15,6 +15,7 @@ import {
     placeholderStyles,
     textInputSizingFromFixedHeight,
     unit,
+    EMPTY_FONTS,
 } from "@library/styles/styleHelpers";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -41,8 +42,10 @@ export const inputVariables = useThemeCache(() => {
     });
 
     const font = makeThemeVars("font", {
+        ...EMPTY_FONTS,
         size: globalVars.fonts.size.large,
         weight: globalVars.fonts.weights.normal,
+        color: colors.fg,
     });
 
     const border: IBordersWithRadius = makeThemeVars("borders", {
@@ -75,6 +78,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         color: colorOut(colors.fg),
         ...borders(border),
         ...fonts(font),
+        lineHeight: unit(font.size),
         outline: 0,
         $nest: {
             ...placeholderStyles({

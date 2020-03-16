@@ -8,12 +8,14 @@ import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const formElementsVariables = useThemeCache(() => {
-    const vars = globalVariables();
-    const varsLayouts = layoutVariables();
+export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const vars = globalVariables(forcedVars);
+    const varsLayouts = layoutVariables(forcedVars);
+    const makeThemeVars = variableFactory("formElements", forcedVars);
+
     const mixBgAndFg = vars.mixBgAndFg;
-    const makeThemeVars = variableFactory("formElements");
 
     const sizing = makeThemeVars("sizing", {
         height: 36,

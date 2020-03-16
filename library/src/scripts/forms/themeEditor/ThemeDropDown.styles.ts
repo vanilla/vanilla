@@ -7,11 +7,11 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { borders, colorOut, fonts, unit } from "@library/styles/styleHelpers";
-import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
-export const inputDropDownClasses = useThemeCache(() => {
-    const style = styleFactory("inputDropDown");
+export const themeDropDownClasses = useThemeCache(() => {
+    const style = styleFactory("themeDropDown");
     const builderVariables = themeBuilderVariables();
     const globalVars = globalVariables();
 

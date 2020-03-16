@@ -7,30 +7,27 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback, ChangeEvent } from "react";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
-import { colorPickerClasses } from "@library/forms/themeEditor/colorPickerStyles";
+import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
 import { color, ColorHelper } from "csx";
 import { ErrorMessage, useField, useFormikContext } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 import debounce from "lodash/debounce";
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
-export interface IColorPicker {
+interface IProps {
     inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex">;
-    inputID: string;
     variableID: string;
+    inputID: string;
     labelID: string;
-    defaultValue?: ColorHelper;
     inputClass?: string;
-    errors?: IErrorWithDefault[]; // Uses default message if true
-    errorMessage?: string;
 }
 
-export default function ColorPicker(props: IColorPicker) {
+export function ThemeColorPicker(props: IProps) {
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
     const textInput = useRef<HTMLInputElement>(null);
@@ -141,7 +138,6 @@ export default function ColorPicker(props: IColorPicker) {
                     })}
                     placeholder={"#0291DB"}
                     value={textValue}
-                    // onKeyDown={onTextChange}
                     onChange={onTextChange}
                     auto-correct="false"
                 />

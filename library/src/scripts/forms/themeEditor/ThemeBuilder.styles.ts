@@ -147,7 +147,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         }),
     });
 
-    const inputBlock = style("inputBlock", {
+    const block = style("block", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
@@ -255,7 +255,7 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     return {
         root,
-        inputBlock,
+        block,
         label,
         undoWrap,
         inputWrap,

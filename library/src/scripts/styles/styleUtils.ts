@@ -16,6 +16,7 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
 import isNumeric from "validator/lib/isNumeric";
 import { useEffect, useState } from "react";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -124,6 +125,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  * - Merge in all subtrees. (theme variables override your defaults).
  *
  * @param componentName The base name of the component being styled.
+ * @param themeVars Optionally force a particular set of variables to be used.
  *
  * @example
  *
@@ -146,8 +148,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentNames: string | string[]) {
-    const themeVars = getThemeVariables();
+export function variableFactory(componentNames: string | string[], themeVars: IThemeVariables = getThemeVariables()) {
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames

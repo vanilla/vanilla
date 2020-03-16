@@ -14,7 +14,7 @@ import InputHidden from "@library/forms/themeEditor/InputHidden";
 import { IFieldError } from "@library/@types/api/core";
 import Select from "react-select";
 
-export interface IInputDropDown extends IMenuPlacement {
+interface IProps extends IMenuPlacement {
     variableID: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
     inputID: string;
     labelID: string;
@@ -29,7 +29,7 @@ export interface IInputDropDown extends IMenuPlacement {
     selectedIndex?: number;
 }
 
-export const InputDropDown: React.FC<IInputDropDown> = (props: IInputDropDown) => {
+export function ThemeDropDown(props: IProps) {
     const [value, valueMeta, valueHelpers] = useField(props.variableID);
 
     let defaultValue;
@@ -78,4 +78,4 @@ export const InputDropDown: React.FC<IInputDropDown> = (props: IInputDropDown) =
             {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
-};
+}

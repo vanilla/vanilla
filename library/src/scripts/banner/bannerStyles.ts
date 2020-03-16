@@ -34,7 +34,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { ButtonPresets } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/buttonStyles";
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
 import { inputMixin } from "@library/forms/inputStyles";
 
@@ -51,7 +51,7 @@ export enum SearchBarPresets {
 
 export const presetsBanner = useThemeCache(() => {
     const makeThemeVars = variableFactory(["presetsBanner"]);
-    const button = makeThemeVars("button", { preset: ButtonPresets.TRANSPARENT });
+    const button = makeThemeVars("button", { preset: ButtonPreset.TRANSPARENT });
     const input = makeThemeVars("input", { preset: SearchBarPresets.NO_BORDER });
 
     return {
@@ -225,11 +225,11 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     if (presets.input.preset === SearchBarPresets.UNIFIED_BORDER) {
-        presets.button.preset = ButtonPresets.SOLID; // Unified border currently only supports solid buttons.
+        presets.button.preset = ButtonPreset.SOLID; // Unified border currently only supports solid buttons.
     }
 
-    const isSolidButton = presets.button.preset === ButtonPresets.SOLID;
-    const isTransparentButton = presets.button.preset === ButtonPresets.TRANSPARENT;
+    const isSolidButton = presets.button.preset === ButtonPreset.SOLID;
+    const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
 
     const inputHasNoBorder =
         presets.input.preset === SearchBarPresets.UNIFIED_BORDER || presets.input.preset === SearchBarPresets.NO_BORDER;
@@ -598,7 +598,7 @@ export const bannerClasses = useThemeCache(() => {
         rightRadius = unit(radius) as any;
     }
 
-    if (presets.button.preset === ButtonPresets.HIDE) {
+    if (presets.button.preset === ButtonPreset.HIDE) {
         leftRadius = rightRadius;
     } else {
         if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {

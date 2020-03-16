@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useRef, useState, useCallback, ChangeEvent } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback, ChangeEvent, useReducer } from "react";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import classNames from "classnames";
 import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
@@ -13,39 +13,93 @@ import { ErrorMessage, useField, useFormikContext } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@vanilla/i18n/src";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
 import debounce from "lodash/debounce";
+import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { ensureColorHelper } from "@library/styles/styleHelpers";
+import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 type IErrorWithDefault = string | boolean; // Uses default message if true
 
-interface IProps {
-    inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex">;
-    variableID: string;
-    inputID: string;
-    labelID: string;
+interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
+    variableKey: string;
     inputClass?: string;
 }
 
-export function ThemeColorPicker(props: IProps) {
+export function ThemeColorPicker(_props: IProps) {
+    const { variableKey, inputClass, ...inputProps } = _props;
+    const { inputID, labelID } = useThemeBlock();
+
+    // The field
+    const { defaultValue, rawValue, setValue, error, setError } = useThemeVariableField(variableKey);
+
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
-    const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid Color"));
 
-    const errorID = useMemo(() => {
-        return uniqueIDFromPrefix("colorPickerError");
+    const errorID = useUniqueID("colorPickerError");
+
+    // Track whether we have a valid color.
+    // If the color is not set, we don't really care.
+    const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue);
+    const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? defaultValue);
+
+    // If we have no color selected we are displaying the default and are definitely valid.
+    const isValidColor = textInputValue ? stringIsValidColor(textInputValue) : true;
+
+    // Do initial load validation of the color.
+    useEffect(() => {
+        if (!isValidColor) {
+            setError(t("Invalid Color"));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // String
-    const initialValidColor =
-        props.defaultValue && isValidColor(props.defaultValue.toString()) ? props.defaultValue.toString() : undefined;
+    const handleColorChange = (colorString: string) => {
+        setTextFieldValue(colorString);
+        if (stringIsValidColor(colorString)) {
+            setValue(colorString); // Only set valid color if passes validation
+            setLastValidColor(colorString);
+            setError(null);
+        } else {
+            setError(t("Invalid Color"));
+        }
+    };
 
-    const [selectedColor, selectedColorMeta, helpers] = useField(props.variableID);
+    // Handle updates from the text field.
+    const onTextChange = e => {
+        const colorString = e.target.value;
+        handleColorChange(colorString);
+    };
 
-    const [validColor, setValidColor] = useState(initialValidColor);
-    const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
+    const handleColorChangeRef = useRef<typeof handleColorChange>(handleColorChange);
+
+    // Debounced internal function for onPickerChange.
+    // Be sure to always use it through the following ref so that we the function identitity,
+    // While still preserving the debounce.
+    // This article explains the issue being worked around here https://dmitripavlutin.com/react-hooks-stale-closures/
+    const _debouncedPickerUpdate = useCallback(
+        debounce(
+            (colorString: string) => {
+                handleColorChangeRef.current(colorString);
+            },
+            16,
+            { trailing: true },
+        ),
+        [],
+    );
+
+    // Handle updates from the color picker.
+    const onPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Will always be valid color, since it's a real picker
+        const newColor: string = e.target.value;
+        if (newColor) {
+            handleColorChangeRef.current = handleColorChange;
+            _debouncedPickerUpdate(newColor);
+        }
+    };
 
     const clickReadInput = () => {
         if (colorInput && colorInput.current) {
@@ -53,110 +107,56 @@ export function ThemeColorPicker(props: IProps) {
         }
     };
 
-    const onTextChange = e => {
-        const colorString = e.target.value;
-        helpers.setValue(colorString); //Text is unchanged
-        helpers.setTouched(true);
-        if (stringIsValidColor(colorString)) {
-            setValidColor(colorString); // Only set valid color if passes validation
-            errorHelpers.setValue(false);
-        } else {
-            errorHelpers.setValue(true);
-        }
-    };
-
-    const updatePickerColor = useCallback(
-        debounce(
-            (newColor: string) => {
-                helpers.setTouched(true);
-                helpers.setValue(newColor);
-                setValidColor(
-                    color(newColor)
-                        .toRGB()
-                        .toString(),
-                );
-                errorHelpers.setValue(undefined);
-            },
-            16,
-            { trailing: true },
-        ),
-        [errorHelpers, setValidColor, helpers],
-    );
-
-    const onPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Will always be valid color, since it's a real picker
-        const newColor: string = e.target.value;
-        if (newColor) {
-            updatePickerColor(newColor);
-        }
-    };
-
-    const textValue =
-        selectedColor.value !== undefined
-            ? selectedColor.value
-            : props.defaultValue && isValidColor(props.defaultValue)
-            ? props.defaultValue.toHexString()
-            : "";
-
-    const hasError = !isValidColor(textValue);
-
-    // Check initial value for errors
-    useEffect(() => {
-        if (hasError) {
-            helpers.setError(true);
-        } else {
-            helpers.setError(false);
-        }
-    }, []);
+    const defaultColorString = ensureColorHelper(defaultValue).toHexString();
+    const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : "#000";
 
     return (
         <>
             <span className={classes.root}>
-                <input className={visibility().displayNone} value={errorField.value} />
-
-                {/*"Real" color input*/}
-                <input
-                    {...props.inputProps}
-                    ref={colorInput}
-                    type="color"
-                    id={props.inputID}
-                    aria-describedby={props.labelID}
-                    className={classNames(classes.realInput, visibility().visuallyHidden)}
-                    onChange={onPickerChange}
-                    onBlur={onPickerChange}
-                    aria-errormessage={hasError ? errorID : undefined}
-                    defaultValue={initialValidColor}
-                />
                 {/*Text Input*/}
                 <input
                     ref={textInput}
                     type="text"
-                    aria-describedby={props.labelID}
+                    aria-describedby={labelID}
                     aria-hidden={true}
                     className={classNames(classes.textInput, {
-                        [builderClasses.invalidField]: hasError,
+                        [builderClasses.invalidField]: !!error,
                     })}
                     placeholder={"#0291DB"}
-                    value={textValue}
+                    value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
                     auto-correct="false"
+                />
+
+                {/* Hidden "Real" color input*/}
+                <input
+                    {...inputProps}
+                    ref={colorInput}
+                    type="color"
+                    id={inputID}
+                    aria-describedby={labelID}
+                    className={classNames(classes.realInput, visibility().visuallyHidden)}
+                    onChange={onPickerChange}
+                    onBlur={onPickerChange}
+                    aria-errormessage={error ? errorID : undefined}
+                    defaultValue={defaultColorString}
                 />
                 {/*Swatch*/}
                 <Button
                     onClick={clickReadInput}
-                    style={{ backgroundColor: color(validColor ?? "#000").toString() }}
-                    title={validColor}
+                    style={{ backgroundColor: validColorString }}
+                    title={validColorString}
                     aria-hidden={true}
                     className={classes.swatch}
                     tabIndex={-1}
                     baseClass={ButtonTypes.CUSTOM}
                 >
-                    <span className={visibility().visuallyHidden}>{color(validColor ?? "#000").toHexString()}</span>
+                    <span className={visibility().visuallyHidden}>{validColorString}</span>
                 </Button>
             </span>
-            {hasError && (
+            {error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    <li className={builderClasses.error}>{errorMessage}</li>
+                    <li className={builderClasses.error}>{error}</li>
                 </ul>
             )}
         </>

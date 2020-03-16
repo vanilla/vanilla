@@ -5,6 +5,7 @@
 
 import { RefObject, useState, useLayoutEffect } from "react";
 import ResizeObserver from "resize-observer-polyfill";
+import debounce from "lodash/debounce";
 
 // DOMRectReadOnly.fromRect()
 const EMPTY_RECT: DOMRect = {
@@ -53,9 +54,9 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
             });
         };
 
-        const resizeListener = () => {
+        const resizeListener = debounce(() => {
             measure();
-        };
+        }, 100);
         window.addEventListener("resize", resizeListener);
 
         const ro = new ResizeObserver(measure);
@@ -66,6 +67,7 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
         return () => {
             window.cancelAnimationFrame(animationFrameId!);
             ro.disconnect();
+            resizeListener.cancel();
             window.removeEventListener("resize", resizeListener);
         };
     }, [adjustForScrollOffset, ref]);

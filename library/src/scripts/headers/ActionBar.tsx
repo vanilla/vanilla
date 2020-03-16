@@ -34,6 +34,7 @@ interface IProps {
     selfPadded?: boolean;
     title?: React.ReactNode;
     fullWidth?: boolean;
+    backTitle?: string;
 }
 
 /**
@@ -60,7 +61,7 @@ export function ActionBar(props: IProps) {
     const content = (
         <ul className={classNames(classes.items)}>
             <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                <BackLink title={t("Cancel")} visibleLabel={true} className={classes.backLink} />
+                <BackLink title={props.backTitle || t("Cancel")} visibleLabel={true} className={classes.backLink} />
             </li>
             {props.statusItem}
             {showMobileDropDown ? (

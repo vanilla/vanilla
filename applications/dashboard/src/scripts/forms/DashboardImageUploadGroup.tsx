@@ -87,7 +87,7 @@ export function DashboardImageUploadGroup(props: IProps) {
                 isVisible={wantsDelete}
                 title={t("Confirm Deletion")}
                 onConfirm={() => {
-                    onChange(null);
+                    onChange("");
                     setWantsDelete(false);
                 }}
                 onCancel={() => {

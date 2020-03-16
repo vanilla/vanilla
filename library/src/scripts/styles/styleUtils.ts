@@ -10,10 +10,12 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
+import { color, rgba, rgb, hsla, hsl, ColorHelper, list } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
+import isNumeric from "validator/lib/isNumeric";
+import { useEffect, useState } from "react";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -68,11 +70,32 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
-let themeUniqueness = hashString(Math.random().toString());
+// A unique identifier that represents the current state of the theme.
+let _themeCacheID = hashString(Math.random().toString());
 
-export function clearThemeCache() {
-    themeUniqueness = hashString(Math.random().toString());
-    return themeUniqueness;
+// Event name for resetting the theme cacheID.
+const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
+
+export function resetThemeCache() {
+    _themeCacheID = hashString(Math.random().toString());
+    document.dispatchEvent(new CustomEvent(THEME_CACHE_EVENT, { detail: _themeCacheID }));
+    return _themeCacheID;
+}
+
+export function useThemeCacheID() {
+    const [cacheID, setCacheID] = useState(_themeCacheID);
+    useEffect(() => {
+        const listener = (e: CustomEvent) => {
+            setCacheID(e.detail);
+        };
+        document.addEventListener(THEME_CACHE_EVENT, listener);
+
+        return () => {
+            document.removeEventListener(THEME_CACHE_EVENT, listener);
+        };
+    });
+
+    return { cacheID, resetThemeCache };
 }
 
 /**
@@ -85,7 +108,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status + themeUniqueness;
+        const cacheKey = themeKey + status + _themeCacheID;
         const result = cacheKey + JSON.stringify(args);
         return result;
     };
@@ -133,19 +156,37 @@ export function variableFactory(componentNames: string | string[]) {
             return merge(prev, curr);
         }, {});
 
-    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
+    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T, overrides?: any): T {
         const customVars = componentThemeVars?.[subElementName] ?? null;
-        if (customVars === null) {
-            return declaredVars;
+        let result = declaredVars;
+        if (customVars != null) {
+            result = normalizeVariables(customVars, result);
         }
 
-        const normalized = normalizeVariables(customVars, declaredVars);
-        return normalized;
+        if (overrides != null) {
+            result = normalizeVariables(stripUndefinedKeys(overrides), result);
+        }
+        return result;
     };
 }
 
-const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
-const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
+function stripUndefinedKeys(obj: any) {
+    if (typeof obj === "object") {
+        const newObj = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                newObj[key] = value;
+            }
+        }
+        return newObj;
+    }
+
+    return obj;
+}
+
+const rgbRegex = /^rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)$/;
+const hslRegex = /^hsla?\((0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%)\)$/;
+const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -187,14 +228,66 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
 }
 
 /**
+ * Check if string is valid color in hex format
+ * @param colorString
+ */
+export function stringIsHexColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hexRegex);
+}
+
+/**
+ * Check if string is valid color in rgb or rgba format
+ * @param colorString
+ */
+export function stringIsRgbColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbRegex);
+}
+
+/**
+ * Check if string is valid color in hsl or hsla format
+ * @param colorString
+ */
+export function stringIsHslColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslRegex);
+}
+
+/**
+ * Check if string is supported color format
+ * @param colorString
+ */
+export function stringIsValidColor(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
+    );
+}
+
+/**
+ * Check if string or ColorHelper is valid
+ * @param colorString
+ */
+export const isValidColor = colorValue => {
+    return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
+};
+
+/**
+ * Takes either a custome error message string or a boolean, true gives default message
+ * @param error
+ * @param defaultMessage
+ */
+export const getDefaultOrCustomErrorMessage = (error, defaultMessage: string) => {
+    return typeof error === "string" ? error : defaultMessage;
+};
+
+/**
  * Convert a color string into an instance.
  * @param colorString
  */
 export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
-    if (colorString.startsWith("#")) {
+    if (stringIsHexColor(colorString)) {
         // It's a colour.
         return color(colorString);
-    } else if (colorString.match(rgbRegex)) {
+    } else if (stringIsRgbColor(colorString)) {
         const result = rgbRegex.exec(colorString)!;
 
         const r = parseInt(result[1], 10);
@@ -207,7 +300,7 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         } else {
             return rgb(r, g, b);
         }
-    } else if (colorString.match(hslRegex)) {
+    } else if (stringIsHslColor(colorString)) {
         const result = hslRegex.exec(colorString)!;
 
         const h = parseInt(result[1], 10);

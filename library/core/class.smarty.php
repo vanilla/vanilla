@@ -186,6 +186,8 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $smarty->setCacheDir(PATH_CACHE.'/Smarty/cache');
             $smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');
             $smarty->addPluginsDir(PATH_LIBRARY.'/SmartyPlugins');
+            $smarty->setDebugTemplate(PATH_APPLICATIONS.'/dashboard/views/debug.tpl');
+            $smarty->registerPlugin('function', 'debug_vars', [$this, 'debugVars'], false);
 
 //         Gdn::pluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($smarty, 'Gdn_Smarty', 'Init');
@@ -218,5 +220,56 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             $return = false;
         }
         return $return;
+    }
+
+    /**
+     * Output template variables.
+     *
+     * @param mixed $params
+     * @param Smarty_Internal_TemplateBase $smarty
+     * @return string
+     */
+    public function debugVars($params, $smarty) {
+        $debug = new Smarty_Internal_Debug();
+        $ptr = $debug->get_debug_vars($smarty);
+        $vars = self::sanitizeVariables($ptr->tpl_vars);
+        ksort($vars);
+
+        $sm = new Smarty();
+        $sm->assign('assigned_vars', $vars);
+        return $sm->fetch(PATH_APPLICATIONS.'/dashboard/views/debug_vars.tpl');
+    }
+
+    /**
+     * Sanitize template variables to remove or obscure sensitive information.
+     *
+     * @param array $vars
+     * @param int $level
+     * @return array
+     */
+    public static function sanitizeVariables(array $vars, int $level = 0): array {
+        $remove = ['password', 'accesstoken', 'fingerprint', 'updatetoken'];
+        $obscure = [
+            'insertipaddress', 'updateipaddress', 'lastipaddress', 'allipaddresses', 'dateofbirth', 'hashmethod',
+            'email', 'firstemail', 'lastemail',
+        ];
+
+        $r = [];
+
+        foreach ($vars as $key => $value) {
+            $lkey = strtolower($key);
+            if (in_array($lkey, $remove, true) || ($level === 0 && $key === 'Assets')) {
+                continue;
+            } elseif (in_array($lkey, $obscure, true)) {
+                $r[$key] = '***OBSCURED***';
+            } elseif (is_array($value)) {
+                $r[$key] = self::sanitizeVariables($value, $level + 1);
+            } elseif ($value instanceof stdClass) {
+                $r[$key] = (object)self::sanitizeVariables((array)$value, $level + 1);
+            } else {
+                $r[$key] = $value;
+            }
+        }
+        return $r;
     }
 }

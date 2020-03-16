@@ -5,10 +5,9 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { color } from "csx";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -29,11 +28,10 @@ export const formElementsVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        width: 1,
-        fullWidth: 2,
-        color: vars.border.color,
-        style: "solid",
-        radius: vars.border.radius,
+        width: vars.borderType.formElements.default.width ?? vars.border.width,
+        color: vars.borderType.formElements.default.color ?? vars.border.color,
+        style: vars.borderType.formElements.default.radius ?? vars.border.style,
+        radius: vars.borderType.formElements.default.radius ?? vars.border.radius,
     });
 
     const giantInput = makeThemeVars("giantInput", {
@@ -130,6 +128,7 @@ export const formErrorClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "space-between",
     });
+
     const actions = style("actions", {
         display: "flex",
         alignItems: "center",
@@ -138,6 +137,7 @@ export const formErrorClasses = useThemeCache(() => {
     const actionButton = style("button", {
         marginLeft: unit(12),
     });
+
     const activeButton = style("activeButton", {
         fontWeight: "bold",
     });

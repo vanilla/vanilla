@@ -22,15 +22,21 @@ story.add("Headings", () => {
         <StoryContent>
             <StoryHeading depth={1}>Headings</StoryHeading>
             <StoryParagraph>Headings can get the style of any depth, but semantically be different</StoryParagraph>
-            <Heading depth={1} renderAsDepth={1} title={"True H1"} />
+            <Heading depth={1} renderAsDepth={1}>
+                True H1
+            </Heading>
             <StoryParagraph>Page Title style</StoryParagraph>
-            <Heading depth={3} renderAsDepth={1} title={"H3 with the style of an H1"} />
+            <Heading depth={3} renderAsDepth={1}>
+                H3 with the style of an H1
+            </Heading>
             <StoryParagraph>
                 The styles are independent from the markup, so you can use any heading that is most semantic.
             </StoryParagraph>
-            <Heading depth={2} title={"Sub Title"} className={classesTypography.subTitle} />
+            <Heading depth={2}>Sub Title</Heading>
             <StoryParagraph>Mostly sub headings in panels</StoryParagraph>
-            <Heading depth={2} title={"Component sub title"} className={classesTypography.componentSubTitle} />
+            <Heading depth={2} renderAsDepth={3}>
+                Component sub title
+            </Heading>
             <StoryParagraph>Sub headings in components</StoryParagraph>
         </StoryContent>
     );

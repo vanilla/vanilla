@@ -5,20 +5,34 @@
  */
 
 import { color, ColorHelper, important } from "csx";
-import { throwError } from "rxjs";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThrowError } from "@vanilla/react-utils/src/useThrowError";
-import { logError } from "@vanilla/utils/src/debugUtils";
+import { logError, logDebug, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
 
-export type ColorValues = ColorHelper | "transparent" | undefined;
+export type ColorValues = ColorHelper | undefined;
 
 export const colorOut = (colorValue: ColorValues | string, makeImportant = false) => {
     if (!colorValue) {
         return undefined;
     } else {
-        const output = typeof colorValue === "string" ? colorValue : colorValue.toString();
-        return makeImportant ? important(output) : output;
+        if (
+            colorValue
+                .toString()
+                .trim()
+                .startsWith("linear-gradient(")
+        ) {
+            return colorValue.toString();
+        } else {
+            const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
+            return makeImportant ? important(output.toString()) : output.toString();
+        }
     }
+};
+
+export const ensureColorHelper = (colorValue: string | ColorHelper) => {
+    return typeof colorValue === "string" ? color(colorValue) : colorValue;
+};
+
+export const importantColorOut = (colorValue: ColorValues | string) => {
+    return colorOut(colorValue, true);
 };
 
 /*
@@ -26,7 +40,7 @@ export const colorOut = (colorValue: ColorValues | string, makeImportant = false
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.45;
+    return color.lightness() >= 0.4;
 };
 
 /*
@@ -54,20 +68,44 @@ export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) =>
  * Color modification based on colors lightness.
  * @param color - The color we're checking and modifying
  * @param weight - The amount you want to mix the two colors (value from 0 to 1)
- * @param flip - By default we darken light colours and lighten dark colors, but if you want to get the opposite result, use this param
+ * @param inverse - By default we darken light colours and lighten dark colors, but if you want to get the inverse result, use this param
+ * @param flipWeightForDark - For dark themes, flip ratio. Example, a weight of ".2" for a light theme would be ".8" for a dark theme.
+ * @param debug - Turn on debug logs
  * Note, however, that we do not check if you've reached a maximum. Example: If you want to darken pure black, you get back pure black.
  */
-export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, flip: boolean = false) => {
+export const modifyColorBasedOnLightness = (
+    color: ColorHelper,
+    weight: number,
+    inverse: boolean = false,
+    flipWeightForDark = false,
+    debug = false,
+) => {
+    logDebugConditionnal(debug, "=== start modifyColorBasedOnLightness debug ===");
+    logDebugConditionnal(debug, "initial color: ", color);
+    logDebugConditionnal(debug, "initial weight: ", weight);
+    logDebugConditionnal(debug, "inverse: ", inverse);
+    logDebugConditionnal(debug, "flipWeightForDark: ", flipWeightForDark);
+    logDebugConditionnal(debug, ": ");
+
     let output;
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
+
     const isLight = isLightColor(color);
-    if ((isLight && !flip) || (!isLight && flip)) {
+    logDebugConditionnal(debug, "is light: ", isLight);
+    if (flipWeightForDark && !isLight) {
+        weight = 1 - weight;
+    }
+    logDebugConditionnal(debug, "final weight: ", weight);
+    if ((isLight && !inverse) || (!isLight && inverse)) {
         output = color.darken(weight) as ColorHelper;
     } else {
         output = color.lighten(weight) as ColorHelper;
     }
+    logDebugConditionnal(debug, "output: ", output);
+    logDebugConditionnal(debug, "output: ");
+    logDebugConditionnal(debug, "=== end modifyColorBasedOnLightness debug ===");
     return output;
 };
 
@@ -81,37 +119,33 @@ export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, 
  * @param weight - The amount you want to mix the two colors (value from 0 to 1)
  * @param flipIfMax - Modify in the opposite direction if we're darker than black or whiter than white.
  */
-export const emphasizeLightness = (
-    colorValue: ColorHelper | "transparent",
+export const offsetLightness = (
+    colorValue: ColorHelper,
     weight: number,
-    darken: boolean = false,
     flipIfMax: boolean = true,
+    debug: boolean = false,
 ) => {
-    if (colorValue === "transparent") {
-        return colorValue;
-    }
-
     const colorLightness = colorValue.lightness();
     let weightOffset = 1;
-    if (colorLightness < 0.4) {
-        weightOffset = Math.abs(colorLightness - 0.4) * 20;
+    if (!isLightColor(colorValue)) {
+        weightOffset = Math.abs(colorLightness - 0.45) * 20; // Seems darker colors need more contrast than light colors to get the same impact
     }
 
     const weightCurved = weight * weightOffset;
     const colorDarker = colorValue.darken(weightCurved) as ColorHelper;
     const colorLighter = colorValue.lighten(weightCurved) as ColorHelper;
 
-    if (isLightColor(colorValue) && !darken) {
+    if (isLightColor(colorValue)) {
         if (colorLightness + weightCurved > 1 && flipIfMax) {
-            return colorDarker;
-        } else {
             return colorLighter;
+        } else {
+            return colorDarker;
         }
     } else {
-        if (colorLightness - weightCurved > 0 && flipIfMax) {
-            return colorDarker;
-        } else {
+        if (colorLightness - weightCurved > 0 && !flipIfMax) {
             return colorLighter;
+        } else {
+            return colorDarker;
         }
     }
 };

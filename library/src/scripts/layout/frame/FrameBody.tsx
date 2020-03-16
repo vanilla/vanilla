@@ -35,3 +35,14 @@ export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
         );
     }
 }
+
+interface IContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+}
+/**
+ * Container to apply paddings inside of a frame body.
+ */
+export function FrameBodyContainer(props: IContainerProps) {
+    const classes = frameBodyClasses();
+    return <div {...props} className={classNames(props.className, classes.framePaddings)} />;
+}

@@ -14,6 +14,11 @@ export interface ILinkPages {
     limit?: number;
 }
 
+export interface IWithPagination<T> {
+    pagination: ILinkPages;
+    body: T;
+}
+
 export default class SimplePagerModel {
     public static parseLinkHeader(header: string, param: string, limitParam?: string): ILinkPages {
         const result = {} as ILinkPages;

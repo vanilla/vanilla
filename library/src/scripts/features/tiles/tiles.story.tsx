@@ -21,48 +21,43 @@ export default {
     },
 };
 
+const tileItems = [
+    {
+        name: "Development",
+        description: "Processes and guidance for developers.",
+        url: "https://staff.vanillaforums.com/kb/dev",
+        icon: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
+    },
+    {
+        name: "Success",
+        description: "Information for CSMs about troubleshooting & working with Vanilla.",
+        url: "https://staff.vanillaforums.com/kb/success",
+        icon: "https://us.v-cdn.net/5022541/uploads/466/WCXDHD4UMW3K.png",
+    },
+    {
+        name: "Internal Testing",
+        description: "Knowledge for us in internal tests. Don't put anything important here.",
+        url: "https://staff.vanillaforums.com/kb/testing",
+        icon: "https://us.v-cdn.net/5022541/uploads/048/66SQHHGSZT2R.png",
+    },
+    {
+        name: "Information Security",
+        description: "Internal company security practices.",
+        url: "https://staff.vanillaforums.com/kb/infosec",
+        icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
+    },
+    {
+        name: "Information Security",
+        description: "Internal company security practices.",
+        url: "https://staff.vanillaforums.com/kb/infosec",
+        icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
+    },
+];
+
 function TilesStory(props: { title: string }) {
     return (
         <>
-            <StoryContent>
-                <StoryHeading>{props.title}</StoryHeading>
-            </StoryContent>
-            <Tiles
-                items={[
-                    {
-                        name: "Development",
-                        description: "Processes and guidance for developers.",
-                        url: "https://staff.vanillaforums.com/kb/dev",
-                        icon: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
-                    },
-                    {
-                        name: "Success",
-                        description: "Information for CSMs about troubleshooting & working with Vanilla.",
-                        url: "https://staff.vanillaforums.com/kb/success",
-                        icon: "https://us.v-cdn.net/5022541/uploads/466/WCXDHD4UMW3K.png",
-                    },
-                    {
-                        name: "Internal Testing",
-                        description: "Knowledge for us in internal tests. Don't put anything important here.",
-                        url: "https://staff.vanillaforums.com/kb/testing",
-                        icon: "https://us.v-cdn.net/5022541/uploads/048/66SQHHGSZT2R.png",
-                    },
-                    {
-                        name: "Information Security",
-                        description: "Internal company security practices.",
-                        url: "https://staff.vanillaforums.com/kb/infosec",
-                        icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
-                    },
-                    {
-                        name: "Information Security",
-                        description: "Internal company security practices.",
-                        url: "https://staff.vanillaforums.com/kb/infosec",
-                        icon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
-                    },
-                ]}
-                title={"Our Games"}
-                emptyMessage={"No subcommunities found"}
-            />
+            <Tiles items={tileItems} title={props.title} emptyMessage={"No Items found"} />
         </>
     );
 }
@@ -167,3 +162,11 @@ export const Tiles4Variation1 = storyWithConfig(
         return <TilesStory title="As Tiles - Variation 1" />;
     },
 );
+
+export function NoItems() {
+    return <Tiles items={[]} title="No Items Story" emptyMessage={"No Items found"} />;
+}
+
+export function HiddenTitle() {
+    return <Tiles items={tileItems} title="Hidden Title" hiddenTitle emptyMessage={"No Items found"} />;
+}

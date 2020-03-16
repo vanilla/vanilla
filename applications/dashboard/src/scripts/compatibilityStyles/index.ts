@@ -11,26 +11,39 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, negative, paddings, unit } from "@library/styles/styleHelpers";
-import { ColorHelper, important } from "csx";
+import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
 import * as types from "typestyle/lib/types";
-import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStyles";
+import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
 import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
-import { metaCSS } from "@dashboard/compatibilityStyles/metaStyles";
+import { forumMetaCSS } from "@dashboard/compatibilityStyles/forumMetaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
-import { layoutCSS } from "@dashboard/compatibilityStyles/layoutStyles";
-import { fontCSS } from "./fontStyles";
+import { fontCSS, forumFontsVariables } from "./fontStyles";
+import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
+import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
+import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
+import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
+import { discussionCSS } from "./discussionStyles";
+import { searchPageCSS } from "./searchPageStyles";
+import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
+import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
+import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
+import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
+import { signaturesCSS } from "./signaturesSyles";
+import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export const compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
+    const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
@@ -48,10 +61,17 @@ export const compatibilityStyles = useThemeCache(() => {
         overflow: "auto",
     });
 
-    cssOut(".DataList .Item, .MessageList .Item", {
-        background: "none",
-        borderColor: colorOut(vars.border.color),
-    });
+    cssOut(
+        `
+        .Content .DataList .Item:not(.ItemDiscussion):not(.ItemComment),
+        .Content .MessageList .Item.Item:not(.ItemDiscussion):not(.ItemComment)
+        `,
+        {
+            background: "none",
+            borderColor: colorOut(vars.border.color),
+            ...paddings(layoutVars.cell.paddings),
+        },
+    );
 
     // @mixin font-style-base()
     cssOut("html, body, .DismissMessage", {
@@ -61,9 +81,12 @@ export const compatibilityStyles = useThemeCache(() => {
         }),
     });
 
-    cssOut(".DismissMessage", {
-        color: fg,
-    });
+    cssOut(
+        ".DismissMessage, .DataList .Excerpt, .DataList .CategoryDescription, .MessageList .Excerpt, .MessageList .CategoryDescription",
+        {
+            color: fg,
+        },
+    );
 
     cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
         background: bg,
@@ -74,20 +97,76 @@ export const compatibilityStyles = useThemeCache(() => {
         color: primary,
     });
 
-    cssOut("a.Bookmark &::before", {
-        color: primary,
+    cssOut(`a.Bookmark`, {
+        opacity: 1,
         $nest: {
+            "&::before": {
+                color: primary,
+            },
             "&:hover::before": {
                 color: colorOut(mainColors.secondary),
             },
         },
     });
+
+    cssOut(
+        `
+        .Content a.Bookmarked::before,
+        .Content a.Bookmark::before,
+        .Content a.Bookmarking::before
+        `,
+        {
+            color: important(colorOut(mainColors.fg.fade(0.5)) as string),
+        },
+    );
+
     cssOut(".Box h4", { color: fg });
 
-    // Panel
-    cssOut(".Panel a", {
-        ...siteNavNodeClasses().linkMixin,
+    cssOut(`.CategoryBox > .OptionsMenu`, {
+        marginRight: unit(layoutVars.cell.paddings.horizontal),
     });
+
+    const panelSelectors = `
+        .About a,
+        .Panel.Panel-main .FilterMenu a,
+        .Panel.Panel-main .BoxFilter a,
+        .Panel.Panel-main .PanelInfo a.ItemLink,
+        .Panel.Panel-main .FilterMenu a,
+        `;
+
+    // Panel
+    cssOut(panelSelectors, {
+        ...siteNavNodeClasses().linkMixin(true, panelSelectors),
+        minHeight: 0,
+        display: "flex",
+        opacity: 1,
+    });
+
+    cssOut(".Panel .ClearFix::after", {
+        display: important("none"),
+    });
+
+    cssOut("a", {
+        cursor: "pointer",
+    });
+
+    cssOut(
+        `
+        #Panel.Panel-main .FilterMenu .Aside,
+        .Panel.Panel-main .PanelInfo .Aside,
+        .Item .Aside
+        `,
+        {
+            ...margins({
+                all: 0,
+                left: "auto",
+            }),
+            ...paddings({
+                all: 0,
+                left: unit(12),
+            }),
+        },
+    );
 
     cssOut(
         `
@@ -127,25 +206,38 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`div.Popup .Body`, {
         // borderRadius: unit(vars.border.radius),
-        ...borders(),
+        ...borders(vars.borderType.modals),
         backgroundColor: bg,
         color: fg,
+    });
+
+    // Items
+    const resultVars = searchResultsVariables();
+    const horizontalPadding = resultVars.spacing.padding.left + resultVars.spacing.padding.right;
+    cssOut(`.DataList, .Item-Header`, {
+        marginLeft: unit(-resultVars.spacing.padding.left),
+        width: calc(`100% + ${unit(horizontalPadding)}`),
+    });
+
+    cssOut(`.DataList .Item`, {
+        borderTop: singleBorder(),
+        borderBottom: singleBorder(),
+        ...paddings(resultVars.spacing.padding),
+    });
+
+    cssOut(`.DataList .Item + .Item`, {
+        borderTop: "none",
+    });
+
+    cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
+        marginTop: unit(vars.gutter.size * 2.5),
+        border: "none",
     });
 
     cssOut(`div.Popup p`, {
         paddingLeft: 0,
         paddingRight: 0,
     });
-
-    cssOut(
-        `
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a
-        `,
-        {
-            textDecoration: "none",
-        },
-    );
 
     cssOut(`.Herobanner-bgImage`, {
         "-webkit-filter": "none",
@@ -170,6 +262,7 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(
         `
         a.TextColor, a .TextColor`,
+
         {
             color: colorOut(vars.mainColors.fg),
         },
@@ -181,7 +274,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.QuickSearchButton`, {
         color: fg,
-        ...borders(),
+        ...borders(vars.borderType.formElements.buttons),
     });
 
     cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
@@ -192,31 +285,99 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(),
+        ...borders(vars.borderType.dropDowns.content),
     });
 
     cssOut(`.Frame-content`, {
         marginTop: unit(vars.gutter.size * 2),
     });
 
-    cssOut(`.PageControls.PageControls .selectBox`, {
-        height: "auto",
-    });
-
     cssOut(`.Content .PageControls`, {
         marginBottom: unit(24),
+    });
+
+    cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
+        borderTopColor: colorOut(vars.border.color),
+    });
+
+    cssOut(`.Author a:not(.PhotoWrap)`, {
+        fontWeight: vars.fonts.weights.bold,
+    });
+
+    cssOut(`.DataList.Discussions .Item .Title a`, {
+        textDecoration: important("none"),
+    });
+
+    cssOut(`.Container .DataList .Meta .Tag-Announcement`, {
+        opacity: 1,
+    });
+
+    cssOut(
+        `
+        .Container a.UserLink,
+        .Container a.UserLink.BlockTitle
+    `,
+        {
+            fontWeight: vars.fonts.weights.bold,
+        },
+    );
+
+    cssOut(".Panel > * + *", {
+        marginTop: unit(vars.gutter.size),
+    });
+
+    cssOut(".Panel li a", {
+        minHeight: 0,
+    });
+
+    cssOut(".Panel.Panel li + li", {
+        paddingTop: forumFontsVariables().panelLink.spacer.default,
+    });
+
+    cssOut(`#ConversationForm label`, {
+        color: colorOut(vars.mainColors.fg),
+    });
+
+    cssOut(`.Group-Box.Group-MembersPreview .PageControls .H`, {
+        position: "relative",
+    });
+
+    cssOut(`#Panel .FilterMenu .Aside, .PanelInfo .Aside, .Item .Aside`, {
+        float: "none",
+        display: "block",
+        margin: `0 0 14px`,
+    });
+
+    cssOut(`.HasNew`, {
+        backgroundColor: colorOut(vars.mainColors.primary),
+        color: colorOut(vars.mainColors.primaryContrast),
+    });
+
+    cssOut(`.Item.Read`, {
+        background: "none",
     });
 
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
-    metaCSS();
+    forumMetaCSS();
     inputCSS();
     socialConnectCSS();
     reactionsCSS();
     paginationCSS();
-    layoutCSS();
+    forumLayoutCSS();
     fontCSS();
+    categoriesCSS();
+    bestOfCSS();
+    ideaCSS();
+    tableCSS();
+    discussionCSS();
+    searchPageCSS();
+    groupsCSS();
+    profilePageCSS();
+    photoGridCSS();
+    messagesCSS();
+    signaturesCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {
@@ -257,19 +418,21 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
     let rawStyles = `\n`;
     Object.keys(nestedObject).forEach(key => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
-        const targetStyles = nestedObject[key];
-        const keys = Object.keys(targetStyles);
-        if (keys.length > 0) {
-            rawStyles += `${finalSelector} { `;
-            keys.forEach(property => {
-                const style = targetStyles[property];
-                if (style) {
-                    rawStyles += `\n    ${camelCaseToDash(property)}: ${
-                        style instanceof ColorHelper ? colorOut(style) : style
-                    };`;
-                }
-            });
-            rawStyles += `\n}\n\n`;
+        if (selector !== "") {
+            const targetStyles = nestedObject[key];
+            const keys = Object.keys(targetStyles);
+            if (keys.length > 0) {
+                rawStyles += `${finalSelector} { `;
+                keys.forEach(property => {
+                    const style = targetStyles[property];
+                    if (style) {
+                        rawStyles += `\n    ${camelCaseToDash(property)}: ${
+                            style instanceof ColorHelper ? colorOut(style) : style
+                        };`;
+                    }
+                });
+                rawStyles += `\n}\n\n`;
+            }
         }
     });
 

@@ -116,4 +116,11 @@ class DefaultSiteSection implements SiteSectionInterface {
     public function setApplication(string $app, bool $enable = true) {
         $this->apps[$app] = $enable;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributes(): array {
+        return [];
+    }
 }

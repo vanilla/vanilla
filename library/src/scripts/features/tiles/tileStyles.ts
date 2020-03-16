@@ -8,11 +8,15 @@ import {
     absolutePosition,
     borders,
     colorOut,
-    debugHelper,
     defaultTransition,
+    offsetLightness,
+    isLightColor,
     paddings,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    fonts,
+    EMPTY_BORDER,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
@@ -54,8 +58,11 @@ export const tileVariables = useThemeCache(() => {
     });
 
     const title = themeVars("title", {
-        fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
-        lineHeight: globalVars.lineHeights.condensed,
+        font: {
+            ...EMPTY_FONTS,
+            size: globalVars.fonts.size.large as FontSizeProperty<TLength>,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
         marginBottom: 6,
     });
 
@@ -72,7 +79,7 @@ export const tileVariables = useThemeCache(() => {
             left: 24,
             right: 24,
         },
-        borderRadius: 2,
+        borderRadius: globalVars.border.radius,
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         bgHover: globalVars.mainColors.bg,
@@ -148,7 +155,7 @@ export const tileClasses = useThemeCache(() => {
             ...shadowOrBorderBasedOnLightness(
                 globalVars.body.backgroundImage.color,
                 borders({
-                    color: vars.link.fg.fade(0.3),
+                    radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                 }),
                 shadow.embed(),
             ),
@@ -163,7 +170,8 @@ export const tileClasses = useThemeCache(() => {
                     ...shadowOrBorderBasedOnLightness(
                         globalVars.body.backgroundImage.color,
                         borders({
-                            color: vars.link.fg.fade(0.5),
+                            color: offsetLightness(globalVars.border.color, -0.05),
+                            radius: vars.link.borderRadius, // We need to redeclare border radius here so it doesn't take default
                         }),
                         shadow.embedHover(),
                     ),
@@ -204,8 +212,7 @@ export const tileClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        fontSize: unit(vars.title.fontSize),
-        lineHeight: vars.title.lineHeight,
+        ...fonts(vars.title.font),
         textAlign: vars.options.alignment,
         marginBottom: unit(vars.title.marginBottom),
     });

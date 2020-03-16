@@ -4,12 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, buttonResetMixin, buttonSizing, ButtonTypes } from "@library/forms/buttonStyles";
+import {
+    buttonGlobalVariables,
+    ButtonPresets,
+    buttonResetMixin,
+    buttonSizing,
+    ButtonTypes,
+    buttonVariables,
+} from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders } from "@library/styles/styleHelpersBorders";
+import { borders, EMPTY_BORDER } from "@library/styles/styleHelpersBorders";
 import { colorOut } from "@library/styles/styleHelpersColors";
-import { fonts } from "@library/styles/styleHelpersTypography";
+import { EMPTY_FONTS, fonts } from "@library/styles/styleHelpersTypography";
 import { styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
@@ -18,46 +25,96 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
 
 export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+    const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
+    const buttonVars = buttonVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
+
+    const state = buttonTypeVars.state ?? {};
+    const colors = buttonTypeVars.colors ?? {
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+    };
 
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
-            colors: {},
-            hover: {},
-            focus: {},
-            active: {},
-            borders: {},
-            focusAccessible: {},
+            preset: ButtonPresets.ADVANCED,
+            colors,
+            state,
+            hover: state,
+            focus: state,
+            active: state,
+            borders: state,
+            focusAccessible: state,
         },
         buttonTypeVars,
     );
 
+    let backgroundColor =
+        buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg;
+
+    let fontColor =
+        buttonTypeVars.fonts && buttonTypeVars.fonts.color
+            ? buttonTypeVars.fonts.color
+            : buttonTypeVars.colors && buttonTypeVars.colors.fg
+            ? buttonTypeVars.colors.fg
+            : undefined;
+
+    if (!buttonTypeVars.borders) {
+        buttonTypeVars.borders = {};
+    }
+
+    if (!buttonTypeVars.borders.color) {
+        buttonTypeVars.borders = EMPTY_BORDER;
+    }
+
+    if (buttonTypeVars.colors && buttonTypeVars.colors.fg && buttonTypeVars.colors.bg) {
+        const fg = buttonTypeVars.colors.fg;
+        const bg = buttonTypeVars.colors.bg;
+        if (buttonTypeVars.preset === ButtonPresets.OUTLINE) {
+            buttonTypeVars.borders.color = bg.mix(fg, buttonGlobals.constants.borderMixRatio);
+            if (buttonTypeVars.state && buttonTypeVars.state.borders && !buttonTypeVars.state.borders.color) {
+                buttonTypeVars.state.borders.color = globalVars.mainColors.primary;
+            }
+        } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
+            buttonTypeVars.borders.color = bg;
+        }
+    }
+
+    let defaultBorder = borders({
+        ...EMPTY_BORDER,
+        ...buttonTypeVars.borders,
+    });
+
     // Remove debug and fallback
-    const defaultBorder = borders(buttonTypeVars.borders, globalVariables().border);
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.hover.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.hover.borders }))
             : {};
 
     const activeBorder =
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.active.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.active.borders }))
             : {};
 
     const focusBorder =
         buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focus && buttonTypeVars.focus.borders))
+            ? merge(
+                  cloneDeep(defaultBorder),
+                  borders({ ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) }),
+              )
             : defaultBorder;
 
     const focusAccessibleBorder =
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(cloneDeep(defaultBorder), borders(buttonTypeVars.focusAccessible.borders))
+            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }))
             : {};
+
+    const fontVars = { ...EMPTY_FONTS, ...buttonTypeVars.fonts };
 
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
@@ -65,15 +122,12 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),
-        color: colorOut(
-            buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
-        ),
-        backgroundColor: colorOut(
-            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
-        ),
+        backgroundColor: colorOut(backgroundColor),
         ...fonts({
-            ...buttonGlobals.font,
-            ...buttonTypeVars.fonts,
+            ...fontVars,
+            size: buttonGlobals.font.size,
+            color: fontColor,
+            weight: fontVars.weight ?? undefined,
         }),
         ...defaultBorder,
         ...buttonSizing(
@@ -118,7 +172,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.hover.colors.bg
                                 : undefined,
                         ),
-                        ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
                         ...hoverBorder,
                     },
                     "&:focus": {
@@ -133,8 +186,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.focus!.colors.bg
                                 : undefined,
                         ),
-
-                        ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
                         ...focusBorder,
                     },
                     "&:active": {
@@ -149,9 +200,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                                 ? buttonTypeVars.active!.colors.bg
                                 : undefined,
                         ),
-                        ...fonts(
-                            buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
-                        ),
                         ...activeBorder,
                     },
                     "&.focus-visible": {
@@ -165,11 +213,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                             buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
                                 ? buttonTypeVars.focusAccessible!.colors.bg
                                 : undefined,
-                        ),
-                        ...fonts(
-                            buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
-                                ? buttonTypeVars.focusAccessible.fonts
-                                : {},
                         ),
                         ...focusAccessibleBorder,
                     },

@@ -5,41 +5,64 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    margins,
+    paddings,
+    setAllLinkColors,
+    unit,
+    fonts,
+    extendItemContainer,
+    EMPTY_FONTS,
+    singleBorder,
+    EMPTY_SPACING,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { media } from "typestyle";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { containerVariables } from "@library/layout/components/containerStyles";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
     const globalVars = globalVariables();
 
-    const linksWithHeadings = makeThemeVars("linksWithHeadings", {
-        paddings: {
-            all: 20,
+    const item = makeThemeVars("item", {
+        fontSize: globalVars.fonts.size.large,
+        padding: {
+            ...EMPTY_SPACING,
+            vertical: globalVars.spacer.size * 2,
+            horizontal: containerVariables().spacing.paddingFull.horizontal,
         },
-        mobile: {
-            paddings: {
-                all: 0,
-            },
+        paddingMobile: {
+            ...EMPTY_SPACING,
+            horizontal: 0,
         },
     });
 
-    const item = makeThemeVars("item", {
-        fontSize: globalVars.fonts.size.large,
+    const linksWithHeadings = makeThemeVars("linksWithHeadings", {
+        paddings: {
+            horizontal: item.padding.horizontal / 2,
+        },
     });
 
     const title = makeThemeVars("title", {
-        fontSize: globalVars.fonts.size.title,
-        fontWeight: globalVars.fonts.weights.semiBold,
-        lineHeight: globalVars.lineHeights.condensed,
+        font: {
+            ...EMPTY_FONTS,
+            size: globalVars.fonts.size.title,
+            weight: globalVars.fonts.weights.bold,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
         maxWidth: percent(100),
         margins: {
-            bottom: 8,
+            bottom: globalVars.gutter.size,
         },
         mobile: {
-            fontSize: globalVars.fonts.size.large,
-            fontWeight: globalVars.fonts.weights.bold,
+            font: {
+                ...EMPTY_FONTS,
+                fontSize: globalVars.fonts.size.large,
+                fontWeight: globalVars.fonts.weights.bold,
+            },
         },
     });
 
@@ -61,28 +84,13 @@ export const navLinksVariables = useThemeCache(() => {
             top: "auto",
         },
         paddings: {
-            top: 20,
-        },
-        mobile: {
-            paddings: {
-                top: 8,
-            },
+            top: globalVars.gutter.size,
         },
         $nest: viewAllLinkColors.nested,
     });
 
     const spacing = makeThemeVars("spacing", {
-        paddings: {
-            vertical: 34,
-            horizontal: 40,
-        },
         margin: 6,
-        mobile: {
-            paddings: {
-                vertical: 22,
-                horizontal: 8,
-            },
-        },
     });
 
     const columns = makeThemeVars("columns", {
@@ -127,7 +135,10 @@ export const navLinksClasses = useThemeCache(() => {
 
     const root = style(
         {
-            ...paddings(vars.spacing.paddings),
+            ...paddings({
+                ...vars.item.padding,
+                horizontal: vars.item.padding.horizontal / 2,
+            }),
             display: "flex",
             flexDirection: "column",
             maxWidth: percent(100),
@@ -135,7 +146,10 @@ export const navLinksClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({
             width: percent(100),
-            ...paddings(vars.spacing.mobile.paddings),
+            ...paddings({
+                ...vars.item.paddingMobile,
+                horizontal: vars.item.paddingMobile.horizontal / 2,
+            }),
         }),
     );
 
@@ -152,21 +166,31 @@ export const navLinksClasses = useThemeCache(() => {
         marginBottom: unit(vars.spacing.margin),
     });
 
-    const title = style(
-        "title",
-        {
-            display: "block",
-            fontSize: unit(vars.title.fontSize),
-            lineHeight: globalVars.lineHeights.condensed,
-            fontWeight: globalVars.fonts.weights.semiBold,
-            maxWidth: percent(100),
-            ...margins(vars.title.margins),
+    const title = style("title", {
+        $nest: {
+            "&&": {
+                display: "block",
+                ...fonts(vars.title.font),
+                maxWidth: percent(100),
+                ...margins(vars.title.margins),
+                ...mediaQueries.oneColumn(fonts(vars.title.mobile.font)),
+            },
         },
-        mediaQueries.oneColumn({
-            fontSize: unit(vars.title.mobile.fontSize),
-            fontWeight: vars.title.mobile.fontWeight,
-        }),
-    );
+    });
+
+    const topTitle = style("topTitle", {
+        $nest: {
+            "&&": {
+                ...margins({
+                    vertical: vars.item.padding.vertical,
+                    top: vars.item.padding.top,
+                    bottom: 0,
+                }),
+                ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
+                width: "100%",
+            },
+        },
+    });
 
     const linkColors = setAllLinkColors({
         default: globalVars.mainColors.fg,
@@ -174,24 +198,21 @@ export const navLinksClasses = useThemeCache(() => {
 
     const link = style("link", {
         display: "block",
-        fontSize: unit(vars.link.fontSize),
-        lineHeight: vars.link.lineHeight,
-        color: linkColors.color,
-        $nest: linkColors.nested,
-    });
-
-    const viewAllitem = style(
-        "viewAllItem",
-        {
-            display: "block",
-            fontSize: unit(vars.item.fontSize),
-            ...margins(vars.viewAll.margins),
-            ...paddings(vars.viewAll.paddings),
-        },
-        mediaQueries.oneColumn({
-            ...paddings(vars.viewAll.mobile.paddings),
+        ...fonts({
+            size: vars.link.fontSize,
+            lineHeight: vars.link.lineHeight,
+            // @ts-ignore
+            color: linkColors.color,
         }),
-    );
+        $nest: linkColors.nested as NestedCSSProperties,
+    } as NestedCSSProperties);
+
+    const viewAllItem = style("viewAllItem", {
+        display: "block",
+        fontSize: unit(vars.item.fontSize),
+        ...margins(vars.viewAll.margins),
+        ...paddings(vars.viewAll.paddings),
+    });
 
     const viewAllLinkColors = setAllLinkColors({
         default: globalVars.mainColors.primary,
@@ -199,9 +220,12 @@ export const navLinksClasses = useThemeCache(() => {
 
     const viewAll = style("viewAll", {
         display: "block",
-        fontWeight: vars.viewAll.fontWeight,
-        fontSize: vars.viewAll.fontSize,
-        color: viewAllLinkColors.color,
+        ...fonts({
+            weight: vars.viewAll.fontWeight,
+            size: vars.viewAll.fontSize,
+            // @ts-ignore
+            color: vars.viewAll.color,
+        }),
         $nest: viewAllLinkColors.nested,
     });
 
@@ -209,27 +233,47 @@ export const navLinksClasses = useThemeCache(() => {
         "linksWithHeadings",
         {
             ...paddings(vars.linksWithHeadings.paddings),
+            ...extendItemContainer(vars.item.padding.horizontal + vars.linksWithHeadings.paddings.horizontal),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            ...paddings(vars.linksWithHeadings.mobile.paddings),
+            ...extendItemContainer(vars.item.paddingMobile.horizontal + vars.linksWithHeadings.paddings.horizontal),
         }),
     );
 
-    const separator = style("separator", {
-        display: "block",
-        width: percent(100),
-        height: unit(vars.separator.height),
-        backgroundColor: colorOut(vars.separator.bg),
-    });
+    const separator = style(
+        "separator",
+        {
+            display: "block",
+            width: percent(100),
+
+            // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
+            borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
+        },
+        mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
+    );
+
+    const separatorIndependant = style(
+        "separatorIndependant",
+        {
+            display: "block",
+            ...extendItemContainer(vars.item.padding.horizontal),
+
+            // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
+            borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
+        },
+        mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
+        mediaQueries.oneColumn({
+            ...extendItemContainer(vars.item.paddingMobile.horizontal),
+        }),
+    );
 
     const separatorOdd = style(
         "separatorOdd",
         {
-            $unique: true,
             display: "none",
         },
         mediaQueries.oneColumn({
@@ -242,11 +286,13 @@ export const navLinksClasses = useThemeCache(() => {
         items,
         item,
         title,
+        topTitle,
         link,
-        viewAllitem,
+        viewAllItem,
         viewAll,
         linksWithHeadings,
         separator,
         separatorOdd,
+        separatorIndependant,
     };
 });

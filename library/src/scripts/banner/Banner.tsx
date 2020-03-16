@@ -5,22 +5,18 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
-import { ColorValues } from "@library/styles/styleHelpersColors";
+import { bannerClasses, bannerVariables, SearchBarPresets, presetsBanner } from "@library/banner/bannerStyles";
 import { t, assetUrl } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
-import { getBackgroundImage } from "@library/styles/styleHelpers";
-import { SearchBarButtonType } from "@library/headers/mebox/pieces/compactSearchStyles";
 
 interface IProps {
     action?: React.ReactNode;
@@ -61,48 +57,52 @@ export default function Banner(props: IProps) {
                 {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
             </div>
             {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-            <Container>
-                <PanelWidgetHorizontalPadding>
-                    <div className={imageElementSrc ? classes.imagePositioner : ""}>
-                        <div className={classes.contentContainer}>
-                            <div className={classes.titleWrap}>
-                                <FlexSpacer className={classes.titleFlexSpacer} />
-                                {title && <Heading title={title} className={classes.title} />}
-                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                            </div>
-                            {!options.hideDesciption && description && (
-                                <div className={classes.descriptionWrap}>
-                                    <p className={classNames(classes.description, classes.text)}>{description}</p>
-                                </div>
+            <Container fullGutter>
+                <div className={imageElementSrc ? classes.imagePositioner : ""}>
+                    <div className={classes.contentContainer}>
+                        <div className={classes.titleWrap}>
+                            <FlexSpacer className={classes.titleFlexSpacer} />
+                            {title && (
+                                <Heading className={classes.title} depth={1} isLarge>
+                                    {title}
+                                </Heading>
                             )}
-                            {!options.hideSearch && (
-                                <div className={classes.searchContainer}>
-                                    <IndependentSearch
-                                        buttonClass={classes.searchButton}
-                                        buttonBaseClass={ButtonTypes.CUSTOM}
-                                        isLarge={true}
-                                        placeholder={t("Search")}
-                                        inputClass={classes.input}
-                                        iconClass={classes.icon}
-                                        buttonLoaderClassName={classes.buttonLoader}
-                                        hideSearchButton={
-                                            device === Devices.MOBILE ||
-                                            device === Devices.XS ||
-                                            vars.searchButtonOptions.type === SearchBarButtonType.NONE
-                                        }
-                                        contentClass={classes.content}
-                                        valueContainerClasses={classes.valueContainer}
-                                    />
-                                </div>
-                            )}
+                            <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
                         </div>
-                        {imageElementSrc && (
-                            <div className={classes.imageElementContainer}>
-                                <img className={classes.imageElement} src={imageElementSrc}></img>
+                        {!options.hideDesciption && description && (
+                            <div className={classes.descriptionWrap}>
+                                <p className={classNames(classes.description, classes.text)}>{description}</p>
+                            </div>
+                        )}
+                        {!options.hideSearch && (
+                            <div className={classes.searchContainer}>
+                                <IndependentSearch
+                                    buttonClass={classes.searchButton}
+                                    buttonBaseClass={ButtonTypes.CUSTOM}
+                                    isLarge={true}
+                                    placeholder={t("Search")}
+                                    inputClass={classes.input}
+                                    iconClass={classes.icon}
+                                    buttonLoaderClassName={classes.buttonLoader}
+                                    hideSearchButton={
+                                        device === Devices.MOBILE ||
+                                        device === Devices.XS ||
+                                        presetsBanner().button.preset === ButtonPresets.HIDE
+                                    }
+                                    contentClass={classes.content}
+                                    valueContainerClasses={classes.valueContainer}
+                                    iconContainerClasses={classes.iconContainer}
+                                    resultsAsModalClasses={classes.resultsAsModal}
+                                />
                             </div>
                         )}
                     </div>
-                </PanelWidgetHorizontalPadding>
+                    {imageElementSrc && (
+                        <div className={classes.imageElementContainer}>
+                            <img className={classes.imageElement} src={imageElementSrc}></img>
+                        </div>
+                    )}
+                </div>
             </Container>
         </div>
     );

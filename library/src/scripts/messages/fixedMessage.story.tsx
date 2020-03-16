@@ -12,7 +12,7 @@ import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { unit, negative } from "@library/styles/styleHelpers";
+import { unit, negative, negativeUnit } from "@library/styles/styleHelpers";
 import { ErrorIcon } from "@library/icons/common";
 
 const story = storiesOf("Messages", module);
@@ -28,7 +28,7 @@ story.add("Fixed Message", () => {
             style={{
                 height: unit(titleBarVariables().sizing.height),
                 position: "relative",
-                marginTop: negative(unit(titleBarVariables().sizing.height)),
+                marginTop: negativeUnit(titleBarVariables().sizing.height),
             }}
         >
             <Message

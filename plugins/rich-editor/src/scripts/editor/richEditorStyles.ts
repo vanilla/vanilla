@@ -16,6 +16,7 @@ import {
     borders,
     paddings,
     margins,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -24,12 +25,14 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
@@ -165,24 +168,30 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         minWidth: unit(vars.menuButton.size),
     });
 
-    const text = style("text", {
-        position: "relative",
-        whiteSpace: important("pre-wrap"),
-        outline: 0,
-        paddingBottom: 24, // So the user has room to click.
-        $nest: {
-            // When the editor is empty we should be displaying a placeholder.
-            "&.ql-blank::before": {
-                content: `attr(placeholder)`,
-                display: "block",
-                color: colorOut(vars.text.placeholder.color),
-                position: "absolute",
-                top: vars.text.offset,
-                left: 0,
-                cursor: "text",
+    const text = style(
+        "text",
+        {
+            position: "relative",
+            whiteSpace: important("pre-wrap"),
+            outline: 0,
+            paddingBottom: 24, // So the user has room to click.
+            $nest: {
+                // When the editor is empty we should be displaying a placeholder.
+                "&.ql-blank::before": {
+                    content: `attr(placeholder)`,
+                    display: "block",
+                    color: colorOut(vars.text.placeholder.color),
+                    position: "absolute",
+                    top: vars.text.offset,
+                    left: 0,
+                    cursor: "text",
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            fontSize: importantUnit(16), // for iOS
+        }),
+    );
 
     const menuItems = style("menuItems", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
@@ -365,6 +374,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         cursor: "pointer",
         border: 0,
         outline: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
     });
 
     const flyoutDescription = style("flyoutDescription", {

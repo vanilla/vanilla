@@ -7,13 +7,24 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borderRadii, borders, colorOut, unit, paddings, importantUnit } from "@library/styles/styleHelpers";
-import { calc, important, percent, px } from "csx";
+import {
+    borderRadii,
+    borders,
+    colorOut,
+    unit,
+    paddings,
+    importantUnit,
+    getVerticalPaddingForTextInput,
+    fonts,
+} from "@library/styles/styleHelpers";
+import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonClasses, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { inputVariables } from "@library/forms/inputStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,6 +62,9 @@ export const searchBarVariables = useThemeCache(() => {
         height: 13,
         width: 14,
         fg: input.fg.fade(0.7),
+        padding: {
+            right: 5,
+        },
     });
 
     const results = themeVars("results", {
@@ -80,10 +94,18 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
+    const inputVars = inputVariables();
 
-    const independantRoot = style("independantRoot", {
+    const independentRoot = style("independentRoot", {
         position: "relative",
     });
+
+    const verticalPadding = getVerticalPaddingForTextInput(
+        vars.sizing.height,
+        inputVars.font.size,
+        formElementVars.border.width * 2,
+    );
+    const calculatedHeight = vars.sizing.height - verticalPadding * 2 - formElementVars.border.width * 2;
 
     const root = style(
         {
@@ -92,12 +114,19 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 "& .searchBar__placeholder": {
                     color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",
+                    height: unit(calculatedHeight),
+                    lineHeight: unit(calculatedHeight),
+                    top: 0,
+                    transform: "none",
                 },
 
                 "& .suggestedTextInput-valueContainer": {
                     $nest: {
                         [`.${classesInputBlock.inputText}`]: {
                             height: "auto",
+                        },
+                        "& > *": {
+                            width: percent(100),
                         },
                     },
                 },
@@ -115,11 +144,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     borderBottomLeftRadius: important(0),
                 },
                 "& .searchBar__control": {
-                    display: "flex",
-                    flex: 1,
                     border: 0,
                     backgroundColor: "transparent",
-                    height: percent(100),
+                    width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {
                         "&.searchBar__control--is-focused": {
@@ -135,8 +162,15 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     },
                 },
                 "& .searchBar__value-container": {
+                    position: "static",
                     overflow: "auto",
                     cursor: "text",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                    fontSize: unit(inputVars.font.size),
+                    height: unit(calculatedHeight),
                     $nest: {
                         "& > div": {
                             width: percent(100),
@@ -150,11 +184,13 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     width: percent(100),
                 },
                 "& .searchBar__input input": {
+                    height: "auto",
+                    minHeight: 0,
                     width: important(`100%`),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
@@ -186,13 +222,16 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     vertical: 9,
                     horizontal: 12,
                 }),
+                ...fonts({
+                    size: globalVars.fonts.size.medium,
+                }),
                 textAlign: "left",
                 display: "block",
                 color: "inherit",
                 $nest: {
                     "&:hover, &:focus, &.isFocused": {
                         color: "inherit",
-                        backgroundColor: globalVars.states.hover.color.toString(),
+                        backgroundColor: globalVars.states.hover.highlight.toString(),
                     },
                 },
             },
@@ -201,6 +240,9 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 padding: 0,
             },
             "& .suggestedTextInput-item": {
+                ...fonts({
+                    size: globalVars.fonts.size.medium,
+                }),
                 listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
@@ -219,6 +261,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         ...borders({
             radius: vars.results.borderRadius,
         }),
+        boxSizing: "border-box",
         ...shadow.dropDown(),
         zIndex: 1,
     });
@@ -234,6 +277,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
         cursor: "text",
+        transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
         ...borderRadii({
             right: 0,
             left: vars.border.radius,
@@ -245,6 +289,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 alignItems: "center",
                 justifyContent: "flex-start",
                 paddingLeft: unit(vars.searchIcon.gap),
+                paddingRight: unit(vars.searchIcon.padding.right),
             },
             "&.noSearchButton": {
                 ...borderRadii({
@@ -258,18 +303,14 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const compoundValueContainer = style("compoundValueContainer", {
         $nest: {
             "&&": {
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
+                borderTopRightRadius: important(0),
+                borderBottomRightRadius: important(0),
             },
         },
     });
 
     const actionButton = style("actionButton", {
         marginLeft: -vars.border.width,
-        // ...borderRadii({
-        //     left: important(0),
-        //     right: important(unit(splashVars.inputAndButton.borderRadius) as string),
-        // }),
     });
 
     const label = style("label", {
@@ -285,6 +326,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.height),
         color: colorOut(globalVars.mixBgAndFg(0.78)),
+        transform: translateX(`${unit(8)}`),
         $nest: {
             "&, &.buttonIcon": {
                 border: "none",
@@ -326,6 +368,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     });
 
     const iconContainer = style("iconContainer", {
+        ...buttonResetMixin(),
         position: "absolute",
         top: 0,
         bottom: 0,
@@ -337,6 +380,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
         cursor: "text",
+        outline: 0,
         $nest: {
             [`.${icon}`]: {
                 width: unit(vars.searchIcon.width),
@@ -392,7 +436,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     return {
         root,
-        independantRoot,
+        independentRoot,
         compoundValueContainer,
         valueContainer,
         actionButton,

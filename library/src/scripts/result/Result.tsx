@@ -78,7 +78,7 @@ export default class Result extends React.Component<IResult> {
                             )}
                             {!!this.props.excerpt && (
                                 <Paragraph className={classNames("searchResult-excerpt", classes.excerpt)}>
-                                    <TruncatedText>{this.props.excerpt}</TruncatedText>
+                                    <TruncatedText maxCharCount={160}>{this.props.excerpt}</TruncatedText>
                                 </Paragraph>
                             )}
                         </div>

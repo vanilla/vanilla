@@ -7,7 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { allLinkStates, colorOut, margins, unit } from "@library/styles/styleHelpers";
-import { calc } from "csx";
+import { calc, important } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const metasVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -49,18 +50,18 @@ export const metasVariables = useThemeCache(() => {
     };
 });
 
-export const metasClasses = useThemeCache(() => {
+export const metaContainerStyles = (overwrites?: any) => {
     const vars = metasVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("metas");
-
-    const root = style({
+    const flexed = { display: "flex", flexWrap: "wrap", justifyContent: "flex-start", alignItems: "center" };
+    return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
         color: colorOut(vars.colors.fg),
         width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
         overflow: "hidden",
         textAlign: "left",
+        fontSize: unit(globalVars.meta.text.fontSize),
         ...margins({
             left: -vars.spacing.default,
             right: vars.spacing.default,
@@ -85,14 +86,18 @@ export const metasClasses = useThemeCache(() => {
                     },
                 }),
             },
-            "&.isFlexed": {
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "flex-start",
-                alignItems: "center",
-            },
+            "&.isFlexed": flexed,
         },
-    });
+        ...overwrites,
+    } as NestedCSSProperties;
+};
+
+export const metasClasses = useThemeCache(() => {
+    const vars = metasVariables();
+    const globalVars = globalVariables();
+    const style = styleFactory("metas");
+
+    const root = style(metaContainerStyles());
 
     const meta = style("meta", {
         display: "inline-block",
@@ -123,10 +128,15 @@ export const metasClasses = useThemeCache(() => {
         textAlign: "left",
     });
 
+    const noUnderline = style("noUnderline", {
+        textDecoration: important("none"),
+    });
+
     return {
         root,
         meta,
         metaStyle,
         draftStatus,
+        noUnderline,
     };
 });

@@ -116,7 +116,7 @@ $Configuration['Garden']['Thumbnail']['Size'] = 200;
 
 // Appearance.
 $Configuration['Garden']['Theme'] = 'keystone';
-$Configuration['Garden']['MobileTheme'] = 'mobile';
+$Configuration['Garden']['MobileTheme'] = 'keystone';
 $Configuration['Garden']['Menu']['Sort'] = ['Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User'];
 $Configuration['Garden']['ThemeOptions']['Styles']['Key'] = 'Default';
 $Configuration['Garden']['ThemeOptions']['Styles']['Value'] = '%s_default';
@@ -182,3 +182,6 @@ $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
 $Configuration['Routes']['Default404'] = ['dashboard/home/filenotfound', 'NotFound'];
 $Configuration['Routes']['DefaultPermission'] = ['dashboard/home/unauthorized', 'NotAuthorized'];
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
+
+// Themes
+$Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList"];

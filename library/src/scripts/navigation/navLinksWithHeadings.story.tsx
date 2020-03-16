@@ -4,30 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
-import React from "react";
-import { StoryContent } from "@library/storybook/StoryContent";
-import { t } from "@library/utility/appUtils";
-import NextPrevious from "@library/navigation/NextPrevious";
-import NavLinksWithHeadings from "@library/navigation/NavLinksWithHeadings";
+import NavLinksWithHeadingsComponent from "@library/navigation/NavLinksWithHeadings";
 import { navLinksWithHeadingsData } from "@library/navigation/navLinksWithHeadings.storyData";
+import { t } from "@library/utility/appUtils";
+import React from "react";
+import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
 
-const story = storiesOf("Navigation", module);
+export default {
+    title: "NavLinksWithHeadings",
+};
 
-const data = navLinksWithHeadingsData;
-
-story.add("Nav Links with Headings", () => {
+export function StandardNavLinksStory() {
     return (
-        <StoryContent>
-            <NavLinksWithHeadings
-                title={t("Browse Articles by Category")}
-                accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
-                {...data}
-                depth={2}
-                ungroupedTitle={t("Other Articles")}
-                ungroupedViewAllUrl={data.ungroupedViewAllUrl}
-            />
-        </StoryContent>
+        <NavLinksWithHeadingsComponent
+            title={t("Browse Articles by Category")}
+            accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
+            {...navLinksWithHeadingsData}
+            depth={2}
+            ungroupedTitle={t("Other Articles")}
+            ungroupedViewAllUrl={navLinksWithHeadingsData.ungroupedViewAllUrl}
+        />
     );
-});
+}
+StandardNavLinksStory.story = {
+    name: "Standard",
+};
+
+export function Placeholder() {
+    return <NavLinksPlaceholder title="Navigation Placeholder" showTitle />;
+}

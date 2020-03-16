@@ -227,7 +227,11 @@ export function useScrollOffset() {
  * Eg. If you click a link #some-hash and an element with the ID `some-hash` is present in the page
  * that item will stay below the HashOffsetReporter.
  */
-export function HashOffsetReporter(props: { children: React.ReactNode }) {
+export function HashOffsetReporter(props: { className?: string; children: React.ReactNode }) {
     const offset = useScrollOffset();
-    return <div ref={offset.hashOffsetRef}>{props.children}</div>;
+    return (
+        <div className={props.className} ref={offset.hashOffsetRef}>
+            {props.children}
+        </div>
+    );
 }

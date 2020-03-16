@@ -14,10 +14,9 @@ import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { InputActionMeta, ActionMeta } from "react-select/lib/types";
+import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
@@ -40,7 +39,6 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     loadOptions?: (inputValue: string) => Promise<any>;
     value: string;
     onChange: (value: string) => void;
-    isBigInput?: boolean;
     noHeading: boolean;
     title: string;
     titleAsComponent?: React.ReactNode;
@@ -62,6 +60,8 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     contentClass?: string;
     buttonBaseClass?: ButtonTypes;
     valueContainerClasses?: string;
+    iconContainerClasses?: string;
+    resultsAsModalClasses?: string;
 }
 
 interface IState {
@@ -78,7 +78,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
 
     public static defaultProps: Partial<IProps> = {
         disabled: false,
-        isBigInput: false,
         noHeading: false,
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
@@ -105,7 +104,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { className, disabled, isLoading } = this.props;
         return (
             <AsyncCreatable
                 id={this.id}
@@ -120,11 +118,11 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 blurInputOnSelect={false}
                 allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
-                isDisabled={disabled}
+                isDisabled={this.props.disabled}
                 loadOptions={this.props.loadOptions!}
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
-                className={classNames(this.prefix, className)}
+                className={classNames(this.prefix, this.props.className)}
                 placeholder={this.props.placeholder}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
@@ -140,6 +138,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 onMenuClose={this.props.onCloseSuggestions}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
+                iconContainerClasses={this.props.iconContainerClasses}
+                resultsAsModalClasses={this.props.resultsAsModalClasses}
             />
         );
     }
@@ -275,8 +275,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 classes.valueContainer,
                                 this.props.valueContainerClasses,
                                 {
+                                    ["focus-visible"]: props.isFocused,
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
-                                    isLarge: this.props.isBigInput,
                                     noSearchButton: !!this.props.hideSearchButton,
                                 },
                             )}
@@ -297,9 +297,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 className={classNames(
                                     "searchBar-submitButton",
                                     this.props.buttonClassName ?? classes.actionButton,
-                                    {
-                                        isLarge: this.props.isBigInput,
-                                    },
                                 )}
                                 tabIndex={this.props.hideSearchButton ? -1 : 0}
                             >
@@ -313,14 +310,15 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 )}
                             </Button>
                         </ConditionalWrap>
-                        <div
+                        <Button
+                            baseClass={ButtonTypes.CUSTOM}
                             onClick={this.focus}
-                            className={classNames("searchBar-iconContainer", classes.iconContainer, {
-                                [classes.iconContainerBigInput]: this.props.isBigInput,
-                            })}
+                            className={classNames(classes.iconContainer, props.selectProps.iconContainerClasses)}
+                            aria-hidden={true}
+                            tabIndex={-1}
                         >
                             <SearchIcon className={classNames("searchBar-icon", classes.icon)} />
-                        </div>
+                        </Button>
                     </div>
                 </form>
             </div>

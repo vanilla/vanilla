@@ -930,20 +930,24 @@ class SettingsController extends DashboardController {
                 ]
             ],
             'Garden.EmailTemplate.TextColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Text Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.BackgroundColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Background Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.ContainerBackgroundColor' => [
                 'Control' => 'color',
-                'LabelCode' => 'Page Color'
+                'LabelCode' => 'Page Color',
             ],
             'Garden.EmailTemplate.ButtonTextColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Button Text Color',
+                'Control' => 'color',
             ],
             'Garden.EmailTemplate.ButtonBackgroundColor' => [
-                'Control' => 'color'
+                'LabelCode' => 'Button Background Color',
+                'Control' => 'color',
             ],
         ]);
 

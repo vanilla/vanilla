@@ -406,9 +406,10 @@ class PermissionModel extends Gdn_Model {
 
         // Select any that match $LimitToSuffix
         foreach ($permissionColumns as $columnName => $value) {
-            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) != $limitToSuffix) {
+            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) !== $limitToSuffix) {
                 continue; // permission not in $LimitToSuffix
-            }            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
+            }
+            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
 
         // Generic part of query
@@ -424,6 +425,7 @@ class PermissionModel extends Gdn_Model {
             if ($foreignKey && $foreignID) {
                 $this->SQL
                     ->join("$junctionTable j", "j.$junctionColumn = p.JunctionID")
+                    ->where("p.JunctionTable", $junctionTable)
                     ->where("j.$foreignKey", $foreignID);
             }
         } else {
@@ -590,6 +592,7 @@ class PermissionModel extends Gdn_Model {
             $junctionColumn = $row['JunctionColumn'];
             unset($row['PermissionID'], $row['RoleID'], $row['JunctionTable'], $row['JunctionColumn'], $row['JunctionID']);
 
+            unset($juncIDs);
             // If the junction column is not the primary key then we must figure out and limit the permissions.
             if ($limitToDefault === false && $junctionColumn != $junctionTable.'ID') {
                 $juncIDs = $sQL

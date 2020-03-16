@@ -38,29 +38,36 @@ export interface IButtonStates {
     active?: object;
 }
 
-export const allLinkStates = (styles: ILinkStates) => {
-    const output = allButtonStates(styles);
+export const allLinkStates = (styles: ILinkStates, nested?: object) => {
+    const output = allButtonStates(styles, nested, true);
     const visited = styles.visited !== undefined ? styles.visited : styles.noState || {};
-    output.$nest["&:visited"] = { ...styles.allStates, ...visited };
+    output.$nest["&:visited"] = { ...visited };
     return output;
 };
 
-export const allButtonStates = (styles: IButtonStates, nested?: object, debugMode?: boolean) => {
+export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?: boolean, debugMode?: boolean) => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
+
+    const disabledStyles = isLink
+        ? {}
+        : {
+              "&:disabled": {
+                  opacity: 0.5,
+              },
+          };
 
     const output = {
         ...allStates,
         ...noState,
         $nest: {
+            "&": noState,
             "&:hover:not(:disabled)": { ...allStates, ...styles.hover },
             "&:focus": { ...allStates, ...styles.focus },
             "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
             "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
             "&:active:not(:disabled)": { ...allStates, ...styles.active },
-            "&:disabled": {
-                opacity: 0.5,
-            },
+            ...disabledStyles,
             ...nested,
         },
     };

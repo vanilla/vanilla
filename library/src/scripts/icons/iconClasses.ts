@@ -32,8 +32,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const vanillaLogo = themeVars("vanillaLogo", {
-        width: 296.866,
-        height: 119.993,
+        width: 80,
+        height: 32.3,
     });
 
     const compact = themeVars("compact", {
@@ -316,11 +316,16 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.error.fg),
     });
 
+    const warningFgColor = style("warningFgColor", {
+        color: colorOut(globalVars.messageColors.warning.fg),
+    });
+
     return {
         standard,
         newFolder,
         warning,
         errorFgColor,
+        warningFgColor,
         fileType,
         attachmentError,
         vanillaLogo,

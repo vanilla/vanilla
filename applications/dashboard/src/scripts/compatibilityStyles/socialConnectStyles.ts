@@ -14,7 +14,7 @@ export const socialConnectCSS = () => {
         alignItems: "flex-end",
     });
 
-    cssOut(`.Gloss`, {
+    cssOut(`.DataList-Connections .Gloss`, {
         minHeight: "42px",
         marginTop: unit(5),
         minWidth: unit(200),

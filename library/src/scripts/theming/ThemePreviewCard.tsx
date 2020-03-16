@@ -9,7 +9,7 @@ import { themeCardClasses } from "./themePreviewCardStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, emphasizeLightness } from "@library/styles/styleHelpersColors";
+import { colorOut, offsetLightness, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
@@ -419,11 +419,11 @@ function calculateVars(props: IProps) {
     let globalFg = props.globalFg ? color(props.globalFg) : gVars.mainColors.fg;
     // Add a little opacity to the FG so it doesn't stick out so much.
     // Normal text isn't nearly so thick.
-    globalFg = emphasizeLightness(globalFg, 0.15) as ColorHelper;
+    globalFg = modifyColorBasedOnLightness(globalFg, 0.3) as ColorHelper;
 
     const globalPrimary = props.globalPrimary ? color(props.globalPrimary) : gVars.mainColors.primary;
     const titleBarBg = props.titleBarBg ? color(props.titleBarBg) : globalPrimary;
-    const splashBg = emphasizeLightness(globalPrimary, 0.2);
+    const splashBg = modifyColorBasedOnLightness(globalPrimary, 0.12, true);
     const titleBarFg = props.titleBarFg ?? titleVars.colors.fg;
     return {
         globalFg: colorOut(globalFg),

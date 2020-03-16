@@ -195,7 +195,7 @@ $toggle-height-sm: to-rem(24);
 $toggle-padding-sm: to-rem(1);
 
 // Padding
-$table-padding-x:                           12px;
+$table-padding-x:                           ($grid-gutter-width / 2);
 $table-padding-y:                           8px;
 $meta-margin:                               15px;
 $padding-row:                               $grid-gutter-width / 2;

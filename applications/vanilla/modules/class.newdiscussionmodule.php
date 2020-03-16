@@ -8,10 +8,14 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\LocaleInterface;
+
 /**
  * Renders the "Start a New Discussion" button.
  */
 class NewDiscussionModule extends Gdn_Module {
+    /** @var LocaleInterface */
+    private $locale;
 
     /** @var int Which category we are viewing (if any). */
     public $CategoryID = null;
@@ -45,6 +49,7 @@ class NewDiscussionModule extends Gdn_Module {
      */
     public function __construct($sender = '', $applicationFolder = false) {
         parent::__construct($sender, 'Vanilla');
+        $this->locale = Gdn::getContainer()->get(\Vanilla\Contracts\LocaleInterface::class);
         // Customize main button by setting Vanilla.DefaultNewButton to URL code. Example: "post/question"
         $this->DefaultButton = c('Vanilla.DefaultNewButton', false);
     }
@@ -128,7 +133,11 @@ class NewDiscussionModule extends Gdn_Module {
             // Check whether to display in dropdown or as a separate button.
             $asOwnButton = $buttonsConfig[$type['Singular']]['AsOwnButton'] ?? false;
 
-            $this->addButton(($type['AddText'] ?? ''), $url, $asOwnButton);
+            $this->addButton(
+                $this->locale->translate($type['AddText'] ?? ''),
+                $url,
+                $asOwnButton
+            );
         }
 
         // Add QueryString to URL if one is defined.

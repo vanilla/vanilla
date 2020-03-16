@@ -52,8 +52,10 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
         }
     }
 
-    .Crumb {
-        opacity: .5;
+    @if ($staticVariables) {
+        .Crumb {
+            opacity: .5;
+        }
     }
 
     .Last a {

@@ -45,6 +45,13 @@
     RewriteCond %{ENV:REDIRECT_X_REWRITE} .+
     RewriteCond %{ENV:REDIRECT_X_PATH_INFO} (.+)
     RewriteRule ^index\.php - [E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]
+    
+    <IfModule mod_setenvif.c>
+        ####
+        # Pass Authorization header to php environment variable to support API authentication
+        ####
+        SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+    </IfModule>
 </IfModule>
 
 <IfModule mod_headers.c>

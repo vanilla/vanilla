@@ -11,7 +11,7 @@ import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/sto
 
 export default {
     title: "PanelLayout",
-    params: {
+    parameters: {
         chromatic: {
             viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
         },

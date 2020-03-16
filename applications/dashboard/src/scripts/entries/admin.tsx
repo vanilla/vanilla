@@ -14,11 +14,14 @@ import { mountReact, applySharedPortalContext } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import "@library/theming/reset";
 import { ScrollOffsetContext, SCROLL_OFFSET_DEFAULTS } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
+import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { roleReducer } from "@dashboard/roles/roleReducer";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
+registerReducer("roles", roleReducer);
 
 applySharedPortalContext(props => {
     const [navHeight, setNavHeight] = useState(0);

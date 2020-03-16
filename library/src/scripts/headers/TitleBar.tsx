@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -20,7 +20,6 @@ import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { HashOffsetReporter, useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import BackLink from "@library/routing/links/BackLink";
@@ -85,9 +84,12 @@ export default function TitleBar(_props: IProps) {
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
 
     const headerContent = (
-        <HashOffsetReporter>
-            <animated.div {...bgProps} className={classes.bg1}></animated.div>
-            <animated.div {...bg2Props} className={classes.bg2}>
+        <HashOffsetReporter className={classes.bgContainer}>
+            <animated.div
+                {...bgProps}
+                className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+            ></animated.div>
+            <animated.div {...bg2Props} className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}>
                 {/* Cannot be a background image there will be flickering. */}
                 {vars.colors.bgImage && (
                     <img
@@ -97,98 +99,97 @@ export default function TitleBar(_props: IProps) {
                         aria-hidden={true}
                     />
                 )}
+                {vars.overlay && <div className={classes.overlay}></div>}
             </animated.div>
-            <Container>
-                <PanelWidgetHorizontalPadding>
-                    <div className={classNames(classes.bar, { isHome: showSubNav })}>
-                        {isCompact &&
-                            (props.useMobileBackButton ? (
-                                <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
-                            ) : (
-                                <FlexSpacer className="pageHeading-leftSpacer" />
-                            ))}
-                        {!isCompact && (
-                            <animated.div className={classes.logoAnimationWrap} {...logoProps}>
-                                <HeaderLogo
-                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                    logoClassName="titleBar-logo"
-                                    logoType={LogoType.DESKTOP}
-                                />
-                            </animated.div>
-                        )}
-                        {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
-                        {!isSearchOpen && !isCompact && (
-                            <TitleBarNav
-                                isCentered={vars.navAlignment.alignment === "center"}
-                                containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
-                                className={classes.nav}
-                                linkClassName={classes.topElement}
-                                linkContentClassName="titleBar-navLinkContent"
+            <Container fullGutter>
+                <div className={classNames(classes.bar, { isHome: showSubNav })}>
+                    {isCompact &&
+                        (props.useMobileBackButton ? (
+                            <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
+                        ) : (
+                            <FlexSpacer className="pageHeading-leftSpacer" />
+                        ))}
+                    {!isCompact && (
+                        <animated.div className={classes.logoAnimationWrap} {...logoProps}>
+                            <HeaderLogo
+                                className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                logoClassName="titleBar-logo"
+                                logoType={LogoType.DESKTOP}
                             />
-                        )}
-                        {isCompact && (
-                            <>
-                                <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
-                                {!isSearchOpen && (
-                                    <>
-                                        {isMobileLogoCentered && <FlexSpacer actualSpacer />}
-                                        <div
-                                            className={classNames(
-                                                isMobileLogoCentered && classes.logoCenterer,
-                                                logoClasses.mobileLogo,
-                                            )}
-                                        >
-                                            <animated.span {...logoProps}>
-                                                <HeaderLogo
-                                                    className={classes.logoContainer}
-                                                    logoClassName="titleBar-logo"
-                                                    logoType={LogoType.MOBILE}
-                                                />
-                                            </animated.span>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                        {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
-                        <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
+                        </animated.div>
+                    )}
+                    {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
+                    {!isSearchOpen && !isCompact && (
+                        <TitleBarNav
+                            isCentered={vars.navAlignment.alignment === "center"}
+                            containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
+                            className={classes.nav}
+                            linkClassName={classes.topElement}
+                            linkContentClassName="titleBar-navLinkContent"
+                        />
+                    )}
+                    {isCompact && (
+                        <>
+                            <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
                             {!isSearchOpen && (
-                                <div className={classes.extraMeBoxIcons}>
-                                    {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                        return <ComponentName key={index} />;
-                                    })}
-                                </div>
+                                <>
+                                    {isMobileLogoCentered && <FlexSpacer actualSpacer />}
+                                    <div
+                                        className={classNames(
+                                            isMobileLogoCentered && classes.logoCenterer,
+                                            logoClasses.mobileLogo,
+                                        )}
+                                    >
+                                        <animated.span {...logoProps}>
+                                            <HeaderLogo
+                                                className={classes.logoContainer}
+                                                logoClassName="titleBar-logo"
+                                                logoType={LogoType.MOBILE}
+                                            />
+                                        </animated.span>
+                                    </div>
+                                </>
                             )}
-                            <CompactSearch
-                                className={classNames(classes.compactSearch, {
-                                    isCentered: isSearchOpen,
+                        </>
+                    )}
+                    {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
+                    <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
+                        {!isSearchOpen && (
+                            <div className={classes.extraMeBoxIcons}>
+                                {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                    return <ComponentName key={index} />;
                                 })}
-                                focusOnMount
-                                open={isSearchOpen}
-                                onSearchButtonClick={() => {
-                                    if (pages.search) {
-                                        pages.search.preload();
-                                    }
-                                    setIsSearchOpen(true);
-                                }}
-                                onCloseSearch={() => {
-                                    setIsSearchOpen(false);
-                                }}
-                                cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
-                                cancelContentClassName="meBox-buttonContent"
-                                buttonClass={classNames(classes.button, {
-                                    [classes.buttonOffset]: !isCompact && isGuest,
-                                })}
-                                showingSuggestions={isShowingSuggestions}
-                                onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                                onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
-                                clearButtonClass={classes.clearButtonClass}
-                            />
-                            {meBox}
-                        </ConditionalWrap>
-                    </div>
-                </PanelWidgetHorizontalPadding>
+                            </div>
+                        )}
+                        <CompactSearch
+                            className={classNames(classes.compactSearch, {
+                                isCentered: isSearchOpen,
+                            })}
+                            focusOnMount
+                            open={isSearchOpen}
+                            onSearchButtonClick={() => {
+                                if (pages.search) {
+                                    pages.search.preload();
+                                }
+                                setIsSearchOpen(true);
+                            }}
+                            onCloseSearch={() => {
+                                setIsSearchOpen(false);
+                            }}
+                            cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
+                            cancelContentClassName="meBox-buttonContent"
+                            buttonClass={classNames(classes.button, {
+                                [classes.buttonOffset]: !isCompact && isGuest,
+                            })}
+                            showingSuggestions={isShowingSuggestions}
+                            onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                            onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                            buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
+                            clearButtonClass={classes.clearButtonClass}
+                        />
+                        {meBox}
+                    </ConditionalWrap>
+                </div>
             </Container>
         </HashOffsetReporter>
     );

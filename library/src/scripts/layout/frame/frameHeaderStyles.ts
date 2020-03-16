@@ -39,6 +39,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
+    const rootBorderLess = style("rootBorderless", {
+        borderBottom: "none",
+    });
+
     const rootMinimal = style("rootMinimal", {
         display: "block",
     });
@@ -143,7 +147,7 @@ export const frameHeaderClasses = useThemeCache(() => {
 
     const categoryIcon = style("categoryIcon", {
         flexBasis: unit(18),
-        marginRight: ".6em",
+        marginRight: 0,
         opacity: 0.8,
     });
 
@@ -151,6 +155,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         closeMinimal,
         root,
         rootMinimal,
+        rootBorderLess,
         backButton,
         heading,
         left,

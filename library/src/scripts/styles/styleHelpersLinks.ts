@@ -47,13 +47,19 @@ export interface ILinkColorOverwrites {
     allStates?: ColorValues;
 }
 
-export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
+export interface ILinkColorOverwritesWithOptions extends ILinkColorOverwrites {
+    skipDefault?: boolean;
+}
+
+export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptions) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
     const overwrites = overwriteValues ? overwriteValues : {};
     const mergedColors = {
-        default: linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default),
+        default: !overwrites.skipDefault
+            ? linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default)
+            : undefined,
         hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
         focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
         accessibleFocus: linkStyleFallbacks(
@@ -67,7 +73,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
 
     const styles = {
         default: {
-            color: colorOut(mergedColors.default),
+            color: !overwrites.skipDefault ? colorOut(mergedColors.default) : undefined,
         },
         hover: {
             color: colorOut(mergedColors.hover),
@@ -84,18 +90,18 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
             cursor: "pointer",
         },
         visited: {
-            color: colorOut(mergedColors.visited),
+            color: mergedColors.visited ? colorOut(mergedColors.visited) : undefined,
         },
     };
 
     const final = {
-        color: styles.default.color,
+        color: styles.default.color as ColorValues,
         nested: {
             "&&:hover": styles.hover,
             "&&:focus": styles.focus,
             "&&.focus-visible": styles.accessibleFocus,
             "&&:active": styles.active,
-            "&:visited": styles.visited,
+            "&:visited": styles.visited ?? undefined,
         },
     };
 

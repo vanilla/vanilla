@@ -28,6 +28,7 @@ export const Editor = (props: IEditorProps) => {
         <EditorContext.Provider
             value={{
                 ...props,
+                onFocus: props.onFocus,
                 quill,
                 setQuillInstance,
                 isMobile,

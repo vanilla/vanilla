@@ -6,7 +6,7 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IMe, IMeCounts, IUser, IUserFragment } from "@library/@types/api/users";
 import UserSuggestionModel, { IUserSuggestionState } from "@library/features/users/suggestion/UserSuggestionModel";
-import UserActions from "@library/features/users/UserActions";
+import UserActions, { useUserActions } from "@library/features/users/UserActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -14,13 +14,26 @@ import NotificationsActions from "@library/features/notifications/NotificationsA
 import { IThemeState } from "@library/theming/themeReducer";
 import { ILocaleState } from "@library/locales/localeReducer";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
 }
 
+export interface IPermission {
+    type: string;
+    id: number | null;
+    permissions: Record<string, boolean>;
+}
+
+export interface IPermissions {
+    isAdmin?: boolean;
+    permissions: IPermission[];
+}
+
 interface IUsersState {
     current: ILoadable<IMe>;
+    permissions: ILoadable<IPermissions>;
     countInformation: {
         counts: IMeCounts;
         lastRequested: number | null; // A timestamp of the last time we received this count data.
@@ -38,6 +51,9 @@ export const INITIAL_USERS_STATE: IUsersState = {
     current: {
         status: LoadStatus.PENDING,
     },
+    permissions: {
+        status: LoadStatus.PENDING,
+    },
     countInformation: {
         counts: [],
         lastRequested: null,
@@ -45,12 +61,6 @@ export const INITIAL_USERS_STATE: IUsersState = {
     suggestions: suggestionReducer(undefined, "" as any),
 };
 
-export const INITIAL_THEMES_STATE: IThemeState = {
-    assets: { status: LoadStatus.PENDING },
-};
-export const INITIAL_LOCALE_STATE: ILocaleState = {
-    locales: { status: LoadStatus.PENDING },
-};
 export const GUEST_USER_ID = 0;
 
 /**
@@ -76,6 +86,20 @@ export const usersReducer = produce(
         .case(UserActions.getMeACs.failed, (state, payload) => {
             state.current.status = LoadStatus.ERROR;
             state.current.error = payload.error;
+            return state;
+        })
+        .case(UserActions.getPermissionsACs.started, state => {
+            state.permissions.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(UserActions.getPermissionsACs.done, (state, payload) => {
+            state.permissions.data = payload.result;
+            state.permissions.status = LoadStatus.SUCCESS;
+            return state;
+        })
+        .case(UserActions.getPermissionsACs.failed, (state, payload) => {
+            state.permissions.status = LoadStatus.ERROR;
+            state.permissions.error = payload.error;
             return state;
         })
         .case(UserActions.getCountsACs.started, state => {
@@ -111,4 +135,18 @@ export function mapUsersStoreState(state: ICoreStoreState): IInjectableUserState
 
 export function useUsersState(): IInjectableUserState {
     return useSelector(mapUsersStoreState);
+}
+
+export function usePermissions() {
+    const permissions = useSelector((state: ICoreStoreState) => state.users.permissions);
+    const { getPermissions } = useUserActions();
+    const { status } = permissions;
+
+    useEffect(() => {
+        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
+            void getPermissions();
+        }
+    }, [status, getPermissions]);
+
+    return permissions;
 }

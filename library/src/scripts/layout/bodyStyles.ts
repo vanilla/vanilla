@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule, style } from "typestyle";
-import { colorOut, background, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { colorOut, backgroundHelper, margins, paddings, fonts } from "@library/styles/styleHelpers";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -84,6 +84,21 @@ export const bodyCSS = useThemeCache(() => {
         flexDirection: "column",
     });
 
+    cssRule(`input[type="number"]`, {
+        [`-webkit-appearance`]: "none",
+        [`-moz-appearance`]: "textfield",
+        $nest: {
+            [`&::-webkit-inner-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+            [`&::-webkit-outer-spin-button`]: {
+                [`-webkit-appearance`]: "none",
+                margin: 0,
+            },
+        },
+    });
+
     cssRule(
         `input::-webkit-search-decoration,
         input::-webkit-search-cancel-button,
@@ -113,7 +128,7 @@ export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        background(source.backgroundImage),
+        backgroundHelper(source.backgroundImage),
     );
 
     return { root };

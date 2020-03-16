@@ -13,7 +13,7 @@ import { Provider } from "react-redux";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 import isEqual from "lodash/isEqual";
-import { clearThemeCache } from "@library/styles/styleUtils";
+import { resetThemeCache } from "@library/styles/styleUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import { resetStoreState } from "@library/__tests__/testStoreState";
 import merge from "lodash/merge";
@@ -22,6 +22,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { tileVariables } from "@library/features/tiles/tileStyles";
 import { tilesVariables } from "@library/features/tiles/tilesStyles";
 import { bannerVariables } from "@library/banner/bannerStyles";
+import { inputClasses } from "@library/forms/inputStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -58,7 +59,7 @@ export function useStoryConfig(value: Partial<IContext>) {
     return context.refreshKey;
 }
 
-export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType) {
+export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType): any {
     const HookWrapper = () => {
         const refreshKey = useStoryConfig(config);
         return <Component key={refreshKey} />;
@@ -100,7 +101,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
             if (!isEqual(newState, contextState)) {
                 setContextState(newState);
                 resetStoreState(newState.storeState);
-                setThemeKey(clearThemeCache().toString());
+                setThemeKey(resetThemeCache().toString());
             }
         },
         [contextState],
@@ -114,6 +115,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
 
     const classes = storyBookClasses();
     blotCSS();
+    inputClasses().applyInputCSSRules();
 
     return (
         <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>

@@ -8,6 +8,9 @@ import getStore from "@library/redux/getStore";
 export function getThemeVariables() {
     const state = getStore().getState();
     if (state !== null) {
+        if (state.theme.forcedVariables) {
+            return state.theme.forcedVariables;
+        }
         const assets = state.theme.assets.data || {};
         const variables = assets.variables ? assets.variables.data : {};
         return variables;

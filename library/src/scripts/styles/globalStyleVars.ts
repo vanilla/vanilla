@@ -6,7 +6,7 @@
 import {
     colorOut,
     ColorValues,
-    emphasizeLightness,
+    offsetLightness,
     IBackground,
     IBorderRadiusOutput,
     modifyColorBasedOnLightness,
@@ -16,9 +16,14 @@ import {
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
-import { color, ColorHelper, percent } from "csx";
+import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+
+export interface IButtonPresets {
+    style: undefined | ButtonTypes;
+}
 
 export const globalVariables = useThemeCache(() => {
     let colorPrimary = color("#0291db");
@@ -31,14 +36,28 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const constants = makeThemeVars("constants", {
-        linkStateColorEmphasis: 0.15,
+        stateColorEmphasis: 0.15,
         fullGutter: 48,
+        states: {
+            hover: {
+                stateEmphasis: 0.08,
+            },
+            selected: {
+                stateEmphasis: 0.5,
+            },
+            active: {
+                stateEmphasis: 0.2,
+            },
+            focus: {
+                stateEmphasis: 0.15,
+            },
+        },
     });
 
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: "transparent" as ColorValues,
+        transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
@@ -47,16 +66,25 @@ export const globalVariables = useThemeCache(() => {
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
+        secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
     colorPrimary = initialMainColors.primary;
 
-    const primaryDarkness = colorPrimary.lightness();
-    const backgroundDarkness = initialMainColors.bg.lightness();
-    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+    // Shorthand checking bg color for darkness
+    const getRatioBasedOnBackgroundDarkness = (
+        weight: number,
+        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+    ) => {
+        return getRatioBasedOnDarkness(weight, bgColor);
+    };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.06, !goodContrast),
+        primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
+        secondary: offsetLightness(colorPrimary, 0.05),
+        stateSecondary: offsetLightness(colorPrimary, 0.2), // Default state color change
+        secondaryContrast: initialMainColors.bg,
     });
 
     const mainColors = {
@@ -64,13 +92,8 @@ export const globalVariables = useThemeCache(() => {
         ...generatedMainColors,
     };
 
-    // Shorthand checking bg color for darkness
-    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
-    };
-
     const mixBgAndFg = (weight: number) => {
-        return mainColors.fg.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
     const mixPrimaryAndFg = (weight: number) => {
@@ -98,16 +121,18 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(linkColorDefault, constants.linkStateColorEmphasis, true);
+    const linkDerivedColors = makeThemeVars("linkDerivedColors", {
+        default: mainColors.secondary,
+        state: mainColors.stateSecondary,
+    });
 
     const links = makeThemeVars("links", {
         colors: {
-            default: linkColorDefault,
-            hover: linkColorState,
-            focus: linkColorState,
-            accessibleFocus: linkColorState,
-            active: linkColorState,
+            default: linkDerivedColors.default,
+            hover: linkDerivedColors.state,
+            focus: linkDerivedColors.state,
+            accessibleFocus: linkDerivedColors.state,
+            active: linkDerivedColors.state,
             visited: undefined,
         },
     });
@@ -125,9 +150,28 @@ export const globalVariables = useThemeCache(() => {
 
     const border = makeThemeVars("border", {
         color: mixBgAndFg(0.15),
+        colorHover: mixBgAndFg(0.2),
         width: 1,
         style: "solid",
-        radius: 6,
+        radius: 6, // Global default
+    });
+
+    const standardBorder = {
+        radius: border.radius,
+        width: border.width,
+        color: border.color,
+        style: border.style,
+    };
+
+    const borderType = makeThemeVars("borderType", {
+        formElements: {
+            default: standardBorder,
+            buttons: standardBorder,
+        },
+        modals: standardBorder,
+        dropDowns: {
+            content: standardBorder,
+        },
     });
 
     const gutterSize = 16;
@@ -214,7 +258,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const animation = makeThemeVars("animation", {
-        defaultTiming: ".15s",
+        defaultTiming: ".1s",
         defaultEasing: "ease-out",
     });
 
@@ -268,19 +312,23 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.08),
+            highlight: mixPrimaryAndBg(constants.states.hover.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         selected: {
-            color: mixPrimaryAndBg(0.5),
+            highlight: mixPrimaryAndBg(constants.states.selected.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.2),
+            highlight: mixPrimaryAndBg(constants.states.active.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.15),
+            highlight: mixPrimaryAndBg(constants.states.focus.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
     });
@@ -322,6 +370,13 @@ export const globalVariables = useThemeCache(() => {
         size: buttonIconSize,
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
+
+    // Sets global "style" for buttons. Use "ButtonPresets" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
+    // the style of them.
+    const buttonPreset = makeThemeVars("buttonPreset", {
+        style: undefined,
+    } as IButtonPresets);
 
     const separator = makeThemeVars("separator", {
         color: border.color,
@@ -380,6 +435,7 @@ export const globalVariables = useThemeCache(() => {
         mainColors,
         messageColors,
         body,
+        borderType,
         border,
         meta,
         gutter,
@@ -404,6 +460,7 @@ export const globalVariables = useThemeCache(() => {
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,
+        buttonPreset,
     };
 });
 

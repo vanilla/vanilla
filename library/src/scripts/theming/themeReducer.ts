@@ -30,22 +30,22 @@ export interface IThemeExternalAsset {
     url: string;
 }
 
-export interface IThemeVariables {
-    [key: string]: string;
-}
+export type IThemeVariables = Record<string, any>;
 
 export interface IThemeState {
     assets: ILoadable<IThemeAssets>;
+    forcedVariables: IThemeVariables | null;
 }
 
-export const INITIAL_STATE: IThemeState = {
+export const INITIAL_THEME_STATE: IThemeState = {
     assets: {
         status: LoadStatus.PENDING,
     },
+    forcedVariables: null,
 };
 
 export const themeReducer = produce(
-    reducerWithInitialState(INITIAL_STATE)
+    reducerWithInitialState(INITIAL_THEME_STATE)
         .case(ThemeActions.getAssets.started, state => {
             state.assets.status = LoadStatus.LOADING;
             return state;
@@ -66,5 +66,9 @@ export const themeReducer = produce(
                 state.assets.error = payload.error;
                 return state;
             }
+        })
+        .case(ThemeActions.forceVariablesAC, (state, payload) => {
+            state.forcedVariables = payload;
+            return state;
         }),
 );

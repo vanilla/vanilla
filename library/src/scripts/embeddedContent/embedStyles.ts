@@ -17,6 +17,7 @@ export const embedContainerVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
     });
 
     const border = makeThemeVars("border", {
@@ -81,7 +82,7 @@ export const embedContainerClasses = useThemeCache(() => {
             display: "block",
             position: "relative",
             textDecoration: "none",
-            color: "inherit",
+            color: colorOut(vars.colors.fg),
             margin: "auto",
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),

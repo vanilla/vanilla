@@ -95,7 +95,7 @@ export const textInputSizingFromFixedHeight = (height: number, fontSize: number,
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
-        minHeight: unit(formElementsVariables().sizing.height),
+        minHeight: unit(height),
         ...paddings({
             vertical: unit(paddingVertical),
             horizontal: unit(paddingHorizontal),

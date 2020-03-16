@@ -13,9 +13,12 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
 import NavLinks from "@library/navigation/NavLinks";
+import Container from "@library/layout/components/Container";
+import { visibility } from "@library/styles/styleHelpers";
 
 interface IProps {
     title: string; // For accessibility, title of group
+    showTitle?: boolean;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     classNames?: string;
     data: ILinkListData;
@@ -61,13 +64,23 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             });
 
             return (
-                <nav className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}>
-                    <ScreenReaderContent>
-                        <Heading title={this.props.title} depth={this.props.depth} />
-                    </ScreenReaderContent>
-                    {groupedContent}
-                    {ungroupedContent}
-                </nav>
+                <Container fullGutter narrow>
+                    <nav
+                        className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
+                    >
+                        <Heading
+                            title={this.props.title}
+                            depth={this.props.depth}
+                            className={classNames(
+                                classes.title,
+                                !this.props.showTitle && visibility().visuallyHidden,
+                                this.props.showTitle && classes.topTitle,
+                            )}
+                        />
+                        {groupedContent}
+                        {ungroupedContent}
+                    </nav>
+                </Container>
             );
         } else {
             return null;

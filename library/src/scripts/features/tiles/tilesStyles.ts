@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit, EMPTY_SPACING, paddings } from "@library/styles/styleHelpers";
+import { unit, EMPTY_SPACING, paddings, extendItemContainer } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -14,7 +14,12 @@ import { CSSPercentage } from "csx/lib/types";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { TileAlignment } from "@library/features/tiles/Tiles";
 
-export const tilesVariables = useThemeCache(() => {
+export interface ITilesOptions {
+    columns?: number;
+    alignment?: TileAlignment;
+}
+
+export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) => {
     const themeVars = variableFactory("tiles");
 
     const itemSpacing = themeVars("itemSpacing", {
@@ -31,118 +36,128 @@ export const tilesVariables = useThemeCache(() => {
         },
     });
 
+    const options = themeVars(
+        "options",
+        {
+            columns: 2,
+            alignment: TileAlignment.CENTER,
+        },
+        optionOverrides,
+    );
+
+    const { columns } = options;
+
     const sizing = themeVars("sizing", {
         containerWidthTwoColumns: itemSpacing.paddingTwoColumns * 4 + 384 * 2,
         containerWidthThreeColumns: itemSpacing.paddingThreeColumns * 6 + 260 * 3,
         containerWidthFourColumns: itemSpacing.paddingFourColumns * 8 + 260 * 4,
     });
 
-    const options = themeVars("options", {
-        columns: 2,
-        alignment: TileAlignment.CENTER,
-    });
+    let calculatedMaxWidth = sizing.containerWidthTwoColumns;
+    switch (columns) {
+        case 3:
+            calculatedMaxWidth = sizing.containerWidthThreeColumns;
+            break;
+        case 4:
+            calculatedMaxWidth = sizing.containerWidthFourColumns;
+            break;
+    }
 
     return {
         itemSpacing,
         containerSpacing,
         sizing,
         options,
+        calculatedMaxWidth,
     };
 });
 
-export const tilesClasses = useThemeCache(() => {
-    const vars = tilesVariables();
+export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
+    const globalVars = globalVariables();
+    const vars = tilesVariables(optionOverrides);
     const style = styleFactory("tiles");
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = useThemeCache((columns?: number) => {
-        let columnCount = columns ?? vars.options.columns;
-        let maxWidth = vars.sizing.containerWidthTwoColumns;
-        switch (columnCount) {
-            case 3:
-                maxWidth = vars.sizing.containerWidthThreeColumns;
-                break;
-            case 4:
-                maxWidth = vars.sizing.containerWidthFourColumns;
-                break;
-        }
+    const root = style(
+        {
+            maxWidth: unit(vars.calculatedMaxWidth),
+            margin: "auto",
+            width: percent(100),
+        },
+        paddings(vars.containerSpacing.padding),
+        mediaQueries.oneColumnDown({
+            padding: 0,
+        }),
+    );
 
-        return style(
-            {
-                maxWidth: unit(maxWidth),
-                margin: "auto",
-                width: percent(100),
-            },
-            paddings(vars.containerSpacing.padding),
-            mediaQueries.oneColumnDown({
-                padding: 0,
-            }),
-        );
+    const isCentered = vars.options.alignment === TileAlignment.CENTER;
+
+    let columnCount = vars.options.columns;
+    let width: CSSPercentage = "50%";
+    let additionnalMediaQueries = [] as NestedCSSProperties[];
+    let itemPadding = vars.itemSpacing.paddingTwoColumns;
+    switch (columnCount) {
+        case 3:
+            width = globalVars.utility["percentage.third"];
+            additionnalMediaQueries.push(
+                mediaQueries.twoColumns({
+                    width: percent(50),
+                }),
+            );
+            itemPadding = vars.itemSpacing.paddingThreeColumns;
+            break;
+        case 4:
+            width = "25%";
+            additionnalMediaQueries.push(
+                mediaQueries.twoColumns({
+                    width: percent(50),
+                }),
+            );
+            itemPadding = vars.itemSpacing.paddingFourColumns;
+            break;
+    }
+
+    const items = style(
+        "items",
+        {
+            position: "relative",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "stretch",
+            justifyContent: isCentered ? "center" : "flex-start",
+            ...extendItemContainer(itemPadding),
+        },
+        mediaQueries.oneColumnDown({
+            display: "block",
+            ...extendItemContainer(vars.itemSpacing.paddingOneColumn),
+        }),
+    );
+
+    const item = style(
+        "item",
+        {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "stretch",
+            width,
+            padding: unit(itemPadding),
+        },
+        ...additionnalMediaQueries,
+        mediaQueries.oneColumnDown({
+            display: "block",
+            width: percent(100),
+            padding: unit(vars.itemSpacing.paddingOneColumn),
+        }),
+    );
+
+    const title = style("title", {
+        marginTop: globalVars.gutter.size,
+        marginBottom: 0,
+        fontSize: globalVars.fonts.size.title,
+        fontWeight: globalVars.fonts.weights.bold,
+        lineHeight: globalVars.lineHeights.condensed,
     });
 
-    const items = useThemeCache((alignment: TileAlignment) => {
-        const vars = tilesVariables();
-        const isCentered = (alignment ?? vars.options.alignment) === TileAlignment.CENTER;
-        return style(
-            "items",
-            {
-                position: "relative",
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "stretch",
-                justifyContent: isCentered ? "center" : "flex-start",
-            },
-            mediaQueries.oneColumnDown({
-                display: "block",
-            }),
-        );
-    });
-
-    const item = useThemeCache((columns?: number) => {
-        const globalVars = globalVariables();
-        let columnCount = columns ?? vars.options.columns;
-        let width: CSSPercentage = "50%";
-        let additionnalMediaQueries = [] as NestedCSSProperties[];
-        let padding = vars.itemSpacing.paddingTwoColumns;
-        switch (columnCount) {
-            case 3:
-                width = globalVars.utility["percentage.third"];
-                additionnalMediaQueries.push(
-                    mediaQueries.twoColumns({
-                        width: percent(50),
-                    }),
-                );
-                padding = vars.itemSpacing.paddingThreeColumns;
-                break;
-            case 4:
-                width = "25%";
-                additionnalMediaQueries.push(
-                    mediaQueries.twoColumns({
-                        width: percent(50),
-                    }),
-                );
-                padding = vars.itemSpacing.paddingFourColumns;
-                break;
-        }
-
-        return style(
-            "item",
-            {
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "stretch",
-                width,
-                padding: unit(padding),
-            },
-            ...additionnalMediaQueries,
-            mediaQueries.oneColumnDown({
-                display: "block",
-                width: percent(100),
-                padding: unit(vars.itemSpacing.paddingOneColumn),
-            }),
-        );
-    });
-
-    return { root, items, item };
+    return { root, items, item, title };
 });

@@ -5,25 +5,26 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
 import {
     borders,
     colorOut,
     getHorizontalPaddingForTextInput,
     getVerticalPaddingForTextInput,
+    importantUnit,
     margins,
     negative,
-    pointerEvents,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent, translateY } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
+import { inputVariables, inputMixin } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const inputCSS = () => {
+    wrapSelects();
+
     const globalVars = globalVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
@@ -31,7 +32,6 @@ export const inputCSS = () => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
 
     cssOut(
         `
@@ -55,7 +55,7 @@ export const inputCSS = () => {
         {
             color: fg,
             backgroundColor: bg,
-            ...borders(),
+            ...borders(globalVars.borderType.formElements.default),
         },
     );
 
@@ -75,12 +75,12 @@ export const inputCSS = () => {
 
     cssOut(`div.token-input-dropdown`, {
         // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-        ...borders(),
+        ...borders(globalVars.borderType.dropDowns.content),
         transform: translateY(unit(globalVars.border.width) as string),
     });
 
     cssOut(".token-input-input-token input", {
-        ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(inputVars.sizing.height, inputVars.font.size, formVars.border.width * 2),
         border: important(0),
         paddingTop: important(0),
         paddingBottom: important(0),
@@ -93,6 +93,7 @@ export const inputCSS = () => {
     // mixinInputStyles(".AdvancedSearch select");
     // mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
+    mixinInputStyles("ul.token-input-list, div.Popup .Body ul.token-input-list");
     mixinInputStyles(`
         .Container input[type= "text"],
         .Container textarea,
@@ -104,8 +105,8 @@ export const inputCSS = () => {
     mixinInputStyles(".Container ul.token-input-list", ".Container ul.token-input-list.token-input-focused");
     mixinInputStyles(".input:-internal-autofill-selected", false, true);
     mixinInputStyles(".AdvancedSearch .InputBox", false, false);
-    cssOut(".InputBox.InputBox.InputBox", inputClasses().inputMixin);
-    // cssOut(".token-input-list", inputClasses().inputMixin);
+    cssOut(".InputBox.InputBox.InputBox", inputMixin());
+    cssOut(`.richEditor-frame.InputBox.InputBox.InputBox `, { padding: 0 });
     cssOut("select", {
         $nest: {
             "&:hover, &:focus, &.focus-visible, &:active": {
@@ -119,7 +120,7 @@ export const inputCSS = () => {
     });
 
     cssOut("form .SelectWrapper, .AdvancedSearch .Handle.Handle ", {
-        color: colorOut(globalVars.border.color),
+        color: colorOut(inputVars.colors.fg),
     });
 
     cssOut("form .SelectWrapper", {
@@ -149,15 +150,15 @@ export const inputCSS = () => {
     const verticalPadding = getVerticalPaddingForTextInput(
         formVars.sizing.height,
         globalVars.fonts.size.small,
-        formVars.border.fullWidth,
+        formVars.border.width * 2,
     );
     const horizontalPadding = getHorizontalPaddingForTextInput(
         formVars.sizing.height,
         globalVars.fonts.size.small,
-        formVars.border.fullWidth,
+        formVars.border.width * 2,
     );
 
-    const spaceWithoutPaddingInInput = formVars.sizing.height - verticalPadding * 2 - formVars.border.fullWidth;
+    const spaceWithoutPaddingInInput = formVars.sizing.height - verticalPadding * 2 - formVars.border.width * 2;
 
     // Container of tokens
     cssOut(".Container ul.token-input-list", {
@@ -189,6 +190,7 @@ export const inputCSS = () => {
         lineHeight: unit(globalVars.meta.lineHeights.default),
         minHeight: unit(spaceWithoutPaddingInInput),
         ...borders({
+            ...globalVars.borderType.formElements.default,
             color: globalVars.meta.colors.fg,
         }),
         display: "inline-flex",
@@ -232,19 +234,44 @@ export const inputCSS = () => {
         },
     });
 
-    cssOut("input[type='checkbox']", {
-        cursor: "pointer",
-        $nest: {
-            "&:hover, &:focus, &.focus-visible, &:active": {
-                outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-            },
-        },
-    });
-
     cssOut("#Form_date", {
         marginRight: unit(globalVars.gutter.half),
     });
+
+    cssOut(`.FormWrapper label`, {
+        fontSize: globalVars.fonts.size.medium,
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`.js-datetime-picker`, {
+        display: "flex",
+        flexWrap: "wrap",
+        width: calc(`100% + ${unit(globalVars.meta.spacing.default * 2)}`),
+        ...margins({
+            left: -globalVars.meta.spacing.default,
+            right: globalVars.meta.spacing.default,
+        }),
+    });
+
+    cssOut(`.InputBox.DatePicker`, {
+        flexGrow: 1,
+        minWidth: unit(200),
+        maxWidth: percent(100),
+        ...margins({
+            all: globalVars.meta.spacing.default,
+        }),
+    });
 };
+
+function wrapSelects() {
+    const selects = document.querySelectorAll("select");
+    selects.forEach((selectElement: HTMLElement) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("SelectWrapper");
+        selectElement.parentElement?.insertBefore(wrapper, selectElement);
+        wrapper.appendChild(selectElement);
+    });
+}
 
 export const mixinInputStyles = (selector: string, focusSelector?: string | false, isImportant = false) => {
     const globalVars = globalVariables();
@@ -262,7 +289,7 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
     }
 
     cssOut(selector, {
-        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formVars.border.fullWidth),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formVars.border.width * 2),
         borderColor: colorOut(globalVars.border.color),
         borderStyle: isImportant ? important(globalVars.border.style) : globalVars.border.style,
         borderWidth: isImportant ? important(unit(globalVars.border.width) as string) : unit(globalVars.border.width),
@@ -294,5 +321,24 @@ export const mixinInputStyles = (selector: string, focusSelector?: string | fals
             borderColor: isImportant ? important(primary as string) : primary,
         },
         ...extraFocus,
+    });
+
+    cssOut(`ul.token-input-list, div.Popup .Body ul.token-input-list`, {
+        paddingBottom: importantUnit(0),
+        paddingRight: importantUnit(0),
+        minHeight: unit(formVars.sizing.height),
+    });
+
+    cssOut(`.TextBoxWrapper li.token-input-token.token-input-token`, {
+        marginBottom: importantUnit(formVars.spacing.verticalPadding - formVars.border.width),
+        marginRight: importantUnit(formVars.spacing.horizontalPadding - 2 * formVars.border.width),
+    });
+
+    cssOut(`li.token-input-token span`, {
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`ul.token-input-list li input`, {
+        marginBottom: importantUnit(4),
     });
 };

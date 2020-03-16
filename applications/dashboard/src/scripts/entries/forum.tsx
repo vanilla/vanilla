@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { onContent, getMeta } from "@library/utility/appUtils";
+import { onContent, getMeta, onReady } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -25,8 +25,9 @@ import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatib
 import { fullBackgroundCompat } from "@vanilla/library/src/scripts/layout/Backgrounds";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import CommunityBanner from "@vanilla/library/src/scripts/banner/CommunityBanner";
 
-initAllUserContent();
+onReady(initAllUserContent);
 onContent(convertAllUserContent);
 
 // Redux
@@ -41,23 +42,24 @@ Router.addRoutes([
 
 applySharedPortalContext(props => {
     return (
-        <AppContext variablesOnly={!getMeta("themeFeatures.DataDrivenTheme", false)} errorComponent={ErrorPage}>
+        <AppContext
+            variablesOnly={
+                !getMeta("themeFeatures.DataDrivenTheme", false) && !getMeta("themeFeatures.SharedMasterView", false)
+            }
+            errorComponent={ErrorPage}
+        >
             {props.children}
         </AppContext>
     );
 });
 
 // Routing
-addComponent("App", () => (
-    <AppContext variablesOnly>
-        <Router disableDynamicRouting />
-    </AppContext>
-));
+addComponent("App", () => <Router disableDynamicRouting />);
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
+addComponent("community-banner", CommunityBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    fullBackgroundCompat();
     compatibilityStyles();
     applyCompatibilityIcons();
 }

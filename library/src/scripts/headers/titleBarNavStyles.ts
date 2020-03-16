@@ -10,7 +10,6 @@ import {
     absolutePosition,
     colorOut,
     flexHelper,
-    margins,
     negative,
     paddings,
     unit,
@@ -19,12 +18,12 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
+    const titleBarVars = titleBarVariables();
 
     const border = makeThemeVars("border", {
         verticalWidth: 3,
@@ -41,7 +40,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
-        bg: globalVars.mainColors.primary,
+        bg: titleBarVars.colors.fg,
         bottomSpace: 1,
     });
 
@@ -164,10 +163,9 @@ const titleBarNavClasses = useThemeCache(() => {
         fontSize: unit(vars.navLinks.fontSize),
         fontWeight: globalVars.fonts.weights.normal,
         position: "relative",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        minHeight: unit(vars.item.size),
-        lineHeight: unit(vars.item.size),
+        alignSelf: "center",
         height: 0, // IE11 Fix.
     });
 

@@ -4,21 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper, important } from "csx";
-import { logError, logDebug, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
-
+import { color, ColorHelper, important, px } from "csx";
+import { logError, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
+import { stringIsLinearGradient } from "@library/styles/styleUtils";
 export type ColorValues = ColorHelper | undefined;
 
-export const colorOut = (colorValue: ColorValues | string, makeImportant = false) => {
+export const colorOut = (colorValue: ColorValues | string, makeImportant = false, debug = false) => {
+    logDebugConditionnal(debug, "colorOut - colorValue: ", colorValue);
     if (!colorValue) {
         return undefined;
     } else {
-        if (
-            colorValue
-                .toString()
-                .trim()
-                .startsWith("linear-gradient(")
-        ) {
+        if (stringIsLinearGradient(colorValue)) {
+            logDebugConditionnal(debug, "colorOut - linear gradient detected - colorValue: ", colorValue);
             return colorValue.toString();
         } else {
             const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
@@ -33,6 +30,10 @@ export const ensureColorHelper = (colorValue: string | ColorHelper) => {
 
 export const importantColorOut = (colorValue: ColorValues | string) => {
     return colorOut(colorValue, true);
+};
+
+export const colorOutIfDefined = (colorValue: ColorValues | string, makeImportant = false, debug = false) => {
+    return colorValue !== undefined ? colorOut(colorValue, makeImportant, debug) : undefined;
 };
 
 /*

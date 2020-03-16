@@ -11,12 +11,14 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, SearchBarPresets, presetsBanner } from "@library/banner/bannerStyles";
-import { t, assetUrl } from "@library/utility/appUtils";
+import { bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
+import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { visibility } from "@library/styles/styleHelpersVisibility";
 
 interface IProps {
     action?: React.ReactNode;
@@ -25,6 +27,8 @@ interface IProps {
     className?: string;
     backgroundImage?: string;
     contentImage?: string;
+    logoImage?: string;
+    searchBarNoTopMargin?: boolean;
 }
 
 /**
@@ -41,10 +45,44 @@ export default function Banner(props: IProps) {
     const classes = bannerClasses();
     const vars = bannerVariables();
     const { options } = vars;
-
-    let imageElementSrc = props.contentImage || vars.imageElement.image || null;
-    imageElementSrc = imageElementSrc ? assetUrl(imageElementSrc) : null;
     const description = props.description ?? vars.description.text;
+
+    // Image element (right)
+    let rightImageSrc = props.contentImage || vars.rightImage.image || null;
+    rightImageSrc = rightImageSrc ? assetUrl(rightImageSrc) : null;
+
+    // Logo (Image in middle)
+    let logoImageSrc = props.logoImage || vars.logo.image || null;
+    logoImageSrc = logoImageSrc ? assetUrl(logoImageSrc) : null;
+
+    // Search placement
+    const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch;
+    const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch;
+    const searchAloneInContainer =
+        showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
+
+    const searchComponent = (
+        <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
+            <IndependentSearch
+                buttonClass={classes.searchButton}
+                buttonBaseClass={ButtonTypes.CUSTOM}
+                isLarge={true}
+                placeholder={t("Search")}
+                inputClass={classes.input}
+                iconClass={classes.icon}
+                buttonLoaderClassName={classes.buttonLoader}
+                hideSearchButton={
+                    device === Devices.MOBILE ||
+                    device === Devices.XS ||
+                    presetsBanner().button.preset === ButtonPresets.HIDE
+                }
+                contentClass={classes.content}
+                valueContainerClasses={classes.valueContainer}
+                iconContainerClasses={classes.iconContainer}
+                resultsAsModalClasses={classes.resultsAsModal}
+            />
+        </div>
+    );
 
     return (
         <div
@@ -53,57 +91,67 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
-                {!props.backgroundImage && !vars.outerBackground.image && <DefaultBannerBg />}
-            </div>
-            {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-            <Container fullGutter>
-                <div className={imageElementSrc ? classes.imagePositioner : ""}>
-                    <div className={classes.contentContainer}>
-                        <div className={classes.titleWrap}>
-                            <FlexSpacer className={classes.titleFlexSpacer} />
-                            {title && (
-                                <Heading className={classes.title} depth={1} isLarge>
-                                    {title}
-                                </Heading>
-                            )}
-                            <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                        </div>
-                        {!options.hideDesciption && description && (
-                            <div className={classes.descriptionWrap}>
-                                <p className={classNames(classes.description, classes.text)}>{description}</p>
-                            </div>
+            <div className={classes.middleContainer}>
+                <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
+                    {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
+                        <DefaultBannerBg />
+                    )}
+                </div>
+                {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
+                <Container fullGutter>
+                    <div className={classes.imagePositioner}>
+                        {/*For SEO & accessibility*/}
+                        {options.hideTitle && (
+                            <Heading className={visibility().visuallyHidden} depth={1}>
+                                {title}
+                            </Heading>
                         )}
-                        {!options.hideSearch && (
-                            <div className={classes.searchContainer}>
-                                <IndependentSearch
-                                    buttonClass={classes.searchButton}
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    isLarge={true}
-                                    placeholder={t("Search")}
-                                    inputClass={classes.input}
-                                    iconClass={classes.icon}
-                                    buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={
-                                        device === Devices.MOBILE ||
-                                        device === Devices.XS ||
-                                        presetsBanner().button.preset === ButtonPresets.HIDE
-                                    }
-                                    contentClass={classes.content}
-                                    valueContainerClasses={classes.valueContainer}
-                                    iconContainerClasses={classes.iconContainer}
-                                    resultsAsModalClasses={classes.resultsAsModal}
-                                />
+                        <ConditionalWrap
+                            className={classes.contentContainer(!rightImageSrc)}
+                            condition={
+                                showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
+                            }
+                        >
+                            {!!logoImageSrc && (
+                                <div className={classes.logoSpacer}>
+                                    <div className={classes.logoContainer}>
+                                        {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                        <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
+                                    </div>
+                                </div>
+                            )}
+                            {!options.hideTitle && (
+                                <div className={classes.titleWrap}>
+                                    <FlexSpacer className={classes.titleFlexSpacer} />
+                                    {title && (
+                                        <Heading className={classes.title} depth={1} isLarge>
+                                            {title}
+                                        </Heading>
+                                    )}
+                                    <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                                </div>
+                            )}
+                            {!options.hideDescription && description && (
+                                <div className={classes.descriptionWrap}>
+                                    <p className={classNames(classes.description, classes.text)}>{description}</p>
+                                </div>
+                            )}
+                            {showMiddleSearch && searchComponent}
+                        </ConditionalWrap>
+                        {rightImageSrc && (
+                            <div className={classes.imageElementContainer}>
+                                {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
                             </div>
                         )}
                     </div>
-                    {imageElementSrc && (
-                        <div className={classes.imageElementContainer}>
-                            <img className={classes.imageElement} src={imageElementSrc}></img>
-                        </div>
-                    )}
+                </Container>
+            </div>
+            {showBottomSearch && (
+                <div className={classes.searchStrip}>
+                    <Container fullGutter>{searchComponent}</Container>
                 </div>
-            </Container>
+            )}
         </div>
     );
 }

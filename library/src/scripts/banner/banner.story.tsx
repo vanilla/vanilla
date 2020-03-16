@@ -6,17 +6,15 @@
 import React from "react";
 import { MemoryRouter } from "react-router";
 import SearchContext from "@library/contexts/SearchContext";
-import { StoryContent } from "@library/storybook/StoryContent";
-import { StoryHeading } from "@library/storybook/StoryHeading";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { color, rgb } from "csx";
+import { color, linearGradient } from "csx";
 import Banner from "@library/banner/Banner";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { BannerAlignment, SearchBarPresets } from "@library/banner/bannerStyles";
+import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPresets } from "@library/forms/buttonStyles";
 
 export default {
     title: "Banner",
@@ -50,7 +48,7 @@ export const NoDescription = storyWithConfig(
         themeVars: {
             banner: {
                 options: {
-                    hideDesciption: true,
+                    hideDescription: true,
                 },
                 colors: {
                     primary: color("#9279a8"),
@@ -188,11 +186,10 @@ export const ImageAsElement = storyWithConfig(
                         color: "#323232",
                     },
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-
                 spacing: {
                     padding: {
                         top: 87,
@@ -211,6 +208,168 @@ export const ImageAsElement = storyWithConfig(
         },
     },
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+);
+
+export const LogoLarge = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                    primaryContrast: color("#fff"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                colors: {
+                    bg: "#fff",
+                    primaryContrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                logo: {
+                    image: "https://us.v-cdn.net/5022541/uploads/594/57SO4ULTV3HP.png",
+                    width: "50%",
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Logo - Huge (shrunk with CSS)" />,
+);
+
+export const LogoSmall = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                    primaryContrast: color("#fff"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                colors: {
+                    bg: "#fff",
+                    primaryContrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                logo: {
+                    width: 150,
+                    image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Logo - Small" />,
+);
+export const LogoAndRightImage = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                mainColors: {
+                    primary: color("#111111"),
+                    primaryContrast: color("#fff"),
+                },
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            banner: {
+                colors: {
+                    bg: "#fff",
+                    primaryContrast: "#111111",
+                },
+                outerBackground: {
+                    color: "#FFF6F5",
+                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                },
+                description: {
+                    font: {
+                        color: "#323232",
+                    },
+                },
+                rightImage: {
+                    image:
+                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                },
+                logo: {
+                    width: 150,
+                    image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
+                },
+                spacing: {
+                    padding: {
+                        top: 87,
+                        bottom: 87,
+                    },
+                },
+            },
+            presetsBanner: {
+                button: {
+                    preset: ButtonPresets.HIDE,
+                },
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Image-o-rama!" />,
 );
 
 (ImageAsElement as any).story = {
@@ -255,7 +414,7 @@ export const ImageAsElementWide = storyWithConfig(
                         color: "#323232",
                     },
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
@@ -318,7 +477,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                 options: {
                     alignment: BannerAlignment.LEFT,
                 },
-                imageElement: {
+                rightImage: {
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
@@ -343,8 +502,95 @@ export const SearchShadowNoSearchButton = storyWithConfig(
     () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
 );
 
-// Only works with button
-export const unifiedBorder = storyWithConfig(
+export const searchPositionBottom = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    searchPlacement: "bottom",
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: "#4b496e",
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
+                },
+                searchStrip: {
+                    bg: color("#4b496e"),
+                    minHeight: 100,
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search on bottom" />,
+);
+export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                options: {
+                    searchPlacement: "bottom" as SearchPlacement,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    position: "50% 100%",
+                    color: color("#54367c"),
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
+                },
+                dimensions: {
+                    mobile: {
+                        minHeight: 200,
+                    },
+                },
+                contentContainer: {
+                    padding: {
+                        bottom: 140,
+                    },
+                    mobile: {
+                        padding: {
+                            top: 30,
+                            bottom: 100,
+                        },
+                    },
+                },
+                searchStrip: {
+                    bg: linearGradient("to bottom", "rgb(0,0,0,0) 0%,rgba(0,0,0, .4) 50%"),
+                    minHeight: 140,
+                    offset: -140,
+                    padding: {
+                        top: 0,
+                        bottom: 70,
+                    },
+                    mobile: {
+                        minHeight: 100,
+                        offset: -100,
+                        padding: {
+                            bottom: 15,
+                        },
+                    },
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Search on bottom with negative offset" />,
+);
+
+export const searchBarNoImage = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
@@ -353,9 +599,75 @@ export const unifiedBorder = storyWithConfig(
                 primaryContrast: "#e3e3e3",
             },
             banner: {
+                options: {
+                    hideDescription: true,
+                    hideTitle: true,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
                 outerBackground: {
-                    color: "#980013",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    color: color("#54367c"),
+                    unsetBackground: true,
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Only search bar, no image" />,
+);
+
+export const bannerImageOnly = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            colors: {
+                primary: "#ff5b64",
+                primaryContrast: "#e3e3e3",
+            },
+            banner: {
+                options: {
+                    hideSearch: true,
+                    hideDescription: true,
+                    hideTitle: true,
+                },
+                dimensions: {
+                    minHeight: 300,
+                    mobile: {
+                        minHeight: 200,
+                    },
+                },
+                outerBackground: {
+                    position: "50% 100%",
+                    color: color("#54367c"),
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
+                    mobile: {
+                        image: "https://us.v-cdn.net/5022541/uploads/470/U68ZI0LRPRBQ.png",
+                    },
+                },
+            },
+            presetsBanner: {
+                input: {
+                    preset: SearchBarPresets.BORDER,
+                },
+            },
+        },
+    },
+    () => <StoryBanner title="Banner Image Only" />,
+);
+
+// Only works with button
+export const unifiedBorder = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                outerBackground: {
+                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
             },
             presetsBanner: {
@@ -365,7 +677,7 @@ export const unifiedBorder = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Search with shadow" />,
+    () => <StoryBanner title="Unified Border" />,
 );
 
 (ImageAsElementWide as any).story = {

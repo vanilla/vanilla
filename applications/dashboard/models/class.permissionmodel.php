@@ -834,6 +834,7 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Get permissions for edit.
      *
      * @param int $roleID
      * @param string $limitToSuffix

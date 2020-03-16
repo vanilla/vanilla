@@ -1866,7 +1866,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     }
 
     /**
-     *
+     * Get Session.
      *
      * @param int $userID
      * @param bool $refresh

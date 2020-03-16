@@ -517,87 +517,20 @@ class PermissionModel extends Gdn_Model {
      * Get user permissions.
      *
      * @param null $userID
-     * @param Mixed $roleID
+     * @param null $roleID
      * @return array|null
      */
-    public function cachePermissions($userID = null, ...$roleID) {
+    public function cachePermissions($userID = null, $roleID = null) {
         if (!$userID) {
             $roleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
-            $permissions = $this->getRolesPermissionsDB($roleID);
+            $permissions = $this->getPermissionsByRoleDB($roleID);
             return $permissions;
         }
 
         if (empty($roleID)) {
-            $roleID = GDN::UserModel()->getRoles($userID)->resultArray();
-            $roleID = array_column($roleID, 'RoleID');
+            $roleID = GDN::UserModel()->getRoleIDs($userID);
         }
-        $permissions = $this->cachePermissions2($roleID);
-        return $permissions;
-    }
-
-    /**
-     * Get the permissions for one or more roles.
-     *
-     * @param array $roleID The role to get the permissions for.
-     * @return array Returns a permission array suitable for use in a session.
-     */
-    protected function cachePermissions2($roleID): array {
-        asort($roleID);
-        $roleIDKey = implode(',', $roleID);
-        $roleIDKey = sha1($roleIDKey);
-        $inc = Gdn::userModel()->getPermissionsIncrement();
-        $key = "perms:$inc:role:$roleIDKey";
-        $permissions = $this->getCachedRoles($key);
-
-        if (!$permissions) {
-            $permissions = $this->getRolesPermissionsDB($roleID);
-            $this->setCachedRoles($key, $permissions);
-        }
-        return $permissions;
-    }
-
-    /**
-     * Get cached role permissions.
-     *
-     * @param string $key The cache key
-     * @return array|bool $permissions Role permissions
-     */
-    protected function getCachedRoles($key) {
-        $permissions = Gdn::cache()->get($key);
-        return $permissions;
-    }
-
-    /**
-     * Save role permissions in the cache.
-     *
-     * @param string $key The cache key
-     * @param array $permissions Role permissions
-     */
-    protected function setCachedRoles($key, $permissions) {
-        Gdn::cache()->store($key, $permissions);
-    }
-
-    /**
-     * Get role permission from the database.
-     *
-     * @param array $roleID
-     * @return array|bool $permissions
-     */
-    protected function getRolesPermissionsDB($roleID) {
-        $sql = clone $this->SQL;
-        $sql->reset();
-        // Select all of the permission columns.
-        $permissionColumns = $this->permissionColumns();
-        foreach ($permissionColumns as $columnName => $value) {
-            $sql->select('p.`' . $columnName . '`', 'MAX');
-        }
-
-        $sql->from('Permission p')
-            ->where('p.RoleID', $roleID)
-            ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
-            ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-
-        $permissions = $sql->get()->resultArray();
+        $permissions = $this->getPermissionsByRoleCache($roleID);
         return $permissions;
     }
 
@@ -801,6 +734,27 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Get the permissions for one or more roles from cache.
+     *
+     * @param array $roleID The role to get the permissions for.
+     * @return array Returns a permission array suitable for use in a session.
+     */
+    protected function getPermissionsByRoleCache(array $roleID): array {
+        asort($roleID);
+        $roleIDKey = implode(',', $roleID);
+        $roleIDKey = sha1($roleIDKey);
+        $inc = Gdn::userModel()->getPermissionsIncrement();
+        $key = "perms:$inc:role:$roleIDKey";
+        $permissions = $this->getCachedRoles($key);
+
+        if (!$permissions) {
+            $permissions = $this->getPermissionsByRoleDB($roleID);
+            $this->setCachedRoles($key, $permissions);
+        }
+        return $permissions;
+    }
+
+    /**
      * Get the permissions for one or more roles.
      *
      * @param int $roleID The role to get the permissions for.
@@ -832,6 +786,51 @@ class PermissionModel extends Gdn_Model {
         }
 
         return $permissions;
+    }
+
+    /**
+     * Get role permission from the database.
+     *
+     * @param array $roleID
+     * @return array $permissions
+     */
+    protected function getPermissionsByRoleDB(...$roleID): array {
+        $sql = clone $this->SQL;
+        $sql->reset();
+        // Select all of the permission columns.
+        $permissionColumns = $this->permissionColumns();
+        foreach ($permissionColumns as $columnName => $value) {
+            $sql->select('p.`' . $columnName . '`', 'MAX');
+        }
+
+        $sql->from('Permission p')
+            ->where('p.RoleID', $roleID)
+            ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
+            ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
+
+        $permissions = $sql->get()->resultArray();
+        return $permissions;
+    }
+
+    /**
+     * Get cached role permissions.
+     *
+     * @param string $key The cache key
+     * @return array|bool $permissions Role permissions
+     */
+    private function getCachedRoles($key) {
+        $permissions = Gdn::cache()->get($key);
+        return $permissions;
+    }
+
+    /**
+     * Save role permissions in the cache.
+     *
+     * @param string $key The cache key
+     * @param array $permissions Role permissions
+     */
+    private function setCachedRoles($key, $permissions) {
+        Gdn::cache()->store($key, $permissions);
     }
 
     /**

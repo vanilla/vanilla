@@ -1847,6 +1847,25 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     }
 
     /**
+     * Get the roles for a user.
+     *
+     * @param int $userID The user to get the roles for.
+     * @return array $rolesDataArray User roles.
+     */
+    public function getRoleIDs($userID) {
+        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
+        $rolesDataArray = Gdn::cache()->get($userRolesKey);
+
+        if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
+            $rolesDataArray = $this->SQL->getWhere('UserRole', ['UserID' => $userID])->resultArray();
+            $rolesDataArray = array_column($rolesDataArray, 'RoleID');
+            // Add result to cache
+            $this->userCacheRoles($userID, $rolesDataArray);
+        }
+        return $rolesDataArray;
+    }
+
+    /**
      *
      *
      * @param int $userID

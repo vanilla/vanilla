@@ -32,7 +32,7 @@ export function ThemeColorPicker(_props: IProps) {
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { defaultValue, rawValue, setValue, error, setError } = useThemeVariableField(variableKey);
+    const { generatedValue, rawValue, setValue, error, setError } = useThemeVariableField(variableKey);
 
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -44,7 +44,7 @@ export function ThemeColorPicker(_props: IProps) {
     // Track whether we have a valid color.
     // If the color is not set, we don't really care.
     const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue);
-    const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? defaultValue);
+    const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? null);
 
     // If we have no color selected we are displaying the default and are definitely valid.
     const isValidColor = textInputValue ? stringIsValidColor(textInputValue) : true;
@@ -107,8 +107,8 @@ export function ThemeColorPicker(_props: IProps) {
         }
     };
 
-    const defaultColorString = ensureColorHelper(defaultValue).toHexString();
-    const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : "#000";
+    const defaultColorString = ensureColorHelper(generatedValue).toHexString();
+    const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : defaultColorString;
 
     return (
         <>
@@ -122,7 +122,7 @@ export function ThemeColorPicker(_props: IProps) {
                     className={classNames(classes.textInput, {
                         [builderClasses.invalidField]: !!error,
                     })}
-                    placeholder={"#0291DB"}
+                    placeholder={defaultColorString}
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
                     auto-correct="false"

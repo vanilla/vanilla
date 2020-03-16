@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext, useState, useCallback } from "react";
+import React, { useMemo, useContext, useState, useCallback, useDebugValue } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
 import get from "lodash/get";
 import set from "lodash/set";
+import cloneDeep from "lodash/cloneDeep";
 
 ///
 /// Types
@@ -52,7 +53,7 @@ export function useThemeBuilder() {
 export function useThemeVariableField<T>(variableKey: string) {
     const context = useThemeBuilder();
 
-    return {
+    const value = {
         rawValue: get(context.rawThemeVariables, variableKey, null) as T | null,
         defaultValue: get(context.defaultThemeVariables, variableKey, null) as T | null,
         initialValue: get(context.initialThemeVariables, variableKey, null) as T | null,
@@ -65,6 +66,9 @@ export function useThemeVariableField<T>(variableKey: string) {
             context.setVariableError(variableKey, value);
         },
     };
+
+    useDebugValue(value);
+    return value;
 }
 
 ///
@@ -79,7 +83,7 @@ export function ThemeBuilderContextProvider(props: IProps) {
     const [errors, setErrors] = useState<IThemeVariables>({});
 
     const setVariableValue = (variableKey: string, value: any) => {
-        const newVariables = set(rawThemeVariables, variableKey, value);
+        const newVariables = set(cloneDeep(rawThemeVariables), variableKey, value);
         onChange(newVariables, getErrorCount(errors) > 0);
     };
     const setVariableError = (variableKey: string, error: string | null) => {

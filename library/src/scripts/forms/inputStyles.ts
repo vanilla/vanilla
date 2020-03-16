@@ -15,6 +15,7 @@ import {
     placeholderStyles,
     textInputSizingFromFixedHeight,
     unit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { cssRule } from "typestyle";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -98,6 +99,14 @@ export const inputClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
 
+    const inputPaddingMixin: NestedCSSProperties = {
+        padding: inputMixin().padding,
+        paddingTop: inputMixin().paddingTop,
+        paddingBottom: inputMixin().paddingBottom,
+        paddingLeft: inputMixin().paddingLeft,
+        paddingRight: inputMixin().paddingRight,
+    };
+
     // Use as assignable unique style.
     const text = style("text", inputMixin());
 
@@ -114,5 +123,5 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, applyInputCSSRules };
+    return { text, inputText, inputPaddingMixin, inputMixin, applyInputCSSRules };
 });

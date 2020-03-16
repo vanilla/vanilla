@@ -218,7 +218,6 @@ export const globalVariables = useThemeCache(() => {
             title: 22,
             subTitle: 18,
         },
-
         mobile: {
             size: {
                 title: 26,
@@ -232,6 +231,7 @@ export const globalVariables = useThemeCache(() => {
 
         families: {
             body: ["Open Sans"],
+            monospace: [],
         },
         alignment: {
             headings: {

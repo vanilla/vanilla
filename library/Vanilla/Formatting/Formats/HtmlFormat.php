@@ -16,7 +16,7 @@ use Exception;
 use Garden\StaticCacheTranslationTrait;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Heading;
+use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;

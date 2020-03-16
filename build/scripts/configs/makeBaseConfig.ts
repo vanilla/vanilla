@@ -65,6 +65,11 @@ ${chalk.green(aliases)}`;
                             return true;
                         }
 
+                        if (modulePath.includes("swagger-ui-react")) {
+                            // Do not do additional transpilation of swagger-ui.
+                            return true;
+                        }
+
                         // We need to transpile quill's ES6 because we are building from source.
                         return /node_modules/.test(modulePath) && !exclusionRegex.test(modulePath);
                     },

@@ -12,7 +12,7 @@ echo $form->errors();
         <li class="form-group">
             <?php
             $leavingLabel = 'Warn users if a link in a post will cause them to leave the forum';
-            $leavingDesc = '@'.t('External link alert details';
+            $leavingDesc = '@'.t('External link alert details');
             echo $form->toggle('Garden.Format.WarnLeaving', $leavingLabel, [], $leavingDesc);
             ?>
         </li>

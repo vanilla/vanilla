@@ -758,7 +758,7 @@ class PermissionModel extends Gdn_Model {
      * @param array $roleID The role to get the permissions for.
      * @return array Returns a permission array suitable for use in a session.
      */
-    public function getPermissionsByRole(...$roleID): array {
+    public function getPermissionsByRole(...$roleID) {
         asort($roleID);
         $roleIDKey = implode(',', $roleID);
         $inc = Gdn::userModel()->getPermissionsIncrement();
@@ -779,7 +779,7 @@ class PermissionModel extends Gdn_Model {
      * @param array $roleID
      * @return array $permissions
      */
-    protected function getPermissionsByRoleDb(...$roleID): array {
+    protected function getPermissionsByRoleDb(...$roleID) {
         $sql = clone $this->SQL;
         $sql->reset();
         // Select all of the permission columns.

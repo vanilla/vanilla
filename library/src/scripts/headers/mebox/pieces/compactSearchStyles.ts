@@ -14,12 +14,14 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { SearchBarPresets } from "@library/banner/bannerStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const compactSearchVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("compactSearch");
-    const titleBarVars = titleBarVariables();
-    const formElVars = formElementsVariables();
+export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const makeThemeVars = variableFactory("compactSearch", forcedVars);
+    const titleBarVars = titleBarVariables(forcedVars);
+    const formElVars = formElementsVariables(forcedVars);
+
     const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPreset.TRANSPARENT });
     const searchInputOptions = makeThemeVars("searchInputOptions", { preset: SearchBarPresets.NO_BORDER });
 

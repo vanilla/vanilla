@@ -38,6 +38,7 @@ import { containerVariables } from "@library/layout/components/containerStyles";
 import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
 import { inputMixin } from "@library/forms/inputStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -50,17 +51,17 @@ export enum SearchBarPresets {
     UNIFIED_BORDER = "unified border", // wraps button, and will set button to "solid"
 }
 
-export const bannerVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory(["banner", "splash"]);
-    const globalVars = globalVariables();
-    const widgetVars = widgetVariables();
+export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeThemeVars = variableFactory(["banner", "splash"], forcedVars);
+    const globalVars = globalVariables(forcedVars);
+    const widgetVars = widgetVariables(forcedVars);
 
     const options = makeThemeVars("options", {
         alignment: BannerAlignment.CENTER,
         hideDesciption: false,
         hideSearch: false,
     });
-    const compactSearchVars = compactSearchVariables();
+    const compactSearchVars = compactSearchVariables(forcedVars);
 
     const topPadding = 69;
     const horizontalPadding = unit(

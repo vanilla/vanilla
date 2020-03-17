@@ -79,12 +79,12 @@ export function ThemeInputNumber(_props: IProps) {
     const [_, dispatch] = useReducer((state: number, action: StepAction) => {
         switch (action) {
             case StepAction.DECR: {
-                const value = Math.max(min ?? 0, state - 1);
+                const value = Math.max(min ?? 0, state - step);
                 setValue(value);
                 return value;
             }
             case StepAction.INCR: {
-                const value = max !== undefined ? Math.min(max ?? 100000, state + 1) : state + 1;
+                const value = max !== undefined ? Math.min(max ?? 100000, state + step) : state + step;
                 setValue(value);
                 return value;
             }

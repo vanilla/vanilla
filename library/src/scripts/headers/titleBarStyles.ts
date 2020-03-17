@@ -46,11 +46,12 @@ import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { BackgroundProperty } from "csstype";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const titleBarVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const makeThemeVars = variableFactory("titleBar");
+export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const formElementVars = formElementsVariables(forcedVars);
+    const makeThemeVars = variableFactory("titleBar", forcedVars);
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
@@ -340,7 +341,7 @@ export const titleBarClasses = useThemeCache(() => {
                 };
             case BorderType.SHADOW:
                 return {
-                    boxShadow: shadowHelper().makeShadow(),
+                    boxShadow: shadowHelper().embed(globalVars.elementaryColors.black).boxShadow,
                 };
             case BorderType.SHADOW_AS_BORDER:
                 // Note that this is empty because this option is set on the background elsewhere.

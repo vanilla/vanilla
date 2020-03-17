@@ -11,6 +11,8 @@ import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
 import unset from "lodash/unset";
+import { bannerVariables } from "@library/banner/bannerStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 ///
 /// Types
@@ -188,6 +190,8 @@ function variableGenerator(variables: IThemeVariables) {
         global: globalVariables(variables),
         buttonGlobals: buttonGlobalVariables(variables),
         button: buttonVariables(variables),
+        banner: bannerVariables(variables),
+        titleBar: titleBarVariables(variables),
     };
 
     // Mix in the addons generator variables.

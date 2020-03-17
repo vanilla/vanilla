@@ -4,33 +4,27 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useRef, useState, useReducer, useCallback } from "react";
-import classNames from "classnames";
-import { useField } from "formik";
-import { t } from "@vanilla/i18n/src";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { getDefaultOrCustomErrorMessage, isValidColor } from "@library/styles/styleUtils";
-import { themeInputNumberClasses } from "@library/forms/themeEditor/ThemeInputNumber.styles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
+import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
+import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { themeInputNumberClasses } from "@library/forms/themeEditor/ThemeInputNumber.styles";
+import { useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n/src";
 import { useInterval } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 
-type IErrorWithDefault = string | boolean; // Uses default message if true
-
-interface IProps {
-    inputProps?: Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex" | "step" | "min" | "max">;
-    inputID: string;
-    variableID: string;
-    labelID: string;
-    defaultValue?: number;
-    placeholder?: number;
-    inputClass?: string;
-    errors?: IErrorWithDefault[]; // Uses default message if true
+interface IProps
+    extends Omit<
+        React.HTMLAttributes<HTMLInputElement>,
+        "type" | "id" | "tabIndex" | "step" | "min" | "max" | "placeholder"
+    > {
+    variableKey: string;
     step?: number;
     min?: number;
     max?: number;
-    errorMessage?: string;
 }
 
 enum StepAction {
@@ -38,71 +32,64 @@ enum StepAction {
     DECR = "decr",
 }
 
-export function ThemeInputNumber(props: IProps) {
-    const classes = themeInputNumberClasses();
-    const textInput = useRef<HTMLInputElement>(null);
+export function ThemeInputNumber(_props: IProps) {
     const builderClasses = themeBuilderClasses();
-    const errorMessage = getDefaultOrCustomErrorMessage(props.errorMessage, t("Invalid Number"));
+    const { step = 1, min = 0, max, variableKey, ...inputProps } = _props;
 
-    const { step = 1, min = 0, max } = props;
-
-    const validatedStep = Number.isInteger(step) ? step : 1;
-    const validatedMin = Number.isInteger(min) ? min : 0;
-    const validatedMax = max && Number.isInteger(max) ? max : undefined;
-
-    /**
-     * Check if is valid number, respecting parameters.
-     * @param number
-     */
-    const isValidValue = (numberVal: number | string) => {
-        if (numberVal !== undefined && Number.isInteger(ensureInteger(numberVal))) {
-            const validatedNumber = parseInt(numberVal.toString());
-            return (
-                validatedNumber % validatedStep === 0 &&
-                validatedNumber >= min &&
-                (!validatedMax ? validatedNumber <= validatedMax! : true)
-            );
-        }
-        return false;
-    };
-
-    const errorID = useMemo(() => {
-        return uniqueIDFromPrefix("inputNumberError");
-    }, []);
+    const { rawValue, generatedValue, error, setError, setValue } = useThemeVariableField(variableKey);
 
     const ensureInteger = (val: number | string) => {
         return parseInt(val.toString());
     };
+    /**
+     * Check if is valid number, respecting parameters.
+     * @param number
+     */
+    const isValidValue = (numberVal: number | string, shouldThrow: boolean = false) => {
+        const intVal = ensureInteger(numberVal);
+        if (numberVal !== undefined && Number.isInteger(intVal)) {
+            const validStep = intVal % step === 0;
+            const overMin = intVal >= min;
+            const underMax = !max || intVal <= max;
+            const result = validStep && overMin && underMax;
+            if (shouldThrow) {
+                if (!validStep) {
+                    return t("Invalid Step");
+                } else if (!overMin) {
+                    return t("Too Small");
+                } else if (!underMax) {
+                    return t("Too Large");
+                }
+            }
 
-    const [number, numberMeta, helpers] = useField(props.variableID);
-    const [errorField, errorMeta, errorHelpers] = useField("errors." + props.variableID);
+            return result;
+        }
+        return false;
+    };
 
-    const onTextChange = e => {
-        helpers.setTouched(true);
-        let newVal = e.target.value;
-        if (Number.isInteger(newVal)) {
-            newVal = ensureInteger(newVal);
-            helpers.setValue(newVal);
-            errorHelpers.setValue(false);
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const intVal = ensureInteger(e.target.value);
+        if (Number.isInteger(intVal)) {
+            setValue(intVal);
         } else {
             e.preventDefault();
         }
     };
 
-    const [internalCount, dispatch] = useReducer((state: number, action: StepAction) => {
+    const [_, dispatch] = useReducer((state: number, action: StepAction) => {
         switch (action) {
             case StepAction.DECR: {
-                const value = Math.max(props.min ?? 0, state - 1);
-                helpers.setValue(value);
+                const value = Math.max(min ?? 0, state - 1);
+                setValue(value);
                 return value;
             }
             case StepAction.INCR: {
-                const value = Math.min(props.max ?? 100000, state + 1);
-                helpers.setValue(value);
+                const value = max !== undefined ? Math.min(max ?? 100000, state + 1) : state + 1;
+                setValue(value);
                 return value;
             }
         }
-    }, props.defaultValue ?? 0);
+    }, rawValue ?? generatedValue ?? 0);
 
     const stepUp = useCallback(() => dispatch(StepAction.INCR), []);
     const stepDown = useCallback(() => dispatch(StepAction.DECR), []);
@@ -110,53 +97,48 @@ export function ThemeInputNumber(props: IProps) {
     const stepUpIntervalProps = usePressInterval(stepUp);
     const stepDownIntervalProps = usePressInterval(stepDown);
 
-    const hasError = number.value ? !!errorField.value || (!isValidValue(number.value) && number.value === "") : false;
-
     // Check initial value for errors
     useEffect(() => {
-        if (number.value === undefined) {
-            if (props.defaultValue !== undefined && Number.isInteger(ensureInteger(props.defaultValue))) {
-                helpers.setValue(props.defaultValue);
-            } else {
-                helpers.setValue("");
-            }
+        if (generatedValue == null) {
+            // No errors if we have a nullish value.
+            return;
+        }
+        try {
+            isValidValue(generatedValue);
+        } catch (e) {
+            setError(e.message);
         }
     }, []);
 
-    // Check initial value for errors
-    useEffect(() => {
-        if (hasError) {
-            helpers.setError(true);
-        } else {
-            helpers.setError(false);
-        }
-    }, []);
+    const errorID = useUniqueID("inputNumberError");
+    const { labelID, inputID } = useThemeBlock();
+    const classes = themeInputNumberClasses();
 
     return (
         <>
             <span className={classes.root}>
                 <input
-                    ref={textInput}
+                    {...inputProps}
                     type="number"
-                    aria-describedby={props.labelID}
-                    aria-hidden={true}
+                    id={inputID}
+                    aria-describedby={labelID}
                     className={classNames(classes.textInput, {
-                        [builderClasses.invalidField]: hasError,
+                        [builderClasses.invalidField]: !!error,
                     })}
-                    placeholder={props.placeholder ? props.placeholder.toString() : ""}
-                    value={number.value || ""}
-                    onChange={onTextChange}
+                    placeholder={generatedValue}
+                    value={rawValue ?? ""}
+                    onChange={handleTextChange}
                     auto-correct="false"
-                    step={validatedStep}
-                    min={validatedMin}
-                    max={validatedMax}
+                    step={step}
+                    min={min}
+                    max={max}
                 />
                 <span className={classes.spinner}>
                     <span className={classes.spinnerSpacer}>
                         <Button
                             onClick={stepUp}
                             {...stepUpIntervalProps}
-                            disabled={!max && number.value && number.value >= max!}
+                            disabled={max != undefined && generatedValue >= max}
                             className={classes.stepUp}
                             baseClass={ButtonTypes.CUSTOM}
                         >
@@ -165,7 +147,7 @@ export function ThemeInputNumber(props: IProps) {
                         <Button
                             onClick={stepDown}
                             {...stepDownIntervalProps}
-                            disabled={number.value === min}
+                            disabled={generatedValue <= min}
                             className={classes.stepDown}
                             baseClass={ButtonTypes.CUSTOM}
                         >
@@ -174,9 +156,9 @@ export function ThemeInputNumber(props: IProps) {
                     </span>
                 </span>
             </span>
-            {hasError && (
+            {error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
-                    <li className={builderClasses.error}>{errorMessage}</li>
+                    <li className={builderClasses.error}>{error}</li>
                 </ul>
             )}
         </>

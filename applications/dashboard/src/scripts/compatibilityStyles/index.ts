@@ -404,7 +404,7 @@ export const trimTrailingCommas = selector => {
 };
 
 export const cssOut = (selector: string, ...objects: types.NestedCSSProperties[]) => {
-    cssRule(trimTrailingCommas(selector), ...objects);
+    cssRule(trimTrailingCommas(selector), ...objects, { $unique: true });
 };
 
 export const camelCaseToDash = (str: string) => {

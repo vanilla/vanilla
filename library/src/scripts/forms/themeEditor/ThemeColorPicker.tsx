@@ -4,23 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useRef, useState, useCallback, ChangeEvent, useReducer } from "react";
-import { visibility } from "@library/styles/styleHelpersVisibility";
-import classNames from "classnames";
-import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
-import { color, ColorHelper } from "csx";
-import { ErrorMessage, useField, useFormikContext } from "formik";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { t } from "@vanilla/i18n/src";
-import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { getDefaultOrCustomErrorMessage, isValidColor, stringIsValidColor } from "@library/styles/styleUtils";
-import debounce from "lodash/debounce";
-import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
-import { ensureColorHelper } from "@library/styles/styleHelpers";
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
-type IErrorWithDefault = string | boolean; // Uses default message if true
+import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
+import { ensureColorHelper } from "@library/styles/styleHelpers";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import { stringIsValidColor } from "@library/styles/styleUtils";
+import { useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n/src";
+import classNames from "classnames";
+import debounce from "lodash/debounce";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
@@ -32,7 +29,7 @@ export function ThemeColorPicker(_props: IProps) {
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, rawValue, setValue, error, setError } = useThemeVariableField(variableKey);
+    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(variableKey);
 
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -59,10 +56,13 @@ export function ThemeColorPicker(_props: IProps) {
 
     const handleColorChange = (colorString: string) => {
         setTextFieldValue(colorString);
-        if (stringIsValidColor(colorString)) {
+        if (colorString === "") {
+            // we are clearing our color to the default.
+            setValue(colorString);
+            setLastValidColor(defaultValue);
+        } else if (stringIsValidColor(colorString)) {
             setValue(colorString); // Only set valid color if passes validation
             setLastValidColor(colorString);
-            setError(null);
         } else {
             setError(t("Invalid Color"));
         }

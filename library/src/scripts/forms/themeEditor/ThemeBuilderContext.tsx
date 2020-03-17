@@ -10,6 +10,7 @@ import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonSty
 import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
+import unset from "lodash/unset";
 
 ///
 /// Types
@@ -79,16 +80,39 @@ export function ThemeBuilderContextProvider(props: IProps) {
     const { rawThemeVariables, onChange } = props;
     const defaultThemeVariables = useMemo(() => variableGenerator({}), []);
     const generatedThemeVariables = variableGenerator(rawThemeVariables);
+
+    // Lock the value to the one on first render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const initialThemeVariables = useMemo(() => generatedThemeVariables, []);
     const [errors, setErrors] = useState<IThemeVariables>({});
 
-    const setVariableValue = (variableKey: string, value: any) => {
-        const newVariables = set(cloneDeep(rawThemeVariables), variableKey, value);
-        onChange(newVariables, getErrorCount(errors) > 0);
-    };
-    const setVariableError = (variableKey: string, error: string | null) => {
-        const newErrors = set(errors, variableKey, error);
+    const calculateNewErrors = (variableKey: string, error: string | null) => {
+        let newErrors = cloneDeep(errors);
+        if (error) {
+            newErrors = set(errors, variableKey, error);
+        } else {
+            unset(newErrors, variableKey);
+        }
         setErrors(newErrors);
+        return newErrors;
+    };
+    const setVariableError = (variableKey: string, error: string | null, doUpdate: boolean = true) => {
+        const newErrors = calculateNewErrors(variableKey, error);
+        const hasErrors = getErrorCount(newErrors) > 0;
+        onChange(rawThemeVariables, hasErrors);
+    };
+
+    const setVariableValue = (variableKey: string, value: any) => {
+        const newErrors = calculateNewErrors(variableKey, null);
+        const hasErrors = getErrorCount(newErrors) > 0;
+        let cloned = cloneDeep(rawThemeVariables);
+        if (value === "" || value === undefined) {
+            // Null does not clear this. Null is a valid value.
+            unset(cloned, variableKey);
+        } else {
+            cloned = set(cloned, variableKey, value);
+        }
+        onChange(cloned, hasErrors);
     };
 
     return (
@@ -110,21 +134,18 @@ export function ThemeBuilderContextProvider(props: IProps) {
 
 function getErrorCount(errors: IThemeVariables): number {
     const result: any[] = [];
-    function recursivelyFindError(o: object | string) {
-        o &&
-            Object.keys(o).forEach(key => {
-                if (typeof o[key] === "object") {
-                    recursivelyFindError(o[key]);
-                } else {
-                    if (o[key]) {
-                        // Value exists if there's an error
-                        result.push(o);
-                    } else {
-                        // Value is undefined if no error exists
-                        result.pop();
-                    }
-                }
-            });
+    function recursivelyFindError(objectOrError: object | string) {
+        Object.entries(objectOrError).forEach(([key, objectOrError]) => {
+            if (!objectOrError) {
+                return;
+            }
+            if (typeof objectOrError === "object") {
+                recursivelyFindError(objectOrError);
+            } else {
+                // Value exists if there's an error
+                result.push(objectOrError);
+            }
+        });
     }
     recursivelyFindError(errors);
     console.log(result);

@@ -21,6 +21,9 @@ class PermissionModelTest extends TestCase {
      */
     private $permissionModel;
 
+    /**
+     *  Test setup.
+     */
     public function setUp(): void {
         parent::setUp();
 

@@ -516,21 +516,40 @@ class PermissionModel extends Gdn_Model {
     /**
      * Get user permissions.
      *
-     * @param null $userID
-     * @param null $roleID
-     * @return array|null
+     * @param ?int $userID
+     * @param ?int $roleID
+     * @return array
+     * @deprecated Use PermissionModel::getPermissionsByUser() or PermissionModel::getPermissionsByRole() instead.
      */
     public function cachePermissions($userID = null, $roleID = null) {
         if (!$userID) {
             $roleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
-            $permissions = $this->getPermissionsByRoleDB($roleID);
+            $permissions = $this->getPermissionsByRole($roleID);
             return $permissions;
         }
 
         if (empty($roleID)) {
             $roleID = GDN::UserModel()->getRoleIDs($userID);
+        } else {
+            $roleID = (array)$roleID;
         }
-        $permissions = $this->getPermissionsByRoleCache($roleID);
+        $permissions = $this->getPermissionsByRole(...$roleID);
+        return $permissions;
+    }
+
+    /**
+     * Get the permissions of a particular user.
+     *
+     * @param int $userID
+     * @return array Returns an array suitable for Permissions::setPermission().
+     */
+    public function getPermissionsByUser(int $userID): array {
+        if (!$userID) {
+            $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+        } else {
+            $roleIDs = GDN::UserModel()->getRoleIDs($userID);
+        }
+        $permissions = $this->getPermissionsByRole(...$roleIDs);
         return $permissions;
     }
 
@@ -739,52 +758,18 @@ class PermissionModel extends Gdn_Model {
      * @param array $roleID The role to get the permissions for.
      * @return array Returns a permission array suitable for use in a session.
      */
-    protected function getPermissionsByRoleCache(array $roleID): array {
+    public function getPermissionsByRole(...$roleID): array {
         asort($roleID);
         $roleIDKey = implode(',', $roleID);
-        $roleIDKey = sha1($roleIDKey);
         $inc = Gdn::userModel()->getPermissionsIncrement();
         $key = "perms:$inc:role:$roleIDKey";
         $permissions = $this->getCachedRoles($key);
 
         if (!$permissions) {
-            $permissions = $this->getPermissionsByRoleDB($roleID);
+            $permissions = $this->getPermissionsByRoleIDDB(...$roleID);
+            $permissions = UserModel::compilePermissions($permissions);
             $this->setCachedRoles($key, $permissions);
         }
-        return $permissions;
-    }
-
-    /**
-     * Get the permissions for one or more roles.
-     *
-     * @param int $roleID The role to get the permissions for.
-     * @return array Returns a permission array suitable for use in a session.
-     */
-    public function getPermissionsByRole($roleID) {
-        $inc = Gdn::userModel()->getPermissionsIncrement();
-        $key = "perms:$inc:role:$roleID";
-
-        $permissions = Gdn::cache()->get($key);
-        if ($permissions === Gdn_Cache::CACHEOP_FAILURE) {
-            $sql = clone $this->SQL;
-            $sql->reset();
-
-            // Select all of the permission columns.
-            $permissionColumns = $this->permissionColumns();
-            foreach ($permissionColumns as $columnName => $value) {
-                $sql->select('p.`'.$columnName.'`', 'MAX');
-            }
-
-            $sql->from('Permission p')
-                ->where('p.RoleID', $roleID)
-                ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
-                ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-
-            $permissions = $sql->get()->resultArray();
-            $permissions = UserModel::compilePermissions($permissions);
-            Gdn::cache()->store($key, $permissions);
-        }
-
         return $permissions;
     }
 
@@ -794,7 +779,7 @@ class PermissionModel extends Gdn_Model {
      * @param array $roleID
      * @return array $permissions
      */
-    protected function getPermissionsByRoleDB(...$roleID): array {
+    protected function getPermissionsByRoleIDDB(...$roleID): array {
         $sql = clone $this->SQL;
         $sql->reset();
         // Select all of the permission columns.

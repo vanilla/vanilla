@@ -1825,15 +1825,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
     public function getRoles($userID, bool $includeInvalid = true) {
-        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
-        $rolesDataArray = Gdn::cache()->get($userRolesKey);
-
-        if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
-            $rolesDataArray = $this->SQL->getWhere('UserRole', ['UserID' => $userID])->resultArray();
-            $rolesDataArray = array_column($rolesDataArray, 'RoleID');
-            // Add result to cache
-            $this->userCacheRoles($userID, $rolesDataArray);
-        }
+        $rolesDataArray = $this->getRoleIDs($userID);
 
         $result = [];
         foreach ($rolesDataArray as $roleID) {
@@ -5247,8 +5239,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             }
         }
 
-        $data = Gdn::permissionModel()->cachePermissions($userID);
-        $permissions->compileAndLoad($data);
+        $data = Gdn::permissionModel()->getPermissionsByUser($userID);
+        $permissions->setPermissions($data);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;

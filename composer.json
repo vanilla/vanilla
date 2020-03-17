@@ -55,6 +55,7 @@
         "vanilla/safecurl": "~0.9",
         "vanilla/vanilla-connect": "~0.0",
         "twig/twig": "^2.5",
+        "wikimedia/composer-merge-plugin": "^1.4.1",
         "psr/event-dispatcher": "^1.0",
         "fig/event-dispatcher-util": "^1.1",
         "symfony/polyfill-php73": "^1.13",
@@ -103,6 +104,21 @@
             "VanillaTests\\Fixtures\\": "tests\\fixtures\\src",
             "GardenTests\\": "tests",
             "GardenTests\\Fixtures\\": "tests\\fixtures\\src"
+        }
+    },
+    "extra": {
+        "merge-plugin": {
+            "include": [
+                "addons/*/composer.json",
+                "plugins/*/composer.json"
+            ],
+            "recurse": false,
+            "replace": false,
+            "ignore-duplicates": false,
+            "merge-dev": true,
+            "merge-extra": false,
+            "merge-extra-deep": false,
+            "merge-scripts": false
         }
     }
 }

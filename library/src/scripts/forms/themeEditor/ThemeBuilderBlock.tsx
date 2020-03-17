@@ -4,16 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext } from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import classNames from "classnames";
-import { useThrowError } from "@vanilla/react-utils";
 import { useUniqueID } from "@library/utility/idUtils";
+import { useThrowError } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useContext } from "react";
 
-export interface IThemeBuilderBlock {
+interface IProps {
     label: string;
     undo?: boolean;
-    children: React.ReactChild;
+    children: React.ReactNode;
     inputWrapClass?: string;
 }
 
@@ -38,7 +38,7 @@ export function useThemeBlock(): IThemeBlockContext {
     return context!;
 }
 
-export function ThemeBuilderBlock(props: IThemeBuilderBlock) {
+export function ThemeBuilderBlock(props: IProps) {
     const inputID = useUniqueID("themBlockInput");
     const labelID = useUniqueID("themeBlockLabel");
     const classes = themeBuilderClasses();

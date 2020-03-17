@@ -158,7 +158,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const primary: IButtonType = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
-        preset: { style: ButtonPreset.OUTLINE },
+        preset: primaryPreset.preset,
         colors: {
             fg: primaryPreset.preset.fg,
             bg: primaryPreset.preset.bg,

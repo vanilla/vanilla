@@ -3,14 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { uploadFile } from "@library/apiv2";
 import classNames from "classnames";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";

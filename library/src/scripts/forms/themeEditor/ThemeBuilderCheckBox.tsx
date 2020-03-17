@@ -7,10 +7,12 @@ import React from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import CheckBox from "@library/forms/Checkbox";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
 
 interface IProps {
     variableKey: string;
     label: string;
+    info?: React.ReactNode;
 }
 
 export function ThemeBuilderCheckBox(props: IProps) {
@@ -31,6 +33,7 @@ export function ThemeBuilderCheckBox(props: IProps) {
                         setValue(e.target.checked);
                     }}
                 />
+                {props.info && <ThemeInfoTooltip label={props.info} />}
             </span>
         </div>
     );

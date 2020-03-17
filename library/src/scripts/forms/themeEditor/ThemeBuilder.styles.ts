@@ -7,8 +7,9 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { colorOut, margins, negativeUnit, paddings, unit, sticky } from "@library/styles/styleHelpers";
+import { colorOut, margins, negativeUnit, paddings, unit, sticky, flexHelper } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -137,6 +138,7 @@ export const themeEditorVariables = () => {
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         maxWidth: unit(themeEditorVariables().panel.width),
@@ -279,6 +281,15 @@ export const themeBuilderClasses = useThemeCache(() => {
         textAlign: "right",
     });
 
+    const tooltip = style("tooltip", {
+        ...flexHelper().middle(),
+        $nest: {
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
     return {
         root,
         block,
@@ -295,5 +306,6 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSectionTitle,
         invalidField,
         colorErrorMessage,
+        tooltip,
     };
 });

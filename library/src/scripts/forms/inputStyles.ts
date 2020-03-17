@@ -22,6 +22,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { percent } from "csx";
 import merge from "lodash/merge";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -106,7 +107,7 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", inputMixin());
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin());
+    const applyInputCSSRules = () => cssOut(" .inputText.inputText", inputMixin());
 
     const inputText = style("inputText", {
         ...inputMixin(),

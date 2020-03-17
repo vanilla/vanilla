@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext, useState, useCallback, useDebugValue } from "react";
+import React, { useMemo, useContext, useState, useCallback, useDebugValue, useRef } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
@@ -81,6 +81,8 @@ export function ThemeBuilderContextProvider(props: IProps) {
     const defaultThemeVariables = useMemo(() => variableGenerator({}), []);
     const generatedThemeVariables = variableGenerator(rawThemeVariables);
 
+    const rawValueRef = useRef<IThemeVariables>(rawThemeVariables);
+
     // Lock the value to the one on first render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const initialThemeVariables = useMemo(() => generatedThemeVariables, []);
@@ -99,13 +101,14 @@ export function ThemeBuilderContextProvider(props: IProps) {
     const setVariableError = (variableKey: string, error: string | null, doUpdate: boolean = true) => {
         const newErrors = calculateNewErrors(variableKey, error);
         const hasErrors = getErrorCount(newErrors) > 0;
-        onChange(rawThemeVariables, hasErrors);
+        onChange(rawValueRef.current, hasErrors);
     };
 
     const setVariableValue = (variableKey: string, value: any) => {
         const newErrors = calculateNewErrors(variableKey, null);
         const hasErrors = getErrorCount(newErrors) > 0;
-        let cloned = cloneDeep(rawThemeVariables);
+        let cloned = cloneDeep(rawValueRef.current);
+        rawValueRef.current = cloned;
         if (value === "" || value === undefined) {
             // Null does not clear this. Null is a valid value.
             unset(cloned, variableKey);
@@ -148,7 +151,6 @@ function getErrorCount(errors: IThemeVariables): number {
         });
     }
     recursivelyFindError(errors);
-    console.log(result);
     return result.length;
 }
 

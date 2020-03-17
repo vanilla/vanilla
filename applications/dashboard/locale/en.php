@@ -167,6 +167,7 @@ $Definition['Locales allow you to support other languages on your site.'] =
 $Definition['Test Email Message'] = '<p>This is a test email message.</p>'.
     '<p>You can configure the appearance of your forum\'s emails by navigating to the Email page in the dashboard.</p>';
 $Definition['oauth2Instructions'] = '<p>Configure your forum to connect with an OAuth2 application by putting your unique Client ID, Client Secret, and required endpoints. You will probably need to provide your SSO application with an allowed callback URL, in part, to validate requests. The callback url for this forum is <code>%s</code></p>';
-
+$Definition['External link alert details'] = 'Alert users if they click a link in a post that will lead them away from the forum. 
+    Users will not be warned when following links that match a Trusted Domain';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

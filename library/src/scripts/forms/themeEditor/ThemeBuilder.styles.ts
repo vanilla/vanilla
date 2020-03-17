@@ -7,7 +7,7 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, negativeUnit, paddings, unit, sticky } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
 
 export const themeBuilderVariables = () => {
@@ -141,6 +141,8 @@ export const themeBuilderClasses = useThemeCache(() => {
         maxWidth: unit(themeEditorVariables().panel.width),
         backgroundColor: colorOut(vars.panel.bg),
         minHeight: percent(100),
+        maxHeight: percent(100),
+        overflow: "auto",
         ...fonts(vars.defaultFont),
         ...paddings({
             vertical: unit(vars.panel.padding),
@@ -186,6 +188,19 @@ export const themeBuilderClasses = useThemeCache(() => {
         flexBasis: unit(vars.input.width),
     });
 
+    const checkBoxWrap = style("checkBoxWrap", {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+        width: unit(vars.input.width),
+        flexBasis: unit(vars.input.width),
+        ...fonts(vars.input.fonts),
+        fontWeight: 600,
+        height: vars.input.height,
+        paddingBottom: 4,
+    });
+
     const title = style("title", {
         ...fonts(vars.title.fonts),
         textAlign: "center",
@@ -193,6 +208,16 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...paddings({
             horizontal: unit(vars.panel.padding),
         }),
+        marginTop: unit(20),
+        paddingTop: unit(20),
+        borderTop: `solid #c1cbd7 1px`,
+        $nest: {
+            "&:first-child": {
+                marginTop: 0,
+                paddingTop: 0,
+                borderTop: "none",
+            },
+        },
     });
 
     const section = style("section", {
@@ -259,6 +284,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         label,
         undoWrap,
         inputWrap,
+        checkBoxWrap,
         title,
         section,
         sectionTitle,

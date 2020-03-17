@@ -238,7 +238,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             semiBold: 600,
             bold: 700,
         },
-
+        forceGoogleFont: false,
         families: {
             body: ["Open Sans"],
         },

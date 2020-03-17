@@ -75,7 +75,7 @@ export function styleFactory(componentName: string) {
 let _themeCacheID = hashString(Math.random().toString());
 
 // Event name for resetting the theme cacheID.
-const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
+export const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
 
 export function resetThemeCache() {
     _themeCacheID = hashString(Math.random().toString());

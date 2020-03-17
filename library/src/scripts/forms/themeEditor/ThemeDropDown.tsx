@@ -17,16 +17,18 @@ interface IProps extends IMenuPlacement {
     variableKey: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
     options: IComboBoxOption[];
     disabled?: boolean;
+    afterChange?: (value: string | null | undefined) => void;
 }
 
 export function ThemeDropDown(_props: IProps) {
-    const { options, variableKey, disabled } = _props;
+    const { options, variableKey, disabled, afterChange } = _props;
     const { inputID, labelID } = useThemeBlock();
     const { generatedValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
     const onChange = (option: IComboBoxOption | undefined) => {
         const newValue = option ? option.value.toString() : undefined;
         setValue(newValue);
+        afterChange?.(newValue);
     };
 
     const selectedOption = options.find(option => {
@@ -55,7 +57,6 @@ export function ThemeDropDown(_props: IProps) {
                 placeholder={defaultOption.label}
                 disabled={disabled ?? options.length === 1}
                 menuPlacement={MenuPlacement.AUTO}
-                isClearable={true}
                 onChange={onChange}
             />
         </div>

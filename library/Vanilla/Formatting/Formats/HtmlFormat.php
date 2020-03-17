@@ -495,6 +495,11 @@ HTML;
         return false;
     }
 
+    /**
+     * Set allowExtendedContent.
+     *
+     * @param bool $extendContent
+     */
     public function setAllowExtendedContent(bool $extendContent): void {
         $this->allowExtendedContent = $extendContent;
     }

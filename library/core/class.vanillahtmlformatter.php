@@ -190,8 +190,8 @@ class VanillaHtmlFormatter {
         ];
 
         if ($options['allowedExtendedContent'] ?? null) {
-           $elements = $config['elements'] ?? null;
-           $config['elements'] = str_replace('-iframe', '', $elements);
+            $elements = $config['elements'] ?? null;
+            $config['elements'] = str_replace('-iframe', '', $elements);
         }
 
         // If we don't allow URL embeds, don't allow HTML media embeds, either.

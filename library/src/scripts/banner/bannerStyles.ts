@@ -24,6 +24,7 @@ import {
     modifyColorBasedOnLightness,
     textInputSizingFromFixedHeight,
     unit,
+    isLightColor,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -34,7 +35,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { media } from "typestyle";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
 import { inputMixin } from "@library/forms/inputStyles";
 
@@ -49,23 +50,10 @@ export enum SearchBarPresets {
     UNIFIED_BORDER = "unified border", // wraps button, and will set button to "solid"
 }
 
-export const presetsBanner = useThemeCache(() => {
-    const makeThemeVars = variableFactory(["presetsBanner"]);
-    const button = makeThemeVars("button", { preset: ButtonPreset.TRANSPARENT });
-    const input = makeThemeVars("input", { preset: SearchBarPresets.NO_BORDER });
-
-    return {
-        button,
-        input,
-    };
-});
-
 export const bannerVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory(["banner", "splash"]);
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
-    const formElVars = formElementsVariables();
-    const presets = presetsBanner();
 
     const options = makeThemeVars("options", {
         alignment: BannerAlignment.CENTER,
@@ -100,12 +88,17 @@ export const bannerVariables = useThemeCache(() => {
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
-        primaryContrast: globalVars.mainColors.primaryContrast,
+        primaryContrast: globalVars.mainColors.bg,
         secondary: globalVars.mainColors.secondary,
         secondaryContrast: globalVars.mainColors.secondaryContrast,
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         borderColor: globalVars.mixPrimaryAndFg(0.4),
+    });
+
+    const presets = makeThemeVars("presets", {
+        button: { preset: isLightColor(colors.primaryContrast) ? ButtonPreset.TRANSPARENT : ButtonPreset.SOLID },
+        input: { preset: SearchBarPresets.NO_BORDER },
     });
 
     const state = makeThemeVars("state", {
@@ -318,7 +311,7 @@ export const bannerVariables = useThemeCache(() => {
 
     const searchButton = makeThemeVars("searchButton", {
         name: "searchButton",
-        preset: presets.button.preset,
+        preset: { style: presets.button.preset },
         spinnerColor: colors.primaryContrast,
         sizing: {
             minHeight: searchBar.sizing.height,
@@ -329,7 +322,6 @@ export const bannerVariables = useThemeCache(() => {
         },
         borders: buttonBorderStyles,
         fonts: {
-            color: colors.primaryContrast,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.bold,
         },
@@ -337,10 +329,13 @@ export const bannerVariables = useThemeCache(() => {
     } as IButtonType);
 
     if (isSolidButton) {
-        buttonBorderStyles.color = searchButtonBg;
-        if (searchButton.state && searchButton.state.borders) {
-            searchButton.state.borders.color = isTransparentButton ? colors.primaryContrast : colors.primary;
-        }
+        console.log("button is soldi");
+        const buttonVars = buttonVariables();
+        searchButton.state = buttonVars.primary.state;
+        searchButton.colors = buttonVars.primary.colors;
+        searchButton.borders!.color = buttonVars.primary.borders.color;
+    } else {
+        console.log(presets);
     }
 
     const buttonShadow = makeThemeVars("shadow", {
@@ -359,6 +354,7 @@ export const bannerVariables = useThemeCache(() => {
     });
 
     return {
+        presets,
         options,
         outerBackground,
         backgrounds,
@@ -384,11 +380,11 @@ export const bannerVariables = useThemeCache(() => {
 
 export const bannerClasses = useThemeCache(() => {
     const vars = bannerVariables();
+    const { presets } = vars;
     const style = styleFactory("banner");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
-    const presets = presetsBanner();
 
     const isCentered = vars.options.alignment === "center";
     const searchButton = style("searchButton", {

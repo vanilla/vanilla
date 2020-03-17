@@ -74,7 +74,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.primaryContrast,
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
     });
@@ -705,7 +705,6 @@ export const titleBarClasses = useThemeCache(() => {
                         {
                             "& .meBox-buttonContent": {
                                 ...borders({
-                                    radius: 0,
                                     width: 1,
                                     color: rgba(0, 0, 0, 0),
                                 }),

@@ -71,19 +71,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         buttonTypeVars.borders = EMPTY_BORDER;
     }
 
-    if (buttonTypeVars.colors && buttonTypeVars.colors.fg && buttonTypeVars.colors.bg) {
-        // const fg = buttonTypeVars.colors.fg;
-        // const bg = buttonTypeVars.colors.bg;
-        // if (buttonTypeVars.preset?.style === ButtonPreset.OUTLINE) {
-        //     buttonTypeVars.borders.color = bg.mix(fg, buttonGlobals.constants.borderMixRatio);
-        //     if (buttonTypeVars.state && buttonTypeVars.state.borders && !buttonTypeVars.state.borders.color) {
-        //         buttonTypeVars.state.borders.color = globalVars.mainColors.primary;
-        //     }
-        // } else if (buttonTypeVars.preset?.style === ButtonPreset.SOLID) {
-        //     buttonTypeVars.borders.color = bg;
-        // }
-    }
-
     let defaultBorder = borders({
         ...EMPTY_BORDER,
         ...buttonTypeVars.borders,

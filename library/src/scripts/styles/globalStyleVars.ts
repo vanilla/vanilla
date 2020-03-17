@@ -21,6 +21,13 @@ import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
 import { ButtonTypes, ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { isLightColor } from "@library/styles/styleHelpersColors";
+import { element } from "prop-types";
+
+export enum GlobalPreset {
+    DARK = "dark",
+    LIGHT = "light",
+}
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#0291db");
@@ -51,15 +58,19 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const options = makeThemeVars("options", { preset: GlobalPreset.LIGHT });
+
     const elementaryColors = {
         black: color("#000"),
+        almostBlack: color("#323639"),
+        greyText: color("#555a62"),
         white: color("#fff"),
         transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
-        fg: color("#555a62"),
-        bg: color("#fff"),
+        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.greyText : elementaryColors.white,
+        bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
@@ -67,6 +78,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     colorPrimary = initialMainColors.primary;
+    const colorSecondary = initialMainColors.secondary;
 
     // Shorthand checking bg color for darkness
     const getRatioBasedOnBackgroundDarkness = (
@@ -77,11 +89,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        primaryContrast: isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
         statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
         secondary: offsetLightness(colorPrimary, 0.05),
         stateSecondary: offsetLightness(colorPrimary, 0.2), // Default state color change
-        secondaryContrast: initialMainColors.bg,
+        secondaryContrast: isLightColor(colorSecondary) ? elementaryColors.almostBlack : elementaryColors.white,
     });
 
     const mainColors = {
@@ -427,6 +439,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     return {
+        options,
         utility,
         elementaryColors,
         mainColors,

@@ -91,10 +91,10 @@ export const NoBackground = storyWithConfig(
                 outerBackground: {
                     image: "none",
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPreset.SOLID,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.SOLID,
+                    },
                 },
             },
         },
@@ -127,10 +127,10 @@ export const BackgroundImage = storyWithConfig(
                 backgrounds: {
                     useOverlay: true,
                 },
-            },
-            presetsBanner: {
-                searchButtonOptions: {
-                    preset: ButtonPreset.TRANSPARENT,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.TRANSPARENT,
+                    },
                 },
             },
         },
@@ -199,13 +199,13 @@ export const ImageAsElement = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPreset.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -265,13 +265,13 @@ export const ImageAsElementWide = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPreset.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -329,13 +329,13 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPreset.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -357,10 +357,10 @@ export const unifiedBorder = storyWithConfig(
                     color: "#980013",
                     image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
                 },
-            },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.UNIFIED_BORDER,
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.UNIFIED_BORDER,
+                    },
                 },
             },
         },

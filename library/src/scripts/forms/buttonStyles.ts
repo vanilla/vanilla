@@ -88,15 +88,27 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPresetInit = makeThemeVars("standard", {
         preset: {
             style: ButtonPreset.OUTLINE,
-            bg: globalVars.mainColors.bg,
-            fg: globalVars.mainColors.fg,
             border: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+        },
+    });
+
+    const standardPresetInit1 = makeThemeVars("standard", {
+        preset: {
+            ...standardPresetInit.preset,
+            bg:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? globalVars.mainColors.bg
+                    : standardPresetInit.preset.border,
+            fg:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? globalVars.mainColors.fg
+                    : offsetLightness(globalVars.mainColors.fg, 0.1),
         },
     });
 
     const standardPresetInit2 = makeThemeVars("standard", {
         preset: {
-            ...standardPresetInit.preset,
+            ...standardPresetInit1.preset,
             bgState: globalVars.mainColors.secondary,
             fgState: globalVars.mainColors.secondaryContrast,
         },
@@ -140,10 +152,32 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    // const primaryPresetInit1 = makeThemeVars("primary", {
+    //     preset: {
+    //         ...standardPresetInit.preset,
+    //         bg:
+    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+    //                 ? globalVars.mainColors.bg
+    //                 : primaryPresetInit.preset.border,
+    //         fg:
+    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+    //                 ? globalVars.mainColors.fg
+    //                 : offsetLightness(globalVars.mainColors.fg, 0.1),
+    //     },
+    // });
+
     const primaryPresetInit2 = makeThemeVars("primary", {
         preset: {
             ...primaryPresetInit.preset,
             border: primaryPresetInit.preset.bg,
+            bg:
+                primaryPresetInit.preset.style === ButtonPreset.SOLID
+                    ? globalVars.mainColors.primary
+                    : globalVars.mainColors.bg,
+            fg:
+                primaryPresetInit.preset.style === ButtonPreset.SOLID
+                    ? globalVars.mainColors.primaryContrast
+                    : primaryPresetInit.preset.bg,
             bgState: globalVars.mainColors.secondary,
             fgState: globalVars.mainColors.secondaryContrast,
         },
@@ -156,7 +190,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const primary: IButtonType = makeThemeVars("primary", {
+    const primary = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
         preset: primaryPreset.preset,
         colors: {

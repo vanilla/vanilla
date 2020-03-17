@@ -766,7 +766,7 @@ class PermissionModel extends Gdn_Model {
         $permissions = $this->getCachedRoles($key);
 
         if (!$permissions) {
-            $permissions = $this->getPermissionsByRoleIDDB(...$roleID);
+            $permissions = $this->getPermissionsByRoleDb(...$roleID);
             $permissions = UserModel::compilePermissions($permissions);
             $this->setCachedRoles($key, $permissions);
         }
@@ -779,7 +779,7 @@ class PermissionModel extends Gdn_Model {
      * @param array $roleID
      * @return array $permissions
      */
-    protected function getPermissionsByRoleIDDB(...$roleID): array {
+    protected function getPermissionsByRoleDb(...$roleID): array {
         $sql = clone $this->SQL;
         $sql->reset();
         // Select all of the permission columns.

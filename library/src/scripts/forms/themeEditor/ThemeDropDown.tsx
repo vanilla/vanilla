@@ -3,79 +3,61 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
-import classNames from "classnames";
-import SelectOne, { IMenuPlacement } from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { useField } from "formik";
-
-import InputHidden from "@library/forms/themeEditor/InputHidden";
-import { IFieldError } from "@library/@types/api/core";
-import Select from "react-select";
+import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/SelectOne";
+import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
+import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { t } from "@vanilla/i18n";
+import classNames from "classnames";
+import React from "react";
+import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 
 interface IProps extends IMenuPlacement {
-    variableID: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
-    inputID: string;
-    labelID: string;
+    variableKey: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
     options: IComboBoxOption[];
-    value?: IComboBoxOption;
-    inputClassName?: string;
     disabled?: boolean;
-    isClearable?: boolean;
-    errors?: IFieldError[];
-    selectRef?: React.RefObject<Select>;
-    defaultValue?: string;
-    selectedIndex?: number;
 }
 
-export function ThemeDropDown(props: IProps) {
-    const [value, valueMeta, valueHelpers] = useField(props.variableID);
-
-    let defaultValue;
-
-    if (
-        props.selectedIndex !== undefined &&
-        Number.isInteger(props.selectedIndex) &&
-        props.selectedIndex <= props.options.length
-    ) {
-        defaultValue = props.options[props.selectedIndex];
-    } else if (!value.value && props.options && props.options.length > 0 && props.defaultValue) {
-        props.options.forEach(option => {
-            if (!defaultValue && option.value === props.defaultValue) {
-                defaultValue = option;
-            }
-        });
-    }
-
-    const [currentOption, setCurrentOption] = useState(defaultValue);
+export function ThemeDropDown(_props: IProps) {
+    const { options, variableKey, disabled } = _props;
+    const { inputID, labelID } = useThemeBlock();
+    const { generatedValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
     const onChange = (option: IComboBoxOption | undefined) => {
         const newValue = option ? option.value.toString() : undefined;
-        valueHelpers.setValue(newValue);
-        setCurrentOption(option as any);
+        setValue(newValue);
+    };
+
+    const selectedOption = options.find(option => {
+        if (option.value === rawValue) {
+            return true;
+        }
+    });
+
+    const defaultOption = options.find(option => {
+        if (option.value === generatedValue) {
+            return true;
+        }
+    }) ?? {
+        label: t("Unknown"),
+        value: generatedValue,
     };
 
     return (
-        <div className={classNames("input-wrap-right")}>
+        <div className={themeDropDownClasses().root}>
             <SelectOne
                 label={null}
-                labelID={props.labelID}
-                inputID={props.inputID}
-                options={props.options}
-                value={currentOption as any}
-                inputClassName={classNames("form-control", props.inputClassName)}
-                disabled={props.disabled ?? props.options.length === 1}
-                menuPlacement={props.menuPlacement}
-                isClearable={props.isClearable ?? false}
-                selectRef={props.selectRef}
+                labelID={labelID}
+                inputID={inputID}
+                options={options}
+                value={selectedOption}
+                placeholder={defaultOption.label}
+                disabled={disabled ?? options.length === 1}
+                menuPlacement={MenuPlacement.AUTO}
+                isClearable={true}
                 onChange={onChange}
             />
-            <InputHidden
-                variableID={props.variableID}
-                value={currentOption && currentOption.value ? currentOption.value : undefined}
-            />
-            {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );
 }

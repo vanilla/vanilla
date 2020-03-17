@@ -17,6 +17,7 @@ export const themeDropDownClasses = useThemeCache(() => {
 
     const root = style({
         width: percent(100),
+        background: colorOut(globalVars.mainColors.bg),
         $nest: {
             "& .input-wrap-right": {
                 width: percent(100),
@@ -35,11 +36,17 @@ export const themeDropDownClasses = useThemeCache(() => {
                 borderColor: colorOut(globalVars.mainColors.primary),
                 cursor: "pointer",
             },
+            "& .suggestedTextInput-option": {
+                minHeight: unit(builderVariables.input.height),
+                paddingTop: 0,
+                paddingBottom: 0,
+            },
             "& .suggestedTextInput-valueContainer": {
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
                 backgroundColor: colorOut(globalVars.elementaryColors.white),
+                fontSize: "inherit",
                 ...borders(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),

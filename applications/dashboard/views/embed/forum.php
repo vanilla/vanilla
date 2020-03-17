@@ -9,7 +9,7 @@ echo heading(t('Embedding'));
 <div class="row form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Embed My Forum'); ?></div>
-        <div class="label-description"><?php echo t('Enable embedding description'); ?></div>
+        <div class="label-description"><?php echo t('If you want to embed your forum, enable embedding.'); ?></div>
     </div>
     <div class="input-wrap-right">
     <span id="plaintext-toggle">

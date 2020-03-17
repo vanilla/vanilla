@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+$Definition['Allow links to be transformed'] = 'Allow links to be transformed into embedded representations in discussions and comments. 
+    For example, a YouTube link will transform into an embedded video.';
 $Definition['EmbeddedDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 <p>{Excerpt}</p>
 <p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';

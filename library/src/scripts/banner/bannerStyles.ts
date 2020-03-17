@@ -25,6 +25,7 @@ import {
     textInputSizingFromFixedHeight,
     unit,
     isLightColor,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -115,10 +116,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const border = {
+    const border = makeThemeVars("border", {
         width: globalVars.border.width,
         radius: globalVars.borderType.formElements.default.radius,
-    };
+    });
 
     const backgrounds = makeThemeVars("backgrounds", {
         ...compactSearchVars.backgrounds,
@@ -281,6 +282,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             ...EMPTY_BORDER,
             color: searchBar.border.color,
             width: searchBar.border.width,
+            radius: 0,
         },
         right: {
             radius: border.radius,
@@ -389,10 +391,33 @@ export const bannerClasses = useThemeCache(() => {
         $nest: {
             "&.searchBar-submitButton": {
                 ...generateButtonStyleProperties(vars.searchButton),
+                borderTopRightRadius: importantUnit(vars.border.radius),
+                borderBottomRightRadius: importantUnit(vars.border.radius),
                 left: -1,
             },
         },
     });
+
+    let rightRadius = vars.border.radius as number | string;
+    let leftRadius = vars.border.radius as number | string;
+
+    if (
+        vars.searchButton &&
+        vars.searchButton.borders &&
+        vars.searchButton.borders.right &&
+        vars.searchButton.borders.right.radius
+    ) {
+        const radius = vars.searchButton.borders.right.radius as string | number;
+        rightRadius = unit(radius) as any;
+    }
+
+    if (presets.button.preset === ButtonPreset.HIDE) {
+        leftRadius = rightRadius;
+    } else {
+        if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
+            leftRadius = unit(vars.searchBar.border.radius.left) as any;
+        }
+    }
 
     const valueContainer = style("valueContainer", {
         $nest: {
@@ -408,6 +433,10 @@ export const bannerClasses = useThemeCache(() => {
                 ...borders({
                     color: vars.searchBar.border.color,
                 }),
+                borderTopLeftRadius: unit(leftRadius),
+                borderBottomLeftRadius: unit(leftRadius),
+                borderTopRightRadius: unit(rightRadius),
+                borderBottomRightRadius: unit(rightRadius),
                 $nest: {
                     "&:active, &:hover, &:focus, &.focus-visible": {
                         ...borders(vars.searchBar.border),
@@ -579,35 +608,10 @@ export const bannerClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    let rightRadius = vars.border.radius as number | string;
-    let leftRadius = vars.border.radius as number | string;
-
-    if (
-        vars.searchButton &&
-        vars.searchButton.borders &&
-        vars.searchButton.borders.right &&
-        vars.searchButton.borders.right.radius
-    ) {
-        const radius = vars.searchButton.borders.right.radius as string | number;
-        rightRadius = unit(radius) as any;
-    }
-
-    if (presets.button.preset === ButtonPreset.HIDE) {
-        leftRadius = rightRadius;
-    } else {
-        if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
-            leftRadius = unit(vars.searchBar.border.radius.left) as any;
-        }
-    }
-
     const content = style("content", {
         boxSizing: "border-box",
         zIndex: 1,
         boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
-        borderTopLeftRadius: unit(leftRadius),
-        borderBottomLeftRadius: unit(leftRadius),
-        borderTopRightRadius: unit(rightRadius),
-        borderBottomRightRadius: unit(rightRadius),
         height: unit(vars.searchBar.sizing.height),
         $nest: {
             "&.hasFocus .searchBar-valueContainer": {

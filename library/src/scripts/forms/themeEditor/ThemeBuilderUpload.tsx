@@ -33,11 +33,22 @@ export function ThemeBuilderUpload(props: IProps) {
     const { inputID, labelID } = useThemeBlock();
     const [isLoading, setIsLoading] = useState(false);
     const classes = themeBuilderUploadClasses();
+    const buttonRef = useRef<HTMLLabelElement>(null);
 
     return (
         <>
             <div className={classes.root}>
-                <label className={classes.button} tabIndex={0}>
+                <label
+                    className={classes.button}
+                    tabIndex={0}
+                    ref={buttonRef}
+                    onKeyDown={e => {
+                        if (e.key === " ") {
+                            buttonRef.current?.click();
+                        }
+                    }}
+                    role="button"
+                >
                     <input
                         className={classNames(visibility().visuallyHidden)}
                         aria-labelledby={labelID}
@@ -60,6 +71,7 @@ export function ThemeBuilderUpload(props: IProps) {
                                 const uploaded = await uploadFile(file);
                                 setIsLoading(false);
                                 setValue(uploaded.url);
+                                setPreviewImage(null);
                             } catch (e) {
                                 setPreviewImage(null);
                                 setError(e.message);
@@ -84,15 +96,19 @@ export function ThemeBuilderUpload(props: IProps) {
                             contentsClassName={classes.optionDropdown}
                         >
                             <DropDownItemButton
+                                disabled={!rawValue || rawValue === initialValue}
                                 onClick={() => {
                                     setValue(initialValue);
+                                    buttonRef.current?.focus();
                                 }}
                             >
                                 {t("Revert")}
                             </DropDownItemButton>
                             <DropDownItemButton
+                                disabled={!rawValue}
                                 onClick={() => {
                                     setValue(null);
+                                    buttonRef.current?.focus();
                                 }}
                             >
                                 {t("Delete")}

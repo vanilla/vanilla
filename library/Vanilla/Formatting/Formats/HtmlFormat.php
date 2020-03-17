@@ -43,6 +43,9 @@ class HtmlFormat extends BaseFormat {
     /** @var HtmlPlainTextConverter */
     private $plainTextConverter;
 
+    /** @var bool allowExtendedContent */
+    private $allowExtendedContent;
+
     /**
      * Constructor for dependency injection.
      *
@@ -50,24 +53,26 @@ class HtmlFormat extends BaseFormat {
      * @param HtmlEnhancer $htmlEnhancer
      * @param HtmlPlainTextConverter $plainTextConverter
      * @param bool $shouldCleanupLineBreaks
+     * @param bool $allowExtendedContent
      */
     public function __construct(
         HtmlSanitizer $htmlSanitizer,
         HtmlEnhancer $htmlEnhancer,
         HtmlPlainTextConverter $plainTextConverter,
-        bool $shouldCleanupLineBreaks = true
+        bool $shouldCleanupLineBreaks = true,
+        bool $allowExtendedContent = false
     ) {
         $this->htmlSanitizer = $htmlSanitizer;
         $this->htmlEnhancer = $htmlEnhancer;
         $this->plainTextConverter = $plainTextConverter;
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
+        $this->allowExtendedContent = $allowExtendedContent;
     }
-
     /**
      * @inheritdoc
      */
     public function renderHtml(string $content, bool $enhance = true): string {
-        $result = $this->htmlSanitizer->filter($content);
+        $result = $this->htmlSanitizer->filter($content, $this->allowExtendedContent);
 
         if ($this->shouldCleanupLineBreaks) {
             $result = self::cleanupLineBreaks($result);
@@ -488,5 +493,9 @@ HTML;
         }
 
         return false;
+    }
+
+    public function setAllowExtendedContent(bool $extendContent): void {
+        $this->allowExtendedContent = $extendContent;
     }
 }

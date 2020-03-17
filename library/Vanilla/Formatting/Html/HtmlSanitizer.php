@@ -7,6 +7,8 @@
 
 namespace Vanilla\Formatting\Html;
 
+use phpDocumentor\Reflection\Types\Boolean;
+
 /**
  * Class for sanitizing HTML.
  */
@@ -34,9 +36,10 @@ class HtmlSanitizer {
      * - Otherwise HTML encodes the content.
      *
      * @param string $content
+     * @param bool $allowExtendedContent
      * @return string
      */
-    public function filter(string $content): string {
+    public function filter(string $content, bool $allowExtendedContent = false): string {
         if (!self::containsHtmlTags($content)) {
             return htmlspecialchars($content);
         }
@@ -49,7 +52,8 @@ class HtmlSanitizer {
                 'span' => [
                     'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
                 ]
-            ]
+            ],
+            'allowedExtendedContent' => $allowExtendedContent
         ];
         return $this->htmlFilterer->format($encodedCodeBlocks, $options);
     }

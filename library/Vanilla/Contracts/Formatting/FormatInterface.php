@@ -105,4 +105,9 @@ interface FormatInterface {
      * @return string[] A list of usernames.
      */
     public function parseMentions(string $content): array;
+
+    /**
+     * @param bool $extendContent
+     */
+    public function setAllowExtendedContent(bool $extendContent): void;
 }

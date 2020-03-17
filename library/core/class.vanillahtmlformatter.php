@@ -189,6 +189,11 @@ class VanillaHtmlFormatter {
             'valid_xhtml' => 0
         ];
 
+        if ($options['allowedExtendedContent'] ?? null) {
+           $elements = $config['elements'] ?? null;
+           $config['elements'] = str_replace('-iframe', '', $elements);
+        }
+
         // If we don't allow URL embeds, don't allow HTML media embeds, either.
         if (self::c('Garden.Format.DisableUrlEmbeds')) {
             if (!array_key_exists('elements', $config) || !is_string($config['elements'])) {

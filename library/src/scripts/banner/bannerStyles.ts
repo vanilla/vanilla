@@ -330,13 +330,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     } as IButtonType);
 
     if (isSolidButton) {
-        console.log("button is soldi");
         const buttonVars = buttonVariables();
         searchButton.state = buttonVars.primary.state;
         searchButton.colors = buttonVars.primary.colors;
         searchButton.borders!.color = buttonVars.primary.borders.color;
-    } else {
-        console.log(presets);
     }
 
     const buttonShadow = makeThemeVars("shadow", {

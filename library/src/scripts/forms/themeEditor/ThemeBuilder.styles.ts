@@ -74,6 +74,7 @@ export const themeBuilderVariables = () => {
         color: color("#bfcbd8"),
         width: 1,
         style: "solid",
+        radius: 3,
     };
     const wrap = {
         borderRadius: 3,

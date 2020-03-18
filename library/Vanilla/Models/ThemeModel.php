@@ -493,12 +493,17 @@ class ThemeModel {
 
         $variables = $theme["assets"]["variables"]->getDataArray();
         if ($variables) {
+            $preset = $variables['global']['options']['preset'];
+            $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
+            $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
             $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
-            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
-            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
+            $preview['global.mainColors.bg'] = $bg ?? null;
+            $preview['global.mainColors.fg'] = $fg ?? null;
             $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
             $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
-            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+            $preview['banner.outerBackground.image'] = $variables['splash']['outerBackground']['image']
+                ?? $variables['banner']['outerBackground']['image']
+                ?? null;
         }
         return $preview;
     }

@@ -34,7 +34,7 @@ import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
 
 interface IProps {
-    container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
+    container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
@@ -200,7 +200,7 @@ export default function TitleBar(_props: IProps) {
     );
 
     const { resetScrollOffset, setScrollOffset, offsetClass } = useScrollOffset();
-    const containerElement = props.container || document.getElementById("titleBar");
+    const containerElement = props.container !== null ? props.container || document.getElementById("titleBar") : null;
 
     const containerClasses = classNames(
         "titleBar",

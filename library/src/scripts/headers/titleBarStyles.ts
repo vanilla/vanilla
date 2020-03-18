@@ -127,10 +127,6 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
-    const navAlignment = makeThemeVars("navAlignment", {
-        alignment: "left" as "left" | "center",
-    });
-
     const generatedColors = makeThemeVars("generatedColors", {
         state: offsetLightness(colors.bg, 0.04), // Default state color change
     });
@@ -246,7 +242,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const logo = makeThemeVars("logo", {
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
-        justifyContent: LogoAlignment.CENTER,
+        justifyContent: LogoAlignment.LEFT,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
@@ -263,6 +259,15 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             },
         },
     });
+
+    const navAlignment = makeThemeVars("navAlignment", {
+        alignment: "left" as "left" | "center",
+    });
+
+    if (logo.justifyContent === LogoAlignment.CENTER) {
+        // Forced to the left because they can't both be in the center.
+        navAlignment.alignment = "left";
+    }
 
     const mobileLogo = makeThemeVars("mobileLogo", {
         justifyContent: LogoAlignment.CENTER,

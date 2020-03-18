@@ -32,7 +32,6 @@ export function ThemeBuilderRevert(_props: IProps) {
             baseClass={ButtonTypes.ICON_COMPACT}
             title={t("Reset")}
             onClick={() => {
-                console.log("resetting to", initialValue);
                 setValue(initialValue);
             }}
         >

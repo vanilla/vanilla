@@ -17,8 +17,11 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
+import Pickr from "@simonwep/pickr";
+import "@simonwep/pickr/dist/themes/nano.min.css";
+import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
@@ -99,18 +102,11 @@ export function ThemeColorPicker(_props: IProps) {
     );
 
     // Handle updates from the color picker.
-    const onPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onPickerChange = (newColor: string) => {
         // Will always be valid color, since it's a real picker
-        const newColor: string = e.target.value;
         if (newColor) {
             handleColorChangeRef.current = handleColorChange;
             _debouncedPickerUpdate(newColor);
-        }
-    };
-
-    const clickReadInput = () => {
-        if (colorInput && colorInput.current) {
-            colorInput.current.click();
         }
     };
 
@@ -134,32 +130,7 @@ export function ThemeColorPicker(_props: IProps) {
                     onChange={onTextChange}
                     auto-correct="false"
                 />
-
-                {/* Hidden "Real" color input*/}
-                <input
-                    {...inputProps}
-                    ref={colorInput}
-                    type="color"
-                    id={inputID}
-                    aria-describedby={labelID}
-                    className={classNames(classes.realInput, visibility().visuallyHidden)}
-                    onChange={onPickerChange}
-                    onBlur={onPickerChange}
-                    aria-errormessage={error ? errorID : undefined}
-                    defaultValue={defaultColorString}
-                />
-                {/*Swatch*/}
-                <Button
-                    onClick={clickReadInput}
-                    style={{ backgroundColor: validColorString }}
-                    title={validColorString}
-                    aria-hidden={true}
-                    className={classes.swatch}
-                    tabIndex={-1}
-                    baseClass={ButtonTypes.CUSTOM}
-                >
-                    <span className={visibility().visuallyHidden}>{validColorString}</span>
-                </Button>
+                <Picker onChange={onPickerChange} validColorString={validColorString} />
             </span>
             <ThemeBuilderRevert variableKey={variableKey} />
             {error && (
@@ -168,5 +139,110 @@ export function ThemeColorPicker(_props: IProps) {
                 </ul>
             )}
         </>
+    );
+}
+
+function Picker(props: { onChange: (newColor: string) => void; validColorString: string }) {
+    const ref = useRef<HTMLButtonElement>(null);
+    const pickrRef = useRef<Pickr | null>(null);
+    const { onChange, validColorString } = props;
+    const classes = colorPickerClasses();
+    const currentColorRef = useRef(validColorString);
+    useEffect(() => {
+        currentColorRef.current = validColorString;
+    }, [validColorString]);
+
+    const handleChange = useCallback(
+        (color: Pickr.HSVaColor) => {
+            const finalColor = color.toHEXA().toString();
+            onChange(finalColor);
+        },
+        [onChange],
+    );
+    const changeHandlerRef = useRef<typeof handleChange | null>(null);
+
+    useEffect(() => {
+        if (changeHandlerRef.current) {
+            pickrRef.current?.off("change", changeHandlerRef.current);
+        }
+        changeHandlerRef.current = handleChange;
+        pickrRef.current?.on("change", handleChange);
+
+        return () => {
+            pickrRef.current?.off("change", handleChange);
+        };
+    }, [handleChange]);
+
+    const createAndOpen = useCallback(() => {
+        if (!ref.current) {
+            return;
+        }
+
+        if (pickrRef.current) {
+            return;
+        }
+
+        const pickr = Pickr.create({
+            el: ref.current,
+            theme: "nano",
+            outputPrecision: 0,
+            useAsButton: true,
+            default: currentColorRef.current,
+            components: {
+                // Main components
+                preview: true,
+                hue: true,
+
+                // Input / output Options
+                interaction: {
+                    input: true,
+                },
+            },
+        });
+
+        pickr.show();
+        pickrRef.current = pickr;
+        pickrRef.current?.on("change", handleChange);
+        changeHandlerRef.current = handleChange;
+    }, [handleChange]);
+
+    useEffect(() => {
+        return () => {
+            pickrRef.current?.destroy();
+            pickrRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        pickrRef.current?.setColor(validColorString, true);
+    }, [validColorString]);
+
+    useEffect(() => {
+        const handler = () => {
+            if (document.activeElement?.tagName === "IFRAME") {
+                pickrRef.current?.hide();
+            }
+        };
+        window.addEventListener("blur", handler);
+        return () => {
+            window.removeEventListener("blur", handler);
+        };
+    }, []);
+
+    return (
+        <Button
+            buttonRef={ref}
+            onClick={() => {
+                createAndOpen();
+            }}
+            style={{ backgroundColor: props.validColorString }}
+            title={props.validColorString}
+            aria-hidden={true}
+            className={classes.swatch}
+            tabIndex={-1}
+            baseClass={ButtonTypes.CUSTOM}
+        >
+            <span className={visibility().visuallyHidden}>{props.validColorString}</span>
+        </Button>
     );
 }

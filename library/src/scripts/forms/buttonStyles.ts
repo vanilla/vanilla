@@ -432,13 +432,13 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
         $nest: {
             "&&": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: colorOut(globalVars.links.colors.default),
             },
             "&&:not(.focus-visible)": {
                 outline: 0,
             },
             "&&:hover, &&:focus, &&:active": {
-                color: colorOut(globalVars.mainColors.secondary),
+                color: colorOut(globalVars.links.colors.active),
             },
         },
     });

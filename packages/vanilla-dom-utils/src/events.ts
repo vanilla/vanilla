@@ -71,9 +71,11 @@ export function delegateEvent(
  * @param eventHash - The event hash passed from delegateEvent().
  */
 export function removeDelegatedEvent(eventHash: string) {
-    const { scope, eventName, wrappedCallback } = delegatedEventListeners[eventHash];
-    scope.removeEventListener(eventName, wrappedCallback);
-    delete delegatedEventListeners[eventHash];
+    if (delegatedEventListeners[eventHash]) {
+        const { scope, eventName, wrappedCallback } = delegatedEventListeners[eventHash];
+        scope.removeEventListener(eventName, wrappedCallback);
+        delete delegatedEventListeners[eventHash];
+    }
 }
 
 /**

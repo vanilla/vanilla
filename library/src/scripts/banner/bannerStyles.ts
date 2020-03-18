@@ -20,7 +20,6 @@ import {
     backgroundHelper,
     borders,
     colorOut,
-    colorOutIfDefined,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
     EMPTY_FONTS,
@@ -892,7 +891,7 @@ export const bannerClasses = useThemeCache(() => {
             marginTop: unitIfDefined(vars.searchStrip.offset),
         },
         mediaQueries.oneColumnDown({
-            background: colorOutIfDefined(vars.searchStrip.mobile.bg),
+            background: vars.searchStrip.mobile.bg ? colorOut(vars.searchStrip.mobile.bg) : undefined,
             ...paddings(vars.searchStrip.mobile.padding),
             minHeight: unitIfDefined(vars.searchStrip.mobile.minHeight),
             marginTop: unitIfDefined(vars.searchStrip.mobile.offset),

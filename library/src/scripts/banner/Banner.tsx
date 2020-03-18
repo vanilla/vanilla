@@ -11,9 +11,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, SearchBarPresets } from "@library/banner/bannerStyles";
-import { t, assetUrl } from "@library/utility/appUtils";
-import { bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
+import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -76,7 +74,7 @@ export default function Banner(props: IProps) {
                 hideSearchButton={
                     device === Devices.MOBILE ||
                     device === Devices.XS ||
-                    presetsBanner().button.preset === ButtonPresets.HIDE
+                    bannerVariables().presets.button.preset === ButtonPreset.HIDE
                 }
                 contentClass={classes.content}
                 valueContainerClasses={classes.valueContainer}

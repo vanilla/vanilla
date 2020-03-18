@@ -12,10 +12,11 @@ use Garden\StaticCacheTranslationTrait;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
+use Vanilla\Contracts\Formatting\HeadingProviderInterface;
 use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Heading;
+use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Web\TwigRenderTrait;
@@ -220,7 +221,9 @@ class RichFormat extends BaseFormat {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             $parser = (new Quill\Parser())
-                ->addBlot(HeadingTerminatorBlot::class);
+                ->addBlot(HeadingTerminatorBlot::class)
+                ->addBlot(ExternalBlot::class);
+
             $blotGroups = $parser->parse($operations);
 
             /** @var Quill\BlotGroup $blotGroup */
@@ -233,7 +236,15 @@ class RichFormat extends BaseFormat {
                         $blot->getReference()
                     );
                 }
+
+                if ($blot instanceof ExternalBlot) {
+                    $embed = $blot->getEmbed();
+                    if ($embed instanceof HeadingProviderInterface) {
+                        $outline = array_merge($outline, $embed->getHeadings());
+                    }
+                }
             }
+
             return $outline;
         } catch (\Throwable $e) {
             $this->logBadInput($e);

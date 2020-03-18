@@ -21,7 +21,7 @@ interface IContextParams {
     setTopOffset(pixels: number): void;
 }
 
-export const ScrollOffsetContext = React.createContext<IContextParams>({
+export const SCROLL_OFFSET_DEFAULTS: IContextParams = {
     setScrollOffset: () => {
         logWarning("Set scroll offset called, but a proper provider was not configured.");
     },
@@ -41,6 +41,10 @@ export const ScrollOffsetContext = React.createContext<IContextParams>({
         current: null,
     },
     offsetClass: "",
+};
+
+export const ScrollOffsetContext = React.createContext<IContextParams>({
+    ...SCROLL_OFFSET_DEFAULTS,
 });
 
 export interface IWithScrollOffset {
@@ -59,6 +63,8 @@ interface IState {
     hashOffset: number;
     isWatchingEnabled: boolean;
 }
+
+window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = 0;
 
 /**
  * Provider for handling a global scroll offset.
@@ -187,6 +193,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
      * Set the value items will be translated by.
      */
     private setScrollOffset: ScollOffsetSetter = offset => {
+        window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = offset;
         this.setState({ scrollOffset: offset });
     };
 

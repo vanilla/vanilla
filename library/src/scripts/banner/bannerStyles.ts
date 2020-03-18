@@ -7,14 +7,20 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import {
+    BackgroundColorProperty,
+    BackgroundImageProperty,
+    FontWeightProperty,
+    PaddingProperty,
+    TextShadowProperty,
+} from "csstype";
 import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
 import {
     absolutePosition,
     backgroundHelper,
     borders,
-    centeredBackgroundProps,
     colorOut,
+    colorOutIfDefined,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
     EMPTY_FONTS,
@@ -22,10 +28,12 @@ import {
     fonts,
     IFont,
     modifyColorBasedOnLightness,
+    negative,
     textInputSizingFromFixedHeight,
     unit,
     isLightColor,
     importantUnit,
+    unitIfDefined,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -40,6 +48,7 @@ import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
 import { inputMixin } from "@library/forms/inputStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import isNumeric from "validator/lib/isNumeric";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -59,8 +68,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const options = makeThemeVars("options", {
         alignment: BannerAlignment.CENTER,
-        hideDesciption: false,
+        hideDescription: false,
+        hideTitle: false,
         hideSearch: false,
+        searchPlacement: "middle" as SearchPlacement,
     });
     const compactSearchVars = compactSearchVariables(forcedVars);
 
@@ -68,6 +79,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const horizontalPadding = unit(
         widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter,
     ) as PaddingProperty<TLength>;
+
     const spacing = makeThemeVars("spacing", {
         padding: {
             ...EMPTY_SPACING,
@@ -75,11 +87,20 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bottom: topPadding as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
-        paddingMobile: {
-            ...EMPTY_SPACING,
-            top: 0,
-            bottom: globalVars.gutter.size,
-            horizontal: horizontalPadding,
+        mobile: {
+            padding: {
+                ...EMPTY_SPACING,
+                top: 0,
+                bottom: globalVars.gutter.size,
+                horizontal: horizontalPadding,
+            },
+        },
+    });
+
+    const dimensions = makeThemeVars("dimensions", {
+        minHeight: 50,
+        mobile: {
+            minHeight: undefined as undefined | number | string,
         },
     });
 
@@ -128,13 +149,20 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const contentContainer = makeThemeVars("contentContainer", {
         minWidth: 550,
         padding: {
-            ...spacing.padding,
-            left: 0,
-            right: 0,
+            ...EMPTY_SPACING,
+            top: spacing.padding.top,
+            bottom: spacing.padding.bottom,
+            horizontal: 0,
+        },
+        mobile: {
+            padding: {
+                top: 12,
+                bottom: 12,
+            },
         },
     });
 
-    const imageElement = makeThemeVars("imageElement", {
+    const rightImage = makeThemeVars("rightImage", {
         image: undefined as string | undefined,
         minWidth: 500,
         disappearingWidth: 500,
@@ -145,15 +173,30 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const logo = makeThemeVars("logo", {
+        height: "auto" as number | string,
+        width: 300 as number | string,
+        padding: {
+            all: 12,
+        },
+        image: undefined as string | undefined,
+    });
+
     const outerBackground = makeThemeVars("outerBackground", {
         ...EMPTY_BACKGROUND,
         color: colors.primary.lighten("12%"),
-        backgroundPosition: "50% 50%",
-        backgroundSize: "cover",
+        repeat: "no-repeat",
+        position: "50% 50%",
+        size: "cover",
+        mobile: {
+            image: undefined as undefined | string,
+        },
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
-        bg: undefined,
+        ...EMPTY_BACKGROUND,
+        unsetBackground: true,
+        size: "unset",
         padding: {
             top: spacing.padding,
             right: spacing.padding,
@@ -354,6 +397,24 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const searchStrip = makeThemeVars("searchStrip", {
+        bg: colors.bg,
+        minHeight: 60 as number | string,
+        offset: undefined as number | string | undefined,
+        padding: {
+            top: 12,
+            bottom: 12,
+        },
+        mobile: {
+            bg: undefined as BackgroundColorProperty | undefined,
+            minHeight: undefined as "string" | number | undefined,
+            offset: undefined as "string" | number | undefined,
+            padding: {
+                ...EMPTY_SPACING,
+            },
+        },
+    });
+
     return {
         presets,
         options,
@@ -362,6 +423,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         spacing,
         innerBackground,
         contentContainer,
+        dimensions,
         text,
         title,
         description,
@@ -372,10 +434,12 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         searchButton,
         colors,
         inputAndButton,
-        imageElement,
+        rightImage,
         border,
         isTransparentButton,
         unifiedBannerOptions,
+        searchStrip,
+        logo,
     };
 });
 
@@ -462,17 +526,22 @@ export const bannerClasses = useThemeCache(() => {
             image: finalUrl,
         };
 
-        return style("outerBackground", {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: percent(100),
-            height: calc(`100% + 2px`),
-            transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
-            ...centeredBackgroundProps(),
-            display: "block",
-            ...backgroundHelper(finalVars),
-        });
+        return style(
+            "outerBackground",
+            {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: percent(100),
+                height: calc(`100% + 2px`),
+                transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
+                display: "block",
+                ...backgroundHelper(finalVars),
+            },
+            mediaQueries.oneColumnDown({
+                image: vars.outerBackground.mobile.image,
+            } as NestedCSSProperties),
+        );
     };
 
     const defaultBannerSVG = style("defaultBannerSVG", {
@@ -485,36 +554,38 @@ export const bannerClasses = useThemeCache(() => {
         top: px(0),
         left: px(0),
         width: percent(100),
-        height: percent(100),
+        height: calc(`100% + 2px`),
         background: colorOut(vars.backgrounds.overlayColor),
     });
 
-    const contentContainer = style(
-        "contentContainer",
-        {
-            ...paddings(vars.contentContainer.padding),
-            backgroundColor: vars.innerBackground.bg,
-            minWidth: vars.contentContainer.minWidth,
-        },
-        media(
+    const contentContainer = (hasFullWidth = false) => {
+        return style(
+            "contentContainer",
             {
-                maxWidth: calc(
-                    `${unit(vars.contentContainer.minWidth)} + ${unit(vars.contentContainer.padding.horizontal)} * 4`,
-                ),
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                ...paddings(vars.contentContainer.padding),
+                ...backgroundHelper(vars.innerBackground),
+                minWidth: unit(vars.contentContainer.minWidth),
+                minHeight: unit(vars.dimensions.minHeight),
+                width: hasFullWidth ? percent(100) : undefined,
             },
-            {
-                width: percent(100),
-                minWidth: "initial",
-            },
-        ),
-        mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.paddingMobile),
-        }),
-    );
+            mediaQueries.oneColumnDown({
+                minWidth: percent(100),
+                maxWidth: percent(100),
+                minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+                ...paddings(vars.contentContainer.mobile.padding),
+            }),
+        );
+    };
 
     const text = style("text", {
         color: colorOut(vars.colors.primaryContrast),
     });
+
+    const noTopMargin = style("noTopMargin", {});
 
     const searchContainer = style(
         "searchContainer",
@@ -531,10 +602,16 @@ export const bannerClasses = useThemeCache(() => {
                     margin: "auto",
                     zIndex: 2,
                 },
+                [`&.${noTopMargin}`]: {
+                    marginTop: 0,
+                },
             },
         },
         mediaQueries.oneColumnDown({
             ...margins(vars.searchBar.marginMobile),
+            [noTopMargin]: {
+                marginTop: 0,
+            },
         }),
     );
 
@@ -632,23 +709,53 @@ export const bannerClasses = useThemeCache(() => {
         flexDirection: "row",
         flexWrap: "nowrap",
         alignItems: "center",
+        maxWidth: percent(100),
     });
 
-    const makeImageMinWidth = (rootUnit, padding) =>
-        calc(
-            `${unit(rootUnit)} - ${unit(vars.contentContainer.minWidth)} - ${unit(
-                vars.contentContainer.padding.left ?? vars.contentContainer.padding.horizontal,
-            )} - ${unit(padding)}`,
-        );
+    const makeImageMinWidth = (rootUnit, padding) => {
+        const values = [
+            rootUnit,
+            negative(vars.contentContainer.minWidth),
+            negative(vars.contentContainer.padding.horizontal),
+            negative(padding),
+        ];
+
+        const stringValues = [];
+        let simplifiedNumber = 0;
+
+        values.forEach(value => {
+            if (typeof value === "number") {
+                simplifiedNumber += value;
+            } else {
+                if (value) {
+                    stringValues.push(unit(value) as never);
+                }
+            }
+        });
+
+        // @ts-ignore
+        let simplifiedNumberOutput = simplifiedNumber ? unit(simplifiedNumber.toString()).toString() : "";
+
+        if (simplifiedNumberOutput.startsWith("-")) {
+            simplifiedNumberOutput = simplifiedNumberOutput.replace("-", "- ");
+        }
+
+        if (stringValues.length > 0) {
+            return calc(`${stringValues.join(" + ")} + ${unit(simplifiedNumberOutput)}`.replace("+ -", "-").trim());
+        } else {
+            return unit(simplifiedNumberOutput);
+        }
+    };
 
     const imageElementContainer = style(
         "imageElementContainer",
         {
             alignSelf: "stretch",
-            minWidth: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
+            width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
             flexGrow: 1,
             position: "relative",
             overflow: "hidden",
+            ...paddings(vars.rightImage.padding),
         },
         media(
             { maxWidth: globalVars.content.width },
@@ -659,7 +766,7 @@ export const bannerClasses = useThemeCache(() => {
         layoutVariables()
             .mediaQueries()
             .oneColumnDown({
-                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingMobile.horizontal),
+                width: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
             }),
         media(
             { maxWidth: 500 },
@@ -669,12 +776,34 @@ export const bannerClasses = useThemeCache(() => {
         ),
     );
 
-    const imageElement = style(
-        "imageElement",
+    const logoContainer = style("logoContainer", {
+        display: "flex",
+        width: percent(100),
+        height: unit(vars.logo.height),
+        maxWidth: percent(100),
+        minHeight: unit(vars.logo.height),
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+    });
+
+    const logoSpacer = style("logoSpacer", {
+        ...paddings(vars.logo.padding),
+    });
+
+    const logo = style("logo", {
+        height: unit(vars.logo.height),
+        width: unit(vars.logo.width),
+        maxHeight: percent(100),
+        maxWidth: percent(100),
+    });
+
+    const rightImage = style(
+        "rightImage",
         {
             ...absolutePosition.middleRightOfParent(),
-            minWidth: unit(vars.imageElement.minWidth),
-            ...paddings(vars.imageElement.padding),
+            minWidth: unit(vars.rightImage.minWidth),
             objectPosition: "100% 50%",
             objectFit: "contain",
             marginLeft: "auto",
@@ -683,8 +812,8 @@ export const bannerClasses = useThemeCache(() => {
         media(
             {
                 maxWidth: calc(
-                    `${unit(vars.imageElement.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
-                        vars.imageElement.padding.horizontal ?? vars.imageElement.padding.all,
+                    `${unit(vars.rightImage.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
+                        vars.rightImage.padding.horizontal ?? vars.rightImage.padding.all,
                     )} * 2`,
                 ),
             },
@@ -708,6 +837,8 @@ export const bannerClasses = useThemeCache(() => {
 
     const root = style({
         position: "relative",
+        maxWidth: percent(100),
+        overflow: "hidden",
         backgroundColor: colorOut(vars.outerBackground.color),
         $nest: {
             [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
@@ -736,6 +867,38 @@ export const bannerClasses = useThemeCache(() => {
         },
     });
 
+    const middleContainer = style(
+        "middleContainer",
+        {
+            position: "relative",
+            minHeight: unit(vars.dimensions.minHeight),
+        },
+        mediaQueries.oneColumnDown({
+            minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+        }),
+    );
+
+    const searchStrip = style(
+        "searchStrip",
+        {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1,
+            background: colorOut(vars.searchStrip.bg),
+            ...paddings(vars.searchStrip.padding),
+            minHeight: unitIfDefined(vars.searchStrip.minHeight),
+            marginTop: unitIfDefined(vars.searchStrip.offset),
+        },
+        mediaQueries.oneColumnDown({
+            background: colorOutIfDefined(vars.searchStrip.mobile.bg),
+            ...paddings(vars.searchStrip.mobile.padding),
+            minHeight: unitIfDefined(vars.searchStrip.mobile.minHeight),
+            marginTop: unitIfDefined(vars.searchStrip.mobile.offset),
+        }),
+    );
+
     return {
         root,
         outerBackground,
@@ -759,7 +922,13 @@ export const bannerClasses = useThemeCache(() => {
         resultsAsModal,
         backgroundOverlay,
         imageElementContainer,
-        imageElement,
+        rightImage,
+        middleContainer,
         imagePositioner,
+        searchStrip,
+        noTopMargin,
+        logoContainer,
+        logoSpacer,
+        logo,
     };
 });

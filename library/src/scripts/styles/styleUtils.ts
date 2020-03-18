@@ -284,6 +284,20 @@ export function stringIsValidColor(colorValue) {
             stringIsRgbaColor(colorValue))
     );
 }
+/**
+ * Check if string is linear gradient
+ * @param colorString
+ */
+export function stringIsLinearGradient(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        !stringIsValidColor(colorValue) &&
+        colorValue
+            .toString()
+            .trim()
+            .startsWith("linear-gradient(")
+    );
+}
 
 /**
  * Check if string or ColorHelper is valid

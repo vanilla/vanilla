@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Formatting;
+namespace Vanilla\Contracts\Formatting;
 
 /**
  * Plain old object to represent a heading.

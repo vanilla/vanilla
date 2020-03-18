@@ -11,6 +11,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty, StandardLonghandPropertiesFallback } from "csstype";
+import { inputClasses } from "@library/forms/inputStyles";
 
 export const inputBlockVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -74,6 +75,9 @@ export const inputBlockClasses = useThemeCache(() => {
         display: "block",
         fontSize: unit(globalVars.fonts.size.small),
     });
+
+    const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
+
     const error = style("error", {
         display: "block",
         color: colorOut(globalVars.messageColors.error.fg),
@@ -122,6 +126,7 @@ export const inputBlockClasses = useThemeCache(() => {
         root,
         inputText,
         errors,
+        errorsPadding,
         error,
         labelNote,
         labelText,

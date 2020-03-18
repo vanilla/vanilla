@@ -727,3 +727,24 @@ export function LoaderIcon(props: { className?: string }) {
         </svg>
     );
 }
+
+export function ResetIcon(props: { className?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.standard, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            width="25"
+            height="24"
+            viewBox="0 0 25 24"
+        >
+            <title>{t("Reset")}</title>
+            <path
+                fill="currentColor"
+                fillOpacity="0.7"
+                fillRule="evenodd"
+                d="M12 6c3.315 0 6 2.685 6 6s-2.685 6-6 6-6-2.685-6-6 2.685-6 6-6zm-.006 3a2.988 2.988 0 00-2.066.83l-.432-.43A.29.29 0 009 9.604v1.622c0 .16.13.29.29.29h1.622a.29.29 0 00.205-.495l-.505-.506a2.032 2.032 0 11.05 3.015.145.145 0 00-.198.006l-.48.48a.144.144 0 00.006.21A3 3 0 1011.994 9z"
+            ></path>
+        </svg>
+    );
+}

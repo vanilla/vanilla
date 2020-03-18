@@ -12,6 +12,7 @@ import {
     unit,
     userSelect,
     spinnerLoaderAnimationProperties,
+    offsetLightness,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -21,8 +22,9 @@ import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export enum ButtonPresets {
+export enum ButtonPreset {
     SOLID = "solid",
     OUTLINE = "outline",
     TRANSPARENT = "transparent",
@@ -30,22 +32,24 @@ export enum ButtonPresets {
     HIDE = "hide",
 }
 
-export const buttonGlobalVariables = useThemeCache(() => {
+export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // Fetch external global variables
-    const globalVars = globalVariables();
-    const formElVars = formElementsVariables();
-    const makeThemeVars = variableFactory("buttonGlobals");
+    const globalVars = globalVariables(forcedVars);
+    const formElVars = formElementsVariables(forcedVars);
+    const makeThemeVars = variableFactory("buttonGlobals", forcedVars);
 
-    const colors = makeThemeVars("colors", {
+    let colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         primary: globalVars.mainColors.primary,
         primaryContrast: globalVars.mainColors.primaryContrast,
+        standard: globalVars.mainColors.secondary,
+        standardContrast: globalVars.mainColors.primaryContrast,
     });
 
     const font = makeThemeVars("font", {
         size: globalVars.fonts.size.medium,
-        weight: globalVars.fonts.weights.normal,
+        weight: globalVars.fonts.weights.semiBold,
     });
 
     const padding = makeThemeVars("padding", {
@@ -71,111 +75,146 @@ export const buttonGlobalVariables = useThemeCache(() => {
         sizing,
         border,
         font,
-        colors,
         constants,
+        colors,
     };
 });
 
-export const buttonVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("button");
-    const vars = buttonGlobalVariables();
+export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const makeThemeVars = variableFactory("button", forcedVars);
+    const vars = buttonGlobalVariables(forcedVars);
 
-    const standard = makeThemeVars("standard", {
+    const standardPresetInit = makeThemeVars("standard", {
+        preset: {
+            style: ButtonPreset.OUTLINE,
+            border: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+        },
+    });
+
+    const standardPresetInit1 = makeThemeVars("standard", {
+        preset: {
+            ...standardPresetInit.preset,
+            bg:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? globalVars.mainColors.bg
+                    : standardPresetInit.preset.border,
+            fg:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? globalVars.mainColors.fg
+                    : offsetLightness(globalVars.mainColors.fg, 0.1),
+        },
+    });
+
+    const standardPresetInit2 = makeThemeVars("standard", {
+        preset: {
+            ...standardPresetInit1.preset,
+            bgState: globalVars.mainColors.secondary,
+            fgState: globalVars.mainColors.secondaryContrast,
+        },
+    });
+
+    const standardPreset = makeThemeVars("standard", {
+        preset: {
+            ...standardPresetInit2.preset,
+            borderState: standardPresetInit2.preset.bgState,
+        },
+    });
+
+    const standard: IButtonType = makeThemeVars("standard", {
         name: ButtonTypes.STANDARD,
-        preset: globalVars.buttonPreset.style ?? ButtonPresets.OUTLINE,
-        spinnerColor: globalVars.mainColors.fg,
+        preset: standardPreset.preset,
         colors: {
-            fg: globalVars.mainColors.fg,
-            bg: globalVars.mainColors.bg,
+            fg: standardPreset.preset.fg,
+            bg: standardPreset.preset.bg,
         },
         borders: {
-            color: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+            color: standardPreset.preset.border,
             radius: globalVars.border.radius,
         },
-        hover: {
+        state: {
             borders: {
                 ...globalVars.borderType.formElements.buttons,
-                color: globalVars.mainColors.primary,
+                color: standardPreset.preset.borderState,
             },
             colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.secondaryContrast,
+                bg: standardPreset.preset.bgState,
+                fg: standardPreset.preset.fgState,
             },
         },
-        active: {
-            borders: {
-                ...globalVars.borderType.formElements.buttons,
-                color: globalVars.mainColors.primary,
-            },
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.secondaryContrast,
-            },
+    });
+
+    const primaryPresetInit = makeThemeVars("primary", {
+        preset: {
+            style: ButtonPreset.SOLID,
+            bg: globalVars.mainColors.primary,
+            fg: globalVars.mainColors.primaryContrast,
         },
-        focus: {
-            borders: {
-                ...globalVars.borderType.formElements.buttons,
-                color: globalVars.mainColors.primary,
-            },
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.secondaryContrast,
-            },
+    });
+
+    // const primaryPresetInit1 = makeThemeVars("primary", {
+    //     preset: {
+    //         ...standardPresetInit.preset,
+    //         bg:
+    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+    //                 ? globalVars.mainColors.bg
+    //                 : primaryPresetInit.preset.border,
+    //         fg:
+    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+    //                 ? globalVars.mainColors.fg
+    //                 : offsetLightness(globalVars.mainColors.fg, 0.1),
+    //     },
+    // });
+
+    const primaryPresetInit2 = makeThemeVars("primary", {
+        preset: {
+            ...primaryPresetInit.preset,
+            border: primaryPresetInit.preset.bg,
+            bg:
+                primaryPresetInit.preset.style === ButtonPreset.SOLID
+                    ? globalVars.mainColors.primary
+                    : globalVars.mainColors.bg,
+            fg:
+                primaryPresetInit.preset.style === ButtonPreset.SOLID
+                    ? globalVars.mainColors.primaryContrast
+                    : primaryPresetInit.preset.bg,
+            bgState: globalVars.mainColors.secondary,
+            fgState: globalVars.mainColors.secondaryContrast,
         },
-        focusAccessible: {
-            borders: {
-                ...globalVars.borderType.formElements.buttons,
-                color: globalVars.mainColors.primary,
-            },
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.secondaryContrast,
-            },
+    });
+
+    const primaryPreset = makeThemeVars("primary", {
+        preset: {
+            ...primaryPresetInit2.preset,
+            borderState: primaryPresetInit2.preset.bgState,
         },
-    } as IButtonType);
+    });
 
     const primary = makeThemeVars("primary", {
         name: ButtonTypes.PRIMARY,
-        preset: globalVars.buttonPreset.style ?? ButtonPresets.SOLID,
+        preset: primaryPreset.preset,
         colors: {
-            fg: vars.colors.primaryContrast,
-            bg: vars.colors.primary,
+            fg: primaryPreset.preset.fg,
+            bg: primaryPreset.preset.bg,
         },
-        spinnerColor: globalVars.mainColors.bg,
         borders: {
-            color: globalVars.mainColors.primary,
+            color: primaryPreset.preset.border,
             radius: globalVars.border.radius,
         },
-        hover: {
+        state: {
             colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.primaryContrast,
+                bg: primaryPreset.preset.bgState,
+                fg: primaryPreset.preset.fgState,
+            },
+            borders: {
+                color: primaryPreset.preset.borderState,
             },
         },
-        active: {
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.primaryContrast,
-            },
-        },
-        focus: {
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.primaryContrast,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                bg: globalVars.mainColors.secondary,
-                fg: globalVars.mainColors.primaryContrast,
-            },
-        },
-    } as IButtonType);
+    });
 
-    const transparent = makeThemeVars("transparent", {
+    const transparent: IButtonType = makeThemeVars("transparent", {
         name: ButtonTypes.TRANSPARENT,
-        preset: ButtonPresets.ADVANCED,
+        preset: { style: ButtonPreset.ADVANCED },
         colors: {
             fg: globalVars.mainColors.bg,
             bg: globalVars.mainColors.fg.fade(0.1),
@@ -204,16 +243,15 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.fg.fade(0.2),
             },
         },
-    } as IButtonType);
+    });
 
-    const translucid = makeThemeVars("translucid", {
+    const translucid: IButtonType = makeThemeVars("translucid", {
         name: ButtonTypes.TRANSLUCID,
-        preset: ButtonPresets.ADVANCED,
+        preset: { style: ButtonPreset.ADVANCED },
         colors: {
             bg: globalVars.mainColors.bg,
             fg: globalVars.mainColors.primary,
         },
-        spinnerColor: globalVars.mainColors.bg,
         borders: {
             ...globalVars.borderType.formElements.buttons,
             color: globalVars.mainColors.bg,
@@ -238,7 +276,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.bg.fade(0.8),
             },
         },
-    } as IButtonType);
+    });
 
     return {
         standard,
@@ -394,13 +432,13 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
         $nest: {
             "&&": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: colorOut(globalVars.links.colors.default),
             },
             "&&:not(.focus-visible)": {
                 outline: 0,
             },
             "&&:hover, &&:focus, &&:active": {
-                color: colorOut(globalVars.mainColors.secondary),
+                color: colorOut(globalVars.links.colors.active),
             },
         },
     });
@@ -429,24 +467,9 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = useThemeCache((buttonType?: ButtonTypes) => {
-    const globalVars = globalVariables();
+export const buttonLoaderClasses = useThemeCache(() => {
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
-    const buttonVars = buttonVariables();
-    let spinnerColor;
-    let stateSpinnerColor;
-
-    switch (buttonType) {
-        case ButtonTypes.PRIMARY:
-            spinnerColor = buttonVars.primary.spinnerColor;
-            stateSpinnerColor = buttonVars.primary.hover?.fonts?.color ?? spinnerColor;
-            break;
-        default:
-            spinnerColor = buttonVars.standard.spinnerColor;
-            stateSpinnerColor = buttonVars.standard.hover?.fonts?.color ?? spinnerColor;
-            break;
-    }
 
     const root = useThemeCache((alignment: "left" | "center" = "center") =>
         style({

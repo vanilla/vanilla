@@ -9,6 +9,7 @@ export * from "./mounting";
 export * from "./useCollisionDetector";
 export * from "./useEscapeListener";
 export * from "./useFocusWatcher";
+export * from "./useInterval";
 export * from "./useMeasure";
 export * from "./useLastValue";
 export * from "./useTabKeyboardHandler";

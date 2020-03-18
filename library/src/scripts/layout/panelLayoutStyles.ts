@@ -16,10 +16,11 @@ import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const layoutVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("globalVariables");
+export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const makeThemeVars = variableFactory("globalVariables", forcedVars);
 
     const colors = makeThemeVars("colors", {
         leftColumnBg: globalVars.mainColors.bg,

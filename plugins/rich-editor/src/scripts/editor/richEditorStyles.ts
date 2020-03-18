@@ -15,6 +15,7 @@ import {
     pointerEvents,
     borders,
     paddings,
+    margins,
     importantUnit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -330,6 +331,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         background: legacyMode ? undefined : colorOut(vars.colors.bg),
     });
 
+    const embedBarSeparator = style("embedBarSeparator", {
+        height: unit(globalVars.gutter.quarter),
+        width: unit(globalVars.gutter.quarter),
+        borderRadius: unit(globalVars.gutter.quarter),
+        background: colorOut(globalVars.mainColors.fg),
+        ...margins({ horizontal: globalVars.gutter.half }),
+    });
+
     const icon = style("icon", {
         display: "block",
         margin: "auto",
@@ -426,6 +435,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         menuItems,
         upload,
         embedBar,
+        embedBarSeparator,
         menuItem,
         button,
         topLevelButtonActive,

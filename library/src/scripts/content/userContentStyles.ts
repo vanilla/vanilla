@@ -4,11 +4,20 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, fonts, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fonts,
+    margins,
+    paddings,
+    setAllLinkColors,
+    unit,
+    singleBorder,
+} from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { em, important, percent, px } from "csx";
+import { em, important, percent, px, border } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
@@ -351,6 +360,22 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
+    const tables: NestedCSSSelectors = {
+        "& table": {
+            width: "100% !important",
+        },
+        "& td": {
+            ...borders(),
+            ...paddings({
+                vertical: 6,
+                horizontal: 12,
+            }),
+        },
+        "& tr td": {
+            fontWeight: globalVars.fonts.weights.bold,
+        },
+    };
+
     const root = style({
         // These CAN'T be flexed. That breaks margin collapsing.
         display: important("block"),
@@ -364,6 +389,10 @@ export const userContentClasses = useThemeCache(() => {
             "&::before": {
                 marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
             },
+            "& iframe": {
+                width: percent(100),
+            },
+            ...tables,
             ...headings,
             ...lists,
             ...paragraphSpacing,

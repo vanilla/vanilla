@@ -23,8 +23,10 @@ export const containerVariables = useThemeCache(() => {
         padding: {
             horizontal: vars.gutter.size,
         },
-        paddingMobile: {
-            horizontal: smallPadding,
+        mobile: {
+            padding: {
+                horizontal: smallPadding,
+            },
         },
     });
 
@@ -67,7 +69,6 @@ export const containerMainStyles = (): NestedCSSProperties => {
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),
-
         $nest: {
             "&.isNarrow": {
                 maxWidth: vars.sizing.narrowContentSize,
@@ -83,7 +84,7 @@ export const containerClasses = useThemeCache(() => {
     const root = style(
         containerMainStyles() as NestedCSSProperties,
         mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.paddingMobile),
+            ...paddings(vars.spacing.mobile.padding),
         }),
     );
 

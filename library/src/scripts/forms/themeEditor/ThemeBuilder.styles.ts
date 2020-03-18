@@ -7,8 +7,9 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut, margins, negativeUnit, paddings, unit, sticky, flexHelper } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const themeBuilderVariables = () => {
     // Intentionally not overwritable with theming system.
@@ -74,6 +75,7 @@ export const themeBuilderVariables = () => {
         color: color("#bfcbd8"),
         width: 1,
         style: "solid",
+        radius: 3,
     };
     const wrap = {
         borderRadius: 3,
@@ -136,18 +138,21 @@ export const themeEditorVariables = () => {
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         maxWidth: unit(themeEditorVariables().panel.width),
         backgroundColor: colorOut(vars.panel.bg),
         minHeight: percent(100),
+        maxHeight: percent(100),
+        overflow: "auto",
         ...fonts(vars.defaultFont),
         ...paddings({
             vertical: unit(vars.panel.padding),
         }),
     });
 
-    const inputBlock = style("inputBlock", {
+    const block = style("block", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
@@ -184,6 +189,20 @@ export const themeBuilderClasses = useThemeCache(() => {
         justifyContent: "flex-end",
         width: unit(vars.input.width),
         flexBasis: unit(vars.input.width),
+        position: "relative",
+    });
+
+    const checkBoxWrap = style("checkBoxWrap", {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+        width: unit(vars.input.width),
+        flexBasis: unit(vars.input.width),
+        ...fonts(vars.input.fonts),
+        fontWeight: 600,
+        height: vars.input.height,
+        paddingBottom: 4,
     });
 
     const title = style("title", {
@@ -193,6 +212,16 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...paddings({
             horizontal: unit(vars.panel.padding),
         }),
+        marginTop: unit(20),
+        paddingTop: unit(20),
+        borderTop: `solid #c1cbd7 1px`,
+        $nest: {
+            "&:first-child": {
+                marginTop: 0,
+                paddingTop: 0,
+                borderTop: "none",
+            },
+        },
     });
 
     const section = style("section", {
@@ -253,12 +282,33 @@ export const themeBuilderClasses = useThemeCache(() => {
         textAlign: "right",
     });
 
+    const tooltip = style("tooltip", {
+        ...flexHelper().middle(),
+        $nest: {
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    const resetButton = style("resetButton", {
+        height: 24,
+        width: 24,
+        position: "absolute",
+        right: percent(100),
+        top: 0,
+        bottom: 0,
+        marginTop: "auto",
+        marginBottom: "auto",
+    });
+
     return {
         root,
-        inputBlock,
+        block,
         label,
         undoWrap,
         inputWrap,
+        checkBoxWrap,
         title,
         section,
         sectionTitle,
@@ -268,5 +318,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSectionTitle,
         invalidField,
         colorErrorMessage,
+        tooltip,
+        resetButton,
     };
 });

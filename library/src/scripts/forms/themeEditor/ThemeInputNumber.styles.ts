@@ -16,10 +16,10 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
-export const inputNumberVariables = useThemeCache(() => {
+export const themeInputNumberVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
     const builderVars = themeBuilderVariables();
     return {
@@ -43,9 +43,9 @@ export const inputNumberVariables = useThemeCache(() => {
     };
 });
 
-export const inputNumberClasses = useThemeCache(() => {
-    const vars = inputNumberVariables();
-    const style = styleFactory("numberInput");
+export const themeInputNumberClasses = useThemeCache(() => {
+    const vars = themeInputNumberVariables();
+    const style = styleFactory("themeInputNumber");
     const builderVariables = themeBuilderVariables();
     const builderClasses = themeBuilderClasses();
 
@@ -68,6 +68,7 @@ export const inputNumberClasses = useThemeCache(() => {
         alignItems: "stretch",
         maxWidth: unit(vars.input.width),
         width: unit(vars.input.width),
+        position: "relative",
     });
 
     const textInput = style("textInput", {
@@ -84,6 +85,8 @@ export const inputNumberClasses = useThemeCache(() => {
         flexBasis: unit(builderVariables.input.width),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
         borderRight: 0,
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
         borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
         transition: `color .2s ease-out, background .2s ease-out`,
@@ -105,6 +108,9 @@ export const inputNumberClasses = useThemeCache(() => {
         ...absolutePosition.topRight(),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
         ...userSelect(),
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
         borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
         display: "flex",
         alignItems: "center",
@@ -123,6 +129,9 @@ export const inputNumberClasses = useThemeCache(() => {
         ...absolutePosition.bottomRight(),
         ...borders({}, builderVariables.border as IGlobalBorderStyles),
         ...userSelect(),
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderTopRightRadius: 0,
         borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
         display: "flex",
         alignItems: "center",

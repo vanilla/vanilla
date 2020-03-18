@@ -4,21 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper, important } from "csx";
-import { logError, logDebug, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
-
+import { color, ColorHelper, important, px } from "csx";
+import { logError, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
+import { stringIsLinearGradient } from "@library/styles/styleUtils";
 export type ColorValues = ColorHelper | undefined;
 
-export const colorOut = (colorValue: ColorValues | string, makeImportant = false) => {
+export const colorOut = (colorValue: ColorValues | string, makeImportant = false, debug = false) => {
+    logDebugConditionnal(debug, "colorOut - colorValue: ", colorValue);
     if (!colorValue) {
         return undefined;
     } else {
-        if (
-            colorValue
-                .toString()
-                .trim()
-                .startsWith("linear-gradient(")
-        ) {
+        if (stringIsLinearGradient(colorValue)) {
+            logDebugConditionnal(debug, "colorOut - linear gradient detected - colorValue: ", colorValue);
             return colorValue.toString();
         } else {
             const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
@@ -35,12 +32,18 @@ export const importantColorOut = (colorValue: ColorValues | string) => {
     return colorOut(colorValue, true);
 };
 
-/*
- * Check if it's a light color or dark color based on lightness
+/**
+ * Check if it's a light color or dark color.
+ * Calculation is based off of this formula. http://alienryderflex.com/hsp.html
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.4;
+    const r = color.red();
+    const b = color.blue();
+    const g = color.green();
+    const result = Math.sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
+    // Values in the range of 128-150 seem to give acceptable results.
+    return result >= 150;
 };
 
 /*

@@ -7,16 +7,17 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { borders, colorOut, fonts, unit } from "@library/styles/styleHelpers";
-import { themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
-export const inputDropDownClasses = useThemeCache(() => {
-    const style = styleFactory("inputDropDown");
+export const themeDropDownClasses = useThemeCache(() => {
+    const style = styleFactory("themeDropDown");
     const builderVariables = themeBuilderVariables();
     const globalVars = globalVariables();
 
     const root = style({
         width: percent(100),
+        background: colorOut(globalVars.mainColors.bg),
         $nest: {
             "& .input-wrap-right": {
                 width: percent(100),
@@ -35,11 +36,17 @@ export const inputDropDownClasses = useThemeCache(() => {
                 borderColor: colorOut(globalVars.mainColors.primary),
                 cursor: "pointer",
             },
+            "& .suggestedTextInput-option": {
+                minHeight: unit(builderVariables.input.height),
+                paddingTop: 0,
+                paddingBottom: 0,
+            },
             "& .suggestedTextInput-valueContainer": {
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
                 backgroundColor: colorOut(globalVars.elementaryColors.white),
+                fontSize: "inherit",
                 ...borders(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),

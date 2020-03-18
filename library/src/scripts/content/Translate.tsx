@@ -12,8 +12,9 @@ type TranslateCallback = (contents: string) => React.ReactNode;
 
 interface IProps {
     source: string;
+    shortSource?: string;
     errorHandler?: (...values) => void;
-    translateFunction?: (source: string) => string;
+    translateFunction?: (source: string, fallback?: string) => string;
     c0?: TranslateCallback | React.ReactNode;
     c1?: TranslateCallback | React.ReactNode;
     c2?: TranslateCallback | React.ReactNode;
@@ -104,7 +105,7 @@ export default class Translate extends React.Component<IProps> {
      * Get a translated version of the source string.
      */
     private get translatedSource(): string {
-        return this.props.translateFunction!(this.props.source);
+        return this.props.translateFunction!(this.props.shortSource ?? this.props.source, this.props.source);
     }
 
     /**

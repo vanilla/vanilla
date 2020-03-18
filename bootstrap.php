@@ -374,6 +374,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerBuiltInFormats')
+    ->setInherit(true)
     ->setShared(true)
 
     ->rule(LegacyEmbedReplacer::class)

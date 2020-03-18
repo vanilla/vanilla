@@ -5,7 +5,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
@@ -13,9 +12,9 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-import { globalVariables, IButtonPresets } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
-import { ButtonPresets, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 
@@ -152,9 +151,9 @@ export const PresetsOutline = storyWithConfig(
     {
         themeVars: {
             global: {
-                buttonPreset: ({
-                    style: ButtonPresets.OUTLINE,
-                } as unknown) as IButtonPresets,
+                buttonPreset: {
+                    style: ButtonPreset.OUTLINE,
+                },
             },
             button: {
                 primary: {
@@ -173,9 +172,9 @@ export const PresetsSolid = storyWithConfig(
     {
         themeVars: {
             global: {
-                buttonPreset: ({
-                    preset: ButtonPresets.SOLID,
-                } as unknown) as IButtonPresets,
+                buttonPreset: {
+                    style: ButtonPreset.SOLID,
+                },
             },
         },
     },

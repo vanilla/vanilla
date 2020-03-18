@@ -5,7 +5,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
@@ -13,7 +12,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
-import { globalVariables, IButtonPreset } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
 import { ButtonPreset, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";

@@ -109,6 +109,8 @@ export function ThemeInputNumber(_props: IProps) {
         } catch (e) {
             setError(e.message);
         }
+        // Initial value only
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const errorID = useUniqueID("inputNumberError");

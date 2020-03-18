@@ -30,7 +30,7 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
 
     /**
      * Validate the message against the schema.
-     * 
+     *
      * @return Schema
      */
     private function messageSchema(): Schema {

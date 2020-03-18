@@ -51,7 +51,9 @@ abstract class BaseFormat implements FormatInterface {
     }
 
     /**
-     * @inheritDoc
+     * Set the status for extended content.
+     *
+     * @param bool $extendContent
      */
     public function setAllowExtendedContent(bool $extendContent): void {
     }

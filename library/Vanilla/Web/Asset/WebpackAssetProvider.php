@@ -225,7 +225,33 @@ class WebpackAssetProvider {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
+
         $styles = [];
+
+        $sharedStyles = new WebpackAsset(
+            $this->request,
+            WebpackAsset::STYLE_EXTENSION,
+            $section,
+            'shared',
+            $this->cacheBustingKey
+        );
+
+        $vendorStyles = new WebpackAsset(
+            $this->request,
+            WebpackAsset::STYLE_EXTENSION,
+            $section,
+            'vendors',
+            $this->cacheBustingKey
+        );
+
+        if ($sharedStyles->existsOnFs()) {
+            $styles[] = $sharedStyles;
+        }
+
+        if ($vendorStyles->existsOnFs()) {
+            $styles[] = $vendorStyles;
+        }
+
         // Grab all of the addon based assets.
         foreach ($this->addonProvider->getEnabled() as $addon) {
             $addon = $this->checkReplacePreview($addon);

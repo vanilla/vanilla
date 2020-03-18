@@ -276,7 +276,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     let buttonBorderStyles = {
-        color: colors.borderColor,
+        color: colors.bg,
         width: 0,
         left: {
             ...EMPTY_BORDER,
@@ -286,6 +286,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         right: {
             radius: border.radius,
+            color: colors.bg,
         },
     };
 
@@ -306,7 +307,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     if (isTransparentButton) {
-        buttonBorderStyles.color = colors.primaryContrast;
+        buttonBorderStyles.color = colors.bg;
         buttonBorderStyles.width = globalVars.border.width;
     }
 
@@ -321,7 +322,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         colors: {
             bg: searchButtonBg,
-            fg: colors.primaryContrast,
+            fg: colors.bg,
         },
         borders: buttonBorderStyles,
         fonts: {

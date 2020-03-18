@@ -324,12 +324,12 @@ class ModerationController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected discussions (that the user has permission to delete).
             foreach ($allowedDiscussions as $discussionID) {
-                $deleted = $discussionModel->deleteID($discussionID);
-                if ($deleted) {
-                    $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
-                }
+                $discussionArray[] = $discussionID;
             }
-
+                // Queue deleting discussions.
+                /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+                $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+                $scheduler->addJob(ExecuteBatchDeleteDiscussion::class, $discussionArray);
             // Clear selections
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
             ModerationController::informCheckedDiscussions($this, true);

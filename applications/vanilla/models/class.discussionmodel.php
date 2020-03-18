@@ -2996,7 +2996,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      *
      * Events: DeleteDiscussion.
      *
-     * @param int $discussionID Unique ID of discussion to delete.
+     * @param mixed $discussionID Unique ID of discussion to delete.
      * @param array $options Additional options to control the delete behavior. Not used for discussions.
      * @return bool Always returns **true**.
      */

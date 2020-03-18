@@ -57,11 +57,11 @@ export function useThemeVariableField<T>(variableKey: string) {
     const context = useThemeBuilder();
 
     const value = {
-        rawValue: get(context.rawThemeVariables, variableKey, null) as T | null,
-        defaultValue: get(context.defaultThemeVariables, variableKey, null) as T | null,
-        initialValue: get(context.initialThemeVariables, variableKey, null) as T | null,
-        generatedValue: get(context.generatedThemeVariables, variableKey, null) as T | null,
-        error: get(context.variableErrors, variableKey, null) as string | null,
+        rawValue: get(context.rawThemeVariables, variableKey, undefined) as T | null | undefined,
+        defaultValue: get(context.defaultThemeVariables, variableKey, undefined) as T | null | undefined,
+        initialValue: get(context.initialThemeVariables, variableKey, undefined) as T | null | undefined,
+        generatedValue: get(context.generatedThemeVariables, variableKey, undefined) as T | null | undefined,
+        error: get(context.variableErrors, variableKey, undefined) as string | null | undefined,
         setValue: (value: T | null) => {
             context.setVariableValue(variableKey, value);
         },
@@ -87,7 +87,7 @@ export function ThemeBuilderContextProvider(props: IProps) {
 
     // Lock the value to the one on first render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const initialThemeVariables = useMemo(() => generatedThemeVariables, []);
+    const initialThemeVariables = useMemo(() => cloneDeep(rawThemeVariables), []);
     const [errors, setErrors] = useState<IThemeVariables>({});
 
     const calculateNewErrors = (variableKey: string, error: string | null) => {

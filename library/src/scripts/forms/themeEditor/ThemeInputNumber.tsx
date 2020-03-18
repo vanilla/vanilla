@@ -15,6 +15,7 @@ import { t } from "@vanilla/i18n/src";
 import { useInterval } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
+import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 
 interface IProps
     extends Omit<
@@ -155,6 +156,7 @@ export function ThemeInputNumber(_props: IProps) {
                         </Button>
                     </span>
                 </span>
+                <ThemeBuilderRevert variableKey={variableKey} />
             </span>
             {error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>

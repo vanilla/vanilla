@@ -68,6 +68,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
         alignItems: "stretch",
         maxWidth: unit(vars.input.width),
         width: unit(vars.input.width),
+        position: "relative",
     });
 
     const textInput = style("textInput", {

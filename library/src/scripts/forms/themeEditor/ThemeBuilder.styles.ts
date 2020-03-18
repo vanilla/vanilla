@@ -189,6 +189,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         justifyContent: "flex-end",
         width: unit(vars.input.width),
         flexBasis: unit(vars.input.width),
+        position: "relative",
     });
 
     const checkBoxWrap = style("checkBoxWrap", {
@@ -290,6 +291,17 @@ export const themeBuilderClasses = useThemeCache(() => {
         },
     });
 
+    const resetButton = style("resetButton", {
+        height: 24,
+        width: 24,
+        position: "absolute",
+        right: percent(100),
+        top: 0,
+        bottom: 0,
+        marginTop: "auto",
+        marginBottom: "auto",
+    });
+
     return {
         root,
         block,
@@ -307,5 +319,6 @@ export const themeBuilderClasses = useThemeCache(() => {
         invalidField,
         colorErrorMessage,
         tooltip,
+        resetButton,
     };
 });

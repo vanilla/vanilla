@@ -18,6 +18,7 @@ import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
@@ -29,7 +30,9 @@ export function ThemeColorPicker(_props: IProps) {
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(variableKey);
+    const { generatedValue, initialValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(
+        variableKey,
+    );
 
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -42,6 +45,10 @@ export function ThemeColorPicker(_props: IProps) {
     // If the color is not set, we don't really care.
     const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue);
     const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? null);
+
+    useEffect(() => {
+        setTextFieldValue(rawValue);
+    }, [rawValue, setTextFieldValue]);
 
     // If we have no color selected we are displaying the default and are definitely valid.
     const isValidColor = textInputValue ? stringIsValidColor(textInputValue) : true;
@@ -154,6 +161,7 @@ export function ThemeColorPicker(_props: IProps) {
                     <span className={visibility().visuallyHidden}>{validColorString}</span>
                 </Button>
             </span>
+            <ThemeBuilderRevert variableKey={variableKey} />
             {error && (
                 <ul id={errorID} className={builderClasses.errorContainer}>
                     <li className={builderClasses.error}>{error}</li>

@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
 
@@ -27,6 +28,17 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
         $this->discussionModel = $discussionModel;
     }
 
+    private function messageSchema(): Schema {
+        $schema = Schema::parse([
+            "discussionID" => [
+                [
+                    "type" => "integer"
+                ]
+            ]
+        ]);
+        return $schema;
+    }
+
     /**
      * Execute all queued up items in the ActivityModel queue.
      */
@@ -44,6 +56,7 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
      * @param array $message
      */
     public function setMessage(array $message) {
+        $message = $this->messageSchema()->validate($message);
         $this->message = $message;
     }
 

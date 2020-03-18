@@ -15,6 +15,7 @@ import {
     placeholderStyles,
     textInputSizingFromFixedHeight,
     unit,
+    EMPTY_FONTS,
     paddings,
 } from "@library/styles/styleHelpers";
 import { cssRule } from "typestyle";
@@ -22,6 +23,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { percent } from "csx";
 import merge from "lodash/merge";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,8 +44,10 @@ export const inputVariables = useThemeCache(() => {
     });
 
     const font = makeThemeVars("font", {
+        ...EMPTY_FONTS,
         size: globalVars.fonts.size.large,
         weight: globalVars.fonts.weights.normal,
+        color: colors.fg,
     });
 
     const border: IBordersWithRadius = makeThemeVars("borders", {
@@ -76,6 +80,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         color: colorOut(colors.fg),
         ...borders(border),
         ...fonts(font),
+        lineHeight: unit(font.size),
         outline: 0,
         $nest: {
             ...placeholderStyles({
@@ -111,7 +116,7 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", inputMixin());
 
     // Use as a global selector. This should be refactored in the future.
-    const applyInputCSSRules = () => cssRule(" .inputText.inputText", inputMixin());
+    const applyInputCSSRules = () => cssOut(" .inputText.inputText", inputMixin());
 
     const inputText = style("inputText", {
         ...inputMixin(),

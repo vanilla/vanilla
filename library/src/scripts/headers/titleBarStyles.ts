@@ -46,11 +46,12 @@ import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { BackgroundProperty } from "csstype";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const titleBarVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const makeThemeVars = variableFactory("titleBar");
+export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const formElementVars = formElementsVariables(forcedVars);
+    const makeThemeVars = variableFactory("titleBar", forcedVars);
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
@@ -74,7 +75,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.primaryContrast,
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
     });
@@ -124,10 +125,6 @@ export const titleBarVariables = useThemeCache(() => {
         state: {
             bg: globalVars.mainColors.statePrimary,
         },
-    });
-
-    const navAlignment = makeThemeVars("navAlignment", {
-        alignment: "left" as "left" | "center",
     });
 
     const generatedColors = makeThemeVars("generatedColors", {
@@ -245,11 +242,16 @@ export const titleBarVariables = useThemeCache(() => {
     const logo = makeThemeVars("logo", {
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
+        justifyContent: LogoAlignment.LEFT,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
-        desktop: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
-        mobile: {}, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        desktop: {
+            url: undefined,
+        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        mobile: {
+            url: undefined,
+        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         offsetVertical: {
             amount: 0,
             mobile: {
@@ -257,6 +259,15 @@ export const titleBarVariables = useThemeCache(() => {
             },
         },
     });
+
+    const navAlignment = makeThemeVars("navAlignment", {
+        alignment: "left" as "left" | "center",
+    });
+
+    if (logo.justifyContent === LogoAlignment.CENTER) {
+        // Forced to the left because they can't both be in the center.
+        navAlignment.alignment = "left";
+    }
 
     const mobileLogo = makeThemeVars("mobileLogo", {
         justifyContent: LogoAlignment.CENTER,
@@ -340,7 +351,7 @@ export const titleBarClasses = useThemeCache(() => {
                 };
             case BorderType.SHADOW:
                 return {
-                    boxShadow: shadowHelper().makeShadow(),
+                    boxShadow: shadowHelper().embed(globalVars.elementaryColors.black).boxShadow,
                 };
             case BorderType.SHADOW_AS_BORDER:
                 // Note that this is empty because this option is set on the background elsewhere.
@@ -452,15 +463,23 @@ export const titleBarClasses = useThemeCache(() => {
         objectFit: "cover",
     });
 
+    const bannerPadding = style(
+        "bannerPadding",
+        {
+            paddingTop: px(vars.sizing.height / 2),
+        },
+        mediaQueries.compact({
+            paddingTop: px(vars.sizing.mobile.height / 2),
+        }),
+    );
+
     const negativeSpacer = style(
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
-            paddingTop: px(vars.sizing.height),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
-            paddingTop: px(vars.sizing.mobile.height),
         }),
     );
 
@@ -705,7 +724,6 @@ export const titleBarClasses = useThemeCache(() => {
                         {
                             "& .meBox-buttonContent": {
                                 ...borders({
-                                    radius: 0,
                                     width: 1,
                                     color: rgba(0, 0, 0, 0),
                                 }),
@@ -944,6 +962,7 @@ export const titleBarClasses = useThemeCache(() => {
         bgContainer,
         bgImage,
         negativeSpacer,
+        bannerPadding,
         spacer,
         bar,
         logoContainer,

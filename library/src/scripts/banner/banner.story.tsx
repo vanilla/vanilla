@@ -14,7 +14,7 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPresets } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/buttonStyles";
 
 export default {
     title: "Banner",
@@ -89,10 +89,10 @@ export const NoBackground = storyWithConfig(
                 outerBackground: {
                     image: "none",
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.SOLID,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.SOLID,
+                    },
                 },
             },
         },
@@ -125,10 +125,10 @@ export const BackgroundImage = storyWithConfig(
                 backgrounds: {
                     useOverlay: true,
                 },
-            },
-            presetsBanner: {
-                searchButtonOptions: {
-                    preset: ButtonPresets.TRANSPARENT,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.TRANSPARENT,
+                    },
                 },
             },
         },
@@ -196,13 +196,13 @@ export const ImageAsElement = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -226,6 +226,14 @@ export const LogoLarge = storyWithConfig(
                 },
             },
             banner: {
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 colors: {
                     bg: "#fff",
                     primaryContrast: "#111111",
@@ -250,14 +258,6 @@ export const LogoLarge = storyWithConfig(
                     },
                 },
             },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
-                },
-            },
         },
     },
     () => <StoryBanner title="Logo - Huge (shrunk with CSS)" />,
@@ -279,6 +279,14 @@ export const LogoSmall = storyWithConfig(
                 },
             },
             banner: {
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 colors: {
                     bg: "#fff",
                     primaryContrast: "#111111",
@@ -303,14 +311,6 @@ export const LogoSmall = storyWithConfig(
                     },
                 },
             },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
-                },
-            },
         },
     },
     () => <StoryBanner title="Logo - Small" />,
@@ -331,6 +331,14 @@ export const LogoAndRightImage = storyWithConfig(
                 },
             },
             banner: {
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 colors: {
                     bg: "#fff",
                     primaryContrast: "#111111",
@@ -357,14 +365,6 @@ export const LogoAndRightImage = storyWithConfig(
                         top: 87,
                         bottom: 87,
                     },
-                },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -424,13 +424,13 @@ export const ImageAsElementWide = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -488,13 +488,13 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                         bottom: 87,
                     },
                 },
-            },
-            presetsBanner: {
-                button: {
-                    preset: ButtonPresets.HIDE,
-                },
-                input: {
-                    preset: SearchBarPresets.BORDER,
+                presets: {
+                    button: {
+                        preset: ButtonPreset.HIDE,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
                 },
             },
         },
@@ -507,24 +507,24 @@ export const searchPositionBottom = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 options: {
-                    searchPlacement: "bottom",
+                    searchPlacement: "bottom" as SearchPlacement,
                 },
                 backgrounds: {
                     useOverlay: true,
                 },
                 outerBackground: {
-                    color: "#4b496e",
+                    color: color("#4b496e"),
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
                 searchStrip: {
                     bg: color("#4b496e"),
                     minHeight: 100,
-                },
-            },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -536,6 +536,11 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 options: {
                     searchPlacement: "bottom" as SearchPlacement,
                 },
@@ -580,11 +585,6 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                     },
                 },
             },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.BORDER,
-                },
-            },
         },
     },
     () => <StoryBanner title="Search on bottom with negative offset" />,
@@ -599,6 +599,11 @@ export const searchBarNoImage = storyWithConfig(
                 primaryContrast: "#e3e3e3",
             },
             banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 options: {
                     hideDescription: true,
                     hideTitle: true,
@@ -609,11 +614,6 @@ export const searchBarNoImage = storyWithConfig(
                 outerBackground: {
                     color: color("#54367c"),
                     unsetBackground: true,
-                },
-            },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.BORDER,
                 },
             },
         },
@@ -630,6 +630,11 @@ export const bannerImageOnly = storyWithConfig(
                 primaryContrast: "#e3e3e3",
             },
             banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
                 options: {
                     hideSearch: true,
                     hideDescription: true,
@@ -650,11 +655,6 @@ export const bannerImageOnly = storyWithConfig(
                     },
                 },
             },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.BORDER,
-                },
-            },
         },
     },
     () => <StoryBanner title="Banner Image Only" />,
@@ -669,10 +669,10 @@ export const unifiedBorder = storyWithConfig(
                 outerBackground: {
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
                 },
-            },
-            presetsBanner: {
-                input: {
-                    preset: SearchBarPresets.UNIFIED_BORDER,
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.UNIFIED_BORDER,
+                    },
                 },
             },
         },

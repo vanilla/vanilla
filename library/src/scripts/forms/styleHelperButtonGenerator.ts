@@ -6,7 +6,7 @@
 
 import {
     buttonGlobalVariables,
-    ButtonPresets,
+    ButtonPreset,
     buttonResetMixin,
     buttonSizing,
     ButtonTypes,
@@ -41,7 +41,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     // Make sure we have the second level, if it was empty
     buttonTypeVars = merge(
         {
-            preset: ButtonPresets.ADVANCED,
+            preset: ButtonPreset.ADVANCED,
             colors,
             state,
             hover: state,
@@ -69,19 +69,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
 
     if (!buttonTypeVars.borders.color) {
         buttonTypeVars.borders = EMPTY_BORDER;
-    }
-
-    if (buttonTypeVars.colors && buttonTypeVars.colors.fg && buttonTypeVars.colors.bg) {
-        const fg = buttonTypeVars.colors.fg;
-        const bg = buttonTypeVars.colors.bg;
-        if (buttonTypeVars.preset === ButtonPresets.OUTLINE) {
-            buttonTypeVars.borders.color = bg.mix(fg, buttonGlobals.constants.borderMixRatio);
-            if (buttonTypeVars.state && buttonTypeVars.state.borders && !buttonTypeVars.state.borders.color) {
-                buttonTypeVars.state.borders.color = globalVars.mainColors.primary;
-            }
-        } else if (buttonTypeVars.preset === ButtonPresets.SOLID) {
-            buttonTypeVars.borders.color = bg;
-        }
     }
 
     let defaultBorder = borders({
@@ -114,7 +101,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }))
             : {};
 
-    const fontVars = { ...EMPTY_FONTS, ...buttonTypeVars.fonts };
+    const fontVars = { ...EMPTY_FONTS, ...buttonGlobals.font, ...buttonTypeVars.fonts };
 
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
@@ -129,6 +116,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             color: fontColor,
             weight: fontVars.weight ?? undefined,
         }),
+        ["-webkit-font-smoothing" as any]: "antialiased",
         ...defaultBorder,
         ...buttonSizing(
             buttonDimensions && buttonDimensions.minHeight !== undefined

@@ -16,6 +16,7 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
 import isNumeric from "validator/lib/isNumeric";
 import { useEffect, useState } from "react";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -74,7 +75,7 @@ export function styleFactory(componentName: string) {
 let _themeCacheID = hashString(Math.random().toString());
 
 // Event name for resetting the theme cacheID.
-const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
+export const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
 
 export function resetThemeCache() {
     _themeCacheID = hashString(Math.random().toString());
@@ -124,6 +125,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  * - Merge in all subtrees. (theme variables override your defaults).
  *
  * @param componentName The base name of the component being styled.
+ * @param themeVars Optionally force a particular set of variables to be used.
  *
  * @example
  *
@@ -146,8 +148,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentNames: string | string[]) {
-    const themeVars = getThemeVariables();
+export function variableFactory(componentNames: string | string[], themeVars: IThemeVariables = getThemeVariables()) {
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames
@@ -184,8 +185,10 @@ function stripUndefinedKeys(obj: any) {
     return obj;
 }
 
-const rgbRegex = /^rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)$/;
-const hslRegex = /^hsla?\((0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%),\s?(0%?|[1-9][0-9]?%|100%)\)$/;
+const rgbRegex = /^rgb\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)\)$/;
+const rgbaRegex = /^rgba\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d*(?:\.\d+))\)$/;
+const hslRegex = /^hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)$/;
+const hslaRegex = /^hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*(\d*(?:\.\d+))\)/;
 const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
@@ -236,7 +239,7 @@ export function stringIsHexColor(colorValue) {
 }
 
 /**
- * Check if string is valid color in rgb or rgba format
+ * Check if string is valid color in rgb format
  * @param colorString
  */
 export function stringIsRgbColor(colorValue) {
@@ -244,11 +247,27 @@ export function stringIsRgbColor(colorValue) {
 }
 
 /**
- * Check if string is valid color in hsl or hsla format
+ * Check if string is valid color in rgba format
+ * @param colorString
+ */
+export function stringIsRgbaColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbaRegex);
+}
+
+/**
+ * Check if string is valid color in hsl format
  * @param colorString
  */
 export function stringIsHslColor(colorValue) {
     return typeof colorValue === "string" && colorValue.match(hslRegex);
+}
+
+/**
+ * Check if string is valid color in hsla format
+ * @param colorString
+ */
+export function stringIsHslaColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslaRegex);
 }
 
 /**
@@ -258,7 +277,11 @@ export function stringIsHslColor(colorValue) {
 export function stringIsValidColor(colorValue) {
     return (
         typeof colorValue === "string" &&
-        (stringIsRgbColor(colorValue) || stringIsHexColor(colorValue) || stringIsHslColor(colorValue))
+        (stringIsRgbColor(colorValue) ||
+            stringIsHexColor(colorValue) ||
+            stringIsHslColor(colorValue) ||
+            stringIsHslaColor(colorValue) ||
+            stringIsRgbaColor(colorValue))
     );
 }
 /**
@@ -307,28 +330,32 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         const r = parseInt(result[1], 10);
         const g = parseInt(result[2], 10);
         const b = parseInt(result[3], 10);
+        return rgb(r, g, b);
+    } else if (stringIsRgbaColor(colorString)) {
+        const result = rgbaRegex.exec(colorString)!;
+
+        const r = parseInt(result[1], 10);
+        const g = parseInt(result[2], 10);
+        const b = parseInt(result[3], 10);
         const a = parseFloat(result[4]);
 
-        if (a !== null) {
-            return rgba(r, g, b, a);
-        } else {
-            return rgb(r, g, b);
-        }
+        return rgba(r, g, b, a);
     } else if (stringIsHslColor(colorString)) {
         const result = hslRegex.exec(colorString)!;
 
         const h = parseInt(result[1], 10);
         const s = parseInt(result[2], 10);
         const l = parseInt(result[3], 10);
+        return hsl(h, s, l);
+    } else if (stringIsHslaColor(colorString)) {
+        const result = hslaRegex.exec(colorString)!;
+
+        const h = parseInt(result[1], 10);
+        const s = parseInt(result[2], 10);
+        const l = parseInt(result[3], 10);
         const a = parseFloat(result[4]);
 
-        if (a !== null) {
-            return hsla(h, s, l, a);
-        } else {
-            return hsl(h, s, l);
-        }
-    } else if (stringIsLinearGradient(colorString)) {
-        return colorString.toString();
+        return hsla(h, s, l, a);
     } else {
         if (throwOnFailure) {
             throw new Error(`Invalid color detected: ${colorString}`);

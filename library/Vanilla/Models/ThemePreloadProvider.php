@@ -119,7 +119,13 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!$this->themeData) {
             $themeKey = $this->getThemeKeyToPreload();
             try {
-                $this->themeData = $this->themesApi->get($themeKey);
+                $this->themeData = $this->themesApi->get(
+                    $themeKey,
+                    [
+                        // Forced theme keys disable addon variables.
+                        'allowAddonVariables' => !$this->forcedThemeKey,
+                    ]
+                );
             } catch (\Throwable $e) {
                 // Prevent infinite loops.
                 // Our error handling page uses the theme when possible.

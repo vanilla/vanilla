@@ -7,7 +7,7 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, translateX } from "csx";
 import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
-import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
 export const colorPickerVariables = useThemeCache(() => {
@@ -41,9 +41,9 @@ export const colorPickerClasses = useThemeCache(() => {
         width: unit(inputWidth),
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(inputWidth),
-        borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
-        borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
-        ...borders({}, builderVariables.border as IGlobalBorderStyles),
+        ...borders(builderVariables.border),
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
         zIndex: 1,
         transition: `color .2s ease-out, background .2s ease-out`,
         $nest: {

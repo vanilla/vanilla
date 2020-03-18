@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
+import { useThemeCacheID } from "@library/styles/styleUtils";
 
 interface IProps {
     children: React.ReactNode;
@@ -32,6 +33,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     const { getAssets } = useReduxActions(ThemeActions);
     const { assets } = useSelector((state: ICoreStoreState) => state.theme);
     const { setTopOffset } = useScrollOffset();
+    const { cacheID } = useThemeCacheID();
 
     const [ownThemeKey, setThemeKey] = useState({});
     // Trigger a state re-render when the theme key changes
@@ -71,7 +73,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
             loadThemeFonts();
         }
-    }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey]);
+    }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey, cacheID]);
 
     if (props.disabled || props.variablesOnly) {
         return <>{props.children}</>;

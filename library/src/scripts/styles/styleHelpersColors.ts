@@ -32,16 +32,18 @@ export const importantColorOut = (colorValue: ColorValues | string) => {
     return colorOut(colorValue, true);
 };
 
-export const colorOutIfDefined = (colorValue: ColorValues | string, makeImportant = false, debug = false) => {
-    return colorValue !== undefined ? colorOut(colorValue, makeImportant, debug) : undefined;
-};
-
-/*
- * Check if it's a light color or dark color based on lightness
+/**
+ * Check if it's a light color or dark color.
+ * Calculation is based off of this formula. http://alienryderflex.com/hsp.html
  * @param color - The color we're checking
  */
 export const isLightColor = (color: ColorHelper) => {
-    return color.lightness() >= 0.4;
+    const r = color.red();
+    const b = color.blue();
+    const g = color.green();
+    const result = Math.sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
+    // Values in the range of 128-150 seem to give acceptable results.
+    return result >= 150;
 };
 
 /*

@@ -82,6 +82,7 @@ export default function TitleBar(_props: IProps) {
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
+    const isDesktopLogoCentered = vars.logo.justifyContent === LogoAlignment.CENTER;
 
     const headerContent = (
         <HashOffsetReporter className={classes.bgContainer}>
@@ -110,9 +111,13 @@ export default function TitleBar(_props: IProps) {
                             <FlexSpacer className="pageHeading-leftSpacer" />
                         ))}
                     {!isCompact && (
-                        <animated.div className={classes.logoAnimationWrap} {...logoProps}>
+                        <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
                             <HeaderLogo
-                                className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                className={classNames(
+                                    "titleBar-logoContainer",
+                                    classes.logoContainer,
+                                    isDesktopLogoCentered && classes.logoCenterer,
+                                )}
                                 logoClassName="titleBar-logo"
                                 logoType={LogoType.DESKTOP}
                             />

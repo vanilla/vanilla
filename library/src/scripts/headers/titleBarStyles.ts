@@ -246,6 +246,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const logo = makeThemeVars("logo", {
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
+        justifyContent: LogoAlignment.CENTER,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},

@@ -1898,17 +1898,27 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      */
     public function getID($discussionID, $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
         $session = Gdn::session();
+
+        $selects = [];
+        $this->EventArguments['Selects'] = &$selects;
         $this->fireEvent('BeforeGetID');
 
         $this->options($options);
 
-        $discussion = $this->SQL
+        $this->SQL
             ->select('d.*')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
+            ->select('d.LastCommentUserID', '', 'LastUserID');
+
+        // Add select of additional fields to the SQL object.
+        foreach ($selects as $select) {
+            $this->SQL->select($select);
+        }
+
+        $discussion = $this->SQL
             ->from('Discussion d')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
             ->where('d.DiscussionID', $discussionID)

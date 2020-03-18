@@ -2614,7 +2614,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     /**
      * Get the user schema without the password.
      *
-     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
     public function userSchema() {

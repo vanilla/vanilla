@@ -50,6 +50,9 @@ abstract class BaseFormat implements FormatInterface {
         return mb_strlen($this->renderPlainText($content), 'UTF-8');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setAllowExtendedContent(bool $extendContent): void {
     }
 }

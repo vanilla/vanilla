@@ -29,7 +29,7 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
     }
 
     /**
-     * Get a schema for validating the job message parameters.
+     * Validate the message against the schema.
      * 
      * @return Schema
      */

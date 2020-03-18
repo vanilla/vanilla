@@ -114,4 +114,12 @@ class NotFoundFormat implements FormatInterface {
     private function getErrorMessage(): string {
         return sprintf(self::t('No formatter is installed for the format %s'), $this->searchedFormat);
     }
+
+    /**
+     * Set the status for extended content.
+     *
+     * @param bool $extendContent
+     */
+    public function setAllowExtendedContent(bool $extendContent): void {
+    }
 }

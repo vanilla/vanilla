@@ -172,7 +172,7 @@ $Definition['Locales allow you to support other languages on your site.'] =
     'Locales allow you to support other languages on your site. Enable and disable locales you want to make available here.';
 $Definition['Test Email Message'] = '<p>This is a test email message.</p>'.
     '<p>You can configure the appearance of your forum\'s emails by navigating to the Email page in the dashboard.</p>';
-$Definition['This setting loads the page before executing Javascript'] = 'This setting loads the page before executing 
+$Definition['This setting loads the page before executing Javascript.'] = 'This setting loads the page before executing 
     Javascript which can improve your SEO.<br><strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ';
 $Definition['oauth2Instructions'] = '<p>Configure your forum to connect with an OAuth2 application by putting your unique Client ID, Client Secret, and required endpoints. You will probably need to provide your SSO application with an allowed callback URL, in part, to validate requests. The callback url for this forum is <code>%s</code></p>';
 

@@ -9,6 +9,7 @@
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
+            "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"]
         },

@@ -2527,7 +2527,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      */
     private function eventFromRow(array $row, string $action): UserEvent {
         $user = $this->normalizeRow($row, false);
-        $user = $this->schema()->validate($user);
+        $user = $this->userSchema()->validate($user);
         $result = new UserEvent(
             $action,
             ["user" => $user]
@@ -2609,6 +2609,23 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         ]);
         return $result;
     }
+
+
+    /**
+     * Get the user schema without the password.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function userSchema() {
+            $schema = Schema::parse(['userID', 'name', 'hashMethod', 'email', 'photo', 'photoUrl', 'points',
+                'emailConfirmed', 'showEmail', 'bypassSpam', 'banned', 'dateInserted',
+                'dateLastActive', 'dateUpdated']);
+            $schema = $schema->add($schema);
+
+            return $schema;
+    }
+
 
     /**
      * Create an admin user account.

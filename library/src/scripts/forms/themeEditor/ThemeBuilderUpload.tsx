@@ -11,7 +11,7 @@ import { t } from "@vanilla/i18n";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { visibility } from "@library/styles/styleHelpers";
 import { themeBuilderUploadClasses } from "@library/forms/themeEditor/ThemeBuilderUpload.styles";
@@ -89,6 +89,7 @@ export function ThemeBuilderUpload(props: IProps) {
                         <ButtonLoader />
                     ) : (
                         <DropDown
+                            openDirection={DropDownOpenDirection.BELOW_LEFT}
                             flyoutType={FlyoutType.LIST}
                             buttonClassName={classes.optionButton}
                             contentsClassName={classes.optionDropdown}

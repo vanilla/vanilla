@@ -28,6 +28,11 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
         $this->discussionModel = $discussionModel;
     }
 
+    /**
+     * Get a schema for validating the job message parameters.
+     * 
+     * @return Schema
+     */
     private function messageSchema(): Schema {
         $schema = Schema::parse([
             "discussionID" => [

@@ -7,7 +7,6 @@
 
 namespace Vanilla\Formatting\Html;
 
-use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * Class for sanitizing HTML.

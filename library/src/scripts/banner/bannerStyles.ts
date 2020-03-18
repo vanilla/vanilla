@@ -4,17 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {
-    BackgroundColorProperty,
-    BackgroundImageProperty,
-    FontWeightProperty,
-    PaddingProperty,
-    TextShadowProperty,
-} from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY } from "csx";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
+import { containerVariables } from "@library/layout/components/containerStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     backgroundHelper,
@@ -26,28 +24,22 @@ import {
     EMPTY_SPACING,
     fonts,
     IFont,
+    importantUnit,
+    isLightColor,
     modifyColorBasedOnLightness,
     negative,
     textInputSizingFromFixedHeight,
     unit,
-    isLightColor,
-    importantUnit,
     unitIfDefined,
 } from "@library/styles/styleHelpers";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { widgetVariables } from "@library/styles/widgetStyleVars";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { media } from "typestyle";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
-import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
-import { inputMixin } from "@library/forms/inputStyles";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import isNumeric from "validator/lib/isNumeric";
+import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper } from "csx";
+import { media } from "typestyle";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -59,6 +51,8 @@ export enum SearchBarPresets {
     BORDER = "border",
     UNIFIED_BORDER = "unified border", // wraps button, and will set button to "solid"
 }
+
+export type SearchPlacement = "middle" | "bottom";
 
 export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory(["banner", "splash"], forcedVars);
@@ -83,7 +77,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         padding: {
             ...EMPTY_SPACING,
             top: topPadding as PaddingProperty<TLength>,
-            bottom: topPadding as PaddingProperty<TLength>,
+            bottom: 40 as PaddingProperty<TLength>,
             horizontal: horizontalPadding,
         },
         mobile: {
@@ -397,7 +391,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const searchStrip = makeThemeVars("searchStrip", {
-        bg: colors.bg,
+        bg: undefined as ColorHelper | undefined | string,
         minHeight: 60 as number | string,
         offset: undefined as number | string | undefined,
         padding: {

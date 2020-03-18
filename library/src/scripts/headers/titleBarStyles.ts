@@ -463,15 +463,23 @@ export const titleBarClasses = useThemeCache(() => {
         objectFit: "cover",
     });
 
+    const bannerPadding = style(
+        "bannerPadding",
+        {
+            paddingTop: px(vars.sizing.height / 2),
+        },
+        mediaQueries.compact({
+            paddingTop: px(vars.sizing.mobile.height / 2),
+        }),
+    );
+
     const negativeSpacer = style(
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
-            paddingTop: px(vars.sizing.height),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
-            paddingTop: px(vars.sizing.mobile.height),
         }),
     );
 
@@ -954,6 +962,7 @@ export const titleBarClasses = useThemeCache(() => {
         bgContainer,
         bgImage,
         negativeSpacer,
+        bannerPadding,
         spacer,
         bar,
         logoContainer,

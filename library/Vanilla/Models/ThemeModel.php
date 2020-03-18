@@ -493,7 +493,7 @@ class ThemeModel {
 
         $variables = $theme["assets"]["variables"]->getDataArray();
         if ($variables) {
-            $preset = $variables['global']['options']['preset'];
+            $preset = $variables['global']['options']['preset'] ?? null;
             $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
             $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
             $primary = $variables['global']['mainColors']['primary'] ?? null;

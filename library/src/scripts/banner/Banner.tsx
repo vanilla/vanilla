@@ -91,7 +91,11 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div className={classes.middleContainer}>
+            <div
+                className={classNames(classes.middleContainer, {
+                    [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
+                })}
+            >
                 <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
                     {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
                         <DefaultBannerBg />

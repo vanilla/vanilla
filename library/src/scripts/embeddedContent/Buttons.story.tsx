@@ -152,9 +152,9 @@ export const PresetsOutline = storyWithConfig(
     {
         themeVars: {
             global: {
-                buttonPreset: ({
+                buttonPreset: {
                     style: ButtonPreset.OUTLINE,
-                } as unknown) as IButtonPreset,
+                },
             },
             button: {
                 primary: {
@@ -173,9 +173,9 @@ export const PresetsSolid = storyWithConfig(
     {
         themeVars: {
             global: {
-                buttonPreset: ({
-                    preset: ButtonPreset.SOLID,
-                } as unknown) as IButtonPreset,
+                buttonPreset: {
+                    style: ButtonPreset.SOLID,
+                },
             },
         },
     },

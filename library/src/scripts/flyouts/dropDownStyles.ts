@@ -172,10 +172,18 @@ export const dropDownClasses = useThemeCache(() => {
         ...borders(vars.contents.border),
     } as NestedCSSProperties);
 
-    const items = style("items", {
-        padding: 0,
-        fontSize: unit(globalVars.fonts.size.medium),
-    });
+    const items = style(
+        "items",
+        {
+            padding: 0,
+            fontSize: unit(globalVars.fonts.size.medium),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                vertical: 9,
+            }),
+        }),
+    );
 
     const metaItems = style("metaItems", {
         $nest: {

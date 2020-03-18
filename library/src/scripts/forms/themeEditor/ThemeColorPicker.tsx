@@ -20,8 +20,7 @@ import debounce from "lodash/debounce";
 import React, { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 import Pickr from "@simonwep/pickr";
-import "@simonwep/pickr/dist/themes/nano.min.css";
-import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
+import "./ThemeColorPicker.scss";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;

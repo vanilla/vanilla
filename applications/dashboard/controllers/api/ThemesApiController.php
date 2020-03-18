@@ -59,7 +59,7 @@ class ThemesApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get(string $themeKey, array $query): array {
+    public function get(string $themeKey, array $query = []): array {
         $this->permission();
         $out = $this->themeResultSchema('out');
         $in = $this->schema([

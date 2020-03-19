@@ -50,6 +50,7 @@ export function DashboardImageUpload(props: IProps) {
         <div className={rootClass}>
             <label className="file-upload">
                 <input
+                    key={`${isLoading}`}
                     type="file"
                     id={inputID}
                     className={classes}

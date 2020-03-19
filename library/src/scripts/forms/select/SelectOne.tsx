@@ -23,6 +23,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     inputID?: string;
     labelID?: string;
     disabled?: boolean;
+    defaultValue?: IComboBoxOption;
     className?: string;
     placeholder?: string;
     options: IComboBoxOption[] | undefined;
@@ -90,6 +91,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     options={options}
                     inputId={inputID}
                     onChange={props.onChange}
+                    defaultValue={props.defaultValue}
                     onInputChange={props.onInputChange}
                     isClearable={props.isClearable}
                     isDisabled={disabled}

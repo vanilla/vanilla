@@ -58,6 +58,7 @@ export function ThemeDropDown(_props: IProps) {
                     options={options}
                     value={selectedOption}
                     placeholder={defaultOption.label}
+                    defaultValue={defaultOption}
                     disabled={disabled ?? options.length === 1}
                     menuPlacement={MenuPlacement.AUTO}
                     isClearable={false}

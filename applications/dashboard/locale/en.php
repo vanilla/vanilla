@@ -166,7 +166,7 @@ $Definition['Check out the new community forum I\'ve just set up.'] = 'Hi Pal!
 Check out the new community forum I\'ve just set up. It\'s a great place for us to chat with each other online.';
 $Definition['If you want to embed your forum, enable embedding.'] =
     'If you want to embed your forum or use Vanilla\'s comments in your blog then you need to enable embedding. If you aren\'t using embedding then we recommend leaving this setting off.';
-$Definition['Invitation email failed to send.'] =
+$Definition['Invitation email failed to send: %s'] =
     'Although the invitation was created successfully, the email failed to send. The server reported the following error: %s';
 $Definition['Large images will be scaled down.'] = 'Large images will be scaled down to a max width of %spx and a max height of %spx.';
 $Definition['Locales allow you to support other languages on your site.'] =

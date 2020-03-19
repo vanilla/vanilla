@@ -76,6 +76,7 @@ class ActivityModel extends Gdn_Model {
 
     /** @var FormatService */
     private $formatService;
+    
     /**
      * Defines the related database table name.
      *

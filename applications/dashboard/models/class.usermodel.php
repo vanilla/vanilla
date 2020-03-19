@@ -2527,7 +2527,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      */
     private function eventFromRow(array $row, string $action): UserEvent {
         $user = $this->normalizeRow($row, false);
-        $user = $this->schema()->validate($user);
+        $user = $this->readSchema()->validate($user);
         $result = new UserEvent(
             $action,
             ["user" => $user]
@@ -2608,6 +2608,32 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             ], 'RoleFragment'),
         ]);
         return $result;
+    }
+
+    /**
+     * A schema representing fields relevant to reading and displaying user info (e.g. no password).
+     *
+     * @return Schema
+     */
+    public function readSchema() {
+            $result = Schema::parse([
+                "banned",
+                "bypassSpam",
+                "email",
+                "emailConfirmed",
+                "dateInserted",
+                "dateLastActive",
+                "dateUpdated",
+                "name",
+                "photoUrl",
+                "points",
+                "roles?",
+                "showEmail",
+                "userID",
+            ]);
+            $result->add($this->schema());
+
+            return $result;
     }
 
     /**

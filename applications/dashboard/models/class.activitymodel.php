@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -11,6 +11,8 @@
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
+use \Vanilla\Formatting\Formats;
+use Vanilla\Formatting\FormatService;
 
 /**
  * Activity data management.
@@ -72,20 +74,22 @@ class ActivityModel extends Gdn_Model {
      */
     private $pruneAfter;
 
+    /** @var FormatService */
+    private $formatService;
     /**
      * Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
      * @param LoggerInterface $logger
      */
-    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null) {
+    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null, ?FormatService $formatService = null) {
         parent::__construct('Activity', $validation);
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
-
+        $this->formatService = $formatService instanceof FormatService ? $formatService : Gdn::getContainer()->get(FormatService::class);
         $this->logger = $logger instanceof LoggerInterface ? $logger : Gdn::getContainer()->get(LoggerInterface::class);
     }
 
@@ -1129,7 +1133,11 @@ class ActivityModel extends Gdn_Model {
      */
     private function getEmailSubject(array $activity, array $options): string {
         $emailSubject = $options["EmailSubject"] ?? null;
-        $result = $emailSubject ?: Gdn_Format::plainText($activity["Headline"]);
+        $headline = $this->formatService->renderPlainText($activity["Headline"], Formats\HtmlFormat::FORMAT_KEY);
+        if ($emailSubject) {
+            $emailSubject = $emailSubject.' '.$headline;
+        }
+        $result = $emailSubject ?: $headline;
         return $result;
     }
 

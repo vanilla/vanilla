@@ -862,7 +862,6 @@ export const bannerClasses = useThemeCache(
         const root = style({
             position: "relative",
             maxWidth: percent(100),
-            overflow: "hidden",
             backgroundColor: colorOut(vars.outerBackground.color),
             $nest: {
                 [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,

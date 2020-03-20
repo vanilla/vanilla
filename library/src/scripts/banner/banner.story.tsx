@@ -26,12 +26,13 @@ export default {
     },
 };
 
-function StoryBanner(props: { title: string; isContentBanner?: boolean }) {
+function StoryBanner(props: { title: string; forceSearchOpen?: boolean; isContentBanner?: boolean }) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <DeviceProvider>
                     <Banner
+                        forceSearchOpen={props.forceSearchOpen}
                         isContentBanner={props.isContentBanner}
                         title={props.title}
                         description="This is a description. They're pretty great, you should try one sometime."
@@ -43,6 +44,10 @@ function StoryBanner(props: { title: string; isContentBanner?: boolean }) {
 }
 
 export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryBanner title="Standard" />);
+
+export const SearchOpen = storyWithConfig({ useWrappers: false }, () => (
+    <StoryBanner title="Search Open" forceSearchOpen />
+));
 
 export const NoDescription = storyWithConfig(
     {

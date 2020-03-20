@@ -48,6 +48,7 @@ export function ThemeBuilderUpload(props: IProps) {
                     role="button"
                 >
                     <input
+                        key={`${isLoading}`}
                         className={classNames(visibility().visuallyHidden)}
                         aria-labelledby={labelID}
                         type="file"

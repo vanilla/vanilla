@@ -22,7 +22,10 @@ interface IProps extends IWithEditorProps {
     legacyMode: boolean;
 }
 
-export class EditorUploadButton extends React.Component<IProps, {}> {
+export class EditorUploadButton extends React.Component<IProps, { uploadCount: number }> {
+    public state = {
+        uploadCount: 0,
+    };
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
@@ -42,6 +45,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
             >
                 <IconForButtonWrap icon={this.icon} />
                 <input
+                    key={this.state.uploadCount}
                     ref={this.inputRef}
                     onChange={this.onInputChange}
                     className={classNames("richEditor-upload", classesRichEditor.upload)}
@@ -106,6 +110,8 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
         const maxUploads = getMeta("upload.maxUploads", 20);
 
         if (files && embedInsertion) {
+            // Increment the upload count to reset the input.
+            this.setState({ uploadCount: this.state.uploadCount + 1 });
             const filesArray = Array.from(files);
             if (filesArray.length >= maxUploads) {
                 const error = new Error(`Can't upload more than ${maxUploads} files at once.`);

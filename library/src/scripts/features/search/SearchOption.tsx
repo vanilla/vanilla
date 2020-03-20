@@ -69,6 +69,6 @@ export default function SearchOption(props: IProps) {
             </li>
         );
     } else {
-        return <SelectOption {...props} />;
+        return <SelectOption {...props} value={props.data.value} />;
     }
 }

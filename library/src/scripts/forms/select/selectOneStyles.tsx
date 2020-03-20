@@ -61,5 +61,9 @@ export const selectOneClasses = useThemeCache(() => {
         },
     });
 
-    return { inputWrap };
+    const checkIcon = style("checkIcon", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
+    return { inputWrap, checkIcon };
 });

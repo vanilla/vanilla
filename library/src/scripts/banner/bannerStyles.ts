@@ -60,7 +60,9 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const widgetVars = widgetVariables(forcedVars);
 
     const options = makeThemeVars("options", {
+        enabled: true,
         alignment: BannerAlignment.CENTER,
+        mobileAlignment: BannerAlignment.CENTER,
         hideDescription: false,
         hideTitle: false,
         hideSearch: false,
@@ -92,8 +94,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const dimensions = makeThemeVars("dimensions", {
         minHeight: 50,
+        maxHeight: undefined,
         mobile: {
             minHeight: undefined as undefined | number | string,
+            maxHeight: undefined,
         },
     });
 
@@ -173,6 +177,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             all: 12,
         },
         image: undefined as string | undefined,
+        mobile: {
+            height: undefined as number | string | undefined,
+            width: undefined as number | string | undefined,
+        },
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
@@ -391,7 +399,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const searchStrip = makeThemeVars("searchStrip", {
-        bg: undefined as ColorHelper | undefined | string,
+        bg: globalVars.mainColors.primary as ColorHelper | undefined | string,
         minHeight: 60 as number | string,
         offset: undefined as number | string | undefined,
         padding: {
@@ -563,12 +571,19 @@ export const bannerClasses = useThemeCache(() => {
                 ...backgroundHelper(vars.innerBackground),
                 minWidth: unit(vars.contentContainer.minWidth),
                 minHeight: unit(vars.dimensions.minHeight),
+                maxHeight: unitIfDefined(vars.dimensions.maxHeight),
                 width: hasFullWidth || vars.options.alignment === BannerAlignment.LEFT ? percent(100) : undefined,
             },
             mediaQueries.oneColumnDown({
                 minWidth: percent(100),
                 maxWidth: percent(100),
                 minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+                maxHeight: unitIfDefined(vars.dimensions.mobile.maxHeight ?? vars.dimensions.maxHeight),
+                ...(vars.options.mobileAlignment
+                    ? {
+                          alignItems: vars.options.mobileAlignment === BannerAlignment.LEFT ? "flex-start" : "center",
+                      }
+                    : {}),
                 ...paddings(vars.contentContainer.mobile.padding),
             }),
         );
@@ -703,6 +718,15 @@ export const bannerClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "center",
         maxWidth: percent(100),
+        height: percent(100),
+    });
+
+    const imagePositionerOverflow = style("imagePositionerOverflow", {
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        maxWidth: percent(100),
     });
 
     const makeImageMinWidth = (rootUnit, padding) => {
@@ -744,7 +768,7 @@ export const bannerClasses = useThemeCache(() => {
         "imageElementContainer",
         {
             alignSelf: "stretch",
-            width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
+            width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.paddingFull.horizontal),
             flexGrow: 1,
             position: "relative",
             overflow: "hidden",
@@ -753,13 +777,13 @@ export const bannerClasses = useThemeCache(() => {
         media(
             { maxWidth: globalVars.content.width },
             {
-                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding.horizontal),
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
             },
         ),
         layoutVariables()
             .mediaQueries()
             .oneColumnDown({
-                width: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
+                width: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
             }),
         media(
             { maxWidth: 500 },
@@ -769,28 +793,42 @@ export const bannerClasses = useThemeCache(() => {
         ),
     );
 
-    const logoContainer = style("logoContainer", {
-        display: "flex",
-        width: percent(100),
-        height: unit(vars.logo.height),
-        maxWidth: percent(100),
-        minHeight: unit(vars.logo.height),
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        overflow: "hidden",
-    });
+    const logoContainer = style(
+        "logoContainer",
+        {
+            display: "flex",
+            width: percent(100),
+            height: unit(vars.logo.height),
+            maxWidth: percent(100),
+            minHeight: unit(vars.logo.height),
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            overflow: "hidden",
+        },
+        mediaQueries.oneColumnDown({
+            height: unitIfDefined(vars.logo.mobile.height),
+            minHeight: unitIfDefined(vars.logo.mobile.height),
+        }),
+    );
 
     const logoSpacer = style("logoSpacer", {
         ...paddings(vars.logo.padding),
     });
 
-    const logo = style("logo", {
-        height: unit(vars.logo.height),
-        width: unit(vars.logo.width),
-        maxHeight: percent(100),
-        maxWidth: percent(100),
-    });
+    const logo = style(
+        "logo",
+        {
+            height: unit(vars.logo.height),
+            width: unit(vars.logo.width),
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+        },
+        mediaQueries.oneColumnDown({
+            height: unitIfDefined(vars.logo.mobile.height),
+            width: unitIfDefined(vars.logo.mobile.width),
+        }),
+    );
 
     const rightImage = style(
         "rightImage",
@@ -828,6 +866,9 @@ export const bannerClasses = useThemeCache(() => {
               }
             : {};
 
+    // NOTE FOR FUTURE
+    // Do no apply overflow hidden here.
+    // It will cut off the search box in the banner.
     const root = style({
         position: "relative",
         maxWidth: percent(100),
@@ -838,6 +879,16 @@ export const bannerClasses = useThemeCache(() => {
                 height: unit(vars.searchBar.sizing.height),
             },
         },
+    });
+
+    // Use this for cutting of the right image with overflow hidden.
+    const overflowRightImageContainer = style("overflowRightImageContainer", {
+        ...absolutePosition.fullSizeOfParent(),
+        overflow: "hidden",
+    });
+
+    const fullHeight = style("fullHeight", {
+        height: percent(100),
     });
 
     const iconContainer = style("iconContainer", {
@@ -862,6 +913,7 @@ export const bannerClasses = useThemeCache(() => {
     const middleContainer = style(
         "middleContainer",
         {
+            height: percent(100),
             position: "relative",
             minHeight: unit(vars.dimensions.minHeight),
         },
@@ -893,6 +945,8 @@ export const bannerClasses = useThemeCache(() => {
 
     return {
         root,
+        overflowRightImageContainer,
+        fullHeight,
         outerBackground,
         contentContainer,
         text,

@@ -25,12 +25,13 @@ export default {
     },
 };
 
-function StoryBanner(props: { title: string }) {
+function StoryBanner(props: { title: string; forceSearchOpen?: boolean }) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <DeviceProvider>
                     <Banner
+                        forceSearchOpen={props.forceSearchOpen}
                         title={props.title}
                         description="This is a description. They're pretty great, you should try one sometime."
                     />
@@ -41,6 +42,10 @@ function StoryBanner(props: { title: string }) {
 }
 
 export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryBanner title="Standard" />);
+
+export const SearchOpen = storyWithConfig({ useWrappers: false }, () => (
+    <StoryBanner title="Search Open" forceSearchOpen />
+));
 
 export const NoDescription = storyWithConfig(
     {

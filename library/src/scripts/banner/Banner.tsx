@@ -29,6 +29,7 @@ interface IProps {
     contentImage?: string;
     logoImage?: string;
     searchBarNoTopMargin?: boolean;
+    forceSearchOpen?: boolean;
 }
 
 /**
@@ -64,6 +65,7 @@ export default function Banner(props: IProps) {
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
             <IndependentSearch
+                forceMenuOpen={props.forceSearchOpen}
                 buttonClass={classes.searchButton}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 isLarge={true}

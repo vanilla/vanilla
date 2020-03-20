@@ -6,12 +6,13 @@
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { bannerVariables, bannerClasses, BannerAlignment } from "@library/banner/bannerStyles";
 import clamp from "lodash/clamp";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
 
-export const contentBannerVariables = useThemeCache(() => {
-    const makeVars = variableFactory("contentBanner");
+export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeVars = variableFactory("contentBanner", forcedVars);
 
     const dimensions = makeVars("dimensions", {
         minHeight: 120,

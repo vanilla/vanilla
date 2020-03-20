@@ -688,15 +688,30 @@ export const unifiedBorder = storyWithConfig(
     },
 };
 
-export const ContentBannerNoLogo = storyWithConfig({ useWrappers: false }, () => {
-    return <StoryBanner title="Should not appear" isContentBanner />;
-});
+export const ContentBannerNoLogo = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            contentBanner: {
+                options: {
+                    enabled: true,
+                },
+            },
+        },
+    },
+    () => {
+        return <StoryBanner title="Should not appear" isContentBanner />;
+    },
+);
 
 export const ContentBannerLogo = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
             contentBanner: {
+                options: {
+                    enabled: true,
+                },
                 logo: {
                     image: STORY_LOGO_WHITE,
                     width: 150,

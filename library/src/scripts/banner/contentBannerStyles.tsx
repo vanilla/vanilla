@@ -24,6 +24,7 @@ export const contentBannerVariables = useThemeCache(() => {
     const minHeightMobile = clamp(dimensions.mobile.minHeight, CONTENT_BANNER_MIN_HEIGHT, CONTENT_BANNER_MAX_HEIGHT);
 
     const options = makeVars("options", {
+        enabled: false,
         alignment: BannerAlignment.CENTER,
         mobileAlignment: BannerAlignment.LEFT,
     });

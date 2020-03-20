@@ -940,10 +940,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'points', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateLastActive', 'dateUpdated', 'roles?']);
-            $schema = $schema->add($this->fullSchema());
-            $this->userSchema = $this->schema($schema, 'User');
+            $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
     }

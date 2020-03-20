@@ -19,15 +19,19 @@ import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes, ButtonPreset } from "@library/forms/buttonStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { isLightColor } from "@library/styles/styleHelpersColors";
+import { element } from "prop-types";
 
-export interface IButtonPresets {
-    style: undefined | ButtonTypes;
+export enum GlobalPreset {
+    DARK = "dark",
+    LIGHT = "light",
 }
 
-export const globalVariables = useThemeCache(() => {
+export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#0291db");
-    const makeThemeVars = variableFactory("global");
+    const makeThemeVars = variableFactory("global", forcedVars);
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -54,15 +58,19 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
+    const options = makeThemeVars("options", { preset: GlobalPreset.LIGHT });
+
     const elementaryColors = {
         black: color("#000"),
+        almostBlack: color("#323639"),
+        greyText: color("#555a62"),
         white: color("#fff"),
         transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
-        fg: color("#555a62"),
-        bg: color("#fff"),
+        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.greyText : elementaryColors.white,
+        bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
@@ -70,6 +78,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     colorPrimary = initialMainColors.primary;
+    const colorSecondary = initialMainColors.secondary;
 
     // Shorthand checking bg color for darkness
     const getRatioBasedOnBackgroundDarkness = (
@@ -80,11 +89,11 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        primaryContrast: initialMainColors.bg, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        primaryContrast: isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
         statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
         secondary: offsetLightness(colorPrimary, 0.05),
         stateSecondary: offsetLightness(colorPrimary, 0.2), // Default state color change
-        secondaryContrast: initialMainColors.bg,
+        secondaryContrast: isLightColor(colorSecondary) ? elementaryColors.almostBlack : elementaryColors.white,
     });
 
     const mainColors = {
@@ -228,7 +237,7 @@ export const globalVariables = useThemeCache(() => {
             semiBold: 600,
             bold: 700,
         },
-
+        forceGoogleFont: false,
         families: {
             body: ["Open Sans"],
             monospace: [],
@@ -371,12 +380,12 @@ export const globalVariables = useThemeCache(() => {
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
-    // Sets global "style" for buttons. Use "ButtonPresets" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // Sets global "style" for buttons. Use "ButtonPreset" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
     // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
     // the style of them.
     const buttonPreset = makeThemeVars("buttonPreset", {
-        style: undefined,
-    } as IButtonPresets);
+        style: undefined as ButtonPreset | undefined,
+    });
 
     const separator = makeThemeVars("separator", {
         color: border.color,
@@ -430,6 +439,7 @@ export const globalVariables = useThemeCache(() => {
     };
 
     return {
+        options,
         utility,
         elementaryColors,
         mainColors,

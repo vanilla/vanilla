@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useDebugValue, useState } from "react";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes, buttonClasses } from "@library/forms/buttonStyles";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { MenuListComponentProps, MenuProps } from "react-select/lib/components/Menu";
@@ -18,7 +18,9 @@ import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { CloseCompactIcon, CloseTinyIcon } from "@library/icons/common";
+import { CloseCompactIcon, CloseTinyIcon, CheckIcon, CheckCompactIcon } from "@library/icons/common";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -39,7 +41,7 @@ export function OptionLoader(props: OptionProps<any>) {
         children: <ButtonLoader />,
     };
 
-    return <SelectOption {...props} />;
+    return <SelectOption {...props} value="" />;
 }
 
 /**
@@ -135,8 +137,9 @@ export function NullComponent() {
  * Overwrite for the menuOption component in React Select
  * @param props
  */
-export function SelectOption(props: OptionProps<any>) {
-    const { isSelected, isFocused } = props;
+export function SelectOption(props: OptionProps<any> & IComboBoxOption) {
+    const { isSelected, isFocused, selectProps, value } = props;
+    const placeholder = {};
 
     return (
         <li className="suggestedTextInput-item">
@@ -150,6 +153,9 @@ export function SelectOption(props: OptionProps<any>) {
             >
                 <span className="suggestedTextInput-head">
                     <span className="suggestedTextInput-title">{props.children}</span>
+                    {(isSelected || value === selectProps.value?.value) && (
+                        <CheckCompactIcon className={selectOneClasses().checkIcon} />
+                    )}
                 </span>
             </button>
         </li>

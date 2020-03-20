@@ -5,13 +5,13 @@
  */
 
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, presetsBanner } from "@library/banner/bannerStyles";
+import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -74,7 +74,7 @@ export default function Banner(props: IProps) {
                 hideSearchButton={
                     device === Devices.MOBILE ||
                     device === Devices.XS ||
-                    presetsBanner().button.preset === ButtonPresets.HIDE
+                    bannerVariables().presets.button.preset === ButtonPreset.HIDE
                 }
                 contentClass={classes.content}
                 valueContainerClasses={classes.valueContainer}
@@ -91,8 +91,12 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
-            <div className={classes.middleContainer}>
-                <div className={classNames(classes.outerBackground(props.backgroundImage ?? undefined))}>
+            <div
+                className={classNames(classes.middleContainer, {
+                    [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
+                })}
+            >
+                <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
                     {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
                         <DefaultBannerBg />
                     )}

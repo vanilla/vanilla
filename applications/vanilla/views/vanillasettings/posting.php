@@ -25,8 +25,7 @@ echo $form->errors();
     <div class="form-group">
         <?php
         $embedsLabel = 'Enable link embeds in discussions and comments';
-        $embedsDesc = 'Allow links to be tranformed into embedded representations in discussions and comments. ';
-        $embedsDesc .= 'For example, a YouTube link will transform into an embedded video.';
+        $embedsDesc = '@'.t('Allow links to be transformed');
         echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
         ?>
     </div>

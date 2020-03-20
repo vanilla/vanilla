@@ -37,6 +37,7 @@ interface IProps {
     globalPrimary?: string;
     titleBarBg?: string;
     titleBarFg?: string;
+    backgroundImage?: string;
     headerImg?: string;
     onApply?: VoidFunction;
     isApplyLoading?: boolean;
@@ -93,11 +94,23 @@ export default function ThemePreviewCard(props: IProps) {
                                 <rect width="100%" height="100%" fill={vars.globalBg} />
                                 <g stroke="none" strokeWidth="1" fill={vars.globalBg} fillRule="evenodd">
                                     <g>
-                                        <polygon
-                                            fill={vars.splashBg}
-                                            fillRule="nonzero"
-                                            points="0 0 310 0 310 61 0 61"
-                                        ></polygon>
+                                        {props.backgroundImage ? (
+                                            <image
+                                                preserveAspectRatio="xMidYMid slice"
+                                                href={props.backgroundImage}
+                                                width="310px"
+                                                height="61px"
+                                                x={0}
+                                                y={0}
+                                            />
+                                        ) : (
+                                            <polygon
+                                                fill={vars.splashBg}
+                                                fillRule="nonzero"
+                                                points="0 0 310 0 310 61 0 61"
+                                            ></polygon>
+                                        )}
+
                                         <polygon
                                             fill={vars.titleBarBg}
                                             fillRule="nonzero"

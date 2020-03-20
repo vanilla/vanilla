@@ -5,10 +5,11 @@
 
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const widgetVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("widget");
+export const widgetVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const makeThemeVars = variableFactory("widget", forcedVars);
 
     const spacing = makeThemeVars("spacing", {
         inner: {

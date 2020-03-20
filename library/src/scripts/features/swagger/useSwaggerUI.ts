@@ -24,11 +24,17 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
     return value !== null && value !== undefined;
 }
 
-export function useSwaggerUI(_options: { url?: string; spec?: object; [key: string]: any }) {
-    const { url, spec } = _options;
+export function useSwaggerUI(_options: { url?: string; spec?: object; [key: string]: any; tryIt?: boolean }) {
+    const { url, spec, tryIt = false } = _options;
     const [headings, setHeadings] = useState<ISwaggerHeading[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const swaggerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (tryIt && swaggerRef.current && !swaggerRef.current.classList.contains("tryIt")) {
+            swaggerRef.current.classList.add("tryIt");
+        }
+    }, [tryIt]);
 
     useEffect(() => {
         importSwagger().then(SwaggerUIConstructor => {

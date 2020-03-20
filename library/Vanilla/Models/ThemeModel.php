@@ -123,6 +123,13 @@ class ThemeModel {
     }
 
     /**
+     * Clear all variable providers.
+     */
+    public function clearVariableProviders() {
+        $this->variableProviders = [];
+    }
+
+    /**
      * Get all configured theme-variable providers.
      *
      * @return array
@@ -486,12 +493,18 @@ class ThemeModel {
 
         $variables = $theme["assets"]["variables"]->getDataArray();
         if ($variables) {
-            $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
-            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
-            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
-            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
+            $preset = $variables['global']['options']['preset'] ?? null;
+            $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
+            $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
+            $primary = $variables['global']['mainColors']['primary'] ?? null;
+            $preview['global.mainColors.primary'] = $primary;
+            $preview['global.mainColors.bg'] = $bg ?? null;
+            $preview['global.mainColors.fg'] = $fg ?? null;
+            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
             $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
-            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+            $preview['banner.outerBackground.image'] = $variables['splash']['outerBackground']['image']
+                ?? $variables['banner']['outerBackground']['image']
+                ?? null;
         }
         return $preview;
     }

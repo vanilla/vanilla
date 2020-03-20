@@ -16,6 +16,7 @@ import {
     importantUnit,
     getVerticalPaddingForTextInput,
     fonts,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { calc, important, percent, px, rgba, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -214,6 +215,10 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             },
             "& .suggestedTextInput-noOptions": {
                 padding: px(12),
+            },
+            "& .suggestedTextInput-head": {
+                ...flexHelper().middleLeft(),
+                justifyContent: "space-between",
             },
             "& .suggestedTextInput-option": {
                 ...buttonResetMixin(),

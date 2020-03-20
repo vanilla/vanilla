@@ -9,6 +9,7 @@ namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
+use Vanilla\SchemaFactory;
 
 /**
  * Schema to validate shape of some media upload metadata.
@@ -37,7 +38,7 @@ class UserFragmentSchema extends Schema {
      */
     public static function instance(): UserFragmentSchema {
         if (self::$cache === null) {
-            self::$cache = new UserFragmentSchema();
+            self::$cache = SchemaFactory::get(self::class, 'UserFragment');
         }
 
         return self::$cache;

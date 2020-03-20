@@ -18,6 +18,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { LogoAlignment } from "@library/headers/TitleBar";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
@@ -89,7 +90,7 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const navigation = style(
         "navigation",
-        titleBarVars.logo.doubleLogoStrategy === "hidden"
+        titleBarVars.logo.doubleLogoStrategy === "hidden" || titleBarVars.logo.justifyContent === LogoAlignment.CENTER
             ? {
                   marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
               }

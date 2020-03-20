@@ -6,6 +6,8 @@
 import getStore from "@library/redux/getStore";
 import WebFont from "webfontloader";
 import { getMeta, assetUrl, siteUrl } from "@library/utility/appUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { THEME_CACHE_EVENT } from "@library/styles/styleUtils";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
@@ -14,6 +16,10 @@ const defaultFontConfig: WebFont.Config = {
 };
 
 let loaded = false;
+
+document.addEventListener(THEME_CACHE_EVENT, () => {
+    loaded = false;
+});
 
 export function loadThemeFonts() {
     if (loaded) {
@@ -24,7 +30,18 @@ export function loadThemeFonts() {
     const assets = state.theme.assets.data || {};
     const { fonts } = assets;
 
-    if (fonts && fonts.data.length > 0) {
+    const globalVars = globalVariables();
+    // Check for forced google fonts from the variables.
+
+    if (globalVars.fonts.forceGoogleFont) {
+        const firstFont = globalVars.fonts.families[0];
+        const webFontConfig: WebFont.Config = {
+            google: {
+                families: [`${firstFont}:400,400italic,600,700`],
+            },
+        };
+        WebFont.load(webFontConfig);
+    } else if (fonts && fonts.data.length > 0) {
         const webFontConfig: WebFont.Config = {
             custom: {
                 families: fonts.data.map(font => font.name),

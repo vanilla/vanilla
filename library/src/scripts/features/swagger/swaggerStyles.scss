@@ -110,3 +110,16 @@
         flex-direction: column;
     }
 }
+
+.tryIt .swagger-ui {
+    .parameters-col_description {
+        input,
+        select {
+            display: block;
+        }
+    }
+
+    .try-out {
+        display: block;
+    }
+}

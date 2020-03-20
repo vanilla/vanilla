@@ -49,4 +49,12 @@ abstract class BaseFormat implements FormatInterface {
     public function getPlainTextLength(string $content): int {
         return mb_strlen($this->renderPlainText($content), 'UTF-8');
     }
+
+    /**
+     * Set the status for extended content.
+     *
+     * @param bool $extendContent
+     */
+    public function setAllowExtendedContent(bool $extendContent): void {
+    }
 }

@@ -8,12 +8,13 @@ import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 import { IFont } from "@library/styles/styleHelpersTypography";
 import { ColorValues } from "@library/styles/styleHelpersColors";
 import { TLength } from "typestyle/lib/types";
-import { ButtonPresets, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPreset, ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IButtonType {
     name: ButtonTypes | string;
-    preset?: ButtonPresets;
-    spinnerColor?: ColorValues;
+    preset?: {
+        style: ButtonPreset;
+    };
     colors?: {
         bg?: ColorValues;
         fg?: ColorValues;

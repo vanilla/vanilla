@@ -7,6 +7,7 @@ import { VanillaLogo } from "@library/icons/titleBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export enum LogoType {
     DESKTOP = "logo",
@@ -17,8 +18,14 @@ class ThemeLogo extends React.Component<IProps> {
     public render() {
         let content;
 
-        if (this.props.logoUrl) {
-            content = <img className={this.props.className} src={this.props.logoUrl} />;
+        const themeDesktopUrl = titleBarVariables().logo.desktop.url;
+        const themeMobileUrl = titleBarVariables().logo.mobile.url;
+
+        const themeUrl = this.props.type === LogoType.DESKTOP ? themeDesktopUrl : themeMobileUrl;
+        const finalUrl = themeUrl ?? this.props.logoUrl;
+
+        if (finalUrl) {
+            content = <img className={this.props.className} src={finalUrl} />;
         } else {
             content = <VanillaLogo className={this.props.className} />;
         }

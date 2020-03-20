@@ -5,14 +5,14 @@
  */
 
 import React, { useMemo } from "react";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 
 export interface IThemeBuilderSection {
     label: string;
     children: React.ReactNode;
 }
 
-export default function ThemeBuilderSection(props: IThemeBuilderSection) {
+export function ThemeBuilderSection(props: IThemeBuilderSection) {
     const classes = themeBuilderClasses();
     return (
         <div className={classes.section}>

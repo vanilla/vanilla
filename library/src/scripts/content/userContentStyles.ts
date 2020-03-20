@@ -361,17 +361,17 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const tables: NestedCSSSelectors = {
-        "& table": {
+        "& > table": {
             width: "100% !important",
         },
-        "& td": {
+        "& > table td": {
             ...borders(),
             ...paddings({
                 vertical: 6,
                 horizontal: 12,
             }),
         },
-        "& tr td": {
+        "& > table tr td": {
             fontWeight: globalVars.fonts.weights.bold,
         },
     };

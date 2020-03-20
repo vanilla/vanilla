@@ -22,6 +22,7 @@ function SwaggerUI() {
             return request;
         },
         url: siteUrl("/api/v2/open-api/v3" + window.location.search),
+        tryIt: true,
     });
 
     return <div ref={swaggerRef}></div>;

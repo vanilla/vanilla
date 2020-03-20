@@ -103,17 +103,59 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
+            {/* First container holds:
+                - Background.
+                - Right image if there is one.
+                - This container has overflow: "hidden".
+                - Spacer elements for all the main content, but no actual content.
+                - Overflow hidden can't be applied to the main content, because it has a search box that can't be cut off.
+            */}
+            <div className={classes.overflowRightImageContainer}>
+                <div
+                    className={classNames(classes.middleContainer, {
+                        [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
+                    })}
+                >
+                    <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
+                        {!props.backgroundImage &&
+                            !vars.outerBackground.image &&
+                            !vars.outerBackground.unsetBackground && <DefaultBannerBg />}
+                    </div>
+                    {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
+                    <Container fullGutter className={classes.fullHeight}>
+                        <div className={classes.imagePositioner}>
+                            {/*For SEO & accessibility*/}
+                            {options.hideTitle && (
+                                <Heading className={visibility().visuallyHidden} depth={1}>
+                                    {title}
+                                </Heading>
+                            )}
+                            <ConditionalWrap
+                                className={classes.contentContainer(!rightImageSrc)}
+                                condition={
+                                    showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
+                                }
+                            ></ConditionalWrap>
+                            {rightImageSrc && (
+                                <div className={classes.imageElementContainer}>
+                                    {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                    <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
+                                </div>
+                            )}
+                        </div>
+                    </Container>
+                    {showBottomSearch && <div className={classes.searchStrip}></div>}
+                </div>
+            </div>
+            {/* Main Content Area
+                - Note that background is up in the previous grouping.
+                - Overflow hidden CAN NEVER BE APPLIED HERE.
+            */}
             <div
                 className={classNames(classes.middleContainer, {
                     [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
                 })}
             >
-                <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
-                    {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
-                        <DefaultBannerBg />
-                    )}
-                </div>
-                {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
                     <div className={classes.imagePositioner}>
                         {/*For SEO & accessibility*/}
@@ -154,12 +196,7 @@ export default function Banner(props: IProps) {
                             )}
                             {showMiddleSearch && searchComponent}
                         </ConditionalWrap>
-                        {rightImageSrc && (
-                            <div className={classes.imageElementContainer}>
-                                {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
-                            </div>
-                        )}
+                        {rightImageSrc && <div className={classes.imageElementContainer} />}
                     </div>
                 </Container>
             </div>

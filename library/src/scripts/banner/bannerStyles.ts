@@ -720,6 +720,15 @@ export const bannerClasses = useThemeCache(
             flexWrap: "nowrap",
             alignItems: "center",
             maxWidth: percent(100),
+            height: percent(100),
+        });
+
+        const imagePositionerOverflow = style("imagePositionerOverflow", {
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "nowrap",
+            alignItems: "center",
+            maxWidth: percent(100),
         });
 
         const makeImageMinWidth = (rootUnit, padding) => {
@@ -761,7 +770,7 @@ export const bannerClasses = useThemeCache(
             "imageElementContainer",
             {
                 alignSelf: "stretch",
-                width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.padding.horizontal),
+                width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.paddingFull.horizontal),
                 flexGrow: 1,
                 position: "relative",
                 overflow: "hidden",
@@ -770,13 +779,13 @@ export const bannerClasses = useThemeCache(
             media(
                 { maxWidth: globalVars.content.width },
                 {
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
                 },
             ),
             layoutVariables()
                 .mediaQueries()
                 .oneColumnDown({
-                    width: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding.horizontal),
+                    width: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
                 }),
             media(
                 { maxWidth: 500 },
@@ -859,6 +868,9 @@ export const bannerClasses = useThemeCache(
                   }
                 : {};
 
+        // NOTE FOR FUTURE
+        // Do no apply overflow hidden here.
+        // It will cut off the search box in the banner.
         const root = style({
             position: "relative",
             maxWidth: percent(100),
@@ -869,6 +881,16 @@ export const bannerClasses = useThemeCache(
                     height: unit(vars.searchBar.sizing.height),
                 },
             },
+        });
+
+        // Use this for cutting of the right image with overflow hidden.
+        const overflowRightImageContainer = style("overflowRightImageContainer", {
+            ...absolutePosition.fullSizeOfParent(),
+            overflow: "hidden",
+        });
+
+        const fullHeight = style("fullHeight", {
+            height: percent(100),
         });
 
         const iconContainer = style("iconContainer", {
@@ -893,6 +915,7 @@ export const bannerClasses = useThemeCache(
         const middleContainer = style(
             "middleContainer",
             {
+                height: percent(100),
                 position: "relative",
                 minHeight: unit(vars.dimensions.minHeight),
             },
@@ -924,6 +947,8 @@ export const bannerClasses = useThemeCache(
 
         return {
             root,
+            overflowRightImageContainer,
+            fullHeight,
             outerBackground,
             contentContainer,
             text,

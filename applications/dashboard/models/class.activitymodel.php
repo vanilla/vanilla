@@ -76,7 +76,7 @@ class ActivityModel extends Gdn_Model {
 
     /** @var FormatService */
     private $formatService;
-    
+
     /**
      * Defines the related database table name.
      *
@@ -1136,7 +1136,7 @@ class ActivityModel extends Gdn_Model {
         $emailSubject = $options["EmailSubject"] ?? null;
         $headline = $this->formatService->renderPlainText($activity["Headline"], Formats\HtmlFormat::FORMAT_KEY);
         if ($emailSubject) {
-            $emailSubject = $emailSubject.' '.$headline;
+            $emailSubject = $headline.' in '.$emailSubject;
         }
         $result = $emailSubject ?: $headline;
         return $result;

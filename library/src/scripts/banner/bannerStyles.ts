@@ -165,8 +165,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         disappearingWidth: 500,
         padding: {
             ...EMPTY_SPACING,
-            all: globalVars.gutter.size,
-            right: 0,
+            vertical: globalVars.gutter.size,
+            horizontal: containerVariables().spacing.paddingFull.horizontal,
         },
     });
 
@@ -571,23 +571,33 @@ export const bannerClasses = useThemeCache(
                     ...paddings(vars.contentContainer.padding),
                     ...backgroundHelper(vars.innerBackground),
                     minWidth: unit(vars.contentContainer.minWidth),
+                    maxWidth: vars.rightImage.image ? unit(vars.contentContainer.minWidth) : undefined,
                     minHeight: unit(vars.dimensions.minHeight),
                     maxHeight: unitIfDefined(vars.dimensions.maxHeight),
+                    flexGrow: 0,
                     width: hasFullWidth || vars.options.alignment === BannerAlignment.LEFT ? percent(100) : undefined,
                 },
-                mediaQueries.oneColumnDown({
-                    minWidth: percent(100),
-                    maxWidth: percent(100),
-                    minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
-                    maxHeight: unitIfDefined(vars.dimensions.mobile.maxHeight ?? vars.dimensions.maxHeight),
-                    ...(vars.options.mobileAlignment
-                        ? {
-                              alignItems:
-                                  vars.options.mobileAlignment === BannerAlignment.LEFT ? "flex-start" : "center",
-                          }
-                        : {}),
-                    ...paddings(vars.contentContainer.mobile.padding),
-                }),
+                media(
+                    {
+                        maxWidth:
+                            vars.contentContainer.minWidth + containerVariables().spacing.paddingFull.horizontal * 2,
+                    },
+                    {
+                        right: "initial",
+                        left: 0,
+                        minWidth: percent(100),
+                        maxWidth: percent(100),
+                        minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+                        maxHeight: unitIfDefined(vars.dimensions.mobile.maxHeight ?? vars.dimensions.maxHeight),
+                        ...(vars.options.mobileAlignment
+                            ? {
+                                  alignItems:
+                                      vars.options.mobileAlignment === BannerAlignment.LEFT ? "flex-start" : "center",
+                              }
+                            : {}),
+                        ...paddings(vars.contentContainer.mobile.padding),
+                    },
+                ),
             );
         };
 
@@ -723,58 +733,24 @@ export const bannerClasses = useThemeCache(
             height: percent(100),
         });
 
-        const imagePositionerOverflow = style("imagePositionerOverflow", {
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "nowrap",
-            alignItems: "center",
-            maxWidth: percent(100),
-        });
-
         const makeImageMinWidth = (rootUnit, padding) => {
-            const values = [
-                rootUnit,
-                negative(vars.contentContainer.minWidth),
-                negative(vars.contentContainer.padding.horizontal),
-                negative(padding),
-            ];
+            const negative = vars.contentContainer.minWidth + vars.contentContainer.padding.horizontal + padding;
 
-            const stringValues = [];
-            let simplifiedNumber = 0;
-
-            values.forEach(value => {
-                if (typeof value === "number") {
-                    simplifiedNumber += value;
-                } else {
-                    if (value) {
-                        stringValues.push(unit(value) as never);
-                    }
-                }
-            });
-
-            // @ts-ignore
-            let simplifiedNumberOutput = simplifiedNumber ? unit(simplifiedNumber.toString()).toString() : "";
-
-            if (simplifiedNumberOutput.startsWith("-")) {
-                simplifiedNumberOutput = simplifiedNumberOutput.replace("-", "- ");
-            }
-
-            if (stringValues.length > 0) {
-                return calc(`${stringValues.join(" + ")} + ${unit(simplifiedNumberOutput)}`.replace("+ -", "-").trim());
-            } else {
-                return unit(simplifiedNumberOutput);
-            }
+            return calc(`${unit(rootUnit)} - ${unit(negative)}`);
         };
 
+        // const innerBreak = vars.contentContainer.minWidth + vars.contentContainer.padding.horizontal + ;
         const imageElementContainer = style(
             "imageElementContainer",
             {
                 alignSelf: "stretch",
-                width: makeImageMinWidth(globalVars.content.width, containerVariables().spacing.paddingFull.horizontal),
+                maxWidth: makeImageMinWidth(
+                    globalVars.content.width,
+                    containerVariables().spacing.paddingFull.horizontal * 2,
+                ),
                 flexGrow: 1,
                 position: "relative",
                 overflow: "hidden",
-                ...paddings(vars.rightImage.padding),
             },
             media(
                 { maxWidth: globalVars.content.width },
@@ -785,7 +761,7 @@ export const bannerClasses = useThemeCache(
             layoutVariables()
                 .mediaQueries()
                 .oneColumnDown({
-                    width: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
                 }),
             media(
                 { maxWidth: 500 },
@@ -835,22 +811,18 @@ export const bannerClasses = useThemeCache(
         const rightImage = style(
             "rightImage",
             {
-                ...absolutePosition.middleRightOfParent(),
+                ...absolutePosition.fullSizeOfParent(),
                 minWidth: unit(vars.rightImage.minWidth),
                 objectPosition: "100% 50%",
                 objectFit: "contain",
                 marginLeft: "auto",
-                right: 0,
+                ...paddings(vars.rightImage.padding),
             },
             media(
+                { maxWidth: vars.contentContainer.minWidth + vars.rightImage.minWidth },
                 {
-                    maxWidth: calc(
-                        `${unit(vars.rightImage.minWidth)} + ${unit(vars.contentContainer.minWidth)} + ${unit(
-                            vars.rightImage.padding.horizontal ?? vars.rightImage.padding.all,
-                        )} * 2`,
-                    ),
+                    paddingRight: 0,
                 },
-                { right: "initial", objectPosition: "0% 50%" },
             ),
         );
 

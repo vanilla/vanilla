@@ -41,7 +41,7 @@ export function OptionLoader(props: OptionProps<any>) {
         children: <ButtonLoader />,
     };
 
-    return <SelectOption {...props} />;
+    return <SelectOption {...props} value="" />;
 }
 
 /**

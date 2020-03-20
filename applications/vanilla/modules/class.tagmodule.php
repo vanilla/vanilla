@@ -243,7 +243,7 @@ endforeach; ?>
                             echo anchor(
                                 htmlspecialchars(tagFullName($tag)).' '.wrap(number_format($tag['CountDiscussions']), 'span', ['class' => 'Count']),
                                 tagUrl($tag, '', '/'),
-                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
+                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])." Tag"]
                             );
                             ?></li>
                     <?php

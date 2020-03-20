@@ -14,11 +14,13 @@ import { useBannerContainerDivRef } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
+import React, { useDebugValue } from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
+import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
+import { useComponentDebug } from "@vanilla/react-utils";
 
 interface IProps {
     action?: React.ReactNode;
@@ -29,6 +31,7 @@ interface IProps {
     contentImage?: string;
     logoImage?: string;
     searchBarNoTopMargin?: boolean;
+    isContentBanner?: boolean;
 }
 
 /**
@@ -38,13 +41,20 @@ export default function Banner(props: IProps) {
     const device = useDevice();
     const ref = useBannerContainerDivRef();
 
-    const { action, className, title } = props;
+    const { action, className, title, isContentBanner } = props;
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = bannerClasses();
-    const vars = bannerVariables();
+    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
     const { options } = vars;
+
+    useComponentDebug({ vars });
+
+    if (!options.enabled) {
+        return null;
+    }
+
     const description = props.description ?? vars.description.text;
 
     // Image element (right)

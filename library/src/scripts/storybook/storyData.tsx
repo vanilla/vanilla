@@ -9,6 +9,9 @@ import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 export const STORY_IMAGE =
     "https://user-images.githubusercontent.com/1770056/74069119-5dda5580-49cb-11ea-883b-61b7463c8cfc.png";
 
+export const STORY_LOGO_WHITE = "https://us.v-cdn.net/6030677/uploads/1861f935b5982c0bec354466296d241f.png";
+export const STORY_LOGO_BLACK = "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png";
+
 export const STORY_IPSUM_LONG =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 

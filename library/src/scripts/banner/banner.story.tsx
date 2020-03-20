@@ -15,6 +15,7 @@ import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/ban
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
+import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
 
 export default {
     title: "Banner",
@@ -25,12 +26,13 @@ export default {
     },
 };
 
-function StoryBanner(props: { title: string }) {
+function StoryBanner(props: { title: string; isContentBanner?: boolean }) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
                 <DeviceProvider>
                     <Banner
+                        isContentBanner={props.isContentBanner}
                         title={props.title}
                         description="This is a description. They're pretty great, you should try one sometime."
                     />
@@ -302,7 +304,7 @@ export const LogoSmall = storyWithConfig(
                 },
                 logo: {
                     width: 150,
-                    image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
+                    image: STORY_LOGO_BLACK,
                 },
                 spacing: {
                     padding: {
@@ -358,7 +360,7 @@ export const LogoAndRightImage = storyWithConfig(
                 },
                 logo: {
                     width: 150,
-                    image: "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png",
+                    image: STORY_LOGO_BLACK,
                 },
                 spacing: {
                     padding: {
@@ -509,7 +511,7 @@ export const searchPositionBottom = storyWithConfig(
             banner: {
                 presets: {
                     input: {
-                        preset: SearchBarPresets.BORDER,
+                        preset: SearchBarPresets.NO_BORDER,
                     },
                 },
                 options: {
@@ -518,14 +520,7 @@ export const searchPositionBottom = storyWithConfig(
                 backgrounds: {
                     useOverlay: true,
                 },
-                outerBackground: {
-                    color: color("#4b496e"),
-                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
-                },
-                searchStrip: {
-                    bg: color("#4b496e"),
-                    minHeight: 100,
-                },
+                searchStrip: {},
             },
         },
     },
@@ -687,3 +682,24 @@ export const unifiedBorder = storyWithConfig(
         },
     },
 };
+
+export const ContentBannerNoLogo = storyWithConfig({ useWrappers: false }, () => {
+    return <StoryBanner title="Should not appear" isContentBanner />;
+});
+
+export const ContentBannerLogo = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            contentBanner: {
+                logo: {
+                    image: STORY_LOGO_WHITE,
+                    width: 150,
+                },
+            },
+        },
+    },
+    () => {
+        return <StoryBanner title="Should not appear" isContentBanner />;
+    },
+);

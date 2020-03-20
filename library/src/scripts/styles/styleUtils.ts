@@ -148,7 +148,17 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentNames: string | string[], themeVars: IThemeVariables = getThemeVariables()) {
+export function variableFactory(
+    componentNames: string | string[],
+    themeVars?: IThemeVariables,
+    mergeWithGlobals = false,
+) {
+    if (!themeVars) {
+        themeVars = getThemeVariables();
+    } else if (mergeWithGlobals) {
+        themeVars = merge(getThemeVariables(), themeVars);
+    }
+
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames

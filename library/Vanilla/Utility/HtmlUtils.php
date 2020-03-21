@@ -72,7 +72,7 @@ final class HtmlUtils {
      *
      * Examples
      *
-     * ```
+     * ```php
      * StringUtils::formatTags('test');
      * // returns 'test'
      *
@@ -91,6 +91,7 @@ final class HtmlUtils {
      * // You can replace a string value using a self-closing tag with a string argument.
      * StringUtils::formatTags('Hello <0 />', 'world');
      * // returns 'Hello world'
+     * ```
      *
      * @param string $format The string to format.
      * @param mixed $args Arguments that will replace the tags in the string.

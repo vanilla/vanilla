@@ -54,15 +54,20 @@ export const forumMetaCSS = () => {
     );
 
     const linkSelectors = `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a,
-        .MessageList .ItemComment .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
         .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MItem.RoleTracker a,
+        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
-        .AuthorInfo .MItem.RoleTracker,
+        .AuthorInfo .MItem.RoleTracker a:not(.Tag),
         .MItem > a,
         `;
+
+    cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
+        padding: 0,
+        margin: 0,
+    });
 
     // Links
     cssOut(linkSelectors, {
@@ -103,10 +108,10 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a,
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
     `,
         {
             ...paddings({
@@ -173,7 +178,7 @@ export const forumMetaCSS = () => {
         `
     .AuthorWrap a.Username,
     .AuthorInfo .MItem,
-    .DiscussionMeta .MItem
+    .DiscussionMeta .MItem,
     `,
         {
             ...paddings({
@@ -212,7 +217,6 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-    .Content .Meta-Discussion > .Tag,
     .Content  .idea-counter-module
     `,
         {

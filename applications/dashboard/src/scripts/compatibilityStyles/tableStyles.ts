@@ -52,6 +52,4 @@ export const tableCSS = () => {
             },
         },
     });
-
-    cssOut(".Container .DataTable .DiscussionName .Meta.Meta-Discussion");
 };

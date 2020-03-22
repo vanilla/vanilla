@@ -38,6 +38,7 @@ import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
+import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -360,6 +361,7 @@ export const compatibilityStyles = useThemeCache(() => {
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
+    forumTagCSS();
     forumMetaCSS();
     inputCSS();
     socialConnectCSS();

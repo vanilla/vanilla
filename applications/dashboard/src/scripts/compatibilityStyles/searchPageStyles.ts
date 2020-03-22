@@ -22,7 +22,7 @@ export const searchPageCSS = () => {
 
     cssOut(
         `
-         #search-results .Breadcrumbs a,
+
          #search-results .MessageList a,
          #search-results .DataTableWrap a,
          #search-results .Container .Frame-contentWrap .ChildCategories a,
@@ -34,7 +34,7 @@ export const searchPageCSS = () => {
         `,
         {
             textDecoration: "none",
-            color: colorOut(globalVars.mainColors.fg),
+            color: colorOut(globalVars.meta.text.color),
             fontSize: unit(globalVars.meta.text.fontSize),
         },
     );
@@ -122,5 +122,38 @@ export const searchPageCSS = () => {
             right: -6,
             left: -6,
         }),
+    });
+
+    cssOut(
+        `
+        #search-results.DataList .Item h3,
+        #search-results.DataList .Item-Body,
+    `,
+        {
+            paddingLeft: 0,
+        },
+    );
+
+    cssOut(
+        `
+        #search-results .Media-Body .Meta .MItem-Location,
+        #search-results .Media-Body .Meta .Breadcrumbs
+        `,
+        {
+            display: "inline",
+            padding: 0,
+            textTransform: "none",
+        },
+    );
+
+    cssOut(`#search-results .Meta-Body.Meta .Breadcrumbs a`, {
+        fontSize: unit(globalVars.meta.text.fontSize),
+        textTransform: "initial",
+    });
+
+    cssOut(`#search-results .Meta-Body Meta`, {});
+
+    cssOut(`#search-results .Item-Body.Media .PhotoWrap`, {
+        display: "none",
     });
 };

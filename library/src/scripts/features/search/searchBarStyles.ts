@@ -182,6 +182,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     display: "none",
                 },
                 "& .searchBar__input": {
+                    color: colorOut(inputVars.colors.fg),
                     width: percent(100),
                 },
                 "& .searchBar__input input": {

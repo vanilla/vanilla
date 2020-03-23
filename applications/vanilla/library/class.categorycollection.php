@@ -202,7 +202,6 @@ class CategoryCollection {
         if (!empty($category)) {
             // This category came from the database, so must be calculated.
             $this->calculateStatic($category);
-            $adt = val("AllowedDiscussionTypes", $category);
 
             $this->cacheStore(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),

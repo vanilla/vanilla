@@ -62,7 +62,7 @@ class ThemeModelHelper {
             return true;
         }
 
-        $isAdmin = ($this->session->User->Admin ?? 0) !== 0;
+        $isAdmin = ($this->session->User->Admin ?? 0) === 2;
         if ($isAdmin) {
             // All theme visible for system admins.
             return true;

@@ -165,6 +165,10 @@ class MinimalContainerTestCase extends TestCase {
                 $session->UserID = $value;
             }
 
+            if ($key === 'Admin' && $value > 0) {
+                $session->getPermissions()->setAdmin(true);
+            }
+
             $session->User = new \stdClass();
             $session->User->{$key} = $value;
         }

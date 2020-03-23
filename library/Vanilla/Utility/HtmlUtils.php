@@ -28,7 +28,7 @@ final class HtmlUtils {
             }
 
             if (is_array($val) && strpos($name, 'data-') === 0) {
-                $val = json_encode($val);
+                $val = json_encode($val, JSON_UNESCAPED_UNICODE);
             }
 
             if ($val === true) {

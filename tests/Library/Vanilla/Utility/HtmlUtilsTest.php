@@ -48,7 +48,7 @@ final class HtmlUtilsTest extends TestCase {
         $this->assertSame('Hello ', $actual);
 
         $this->expectNotice();
-        $this->expectExceptionMessage('<0/>');
+        $this->expectNoticeMessage('<0/>');
         HtmlUtils::formatTags('Hello <0/>');
     }
 
@@ -115,6 +115,7 @@ final class HtmlUtilsTest extends TestCase {
             'bool true' => [['type' => 'checkbox', 'checked' => true], ' type="checkbox" checked'],
             'bool false' => [['type' => 'checkbox', 'checked' => false], ' type="checkbox"'],
             'json data' => [['data-foo' => ['a' => 'b']], ' data-foo="{&quot;a&quot;:&quot;b&quot;}"'],
+            'unicode json' => [['data-foo' => ['a' => 'ぁ']], ' data-foo="{&quot;a&quot;:&quot;ぁ&quot;}"'],
         ];
         return $r;
     }

@@ -14,6 +14,7 @@
  *
  * This class is useful for partial deliveries where parts of the page are not necessary,
  * but you don't want to have to check for them on every use.
+ * @deprecated
  */
 class Gdn_Dummy {
 

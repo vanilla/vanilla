@@ -11,6 +11,7 @@
 
 /**
  * Handles analyzing and returning various parts of the current url.
+ * @deprecated
  */
 class Gdn_Url {
 

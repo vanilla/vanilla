@@ -154,6 +154,24 @@ class MinimalContainerTestCase extends TestCase {
     }
 
     /**
+     * Set information about the current user in the session.
+     * @param array $info The user information to set.
+     */
+    public function setUserInfo(array $info) {
+        $session = new \Gdn_Session();
+
+        foreach ($info as $key => $value) {
+            if ($key === 'UserID') {
+                $session->UserID = $value;
+            }
+
+            $session->User = new \stdClass();
+            $session->User->{$key} = $value;
+        }
+        self::container()->setInstance(\Gdn_Session::class, $session);
+    }
+
+    /**
      * Set some configuration key for the tests.
      *
      * @param string $key The config key.

@@ -31,6 +31,9 @@ class CategoryCollection {
      */
     private $cache;
 
+    /** @var bool */
+    private $cacheReadOnly = false;
+
     /**
      * @var int
      */
@@ -199,12 +202,13 @@ class CategoryCollection {
         if (!empty($category)) {
             // This category came from the database, so must be calculated.
             $this->calculateStatic($category);
+            $adt = val("AllowedDiscussionTypes", $category);
 
-            $this->cache->store(
+            $this->cacheStore(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
                 $category
             );
-            $this->cache->store(
+            $this->cacheStore(
                 $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
@@ -375,11 +379,11 @@ class CategoryCollection {
             foreach ($dbCategories as &$category) {
                 $this->calculateStatic($category);
 
-                $this->cache->store(
+                $this->cacheStore(
                     $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
                     $category
                 );
-                $this->cache->store(
+                $this->cacheStore(
                     $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
                     (int)$category['CategoryID']
                 );
@@ -619,11 +623,11 @@ class CategoryCollection {
         $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         if ($category) {
             $this->calculateStatic($category);
-            $this->cache->store(
+            $this->cacheStore(
                 $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
                 $category
             );
-            $this->cache->store(
+            $this->cacheStore(
                 $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
@@ -712,5 +716,40 @@ class CategoryCollection {
         foreach ($children as $child) {
             $this->flattenTreeInternal($child, $result);
         }
+    }
+
+    /**
+     * Store an item in the cache, accounting for the read-only flag.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param array $options
+     * @return void
+     */
+    private function cacheStore($key, $value, $options = []): void {
+        if ($this->cacheReadOnly) {
+            return;
+        }
+
+        $this->cache->store($key, $value, $options);
+    }
+
+    /**
+     * Is this collection avoiding write operations to the cache?
+     *
+     * @return boolean
+     */
+    public function isCacheReadOnly(): bool {
+        return $this->cacheReadOnly;
+    }
+
+    /**
+     * Should this collection avoid writing to the cache?
+     *
+     * @param boolean $cacheReadOnly
+     * @return void
+     */
+    public function setCacheReadOnly(bool $cacheReadOnly): void {
+        $this->cacheReadOnly = $cacheReadOnly;
     }
 }

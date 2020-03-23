@@ -56,12 +56,12 @@ export const forumMetaCSS = () => {
     const linkSelectors = `
         .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
         .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
         .MainContent.Content .MItem.RoleTracker a:not(.Tag),
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
         .AuthorInfo .MItem.RoleTracker a:not(.Tag),
-        .MItem > a,
+        .MItem > a:not(.Tag),
         `;
 
     cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
@@ -136,9 +136,15 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(`.Content .MessageList .RoleTracker > .Tag, .Tag`, {
-        color: colorOut(globalVars.mainColors.fg),
-    });
+    cssOut(
+        `
+        .Content .MessageList .RoleTracker > .Tag,
+        .Tag
+        `,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
 
     cssOut(
         `

@@ -43,7 +43,14 @@ export const forumTagCSS = () => {
 
     mixinTag(`.Tag`);
     mixinTag(`.DataTableWrap a.Tag`);
-    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a`);
+    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker .Tag`);
+    mixinTag(
+        `
+        .MessageList .ItemComment .MItem.RoleTracker a.Tag,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag,
+        .MessageList .ItemComment .MItem.RoleTracker,
+        `,
+    );
 };
 
 function mixinTag(selector: string, overwrite?: {}) {
@@ -59,10 +66,10 @@ function mixinTag(selector: string, overwrite?: {}) {
 
     selectors.map(s => {
         cssOut(selector, {
+            color: colorOut(vars.font.color),
             maxWidth: percent(100),
             display: "inline-block",
             whiteSpace: "normal",
-            color: colorOut(vars.colors.fg),
             textDecoration: important("none"),
             textOverflow: "ellipsis",
             ...userSelect(),

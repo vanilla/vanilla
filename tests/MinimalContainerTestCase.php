@@ -182,9 +182,7 @@ class MinimalContainerTestCase extends TestCase {
      * @param mixed $value The value to set.
      */
     public static function setConfig(string $key, $value) {
-        /** @var MockConfig $config */
-        $config = self::container()->get(ConfigurationInterface::class);
-        $config->set($key, $value);
+        self::getConfig()->set($key, $value);
     }
 
     /**
@@ -193,9 +191,14 @@ class MinimalContainerTestCase extends TestCase {
      * @param array $configs An array of $configKey => $value
      */
     public static function setConfigs(array $configs) {
-        /** @var MockConfig $config */
-        $config = self::container()->get(MockConfig::class);
-        $config->loadData($configs);
+        self::getConfig()->loadData($configs);
+    }
+
+    /**
+     * Get the config object.
+     */
+    public static function getConfig(): ConfigurationInterface {
+        return self::container()->get(ConfigurationInterface::class);
     }
 
     /**

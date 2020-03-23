@@ -69,7 +69,7 @@ class ThemeModelHelper {
         }
 
         $themeKey = $theme->getKey();
-        $alwaysVisibleThemes = array_map('trim', explode(',', $confVisible));
+        $alwaysVisibleThemes = array_map('trim', explode(",", $confVisible));
 
         if (in_array($themeKey, $alwaysVisibleThemes, true)) {
             return true;
@@ -89,10 +89,10 @@ class ThemeModelHelper {
             $sites[] = $site;
         }
 
-        if ($hidden === true) {
-            return false;
-        } elseif ($hidden === true) {
+        if ($hidden === false) {
             return true;
+        } elseif ($hidden === true) {
+            return false;
         } else {
             $hidden = false;
             foreach ($sites as $addonSite) {

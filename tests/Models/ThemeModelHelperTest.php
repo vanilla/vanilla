@@ -50,6 +50,16 @@ class ThemeModelHelperTest extends MinimalContainerTestCase {
     }
 
     /**
+     * With no other factors test the theme hidden value.
+     */
+    public function testThemeHidden() {
+        $this->assertFalse($this->getHelper()->isThemeVisible(new MockAddon('theme-no-hidden-field')));
+        $this->assertFalse($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden-true', ['hidden' => true])));
+        $this->assertTrue($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden-false', ['hidden' => false])));
+    }
+
+
+    /**
      * Test the configuration based visibilies.
      */
     public function testVisibilityConfig() {

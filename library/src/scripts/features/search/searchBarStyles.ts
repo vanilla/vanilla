@@ -189,6 +189,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     minHeight: 0,
                     width: important(`100%`),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                    color: vars.search,
                 },
             },
         } as NestedCSSProperties,

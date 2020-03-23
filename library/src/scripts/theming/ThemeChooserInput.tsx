@@ -14,7 +14,7 @@ import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 interface IProps {
     value?: number | string | null;
     initialValue: number | string;
-    onChange?: (value: number | string | null) => void;
+    onChange?: (value: number | string) => void;
 }
 
 /**

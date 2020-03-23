@@ -5,22 +5,22 @@
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { t } from "@vanilla/i18n";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useThemeActions } from "@library/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
-import {DashboardSelect} from "@dashboard/forms/DashboardSelect";
+import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 
-interface IProps{
+interface IProps {
     value?: number | string | null;
-    initialValue: number| string | null;
-    onChange?: (value:  number| string | null) => void;
+    initialValue: number | string;
+    onChange?: (value: number | string | null) => void;
 }
 
 export function ThemeChooserInput(props: IProps) {
-    const [ownValue, setOwnValue] = useState<number | string | null |undefined>(
-        typeof props.initialValue === "boolean" ? null : props.initialValue
-    )
+    const [ownValue, setOwnValue] = useState<number | string | null | undefined>(
+        typeof props.initialValue === "boolean" ? null : props.initialValue,
+    );
     const setValue = props.onChange ?? setOwnValue;
 
     const value = props.value ?? ownValue;
@@ -55,26 +55,24 @@ export function ThemeChooserInput(props: IProps) {
 
     const themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
 
-    const selectedTheme = themeGroupOptions.find(option => {
-            if (props.initialValue !== null && option.value === props.initialValue) {
-                return {
-                    label: option.label,
-                    value: option.value
-                }
-            }
-
-
-        }) ?? {label: t("Unknown"), value: props.initialValue};
+    let selectedTheme = themeGroupOptions.find(option => {
+        if (props.initialValue !== null && props.initialValue !== undefined && option.value === props.initialValue) {
+            return {
+                label: option.label,
+                value: option.value,
+            };
+        }
+    }) ?? { label: t("Unknown"), value: props.initialValue };
 
     return (
         <>
-                <DashboardSelect
-                    options={themeGroupOptions}
-                    onChange={value => {
-                        setValue(value ? value.value : null);
-                    }}
-                    value={selectedTheme}
-                />
+            <DashboardSelect
+                options={themeGroupOptions}
+                onChange={value => {
+                    setValue(value ? value.value : "");
+                }}
+                value={selectedTheme}
+            />
         </>
     );
 }

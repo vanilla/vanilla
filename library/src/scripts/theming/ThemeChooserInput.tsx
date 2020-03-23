@@ -4,25 +4,17 @@
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/SelectOne";
 import { t } from "@vanilla/i18n";
-import classNames from "classnames";
-import React, {useEffect, useMemo, useState} from "react";
-import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
-import { ThemeType, useThemeActions } from "@library/theming/ThemeActions";
-import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
+import React, {useEffect, useState} from "react";
+import { useThemeActions } from "@library/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
-import Loader from "@library/loaders/Loader";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { useSubcommunities } from "@subcommunities/subcommunities/subcommunitySelectors";
 import {DashboardSelect} from "@dashboard/forms/DashboardSelect";
 
-interface IProps extends IMenuPlacement {
+interface IProps{
     value?: number | string | null;
-    initialValue: number| string | null | boolean | undefined;
-    onChange?: (value:  number| string | null | boolean | undefined) => void;
+    initialValue: number| string | null;
+    onChange?: (value:  number| string | null) => void;
 }
 
 export function ThemeChooserInput(props: IProps) {
@@ -42,7 +34,7 @@ export function ThemeChooserInput(props: IProps) {
     });
 
     if (!themeSettingsState.themes.data || themeSettingsState.themes.status === LoadStatus.LOADING) {
-        return <Loader />;
+        return <DashboardSelect options={[]} value={undefined} onChange={() => {}} disabled isLoading />;
     }
 
     const { templates, themes } = themeSettingsState.themes.data;
@@ -63,17 +55,16 @@ export function ThemeChooserInput(props: IProps) {
 
     const themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
 
-
     const selectedTheme = themeGroupOptions.find(option => {
-            if (option.value === props.initialValue?.toString()) {
+            if (props.initialValue !== null && option.value === props.initialValue) {
                 return {
                     label: option.label,
                     value: option.value
                 }
             }
 
-            return undefined;
-        });
+
+        }) ?? {label: t("Unknown"), value: props.initialValue};
 
     return (
         <>

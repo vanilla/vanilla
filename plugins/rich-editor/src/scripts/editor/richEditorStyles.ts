@@ -126,6 +126,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const menuBar = style("menuBar", {
         position: "relative",
         width: unit(vars.menuButton.size * 4),
+        fontSize: unit(globalVars.fonts.size.medium),
         overflow: "hidden",
         zIndex: 1,
     });

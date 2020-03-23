@@ -357,6 +357,10 @@ export const compatibilityStyles = useThemeCache(() => {
         background: "none",
     });
 
+    cssOut(`.QuickSearch`, {
+        display: "none",
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

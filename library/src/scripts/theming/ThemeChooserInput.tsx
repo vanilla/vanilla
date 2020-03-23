@@ -17,6 +17,9 @@ interface IProps {
     onChange?: (value: number | string | null) => void;
 }
 
+/**
+ * An Input that allows for users to select an available theme.
+ */
 export function ThemeChooserInput(props: IProps) {
     const [ownValue, setOwnValue] = useState<number | string | null | undefined>(
         typeof props.initialValue === "boolean" ? null : props.initialValue,

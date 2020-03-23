@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import SearchOption from "@library/features/search/SearchOption";
 import { t } from "@library/utility/appUtils";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
@@ -32,6 +32,7 @@ interface IProps extends IWithSearchProps, RouteComponentProps<{}> {
     buttonBaseClass?: ButtonTypes;
     iconContainerClasses?: string;
     resultsAsModalClasses?: string;
+    forceMenuOpen?: boolean;
 }
 
 interface IState {
@@ -46,6 +47,7 @@ export function IndependentSearch(props: IProps) {
     const id = useUniqueID("search");
     const resultsRef = useRef<HTMLDivElement>(null);
     const [query, setQuery] = useState("");
+    const [forcedOptions, setForcedOptions] = useState<any[]>([]);
 
     const { pushSmartLocation } = useLinkContext();
 
@@ -60,11 +62,23 @@ export function IndependentSearch(props: IProps) {
         [setQuery],
     );
 
+    const { forceMenuOpen, searchOptionProvider } = props;
+    useEffect(() => {
+        if (forceMenuOpen) {
+            searchOptionProvider.autocomplete("").then(results => {
+                setQuery("a");
+                setForcedOptions(results);
+            });
+        }
+    }, [forceMenuOpen, searchOptionProvider]);
+
     const classesSearchBar = searchBarClasses();
     return (
         <div className={classNames(classesSearchBar.independentRoot, props.className)}>
             <SearchBar
                 id={id}
+                forceMenuOpen={props.forceMenuOpen}
+                forcedOptions={forcedOptions}
                 placeholder={props.placeholder}
                 optionComponent={SearchOption}
                 noHeading={true}

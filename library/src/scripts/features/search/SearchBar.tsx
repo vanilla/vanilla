@@ -63,6 +63,8 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     valueContainerClasses?: string;
     iconContainerClasses?: string;
     resultsAsModalClasses?: string;
+    forceMenuOpen?: boolean;
+    forcedOptions?: any[];
 }
 
 interface IState {
@@ -121,7 +123,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 controlShouldRenderValue={false}
                 isDisabled={this.props.disabled}
                 loadOptions={this.props.loadOptions!}
-                menuIsOpen={this.isMenuVisible}
+                defaultOptions={this.props.forcedOptions}
+                menuIsOpen={(this.props.resultsRef?.current && this.props.forceMenuOpen) || this.isMenuVisible}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, this.props.className)}
                 placeholder={this.props.placeholder}

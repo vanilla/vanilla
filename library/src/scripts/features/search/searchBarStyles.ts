@@ -146,7 +146,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 },
                 "& .searchBar__control": {
                     border: 0,
-                    backgroundColor: "transparent",
+                    backgroundColor: colorOut(globalVars.elementaryColors.transparent),
                     width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {
@@ -189,7 +189,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     minHeight: 0,
                     width: important(`100%`),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
-                    color: vars.search,
                 },
             },
         } as NestedCSSProperties,

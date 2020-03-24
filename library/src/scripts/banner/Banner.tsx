@@ -14,11 +14,13 @@ import { useBannerContainerDivRef } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
+import React, { useDebugValue } from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
+import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
+import { useComponentDebug } from "@vanilla/react-utils";
 
 interface IProps {
     action?: React.ReactNode;
@@ -29,6 +31,8 @@ interface IProps {
     contentImage?: string;
     logoImage?: string;
     searchBarNoTopMargin?: boolean;
+    forceSearchOpen?: boolean;
+    isContentBanner?: boolean;
 }
 
 /**
@@ -38,13 +42,20 @@ export default function Banner(props: IProps) {
     const device = useDevice();
     const ref = useBannerContainerDivRef();
 
-    const { action, className, title } = props;
+    const { action, className, title, isContentBanner } = props;
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = bannerClasses();
-    const vars = bannerVariables();
+    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
     const { options } = vars;
+
+    useComponentDebug({ vars });
+
+    if (!options.enabled) {
+        return null;
+    }
+
     const description = props.description ?? vars.description.text;
 
     // Image element (right)
@@ -69,6 +80,7 @@ export default function Banner(props: IProps) {
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
             <IndependentSearch
+                forceMenuOpen={props.forceSearchOpen}
                 buttonClass={classes.searchButton}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 isLarge={true}
@@ -92,17 +104,59 @@ export default function Banner(props: IProps) {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
             })}
         >
+            {/* First container holds:
+                - Background.
+                - Right image if there is one.
+                - This container has overflow: "hidden".
+                - Spacer elements for all the main content, but no actual content.
+                - Overflow hidden can't be applied to the main content, because it has a search box that can't be cut off.
+            */}
+            <div className={classes.overflowRightImageContainer}>
+                <div
+                    className={classNames(classes.middleContainer, {
+                        [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
+                    })}
+                >
+                    <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
+                        {!props.backgroundImage &&
+                            !vars.outerBackground.image &&
+                            !vars.outerBackground.unsetBackground && <DefaultBannerBg />}
+                    </div>
+                    {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
+                    <Container fullGutter className={classes.fullHeight}>
+                        <div className={classes.imagePositioner}>
+                            {/*For SEO & accessibility*/}
+                            {options.hideTitle && (
+                                <Heading className={visibility().visuallyHidden} depth={1}>
+                                    {title}
+                                </Heading>
+                            )}
+                            <ConditionalWrap
+                                className={classes.contentContainer(!rightImageSrc)}
+                                condition={
+                                    showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
+                                }
+                            ></ConditionalWrap>
+                            {rightImageSrc && (
+                                <div className={classes.imageElementContainer}>
+                                    {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                    <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
+                                </div>
+                            )}
+                        </div>
+                    </Container>
+                    {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }}></div>}
+                </div>
+            </div>
+            {/* Main Content Area
+                - Note that background is up in the previous grouping.
+                - Overflow hidden CAN NEVER BE APPLIED HERE.
+            */}
             <div
                 className={classNames(classes.middleContainer, {
                     [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
                 })}
             >
-                <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
-                    {!props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground && (
-                        <DefaultBannerBg />
-                    )}
-                </div>
-                {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                 <Container fullGutter>
                     <div className={classes.imagePositioner}>
                         {/*For SEO & accessibility*/}
@@ -143,12 +197,7 @@ export default function Banner(props: IProps) {
                             )}
                             {showMiddleSearch && searchComponent}
                         </ConditionalWrap>
-                        {rightImageSrc && (
-                            <div className={classes.imageElementContainer}>
-                                {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
-                            </div>
-                        )}
+                        {rightImageSrc && <div className={classes.imageElementContainer} />}
                     </div>
                 </Container>
             </div>

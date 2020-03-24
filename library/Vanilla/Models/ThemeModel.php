@@ -340,7 +340,7 @@ class ThemeModel {
     public function getCurrentTheme($themeID = null): ?array {
         $current = null;
         try {
-            $themeID = $themeID ?? 1;
+            $themeID = $themeID ?? null;
             $provider = $this->getThemeProvider($themeID);
             $current = $provider->getCurrent($themeID);
         } catch (ClientException $e) {

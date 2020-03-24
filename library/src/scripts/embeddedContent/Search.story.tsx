@@ -57,7 +57,7 @@ story.add("Search Components", () => {
                                 iconClass={classesSearch.icon}
                                 buttonLoaderClassName={classesSearch.buttonLoader}
                                 contentClass={classesSearch.content}
-                                valueContainerClasses={classesSearch.valueContainer}
+                                valueContainerClasses={classesSearch.valueContainer(false)}
                             />
                         </div>
                     </div>

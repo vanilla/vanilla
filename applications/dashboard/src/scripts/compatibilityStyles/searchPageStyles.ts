@@ -7,9 +7,12 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { allLinkStates, fonts, margins, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
+import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
+import { percent } from "csx";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
@@ -155,5 +158,64 @@ export const searchPageCSS = () => {
 
     cssOut(`#search-results .Item-Body.Media .PhotoWrap`, {
         display: "none",
+    });
+
+    // Search result styles
+    const searchResultsStyles = searchBarClasses().searchResultsStyles;
+    const searchResultsVars = searchResultsVariables();
+
+    cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete`, {
+        position: "relative",
+        ...paddings({
+            vertical: 0,
+        }),
+    });
+
+    // li
+    cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete .ui-menu-item`, {
+        position: "relative",
+        padding: 0,
+        margin: 0,
+        $nest: {
+            "& + .ui-menu-item": {
+                borderTop: singleBorder({
+                    color: searchResultsVars.separator.fg,
+                    width: searchResultsVars.separator.width,
+                }),
+            },
+        },
+    });
+
+    // a
+    cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete .ui-menu-item a`, {
+        ...searchResultsStyles.option,
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        $nest: {
+            "& .Title": {
+                ...searchResultsStyles.title,
+                display: "block",
+                width: percent(100),
+                marginBottom: ".15em",
+            },
+            "& .Aside": {
+                display: "inline-block",
+                float: "none",
+                ...searchResultsStyles.meta,
+            },
+            "& .Aside .Date": {
+                display: "inline",
+                ...searchResultsStyles.meta,
+            },
+            "& .Gloss": {
+                ...searchResultsStyles.excerpt,
+                display: "block",
+                paddingLeft: 0,
+                marginTop: 0,
+                width: percent(100),
+            },
+        },
     });
 };

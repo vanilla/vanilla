@@ -63,6 +63,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     valueContainerClasses?: string;
     iconContainerClasses?: string;
     resultsAsModalClasses?: string;
+    needsPageTitle?: boolean;
 }
 
 interface IState {
@@ -192,7 +193,11 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Create a label for React Select's "Add option" option.
      */
     private createFormatLabel = (inputValue: string) => {
-        return <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />;
+        return (
+            <span className="suggestedTextInput-searchingFor">
+                <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />
+            </span>
+        );
     };
 
     /**
@@ -243,21 +248,26 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const classes = searchBarClasses();
+        const classes = searchBarClasses(!this.props.hideSearchButton);
         return (
             <div className={classNames("searchBar", classes.root)}>
                 <form className={classNames("searchBar-form", classes.form)} onSubmit={this.onFormSubmit}>
-                    <Heading
-                        depth={1}
-                        className={classNames("searchBar-heading", classes.heading, {
-                            [visibility().visuallyHidden]: this.props.noHeading,
-                        })}
-                        title={this.props.title || t("Search")}
-                    >
-                        <label className={classNames("searchBar-label", classes.label)} htmlFor={this.searchInputID}>
-                            {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
-                        </label>
-                    </Heading>
+                    {this.props.needsPageTitle && (
+                        <Heading
+                            depth={1}
+                            className={classNames("searchBar-heading", classes.heading, {
+                                [visibility().visuallyHidden]: this.props.noHeading,
+                            })}
+                            title={this.props.title || t("Search")}
+                        >
+                            <label
+                                className={classNames("searchBar-label", classes.label)}
+                                htmlFor={this.searchInputID}
+                            >
+                                {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
+                            </label>
+                        </Heading>
+                    )}
 
                     <div
                         onClick={this.focus}
@@ -271,12 +281,11 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "suggestedTextInput-inputText",
                                 "inputText",
                                 "isClearable",
-                                classes.valueContainer,
+                                classes.valueContainer(this.props.hideSearchButton),
                                 this.props.valueContainerClasses,
                                 {
                                     ["focus-visible"]: props.isFocused,
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
-                                    noSearchButton: !!this.props.hideSearchButton,
                                 },
                             )}
                         >
@@ -350,7 +359,13 @@ export default class SearchBar extends React.Component<IProps, IState> {
         return ReactDOM.createPortal(
             <components.Menu
                 {...props}
-                className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.menu)}
+                className={classNames(
+                    "suggestedTextInput-menu",
+                    "dropDown-contents",
+                    "isParentWidth",
+                    classes.menu,
+                    classes.results,
+                )}
             />,
             this.props.resultsRef!.current!,
         );

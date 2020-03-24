@@ -312,7 +312,10 @@ class ThemeModel {
      * @return string
      */
     public function getCurrentThemeAddon(): Addon {
-        $themeKey = $this->config->get( $this->config->get('Garden.Theme'));
+        $isMobile = isMobile();
+        $configParam = $isMobile ? 'Garden.MobileTheme' : 'Garden.Theme';
+
+        $themeKey = $this->config->get( $this->config->get($configParam));
         $provider = $this->getThemeProvider($themeKey);
         $addonThemeKey = $provider->getMasterThemeKey($themeKey);
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {

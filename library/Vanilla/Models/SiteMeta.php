@@ -156,6 +156,7 @@ class SiteMeta implements \JsonSerializable {
         }
 
         $theme = $themeModel->getCurrentTheme($themeID);
+        
         $this->activeThemeKey = $theme["themeID"];
         $this->activeThemeViewPath =  $themeModel->getThemeViewPath($theme["themeID"]);
         $this->themePreview =  $themeModel->getPreviewTheme();

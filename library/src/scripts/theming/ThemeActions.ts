@@ -10,6 +10,7 @@ import { ITheme } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
+import { setMeta } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@themes");
 
@@ -102,7 +103,8 @@ export default class ThemeActions extends ReduxActions {
         const body = { themeID };
         const thunk = bindThunkAction(ThemeActions.putCurrentThemeACs, async () => {
             const response = await this.api.put(`/themes/current`, body);
-
+            setMeta("ui.themeKey", themeID);
+            setMeta("ui.mobileThemeKey", themeID);
             return response.data;
         })(body);
         return this.dispatch(thunk);

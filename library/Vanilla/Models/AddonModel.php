@@ -449,7 +449,7 @@ class AddonModel implements LoggerAwareInterface {
             'enabled' => null,
             'type' => null,
             'addonID' => null,
-            'hidden' => $this->config->get('Garden.Themes.Visible') ? null : false,
+            'hidden' => $this->config->get('Garden.Themes.Visible') === 'all' ? null : false,
             'deprecated' => null,
             'themeType' => 'desktop'
         ];

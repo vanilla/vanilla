@@ -145,7 +145,7 @@ export default function Banner(props: IProps) {
                             )}
                         </div>
                     </Container>
-                    {showBottomSearch && <div className={classes.searchStrip}></div>}
+                    {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }}></div>}
                 </div>
             </div>
             {/* Main Content Area

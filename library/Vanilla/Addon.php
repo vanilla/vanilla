@@ -165,7 +165,7 @@ class Addon implements Contracts\AddonInterface {
                     }
                 }
             }
-            
+
             return $info;
         }
 
@@ -427,7 +427,7 @@ class Addon implements Contracts\AddonInterface {
      * @param array $info The new info array to set.
      * @return Addon Returns `$this` for fluent calls.
      */
-    private function setInfo($info) {
+    private function setInfo(array $info) {
         $this->info = $info;
         return $this;
     }
@@ -689,13 +689,9 @@ class Addon implements Contracts\AddonInterface {
     }
 
     /**
-     * Get a single value from the info array.
-     *
-     * @param string $key The key in the info array.
-     * @param mixed $default The default value to return if there is no item.
-     * @return mixed Returns the info value or {@link $default}.
+     * @inheritdoc
      */
-    public function getInfoValue($key, $default = null) {
+    public function getInfoValue(string $key, $default = null) {
         return isset($this->info[$key]) ? $this->info[$key] : $default;
     }
 
@@ -1150,11 +1146,9 @@ class Addon implements Contracts\AddonInterface {
     }
 
     /**
-     * Get the info.
-     *
-     * @return array Returns the info.
+     * @inheritdoc
      */
-    public function getInfo() {
+    public function getInfo(): array {
         return $this->info;
     }
 

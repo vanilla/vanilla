@@ -3,6 +3,7 @@
     "description": "In 2012 Vanilla went to great lengths to simplify their core theme. This theme is a compatibility layer for themes that were extended from the old 2011 version.",
     "version": "1",
     "hidden": true,
+    "archived": true,
     "options": {
         "description": "This theme has <font color=\"red\">6 color</font> options.",
         "styles": {
@@ -14,7 +15,6 @@
             "vanilla Blue": "%s"
         }
     },
-    "archived": true,
     "key": "2011Compatibility",
     "type": "theme",
     "priority": 1000,

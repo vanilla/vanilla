@@ -125,8 +125,8 @@ export const fontCSS = () => {
 
     cssOut(
         `
-        .Panel .Box a:not(.Button),
-        .Panel .BoxFilter a:not(.Button),
+        .Panel .Box a:not(.Button):not(.Tag),
+        .Panel .BoxFilter a:not(.Button):not(.Tag),
         body.Section-EditProfile .Box .PanelCategories li.Depth3 a,
         body.Section-EditProfile .Box .PanelCategories li.Depth4 a,
         body.Section-EditProfile .Box .PanelCategories li.Depth5 a,

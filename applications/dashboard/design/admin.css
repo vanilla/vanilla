@@ -8835,7 +8835,7 @@ button.close {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  height: 100%;
+  max-height: calc(100vh - 96px);
   padding-bottom: 0;
 }
 .panel-left .panel-content {
@@ -8850,11 +8850,11 @@ button.close {
           order: 3;
   position: -webkit-sticky;
   position: sticky;
-  height: 100%;
+  max-height: calc(100vh - 96px);
   top: 0;
 }
 .panel-right .panel-content {
-  max-height: 100%;
+  max-height: calc(100vh - 96px);
   overflow: auto;
   padding-left: 18px;
 }

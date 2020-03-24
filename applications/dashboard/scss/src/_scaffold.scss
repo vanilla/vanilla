@@ -90,15 +90,17 @@
   height: 100%;
 }
 
+$panelMaxHeight: calc(100vh - #{$navbar-height * 2});
+
 .panel-left {
   padding-left: $spacer;
   position: sticky;
   top: 0;
-  height: 100%;
+  max-height: $panelMaxHeight;
   padding-bottom: 0;
 
   .panel-content {
-    max-height: calc(100vh - #{$navbar-height * 2});
+    max-height: $panelMaxHeight;
     overflow: auto;
   }
 }
@@ -107,11 +109,12 @@
   padding-right: $spacer;
   order: 3;
   position: sticky;
-  height: 100%;
+  max-height: $panelMaxHeight;
+
   top: 0;
 
   .panel-content {
-    max-height: 100%;
+    max-height: $panelMaxHeight;
     overflow: auto;
     padding-left: $spacer;
   }

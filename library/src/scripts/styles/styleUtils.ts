@@ -216,6 +216,8 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
         } else if (defaultVariable instanceof ColorHelper) {
             if (customVariable instanceof ColorHelper) {
                 return customVariable;
+            } else if (typeof customVariable === "string" && customVariable.startsWith("linear-gradient")) {
+                return customVariable;
             } else {
                 const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
                 return color;

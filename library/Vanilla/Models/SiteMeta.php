@@ -8,6 +8,7 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
+use Gdn_Session;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
@@ -98,6 +99,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $dynamicPathFolder = '';
 
+    /** @var Gdn_Session */
+    private $session;
+
     /**
      * SiteMeta constructor.
      *
@@ -105,8 +109,9 @@ class SiteMeta implements \JsonSerializable {
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
-     * @param ThemeFeatres $themeFeatures
+     * @param ThemeFeatures $themeFeatures
      * @param ThemeModel $themeModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         RequestInterface $request,
@@ -114,7 +119,8 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ThemeModel $themeModel
+        ThemeModel $themeModel,
+        Gdn_Session $session
     ) {
         $this->host = $request->getHost();
 
@@ -149,18 +155,26 @@ class SiteMeta implements \JsonSerializable {
         // DeploymentCacheBuster
         $this->cacheBuster = $deploymentCacheBuster->value();
 
+        $this->session = $session;
+
         // Theming
         $themeID = null;
+        $sectionThemeID = '';
         $configParam = 'Garden.Theme';
         if ($this->currentSiteSection->getSectionThemeID()) {
-            $themeID =  $this->currentSiteSection->getSectionThemeID();
+            $sectionThemeID =  $this->currentSiteSection->getSectionThemeID();
             $configParam = 'Garden.CurrentTheme';
         }
 
-        $theme = $themeModel->getCurrentTheme($themeID);
+        $theme = $themeModel->getCurrentTheme($sectionThemeID);
+        $themeID = $theme['themeID'] ?? null;
         $themeAddon = $themeModel->getCurrentThemeAddon($configParam);
 
-        $this->activeThemeKey = $theme["themeID"];
+        if ($this->session->getPreference('PreviewThemeKey')) {
+            $themeID = $this->session->getPreference('PreviewThemeKey');
+        }
+
+        $this->activeThemeKey = $themeID;
         $this->activeThemeViewPath = $themeAddon->path();
         $this->themePreview =  $themeModel->getPreviewTheme();
 

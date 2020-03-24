@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\ThemeModelHelper;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\MinimalContainerTestCase;
@@ -122,5 +123,34 @@ class ThemeModelHelperTest extends MinimalContainerTestCase {
         $this->setUserInfo([ 'Admin' => 2 ]);
         $this->setConfigs([]);
         $this->assertTrue($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden', ['hidden' => true])));
+    }
+
+    /**
+     * Test saving the current themes into the visible themes.
+     */
+    public function testSaveCurrentThemeToVisible() {
+        $this->setConfigs([
+            ThemeModelHelper::CONFIG_THEMES_VISIBLE => ThemeModelHelper::ALL_VISIBLE,
+            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-active',
+        ]);
+        $this->getHelper()->saveCurrentThemeToVisible();
+        $this->assertEquals(ThemeModelHelper::ALL_VISIBLE, self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
+
+        $this->setConfigs([
+            ThemeModelHelper::CONFIG_THEMES_VISIBLE => '',
+            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-active',
+            ThemeModelHelper::CONFIG_MOBILE_THEME => 'test-active',
+        ]);
+        $this->getHelper()->saveCurrentThemeToVisible();
+        $this->assertEquals('test-active', self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
+
+        $this->setConfigs([
+            ThemeModelHelper::CONFIG_THEMES_VISIBLE => '',
+            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-desktop',
+            ThemeModelHelper::CONFIG_MOBILE_THEME => 'test-mobile',
+            ThemeModelHelper::CONFIG_CURRENT_THEME => 'test-current',
+        ]);
+        $this->getHelper()->saveCurrentThemeToVisible();
+        $this->assertEquals('test-desktop,test-mobile,test-current', self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
     }
 }

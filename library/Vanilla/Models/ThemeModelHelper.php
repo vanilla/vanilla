@@ -17,6 +17,20 @@ use Vanilla\Theme\ThemeProviderInterface;
  * Theme helper functions.
  */
 class ThemeModelHelper {
+
+    // Config holding all forced visiblity themes.
+    const CONFIG_THEMES_VISIBLE = 'Garden.Themes.Visible';
+    const ALL_VISIBLE = 'all';
+
+    // Old desktop config key.
+    const CONFIG_DESKTOP_THEME = 'Garden.Theme';
+
+    // Old Mobile config key.
+    const CONFIG_MOBILE_THEME = 'Garden.MobileTheme';
+
+    // New theme API config.
+    const CONFIG_CURRENT_THEME = 'Garden.CurrentTheme';
+
     /** @var SessionInterface $session */
     private $session;
 
@@ -55,9 +69,9 @@ class ThemeModelHelper {
         if ($siteName === null && defined('CLIENT_NAME')) {
             $siteName = CLIENT_NAME;
         }
-        $confVisible = $this->config->get('Garden.Themes.Visible', '');
+        $confVisible = $this->config->get(self::CONFIG_THEMES_VISIBLE);
 
-        if ($confVisible === 'all') {
+        if ($confVisible === self::ALL_VISIBLE) {
             // Config setup to show all themes.
             return true;
         }
@@ -158,5 +172,38 @@ class ThemeModelHelper {
      */
     public function getConfigThemeKey(): string {
         return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+    }
+
+    /**
+     * Take the current themes in the config and save theme as visible.
+     *
+     * This way if themes are hidden in the future, a customer won't lose access to the theme.
+     */
+    public function saveCurrentThemeToVisible() {
+        $currentVisible = $this->config->get(self::CONFIG_THEMES_VISIBLE, '');
+        if ($currentVisible === self::ALL_VISIBLE) {
+            // Don't modify because all are visible.
+            return;
+        }
+
+        $themes = array_filter(array_map('trim', explode(",", $currentVisible)));
+        $desktopTheme = $this->config->get(self::CONFIG_DESKTOP_THEME);
+        $mobileTheme = $this->config->get(self::CONFIG_MOBILE_THEME);
+        $currentTheme = $this->config->get(self::CONFIG_CURRENT_THEME);
+
+        if ($desktopTheme && !in_array($desktopTheme, $themes, true)) {
+            $themes[] = $desktopTheme;
+        }
+
+        if ($mobileTheme && !in_array($mobileTheme, $themes, true)) {
+            $themes[] = $mobileTheme;
+        }
+
+        if ($currentTheme && !in_array($currentTheme, $themes, true)) {
+            $themes[] = $currentTheme;
+        }
+
+        $resultConfig = implode($themes, ",");
+        $this->config->saveToConfig(self::CONFIG_THEMES_VISIBLE, $resultConfig);
     }
 }

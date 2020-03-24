@@ -55,7 +55,6 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
-    mixinTextLinkNoDefaultLinkAppearance("a.Tag");
     mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");

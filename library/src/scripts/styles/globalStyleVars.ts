@@ -475,9 +475,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 });
 
 export interface IGlobalBorderStyles extends IBorderRadiusOutput {
-    color: ColorValues;
-    width: BorderWidthProperty<TLength> | number;
-    style: BorderStyleProperty;
+    color?: ColorValues;
+    width?: BorderWidthProperty<TLength> | number;
+    style?: BorderStyleProperty;
     radius?: radiusValue;
 }
 

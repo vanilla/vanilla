@@ -17,13 +17,18 @@ class MockAddon implements Contracts\AddonInterface {
     /** @var string */
     private $key;
 
+    /** @var array */
+    private $info;
+
     /**
      * Constructor for MockAddon
      *
      * @param string $key
+     * @param array $info
      */
-    public function __construct(string $key) {
+    public function __construct(string $key, array $info = []) {
         $this->key = $key;
+        $this->info = $info;
     }
 
     /**
@@ -38,5 +43,19 @@ class MockAddon implements Contracts\AddonInterface {
      */
     public function getKey(): string {
         return $this->key;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getInfo(): array {
+        return $this->info;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getInfoValue(string $key, $default = null) {
+        return isset($this->info[$key]) ? $this->info[$key] : $default;
     }
 }

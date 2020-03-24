@@ -60,6 +60,7 @@ $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
 $Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
 $Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
+$Definition['RolePersonalInfo'] = "This role is personal info. Only users with permission to view personal info will see it.";
 $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the %s you entered.';

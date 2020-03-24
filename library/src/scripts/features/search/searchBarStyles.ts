@@ -146,7 +146,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 },
                 "& .searchBar__control": {
                     border: 0,
-                    backgroundColor: "transparent",
+                    backgroundColor: colorOut(globalVars.elementaryColors.transparent),
                     width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {

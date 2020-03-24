@@ -47,9 +47,24 @@ export interface ILinkColorOverwrites {
     allStates?: ColorValues;
 }
 
+export const EMPTY_LINK_COLOR_OVERWRITES = {
+    default: undefined as undefined | ColorValues,
+    hover: undefined as undefined | ColorValues,
+    focus: undefined as undefined | ColorValues,
+    accessibleFocus: undefined as undefined | ColorValues,
+    active: undefined as undefined | ColorValues,
+    visited: undefined as undefined | ColorValues,
+    allStates: undefined as undefined | ColorValues,
+};
+
 export interface ILinkColorOverwritesWithOptions extends ILinkColorOverwrites {
     skipDefault?: boolean;
 }
+
+export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
+    ...EMPTY_LINK_COLOR_OVERWRITES,
+    skipDefault: undefined as undefined | boolean,
+};
 
 export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptions) => {
     const vars = globalVariables();

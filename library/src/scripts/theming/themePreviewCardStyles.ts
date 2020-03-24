@@ -175,7 +175,6 @@ export const themeCardClasses = useThemeCache(() => {
         right: 0,
         bottom: 0,
         width: percent(100),
-        height: percent(100),
     });
 
     const actionDropdown = style("actionDropdown", {

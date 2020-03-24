@@ -55,6 +55,13 @@ class MockConfig implements Contracts\ConfigurationInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function saveToConfig($name, $value = '', $options = []) {
+        $this->set($name, $value);
+    }
+
+    /**
      * Flatten and set the data into configuration.
      *
      * @param array $data

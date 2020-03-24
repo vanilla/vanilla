@@ -14,6 +14,7 @@ import { searchResultsVariables } from "@library/features/search/searchResultsSt
 import { percent } from "csx";
 import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts/styles/metasStyles";
 import { important } from "csx";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
@@ -122,6 +123,7 @@ export const searchPageCSS = () => {
 
     cssOut(`#search-results.DataList .Item-Body`, {
         paddingLeft: 0,
+        margin: 0,
     });
 
     cssOut(`#search-results.DataList .Item h3`, {
@@ -196,6 +198,7 @@ export const searchPageCSS = () => {
         $nest: {
             "& .Title": {
                 ...searchResultsStyles.title,
+                ...lineHeightAdjustment(),
                 display: "block",
                 width: percent(100),
                 marginBottom: ".15em",

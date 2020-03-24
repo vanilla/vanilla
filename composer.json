@@ -77,6 +77,7 @@
     "autoload": {
         "classmap": [
             "library/core/",
+            "library/deprecated/",
             "library/database/",
             "library/setup/"
         ],
@@ -85,7 +86,7 @@
             "library/core/functions.framework.php",
             "library/core/functions.general.php",
             "library/core/functions.compatibility.php",
-            "library/core/functions.deprecated.php"
+            "library/deprecated/functions.deprecated.php"
         ],
         "psr-4": {
             "Vanilla\\": "library/Vanilla",

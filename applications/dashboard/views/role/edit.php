@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
+/* @var RoleController $this */
 echo heading($this->title(), '', '', [], '/dashboard/role');
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -32,7 +33,7 @@ echo $this->Form->errors();
     </li>
     <li class="form-group row">
         <div class="input-wrap no-label">
-            <?php echo $this->Form->checkBox('PersonalInfo', t('RolePersonalInfo', "This role is personal info. Only users with permission to view personal info will see it."), ['value' => '1']); ?>
+            <?php echo $this->Form->checkBox('PersonalInfo', 'RolePersonalInfo', ['value' => '1']); ?>
         </div>
     </li>
     <?php

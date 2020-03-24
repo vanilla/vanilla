@@ -20,11 +20,11 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $coreThemes = [
-        'EmbedFriendly', 'bittersweet', 'default', 'mobile', 'keystone',  // themes
+        'keystone',  // themes
     ];
 
     private $hiddenAddons = [
-        'dashboard', 'vanilla', 'gettingstarted', 'googleplus'
+        'dashboard', 'vanilla', 'gettingstarted', 'googleplus', 'EmbedFriendly', 'bittersweet', 'default', 'mobile'
     ];
 
     /**
@@ -106,21 +106,24 @@ class AddonsTest extends AbstractAPIv2Test {
      * Test changing themes.
      */
     public function testChangeTheme() {
-        $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
-        $this->assertEquals('keystone-theme', $desktop['addonID']);
+        $this->runWithConfig(['Garden.Themes.Visible' => 'all'], function () {
 
-        $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
-        $this->assertEquals('keystone-theme', $mobile['addonID']);
+            $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
+            $this->assertEquals('keystone-theme', $desktop['addonID']);
 
-        // Set the desktop and mobile theme.
-        $this->api()->patch('/addons/bittersweet-theme', ['enabled' => true, 'themeType' => 'desktop']);
-        $this->api()->patch('/addons/default-theme', ['enabled' => true, 'themeType' => 'mobile']);
+            $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
+            $this->assertEquals('keystone-theme', $mobile['addonID']);
 
-        $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
-        $this->assertEquals('bittersweet-theme', $desktop['addonID']);
+            // Set the desktop and mobile theme.
+            $this->api()->patch('/addons/bittersweet-theme', ['enabled' => true, 'themeType' => 'desktop']);
+            $this->api()->patch('/addons/default-theme', ['enabled' => true, 'themeType' => 'mobile']);
 
-        $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
-        $this->assertEquals('default-theme', $mobile['addonID']);
+            $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
+            $this->assertEquals('bittersweet-theme', $desktop['addonID']);
+
+            $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
+            $this->assertEquals('default-theme', $mobile['addonID']);
+        });
     }
 
     /**

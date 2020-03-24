@@ -16,6 +16,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     backgroundHelper,
+    borderRadii,
     borders,
     colorOut,
     EMPTY_BACKGROUND,
@@ -329,6 +330,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             radius: 0,
         },
         right: {
+            ...EMPTY_BORDER,
             radius: border.radius,
             color: colors.bg,
         },
@@ -465,63 +467,44 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        let rightRadius = vars.border.radius as number | string;
-        let leftRadius = vars.border.radius as number | string;
-
-        if (
-            vars.searchButton &&
-            vars.searchButton.borders &&
-            vars.searchButton.borders.right &&
-            vars.searchButton.borders.right.radius
-        ) {
-            const radius = vars.searchButton.borders.right.radius as string | number;
-            rightRadius = unit(radius) as any;
-        }
-
-        if (presets.button.preset === ButtonPreset.HIDE) {
-            leftRadius = rightRadius;
-        } else {
-            if (vars.searchBar.border.radius && vars.searchBar.border.radius.left) {
-                leftRadius = unit(vars.searchBar.border.radius.left) as any;
-            }
-        }
-
-        const valueContainer = style("valueContainer", {
-            $nest: {
-                "&&.inputText": {
-                    ...textInputSizingFromFixedHeight(
-                        vars.searchBar.sizing.height,
-                        vars.searchBar.font.size,
-                        vars.searchBar.border.width * 2,
-                    ),
-                    boxSizing: "border-box",
-                    paddingLeft: unit(searchBarVariables().searchIcon.gap),
-                    backgroundColor: colorOut(vars.searchBar.colors.bg),
-                    ...borders({
-                        color: vars.searchBar.border.color,
-                    }),
-                    borderTopLeftRadius: unit(leftRadius),
-                    borderBottomLeftRadius: unit(leftRadius),
-                    borderTopRightRadius: unit(rightRadius),
-                    borderBottomRightRadius: unit(rightRadius),
-                    $nest: {
-                        "&:active, &:hover, &:focus, &.focus-visible": {
-                            ...borders(vars.searchBar.border),
+        const valueContainer = mirrorLeftRadius => {
+            return style("valueContainer", {
+                $nest: {
+                    "&&.inputText": {
+                        ...textInputSizingFromFixedHeight(
+                            vars.searchBar.sizing.height,
+                            vars.searchBar.font.size,
+                            vars.searchBar.border.width * 2,
+                        ),
+                        boxSizing: "border-box",
+                        paddingLeft: unit(searchBarVariables().searchIcon.gap),
+                        backgroundColor: colorOut(vars.searchBar.colors.bg),
+                        ...borders({
+                            ...vars.searchBar.border,
+                        }),
+                        $nest: {
+                            "&:active, &:hover, &:focus, &.focus-visible": {
+                                borderColor: colorOut(vars.searchBar.state.border.color),
+                            },
                         },
+                        ...borderRadii({
+                            left: vars.border.radius,
+                            right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+                        }),
+                        borderColor: colorOut(vars.searchBar.border.color),
                     },
-                    borderColor: colorOut(vars.searchBar.border.color),
+                    ".searchBar__control": {
+                        cursor: "text",
+                        position: "relative",
+                    },
+                    "& .searchBar__placeholder": {
+                        color: colorOut(vars.searchBar.font.color),
+                    },
                 },
-                ".searchBar__control": {
-                    cursor: "text",
-                    position: "relative",
-                },
-                "& .searchBar__placeholder": {
-                    color: colorOut(vars.searchBar.font.color),
-                },
-            },
-        } as NestedCSSProperties);
+            } as NestedCSSProperties);
+        };
 
-        const outerBackground = (url?: string) => {
+        const outerBackground = useThemeCache((url?: string) => {
             const finalUrl = url ?? vars.outerBackground.image ?? undefined;
             const finalVars = {
                 ...vars.outerBackground,
@@ -544,7 +527,7 @@ export const bannerClasses = useThemeCache(
                     image: vars.outerBackground.mobile.image,
                 } as NestedCSSProperties),
             );
-        };
+        });
 
         const defaultBannerSVG = style("defaultBannerSVG", {
             ...absolutePosition.fullSizeOfParent(),
@@ -825,14 +808,9 @@ export const bannerClasses = useThemeCache(
                 },
             ),
         );
-
         const rootConditionalStyles =
             presets.input.preset === SearchBarPresets.UNIFIED_BORDER
                 ? {
-                      borderTopLeftRadius: unit(leftRadius),
-                      borderBottomLeftRadius: unit(leftRadius),
-                      borderTopRightRadius: unit(rightRadius),
-                      borderBottomRightRadius: unit(rightRadius),
                       backgroundColor: colorOut(vars.unifiedBannerOptions.border.color),
                       boxShadow: `0 0 0 ${unit(vars.unifiedBannerOptions.border.width)} ${
                           vars.unifiedBannerOptions.border.color

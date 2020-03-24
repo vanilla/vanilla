@@ -92,14 +92,9 @@ export const metaContainerStyles = (overwrites?: any) => {
     } as NestedCSSProperties;
 };
 
-export const metasClasses = useThemeCache(() => {
+export const metaItemStyle = useThemeCache(() => {
     const vars = metasVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("metas");
-
-    const root = style(metaContainerStyles());
-
-    const meta = style("meta", {
+    return {
         display: "inline-block",
         fontSize: unit(vars.fonts.size),
         color: colorOut(vars.colors.fg),
@@ -114,7 +109,16 @@ export const metasClasses = useThemeCache(() => {
                 margin: 0,
             },
         },
-    });
+    } as NestedCSSProperties;
+});
+
+export const metasClasses = useThemeCache(() => {
+    const vars = metasVariables();
+    const globalVars = globalVariables();
+    const style = styleFactory("metas");
+
+    const root = style(metaContainerStyles());
+    const meta = style("meta", metaItemStyle());
 
     // Get styles of meta, without the margins
     const metaStyle = style("metaStyles", {

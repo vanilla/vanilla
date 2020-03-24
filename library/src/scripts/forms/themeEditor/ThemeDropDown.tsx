@@ -4,12 +4,10 @@
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/SelectOne";
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { t } from "@vanilla/i18n";
-import classNames from "classnames";
 import React from "react";
 import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";

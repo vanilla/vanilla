@@ -83,4 +83,12 @@ export const discussionCSS = () => {
             left: 2,
         },
     );
+
+    cssOut(`.Container .DataTable span.MItem`, {
+        display: "inline-block",
+    });
+
+    cssOut(`.Container .DataTable span.MItem a`, {
+        display: "inline",
+    });
 };

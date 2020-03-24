@@ -42,7 +42,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         borderColor: globalVars.mainColors.fg.fade(0.4),
-        placeholder: titleBarVars.colors.fg.fade(0.8),
+        placeholder: globalVars.mainColors.fg.fade(0.8),
         active: {
             bg: baseColor,
         },
@@ -175,8 +175,12 @@ export const compactSearchClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             "& .searchBar__input": {
-                color: colorOut(vars.colors.fg),
+                color: colorOut(vars.searchBar.font.color),
                 width: percent(100),
+            },
+            "& .searchBar__input input": {
+                color: colorOut(vars.searchBar.font.color),
+                borderRadius: important(0),
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
@@ -194,7 +198,7 @@ export const compactSearchClasses = useThemeCache(() => {
             "&.isCentered": {
                 margin: "auto",
             },
-            ".suggestedTextInput-inputText": {
+            "& .suggestedTextInput-inputText": {
                 borderTopRightRadius: unit(globalVars.border.radius),
                 borderBottomRightRadius: unit(globalVars.border.radius),
             },

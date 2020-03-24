@@ -108,7 +108,7 @@ class TagModule extends Gdn_Module {
         $this->EventArguments['ParentType'] = $this->ParentType;
         $this->EventArguments['tagData'] = &$tagData;
         $this->fireEvent('getData');
-        
+
         if (is_array($tagData)) {
             $this->_TagData = new Gdn_DataSet($tagData, DATASET_TYPE_ARRAY);
             return;
@@ -239,11 +239,11 @@ endforeach; ?>
 ?>
                     <?php if ($tag['Name'] != '') :
 ?>
-                        <li><?php
+                        <li class="TagCloud-Item"><?php
                             echo anchor(
                                 htmlspecialchars(tagFullName($tag)).' '.wrap(number_format($tag['CountDiscussions']), 'span', ['class' => 'Count']),
                                 tagUrl($tag, '', '/'),
-                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
+                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])." Tag"]
                             );
                             ?></li>
                     <?php

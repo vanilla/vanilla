@@ -5,17 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import {
-    allLinkStates,
-    borders,
-    colorOut,
-    fonts,
-    importantColorOut,
-    margins,
-    negative,
-    paddings,
-    unit,
-} from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
@@ -54,15 +44,20 @@ export const forumMetaCSS = () => {
     );
 
     const linkSelectors = `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a,
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
         .MessageList .ItemComment .Username,
         .MessageList .ItemDiscussion .Username,
-        .AuthorInfo .MItem.RoleTracker,
-        .MItem > a,
+        .AuthorInfo .MItem.RoleTracker a:not(.Tag),
+        .MItem > a:not(.Tag),
         `;
+
+    cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
+        padding: 0,
+        margin: 0,
+    });
 
     // Links
     cssOut(linkSelectors, {
@@ -103,10 +98,10 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a,
-        .MessageList .ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a,
-        .MainContent.Content .MItem.RoleTracker a,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
     `,
         {
             ...paddings({
@@ -131,9 +126,15 @@ export const forumMetaCSS = () => {
         },
     );
 
-    cssOut(`.Content .MessageList .RoleTracker > .Tag, .Tag`, {
-        color: colorOut(globalVars.mainColors.fg),
-    });
+    cssOut(
+        `
+        .Content .MessageList .RoleTracker > .Tag,
+        .Tag
+        `,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
 
     cssOut(
         `
@@ -173,7 +174,7 @@ export const forumMetaCSS = () => {
         `
     .AuthorWrap a.Username,
     .AuthorInfo .MItem,
-    .DiscussionMeta .MItem
+    .DiscussionMeta .MItem,
     `,
         {
             ...paddings({
@@ -212,7 +213,6 @@ export const forumMetaCSS = () => {
 
     cssOut(
         `
-    .Content .Meta-Discussion > .Tag,
     .Content  .idea-counter-module
     `,
         {

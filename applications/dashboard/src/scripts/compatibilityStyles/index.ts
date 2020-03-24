@@ -358,7 +358,7 @@ export const compatibilityStyles = useThemeCache(() => {
         background: "none",
     });
 
-    cssOut(".Bullet", {
+    cssOut(".Bullet, .QuickSearch", {
         display: "none",
     });
 

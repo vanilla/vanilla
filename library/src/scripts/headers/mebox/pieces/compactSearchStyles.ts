@@ -198,7 +198,7 @@ export const compactSearchClasses = useThemeCache(() => {
             "&.isCentered": {
                 margin: "auto",
             },
-            ".suggestedTextInput-inputText": {
+            "& .suggestedTextInput-inputText": {
                 borderTopRightRadius: unit(globalVars.border.radius),
                 borderBottomRightRadius: unit(globalVars.border.radius),
             },

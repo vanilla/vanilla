@@ -61,6 +61,11 @@ export default function Banner(props: IProps) {
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
+    const hideButton =
+        device === Devices.MOBILE ||
+        device === Devices.XS ||
+        bannerVariables().presets.button.preset === ButtonPreset.HIDE;
+
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
             <IndependentSearch
@@ -71,13 +76,9 @@ export default function Banner(props: IProps) {
                 inputClass={classes.input}
                 iconClass={classes.icon}
                 buttonLoaderClassName={classes.buttonLoader}
-                hideSearchButton={
-                    device === Devices.MOBILE ||
-                    device === Devices.XS ||
-                    bannerVariables().presets.button.preset === ButtonPreset.HIDE
-                }
+                hideSearchButton={hideButton}
                 contentClass={classes.content}
-                valueContainerClasses={classes.valueContainer}
+                valueContainerClasses={classes.valueContainer(hideButton)}
                 iconContainerClasses={classes.iconContainer}
                 resultsAsModalClasses={classes.resultsAsModal}
             />

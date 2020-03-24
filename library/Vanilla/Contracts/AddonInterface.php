@@ -24,4 +24,20 @@ interface AddonInterface {
      * @return string The addon key.
      */
     public function getKey(): string;
+
+    /**
+     * Get information about the addon.
+     *
+     * @return array
+     */
+    public function getInfo(): array;
+
+    /**
+     * Get a single value from the info array.
+     *
+     * @param string $key The key in the info array.
+     * @param mixed $default The default value to return if there is no item.
+     * @return mixed Returns the info value or {@link $default}.
+     */
+    public function getInfoValue(string $key, $default = null);
 }

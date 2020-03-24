@@ -6,8 +6,10 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Contracts\AddonProviderInterface;
 use Gdn_Session as SessionInterface;
+use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\ThemeProviderInterface;
 
@@ -39,6 +41,69 @@ class ThemeModelHelper {
         $this->session = $session;
         $this->addonManager = $addonManager;
         $this->config  = $config;
+    }
+
+    /**
+     * Filter themes based on their addon.json.
+     *
+     * @param AddonInterface $theme A themes data from it's addon.json.
+     * @param string $siteName The vanilla domain of the site.
+     *
+     * @return bool
+     */
+    public function isThemeVisible(AddonInterface $theme, ?string $siteName = null): bool {
+        if ($siteName === null && defined('CLIENT_NAME')) {
+            $siteName = CLIENT_NAME;
+        }
+        $confVisible = $this->config->get('Garden.Themes.Visible', '');
+
+        if ($confVisible === 'all') {
+            // Config setup to show all themes.
+            return true;
+        }
+
+        $isAdmin = ($this->session->User->Admin ?? 0) === 2;
+        if ($isAdmin) {
+            // All theme visible for system admins.
+            return true;
+        }
+
+        $themeKey = $theme->getKey();
+        $alwaysVisibleThemes = array_map('trim', explode(",", $confVisible));
+
+        if (in_array($themeKey, $alwaysVisibleThemes, true)) {
+            return true;
+        }
+
+        $currentTheme = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        if ($currentTheme === $themeKey) {
+            // Always visible.
+            return true;
+        }
+
+        // Check if theme visibility is set through the JSON.
+        $hidden = $theme->getInfoValue('hidden', null);
+        $sites = $theme->getInfoValue('sites', []);
+        $site = $theme->getInfoValue('site', null);
+        if ($site !== null) {
+            $sites[] = $site;
+        }
+
+        if ($hidden === false) {
+            return true;
+        } elseif ($hidden === true) {
+            return false;
+        } else {
+            $hidden = false;
+            foreach ($sites as $addonSite) {
+                if ($addonSite === $siteName || fnmatch($addonSite, $siteName)) {
+                    $hidden = true;
+                    break;
+                }
+            }
+
+            return $hidden;
+        }
     }
 
     /**
@@ -84,5 +149,14 @@ class ThemeModelHelper {
                 'PreviewThemeName' => ''
             ]
         );
+    }
+
+    /**
+     * Get the current theme key from the config.
+     *
+     * @return string
+     */
+    public function getConfigThemeKey(): string {
+        return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
     }
 }

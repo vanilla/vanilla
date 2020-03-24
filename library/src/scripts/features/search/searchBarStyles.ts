@@ -188,6 +188,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     height: "auto",
                     minHeight: 0,
                     width: important(`100%`),
+                    borderRadius: important(0),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
@@ -200,6 +201,51 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             },
         }),
     );
+
+    // The styles have been split here so they can be exported to the compatibility styles.
+    const searchResultsStyles = {
+        option: {
+            ...buttonResetMixin(),
+            width: percent(100),
+            ...paddings({
+                vertical: 9,
+                horizontal: 12,
+            }),
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+            }),
+            textAlign: "left",
+            display: "block",
+            color: "inherit",
+            $nest: {
+                "&:hover, &:focus, &.isFocused": {
+                    color: "inherit",
+                    backgroundColor: globalVars.states.hover.highlight.toString(),
+                },
+            },
+        } as NestedCSSProperties,
+        title: {
+            ...fonts({
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.semiBold,
+                lineHeight: globalVars.lineHeights.condensed,
+            }),
+        } as NestedCSSProperties,
+        meta: {
+            ...fonts({
+                ...globalVars.meta.text,
+                lineHeight: globalVars.meta.lineHeights.default,
+            }),
+        } as NestedCSSProperties,
+        excerpt: {
+            marginTop: unit(6),
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+                color: vars.results.fg,
+                lineHeight: globalVars.lineHeights.excerpt,
+            }),
+        } as NestedCSSProperties,
+    };
 
     const results = style("results", {
         position: "absolute",
@@ -220,40 +266,24 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-option": {
-                ...buttonResetMixin(),
-                width: percent(100),
-                ...paddings({
-                    vertical: 9,
-                    horizontal: 12,
-                }),
-                ...fonts({
-                    size: globalVars.fonts.size.medium,
-                }),
-                textAlign: "left",
-                display: "block",
-                color: "inherit",
-                $nest: {
-                    "&:hover, &:focus, &.isFocused": {
-                        color: "inherit",
-                        backgroundColor: globalVars.states.hover.highlight.toString(),
-                    },
-                },
-            },
+            "& .suggestedTextInput-option": searchResultsStyles.option,
             "& .suggestedTextInput-menuItems": {
                 margin: 0,
                 padding: 0,
             },
             "& .suggestedTextInput-item": {
-                ...fonts({
-                    size: globalVars.fonts.size.medium,
-                }),
                 listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
                         borderTop: `solid 1px ${globalVars.border.color.toString()}`,
                     },
                 },
+            },
+            "& .suggestedTextInput-title": {
+                ...searchResultsStyles.title,
+            },
+            "& .suggestedTextInput-title .suggestedTextInput-searchingFor": {
+                fontWeight: globalVars.fonts.weights.normal,
             },
         },
     });
@@ -456,5 +486,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         results,
         resultsAsModal,
         menu,
+        searchResultsStyles, // for compatibility
     };
 });

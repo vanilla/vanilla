@@ -192,7 +192,11 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Create a label for React Select's "Add option" option.
      */
     private createFormatLabel = (inputValue: string) => {
-        return <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />;
+        return (
+            <span className="suggestedTextInput-searchingFor">
+                <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />
+            </span>
+        );
     };
 
     /**

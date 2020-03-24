@@ -6,7 +6,7 @@
 
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { borders, colorOut, fonts, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, flexHelper, fonts, unit } from "@library/styles/styleHelpers";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 
@@ -37,9 +37,15 @@ export const themeDropDownClasses = useThemeCache(() => {
                 cursor: "pointer",
             },
             "& .suggestedTextInput-option": {
+                width: percent(100),
+                textAlign: "left",
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
+            },
+            "& .suggestedTextInput-head": {
+                ...flexHelper().middleLeft(),
+                justifyContent: "space-between",
             },
             "& .suggestedTextInput-valueContainer": {
                 minHeight: unit(builderVariables.input.height),

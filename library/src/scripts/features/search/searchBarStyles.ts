@@ -282,6 +282,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             "& .suggestedTextInput-title": {
                 ...searchResultsStyles.title,
             },
+
             "& .suggestedTextInput-title .suggestedTextInput-searchingFor": {
                 fontWeight: globalVars.fonts.weights.normal,
             },
@@ -301,38 +302,35 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         zIndex: 1,
     });
 
-    const valueContainer = style("valueContainer", {
-        display: "flex",
-        alignItems: "center",
-        width: percent(100),
-        paddingTop: 0,
-        paddingBottom: 0,
-        paddingRight: 0,
-        height: unit(vars.sizing.height),
-        backgroundColor: colorOut(vars.input.bg),
-        color: colorOut(vars.input.fg),
-        cursor: "text",
-        transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
-        ...borderRadii({
-            right: 0,
-            left: vars.border.radius,
-        }),
-        $nest: {
-            "&&&": {
-                display: "flex",
-                flexWrap: "nowrap",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                paddingLeft: unit(vars.searchIcon.gap),
-                paddingRight: unit(vars.searchIcon.padding.right),
+    const valueContainer = (mirrorLeftRadius = false) => {
+        return style("valueContainer", {
+            display: "flex",
+            alignItems: "center",
+            width: percent(100),
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingRight: 0,
+            height: unit(vars.sizing.height),
+            backgroundColor: colorOut(vars.input.bg),
+            color: colorOut(vars.input.fg),
+            cursor: "text",
+            transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
+            ...borderRadii({
+                left: vars.border.radius,
+                right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+            }),
+            $nest: {
+                "&&&": {
+                    display: "flex",
+                    flexWrap: "nowrap",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    paddingLeft: unit(vars.searchIcon.gap),
+                    paddingRight: unit(vars.searchIcon.padding.right),
+                },
             },
-            "&.noSearchButton": {
-                ...borderRadii({
-                    right: importantUnit(vars.border.radius),
-                }),
-            },
-        },
-    });
+        });
+    };
 
     // Has a search button attached.
     const compoundValueContainer = style("compoundValueContainer", {
@@ -387,6 +385,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     const form = style("form", {
         display: "block",
+        height: percent(100),
     });
 
     // special selector

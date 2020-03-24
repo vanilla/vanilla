@@ -106,6 +106,9 @@
 .panel-right {
   padding-right: $spacer;
   order: 3;
+  position: sticky;
+  height: 100%;
+  top: 0;
 
   .panel-content {
     max-height: 100%;

@@ -8848,6 +8848,10 @@ button.close {
   -webkit-order: 3;
       -ms-flex-order: 3;
           order: 3;
+  position: -webkit-sticky;
+  position: sticky;
+  height: 100%;
+  top: 0;
 }
 .panel-right .panel-content {
   max-height: 100%;

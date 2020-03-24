@@ -26,6 +26,15 @@ class Gdn_Session {
     /** Maximum length of inactivity, in seconds, before a visit is considered new. */
     const VISIT_LENGTH = 1200; // 20 minutes
 
+    /** Array of ranked permissions. */
+    private const RANKED_PERMISSIONS = [
+        'Garden.Settings.Manage',
+        'Garden.Community.Manage',
+        'Garden.Moderation.Manage',
+        'Garden.Curation.Manage',
+        'Garden.SignIn.Allow',
+    ];
+
     /** @var int Unique user identifier. */
     public $UserID;
 
@@ -73,28 +82,38 @@ class Gdn_Session {
         $this->permissions->merge($newPermissions);
     }
 
-    /**
-     * Check the given permission, but also return true if the user has a higher permission.
-     *
-     * @param bool|string $permission The permission to check.  Bool to force true/false.
-     * @return boolean True on valid authorization, false on failure to authorize
-     */
-    public function checkRankedPermission($permission) {
-        $permissionsRanked = [
-            'Garden.Settings.Manage',
-            'Garden.Community.Manage',
-            'Garden.Moderation.Manage',
-            'Garden.Curation.Manage',
-            'Garden.SignIn.Allow',
-        ];
+    public function hasHigherPermissionLevel($sessionPermission, $userID) {
 
-        if ($permission === true) {
+        // If the current user is an admin, they can do whatever they want.
+        if ($this->permissions->has('Garden.Settings.Manage')) {
             return true;
-        } elseif ($permission === false) {
+        }
+
+        // Otherwise, check the current user's permissions against the user they want to ban/warn/etc.
+        // Throw a permission error if the session user doesn't outrank the user to be banned. Otherwise, return true.
+
+        if ($this->checkUserRankedPermission($sessionPermission, $userID) || !$this->checkRankedPermission($sessionPermission)) {
+            throw permissionException();
+        } else {
+            return true;
+        }
+    }
+
+    public function checkUserRankedPermission($permission, $userID) {
+        $rankedPermissions = self::RANKED_PERMISSIONS;
+
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $userPermissions = $userModel->getPermissions($userID);
+        $userPermissions = $userPermissions->getPermissions();
+        // Get the highest permission in the user's permission array.
+
+        if ($userPermissions[$permission] === true) {
+            return true;
+        } elseif ($userPermissions[$permission] === false) {
             return false;
-        } elseif (in_array($permission, $permissionsRanked)) {
+        } elseif (in_array($permission, $rankedPermissions)) {
             // Ordered rank of some permissions, highest to lowest
-            $currentPermissionRank = array_search($permission, $permissionsRanked);
+            $currentPermissionRank = array_search($permission, $rankedPermissions);
 
             /**
              * If the current permission is in our ranked list, iterate through the list, starting from the highest
@@ -104,7 +123,40 @@ class Gdn_Session {
              * assigned to their role.
              */
             for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                if ($this->permissions->has($permissionsRanked[$i])) {
+                if (in_array($rankedPermissions[$i], $userPermissions)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param bool|string $permission The permission to check.  Bool to force true/false.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function checkRankedPermission($permission) {
+        $rankedPermissions = self::RANKED_PERMISSIONS;
+
+        if ($permission === true) {
+            return true;
+        } elseif ($permission === false) {
+            return false;
+        } elseif (in_array($permission, $rankedPermissions)) {
+            // Ordered rank of some permissions, highest to lowest
+            $currentPermissionRank = array_search($permission, $rankedPermissions);
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                if ($this->permissions->has($rankedPermissions[$i])) {
                     return true;
                 }
             }

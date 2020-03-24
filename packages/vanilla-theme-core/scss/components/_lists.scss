@@ -503,7 +503,9 @@
                 padding: 0 $utility-baseUnitHalf;
 
                 a {
-                    color: inherit;
+                    @if ($staticVariables) {
+                        color: inherit;
+                    }
                     margin: 0;
 
                     &:hover,

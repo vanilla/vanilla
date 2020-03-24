@@ -322,7 +322,7 @@ class ModerationController extends VanillaController {
         $this->setData('CountNotAllowed', $countNotAllowed);
 
         if ($this->Form->authenticatedPostBack()) {
-            $discussionArray = array('discussionID' => $allowedDiscussions);
+            $discussionArray = ['discussionID' => $allowedDiscussions];
                 // Queue deleting discussions.
                 /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
                 $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);

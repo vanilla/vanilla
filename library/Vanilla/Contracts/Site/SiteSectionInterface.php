@@ -7,8 +7,6 @@
 
 namespace Vanilla\Contracts\Site;
 
-use phpDocumentor\Reflection\Types\Mixed_;
-
 /**
  * Interface representing a section of a site.
  *

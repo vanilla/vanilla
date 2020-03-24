@@ -328,12 +328,6 @@ class ThemeModel {
         return $addon;
     }
 
-    public function getThemeViewPath($themeKey): string {
-        $provider = $this->getThemeProvider($themeKey);
-        $path = $provider->getThemeViewPath($themeKey);
-        return $path;
-    }
-
     /**
      * Get current theme.
      *
@@ -362,6 +356,17 @@ class ThemeModel {
         return $current;
     }
 
+    /**
+     * Get theme view folder path
+     *
+     * @param string|int $themeKey Theme key or id
+     * @return string
+     */
+    public function getThemeViewPath($themeKey): string {
+        $provider = $this->getThemeProvider($themeKey);
+        $path = $provider->getThemeViewPath($themeKey);
+        return $path;
+    }
 
 
     /**

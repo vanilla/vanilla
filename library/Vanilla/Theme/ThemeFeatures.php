@@ -97,8 +97,4 @@ class ThemeFeatures {
     public function disableKludgedVars(): bool {
         return (bool) $this->allFeatures()['DisableKludgedVars'];
     }
-
-    public function getTheme() {
-        return $this->theme;
-    }
 }

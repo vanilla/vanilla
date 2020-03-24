@@ -269,8 +269,6 @@ class ThemeModel {
         return $theme;
     }
 
-
-
     /**
      * Get preview theme properties if exists.
      *

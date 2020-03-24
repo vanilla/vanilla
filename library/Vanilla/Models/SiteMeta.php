@@ -57,6 +57,9 @@ class SiteMeta implements \JsonSerializable {
     private $activeThemeKey;
 
     /** @var string */
+    private $mobileThemeKey;
+
+    /** @var string */
     private $activeThemeViewPath;
 
     /** @var ThemeFeatures */
@@ -153,6 +156,7 @@ class SiteMeta implements \JsonSerializable {
         $themeKey = $themeModel->getViewThemeKey();
         $this->activeThemeKey = $themeKey;
         $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
+        $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
         $this->themePreview =  $themeModel->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
@@ -199,6 +203,7 @@ class SiteMeta implements \JsonSerializable {
                 'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeThemeKey,
+                'mobileThemeKey' => $this->mobileThemeKey,
                 'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'shareImage' => $this->shareImage,

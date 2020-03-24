@@ -5,12 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, setAllLinkColors } from "@library/styles/styleHelpers";
+import { colorOut, ILinkColorOverwritesWithOptions, setAllLinkColors } from "@library/styles/styleHelpers";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { throwError } from "rxjs";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const textLinkCSS = () => {
+    const globalVars = globalVariables();
+
     // Various links
     mixinTextLink(".Navigation-linkContainer a");
     mixinTextLink(".Panel .PanelInThisDiscussion a");
@@ -44,6 +46,9 @@ export const textLinkCSS = () => {
         .Container .userContent a,
         .Container .UserContent a
     `);
+    mixinTextLink(".BreadcrumbsBox .Breadcrumbs a", {
+        default: globalVars.links.colors.default,
+    });
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
@@ -56,7 +61,7 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".DataTable .Title.Title a");
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
-    mixinTextLinkNoDefaultLinkAppearance(".Breadcrumbs a");
+    mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
 };
 
 // Mixins replacement

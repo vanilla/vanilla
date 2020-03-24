@@ -100,9 +100,10 @@ interface ThemeProviderInterface {
     /**
      * Get "current" theme.
      *
+     * @param $themeID
      * @return array
      */
-    public function getCurrent(): ?array;
+    public function getCurrent($themeID): ?array;
 
     /**
      * Get theme view folder path

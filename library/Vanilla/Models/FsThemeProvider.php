@@ -427,7 +427,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrent(): ?array {
+    public function getCurrent($themeID = null): ?array {
         $themeKey = $this->themeHelper->getConfigThemeKey();
         return $this->getThemeWithAssets($themeKey);
     }

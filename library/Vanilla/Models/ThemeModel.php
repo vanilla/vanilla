@@ -309,13 +309,14 @@ class ThemeModel {
     /**
      * Get view theme addon
      *
-     * @return string
+     * @param string $configParam
+     * @return Addon
      */
-    public function getCurrentThemeAddon(): Addon {
+    public function getCurrentThemeAddon(string $configParam = ''): Addon {
         $isMobile = isMobile();
-        $configParam = $isMobile ? 'Garden.MobileTheme' : 'Garden.Theme';
+        $configParam = $isMobile ? 'Garden.MobileTheme' : $configParam;
 
-        $themeKey = $this->config->get( $this->config->get($configParam));
+        $themeKey = $this->config->get($configParam);
         $provider = $this->getThemeProvider($themeKey);
         $addonThemeKey = $provider->getMasterThemeKey($themeKey);
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
@@ -353,7 +354,7 @@ class ThemeModel {
 
         if (is_null($current)) {
             $provider = $this->getThemeProvider("FILE");
-            $current = $provider->getCurrent();
+            $current = $provider->getCurrent($themeID);
         }
         $current['preview'] = $this->generateThemePreview($current) ?? null;
         return $current;

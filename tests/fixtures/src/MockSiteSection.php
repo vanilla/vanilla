@@ -47,7 +47,6 @@ class MockSiteSection implements SiteSectionInterface {
      * @param string $sectionID
      * @param string $sectionGroup
      * @param array $defaultRoute
-     * @param string $themeID
      */
     public function __construct(
         string $sectionName,

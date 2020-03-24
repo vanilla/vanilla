@@ -335,7 +335,7 @@ class ThemeModel {
      *
      * @param null $themeID
      * @return array|void If no currnt theme set returns null
-     * @throws ClientException
+     * @throws ClientException If no theme is found.
      */
     public function getCurrentTheme($themeID = null): ?array {
         $current = null;

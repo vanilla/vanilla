@@ -100,7 +100,7 @@ interface ThemeProviderInterface {
     /**
      * Get "current" theme.
      *
-     * @param $themeID
+     * @param int/string $themeID
      * @return array
      */
     public function getCurrent($themeID): ?array;

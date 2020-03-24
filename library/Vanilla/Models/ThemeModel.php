@@ -269,19 +269,7 @@ class ThemeModel {
         return $theme;
     }
 
-    /**
-     * Get view theme key
-     *
-     * @return string
-     */
-    public function getViewThemeKey(): string {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
 
-        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
-            $themeKey = $previewTheme;
-        }
-        return $themeKey;
-    }
 
     /**
      * Get preview theme properties if exists.
@@ -317,13 +305,14 @@ class ThemeModel {
         return $this->themeManagePageUrl;
     }
 
+
     /**
      * Get view theme addon
      *
      * @return string
      */
-    public function getThemeAddon(): Addon {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+    public function getCurrentThemeAddon(): Addon {
+        $themeKey = $this->config->get( $this->config->get('Garden.Theme'));
         $provider = $this->getThemeProvider($themeKey);
         $addonThemeKey = $provider->getMasterThemeKey($themeKey);
         if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
@@ -339,16 +328,25 @@ class ThemeModel {
         return $addon;
     }
 
+    public function getThemeViewPath($themeKey): string {
+        $provider = $this->getThemeProvider($themeKey);
+        $path = $provider->getThemeViewPath($themeKey);
+        return $path;
+    }
+
     /**
      * Get current theme.
      *
+     * @param null $themeID
      * @return array|void If no currnt theme set returns null
+     * @throws ClientException
      */
-    public function getCurrentTheme(): ?array {
+    public function getCurrentTheme($themeID = null): ?array {
         $current = null;
         try {
-            $provider = $this->getThemeProvider(1);
-            $current = $provider->getCurrent();
+            $themeID = $themeID ?? 1;
+            $provider = $this->getThemeProvider($themeID);
+            $current = $provider->getCurrent($themeID);
         } catch (ClientException $e) {
             if ($e->getMessage() !== 'No custom theme provider found!') {
                 throw $e;
@@ -364,17 +362,7 @@ class ThemeModel {
         return $current;
     }
 
-    /**
-     * Get theme view folder path
-     *
-     * @param string|int $themeKey Theme key or id
-     * @return string
-     */
-    public function getThemeViewPath($themeKey): string {
-        $provider = $this->getThemeProvider($themeKey);
-        $path = $provider->getThemeViewPath($themeKey);
-        return $path;
-    }
+
 
     /**
      * Set theme asset (update existing or create new if asset does not exist).

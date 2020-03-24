@@ -38,7 +38,7 @@ class ThemeFeatures {
      */
     public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
         $this->config = $config;
-        $this->theme = $themeModel->getThemeAddon();
+        $this->theme = $themeModel->getCurrentThemeAddon();
     }
 
     /**
@@ -96,5 +96,9 @@ class ThemeFeatures {
      */
     public function disableKludgedVars(): bool {
         return (bool) $this->allFeatures()['DisableKludgedVars'];
+    }
+
+    public function getTheme() {
+        return $this->theme;
     }
 }

@@ -7,6 +7,8 @@
 
 namespace Vanilla\Contracts\Site;
 
+use phpDocumentor\Reflection\Types\Mixed_;
+
 /**
  * Interface representing a section of a site.
  *
@@ -93,4 +95,11 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return array
      */
     public function getAttributes(): array;
+
+    /**
+     * Get the themeID for this siteSection
+     *
+     * @return mixed
+     */
+    public function getSectionThemeID();
 }

@@ -94,8 +94,8 @@ class ThemeModel {
     /** @var \Gdn_Session */
     private $session;
 
-    /** @var SiteSectionInterface */
-    private $currentSiteSection;
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
 
     /** @var AddonProviderInterface $addonManager */
     private $addonManager;
@@ -126,7 +126,7 @@ class ThemeModel {
         $this->session = $session;
         $this->addonManager = $addonManager;
         $this->themeHelper = $themeHelper;
-        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -370,7 +370,7 @@ class ThemeModel {
                 $current = $baseTheme;
             }
 
-            $sectionThemeID =  $this->currentSiteSection->getSectionThemeID();
+            $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();
             if ($sectionThemeID !== null) {
                 // Check if the theme actually exists.
                 $sectionTheme = $this->getThemeProvider($sectionThemeID)->getThemeWithAssets($sectionThemeID);

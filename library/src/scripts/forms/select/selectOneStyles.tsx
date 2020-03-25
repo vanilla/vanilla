@@ -7,6 +7,8 @@ import { useThemeCache, styleFactory, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
@@ -60,6 +62,8 @@ export const selectOneClasses = useThemeCache(() => {
             },
         },
     });
+
+    cssOut(".suggestedTextInput-option", searchBarClasses().searchResultsStyles.option);
 
     const checkIcon = style("checkIcon", {
         color: colorOut(globalVars.mainColors.primary),

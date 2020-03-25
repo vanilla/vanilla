@@ -323,10 +323,10 @@ class ModerationController extends VanillaController {
 
         if ($this->Form->authenticatedPostBack()) {
             $discussionArray = ['discussionID' => $allowedDiscussions];
-                // Queue deleting discussions.
-                /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-                $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-                $scheduler->addJob(ExecuteBatchDeleteDiscussion::class, $discussionArray);
+            // Queue deleting discussions.
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob(ExecuteBatchDeleteDiscussion::class, $discussionArray);
             foreach ($discussionArray['discussionID'] as $discussionID) {
                 $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
             }

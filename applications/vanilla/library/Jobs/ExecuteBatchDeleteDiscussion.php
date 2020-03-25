@@ -16,8 +16,8 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
     /** @var DiscussionModel */
     private $discussionModel;
 
-    /** @var array */
-    private $message;
+    /** @var array*/
+    private $discussionArray;
 
     /**
      * Initial job setup.
@@ -35,11 +35,13 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
      */
     private function messageSchema(): Schema {
         $schema = Schema::parse([
-            "discussionID" => [
+            "discussionID" =>
                 [
-                    "type" => "integer"
+                    "type" => "array",
+                    "items" => [
+                        'type' => 'integer'
+                    ]
                 ]
-            ]
         ]);
         return $schema;
     }
@@ -48,10 +50,10 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
      * Execute all queued up items in the ActivityModel queue.
      */
     public function run(): JobExecutionStatus {
-        if (!is_array($this->message)) {
+        if (!is_array($this->discussionArray)) {
             return JobExecutionStatus::abandoned();
         }
-        $this->discussionModel->deleteID($this->message);
+        $this->discussionModel->deleteID($this->discussionArray);
         return JobExecutionStatus::complete();
     }
 
@@ -62,7 +64,7 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
      */
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
-        $this->message = $message;
+        $this->discussionArray = $message["discussionID"];
     }
 
     /**

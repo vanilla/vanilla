@@ -185,7 +185,7 @@ export const singleLineEllipsis = () => {
     return {
         whiteSpace: "nowrap" as WhiteSpaceProperty,
         textOverflow: "ellipsis" as TextOverflowProperty,
-        overflowX: "hidden" as OverflowXProperty,
+        overflow: "hidden" as OverflowXProperty,
         maxWidth: percent(100) as MaxWidthProperty<TLength>,
     };
 };

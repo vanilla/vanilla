@@ -8,6 +8,7 @@ import { ColorHelper } from "csx";
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonStates } from "@library/styles/styleHelpersButtons";
+import { emptyObject } from "expect/build/utils";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
@@ -71,6 +72,9 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
     const overwrites = overwriteValues ? overwriteValues : {};
+
+    const visitedStyles = linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited);
+
     const mergedColors = {
         default: !overwrites.skipDefault
             ? linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default)
@@ -83,7 +87,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
             linkColors.accessibleFocus,
         ),
         active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
-        visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
+        visited: visitedStyles,
     };
 
     const styles = {
@@ -104,10 +108,14 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
             color: colorOut(mergedColors.active),
             cursor: "pointer",
         },
-        visited: {
-            color: mergedColors.visited ? colorOut(mergedColors.visited) : undefined,
-        },
+        visited: {},
     };
+
+    if (mergedColors.visited) {
+        styles.visited = {
+            color: colorOut(mergedColors.visited),
+        };
+    }
 
     const final = {
         color: styles.default.color as ColorValues,
@@ -116,7 +124,7 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
             "&&:focus": styles.focus,
             "&&.focus-visible": styles.accessibleFocus,
             "&&:active": styles.active,
-            "&:visited": styles.visited ?? undefined,
+            "&:visited": !!styles.visited && !emptyObject(styles.visited) ? styles.visited : undefined,
         },
     };
 

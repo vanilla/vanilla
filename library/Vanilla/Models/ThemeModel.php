@@ -519,17 +519,6 @@ class ThemeModel {
     }
 
     /**
-     * Normalize theme data.
-     *
-     * @param array $theme
-     * @return array
-     */
-    public function normalizeTheme(array $theme): array {
-        $key = $theme['parentID'] ?? $theme['themeID'];
-        $addon = $this->getThemeAddon($key);
-    }
-
-    /**
      * Take in some some asset and normalize it.
      *
      * @param string $assetName

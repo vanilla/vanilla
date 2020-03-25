@@ -4,10 +4,15 @@
  */
 
 import getStore from "@library/redux/getStore";
+import { isComponentThemingEnabled } from "@library/utility/componentRegistry";
 
 export function getThemeVariables() {
     const state = getStore().getState();
     if (state !== null) {
+        if (!isComponentThemingEnabled()) {
+            return {};
+        }
+
         if (state.theme.forcedVariables) {
             return state.theme.forcedVariables;
         }

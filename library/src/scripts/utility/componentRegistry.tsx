@@ -18,6 +18,10 @@ export function disableComponentTheming() {
     useTheme = false;
 }
 
+export function isComponentThemingEnabled() {
+    return useTheme;
+}
+
 interface IRegisteredComponent {
     Component: React.ComponentType<any>;
     mountOptions?: IComponentMountOptions;

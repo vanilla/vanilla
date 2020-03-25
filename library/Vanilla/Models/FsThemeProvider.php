@@ -28,10 +28,7 @@ use Vanilla\Theme\TwigAsset;
  */
 class FsThemeProvider implements ThemeProviderInterface {
 
-    const FALLBACK_THEME_KEY = "theme-foundation";
-
     use FsThemeMissingTrait;
-    use ThemeVariablesTrait;
 
     /** @var AddonProviderInterface $addonManager */
     private $addonManager;
@@ -103,15 +100,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeViewPath($themeKey): string {
-        $theme = $this->getThemeAddon($themeKey);
-        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
-        return $path;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->getThemeAddon($themeKey);
         return $theme->getKey();
@@ -135,7 +123,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof AddonInterface)) {
-            $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
+            $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
             if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
@@ -269,11 +257,6 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         $data = $this->getFileAsset($theme, $asset);
-
-        // Mix in addon variables to the variables asset.
-        if (preg_match('/^variables/', $key)) {
-            $data = $this->addAddonVariables($data);
-        }
 
         switch ($type) {
             case "data":
@@ -427,7 +410,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrent($themeID = null): ?array {
+    public function getCurrent(): ?array {
         $themeKey = $this->themeHelper->getConfigThemeKey();
         return $this->getThemeWithAssets($themeKey);
     }

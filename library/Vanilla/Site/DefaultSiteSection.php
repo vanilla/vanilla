@@ -128,6 +128,6 @@ class DefaultSiteSection implements SiteSectionInterface {
      * @inheritDoc
      */
     public function getSectionThemeID() {
-        // TODO: Implement getSectionThemeID() method.
+        return null;
     }
 }

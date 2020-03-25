@@ -97,7 +97,7 @@ interface SiteSectionInterface extends \JsonSerializable {
     /**
      * Get the themeID for this siteSection
      *
-     * @return int|string
+     * @return int|string|null
      */
     public function getSectionThemeID();
 }

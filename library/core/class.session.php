@@ -10,6 +10,8 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Vanilla\Permissions;
 
 /**
@@ -89,8 +91,8 @@ class Gdn_Session {
      * @param string $sessionPermission
      * @param int|string $userID
      * @return bool
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws NotFoundException Throws exception if there's a problem getting the container.
+     * @throws ContainerException Throws exception if there's a problem getting the container.
      */
     public function hasHigherPermissionLevel(string $sessionPermission, $userID) {
 
@@ -103,7 +105,7 @@ class Gdn_Session {
         // Throw a permission error if the session user doesn't outrank the user to be banned. Otherwise, return true.
 
         if ($this->checkUserRankedPermission($sessionPermission, $userID) || !$this->checkRankedPermission($sessionPermission)) {
-            throw permissionException();
+            return false;
         } else {
             return true;
         }
@@ -117,8 +119,8 @@ class Gdn_Session {
      * @param string $permission
      * @param int|string $userID
      * @return bool
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function checkUserRankedPermission(string $permission, $userID) {
         $rankedPermissions = self::RANKED_PERMISSIONS;

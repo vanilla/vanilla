@@ -119,8 +119,8 @@ class Gdn_Session {
      * @param string $permission
      * @param int|string $userID
      * @return bool
-     * @throws ContainerException
-     * @throws NotFoundException
+     * @throws ContainerException Throws exception if there's a problem getting the container.
+     * @throws NotFoundException Throws exception if there's a problem getting the container.
      */
     public function checkUserRankedPermission(string $permission, $userID) {
         $rankedPermissions = self::RANKED_PERMISSIONS;

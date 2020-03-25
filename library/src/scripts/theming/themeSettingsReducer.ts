@@ -5,9 +5,10 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemeActions, { IManageTheme, ThemeType } from "@library/theming/ThemeActions";
+import ThemeActions, { IManageTheme } from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { ThemeType } from "@library/theming/themeReducer";
 
 export interface IThemesState {
     themes: ILoadable<{

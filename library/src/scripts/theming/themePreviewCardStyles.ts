@@ -240,6 +240,16 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
+    const title = style("title", {
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        ...flexHelper().middleLeft(),
+    });
+
+    const titleIcon = style("titleIcon", {
+        marginLeft: globalVars.gutter.half,
+    });
+
     return {
         svg,
         menuBar,
@@ -260,6 +270,8 @@ export const themeCardClasses = useThemeCache(() => {
         toolTipBox,
         actionLink,
         action,
+        title,
+        titleIcon,
     };
 });
 

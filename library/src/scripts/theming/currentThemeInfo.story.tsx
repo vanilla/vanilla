@@ -10,6 +10,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import CurrentThemeInfo from "./CurrentThemeInfo";
 import ThemePreviewCard from "./ThemePreviewCard";
 import { StoryTile } from "@library/storybook/StoryTile";
+import { ThemeType } from "@library/theming/themeReducer";
 
 const story = storiesOf("Theme", module);
 
@@ -30,6 +31,17 @@ story.add("Current Theme", () => {
                     />
                 </div>
                 <CurrentThemeInfo
+                    theme={{
+                        name: "Keystone",
+                        supportedSections: ["Forum", "Knowledge Base", "HomePage"],
+                        themeID: "keystone",
+                        assets: {},
+                        features: {},
+                        preview: {},
+                        type: ThemeType.FS,
+                        current: true,
+                        version: "4.0.0",
+                    }}
                     name={"Keystone"}
                     info={{
                         Description: {

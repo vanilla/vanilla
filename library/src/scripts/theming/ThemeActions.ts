@@ -14,23 +14,12 @@ import { setMeta } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@themes");
 
-export enum ThemeType {
-    DB = "themeDB",
-    FS = "themeFile",
-}
-
 export enum PreviewStatusType {
     PREVIEW = "preview",
     APPLY = "apply",
     CANCEL = "cancel",
 }
 export interface IManageTheme extends ITheme {
-    name: string;
-    type: ThemeType;
-    current: boolean;
-    themeID: string;
-    parentTheme: string;
-    parentVersion: string;
     preview: {
         info: IThemeInfo;
         [key: string]: any;

@@ -60,7 +60,7 @@ export const toolTipClasses = useThemeCache(() => {
     });
 
     const box = style("box", {
-        position: "fixed",
+        position: "absolute",
         fontSize: unit(globalVars.fonts.size.medium),
         minWidth: unit(vars.sizes.min),
         maxWidth: unit(vars.sizes.max),
@@ -76,7 +76,7 @@ export const toolTipClasses = useThemeCache(() => {
     });
 
     const nubPosition = style("nubPosition", {
-        position: "fixed",
+        position: "absolute",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

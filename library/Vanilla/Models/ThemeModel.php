@@ -356,9 +356,9 @@ class ThemeModel {
         try {
             // We absolutely cannot fail if a certain provider is not hooked up.
             // As a result we will fall back to our default theme if there is some error.
-            $mobileKey = $this->config->get(ThemeModelHelper::CONFIG_MOBILE_THEME);
-            $desktopKey = $this->config->get(ThemeModelHelper::CONFIG_DESKTOP_THEME);
-            $currentKey = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME);
+            $mobileKey = $this->config->get(ThemeModelHelper::CONFIG_MOBILE_THEME, null);
+            $desktopKey = $this->config->get(ThemeModelHelper::CONFIG_DESKTOP_THEME, null);
+            $currentKey = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
 
             $baseKey = isMobile()
                 ? $mobileKey ?? $desktopKey

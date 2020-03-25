@@ -48,7 +48,6 @@ export const forumTagCSS = () => {
         `
         .MessageList .ItemComment .MItem.RoleTracker a.Tag,
         .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag,
-        .MessageList .ItemComment .MItem.RoleTracker,
         `,
     );
 };

@@ -62,6 +62,8 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Content .MessageList .ItemComment .InlineTags a`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Content  .MessageList .ItemDiscussion .InlineTags a`);
 };
 
 // Mixins replacement

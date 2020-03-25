@@ -60,7 +60,7 @@ export const forumMetaCSS = () => {
     });
 
     // Links
-    cssOut(linkSelectors, {
+    cssOut(trimTrailingCommas(linkSelectors).trim(), {
         display: "inline-flex",
         alignItems: "center",
         opacity: important(1),
@@ -71,29 +71,34 @@ export const forumMetaCSS = () => {
     trimTrailingCommas(linkSelectors)
         .split(",")
         .map(s => {
-            cssOut(trim(s), {
-                ...allLinkStates({
-                    noState: {
-                        color: colorOut(globalVars.mainColors.fg),
+            cssOut(
+                trim(s),
+                allLinkStates(
+                    {
+                        noState: {
+                            color: colorOut(globalVars.mainColors.fg),
+                        },
+                        hover: {
+                            color: colorOut(globalVars.links.colors.hover),
+                            textDecoration: "underline",
+                        },
+                        focus: {
+                            color: colorOut(globalVars.links.colors.focus),
+                            textDecoration: "underline",
+                        },
+                        accessibleFocus: {
+                            color: colorOut(globalVars.links.colors.accessibleFocus),
+                            textDecoration: "underline",
+                        },
+                        active: {
+                            color: colorOut(globalVars.links.colors.active),
+                            textDecoration: "underline",
+                        },
                     },
-                    hover: {
-                        color: colorOut(globalVars.links.colors.hover),
-                        textDecoration: "underline",
-                    },
-                    focus: {
-                        color: colorOut(globalVars.links.colors.focus),
-                        textDecoration: "underline",
-                    },
-                    accessibleFocus: {
-                        color: colorOut(globalVars.links.colors.accessibleFocus),
-                        textDecoration: "underline",
-                    },
-                    active: {
-                        color: colorOut(globalVars.links.colors.active),
-                        textDecoration: "underline",
-                    },
-                }),
-            });
+                    {},
+                    true,
+                ),
+            );
         });
 
     cssOut(

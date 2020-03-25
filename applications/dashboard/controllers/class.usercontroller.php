@@ -412,7 +412,9 @@ class UserController extends DashboardController {
         }
 
         // Check to make sure the session user has a higher permission level than the user to be banned.
-        Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID);
+        if (!Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID)) {
+            throw permissionException();
+        }
 
         // Is the user banned for other reasons?
         $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $user, 0), ~BanModel::BAN_MANUAL));

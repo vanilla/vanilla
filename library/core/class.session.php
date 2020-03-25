@@ -82,7 +82,17 @@ class Gdn_Session {
         $this->permissions->merge($newPermissions);
     }
 
-    public function hasHigherPermissionLevel($sessionPermission, $userID) {
+    /**
+     * Checks the session user's permission level against the permissions level of the user they want
+     * to perform some action on.
+     *
+     * @param string $sessionPermission
+     * @param int|string $userID
+     * @return bool
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function hasHigherPermissionLevel(string $sessionPermission, $userID) {
 
         // If the current user is an admin, they can do whatever they want.
         if ($this->permissions->has('Garden.Settings.Manage')) {
@@ -99,7 +109,18 @@ class Gdn_Session {
         }
     }
 
-    public function checkUserRankedPermission($permission, $userID) {
+    /**
+     * Checks a user's permission level against a ranked list of permissions and implicitly assigns
+     * the user any permissions below their level even in if the permission isn't explicitly assigned.
+     * Based on checkRakedPermission().
+     *
+     * @param string $permission
+     * @param int|string $userID
+     * @return bool
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function checkUserRankedPermission(string $permission, $userID) {
         $rankedPermissions = self::RANKED_PERMISSIONS;
 
         $userModel = Gdn::getContainer()->get(UserModel::class);

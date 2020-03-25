@@ -38,7 +38,7 @@ class ThemeFeatures {
      */
     public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
         $this->config = $config;
-        $this->theme = $themeModel->getThemeAddon();
+        $this->theme = $themeModel->getCurrentThemeAddon();
     }
 
     /**

@@ -20,10 +20,5 @@ const PREVIEW_CONTAINER = "previewContainer";
 registerReducer("themePreviewToaster", themePreviewToastReducer);
 addComponent("toaster", Toast);
 onReady(() => {
-    mountPortal(
-        <AppContext noWrap noTheme>
-            <ThemePreviewToast />
-        </AppContext>,
-        PREVIEW_CONTAINER,
-    );
+    mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);
 });

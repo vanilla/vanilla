@@ -716,7 +716,7 @@ export const titleBarClasses = useThemeCache(() => {
                                     },
                                 },
                             },
-                            accessibleFocus: {
+                            keyboardFocus: {
                                 outline: 0,
                                 color: colorOut(vars.colors.fg),
                                 $nest: {

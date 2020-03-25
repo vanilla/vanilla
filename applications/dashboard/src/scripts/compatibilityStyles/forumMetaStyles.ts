@@ -84,8 +84,8 @@ export const forumMetaCSS = () => {
                         color: colorOut(globalVars.links.colors.focus),
                         textDecoration: "underline",
                     },
-                    accessibleFocus: {
-                        color: colorOut(globalVars.links.colors.accessibleFocus),
+                    keyboardFocus: {
+                        color: colorOut(globalVars.links.colors.keyboardFocus),
                         textDecoration: "underline",
                     },
                     active: {

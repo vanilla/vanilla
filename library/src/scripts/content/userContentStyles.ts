@@ -10,7 +10,7 @@ import {
     fonts,
     margins,
     paddings,
-    setAllLinkColors,
+    setAllLinkStateStyles,
     unit,
     singleBorder,
 } from "@library/styles/styleHelpers";
@@ -241,7 +241,7 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkColors = setAllLinkColors();
+    const linkColors = setAllLinkStateStyles();
     const linkStyle = {
         "& a": {
             color: colorOut(linkColors.color),
@@ -255,7 +255,7 @@ export const userContentClasses = useThemeCache(() => {
             textDecoration: "underline",
         },
         "& a.focus-visible": {
-            color: colorOut(globalVars.links.colors.accessibleFocus),
+            color: colorOut(globalVars.links.colors.keyboardFocus),
             textDecoration: "underline",
         },
         "& a:active": {

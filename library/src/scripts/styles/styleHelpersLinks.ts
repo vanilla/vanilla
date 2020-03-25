@@ -8,13 +8,14 @@ import { ColorHelper } from "csx";
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonStates } from "@library/styles/styleHelpersButtons";
+import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
     noState?: object;
     hover?: object;
     focus?: object;
-    accessibleFocus?: object;
+    keyboardFocus?: object;
     active?: object;
     visited?: object;
 }
@@ -41,7 +42,8 @@ export interface ILinkColorOverwrites {
     default?: ColorValues;
     hover?: ColorValues;
     focus?: ColorValues;
-    accessibleFocus?: ColorValues;
+    clickFocus?: ColorValues;
+    keyboardFocus?: ColorValues;
     active?: ColorValues;
     visited?: ColorValues;
     allStates?: ColorValues;
@@ -51,7 +53,8 @@ export const EMPTY_LINK_COLOR_OVERWRITES = {
     default: undefined as undefined | ColorValues,
     hover: undefined as undefined | ColorValues,
     focus: undefined as undefined | ColorValues,
-    accessibleFocus: undefined as undefined | ColorValues,
+    clickFocus: undefined as undefined | ColorValues,
+    keyboardFocus: undefined as undefined | ColorValues,
     active: undefined as undefined | ColorValues,
     visited: undefined as undefined | ColorValues,
     allStates: undefined as undefined | ColorValues,
@@ -66,22 +69,21 @@ export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
     skipDefault: undefined as undefined | boolean,
 };
 
-export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptions) => {
+export const setAllLinkStateStyles = (overwriteColors?: ILinkColorOverwritesWithOptions) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
-    const overwrites = overwriteValues ? overwriteValues : {};
+
+    const overwrites = overwriteColors ? overwriteColors : {};
+
     const mergedColors = {
         default: !overwrites.skipDefault
             ? linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default)
             : undefined,
         hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
         focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
-        accessibleFocus: linkStyleFallbacks(
-            overwrites.accessibleFocus,
-            overwrites.allStates,
-            linkColors.accessibleFocus,
-        ),
+        clickFocus: linkStyleFallbacks(overwrites.clickFocus, overwrites.allStates, linkColors.focus),
+        keyboardFocus: linkStyleFallbacks(overwrites.keyboardFocus, overwrites.allStates, linkColors.keyboardFocus),
         active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
         visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
     };
@@ -97,8 +99,11 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
         focus: {
             color: colorOut(mergedColors.focus),
         },
-        accessibleFocus: {
-            color: colorOut(mergedColors.accessibleFocus),
+        clickFocus: {
+            color: colorOut(mergedColors.focus),
+        },
+        keyboardFocus: {
+            color: colorOut(mergedColors.keyboardFocus),
         },
         active: {
             color: colorOut(mergedColors.active),
@@ -113,8 +118,14 @@ export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptio
         color: styles.default.color as ColorValues,
         nested: {
             "&&:hover": styles.hover,
-            "&&:focus": styles.focus,
-            "&&.focus-visible": styles.accessibleFocus,
+            "&&:focus": {
+                ...(styles.focus ?? {}),
+                ...(styles.clickFocus ?? {}),
+            },
+            "&&.focus-visible": {
+                ...(styles.focus ?? {}),
+                ...(styles.keyboardFocus ?? {}),
+            },
             "&&:active": styles.active,
             "&:visited": styles.visited ?? undefined,
         },

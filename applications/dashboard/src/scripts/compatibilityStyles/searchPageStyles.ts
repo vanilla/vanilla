@@ -60,8 +60,8 @@ export const searchPageCSS = () => {
                 hover: {
                     color: colorOut(globalVars.links.colors.hover),
                 },
-                accessibleFocus: {
-                    color: colorOut(globalVars.links.colors.accessibleFocus),
+                keyboardFocus: {
+                    color: colorOut(globalVars.links.colors.keyboardFocus),
                 },
                 focus: {
                     color: colorOut(globalVars.links.colors.focus),

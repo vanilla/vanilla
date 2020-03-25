@@ -140,7 +140,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             default: linkDerivedColors.default,
             hover: linkDerivedColors.state,
             focus: linkDerivedColors.state,
-            accessibleFocus: linkDerivedColors.state,
+            keyboardFocus: linkDerivedColors.state,
             active: linkDerivedColors.state,
             visited: undefined,
         },

@@ -355,7 +355,7 @@ export const titleBarClasses = useThemeCache(() => {
                             },
                         },
                     },
-                    accessibleFocus: {
+                    keyboardFocus: {
                         outline: 0,
                         $nest: {
                             "& .meBox-buttonContent": {

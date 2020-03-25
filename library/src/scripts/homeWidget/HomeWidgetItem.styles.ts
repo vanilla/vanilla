@@ -18,7 +18,7 @@ import {
     IBackground,
     linkStyleFallbacks,
     paddings,
-    setAllLinkColors,
+    setAllLinkStateStyles,
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -144,7 +144,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         }
     })();
 
-    const linkStyles = setAllLinkColors();
+    const linkStyles = setAllLinkStateStyles();
 
     const name = style("name", {
         color: colorOut(vars.options.fg),

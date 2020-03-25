@@ -12,7 +12,7 @@ import {
     colorOut,
     margins,
     paddings,
-    setAllLinkColors,
+    setAllLinkStateStyles,
     singleLineEllipsis,
     unit,
     userSelect,
@@ -32,7 +32,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = breadcrumbsVariables();
     const style = styleFactory("breadcrumbs");
-    const linkColors = setAllLinkColors();
+    const linkColors = setAllLinkStateStyles();
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",

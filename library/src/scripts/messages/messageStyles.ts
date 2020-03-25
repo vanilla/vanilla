@@ -219,7 +219,7 @@ export const messagesClasses = useThemeCache(() => {
                     allStates: {
                         color: colorOut(vars.colors.states.fg),
                     },
-                    focusNotKeyboard: {
+                    mouseFocus: {
                         outline: 0,
                     },
                 }),

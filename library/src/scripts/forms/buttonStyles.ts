@@ -386,10 +386,10 @@ export const buttonUtilityClasses = useThemeCache(() => {
             hover: {
                 color: colorOut(globalVars.mainColors.primary),
             },
-            focusNotKeyboard: {
+            mouseFocus: {
                 outline: 0,
             },
-            accessibleFocus: {
+            keyboardFocus: {
                 outline: "initial",
             },
         }),

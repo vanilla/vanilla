@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, ILinkColorOverwritesWithOptions, setAllLinkColors } from "@library/styles/styleHelpers";
+import { colorOut, ILinkColorOverwritesWithOptions, setAllLinkStateStyles } from "@library/styles/styleHelpers";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { throwError } from "rxjs";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -70,7 +70,7 @@ export const textLinkCSS = () => {
 export const mixinTextLink = (selector: string, overwrite?: {}) => {
     selector = trimTrailingCommas(selector);
     const selectors = selector.split(",");
-    const linkColors = setAllLinkColors(overwrite);
+    const linkColors = setAllLinkStateStyles(overwrite);
     if (!selectors) {
         cssOut(selector, {
             color: colorOut(linkColors.color),

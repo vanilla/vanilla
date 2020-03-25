@@ -9,7 +9,7 @@ import {
     colorOut,
     margins,
     paddings,
-    setAllLinkColors,
+    setAllLinkStateStyles,
     unit,
     fonts,
     extendItemContainer,
@@ -75,7 +75,7 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
-    const viewAllLinkColors = setAllLinkColors();
+    const viewAllLinkColors = setAllLinkStateStyles();
     const viewAll = makeThemeVars("viewAll", {
         color: viewAllLinkColors.color,
         fontWeight: globalVars.fonts.weights.semiBold,
@@ -192,7 +192,7 @@ export const navLinksClasses = useThemeCache(() => {
         },
     });
 
-    const linkColors = setAllLinkColors({
+    const linkColors = setAllLinkStateStyles({
         default: globalVars.mainColors.fg,
     });
 
@@ -214,7 +214,7 @@ export const navLinksClasses = useThemeCache(() => {
         ...paddings(vars.viewAll.paddings),
     });
 
-    const viewAllLinkColors = setAllLinkColors({
+    const viewAllLinkColors = setAllLinkStateStyles({
         default: globalVars.mainColors.primary,
     });
 

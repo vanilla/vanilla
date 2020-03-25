@@ -8,9 +8,10 @@
 import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 import trim from "validator/lib/trim";
+import { logDebugConditionnal } from "@vanilla/utils";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -71,34 +72,41 @@ export const forumMetaCSS = () => {
     trimTrailingCommas(linkSelectors)
         .split(",")
         .map(s => {
-            cssOut(
-                trim(s),
-                allLinkStates(
-                    {
-                        noState: {
-                            color: colorOut(globalVars.mainColors.fg),
-                        },
-                        hover: {
-                            color: colorOut(globalVars.links.colors.hover),
-                            textDecoration: "underline",
-                        },
-                        focus: {
-                            color: colorOut(globalVars.links.colors.focus),
-                            textDecoration: "underline",
-                        },
-                        accessibleFocus: {
-                            color: colorOut(globalVars.links.colors.accessibleFocus),
-                            textDecoration: "underline",
-                        },
-                        active: {
-                            color: colorOut(globalVars.links.colors.active),
-                            textDecoration: "underline",
-                        },
+            const selector = trim(s);
+            const debug = false;
+            const linkStates = allLinkStates(
+                {
+                    noState: {
+                        color: colorOut(globalVars.mainColors.fg),
                     },
-                    {},
-                    true,
-                ),
+                    hover: {
+                        color: colorOut(globalVars.links.colors.hover),
+                        textDecoration: "underline",
+                    },
+                    focus: {
+                        color: colorOut(globalVars.links.colors.focus),
+                        textDecoration: "underline",
+                    },
+                    accessibleFocus: {
+                        color: colorOut(globalVars.links.colors.accessibleFocus),
+                        textDecoration: "underline",
+                    },
+                    active: {
+                        color: colorOut(globalVars.links.colors.active),
+                        textDecoration: "underline",
+                    },
+                },
+                {},
+                debug,
             );
+
+            logDebugConditionnal(debug, linkStates);
+
+            const nested = linkStates.$nest;
+            delete linkStates["$nest"];
+
+            cssOut(selector, linkStates);
+            nestedWorkaround(selector, nested);
         });
 
     cssOut(

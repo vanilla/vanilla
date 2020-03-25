@@ -10,6 +10,15 @@
             "families": {
                 "body": ["Nunito"]
             }
+        },
+        "links": {
+            "colors": {
+                "default": "#fcba03",
+                "hover": "#ff245b",
+                "focus": "#b080ff",
+                "accessibleFocus": "#d8ff14",
+                "active": "#14ff47"
+            }
         }
     },
     "banner": {

@@ -426,7 +426,7 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
         if (selector !== "") {
             const targetStyles = nestedObject[key];
-            const keys = Object.keys(targetStyles);
+            const keys = targetStyles ? Object.keys(targetStyles) : [];
             if (keys.length > 0) {
                 rawStyles += `${finalSelector} { `;
                 keys.forEach(property => {

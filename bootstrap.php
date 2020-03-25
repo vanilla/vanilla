@@ -138,6 +138,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(ThemeFeatures::class)
     ->setShared(true)
+    ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // Logger
     ->rule(\Vanilla\Logger::class)

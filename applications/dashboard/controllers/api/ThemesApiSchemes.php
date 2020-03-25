@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\TwigAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\FontsAsset;
@@ -37,6 +38,8 @@ trait ThemesApiSchemes {
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
+                'supportedSections:a',
+                'features' => new InstanceValidatorSchema(ThemeFeatures::class),
                 'preview?' => [":a" => $this->assetsPreviewSchema()]
             ]),
             $type

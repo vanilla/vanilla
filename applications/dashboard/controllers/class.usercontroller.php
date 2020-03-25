@@ -411,6 +411,9 @@ class UserController extends DashboardController {
             throw forbiddenException("@You may not ban a super admin.");
         }
 
+        // Check to make sure the session user has a higher permission level than the user to be banned.
+        Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID);
+
         // Is the user banned for other reasons?
         $this->setData('OtherReasons', BanModel::isBanned(val('Banned', $user, 0), ~BanModel::BAN_MANUAL));
 

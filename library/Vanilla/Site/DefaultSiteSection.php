@@ -123,4 +123,11 @@ class DefaultSiteSection implements SiteSectionInterface {
     public function getAttributes(): array {
         return [];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSectionThemeID() {
+        return null;
+    }
 }

@@ -21,7 +21,7 @@ export function ThemePreviewTitle(props: IProps) {
         <ToolTip
             label={
                 <>
-                    {t("Edits to this theme apply to: ")}
+                    {t("Edits to this theme apply to:")}{" "}
                     <ul>
                         {supportedSections.map(section => {
                             return (

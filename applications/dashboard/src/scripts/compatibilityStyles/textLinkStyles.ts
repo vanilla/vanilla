@@ -69,15 +69,19 @@ export const mixinTextLink = (selector: string, overwrite?: {}) => {
     const selectors = selector.split(",");
     const linkColors = setAllLinkStateStyles(overwrite);
     if (!selectors) {
-        cssOut(selector, {
-            color: colorOut(linkColors.color),
-        });
-        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
-    } else {
-        selectors.map(s => {
+        if (linkColors.color !== undefined) {
             cssOut(selector, {
                 color: colorOut(linkColors.color),
             });
+        }
+        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
+    } else {
+        selectors.map(s => {
+            if (linkColors.color !== undefined) {
+                cssOut(selector, {
+                    color: colorOut(linkColors.color),
+                });
+            }
             nestedWorkaround(trimTrailingCommas(s), linkColors.nested);
         });
     }

@@ -179,7 +179,7 @@ class ThemesTest extends AbstractAPIv2Test {
         $this->api()->setUserID(\UserModel::GUEST_USER_ID);
         $response = $this->api()->get("themes");
         $body = $response->getBody();
-        $this->assertEquals(3, count($body), 'The 2 unhidden files, and the current are returned');
+        $this->assertEquals(2, count($body), 'The 2 unhidden themes, keystone and foundation are returned.');
     }
 
     /**

@@ -5,9 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, ILinkColorOverwritesWithOptions, setAllLinkStateStyles } from "@library/styles/styleHelpers";
+import { colorOut, setAllLinkStateStyles } from "@library/styles/styleHelpers";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { throwError } from "rxjs";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const textLinkCSS = () => {
@@ -62,8 +61,6 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
-    mixinTextLinkNoDefaultLinkAppearance(`.Content .MessageList .ItemComment .InlineTags a`);
-    mixinTextLinkNoDefaultLinkAppearance(`.Content  .MessageList .ItemDiscussion .InlineTags a`);
 };
 
 // Mixins replacement
@@ -72,15 +69,19 @@ export const mixinTextLink = (selector: string, overwrite?: {}) => {
     const selectors = selector.split(",");
     const linkColors = setAllLinkStateStyles(overwrite);
     if (!selectors) {
-        cssOut(selector, {
-            color: colorOut(linkColors.color),
-        });
-        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
-    } else {
-        selectors.map(s => {
+        if (linkColors.color !== undefined) {
             cssOut(selector, {
                 color: colorOut(linkColors.color),
             });
+        }
+        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
+    } else {
+        selectors.map(s => {
+            if (linkColors.color !== undefined) {
+                cssOut(selector, {
+                    color: colorOut(linkColors.color),
+                });
+            }
             nestedWorkaround(trimTrailingCommas(s), linkColors.nested);
         });
     }

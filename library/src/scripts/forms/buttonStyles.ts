@@ -386,7 +386,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
             hover: {
                 color: colorOut(globalVars.mainColors.primary),
             },
-            mouseFocus: {
+            clickFocus: {
                 outline: 0,
             },
             keyboardFocus: {

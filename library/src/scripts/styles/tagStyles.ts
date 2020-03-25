@@ -32,15 +32,14 @@ export const tagVariables = useThemeCache(() => {
     const borderOverwrites = {
         all: {
             ...borders({ color: linkColors.nested["&&:hover"].color } as IBorderStyles, {}),
-        }
+        },
         hover: {},
         focus: {},
-        mouseFocus: {},
+        clickFocus: {},
         focusVisible: {},
         active: {},
         visited: {},
-
-    }
+    };
 
     const nested = merge(linkColors.nested, {
         "&&:hover": {

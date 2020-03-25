@@ -5,8 +5,7 @@
  */
 
 import { ILinkStates } from "@library/styles/styleHelpersLinks";
-import { logDebug, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
-import { emptyObject } from "expect/build/utils";
+import { logDebug } from "@vanilla/utils/src/debugUtils";
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {
@@ -14,7 +13,7 @@ export interface IActionStates {
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
-    mouseFocus?: object; // Focused, not through keyboard?: object;
+    clickFocus?: object; // Focused, not through keyboard?: object;
     keyboardFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
@@ -24,7 +23,7 @@ export interface IStateSelectors {
     allStates?: string; // Applies to all
     hover?: string;
     focus?: string;
-    mouseFocus?: string; // Focused, not through keyboard?: object;
+    clickFocus?: string; // Focused, not through keyboard?: object;
     keyboardFocus?: string; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: string;
 }
@@ -34,26 +33,19 @@ export interface IButtonStates {
     noState?: object; // Applies to stateless link
     hover?: object;
     focus?: object;
-    mouseFocus?: object; // Focused, not through keyboard
+    clickFocus?: object; // Focused, not through keyboard
     keyboardFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
-    // debug?: boolean; // For debugging, no style here,
 }
 
-export const allLinkStates = (styles: ILinkStates, nested?: object, debug?: boolean) => {
-    const output = allButtonStates(styles, nested, true, debug);
-    const visited = styles.visited !== undefined ? styles.visited : {};
-
-    if (visited && !emptyObject(visited)) {
-        output.$nest["&:visited"] = { ...visited };
-    }
-
-    logDebugConditionnal(debug, "allLinkStates debug: ", output);
-
+export const allLinkStates = (styles: ILinkStates, nested?: object) => {
+    const output = allButtonStates(styles, nested, true);
+    const visited = styles.visited !== undefined ? styles.visited : styles.noState || {};
+    output.$nest["&:visited"] = { ...visited };
     return output;
 };
 
-export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?: boolean, debugLog?: boolean) => {
+export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?: boolean, debugMode?: boolean) => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
 
@@ -69,20 +61,23 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?:
         ...allStates,
         ...noState,
         $nest: {
+            "&": noState,
             "&:hover:not(:disabled)": { ...allStates, ...styles.hover },
-            "&:focus:not(.focus-visible)": { ...allStates, ...styles.focus, ...styles.mouseFocus },
-            "&&.focus-visible": { ...allStates, ...styles.focus, ...styles.keyboardFocus },
+            "&:focus": { ...allStates, ...styles.focus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...styles.clickFocus },
+            "&&.focus-visible": { ...allStates, ...styles.keyboardFocus },
             "&:active:not(:disabled)": { ...allStates, ...styles.active },
             ...disabledStyles,
-            ...(nested ?? {}),
+            ...nested,
         },
     };
 
-    // logDebugConditionnal(debugLog, "allButtonStates: ");
-    // logDebugConditionnal(debugLog, "style: ", styles);
-    // logDebugConditionnal(debugLog, "nested: ", nested);
-    // logDebugConditionnal(debugLog, "disabledStyles: ", disabledStyles);
-    // logDebugConditionnal(debugLog, "output: ", output);
+    if (debugMode) {
+        logDebug("allButtonStates: ");
+        logDebug("style: ", styles);
+        logDebug("nested: ", nested);
+        logDebug("output: ", output);
+    }
 
     return output;
 };
@@ -95,7 +90,7 @@ export const buttonStates = (styles: IActionStates, nest?: object, classBasedSta
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const hover = styles.hover !== undefined ? styles.hover : {};
     const focus = styles.focus !== undefined ? styles.focus : {};
-    const mouseFocus = styles.mouseFocus !== undefined ? styles.mouseFocus : {};
+    const clickFocus = styles.clickFocus !== undefined ? styles.clickFocus : {};
     const keyboardFocus = styles.keyboardFocus !== undefined ? styles.keyboardFocus : {};
     const active = styles.active !== undefined ? styles.active : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
@@ -108,9 +103,9 @@ export const buttonStates = (styles: IActionStates, nest?: object, classBasedSta
         [appendExtraSelector("&", classBasedStates.allStates)]: { ...allStates, ...noState },
         [appendExtraSelector("&:hover", classBasedStates.hover)]: { ...allStates, ...hover },
         [appendExtraSelector("&:focus", classBasedStates.focus)]: { ...allStates, ...focus },
-        [appendExtraSelector("&:focus:not(.focus-visible)", classBasedStates.mouseFocus)]: {
+        [appendExtraSelector("&:focus:not(.focus-visible)", classBasedStates.clickFocus)]: {
             ...allStates,
-            ...mouseFocus,
+            ...clickFocus,
         },
         [appendExtraSelector("&.focus-visible", classBasedStates.keyboardFocus)]: {
             ...allStates,

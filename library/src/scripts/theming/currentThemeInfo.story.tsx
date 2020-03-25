@@ -37,19 +37,19 @@ story.add("Current Theme", () => {
                         themeID: "keystone",
                         assets: {},
                         features: {},
-                        preview: {},
+                        preview: {
+                            info: {
+                                Description: {
+                                    type: "string",
+                                    info:
+                                        "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+                                },
+                                Authors: { type: "string", info: "Author1, Author2, Author3" },
+                            },
+                        },
                         type: ThemeType.FS,
                         current: true,
                         version: "4.0.0",
-                    }}
-                    name={"Keystone"}
-                    info={{
-                        Description: {
-                            type: "string",
-                            info:
-                                "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
-                        },
-                        Authors: { type: "string", info: "Author1, Author2, Author3" },
                     }}
                 />
             </div>

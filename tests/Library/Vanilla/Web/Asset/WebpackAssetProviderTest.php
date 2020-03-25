@@ -12,6 +12,7 @@ use org\bovigo\vfs\vfsStream;
 use Vanilla\Models\FsThemeProvider;
 use Vanilla\Models\ThemeModel;
 use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Models\ThemeSectionModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -55,6 +56,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
             $session,
             $addonManager,
             $themeHelper,
+            self::container()->get(ThemeSectionModel::class),
             self::container()->get(SiteSectionModel::class)
         );
         $request = new Request();

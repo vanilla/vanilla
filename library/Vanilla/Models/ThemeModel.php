@@ -84,11 +84,17 @@ class ThemeModel {
     /** @var ConfigurationInterface $config */
     private $config;
 
+    /** @var \Gdn_Session */
+    private $session;
+
     /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper $themeHelper */
     private $themeHelper;
+
+    /** @var ThemeSectionModel */
+    private $themeSections;
 
     /** @var string $themeManagePageUrl */
     private $themeManagePageUrl = '/dashboard/settings/themes';
@@ -100,17 +106,20 @@ class ThemeModel {
      * @param \Gdn_Session $session
      * @param AddonProviderInterface $addonManager
      * @param ThemeModelHelper $themeHelper
+     * @param ThemeSectionModel $themeSections
      */
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
         AddonProviderInterface $addonManager,
-        ThemeModelHelper $themeHelper
+        ThemeModelHelper $themeHelper,
+        ThemeSectionModel $themeSections
     ) {
         $this->config = $config;
         $this->session = $session;
         $this->addonManager = $addonManager;
         $this->themeHelper = $themeHelper;
+        $this->themeSections = $themeSections;
     }
 
     /**
@@ -428,6 +437,8 @@ class ThemeModel {
      *
      * @param string $themeKey
      * @param string $assetKey
+     *
+     * @return string The asset contents.
      */
     public function getAssetData(string $themeKey, string $assetKey): string {
         $provider = $this->getThemeProvider($themeKey);
@@ -476,6 +487,17 @@ class ThemeModel {
                 break;
         }
         return $valid;
+    }
+
+    /**
+     * Normalize theme data.
+     *
+     * @param array $theme
+     * @return array
+     */
+    public function normalizeTheme(array $theme): array {
+        $key = $theme['parentID'] ?? $theme['themeID'];
+        $addon = $this->getThemeAddon($key);
     }
 
     /**

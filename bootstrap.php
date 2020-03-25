@@ -132,6 +132,8 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Models\ThemeModel::class)
         ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
 
+    ->rule(\Vanilla\Models\ThemeSectionModel::class)
+    ->setShared(true)
 
     // Logger
     ->rule(\Vanilla\Logger::class)

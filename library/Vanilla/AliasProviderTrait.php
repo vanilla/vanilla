@@ -36,7 +36,7 @@ trait AliasProviderTrait {
      *
      * @return array A mapping of Class Name => AliasName[]
      */
-    protected abstract static function provideAliases(): array;
+    abstract protected static function provideAliases(): array;
 
     /**
      * Get the map of class => alias[]
@@ -45,7 +45,7 @@ trait AliasProviderTrait {
      */
     private static function getClassToAliases(): array {
         if (self::$classToAliases === null) {
-            self::$classToAliases = self::provideAliases();
+            self::$classToAliases = static::provideAliases();
         }
 
         return self::$classToAliases;
@@ -59,7 +59,7 @@ trait AliasProviderTrait {
     private static function getAliasesToClasses(): array {
         if (self::$aliasesToClasses === null) {
             self::$aliasesToClasses = [];
-            foreach (self::getClassToAliases() as $className => $aliases) {
+            foreach (static::getClassToAliases() as $className => $aliases) {
                 foreach ($aliases as $alias) {
                     self::$aliasesToClasses[$alias] = $className;
                 }

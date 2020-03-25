@@ -8,6 +8,7 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
+use Gdn_Session;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
@@ -101,6 +102,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $dynamicPathFolder = '';
 
+    /** @var Gdn_Session */
+    private $session;
+
     /**
      * SiteMeta constructor.
      *
@@ -108,8 +112,9 @@ class SiteMeta implements \JsonSerializable {
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
-     * @param ThemeFeatres $themeFeatures
+     * @param ThemeFeatures $themeFeatures
      * @param ThemeModel $themeModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         RequestInterface $request,
@@ -117,7 +122,8 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ThemeModel $themeModel
+        ThemeModel $themeModel,
+        Gdn_Session $session
     ) {
         $this->host = $request->getHost();
 
@@ -152,10 +158,14 @@ class SiteMeta implements \JsonSerializable {
         // DeploymentCacheBuster
         $this->cacheBuster = $deploymentCacheBuster->value();
 
+        $this->session = $session;
+
         // Theming
-        $themeKey = $themeModel->getViewThemeKey();
-        $this->activeThemeKey = $themeKey;
-        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
+        $currentTheme = $themeModel->getCurrentTheme();
+        $currentThemeAddon = $themeModel->getCurrentThemeAddon();
+
+        $this->activeThemeKey = $currentTheme['themeID'];
+        $this->activeThemeViewPath = $currentThemeAddon->path('/views');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
         $this->themePreview =  $themeModel->getPreviewTheme();
 

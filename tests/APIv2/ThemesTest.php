@@ -190,14 +190,4 @@ class ThemesTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         $this->assertEquals('keystone', $body['themeID']);
     }
-
-    /**
-     * Test getThemeViewPath method of ThemeModel.
-     */
-    public function testGetThemeViewPath() {
-        /** @var ThemeModel $themeModel */
-        $themeModel = self::container()->get(ThemeModel::class);
-        $viewPath = $themeModel->getThemeViewPath('keystone');
-        $this->assertStringEndsWith('/themes/keystone/views/', $viewPath);
-    }
 }

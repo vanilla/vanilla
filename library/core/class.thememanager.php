@@ -580,10 +580,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 saveToConfig('Garden.MobileTheme', $themeName);
             } else {
                 saveToConfig('Garden.Theme', $themeName);
+                // Cleanup from the other theme page.
+                removeFromConfig('Garden.CurrentTheme');
             }
-
-            // Cleanup from the other theme page.
-            removeFromConfig('Garden.CurrentTheme');
 
             $this->setLayout($themeInfo);
         }

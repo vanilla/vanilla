@@ -67,15 +67,15 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
                 prepareShadowRoot(themeFooter, true);
             }
 
+            loadThemeFonts();
+
             if (variablesOnly) {
                 return;
             }
-
-            loadThemeFonts();
         }
     }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey, cacheID]);
 
-    if (props.disabled || props.variablesOnly) {
+    if (props.disabled) {
         return <>{props.children}</>;
     }
 

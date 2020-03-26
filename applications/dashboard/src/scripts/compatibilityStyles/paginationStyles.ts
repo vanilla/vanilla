@@ -8,7 +8,7 @@
 import { borders, colorOut, unit, margins, userSelect } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { mixinLink, mixinLinkNoDefaultLinkAppearance } from "@dashboard/compatibilityStyles/textLinkStyles";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/textLinkStyles";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
@@ -16,7 +16,7 @@ export const paginationCSS = () => {
     const primary = colorOut(mainColors.primary);
     const primaryContrast = colorOut(mainColors.primaryContrast);
 
-    mixinLink(
+    mixinClickInput(
         `
         .Pager > span,
         .Pager > a,
@@ -33,7 +33,7 @@ export const paginationCSS = () => {
         },
     );
 
-    mixinLink(
+    mixinClickInput(
         `
         .Pager > a.Highlight
     `,

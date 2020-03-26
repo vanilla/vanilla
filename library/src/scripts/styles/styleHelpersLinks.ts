@@ -8,6 +8,9 @@ import { ColorHelper } from "csx";
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonStates } from "@library/styles/styleHelpersButtons";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { emptyObject } from "expect/build/utils";
+import merge from "lodash/merge";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
@@ -36,7 +39,14 @@ export const linkStyleFallbacks = (
         return globalDefault as ColorValues;
     }
 };
-
+// These need to be strings as they could be any styles.
+export const clickStyleFallback = (
+    specificOverwrite: undefined | NestedCSSProperties,
+    defaultOverwrite: undefined | NestedCSSProperties,
+) => {
+    const mergedStyles = merge(specificOverwrite || {}, defaultOverwrite || {});
+    return emptyObject(mergedStyles) ? undefined : mergedStyles;
+};
 export interface ILinkColorOverwrites {
     default?: ColorValues;
     hover?: ColorValues;
@@ -59,8 +69,42 @@ export const EMPTY_LINK_COLOR_OVERWRITES = {
     allStates: undefined as undefined | ColorValues,
 };
 
+export const EMPTY_LINK_OVERWRITES = {
+    default: undefined as undefined | NestedCSSProperties,
+    hover: undefined as undefined | NestedCSSProperties,
+    focus: undefined as undefined | NestedCSSProperties,
+    clickFocus: undefined as undefined | NestedCSSProperties,
+    keyboardFocus: undefined as undefined | NestedCSSProperties,
+    active: undefined as undefined | NestedCSSProperties,
+    visited: undefined as undefined | NestedCSSProperties,
+    allStates: undefined as undefined | NestedCSSProperties,
+};
+
 export interface ILinkColorOverwritesWithOptions extends ILinkColorOverwrites {
     skipDefault?: boolean;
+}
+
+// The "special" here is non standard styles for links. The text colors have presets and have more complicated inheritance
+export interface ILinkSpecialOverwritesOptional {
+    default?: undefined;
+    hover?: undefined;
+    focus?: undefined;
+    clickFocus?: undefined;
+    keyboardFocus?: undefined;
+    active?: undefined;
+    visited?: undefined;
+    allStates?: undefined;
+}
+
+export interface ILinkSpecialOverwritesEnforced {
+    default: undefined;
+    hover: undefined;
+    focus: undefined;
+    clickFocus: undefined;
+    keyboardFocus: undefined;
+    active: undefined;
+    visited: undefined;
+    allStates: undefined;
 }
 
 export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
@@ -68,28 +112,46 @@ export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
     skipDefault: undefined as undefined | boolean,
 };
 
-export const clickableItemStates = (overwriteColors?: ILinkColorOverwritesWithOptions) => {
+export const clickableItemStates = (
+    overwriteColors?: ILinkColorOverwritesWithOptions,
+    overwritesSpecial?: ILinkSpecialOverwritesOptional,
+) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
 
-    const overwrites = overwriteColors ? overwriteColors : {};
+    overwriteColors = { ...EMPTY_LINK_COLOR_OVERWRITES, ...(overwriteColors ?? {}) };
+    overwritesSpecial = { ...EMPTY_LINK_OVERWRITES, ...(overwritesSpecial ?? {}) } as ILinkSpecialOverwritesEnforced;
 
     const mergedColors = {
-        default: !overwrites.skipDefault
-            ? linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default)
+        default: !overwriteColors.skipDefault
+            ? linkStyleFallbacks(overwriteColors.default, undefined, linkColors.default)
             : undefined,
-        hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
-        focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
-        clickFocus: linkStyleFallbacks(overwrites.clickFocus, overwrites.allStates, linkColors.focus),
-        keyboardFocus: linkStyleFallbacks(overwrites.keyboardFocus, overwrites.allStates, linkColors.keyboardFocus),
-        active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
-        visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
+        hover: linkStyleFallbacks(overwriteColors.hover, overwriteColors.allStates, linkColors.hover),
+        focus: linkStyleFallbacks(overwriteColors.focus, overwriteColors.allStates, linkColors.focus),
+        clickFocus: linkStyleFallbacks(overwriteColors.clickFocus, overwriteColors.allStates, linkColors.focus),
+        keyboardFocus: linkStyleFallbacks(
+            overwriteColors.keyboardFocus,
+            overwriteColors.allStates,
+            linkColors.keyboardFocus,
+        ),
+        active: linkStyleFallbacks(overwriteColors.active, overwriteColors.allStates, linkColors.active),
+        visited: linkStyleFallbacks(overwriteColors.visited, overwriteColors.allStates, linkColors.visited),
+    };
+
+    const specialStyles = {
+        default: overwritesSpecial ? overwritesSpecial.default : undefined,
+        hover: clickStyleFallback(overwritesSpecial.hover, overwritesSpecial.allStates),
+        focus: clickStyleFallback(overwritesSpecial.focus, overwritesSpecial.allStates),
+        clickFocus: clickStyleFallback(overwritesSpecial.clickFocus, overwritesSpecial.allStates),
+        keyboardFocus: clickStyleFallback(overwritesSpecial.keyboardFocus, overwritesSpecial.allStates),
+        active: clickStyleFallback(overwritesSpecial.active, overwritesSpecial.allStates),
+        visited: clickStyleFallback(overwritesSpecial.visited, overwritesSpecial.allStates),
     };
 
     const styles = {
         default: {
-            color: !overwrites.skipDefault ? colorOut(mergedColors.default) : undefined,
+            color: colorOut(mergedColors.default),
         },
         hover: {
             color: colorOut(mergedColors.hover),

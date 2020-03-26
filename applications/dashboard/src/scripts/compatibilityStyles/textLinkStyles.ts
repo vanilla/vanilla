@@ -67,7 +67,7 @@ export const textLinkCSS = () => {
 export const mixinClickInput = (selector: string, overwrite?: {}) => {
     selector = trimTrailingCommas(selector);
     const selectors = selector.split(",");
-    const linkColors = clickableItemStates(overwrite);
+    const linkColors = clickableItemStates(overwriteColors, overwriteSpecial);
     if (!selectors) {
         if (linkColors.color !== undefined) {
             cssOut(selector, {

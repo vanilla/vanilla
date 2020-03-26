@@ -822,8 +822,7 @@ jQuery(document).ready(function($) {
     }
 
     gdn.stats = function() {
-        // Call directly back to the deployment and invoke the stats handler
-        var StatsURL = gdn.getMeta('context')["dynamicPathFolder"] + gdn.url('/settings/analyticstick.json');
+        var StatsURL = gdn.url('settings/analyticstick.json');
         var SendData = {
             'TransientKey': gdn.definition('TransientKey'),
             'Path': gdn.definition('Path'),

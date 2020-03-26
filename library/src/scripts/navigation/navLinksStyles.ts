@@ -86,7 +86,7 @@ export const navLinksVariables = useThemeCache(() => {
         paddings: {
             top: globalVars.gutter.size,
         },
-        $nest: viewAllLinkColors.nested,
+        $nest: viewAllLinkColors.$nest,
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -226,7 +226,7 @@ export const navLinksClasses = useThemeCache(() => {
             // @ts-ignore
             color: vars.viewAll.color,
         }),
-        $nest: viewAllLinkColors.nested,
+        $nest: viewAllLinkColors.$nest,
     });
 
     const linksWithHeadings = style(

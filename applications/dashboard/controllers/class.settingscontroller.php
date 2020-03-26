@@ -525,11 +525,14 @@ class SettingsController extends DashboardController {
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
                 'Control' => 'imageupload',
-                'Size' => '16x16',
+                'Size' => '48x48',
                 'OutputType' => 'ico',
                 'Prefix' => 'favicon_',
                 'Crop' => true,
-                'Description' => t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
+                'Description' => t(
+                    'FaviconDescription',
+                    "Your site's favicon appears in your browser's title bar. It will be scaled down appropriately."
+                ),
                 'Options' => [
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
                 ]

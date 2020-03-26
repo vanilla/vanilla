@@ -9,7 +9,7 @@ import {
     colorOut,
     margins,
     paddings,
-    setAllLinkStateStyles,
+    clickableItemStates,
     unit,
     fonts,
     extendItemContainer,
@@ -75,7 +75,7 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
-    const viewAllLinkColors = setAllLinkStateStyles();
+    const viewAllLinkColors = clickableItemStates();
     const viewAll = makeThemeVars("viewAll", {
         color: viewAllLinkColors.color,
         fontWeight: globalVars.fonts.weights.semiBold,
@@ -86,7 +86,7 @@ export const navLinksVariables = useThemeCache(() => {
         paddings: {
             top: globalVars.gutter.size,
         },
-        $nest: viewAllLinkColors.nested,
+        $nest: viewAllLinkColors.$nest,
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -192,7 +192,7 @@ export const navLinksClasses = useThemeCache(() => {
         },
     });
 
-    const linkColors = setAllLinkStateStyles({
+    const linkColors = clickableItemStates({
         default: globalVars.mainColors.fg,
     });
 
@@ -204,7 +204,7 @@ export const navLinksClasses = useThemeCache(() => {
             // @ts-ignore
             color: linkColors.color,
         }),
-        $nest: linkColors.nested as NestedCSSProperties,
+        $nest: linkColors.$nest as NestedCSSProperties,
     } as NestedCSSProperties);
 
     const viewAllItem = style("viewAllItem", {
@@ -214,7 +214,7 @@ export const navLinksClasses = useThemeCache(() => {
         ...paddings(vars.viewAll.paddings),
     });
 
-    const viewAllLinkColors = setAllLinkStateStyles({
+    const viewAllLinkColors = clickableItemStates({
         default: globalVars.mainColors.primary,
     });
 
@@ -226,7 +226,7 @@ export const navLinksClasses = useThemeCache(() => {
             // @ts-ignore
             color: vars.viewAll.color,
         }),
-        $nest: viewAllLinkColors.nested,
+        $nest: viewAllLinkColors.$nest,
     });
 
     const linksWithHeadings = style(

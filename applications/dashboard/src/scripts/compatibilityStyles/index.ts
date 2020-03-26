@@ -357,6 +357,10 @@ export const compatibilityStyles = useThemeCache(() => {
         background: "none",
     });
 
+    cssOut(".Bullet", {
+        display: "none",
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

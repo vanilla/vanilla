@@ -39,7 +39,7 @@ class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInte
                 [
                     "type" => "array",
                     "items" => [
-                        'type' => 'integer'
+                        "type" => "integer"
                     ]
                 ]
         ]);

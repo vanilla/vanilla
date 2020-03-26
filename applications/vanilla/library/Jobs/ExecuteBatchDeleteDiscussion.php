@@ -11,7 +11,7 @@ use Vanilla\Scheduler\Job\JobPriority;
 /**
  * Execute the discussion delete queue.
  */
-class ExecuteBatchDeleteDiscussion implements Vanilla\Scheduler\Job\LocalJobInterface {
+class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
 
     /** @var DiscussionModel */
     private $discussionModel;

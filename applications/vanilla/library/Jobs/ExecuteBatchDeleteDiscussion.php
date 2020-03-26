@@ -9,7 +9,7 @@ use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
 
 /**
- * Execute the discussion delete queue.
+ * Delete one or more discussions.
  */
 class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
 

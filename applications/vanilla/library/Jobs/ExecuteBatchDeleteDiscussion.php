@@ -47,7 +47,7 @@ class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
     }
 
     /**
-     * Execute all queued up items in the DiscussionModel queue.
+     * Delete specified discussions
      */
     public function run(): JobExecutionStatus {
         if (!is_array($this->discussionArray)) {

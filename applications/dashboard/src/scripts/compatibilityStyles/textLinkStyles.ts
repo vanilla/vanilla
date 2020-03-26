@@ -5,7 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, setAllLinkStateStyles } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    ILinkColorOverwrites,
+    ILinkSpecialOverwritesOptional,
+    setAllLinkStateStyles,
+} from "@library/styles/styleHelpers";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -13,22 +18,21 @@ export const textLinkCSS = () => {
     const globalVars = globalVariables();
 
     // Various links
-    mixinTextLink(".Navigation-linkContainer a");
-    mixinTextLink(".Panel .PanelInThisDiscussion a");
-    mixinTextLink(".Panel .Leaderboard a");
-    mixinTextLink(".Panel .InThisConversation a");
-    mixinTextLink(".FieldInfo a");
+    mixinLink(".Navigation-linkContainer a");
+    mixinLink(".Panel .PanelInThisDiscussion a");
+    mixinLink(".Panel .Leaderboard a");
+    mixinLink(".Panel .InThisConversation a");
+    mixinLink(".FieldInfo a");
 
-    mixinTextLink("div.Popup .Body a");
-    mixinTextLink(".selectBox-toggle");
-    mixinTextLink(".followButton");
-    mixinTextLink(".SelectWrapper::after");
-    mixinTextLink(".Back a");
-    mixinTextLink(".OptionsLink-Clipboard");
-    mixinTextLink("a.OptionsLink");
-    mixinTextLink("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
-    mixinTextLink(`body.Section-BestOf .Tile .Message a`);
-    mixinTextLink(
+    mixinLink("div.Popup .Body a");
+    mixinLink(".followButton");
+    mixinLink(".SelectWrapper::after");
+    mixinLink(".Back a");
+    mixinLink(".OptionsLink-Clipboard");
+    mixinLink("a.OptionsLink");
+    mixinLink("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
+    mixinLink(`body.Section-BestOf .Tile .Message a`);
+    mixinLink(
         `
         .DataList .IdeationTag,
         .DataList .tag-tracker,
@@ -41,33 +45,43 @@ export const textLinkCSS = () => {
         .DataTableWrap .MItem.RoleTracker
         `,
     );
-    mixinTextLink(`
+    mixinLink(`
         .Container .userContent a,
         .Container .UserContent a
     `);
-    mixinTextLink(".BreadcrumbsBox .Breadcrumbs a", {
+    mixinLink(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
     });
 
     // Links that have FG color by default but regular state colors.
-    mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
-    mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
-    mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
-    mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");
-    mixinTextLinkNoDefaultLinkAppearance(".DataTable .Title.Title a");
-    mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
-    mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
-    mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
+    mixinLinkNoDefaultLinkAppearance(".ItemContent a");
+    mixinLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
+    mixinLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
+    mixinLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
+    mixinLinkNoDefaultLinkAppearance(".MenuItems a");
+    mixinLinkNoDefaultLinkAppearance(".DataTable h2 a");
+    mixinLinkNoDefaultLinkAppearance(".DataTable h3 a");
+    mixinLinkNoDefaultLinkAppearance(".DataTable .Title.Title a");
+    mixinLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
+    mixinLinkNoDefaultLinkAppearance(".FilterMenu a");
+    mixinLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
+    mixinLinkNoDefaultLinkAppearance(`.selectBox-toggle`);
+
+    mixinLinkNoDefaultLinkAppearance(`
+        .Container .Frame-contentWrap .ChildCategories,
+        .Container .Frame-contentWrap .ChildCategories a,
+        .DiscussionName .Wrap > a,`);
 };
 
 // Mixins replacement
-export const mixinTextLink = (selector: string, overwrite?: {}) => {
+export const mixinLink = (
+    selector: string,
+    linkColorOverwrites?: ILinkColorOverwrites,
+    nonstandardLinkStates?: ILinkSpecialOverwritesOptional,
+) => {
     selector = trimTrailingCommas(selector);
     const selectors = selector.split(",");
-    const linkColors = setAllLinkStateStyles(overwrite);
+    const linkColors = setAllLinkStateStyles(linkColorOverwrites, nonstandardLinkStates);
     if (!selectors) {
         if (linkColors.color !== undefined) {
             cssOut(selector, {
@@ -87,7 +101,7 @@ export const mixinTextLink = (selector: string, overwrite?: {}) => {
     }
 };
 
-export const mixinTextLinkNoDefaultLinkAppearance = selector => {
+export const mixinLinkNoDefaultLinkAppearance = selector => {
     const globalVars = globalVariables();
-    mixinTextLink(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
+    mixinLink(selector, { default: globalVars.mainColors.fg });
 };

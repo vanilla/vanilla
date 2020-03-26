@@ -50,6 +50,7 @@ export const compatibilityStyles = useThemeCache(() => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
+    const primaryContrast = colorOut(mainColors.primaryContrast);
 
     fullBackgroundCompat();
 
@@ -187,9 +188,11 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
-        color: primary,
-    });
+    // cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
+    //     color: primary,
+    //     backgroundColor: primaryContrast,
+    //     cursor: "pointer",
+    // });
 
     cssOut(
         `

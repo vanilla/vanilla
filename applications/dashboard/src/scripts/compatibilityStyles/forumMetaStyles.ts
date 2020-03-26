@@ -97,7 +97,6 @@ export const forumMetaCSS = () => {
                     },
                 },
                 {},
-                debug,
             );
 
             logDebugConditionnal(debug, linkStates);
@@ -123,19 +122,6 @@ export const forumMetaCSS = () => {
             ...margins({
                 all: 0,
             }),
-        },
-    );
-
-    cssOut(
-        `
-        .Container .Frame-contentWrap .ChildCategories,
-        .Container .Frame-contentWrap .ChildCategories a,
-        .DiscussionName .Wrap > a,
-        .Gloss
-        `,
-        {
-            fontSize: unit(globalVars.meta.text.fontSize),
-            color: colorOut(globalVars.meta.text.color),
         },
     );
 

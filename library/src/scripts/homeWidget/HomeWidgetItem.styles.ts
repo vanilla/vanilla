@@ -16,7 +16,7 @@ import {
     EMPTY_SPACING,
     fonts,
     IBackground,
-    linkStyleFallbacks,
+    linksColorFallbacks,
     paddings,
     setAllLinkStateStyles,
     unit,
@@ -149,7 +149,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     const name = style("name", {
         color: colorOut(vars.options.fg),
         ...fonts(vars.name.font),
-        ...linkStyleFallbacks,
+        ...linksColorFallbacks,
         marginBottom: unit(globalVars.gutter.half),
     });
 

@@ -494,7 +494,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                         ? colorOut(globalVars.states.active.contrast, true)
                         : undefined,
                 },
-                accessibleFocus: {
+                keyboardFocus: {
                     borderColor: colorOut(globalVars.states.focus.highlight, true),
                     color: globalVars.states.hover.contrast
                         ? colorOut(globalVars.states.focus.contrast, true)

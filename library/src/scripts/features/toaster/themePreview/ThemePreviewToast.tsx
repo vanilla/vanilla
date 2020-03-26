@@ -13,13 +13,22 @@ import { useThemePreviewToasterState } from "@library/features/toaster/themePrev
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 
+interface IThemePreview {
+    name: string;
+    redirect: string;
+    themeID: string | number;
+}
+
 export function ThemePreviewToast() {
     const { applyStatus, cancelStatus } = useThemePreviewToasterState();
-    const [showToaster, setShowToast] = useState(getMeta("themePreview", true));
+    const [themePreview, setThemePreview] = useState<IThemePreview | null>(getMeta("themePreview", null));
     const { putCurrentTheme, putPreviewTheme } = useThemeActions();
 
     const handleApply = async () => {
-        putCurrentTheme(showToaster.themeID);
+        if (!themePreview) {
+            return;
+        }
+        putCurrentTheme(themePreview.themeID);
         putPreviewTheme({ themeID: "", type: PreviewStatusType.APPLY });
     };
 
@@ -28,15 +37,18 @@ export function ThemePreviewToast() {
     };
 
     useEffect(() => {
+        if (!themePreview) {
+            return;
+        }
         if (
-            (showToaster.name && applyStatus.status === LoadStatus.SUCCESS) ||
+            (themePreview.name && applyStatus.status === LoadStatus.SUCCESS) ||
             cancelStatus.status === LoadStatus.SUCCESS
         ) {
-            window.location.href = showToaster.redirect;
+            window.location.href = themePreview.redirect;
         }
     });
 
-    if (!showToaster.name) {
+    if (!themePreview) {
         return null;
     }
 
@@ -58,7 +70,7 @@ export function ThemePreviewToast() {
             ]}
             message={
                 <>
-                    You are previewing the <b>{showToaster.name}</b> theme.
+                    You are previewing the <b>{themePreview.name}</b> theme.
                     {applyStatus.error && <ErrorMessages errors={[applyStatus.error]} />}
                 </>
             }

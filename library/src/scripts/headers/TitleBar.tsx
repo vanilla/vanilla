@@ -32,6 +32,8 @@ import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
+import { useSelector } from "react-redux";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
@@ -84,24 +86,39 @@ export default function TitleBar(_props: IProps) {
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
     const isDesktopLogoCentered = vars.logo.justifyContent === LogoAlignment.CENTER;
 
+    // When previewing and updating the colors live, there can be flickering of some components.
+    // As a result we want to hide them on first render for these cases.
+    const isPreviewing = useSelector((state: ICoreStoreState) => state.theme.forcedVariables);
+    const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(!!isPreviewing);
+    useEffect(() => {
+        if (isPreviewFirstRender) {
+            setIsPreviewFirstRender(false);
+        }
+    }, [isPreviewFirstRender]);
+
     const headerContent = (
         <HashOffsetReporter className={classes.bgContainer}>
             <animated.div
                 {...bgProps}
                 className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
             ></animated.div>
-            <animated.div {...bg2Props} className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}>
-                {/* Cannot be a background image there will be flickering. */}
-                {vars.colors.bgImage && (
-                    <img
-                        src={vars.colors.bgImage}
-                        className={classes.bgImage}
-                        alt={"titleBarImage"}
-                        aria-hidden={true}
-                    />
-                )}
-                {vars.overlay && <div className={classes.overlay}></div>}
-            </animated.div>
+            {!isPreviewFirstRender && (
+                <animated.div
+                    {...bg2Props}
+                    className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
+                >
+                    {/* Cannot be a background image there will be flickering. */}
+                    {vars.colors.bgImage && (
+                        <img
+                            src={vars.colors.bgImage}
+                            className={classes.bgImage}
+                            alt={"titleBarImage"}
+                            aria-hidden={true}
+                        />
+                    )}
+                    {vars.overlay && <div className={classes.overlay}></div>}
+                </animated.div>
+            )}
             <Container fullGutter>
                 <div className={classNames(classes.bar, { isHome: showSubNav })}>
                     {isCompact &&

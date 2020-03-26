@@ -10,13 +10,9 @@ import { ITheme } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
+import { setMeta } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@themes");
-
-export enum ThemeType {
-    DB = "themeDB",
-    FS = "themeFile",
-}
 
 export enum PreviewStatusType {
     PREVIEW = "preview",
@@ -24,12 +20,6 @@ export enum PreviewStatusType {
     CANCEL = "cancel",
 }
 export interface IManageTheme extends ITheme {
-    name: string;
-    type: ThemeType;
-    current: boolean;
-    themeID: string;
-    parentTheme: string;
-    parentVersion: string;
     preview: {
         info: IThemeInfo;
         [key: string]: any;
@@ -102,7 +92,8 @@ export default class ThemeActions extends ReduxActions {
         const body = { themeID };
         const thunk = bindThunkAction(ThemeActions.putCurrentThemeACs, async () => {
             const response = await this.api.put(`/themes/current`, body);
-
+            setMeta("ui.themeKey", themeID);
+            setMeta("ui.mobileThemeKey", themeID);
             return response.data;
         })(body);
         return this.dispatch(thunk);

@@ -34,31 +34,6 @@ class ThemesTest extends AbstractAPIv2Test {
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
-        $root = '/tests/fixtures';
-        $addonManager = new AddonManager(
-            [
-                Addon::TYPE_ADDON => [
-                    "$root/addons", "$root/applications", "$root/plugins"
-                ],
-                Addon::TYPE_THEME => "$root/themes",
-                Addon::TYPE_LOCALE => "$root/locales"
-            ],
-            PATH_ROOT.'/tests/cache/am/test-manager'
-        );
-
-        $request = self::container()->get(Gdn_Request::class);
-        $config = self::container()->get(Gdn_Configuration::class);
-
-        static::container()
-            ->rule(FsThemeProvider::class)
-            ->setConstructorArgs(
-                [
-                    $addonManager,
-                    $request,
-                    $config
-                ]
-            );
-
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
 
@@ -179,7 +154,7 @@ class ThemesTest extends AbstractAPIv2Test {
         $this->api()->setUserID(\UserModel::GUEST_USER_ID);
         $response = $this->api()->get("themes");
         $body = $response->getBody();
-        $this->assertEquals(3, count($body), 'The 2 unhidden files, and the current are returned');
+        $this->assertEquals(2, count($body), 'The 2 unhidden themes, keystone and foundation are returned.');
     }
 
     /**
@@ -188,16 +163,6 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
-        $this->assertEquals('keystone', $body['themeID']);
-    }
-
-    /**
-     * Test getThemeViewPath method of ThemeModel.
-     */
-    public function testGetThemeViewPath() {
-        /** @var ThemeModel $themeModel */
-        $themeModel = self::container()->get(ThemeModel::class);
-        $viewPath = $themeModel->getThemeViewPath('keystone');
-        $this->assertStringEndsWith('/themes/keystone/views/', $viewPath);
+        $this->assertEquals('theme-foundation', $body['themeID']);
     }
 }

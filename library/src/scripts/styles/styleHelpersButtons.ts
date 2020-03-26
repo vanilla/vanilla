@@ -13,8 +13,8 @@ export interface IActionStates {
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
-    focusNotKeyboard?: object; // Focused, not through keyboard?: object;
-    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    clickFocus?: object; // Focused, not through keyboard?: object;
+    keyboardFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
 
@@ -23,8 +23,8 @@ export interface IStateSelectors {
     allStates?: string; // Applies to all
     hover?: string;
     focus?: string;
-    focusNotKeyboard?: string; // Focused, not through keyboard?: object;
-    accessibleFocus?: string; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    clickFocus?: string; // Focused, not through keyboard?: object;
+    keyboardFocus?: string; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: string;
 }
 
@@ -33,8 +33,8 @@ export interface IButtonStates {
     noState?: object; // Applies to stateless link
     hover?: object;
     focus?: object;
-    focusNotKeyboard?: object; // Focused, not through keyboard
-    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    clickFocus?: object; // Focused, not through keyboard
+    keyboardFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
 
@@ -64,8 +64,8 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?:
             "&": noState,
             "&:hover:not(:disabled)": { ...allStates, ...styles.hover },
             "&:focus": { ...allStates, ...styles.focus },
-            "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
-            "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...styles.clickFocus },
+            "&&.focus-visible": { ...allStates, ...styles.keyboardFocus },
             "&:active:not(:disabled)": { ...allStates, ...styles.active },
             ...disabledStyles,
             ...nested,
@@ -90,8 +90,8 @@ export const buttonStates = (styles: IActionStates, nest?: object, classBasedSta
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const hover = styles.hover !== undefined ? styles.hover : {};
     const focus = styles.focus !== undefined ? styles.focus : {};
-    const focusNotKeyboard = styles.focusNotKeyboard !== undefined ? styles.focusNotKeyboard : {};
-    const accessibleFocus = styles.accessibleFocus !== undefined ? styles.accessibleFocus : {};
+    const clickFocus = styles.clickFocus !== undefined ? styles.clickFocus : {};
+    const keyboardFocus = styles.keyboardFocus !== undefined ? styles.keyboardFocus : {};
     const active = styles.active !== undefined ? styles.active : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
 
@@ -103,13 +103,13 @@ export const buttonStates = (styles: IActionStates, nest?: object, classBasedSta
         [appendExtraSelector("&", classBasedStates.allStates)]: { ...allStates, ...noState },
         [appendExtraSelector("&:hover", classBasedStates.hover)]: { ...allStates, ...hover },
         [appendExtraSelector("&:focus", classBasedStates.focus)]: { ...allStates, ...focus },
-        [appendExtraSelector("&:focus:not(.focus-visible)", classBasedStates.focusNotKeyboard)]: {
+        [appendExtraSelector("&:focus:not(.focus-visible)", classBasedStates.clickFocus)]: {
             ...allStates,
-            ...focusNotKeyboard,
+            ...clickFocus,
         },
-        [appendExtraSelector("&.focus-visible", classBasedStates.accessibleFocus)]: {
+        [appendExtraSelector("&.focus-visible", classBasedStates.keyboardFocus)]: {
             ...allStates,
-            ...accessibleFocus,
+            ...keyboardFocus,
         },
         [appendExtraSelector("&&:active", classBasedStates.active)]: { ...allStates, ...active },
         ...nest,

@@ -12,22 +12,27 @@ use org\bovigo\vfs\vfsStream;
 use Vanilla\Models\FsThemeProvider;
 use Vanilla\Models\ThemeModel;
 use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Models\ThemeSectionModel;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\MockConfig;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Fixtures\Request;
+use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Tests for the asset provider.
  */
-class WebpackAssetProviderTest extends TestCase {
+class WebpackAssetProviderTest extends MinimalContainerTestCase {
 
     /**
      * @inheritdoc
      */
     public function setUp(): void {
+        parent::setUp();
         vfsStream::setup();
     }
 
@@ -50,7 +55,9 @@ class WebpackAssetProviderTest extends TestCase {
             $config,
             $session,
             $addonManager,
-            $themeHelper
+            $themeHelper,
+            self::container()->get(ThemeSectionModel::class),
+            self::container()->get(SiteSectionModel::class)
         );
         $request = new Request();
         $fsThemeProvider = new FsThemeProvider(

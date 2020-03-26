@@ -5,6 +5,8 @@
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { cssOut } from "@dashboard/compatibilityStyles";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -18,6 +20,8 @@ export const dashboardClasses = useThemeCache(() => {
         fontSize: "inherit !important",
         marginBottom: globalVars.gutter.size,
     });
+
+    cssOut(`.form-group .suggestedTextInput-option`, suggestedTextStyleHelper().option);
 
     return {
         formList,

@@ -8,6 +8,7 @@ import { ComponentClass } from "react";
 import { logWarning, logError } from "@vanilla/utils";
 import { mountReact, IComponentMountOptions } from "@vanilla/react-utils";
 import { AppContext } from "@library/AppContext";
+import { resetThemeCache } from "@library/styles/styleUtils";
 
 let useTheme = true;
 
@@ -16,6 +17,19 @@ let useTheme = true;
  */
 export function disableComponentTheming() {
     useTheme = false;
+    resetThemeCache();
+}
+
+/**
+ * Enable theming for the site. This is useful for sections like the dashboard.
+ */
+export function enableComponentTheming() {
+    useTheme = true;
+    resetThemeCache();
+}
+
+export function isComponentThemingEnabled() {
+    return useTheme;
 }
 
 interface IRegisteredComponent {

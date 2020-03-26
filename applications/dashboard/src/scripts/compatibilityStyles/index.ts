@@ -38,6 +38,8 @@ import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
+import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
+import { emptyObject } from "expect/build/utils";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -357,9 +359,14 @@ export const compatibilityStyles = useThemeCache(() => {
         background: "none",
     });
 
+    cssOut(".Bullet, .QuickSearch", {
+        display: "none",
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
+    forumTagCSS();
     forumMetaCSS();
     inputCSS();
     socialConnectCSS();
@@ -418,20 +425,29 @@ export const nestedWorkaround = (selector: string, nestedObject: {}) => {
     let rawStyles = `\n`;
     Object.keys(nestedObject).forEach(key => {
         const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
+        let newStyleDeclaration = "";
         if (selector !== "") {
             const targetStyles = nestedObject[key];
-            const keys = Object.keys(targetStyles);
-            if (keys.length > 0) {
-                rawStyles += `${finalSelector} { `;
-                keys.forEach(property => {
+            const styleProps = targetStyles ? Object.keys(targetStyles) : [];
+
+            let emptyStyles = true;
+
+            if (styleProps.length > 0) {
+                newStyleDeclaration += `${finalSelector} { `;
+                styleProps.forEach(property => {
                     const style = targetStyles[property];
-                    if (style) {
-                        rawStyles += `\n    ${camelCaseToDash(property)}: ${
+                    if (style !== undefined && style !== "") {
+                        newStyleDeclaration += `\n    ${camelCaseToDash(property)}: ${
                             style instanceof ColorHelper ? colorOut(style) : style
                         };`;
+                        emptyStyles = false;
                     }
                 });
-                rawStyles += `\n}\n\n`;
+                newStyleDeclaration += `\n}\n\n`;
+            }
+
+            if (!emptyStyles) {
+                rawStyles += newStyleDeclaration;
             }
         }
     });

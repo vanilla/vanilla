@@ -12,8 +12,6 @@ import {
     borders,
     colorOut,
     unit,
-    paddings,
-    importantUnit,
     getVerticalPaddingForTextInput,
     fonts,
     flexHelper,
@@ -26,6 +24,7 @@ import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { inputVariables } from "@library/forms/inputStyles";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -146,7 +145,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 },
                 "& .searchBar__control": {
                     border: 0,
-                    backgroundColor: "transparent",
+                    backgroundColor: colorOut(globalVars.elementaryColors.transparent),
                     width: percent(100),
                     maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                     $nest: {
@@ -188,6 +187,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     height: "auto",
                     minHeight: 0,
                     width: important(`100%`),
+                    borderRadius: important(0),
                     lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 },
             },
@@ -200,6 +200,31 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             },
         }),
     );
+
+    // The styles have been split here so they can be exported to the compatibility styles.
+    const searchResultsStyles = {
+        title: {
+            ...fonts({
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.semiBold,
+                lineHeight: globalVars.lineHeights.condensed,
+            }),
+        } as NestedCSSProperties,
+        meta: {
+            ...fonts({
+                ...globalVars.meta.text,
+                lineHeight: globalVars.meta.lineHeights.default,
+            }),
+        } as NestedCSSProperties,
+        excerpt: {
+            marginTop: unit(6),
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+                color: vars.results.fg,
+                lineHeight: globalVars.lineHeights.excerpt,
+            }),
+        } as NestedCSSProperties,
+    };
 
     const results = style("results", {
         position: "absolute",
@@ -220,40 +245,25 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-option": {
-                ...buttonResetMixin(),
-                width: percent(100),
-                ...paddings({
-                    vertical: 9,
-                    horizontal: 12,
-                }),
-                ...fonts({
-                    size: globalVars.fonts.size.medium,
-                }),
-                textAlign: "left",
-                display: "block",
-                color: "inherit",
-                $nest: {
-                    "&:hover, &:focus, &.isFocused": {
-                        color: "inherit",
-                        backgroundColor: globalVars.states.hover.highlight.toString(),
-                    },
-                },
-            },
+            "& .suggestedTextInput-option": suggestedTextStyleHelper().option,
             "& .suggestedTextInput-menuItems": {
                 margin: 0,
                 padding: 0,
             },
             "& .suggestedTextInput-item": {
-                ...fonts({
-                    size: globalVars.fonts.size.medium,
-                }),
                 listStyle: "none",
                 $nest: {
                     "& + .suggestedTextInput-item": {
                         borderTop: `solid 1px ${globalVars.border.color.toString()}`,
                     },
                 },
+            },
+            "& .suggestedTextInput-title": {
+                ...searchResultsStyles.title,
+            },
+
+            "& .suggestedTextInput-title .suggestedTextInput-searchingFor": {
+                fontWeight: globalVars.fonts.weights.normal,
             },
         },
     });
@@ -271,38 +281,35 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         zIndex: 1,
     });
 
-    const valueContainer = style("valueContainer", {
-        display: "flex",
-        alignItems: "center",
-        width: percent(100),
-        paddingTop: 0,
-        paddingBottom: 0,
-        paddingRight: 0,
-        height: unit(vars.sizing.height),
-        backgroundColor: colorOut(vars.input.bg),
-        color: colorOut(vars.input.fg),
-        cursor: "text",
-        transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
-        ...borderRadii({
-            right: 0,
-            left: vars.border.radius,
-        }),
-        $nest: {
-            "&&&": {
-                display: "flex",
-                flexWrap: "nowrap",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                paddingLeft: unit(vars.searchIcon.gap),
-                paddingRight: unit(vars.searchIcon.padding.right),
+    const valueContainer = (mirrorLeftRadius = false) => {
+        return style("valueContainer", {
+            display: "flex",
+            alignItems: "center",
+            width: percent(100),
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingRight: 0,
+            height: unit(vars.sizing.height),
+            backgroundColor: colorOut(vars.input.bg),
+            color: colorOut(vars.input.fg),
+            cursor: "text",
+            transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
+            ...borderRadii({
+                left: vars.border.radius,
+                right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+            }),
+            $nest: {
+                "&&&": {
+                    display: "flex",
+                    flexWrap: "nowrap",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    paddingLeft: unit(vars.searchIcon.gap),
+                    paddingRight: unit(vars.searchIcon.padding.right),
+                },
             },
-            "&.noSearchButton": {
-                ...borderRadii({
-                    right: importantUnit(vars.border.radius),
-                }),
-            },
-        },
-    });
+        });
+    };
 
     // Has a search button attached.
     const compoundValueContainer = style("compoundValueContainer", {
@@ -357,6 +364,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     const form = style("form", {
         display: "block",
+        height: percent(100),
     });
 
     // special selector
@@ -456,5 +464,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         results,
         resultsAsModal,
         menu,
+        searchResultsStyles, // for compatibility
     };
 });

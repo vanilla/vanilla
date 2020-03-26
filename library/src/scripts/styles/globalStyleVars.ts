@@ -140,7 +140,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             default: linkDerivedColors.default,
             hover: linkDerivedColors.state,
             focus: linkDerivedColors.state,
-            accessibleFocus: linkDerivedColors.state,
+            keyboardFocus: linkDerivedColors.state,
             active: linkDerivedColors.state,
             visited: undefined,
         },
@@ -475,9 +475,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 });
 
 export interface IGlobalBorderStyles extends IBorderRadiusOutput {
-    color: ColorValues;
-    width: BorderWidthProperty<TLength> | number;
-    style: BorderStyleProperty;
+    color?: ColorValues;
+    width?: BorderWidthProperty<TLength> | number;
+    style?: BorderStyleProperty;
     radius?: radiusValue;
 }
 

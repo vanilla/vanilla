@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, margins, flexHelper } from "@library/styles/styleHelpers";
+import { unit, paddings, flexHelper } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themePreviewCardStyles";
@@ -13,9 +13,6 @@ export const addthemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
     const globalVars = globalVariables();
 
-    const colors = makeThemeVars("colors", {
-        fg: globalVars.messageColors.warning.fg,
-    });
     const addTheme = makeThemeVars("addTheme", {
         width: percent(100),
         height: percent(100),
@@ -29,7 +26,6 @@ export const addthemeVariables = useThemeCache(() => {
 
 export const addThemeClasses = useThemeCache(() => {
     const vars = addthemeVariables();
-    const globalVars = globalVariables();
 
     const style = styleFactory("addTheme");
 
@@ -50,7 +46,7 @@ export const addThemeClasses = useThemeCache(() => {
 
     const button = style("button", {
         padding: 0,
-        minHeight: 100,
+        minHeight: 200,
         minWidth: themeCardVariables().container.minWidth,
         maxWidth: themeCardVariables().container.maxWidth,
         $nest: {

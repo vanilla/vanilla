@@ -7,6 +7,7 @@ export * from "./createContextProvider";
 export * from "./Hoverable";
 export * from "./mounting";
 export * from "./useCollisionDetector";
+export * from "./useComponentDebug";
 export * from "./useEscapeListener";
 export * from "./useFocusWatcher";
 export * from "./useInterval";

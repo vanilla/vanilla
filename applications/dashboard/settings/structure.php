@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
 /**
  * Dashboard database structure.
  *
@@ -10,6 +8,11 @@
  * @since 2.0
  */
 
+use Vanilla\Models\ThemeModelHelper;
+
+if (!defined('APPLICATION')) {
+    exit();
+}
 if (!isset($Drop)) {
     $Drop = false;
 }
@@ -1023,3 +1026,12 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
     Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
     Gdn::config()->remove("Sitemap.Robots.Rules");
 }
+
+
+// Save current theme value into the visible themes. This way existing sites will continue to see them even if they get hidden.
+
+/**
+ * @var ThemeModelHelper $themeHelper
+ */
+$themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+$themeHelper->saveCurrentThemeToVisible();

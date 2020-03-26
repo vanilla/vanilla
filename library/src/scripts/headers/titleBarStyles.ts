@@ -25,6 +25,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     calc,
     ColorHelper,
+    important,
     linearGradient,
     percent,
     px,
@@ -400,9 +401,6 @@ export const titleBarClasses = useThemeCache(() => {
             [`& .${searchBarClasses().valueContainer}`]: {
                 backgroundColor: colorOut(vars.compactSearch.bg),
             },
-            [`& .${searchBarClasses().valueContainer} .searchBar__input`]: {
-                color: colorOut(vars.compactSearch.fg),
-            },
         },
         ...mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
@@ -710,7 +708,15 @@ export const titleBarClasses = useThemeCache(() => {
                                     },
                                 },
                             },
-                            accessibleFocus: {
+                            focus: {
+                                color: colorOut(vars.colors.fg),
+                                $nest: {
+                                    "& .meBox-buttonContent": {
+                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                },
+                            },
+                            keyboardFocus: {
                                 outline: 0,
                                 color: colorOut(vars.colors.fg),
                                 $nest: {

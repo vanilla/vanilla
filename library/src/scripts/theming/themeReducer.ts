@@ -8,8 +8,22 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import produce from "immer";
 
+export enum ThemeType {
+    DB = "themeDB",
+    FS = "themeFile",
+}
+
 export interface ITheme {
     assets: IThemeAssets;
+    features: Record<string, boolean>;
+    supportedSections?: string[];
+    preview: Record<string, any> & { info: Record<string, any> };
+    themeID: string | number;
+    name: string;
+    type: ThemeType;
+    parentTheme?: string;
+    current: boolean;
+    version: string;
 }
 
 export interface IThemeAssets {
@@ -17,6 +31,18 @@ export interface IThemeAssets {
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
+    header?: IThemeHeader;
+    footer?: IThemeFooter;
+    javascript?: string;
+    styles?: string;
+}
+export interface IThemeHeader {
+    data?: string;
+    type: string;
+}
+export interface IThemeFooter {
+    data?: string;
+    type: string;
 }
 
 export interface IThemeFont {

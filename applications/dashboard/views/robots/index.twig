@@ -2,5 +2,5 @@
 Sitemap: {{ url(sitemap, true) }}
 {% endfor %}
 {% for rule in rules %}
-{{ rule }}
+{{ rule|raw }}
 {% endfor %}

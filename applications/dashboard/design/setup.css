@@ -1,57 +1,55 @@
 body {
-    font-family: 'lucida grande', 'Lucida Sans Unicode', tahoma, sans-serif;
-    background: #C7E6FB;
     margin: 0px;
     padding: 0px;
     text-align: center;
-    color: #076C8E;
+    visibility: hidden;
 }
 
 a,
 a:link,
 a:active,
 a:visited {
-    color: #2786C2;
+    color: #2786c2;
     text-decoration: none;
 }
 
 a:hover {
-    color: #2786C2 !important;
+    color: #2786c2 !important;
     text-decoration: underline;
 }
 
-div.Title {
-    background: #E2F4FF none repeat scroll 0 0;
-    border-top: 1px solid #A5D0E7;
-    border-bottom: 1px solid #A5D0E7;
-    margin: 50px 0;
-    padding: 30px 0 4px;
+.Title {
+    background: #0291db;
+    border-top: 1px solid #a5d0e7;
+    border-bottom: 1px solid #a5d0e7;
+    margin-bottom: 50px;
+    padding: 18px 0;
 }
 
-div.Title h1 {
+.Title h1 {
+    color: #fff;
     text-align: left;
-    width: 600px;
+    width: 800px;
     margin: 0 auto;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
 }
 
-div.Title img {
-    top: 20px;
-    position: absolute;
-}
-
-div.Title p {
-    padding: 0 0 0 270px;
+.Title p {
+    padding-left: 24px;
     margin: 0;
-    font-size: 30px;
+}
+
+.Title img {
+    width: 120px;
 }
 
 h1 {
-    font-family: Arial, Helvetica, Verdana;
-    color: #02455B;
+    color: #02455b;
     width: 568px;
     margin: 0 auto;
     padding: 0;
-    font-size: 180%;
 }
 
 .Container {
@@ -75,7 +73,7 @@ div.Errors {
     background: #d00;
     padding: 20px 8px !important;
     margin: 0 0 10px;
-    border-bottom: 1px solid #C0E7F5;
+    border-bottom: 1px solid #c0e7f5;
 }
 
 .Errors li {
@@ -106,7 +104,6 @@ div.Errors {
     text-shadow: none;
     font-size: 13px;
     font-weight: normal;
-    font-family: monospace;
 }
 
 .Errors li a {
@@ -121,7 +118,7 @@ div.Errors {
 
 .ImportProgress {
     padding-left: 40px;
-    background: url('images/progress.gif') left center no-repeat;
+    background: url("images/progress.gif") left center no-repeat;
 }
 
 .ImportProgress strong {
@@ -136,12 +133,12 @@ div.Errors {
 
 .Loading {
     height: 100px;
-    background: url('images/progress.gif') center center no-repeat;
+    background: url("images/progress.gif") center center no-repeat;
 }
 
 .Progress {
     padding: 10px 40px 10px 0px;
-    background: url('images/progress.gif') center center no-repeat;
+    background: url("images/progress.gif") center center no-repeat;
 }
 
 .Hidden {
@@ -162,7 +159,7 @@ form ul {
 }
 
 form ul li {
-    padding: 10px 0;
+    margin-bottom: 12px;
     font-size: 18px;
 }
 
@@ -181,12 +178,11 @@ form ul li.Warning div {
 }
 
 form ul li label {
-    font-family: Arial, Helvetica, Verdana;
     font-weight: bold;
     display: block;
     padding: 8px 0 4px;
-    font-size: 110%;
-    color: #02455B;
+    font-size: 16px;
+    color: #02455b;
 }
 
 form ul li input.InputBox {
@@ -202,7 +198,7 @@ form ul li input.InputBox {
 
 form ul li input.InputBox:focus {
     color: #000;
-    background: #FFFEDE;
+    background: #fffede;
     border: 1px solid #aaa;
 }
 
@@ -221,10 +217,9 @@ div.Button {
 div.Button a,
 input.Button {
     cursor: pointer;
-    font-family: arial, helvetica, verdana;
     font-size: 25px;
     font-weight: bold;
-    color: #02475A;
+    color: #02475a;
     text-shadow: 0 1px 0 #fff;
     margin: 0;
     padding: 3px 10px;
@@ -292,6 +287,6 @@ div.Info li {
 }
 
 .Description a {
-    color: #076C8E;
+    color: #076c8e;
     text-decoration: underline;
 }

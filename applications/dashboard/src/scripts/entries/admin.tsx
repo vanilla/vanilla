@@ -33,7 +33,7 @@ applySharedPortalContext(props => {
         }
     }, [setNavHeight]);
     return (
-        <AppContext noTheme errorComponent={ErrorPage}>
+        <AppContext variablesOnly errorComponent={ErrorPage}>
             <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
                 {props.children}
             </ScrollOffsetContext.Provider>
@@ -50,13 +50,7 @@ const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
 
     if (app) {
-        mountReact(
-            // Error component is set as null until we can refactor a non-kb specific Error page.
-            <AppContext errorComponent={<ErrorPage /> || null}>
-                <Router disableDynamicRouting />
-            </AppContext>,
-            app,
-        );
+        mountReact(<Router disableDynamicRouting />, app);
     }
 };
 onReady(render);

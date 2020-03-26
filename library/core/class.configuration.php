@@ -889,12 +889,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     *
-     *
-     * @param $name
-     * @param string $value
-     * @param array $options
-     * @return bool|int
+     * @inheritdoc
      */
     public function saveToConfig($name, $value = '', $options = []) {
         $save = $options === false ? false : val('Save', $options, true);

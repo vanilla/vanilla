@@ -145,8 +145,8 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 focus: {
                     color: colorOut(globalVars.links.colors.focus),
                 },
-                accessibleFocus: {
-                    color: colorOut(globalVars.links.colors.accessibleFocus),
+                keyboardFocus: {
+                    color: colorOut(globalVars.links.colors.keyboardFocus),
                 },
                 active: {
                     color: colorOut(globalVars.links.colors.active),

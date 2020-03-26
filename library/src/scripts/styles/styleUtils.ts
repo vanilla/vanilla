@@ -148,7 +148,17 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentNames: string | string[], themeVars: IThemeVariables = getThemeVariables()) {
+export function variableFactory(
+    componentNames: string | string[],
+    themeVars?: IThemeVariables,
+    mergeWithGlobals = false,
+) {
+    if (!themeVars) {
+        themeVars = getThemeVariables();
+    } else if (mergeWithGlobals) {
+        themeVars = merge(getThemeVariables(), themeVars);
+    }
+
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames
@@ -205,6 +215,8 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
             return customVariable;
         } else if (defaultVariable instanceof ColorHelper) {
             if (customVariable instanceof ColorHelper) {
+                return customVariable;
+            } else if (typeof customVariable === "string" && customVariable.startsWith("linear-gradient")) {
                 return customVariable;
             } else {
                 const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);

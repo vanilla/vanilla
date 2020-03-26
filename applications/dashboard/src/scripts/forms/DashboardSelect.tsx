@@ -22,6 +22,7 @@ interface IProps extends IMenuPlacement {
     isClearable?: boolean;
     errors?: IFieldError[];
     selectRef?: React.RefObject<Select>;
+    isLoading?: boolean;
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
@@ -41,6 +42,7 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 menuPlacement={props.menuPlacement}
                 isClearable={props.isClearable}
                 selectRef={props.selectRef}
+                isLoading={props.isLoading}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}
         </div>

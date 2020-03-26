@@ -28,10 +28,7 @@ use Vanilla\Theme\TwigAsset;
  */
 class FsThemeProvider implements ThemeProviderInterface {
 
-    const FALLBACK_THEME_KEY = "theme-foundation";
-
     use FsThemeMissingTrait;
-    use ThemeVariablesTrait;
 
     /** @var AddonProviderInterface $addonManager */
     private $addonManager;
@@ -103,15 +100,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeViewPath($themeKey): string {
-        $theme = $this->getThemeAddon($themeKey);
-        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
-        return $path;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->getThemeAddon($themeKey);
         return $theme->getKey();
@@ -135,7 +123,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof AddonInterface)) {
-            $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
+            $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
             if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
@@ -268,12 +256,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             throw new ServerException("File key missing for theme asset.");
         }
 
-        $data = $this->getFileAsset($theme, $asset);
-
-        // Mix in addon variables to the variables asset.
-        if (preg_match('/^variables/', $key)) {
-            $data = $this->addAddonVariables($data);
-        }
+        $data = $this->getFileAsset($theme, $key, $asset);
 
         switch ($type) {
             case "data":
@@ -312,26 +295,24 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Cast themeAssetModel data to out schema data by calculating and casting required fields.
      *
      * @param Addon $theme
+     * @param string $assetKey
      * @param array $asset
      *
      * @return string
      */
-    private function getFileAsset(Addon $theme, array $asset): string {
+    private function getFileAsset(Addon $theme, string $assetKey, array $asset): string {
         $filename = basename($asset['file']);
-        if (!isset($asset['placeholder'])) {
+        if ($filename) {
             $fullFilename = $theme->path("/assets/{$filename}");
-            if (!file_exists($fullFilename)) {
-                throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+            if (!file_exists($fullFilename) || !is_readable($fullFilename)) {
+                trigger_error("Theme asset file does not exist or is not readable: {$fullFilename}", E_USER_WARNING);
+            } else {
+                return file_get_contents($fullFilename);
             }
-            if (!is_readable($fullFilename)) {
-                throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-            }
-            $assetContent = file_get_contents($fullFilename);
-        } else {
-            $assetContent = $asset['placeholder'];
         }
 
-        return $assetContent;
+        $defaultAsset = ThemeModel::ASSET_LIST[$assetKey];
+        return $defaultAsset['default'];
     }
 
     /**
@@ -347,7 +328,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $assets = $this->getAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
-            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
+            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assetKey, $assets[$assetKey]);
         } else {
             throw new NotFoundException("Asset");
         }
@@ -371,14 +352,13 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritDoc
      */
     public function getAllThemes(): array {
+        /** @var Addon[] $allThemes */
         $allThemes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
         $allAvailableThemes = [];
 
         foreach ($allThemes as $theme) {
-            $themeInfo = $theme->getInfo();
-            $filteredTheme = $this->filterTheme($themeInfo);
-            if ($filteredTheme) {
-                $allAvailableThemes[] = $this->getThemeWithAssets($filteredTheme["key"]);
+            if ($this->themeHelper->isThemeVisible($theme)) {
+                $allAvailableThemes[] = $this->getThemeWithAssets($theme->getKey());
             }
         }
         return $allAvailableThemes;
@@ -398,54 +378,6 @@ class FsThemeProvider implements ThemeProviderInterface {
                 "placeholder" => '{}',
             ]
         ];
-    }
-
-    /**
-     * Filter theme based on it's info.
-     *
-     * @param array $themeInfo
-     * @return array
-     */
-    protected function filterTheme($themeInfo): array {
-        $clientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
-        $alwaysVisibleThemes = c('Garden.Themes.Visible', '');
-
-        if ($alwaysVisibleThemes === 'all') {
-            return $themeInfo;
-        }
-
-        $alwaysVisibleThemes = explode(',', $alwaysVisibleThemes);
-
-        // Check if theme visibility is explicitly set
-        $hidden = $themeInfo['hidden'] ?? null;
-        if (is_null($hidden)) {
-            $hidden = true;
-            $sites = $themeInfo['sites'] ?? [];
-            $site = $themeInfo['site'] ?? '';
-            $key = $themeInfo['key'] ?? '';
-
-            if ($key === $this->getConfigThemeKey()) {
-                $hidden = false;
-            }
-
-            if ($site) {
-                array_push($sites, $site);
-            }
-            foreach ($sites as $s) {
-                if ($s === $clientName || fnmatch($s, $clientName)) {
-                    $hidden = false;
-                    break;
-                }
-            }
-        }
-
-        if ($hidden && !in_array($themeInfo['key'], $alwaysVisibleThemes)) {
-            if ($themeInfo['key'] !== $this->getConfigThemeKey()) {
-                return [];
-            }
-        }
-
-        return $themeInfo;
     }
 
     /**
@@ -477,16 +409,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getCurrent(): ?array {
-        $themeKey = $this->getConfigThemeKey();
+        $themeKey = $this->themeHelper->getConfigThemeKey();
         return $this->getThemeWithAssets($themeKey);
-    }
-
-    /**
-     * Get the current theme key from the config.
-     *
-     * @return string
-     */
-    public function getConfigThemeKey(): string {
-        return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
     }
 }

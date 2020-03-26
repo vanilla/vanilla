@@ -175,7 +175,6 @@ export const themeCardClasses = useThemeCache(() => {
         right: 0,
         bottom: 0,
         width: percent(100),
-        height: percent(100),
     });
 
     const actionDropdown = style("actionDropdown", {
@@ -241,6 +240,16 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
+    const title = style("title", {
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        ...flexHelper().middleLeft(),
+    });
+
+    const titleIcon = style("titleIcon", {
+        marginLeft: globalVars.gutter.half,
+    });
+
     return {
         svg,
         menuBar,
@@ -261,6 +270,8 @@ export const themeCardClasses = useThemeCache(() => {
         toolTipBox,
         actionLink,
         action,
+        title,
+        titleIcon,
     };
 });
 

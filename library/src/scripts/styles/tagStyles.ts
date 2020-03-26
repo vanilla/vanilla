@@ -5,11 +5,11 @@ import { EMPTY_SPACING } from "@library/styles/styleHelpersSpacing";
 import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
 import {
     ILinkColorOverwritesWithOptions,
-    clickableItemStates,
     EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS,
 } from "@library/styles/styleHelpersLinks";
 import merge from "lodash/merge";
 import { important } from "csx";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const tagVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");

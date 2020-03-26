@@ -5,9 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, clickableItemStates } from "@library/styles/styleHelpers";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();
@@ -61,30 +60,6 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
-};
-
-// Mixins replacement
-export const mixinClickInput = (selector: string, overwrite?: {}) => {
-    selector = trimTrailingCommas(selector);
-    const selectors = selector.split(",");
-    const linkColors = clickableItemStates(overwriteColors, overwriteSpecial);
-    if (!selectors) {
-        if (linkColors.color !== undefined) {
-            cssOut(selector, {
-                color: colorOut(linkColors.color),
-            });
-        }
-        nestedWorkaround(trimTrailingCommas(selector), linkColors.$nest);
-    } else {
-        selectors.map(s => {
-            if (linkColors.color !== undefined) {
-                cssOut(selector, {
-                    color: colorOut(linkColors.color),
-                });
-            }
-            nestedWorkaround(trimTrailingCommas(s), linkColors.$nest);
-        });
-    }
 };
 
 export const mixinTextLinkNoDefaultLinkAppearance = selector => {

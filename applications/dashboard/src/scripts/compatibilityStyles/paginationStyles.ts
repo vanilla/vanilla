@@ -8,7 +8,7 @@
 import { borders, colorOut, unit, margins, userSelect } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { mixinClickInput } from "@dashboard/compatibilityStyles/textLinkStyles";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();

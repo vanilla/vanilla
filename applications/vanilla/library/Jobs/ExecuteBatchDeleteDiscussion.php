@@ -4,16 +4,19 @@
  * @license GPL-2.0-only
  */
 
+namespace Vanilla\Library\Jobs;
+
 use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
+use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
  * Delete one or more discussions.
  */
-class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
+class DeleteDiscussions implements LocalJobInterface {
 
-    /** @var DiscussionModel */
+    /** @var \DiscussionModel */
     private $discussionModel;
 
     /** @var array */
@@ -22,9 +25,9 @@ class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
     /**
      * Initial job setup.
      *
-     * @param DiscussionModel $discussionModel
+     * @param \DiscussionModel $discussionModel
      */
-    public function __construct(DiscussionModel $discussionModel) {
+    public function __construct(\DiscussionModel $discussionModel) {
         $this->discussionModel = $discussionModel;
     }
 

@@ -326,7 +326,7 @@ class ModerationController extends VanillaController {
             // Queue deleting discussions.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
             $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-            $scheduler->addJob(ExecuteBatchDeleteDiscussion::class, $discussionArray);
+            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
             foreach ($discussionArray['discussionID'] as $discussionID) {
                 $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
             }

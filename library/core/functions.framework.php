@@ -6,6 +6,7 @@
  * @since 4.0
  */
 
+use Vanilla\Models\ThemeModel;
 use Vanilla\Web\CacheControlMiddleware;
 
 if (!function_exists('asset')) {
@@ -1922,7 +1923,9 @@ if (!function_exists('theme')) {
      * @return string Returns the name of the current theme.
      */
     function theme() {
-        return Gdn::themeManager()->currentTheme();
+        /** @var ThemeModel $themeModel */
+        $themeModel = Gdn::getContainer()->get(ThemeModel::class);
+        return $themeModel->getCurrentThemeAddon()->getKey();
     }
 }
 

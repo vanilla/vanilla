@@ -13,6 +13,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -103,6 +104,9 @@ class ThemeModel {
     /** @var ThemeModelHelper $themeHelper */
     private $themeHelper;
 
+    /** @var ThemeSectionModel */
+    private $themeSections;
+
     /** @var string $themeManagePageUrl */
     private $themeManagePageUrl = '/dashboard/settings/themes';
 
@@ -113,6 +117,7 @@ class ThemeModel {
      * @param \Gdn_Session $session
      * @param AddonProviderInterface $addonManager
      * @param ThemeModelHelper $themeHelper
+     * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
@@ -120,12 +125,14 @@ class ThemeModel {
         \Gdn_Session $session,
         AddonProviderInterface $addonManager,
         ThemeModelHelper $themeHelper,
+        ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel
     ) {
         $this->config = $config;
         $this->session = $session;
         $this->addonManager = $addonManager;
         $this->themeHelper = $themeHelper;
+        $this->themeSections = $themeSections;
         $this->siteSectionModel = $siteSectionModel;
     }
 
@@ -341,7 +348,9 @@ class ThemeModel {
      * @return Addon
      */
     public function getThemeAddon(string $themeKey = ''): Addon {
-        return $this->addonManager->lookupTheme($themeKey);
+        return $this->addonManager->lookupTheme(
+            $this->getMasterThemeKey($themeKey)
+        );
     }
 
     /**
@@ -418,7 +427,7 @@ class ThemeModel {
     public function setAsset(int $themeID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
         $asset = $provider->setAsset($themeID, $assetKey, $data);
-        return $this->normalizeAsset($assetKey, $asset);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -434,7 +443,7 @@ class ThemeModel {
     public function sparseAsset(int $themeID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
         $asset = $provider->sparseAsset($themeID, $assetKey, $data);
-        return $this->normalizeAsset($assetKey, $asset);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -457,14 +466,15 @@ class ThemeModel {
     /**
      * Get the raw data of an asset.
      *
-     * @param string $themeKey
+     * @param string $themeID
      * @param string $assetKey
-     * @return string The asset content.
+     *
+     * @return string The asset contents.
      */
-    public function getAssetData(string $themeKey, string $assetKey): string {
-        $provider = $this->getThemeProvider($themeKey);
-        $asset = $provider->getAssetData($themeKey, $assetKey);
-        return $this->normalizeAsset($assetKey, $asset);
+    public function getAssetData(string $themeID, string $assetKey): string {
+        $provider = $this->getThemeProvider($themeID);
+        $asset = $provider->getAssetData($themeID, $assetKey);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -516,12 +526,18 @@ class ThemeModel {
      *
      * @param string $assetName
      * @param mixed $assetContents
+     * @param Addon $themeAddon
      *
      * @return mixed The updated asset.
      */
-    public function normalizeAsset(string $assetName, $assetContents) {
+    private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
+        $features = new ThemeFeatures($this->config, $themeAddon);
+
         // Mix in addon variables to the variables asset.
-        if (preg_match('/^variables/', $assetName) && $assetContents instanceof JsonAsset) {
+        if (preg_match('/^variables/', $assetName) &&
+            $assetContents instanceof JsonAsset
+            && !$features->disableKludgedVars()
+        ) {
             $newJson = $this->mixAddonVariables($assetContents->getData());
             return new JsonAsset($newJson);
         } else {
@@ -535,15 +551,28 @@ class ThemeModel {
      * @param array $theme The theme data.
      * @return array Updated theme data.
      */
-    public function normalizeTheme(array $theme): array {
+    private function normalizeTheme(array $theme): array {
+        $themeID = $theme['themeID'];
+        $addon = $this->getThemeAddon($themeID);
+        $features = new ThemeFeatures($this->config, $addon);
+        $theme['features'] = $features;
+
+        // Apply supported sections.
+        $supportedSections = $this->themeSections->getModernSections();
+        if ($features->useDataDrivenTheme()) {
+            $supportedSections = array_merge($supportedSections, $this->themeSections->getLegacySections());
+        }
+        $theme['supportedSections'] = $supportedSections;
+
+        // Normalize all assets.
         foreach ($theme['assets'] as $assetName => $assetContents) {
-            $theme['assets'][$assetName] = $this->normalizeAsset($assetName, $assetContents);
+            $theme['assets'][$assetName] = $this->normalizeAsset($assetName, $assetContents, $addon);
         }
 
+        // Generate a preview.
         $theme['preview'] = $this->generateThemePreview($theme);
 
         // A little fixup to ensure current variables are always applied to asset compat themes.
-        $themeID = $theme['themeID'];
         $currentID = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
         if (in_array($themeID, self::ASSET_COMPAT_THEMES, true) &&
             $currentID !== null &&
@@ -586,7 +615,7 @@ class ThemeModel {
      * @param array $theme
      * @return array
      */
-    public function generateThemePreview(array $theme): array {
+    private function generateThemePreview(array $theme): array {
         $preview = $theme['preview'] ?? [];
 
         if (!($theme["assets"]["variables"] instanceof JsonAsset)) {

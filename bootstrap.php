@@ -132,8 +132,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Models\ThemeModel::class)
         ->setShared(true)
         ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
+    ->rule(\Vanilla\Models\ThemeSectionModel::class)
+    ->setShared(true)
+
     ->rule(ThemeFeatures::class)
     ->setShared(true)
+    ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // Logger
     ->rule(\Vanilla\Logger::class)

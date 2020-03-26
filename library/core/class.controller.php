@@ -682,7 +682,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         /** @var \Vanilla\Models\SiteMeta $siteMeta */
         $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
-        $this->_Definitions += $siteMeta->value();
+        $this->_Definitions = array_merge_recursive($this->_Definitions, $siteMeta->value());
 
         $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
 

@@ -10,6 +10,7 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Models\ThemeSectionModel;
 
 /**
  * Vanilla's event handlers.
@@ -29,6 +30,9 @@ class VanillaHooks implements Gdn_IPlugin {
         $dic->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
         ;
+
+        $dic->rule(ThemeSectionModel::class)
+            ->addCall('registerLegacySection', [t('Forum')]);
     }
 
     /**
@@ -913,7 +917,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->setTabView('Comments', 'profile', 'Discussion', 'Vanilla');
 
         $pageSize = c('Vanilla.Discussions.PerPage', 30);
-        list($offset, $limit) = offsetLimit($page, $pageSize);
+        [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
         $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'));
@@ -974,7 +978,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->setTabView('Discussions', 'Profile', 'Discussions', 'Vanilla');
         $sender->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
 
-        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        [$offset, $limit] = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
 
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID);

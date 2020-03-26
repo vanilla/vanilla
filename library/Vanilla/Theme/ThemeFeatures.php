@@ -14,7 +14,7 @@ use Vanilla\Models\ThemeModel;
 /**
  * Class to hold information about a theme and it's configuration options.
  */
-class ThemeFeatures {
+class ThemeFeatures implements \JsonSerializable {
 
     /** @var Addon */
     private $theme;
@@ -34,12 +34,20 @@ class ThemeFeatures {
      * Constuctor.
      *
      * @param ConfigurationInterface $config
-     * @param ThemeModel $themeModel
+     * @param Addon $theme
      */
-    public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
+    public function __construct(ConfigurationInterface $config, Addon $theme) {
         $this->config = $config;
-        $this->theme = $themeModel->getCurrentThemeAddon();
+        $this->theme = $theme;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize() {
+        return $this->allFeatures();
+    }
+
 
     /**
      * Get all of the current theme features.

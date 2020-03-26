@@ -16,7 +16,7 @@ class DeleteDiscussions implements Vanilla\Scheduler\Job\LocalJobInterface {
     /** @var DiscussionModel */
     private $discussionModel;
 
-    /** @var array*/
+    /** @var array */
     private $discussionArray;
 
     /**

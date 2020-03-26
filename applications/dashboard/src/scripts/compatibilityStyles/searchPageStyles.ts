@@ -9,12 +9,13 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { allLinkStates, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { percent } from "csx";
 import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts/styles/metasStyles";
 import { important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
@@ -190,7 +191,7 @@ export const searchPageCSS = () => {
 
     // a
     cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete .ui-menu-item a`, {
-        ...searchResultsStyles.option,
+        ...suggestedTextStyleHelper().option,
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",

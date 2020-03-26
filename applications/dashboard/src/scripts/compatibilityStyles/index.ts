@@ -188,12 +188,6 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    // cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
-    //     color: primary,
-    //     backgroundColor: primaryContrast,
-    //     cursor: "pointer",
-    // });
-
     cssOut(
         `
         .Herobanner .SearchBox .AdvancedSearch .BigInput,

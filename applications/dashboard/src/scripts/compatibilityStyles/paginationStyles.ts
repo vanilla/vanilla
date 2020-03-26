@@ -53,41 +53,6 @@ export const paginationCSS = () => {
         },
     );
 
-    // cssOut(
-    //     `
-    //     .Pager > span,
-    //     .Pager > a`,
-    //     {
-    //         ...borders({
-    //             ...globalVars.borderType.formElements.buttons,
-    //             radius: 0,
-    //         }),
-    //         backgroundColor: colorOut(globalVars.mainColors.bg),
-    //         color: colorOut(globalVars.mainColors.fg),
-    //         $nest: {
-    //             ""
-    //         }
-    //     },
-    // );
-
-    // cssOut(`.Pager .Next`, {
-    //     borderTopRightRadius: globalVars.border.radius,
-    //     borderBottomRightRadius: globalVars.border.radius,
-    // });
-    //
-    // cssOut(`.Pager .Prev`, {
-    //     borderBottomLeftRadius: globalVars.border.radius,
-    //     borderTopLeftRadius: globalVars.border.radius,
-    // });
-
-    // cssOut(`.Pager span`, {
-    //     $nest: {
-    //         [`&:hover, &:focus, &:active`]: {
-    //             color: primary,
-    //         },
-    //     },
-    // });
-
     cssOut(`.Content .PageControls`, {
         display: "flex",
         alignItems: "center",

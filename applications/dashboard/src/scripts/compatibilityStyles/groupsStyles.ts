@@ -147,20 +147,6 @@ export const groupsCSS = () => {
         },
     );
 
-    // cssOut(
-    //     `
-    //     .DataList a,
-    //     .DataList-Search a,
-    //     .Breadcrumbs a,
-    //     .MessageList a,
-    //     .DataTableWrap a,
-    //     .Container .Frame-contentWrap .ChildCategories a
-    //     `,
-    //     {
-    //         fontSize: unit(globalVars.fonts.size.medium),
-    //     },
-    // );
-
     cssOut(`.Groups .Name.Group-Name .Options .Button`, {
         minWidth: 0,
         marginLeft: unit(globalVars.gutter.size),

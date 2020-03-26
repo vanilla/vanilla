@@ -10,7 +10,7 @@ import {
     fonts,
     margins,
     paddings,
-    setAllLinkStateStyles,
+    clickableItemStates,
     unit,
     singleBorder,
 } from "@library/styles/styleHelpers";
@@ -241,7 +241,7 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkColors = setAllLinkStateStyles();
+    const linkColors = clickableItemStates();
     const linkStyle = {
         "& a": {
             color: colorOut(linkColors.color),

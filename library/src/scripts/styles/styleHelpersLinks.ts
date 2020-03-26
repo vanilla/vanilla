@@ -8,7 +8,6 @@ import { ColorHelper } from "csx";
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonStates } from "@library/styles/styleHelpersButtons";
-import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
@@ -69,7 +68,7 @@ export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
     skipDefault: undefined as undefined | boolean,
 };
 
-export const setAllLinkStateStyles = (overwriteColors?: ILinkColorOverwritesWithOptions) => {
+export const clickableItemStates = (overwriteColors?: ILinkColorOverwritesWithOptions) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
@@ -116,7 +115,7 @@ export const setAllLinkStateStyles = (overwriteColors?: ILinkColorOverwritesWith
 
     const final = {
         color: styles.default.color as ColorValues,
-        nested: {
+        $nest: {
             "&&:hover": styles.hover,
             "&&:focus": {
                 ...(styles.focus ?? {}),

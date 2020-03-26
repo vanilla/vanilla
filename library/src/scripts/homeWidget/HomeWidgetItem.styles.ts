@@ -16,10 +16,10 @@ import {
     EMPTY_SPACING,
     fonts,
     IBackground,
-    linkStyleFallbacks,
     paddings,
-    setAllLinkStateStyles,
+    clickableItemStates,
     unit,
+    linkStyleFallbacks,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
@@ -144,12 +144,12 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         }
     })();
 
-    const linkStyles = setAllLinkStateStyles();
+    const buttonStateStyles = clickableItemStates();
 
     const name = style("name", {
         color: colorOut(vars.options.fg),
         ...fonts(vars.name.font),
-        ...linkStyleFallbacks,
+        // ...linkStyleFallbacks,
         marginBottom: unit(globalVars.gutter.half),
     });
 
@@ -162,9 +162,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
             overflow: "hidden",
             minWidth: unit(vars.sizing.minWidth),
             $nest: {
-                [`&:active .${name}`]: linkStyles.nested["&&:active"],
-                [`&:focus .${name}`]: linkStyles.nested["&&:focus"],
-                [`&:hover .${name}`]: linkStyles.nested["&&:hover"],
+                [`&:hover .${name}`]: buttonStateStyles.$nest["&&:hover"],
+                [`&:focus .${name}`]: buttonStateStyles.$nest["&&:focus"],
+                [`&:focus-visible .${name}`]: buttonStateStyles.$nest["&&:focus-visible"],
+                [`&:active .${name}`]: buttonStateStyles.$nest["&&:active"],
             },
         },
         borderStyling,

@@ -5,7 +5,7 @@ import { EMPTY_SPACING } from "@library/styles/styleHelpersSpacing";
 import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
 import {
     ILinkColorOverwritesWithOptions,
-    setAllLinkStateStyles,
+    clickableItemStates,
     EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS,
 } from "@library/styles/styleHelpersLinks";
 import merge from "lodash/merge";
@@ -23,14 +23,14 @@ export const tagVariables = useThemeCache(() => {
         textDecoration: important("none"),
     };
 
-    const linkColors = setAllLinkStateStyles(colorOverwrite);
+    const linkColors = clickableItemStates(colorOverwrite);
 
     const allStates = {
-        color: linkColors.nested["&&:hover"].color,
-        ...borders({ color: linkColors.nested["&&:hover"].color } as IBorderStyles, {}),
+        color: linkColors.$nest["&&:hover"].color,
+        ...borders({ color: linkColors.$nest["&&:hover"].color } as IBorderStyles, {}),
     };
 
-    const nested = merge(linkColors.nested, {
+    const nested = merge(linkColors.$nest, {
         "&&:hover": {
             ...allStyles,
             ...allStates,

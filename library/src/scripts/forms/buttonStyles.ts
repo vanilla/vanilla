@@ -152,20 +152,6 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    // const primaryPresetInit1 = makeThemeVars("primary", {
-    //     preset: {
-    //         ...standardPresetInit.preset,
-    //         bg:
-    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
-    //                 ? globalVars.mainColors.bg
-    //                 : primaryPresetInit.preset.border,
-    //         fg:
-    //             primaryPresetInit.preset.style === ButtonPreset.OUTLINE
-    //                 ? globalVars.mainColors.fg
-    //                 : offsetLightness(globalVars.mainColors.fg, 0.1),
-    //     },
-    // });
-
     const primaryPresetInit2 = makeThemeVars("primary", {
         preset: {
             ...primaryPresetInit.preset,

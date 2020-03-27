@@ -18,7 +18,7 @@ if (count($Discussions) < 2) {
     echo '</li></ul>';
 
     echo '<div class="P">'.
-        $this->Form->checkBox('RedirectLink', 'Leave a redirect links from the old discussions.').
+        $this->Form->checkBox('RedirectLink', 'Leave a redirect link from the old discussions.').
         '</div>';
 
     echo '<div class="Buttons">'.

@@ -317,7 +317,7 @@ div.token-input-dropdown {
     > .Button:first-child {
         width: 100%;
         text-align: center;
-        @if($staticVariables) {
+        @if ($staticVariables) {
             border-top-right-radius: $formButton_borderRadius;
             border-bottom-right-radius: $formButton_borderRadius;
         }
@@ -425,4 +425,3 @@ div.token-input-dropdown {
 .CommentForm .DraftButton {
     display: none !important;
 }
-

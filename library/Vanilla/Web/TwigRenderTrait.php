@@ -31,7 +31,7 @@ trait TwigRenderTrait {
 
         $isDebug = \Gdn::config('Debug') === true;
         $envArgs = [
-            'cache' => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
+            'cache' => $isDebug ? false : $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
             'debug' => $isDebug,
             // Automatically controlled by the debug value.
             // This causes twig to check the FS timestamp before going to cache.

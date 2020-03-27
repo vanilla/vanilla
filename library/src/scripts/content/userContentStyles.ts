@@ -244,7 +244,7 @@ export const userContentClasses = useThemeCache(() => {
     const linkColors = clickableItemStates();
     const linkStyle = {
         "& a": {
-            color: colorOut(linkColors.color),
+            color: colorOut(linkColors.color as string),
         },
         "& a:hover": {
             color: colorOut(globalVars.links.colors.hover),

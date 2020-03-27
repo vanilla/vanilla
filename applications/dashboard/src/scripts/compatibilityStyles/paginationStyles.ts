@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { borders, colorOut, unit, margins, userSelect } from "@library/styles/styleHelpers";
+import { colorOut, unit, userSelect, importantColorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
@@ -52,6 +52,22 @@ export const paginationCSS = () => {
             },
         },
     );
+
+    cssOut(`.Pager .Next`, {
+        borderTopRightRadius: globalVars.border.radius,
+        borderBottomRightRadius: globalVars.border.radius,
+    });
+
+    cssOut(`.Pager .Prev`, {
+        borderBottomLeftRadius: globalVars.border.radius,
+        borderTopLeftRadius: globalVars.border.radius,
+    });
+
+    cssOut(`.Pager span`, {
+        cursor: "default",
+        backgroundColor: importantColorOut(globalVars.mainColors.bg),
+        opacity: 0.5,
+    });
 
     cssOut(`.Content .PageControls`, {
         display: "flex",

@@ -5,13 +5,22 @@
  * @license GPL-2.0-only
  */
 
-import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
+import {
+    allLinkStates,
+    clickableItemStates,
+    colorOut,
+    margins,
+    negative,
+    paddings,
+    unit,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -105,7 +114,8 @@ export const forumMetaCSS = () => {
             delete linkStates["$nest"];
 
             cssOut(selector, linkStates);
-            nestedWorkaround(selector, nested);
+
+            nested && nestedWorkaround(selector, nested as NestedCSSProperties);
         });
 
     cssOut(
@@ -229,6 +239,13 @@ export const forumMetaCSS = () => {
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
         marginLeft: unit(negative(globalVars.meta.text.margin)),
+    });
+
+    const linkColors = clickableItemStates();
+    const inlineTagSelector = `.InlineTags.Meta a`;
+    cssOut(inlineTagSelector, {
+        color: linkColors.color,
+        ...(linkColors.$nest ? nestedWorkaround(inlineTagSelector, linkColors.$nest as NestedCSSProperties) : {}),
     });
 };
 

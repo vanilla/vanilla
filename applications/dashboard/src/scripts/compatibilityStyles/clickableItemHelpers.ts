@@ -15,6 +15,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import merge from "lodash/merge";
 import { emptyObject } from "expect/build/utils";
+import { NestedCSSSelectors } from "typestyle/src/types";
 
 export const EMPTY_STATE_COLORS = {
     default: undefined as undefined | ColorValues,
@@ -54,7 +55,7 @@ export const mixinClickInput = (selector: string, overwriteColors?: {}, overwrit
     if (!selectors) {
         if (linkColors.color !== undefined) {
             cssOut(selector, {
-                color: colorOut(linkColors.color),
+                color: linkColors.color,
             });
         }
         nestedWorkaround(trimTrailingCommas(selector), linkColors.$nest);
@@ -62,7 +63,7 @@ export const mixinClickInput = (selector: string, overwriteColors?: {}, overwrit
         selectors.map(s => {
             if (linkColors.color !== undefined) {
                 cssOut(selector, {
-                    color: colorOut(linkColors.color),
+                    color: linkColors.color,
                 });
             }
             nestedWorkaround(trimTrailingCommas(s), linkColors.$nest);
@@ -102,7 +103,7 @@ export const clickableItemStates = (
     const linkColors = vars.links.colors;
 
     overwriteColors = { ...EMPTY_STATE_COLORS, ...(overwriteColors ?? {}) };
-    overwritesSpecial = { ...EMPTY_LINK_OVERWRITES, ...(overwritesSpecial ?? {}) } as IClickableItemEnforcedStates;
+    overwritesSpecial = { ...EMPTY_STATE_STYLES, ...(overwritesSpecial ?? {}) } as IClickableItemEnforcedStates;
 
     const mergedColors = {
         default: !overwriteColors.skipDefault
@@ -157,7 +158,7 @@ export const clickableItemStates = (
     };
 
     const final = {
-        color: styles.default.color as ColorValues,
+        color: styles.default.color as undefined | string,
         $nest: {
             "&&:hover": styles.hover,
             "&&:focus": {
@@ -170,8 +171,8 @@ export const clickableItemStates = (
             },
             "&&:active": styles.active,
             "&:visited": styles.visited ?? undefined,
-        },
-    };
+        } as NestedCSSSelectors,
+    } as NestedCSSProperties;
 
     return final;
 };

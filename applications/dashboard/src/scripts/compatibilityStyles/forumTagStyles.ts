@@ -23,13 +23,18 @@ import { important, percent } from "csx";
 export const forumTagCSS = () => {
     const vars = tagVariables();
 
-    cssOut(`.TagCloud`, {
-        ...margins({
-            vertical: negative(vars.margin.vertical),
-            horizontal: negative(vars.margin.horizontal),
-        }),
-        padding: 0,
-    });
+    cssOut(
+        `
+        .TagCloud
+    `,
+        {
+            ...margins({
+                vertical: negative(vars.margin.vertical),
+                horizontal: negative(vars.margin.horizontal),
+            }),
+            padding: 0,
+        },
+    );
 
     cssOut(".Panel.Panel li.TagCloud-Item", {
         margin: 0,
@@ -43,11 +48,11 @@ export const forumTagCSS = () => {
 
     mixinTag(`.Tag`);
     mixinTag(`.DataTableWrap a.Tag`);
-    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker .Tag`);
+    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a.Tag`);
     mixinTag(
         `
         .MessageList .ItemComment .MItem.RoleTracker a.Tag,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag,
+        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag
         `,
     );
 };
@@ -78,6 +83,6 @@ function mixinTag(selector: string, overwrite?: {}) {
             ...defaultTransition("border"),
             ...margins(vars.margin),
         });
-        nestedWorkaround(trimTrailingCommas(s), vars.nested);
+        nestedWorkaround(trimTrailingCommas(s), vars.$nest);
     });
 }

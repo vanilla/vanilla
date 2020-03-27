@@ -530,17 +530,19 @@
                 }
             }
 
-            .InlineTags {
-                padding-left: 0;
+            @if ($staticVariables) {
+                .InlineTags {
+                    padding-left: 0;
 
-                a {
-                    font-size: inherit;
-                    color: $component-meta-link_color;
+                    a {
+                        font-size: inherit;
+                        color: $component-meta-link_color;
 
-                    &:hover,
-                    &:focus,
-                    &:active {
-                        color: $component-meta-link-hover_color;
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            color: $component-meta-link-hover_color;
+                        }
                     }
                 }
             }

@@ -34,7 +34,6 @@ export const textLinkCSS = () => {
         .DataList .MItem.RoleTracker,
         .MessageList .IdeationTag,
         .MessageList .tag-tracker,
-        .MessageList .MItem.RoleTracker,
         .DataTableWrap .IdeationTag,
         .DataTableWrap .tag-tracker,
         .DataTableWrap .MItem.RoleTracker

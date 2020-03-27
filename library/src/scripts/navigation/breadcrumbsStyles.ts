@@ -16,6 +16,7 @@ import {
     singleLineEllipsis,
     unit,
     userSelect,
+    ColorValues,
 } from "@library/styles/styleHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
@@ -39,7 +40,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
         fontSize: unit(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
         textTransform: "uppercase",
-        color: colorOut(linkColors.color),
+        color: linkColors.color ? colorOut(linkColors.color as any) : undefined,
         $nest: linkColors.$nest,
     });
 

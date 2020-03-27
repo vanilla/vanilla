@@ -49,30 +49,45 @@ export const buttonCSS = () => {
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
-    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+    // mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
 
     const buttonBorderRadius = parseInt(formElementVars.border.radius.toString(), 10);
+    const borderOffset = globalVars.border.width * 2;
+    const handleSize = formElementVars.sizing.height - borderOffset;
 
     if (buttonBorderRadius && buttonBorderRadius > 0) {
         cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
             marginTop: unit((formElementVars.sizing.height * 2) / 36), // center vertically
             marginRight: unit(buttonBorderRadius * 0.035), // offset based on border radius. No radius will give no offset.
+            maxHeight: unit(handleSize),
+            height: unit(handleSize),
+            lineHeight: unit(handleSize),
         });
     }
 
     cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
-        width: unit(formElementVars.sizing.height),
-        background: important("none"),
+        height: unit(handleSize),
+        maxHeight: unit(handleSize),
+        width: unit(handleSize),
+        maxWidth: unit(handleSize),
+        background: important("transparent"),
         backgroundColor: important("none"),
         ...borders({
-            ...globalVars.borderType.formElements.buttons,
             color: rgba(0, 0, 0, 0),
         }),
     });
 
-    cssOut(`.ButtonGroup.Multi .Button.Handle`, {
-        borderTopLeftRadius: 0,
-        borderBottomLeftRadius: 0,
+    cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle`, {
+        top: unit(0),
+        right: unit(formElementVars.border.width),
+        minWidth: importantUnit(handleSize),
+        maxWidth: importantUnit(handleSize),
+        maxHeight: importantUnit(handleSize),
+        minHeight: importantUnit(handleSize),
+        height: importantUnit(handleSize),
+        width: importantUnit(handleSize),
+        borderTopRightRadius: unit(formElementVars.border.radius),
+        borderBottomRightRadius: unit(formElementVars.border.radius),
     });
 
     cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
@@ -83,6 +98,7 @@ export const buttonCSS = () => {
     cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
         position: "relative",
         maxWidth: percent(100),
+        boxSizing: "border-box",
         $nest: {
             "& .Button.Primary": {
                 maxWidth: percent(100),
@@ -93,7 +109,6 @@ export const buttonCSS = () => {
             },
             "& .Sprite.SpDropdownHandle": {
                 ...absolutePosition.fullSizeOfParent(),
-                minWidth: importantUnit(formElementVars.sizing.height),
                 padding: important(0),
                 border: important(0),
                 borderRadius: important(0),

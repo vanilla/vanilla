@@ -261,6 +261,15 @@ class TwigEnhancer {
     }
 
     /**
+     * Make an asset URL.
+     *
+     * @param string $url
+     */
+    public function assetUrl(string $url) {
+        return asset($url, true, true);
+    }
+
+    /**
      * Render out breadcrumbs from the controller.
      *
      * @param array $options
@@ -311,6 +320,7 @@ class TwigEnhancer {
             'inSection' => [\Gdn_Theme::class, 'inSection'],
 
             // Routing.
+            'assetUrl' => [$this, 'assetUrl'],
             'url' => [$this->request, 'url'],
         ];
     }

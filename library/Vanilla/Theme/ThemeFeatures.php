@@ -48,7 +48,7 @@ class ThemeFeatures implements \JsonSerializable {
      *
      * @param array $forcedFeatures An array of Feature => boolean.
      */
-    public function forceThemeValues(array $forcedFeatures) {
+    public function forceFeatures(array $forcedFeatures) {
         $this->forcedFeatures = $forcedFeatures;
     }
 

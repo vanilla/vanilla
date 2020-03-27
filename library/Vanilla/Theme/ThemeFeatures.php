@@ -22,6 +22,8 @@ class ThemeFeatures implements \JsonSerializable {
     /** @var ConfigurationInterface */
     private $config;
 
+    private $forcedFeatures = [];
+
     const FEATURE_DEFAULTS = [
         'NewFlyouts' => false,
         'SharedMasterView' => false,
@@ -39,6 +41,15 @@ class ThemeFeatures implements \JsonSerializable {
     public function __construct(ConfigurationInterface $config, Addon $theme) {
         $this->config = $config;
         $this->theme = $theme;
+    }
+
+    /**
+     * Force some theme features to be active.
+     *
+     * @param array $forcedFeatures An array of Feature => boolean.
+     */
+    public function forceThemeValues(array $forcedFeatures) {
+        $this->forcedFeatures = $forcedFeatures;
     }
 
     /**
@@ -68,7 +79,7 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['NewFlyouts'] = true;
         }
 
-        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues);
+        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
     }
 
     /**

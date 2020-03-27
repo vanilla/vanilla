@@ -94,6 +94,7 @@ export default class ThemeActions extends ReduxActions {
             const response = await this.api.put(`/themes/current`, body);
             setMeta("ui.themeKey", themeID);
             setMeta("ui.mobileThemeKey", themeID);
+            setMeta("ui.desktopThemeKey", themeID);
             return response.data;
         })(body);
         return this.dispatch(thunk);

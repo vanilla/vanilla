@@ -8,6 +8,7 @@ import WebFont from "webfontloader";
 import { getMeta, assetUrl, siteUrl } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { THEME_CACHE_EVENT } from "@library/styles/styleUtils";
+import { IThemeFont } from "@library/theming/themeReducer";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
@@ -33,7 +34,28 @@ export function loadThemeFonts() {
     const globalVars = globalVariables();
     // Check for forced google fonts from the variables.
 
-    if (globalVars.fonts.forceGoogleFont) {
+    const makeFontConfigFromFontVar = (fonts: IThemeFont[]) => {
+        const webFontConfig: WebFont.Config = {
+            custom: {
+                families: fonts.map(font => font.name),
+                urls: fonts.map(font => {
+                    const url = new URL(siteUrl(assetUrl(font.url)));
+                    url.searchParams.append("v", getMeta("context.cacheBuster"));
+                    return url.href;
+                }),
+            },
+        };
+        return webFontConfig;
+    };
+
+    if (globalVars.fonts.customFontUrl) {
+        const [firstFamily, ...restFamilies] = globalVars.fonts.families.body;
+        WebFont.load(
+            makeFontConfigFromFontVar([
+                { name: firstFamily, url: globalVars.fonts.customFontUrl, fallbacks: restFamilies },
+            ]),
+        );
+    } else if (globalVars.fonts.forceGoogleFont) {
         const firstFont = globalVars.fonts.families[0];
         const webFontConfig: WebFont.Config = {
             google: {
@@ -42,16 +64,7 @@ export function loadThemeFonts() {
         };
         WebFont.load(webFontConfig);
     } else if (fonts && fonts.data.length > 0) {
-        const webFontConfig: WebFont.Config = {
-            custom: {
-                families: fonts.data.map(font => font.name),
-                urls: fonts.data.map(font => {
-                    const url = new URL(siteUrl(assetUrl(font.url)));
-                    url.searchParams.append("v", getMeta("context.cacheBuster"));
-                    return url.href;
-                }),
-            },
-        };
+        const webFontConfig = makeFontConfigFromFontVar(fonts.data);
 
         if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
             WebFont.load(webFontConfig);

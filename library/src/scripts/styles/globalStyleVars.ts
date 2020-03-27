@@ -238,6 +238,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bold: 700,
         },
         forceGoogleFont: false,
+        customFontUrl: undefined as undefined | string,
         families: {
             body: ["Open Sans"],
             monospace: [],

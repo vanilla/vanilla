@@ -16,16 +16,28 @@ import {
     singleLineEllipsis,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    fonts,
 } from "@library/styles/styleHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeVariables = variableFactory("breadcrumbs");
 
     const sizing = makeVariables("sizing", {
         minHeight: 16,
     });
 
-    return { sizing };
+    const link = makeVariables("link", {
+        textTransform: "uppercase",
+        font: {
+            ...EMPTY_FONTS,
+            size: globalVars.fonts.size.small,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
+    });
+
+    return { sizing, link };
 });
 
 export const breadcrumbsClasses = useThemeCache(() => {
@@ -36,9 +48,8 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        fontSize: unit(globalVars.fonts.size.small),
-        lineHeight: globalVars.lineHeights.condensed,
-        textTransform: "uppercase",
+        ...fonts(vars.link.font),
+        textTransform: vars.link.textTransform as any,
         color: colorOut(linkColors.color),
         $nest: linkColors.$nest,
     });

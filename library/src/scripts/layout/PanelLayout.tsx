@@ -14,6 +14,7 @@ import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { useBannerContext } from "@library/banner/BannerContext";
 
 interface IProps {
     className?: string;
@@ -69,6 +70,7 @@ export default function PanelLayout(props: IProps) {
 
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
+    const { bannerRect } = useBannerContext();
     const device = useDevice();
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
@@ -77,7 +79,7 @@ export default function PanelLayout(props: IProps) {
         return measuredPanelTop + window.scrollY; // Every time this changes, adjust for the scroll height.
     }, [measuredPanelTop]);
 
-    const overflowOffset = sidePanelDistanceFromTop - topOffset;
+    const overflowOffset = sidePanelDistanceFromTop - topOffset - (bannerRect?.height ?? 0);
 
     const panelOffsetClass = useMemo(() => style({ top: overflowOffset, $debugName: "stickyOffset" }), [
         overflowOffset,

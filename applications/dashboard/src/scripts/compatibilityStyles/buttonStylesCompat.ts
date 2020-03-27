@@ -49,7 +49,6 @@ export const buttonCSS = () => {
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
-    // mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
 
     const buttonBorderRadius = parseInt(formElementVars.border.radius.toString(), 10);
     const borderOffset = globalVars.border.width * 2;

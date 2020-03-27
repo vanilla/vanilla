@@ -328,6 +328,10 @@ export const compatibilityStyles = useThemeCache(() => {
         marginTop: unit(vars.gutter.size),
     });
 
+    cssOut(`.Panel > .PhotoWrapLarge`, {
+        padding: 0,
+    });
+
     cssOut(".Panel li a", {
         minHeight: 0,
     });

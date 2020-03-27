@@ -83,10 +83,6 @@ export const groupsCSS = () => {
         opacity: 0,
     });
 
-    // cssOut(`body.Section-Group .Group-Banner`, {
-    //     ...absolutePosition.fullSizeOfParent(),
-    // });
-
     cssOut(`.DataTableContainer.Group-Box.ApplicantList .PageControls .H`, {
         position: "relative",
     });

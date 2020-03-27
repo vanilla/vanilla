@@ -190,11 +190,6 @@ export const compatibilityStyles = useThemeCache(() => {
         },
     );
 
-    cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
-        color: primary,
-        cursor: "default",
-    });
-
     cssOut(
         `
         .Herobanner .SearchBox .AdvancedSearch .BigInput,

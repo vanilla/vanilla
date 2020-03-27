@@ -9,6 +9,7 @@ import { colorOut, unit, userSelect, importantColorOut } from "@library/styles/s
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { important } from "csx";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
@@ -44,11 +45,12 @@ export const paginationCSS = () => {
         {
             default: {
                 backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
-                cursor: "default",
+                cursor: "pointer",
+                ...userSelect(),
             },
             allStates: {
                 backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
-                cursor: "default",
+                ...userSelect(),
             },
         },
     );
@@ -64,8 +66,9 @@ export const paginationCSS = () => {
     });
 
     cssOut(`.Pager span`, {
-        cursor: "default",
+        cursor: important("default"),
         backgroundColor: importantColorOut(globalVars.mainColors.bg),
+        color: importantColorOut(globalVars.links.colors.default),
         opacity: 0.5,
     });
 

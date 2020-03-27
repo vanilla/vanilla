@@ -8,16 +8,8 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { px, em } from "csx";
-import {
-    colorOut,
-    margins,
-    paddings,
-    clickableItemStates,
-    singleLineEllipsis,
-    unit,
-    userSelect,
-    ColorValues,
-} from "@library/styles/styleHelpers";
+import { colorOut, margins, singleLineEllipsis, unit, userSelect } from "@library/styles/styleHelpers";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
     const makeVariables = variableFactory("breadcrumbs");

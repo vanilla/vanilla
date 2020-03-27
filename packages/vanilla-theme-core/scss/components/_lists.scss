@@ -718,16 +718,18 @@
         margin-right: 0;
     }
 
-    .MItem-Author a {
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: $component-meta-link_color;
+    @if($staticVariables) {
+        .MItem-Author a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            color: $component-meta-link_color;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
         }
     }
 }

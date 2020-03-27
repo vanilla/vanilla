@@ -73,14 +73,14 @@ export const mixinClickInput = (selector: string, overwriteColors?: {}, overwrit
 
 // The "special" here is non standard styles for links. The text colors have presets and have more complicated inheritance
 export interface IClickableItemOptionalStates {
-    default?: undefined;
-    hover?: undefined;
-    focus?: undefined;
-    clickFocus?: undefined;
-    keyboardFocus?: undefined;
-    active?: undefined;
-    visited?: undefined;
-    allStates?: undefined;
+    default?: NestedCSSProperties;
+    hover?: NestedCSSProperties;
+    focus?: NestedCSSProperties;
+    clickFocus?: NestedCSSProperties;
+    keyboardFocus?: NestedCSSProperties;
+    active?: NestedCSSProperties;
+    visited?: NestedCSSProperties;
+    allStates?: NestedCSSProperties;
 }
 
 export interface IClickableItemEnforcedStates {

@@ -5,15 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import {
-    allLinkStates,
-    clickableItemStates,
-    colorOut,
-    margins,
-    negative,
-    paddings,
-    unit,
-} from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
@@ -21,6 +13,7 @@ import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasSt
 import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));

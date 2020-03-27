@@ -17,14 +17,13 @@ import {
     fonts,
     IBackground,
     paddings,
-    clickableItemStates,
     unit,
-    linkStyleFallbacks,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",

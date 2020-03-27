@@ -43,7 +43,7 @@ export class MessagesContents extends React.Component<IProps> {
                     <FrameHeaderWithAction title={title}>
                         <LinkAsButton
                             title={t("New Message")}
-                            to={"/messages/inbox"}
+                            to={"/messages/add"}
                             baseClass={ButtonTypes.ICON}
                             className={classNames(buttonUtils.pushRight)}
                         >

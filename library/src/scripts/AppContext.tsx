@@ -58,7 +58,9 @@ export function AppContext(props: IProps) {
                                     <FontSizeCalculatorProvider>
                                         <SearchFilterContextProvider>
                                             <TitleBarDeviceProvider>
-                                                <DeviceProvider>{props.children}</DeviceProvider>
+                                                <BannerContextProviderNoHistory>
+                                                    <DeviceProvider>{props.children}</DeviceProvider>
+                                                </BannerContextProviderNoHistory>
                                             </TitleBarDeviceProvider>
                                         </SearchFilterContextProvider>
                                     </FontSizeCalculatorProvider>

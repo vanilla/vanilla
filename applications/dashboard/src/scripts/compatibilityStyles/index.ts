@@ -60,7 +60,6 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".Frame", {
         background: "none",
-        overflow: "auto",
     });
 
     cssOut(

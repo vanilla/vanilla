@@ -73,6 +73,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
 
     let defaultBorder = borders({
         ...EMPTY_BORDER,
+        ...buttonGlobals.border,
         ...buttonTypeVars.borders,
     });
 
@@ -80,25 +81,37 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.hover.borders }))
+            ? merge(
+                  cloneDeep(defaultBorder),
+                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.hover.borders }, buttonGlobals.border),
+              )
             : {};
 
     const activeBorder =
         buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.active.borders }))
+            ? merge(
+                  cloneDeep(defaultBorder),
+                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.active.borders }, buttonGlobals.border),
+              )
             : {};
 
     const focusBorder =
         buttonTypeVars.focus && buttonTypeVars.focus.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders({ ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) }),
+                  borders(
+                      { ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
+                      buttonGlobals.border,
+                  ),
               )
             : defaultBorder;
 
     const focusAccessibleBorder =
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(cloneDeep(defaultBorder), borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }))
+            ? merge(
+                  cloneDeep(defaultBorder),
+                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }, buttonGlobals.border),
+              )
             : {};
 
     const fontVars = { ...EMPTY_FONTS, ...buttonGlobals.font, ...buttonTypeVars.fonts };

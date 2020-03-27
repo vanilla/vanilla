@@ -19,13 +19,18 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
     /** @var \UsersApiController */
     private $usersApi;
 
+    /** @var \SessionController */
+    private $session;
+
     /**
      * DI.
      *
      * @param \UsersApiController $usersApi
+     * @param \Gdn_Session $session
      */
-    public function __construct(\UsersApiController $usersApi) {
+    public function __construct(\UsersApiController $usersApi, \Gdn_Session $session) {
         $this->usersApi = $usersApi;
+        $this->session = $session;
     }
 
 
@@ -34,9 +39,10 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
      */
     public function createActions(): array {
         $user = $this->usersApi->get_me([]);
-
+        $permissions = $this->usersApi->get_permissions($this->session->UserID);
         return [
-            new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), [])
+            new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), []),
+            new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])
         ];
     }
 }

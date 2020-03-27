@@ -41,7 +41,7 @@ export const buttonCSS = () => {
     mixinButton(".BigButton:not(.Danger)", ButtonTypes.PRIMARY);
     mixinButton(".NewConversation.NewConversation", ButtonTypes.PRIMARY);
     mixinButton(".groupToolbar .Button.Primary", ButtonTypes.PRIMARY);
-    mixinButton(".BoxButtons .Button.Primary", ButtonTypes.PRIMARY);
+    mixinButton(".BoxButtons .ButtonGroup.Multi .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Section-Members .Group-RemoveMember", ButtonTypes.PRIMARY);
     mixinButton(".group-members-filter-box .Button.search", ButtonTypes.PRIMARY);
     mixinButton("#Form_Ban", ButtonTypes.PRIMARY);
@@ -50,6 +50,15 @@ export const buttonCSS = () => {
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+
+    const buttonBorderRadius = parseInt(formElementVars.border.radius.toString(), 10);
+
+    if (buttonBorderRadius && buttonBorderRadius > 0) {
+        cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
+            marginTop: unit((formElementVars.sizing.height * 2) / 36), // center vertically
+            marginRight: unit(buttonBorderRadius * 0.035), // offset based on border radius. No radius will give no offset.
+        });
+    }
 
     cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         width: unit(formElementVars.sizing.height),
@@ -61,17 +70,14 @@ export const buttonCSS = () => {
         }),
     });
 
+    cssOut(`.ButtonGroup.Multi .Button.Handle`, {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+    });
+
     cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
         backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
         width: unit(formElementVars.sizing.height),
-        ...borders({
-            ...globalVars.borderType.formElements.buttons,
-            color: rgba(0, 0, 0, 0),
-            radius: {
-                left: important(0),
-            },
-        }),
-        $nest: {},
     });
 
     cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
@@ -110,6 +116,10 @@ export const buttonCSS = () => {
                 padding: important(0),
             },
         },
+    });
+
+    cssOut(`.ButtonGroup.Multi > .Button:first-child`, {
+        borderTopLeftRadius: unit(formElementVars.border.radius),
     });
 
     // Standard

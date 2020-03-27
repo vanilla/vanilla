@@ -30,7 +30,6 @@ export const textLinkCSS = () => {
     mixinClickInput(
         `
         .DataList .IdeationTag,
-        .DataList .tag-tracker,
         .DataList .MItem.RoleTracker,
         .MessageList .IdeationTag,
         .MessageList .tag-tracker,
@@ -46,14 +45,14 @@ export const textLinkCSS = () => {
     mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
     });
-
+    mixinClickInput(".DataList .Item .Title a");
     mixinClickInput(`.DataTable.DiscussionsTable a.Title`);
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
+
     mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");

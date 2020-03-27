@@ -1107,12 +1107,7 @@ class EntryController extends Gdn_Controller {
                             }
 
                             Gdn::session()->start(val('UserID', $user), true, (bool)$this->Form->getFormValue('RememberMe'));
-                            // If user is banned, check for expired warnings.
-                            if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
-//                                (new Garden\EventManager)->fire('CheckExpiredBan', ['UserID' => $user->UserID]);
-                                $this->fireEvent('CheckExpiredBan', ['UserID' => $user->UserID]);
-                                Gdn::session()->getPermissions();
-                            }
+                            Gdn::userModel()->fireEvent('AfterSignIn');
                             if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
                                 $this->Form->addError('ErrorPermission');
                                 Gdn::session()->end();
@@ -1126,8 +1121,6 @@ class EntryController extends Gdn_Controller {
                                 if ($hourOffset != Gdn::session()->User->HourOffset) {
                                     Gdn::userModel()->setProperty(Gdn::session()->UserID, 'HourOffset', $hourOffset);
                                 }
-
-                                Gdn::userModel()->fireEvent('AfterSignIn');
 
                                 $this->_setRedirect();
                             }

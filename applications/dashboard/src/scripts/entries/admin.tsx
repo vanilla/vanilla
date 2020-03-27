@@ -16,6 +16,7 @@ import "@library/theming/reset";
 import { ScrollOffsetContext, SCROLL_OFFSET_DEFAULTS } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import { roleReducer } from "@dashboard/roles/roleReducer";
+import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -34,9 +35,11 @@ applySharedPortalContext(props => {
     }, [setNavHeight]);
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
-                {props.children}
-            </ScrollOffsetContext.Provider>
+            <BannerContextProviderNoHistory>
+                <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
+                    {props.children}
+                </ScrollOffsetContext.Provider>
+            </BannerContextProviderNoHistory>
         </AppContext>
     );
 });

@@ -383,7 +383,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonIcon = style(
-        "icon",
+        "buttonIcon",
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
             height: vars.sizing.compactHeight,

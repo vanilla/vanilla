@@ -165,7 +165,7 @@ class SiteMeta implements \JsonSerializable {
         $currentThemeAddon = $themeModel->getCurrentThemeAddon();
 
         $this->activeThemeKey = $currentTheme['themeID'];
-        $this->activeThemeViewPath = $currentThemeAddon->path('/views');
+        $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
         $this->themePreview =  $themeModel->getPreviewTheme();
 

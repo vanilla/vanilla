@@ -50,7 +50,7 @@ export const buttonCSS = () => {
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
 
-    const buttonBorderRadius = parseInt(formElementVars.border.radius.toString(), 10);
+    const buttonBorderRadius = parseInt(globalVars.borderType.formElements.buttons.toString(), 10);
     const borderOffset = globalVars.border.width * 2;
     const handleSize = formElementVars.sizing.height - borderOffset;
 
@@ -85,8 +85,8 @@ export const buttonCSS = () => {
         minHeight: importantUnit(handleSize),
         height: importantUnit(handleSize),
         width: importantUnit(handleSize),
-        borderTopRightRadius: unit(formElementVars.border.radius),
-        borderBottomRightRadius: unit(formElementVars.border.radius),
+        borderTopRightRadius: unit(buttonBorderRadius),
+        borderBottomRightRadius: unit(buttonBorderRadius),
     });
 
     cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
@@ -133,7 +133,7 @@ export const buttonCSS = () => {
     });
 
     cssOut(`.ButtonGroup.Multi > .Button:first-child`, {
-        borderTopLeftRadius: unit(formElementVars.border.radius),
+        borderTopLeftRadius: unit(buttonBorderRadius),
     });
 
     // Standard

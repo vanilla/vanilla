@@ -58,7 +58,7 @@ include $this->fetchViewLocation('helper_functions');
                                 ->addTitleMeta(plural($recordUser['CountDiscussions'] + $recordUser['CountComments'], '%s post', '%s posts'))
 
                                 ->addMeta(Gdn_Format::dateFull($row['Data']['DateInserted'] ?? $row['RecordDate'], 'html'))
-                                ->addMeta('<b>'.t($recordLabel, htmlspecialchars($recordLabel)).'</b>')
+                                ->addMeta('<b>'.htmlspecialchars(t($recordLabel, $recordLabel)).'</b>')
                                 ->addMetaIf(($viewPersonalInfo && !empty($row['Data']['InsertIPAddress'])), iPAnchor($row['Data']['InsertIPAddress']));
 
                             echo $authorBlock;

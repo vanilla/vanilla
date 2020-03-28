@@ -39,8 +39,7 @@ import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
-import { emptyObject } from "expect/build/utils";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -389,6 +388,7 @@ export const compatibilityStyles = useThemeCache(() => {
     photoGridCSS();
     messagesCSS();
     signaturesCSS();
+    signInMethodsCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

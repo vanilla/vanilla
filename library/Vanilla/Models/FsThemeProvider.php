@@ -256,7 +256,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             throw new ServerException("File key missing for theme asset.");
         }
 
-        $data = $this->getFileAsset($theme, $asset);
+        $data = $this->getFileAsset($theme, $key, $asset);
 
         switch ($type) {
             case "data":
@@ -295,26 +295,24 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Cast themeAssetModel data to out schema data by calculating and casting required fields.
      *
      * @param Addon $theme
+     * @param string $assetKey
      * @param array $asset
      *
      * @return string
      */
-    private function getFileAsset(Addon $theme, array $asset): string {
+    private function getFileAsset(Addon $theme, string $assetKey, array $asset): string {
         $filename = basename($asset['file']);
-        if (!isset($asset['placeholder'])) {
+        if ($filename) {
             $fullFilename = $theme->path("/assets/{$filename}");
-            if (!file_exists($fullFilename)) {
-                throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+            if (!file_exists($fullFilename) || !is_readable($fullFilename)) {
+                trigger_error("Theme asset file does not exist or is not readable: {$fullFilename}", E_USER_WARNING);
+            } else {
+                return file_get_contents($fullFilename);
             }
-            if (!is_readable($fullFilename)) {
-                throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-            }
-            $assetContent = file_get_contents($fullFilename);
-        } else {
-            $assetContent = $asset['placeholder'];
         }
 
-        return $assetContent;
+        $defaultAsset = ThemeModel::ASSET_LIST[$assetKey];
+        return $defaultAsset['default'];
     }
 
     /**
@@ -330,7 +328,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $assets = $this->getAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
-            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
+            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assetKey, $assets[$assetKey]);
         } else {
             throw new NotFoundException("Asset");
         }

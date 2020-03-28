@@ -180,7 +180,6 @@ body.hasRichEditor {
 .Popup.hasRichEditor {
 
     .Border {
-        width: 100%;
         box-sizing: border-box;
     }
 
@@ -189,6 +188,15 @@ body.hasRichEditor {
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
+    }
+}
+
+@include mediaQuery-richEditor_mobile {
+    .Popup.hasRichEditor {
+
+        .Border {
+            width: 100%;
+        }
     }
 }
 
@@ -293,7 +301,7 @@ body.hasRichEditor {
 
         .Popup.hasRichEditor {
             .Border {
-                width: 100%;
+                max-width: 100%;
                 box-sizing: border-box;
             }
 

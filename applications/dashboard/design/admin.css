@@ -11519,7 +11519,6 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
 }
 
 .Popup.hasRichEditor .Border {
-  width: 100%;
   box-sizing: border-box;
 }
 .Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
@@ -11528,6 +11527,11 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   display: none !important;
 }
 
+@media (max-width: 700px) {
+  .Popup.hasRichEditor .Border {
+    width: 100%;
+  }
+}
 @media (min-width: 700px) {
   .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm select,
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
@@ -11613,7 +11617,7 @@ body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
   }
   .Popup.hasRichEditor .Popup.hasRichEditor .Border,
 body.hasRichEditor .Popup.hasRichEditor .Border {
-    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
   }
   .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,

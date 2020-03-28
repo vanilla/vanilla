@@ -287,6 +287,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".MenuItems, .Flyout.Flyout", {
         ...borders(vars.borderType.dropDowns.content),
+        overflow: "hidden",
     });
 
     cssOut(`.Frame-content`, {

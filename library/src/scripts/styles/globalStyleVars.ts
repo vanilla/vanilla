@@ -165,21 +165,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         radius: 6, // Global default
     });
 
-    const standardBorder = {
-        radius: border.radius,
-        width: border.width,
-        color: border.color,
-        style: border.style,
-    };
-
     const borderType = makeThemeVars("borderType", {
         formElements: {
-            default: standardBorder,
-            buttons: standardBorder,
+            default: border,
+            buttons: border,
         },
-        modals: standardBorder,
+        modals: border,
         dropDowns: {
-            content: standardBorder,
+            content: border,
         },
     });
 

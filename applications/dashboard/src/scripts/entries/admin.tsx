@@ -35,11 +35,9 @@ applySharedPortalContext(props => {
     }, [setNavHeight]);
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            <BannerContextProviderNoHistory>
-                <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
-                    {props.children}
-                </ScrollOffsetContext.Provider>
-            </BannerContextProviderNoHistory>
+            <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
+                {props.children}
+            </ScrollOffsetContext.Provider>
         </AppContext>
     );
 });

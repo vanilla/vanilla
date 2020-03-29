@@ -6,7 +6,4 @@
  */
 // phpcs:ignoreFile
 
-$Definition['Create New Discussion'] = 'Create New Discussion';
-$Definition['Leave a redirect link from the old discussions.'] = 'Leave a redirect link from the old discussions.';
-$Definition['New Discussion Topic'] = 'New Discussion Topic';
 $Definition['Split %s to new discussion'] = 'You have chosen to split %s into a new discussion.';

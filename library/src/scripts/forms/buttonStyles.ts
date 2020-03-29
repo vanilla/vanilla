@@ -55,7 +55,7 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     const padding = makeThemeVars("padding", {
         top: 2,
         bottom: 3,
-        side: 12,
+        horizontal: 12,
     });
 
     const sizing = makeThemeVars("sizing", {

@@ -60,7 +60,7 @@ export const paginationCSS = () => {
         borderBottomRightRadius: globalVars.border.radius,
     });
 
-    cssOut(`.Pager .Prev`, {
+    cssOut(`.Pager .Previous`, {
         borderBottomLeftRadius: globalVars.border.radius,
         borderTopLeftRadius: globalVars.border.radius,
     });

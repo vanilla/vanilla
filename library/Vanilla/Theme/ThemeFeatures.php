@@ -7,16 +7,15 @@
 
 namespace Vanilla\Theme;
 
-use Vanilla\Addon;
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeModel;
 
 /**
  * Class to hold information about a theme and it's configuration options.
  */
 class ThemeFeatures implements \JsonSerializable {
 
-    /** @var Addon */
+    /** @var AddonInterface */
     private $theme;
 
     /** @var ConfigurationInterface */
@@ -36,9 +35,9 @@ class ThemeFeatures implements \JsonSerializable {
      * Constuctor.
      *
      * @param ConfigurationInterface $config
-     * @param Addon $theme
+     * @param AddonInterface $theme
      */
-    public function __construct(ConfigurationInterface $config, Addon $theme) {
+    public function __construct(ConfigurationInterface $config, AddonInterface $theme) {
         $this->config = $config;
         $this->theme = $theme;
     }

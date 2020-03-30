@@ -13,72 +13,73 @@ include $this->fetchViewLocation('helper_functions');
             </thead>
             <tbody>
             <?php
-            foreach ($this->data('Log') as $Row):
-                $RecordLabel = valr('Data.Type', $Row);
-                if (!$RecordLabel)
-                    $RecordLabel = $Row['RecordType'];
-                $RecordLabel = Gdn_Form::labelCode($RecordLabel);
-                $user = Gdn::userModel()->getID($Row['InsertUserID'] ?? 0);
+            foreach ($this->data('Log') as $row):
+                $recordLabel = valr('Data.Type', $row);
+                if (!$recordLabel || $recordLabel === 'Post') {
+                    $recordLabel = $row['RecordType'];
+                }
+                $recordLabel = Gdn_Form::labelCode(mb_convert_case($recordLabel, MB_CASE_TITLE));
+                $user = Gdn::userModel()->getID($row['InsertUserID'] ?? 0);
                 $viewPersonalInfo = gdn::session()->checkPermission('Garden.PersonalInfo.View');
 
                 $userBlock = new MediaItemModule(val('Name', $user), userUrl($user));
                 $userBlock->setView('media-sm')
                     ->setImage(userPhotoUrl($user))
-                    ->addMeta(Gdn_Format::dateFull($Row['DateInserted'], 'html'));
+                    ->addMeta(Gdn_Format::dateFull($row['DateInserted'], 'html'));
 
                 $Url = FALSE;
-                if (in_array($Row['Operation'], ['Edit', 'Moderate'])) {
-                    switch (strtolower($Row['RecordType'])) {
+                if (in_array($row['Operation'], ['Edit', 'Moderate'])) {
+                    switch (strtolower($row['RecordType'])) {
                         case 'discussion':
-                            $Url = "/discussion/{$Row['RecordID']}/x/p1";
+                            $Url = "/discussion/{$row['RecordID']}/x/p1";
                             break;
                         case 'comment':
-                            $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
+                            $Url = "/discussion/comment/{$row['RecordID']}#Comment_{$row['RecordID']}";
                     }
-                } elseif ($Row['Operation'] === 'Delete') {
-                    switch (strtolower($Row['RecordType'])) {
+                } elseif ($row['Operation'] === 'Delete') {
+                    switch (strtolower($row['RecordType'])) {
                         case 'comment':
-                            $Url = "/log/filter?recordType=comment&recordID={$Row['RecordID']}";
+                            $Url = "/log/filter?recordType=comment&recordID={$row['RecordID']}";
                     }
                 }
 
                 ?>
-                <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
-                    <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
+                <tr id="<?php echo "LogID_{$row['LogID']}"; ?>">
+                    <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $row['LogID']; ?>"/>
                     </td>
                     <td class="content-cell">
                         <?php
-                        $recordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
-                        if ($Row['RecordName']) {
+                        $recordUser = Gdn::userModel()->getID($row['Data']['InsertUserID'] ?? $row['RecordUserID'], DATASET_TYPE_ARRAY);
+                        if ($row['RecordName']) {
                             $authorBlock = new MediaItemModule(val('Name', $recordUser), userUrl($recordUser));
                             $authorBlock->setView('media-sm')
                                 ->setImage(userPhotoUrl($recordUser))
                                 ->addTitleMetaIf((bool)$recordUser['Banned'], wrap(t('Banned'), 'span', ['class' => 'text-danger']))
                                 ->addTitleMeta(plural($recordUser['CountDiscussions'] + $recordUser['CountComments'], '%s post', '%s posts'))
 
-                                ->addMeta(Gdn_Format::dateFull($Row['RecordDate'], 'html'))
-                                ->addMeta('<b>'.t($RecordLabel, htmlspecialchars($RecordLabel)).'</b>')
-                                ->addMetaIf(($viewPersonalInfo && val('RecordIPAddress', $Row)), iPAnchor($Row['RecordIPAddress']));
+                                ->addMeta(Gdn_Format::dateFull($row['Data']['DateInserted'] ?? $row['RecordDate'], 'html'))
+                                ->addMeta('<b>'.htmlspecialchars(t($recordLabel, $recordLabel)).'</b>')
+                                ->addMetaIf(($viewPersonalInfo && !empty($row['Data']['InsertIPAddress'])), iPAnchor($row['Data']['InsertIPAddress']));
 
                             echo $authorBlock;
                         }
 
-                        echo '<div class="post-content js-collapsable" data-className="userContent">', $this->formatContent($Row), '</div>';
+                        echo '<div class="post-content js-collapsable" data-className="userContent">', $this->formatContent($row), '</div>';
 
                         // Write the other record counts.
 
-                        echo otherRecordsMeta($Row['Data']);
+                        echo otherRecordsMeta($row['Data']);
 
                         echo '<div class="Meta-Container">';
-                        if ($Row['CountGroup'] > 1) {
+                        if ($row['CountGroup'] > 1) {
                             echo ' <span class="info">',
                                 '<span class="Meta-Label">'.t('Reported').'</span> ',
-                            wrap(plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
+                            wrap(plural($row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
                             '</span> ';
                         }
 
                         // Write custom meta information.
-                        $CustomMeta = valr('Data._Meta', $Row, false);
+                        $CustomMeta = valr('Data._Meta', $row, false);
                         if (is_array($CustomMeta)) {
                             foreach ($CustomMeta as $Key => $Value) {
                                 echo ' <span class="Meta">',

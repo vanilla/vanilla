@@ -5,7 +5,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
 import backLinkClasses from "@library/routing/links/backLinkStyles";

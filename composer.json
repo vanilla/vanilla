@@ -109,7 +109,15 @@
     },
     "extra": {
         "metasyntactical/composer-plugin-license-check": {
-            "whitelist": ["MIT", "BSD-2-Clause", "BSD-3-Clause", "LGPL-2.1", "LGPL-3.0", "GPL-2.0", "GPL-2.0+"]
+            "whitelist": [
+                "MIT",
+                "BSD-2-Clause",
+                "BSD-3-Clause",
+                "LGPL-2.1",
+                "LGPL-3.0",
+                "GPL-2.0",
+                "GPL-2.0+"
+            ]
         }
     }
 }

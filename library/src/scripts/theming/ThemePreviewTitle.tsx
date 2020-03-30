@@ -40,6 +40,6 @@ export function ThemePreviewTitle(props: IProps) {
             </h3>
         </ToolTip>
     ) : (
-        <h3 className={classes.title}>name</h3>
+        <h3 className={classes.title}>{name}</h3>
     );
 }

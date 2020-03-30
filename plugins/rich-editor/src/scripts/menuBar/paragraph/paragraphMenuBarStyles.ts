@@ -3,7 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { formElementsVariables } from "@library//forms/formElementStyles";
+
 import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";

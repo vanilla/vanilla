@@ -198,26 +198,32 @@
     }
 
     .MItem {
-        color: $component-meta-link_color;
+        @if ($staticVariables) {
+            color: $component-meta-link_color;
+        }
 
         &:last-child {
             margin-right: 0;
         }
 
-        &:focus,
-        &:hover {
-            color: $component-meta-link-hover_color;
+        @if ($staticVariables) {
+            &:focus,
+            &:hover {
+                color: $component-meta-link-hover_color;
+            }
         }
 
         a {
             font-size: inherit;
             font-weight: inherit;
             line-height: inherit;
-            color: inherit;
-
-            &:focus,
-            &:hover {
+            @if ($staticVariables) {
                 color: inherit;
+
+                &:focus,
+                &:hover {
+                    color: inherit;
+                }
             }
         }
     }
@@ -229,13 +235,15 @@
          margin-left: $utility-baseUnitDouble;
     }
 
-    .LatestPostTitle,
-    .UserLink {
-        color: $component-meta-link_color;
+    @if ($staticVariables) {
+        .LatestPostTitle,
+        .UserLink {
+            color: $component-meta-link_color;
 
-        &:focus,
-        &:hover {
-            color: $component-meta-link-hover_color;
+            &:focus,
+            &:hover {
+                color: $component-meta-link-hover_color;
+            }
         }
     }
 

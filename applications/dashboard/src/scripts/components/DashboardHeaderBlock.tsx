@@ -6,7 +6,7 @@ import React from "react";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import { RouteComponentProps, useHistory } from "react-router";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {
     showBackLink?: boolean;

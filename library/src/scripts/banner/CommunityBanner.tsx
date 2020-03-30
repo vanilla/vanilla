@@ -17,12 +17,23 @@ interface IProps {
 }
 
 /**
- * A component representing a single crumb in a breadcrumb component.
+ * Main banner for the community.
  */
-export default function CommunityBanner(props: IProps) {
+export function CommunityBanner(props: IProps) {
     return (
         <MemoryRouter>
             <Banner {...props} />
+        </MemoryRouter>
+    );
+}
+
+/**
+ * Content banner for the community.
+ */
+export function CommunityContentBanner(props: IProps) {
+    return (
+        <MemoryRouter>
+            <Banner {...props} isContentBanner />
         </MemoryRouter>
     );
 }

@@ -5,7 +5,7 @@
 
 import { collapsableContentClasses } from "@library/content/collapsableContentStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { BottomChevronIcon } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";

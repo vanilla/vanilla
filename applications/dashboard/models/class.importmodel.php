@@ -664,7 +664,7 @@ class ImportModel extends Gdn_Model {
             if ($inEscape) {
                 // Check for an escaped null.
                 if ($c == 'N' && strlen($token) == 0) {
-                    $token = null;
+                    $token = 'NULL'; // This will be replaced later with proper null value before an insert
                 } else {
                     $token .= $c;
                 }
@@ -2228,6 +2228,7 @@ class ImportModel extends Gdn_Model {
                 $inserts .= ',';
             }
             $inserts .= '('.implode(',', $row).')';
+            $inserts = str_replace("'NULL',", "null", $inserts);  // Need to replace any 'NULL',  values with actual null value for database
 
             if ($count >= $chunk) {
                 // Insert in chunks.

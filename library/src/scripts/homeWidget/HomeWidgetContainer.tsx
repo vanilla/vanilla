@@ -14,7 +14,7 @@ import classNames from "classnames";
 import Heading from "@library/layout/Heading";
 import { BorderType } from "@library/styles/styleHelpers";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
 import Container from "@library/layout/components/Container";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";

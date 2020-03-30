@@ -6,7 +6,8 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { buttonLoaderClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonLoaderClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { LoaderIcon } from "@library/icons/common";
 import classNames from "classnames";

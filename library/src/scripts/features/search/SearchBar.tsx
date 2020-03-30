@@ -14,7 +14,7 @@ import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
 import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";

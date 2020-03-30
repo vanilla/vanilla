@@ -6,8 +6,6 @@
 
 import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
 export const simplePagerVariables = useThemeCache(() => {

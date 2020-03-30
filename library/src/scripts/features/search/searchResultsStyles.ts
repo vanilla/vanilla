@@ -42,6 +42,7 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const excerpt = makeThemeVars("excerpt", {
         fg: globalVars.mainColors.fg,
+        margin: "0.7em",
     });
 
     const image = makeThemeVars("image", {
@@ -126,11 +127,13 @@ export const searchResultsClasses = useThemeCache(() => {
         display: "block",
         userSelect: "none",
     });
+
     const result = style("result", {
         position: "relative",
         display: "block",
         width: percent(100),
     });
+
     return {
         root,
         noResults,
@@ -249,7 +252,7 @@ export const searchResultClasses = useThemeCache(() => {
     });
 
     const excerpt = style("excerpt", {
-        marginTop: unit(6),
+        marginTop: unit(vars.excerpt.margin),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
     });

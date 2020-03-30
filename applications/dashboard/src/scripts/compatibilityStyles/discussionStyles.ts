@@ -91,4 +91,9 @@ export const discussionCSS = () => {
     cssOut(`.Container .DataTable span.MItem a`, {
         display: "inline",
     });
+
+    cssOut(`.MessageList .ItemDiscussion .InlineTags`, {
+        margin: 0,
+        padding: 0,
+    });
 };

@@ -64,6 +64,9 @@ export const buttonCSS = () => {
         });
     }
 
+    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+    mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
+
     cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         height: unit(handleSize),
         maxHeight: unit(handleSize),
@@ -153,6 +156,21 @@ export const buttonCSS = () => {
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",
+    });
+
+    cssOut(`.AdvancedSearch .InputAndButton .bwrap.bwrap`, {
+        ...absolutePosition.topRight(),
+    });
+
+    cssOut(`.AdvancedSearch .InputAndButton .bwrap .Button`, {
+        minWidth: "auto",
+        borderTopLeftRadius: important(0),
+        borderBottomLeftRadius: important(0),
+    });
+
+    cssOut(`.AdvancedSearch .InputAndButton .bwrap .Button .Sprite.SpSearch`, {
+        width: "auto",
+        height: "auto",
     });
 };
 

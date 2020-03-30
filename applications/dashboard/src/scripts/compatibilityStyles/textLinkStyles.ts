@@ -5,9 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, clickableItemStates } from "@library/styles/styleHelpers";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();
@@ -31,11 +30,9 @@ export const textLinkCSS = () => {
     mixinClickInput(
         `
         .DataList .IdeationTag,
-        .DataList .tag-tracker,
         .DataList .MItem.RoleTracker,
         .MessageList .IdeationTag,
         .MessageList .tag-tracker,
-        .MessageList .MItem.RoleTracker,
         .DataTableWrap .IdeationTag,
         .DataTableWrap .tag-tracker,
         .DataTableWrap .MItem.RoleTracker
@@ -48,12 +45,14 @@ export const textLinkCSS = () => {
     mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
     });
+    mixinClickInput(".DataList .Item .Title a");
+    mixinClickInput(`.DataTable.DiscussionsTable a.Title`);
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
+
     mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");
@@ -61,30 +60,8 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
-};
-
-// Mixins replacement
-export const mixinClickInput = (selector: string, overwrite?: {}) => {
-    selector = trimTrailingCommas(selector);
-    const selectors = selector.split(",");
-    const linkColors = clickableItemStates(overwrite);
-    if (!selectors) {
-        if (linkColors.color !== undefined) {
-            cssOut(selector, {
-                color: colorOut(linkColors.color),
-            });
-        }
-        nestedWorkaround(trimTrailingCommas(selector), linkColors.$nest);
-    } else {
-        selectors.map(s => {
-            if (linkColors.color !== undefined) {
-                cssOut(selector, {
-                    color: colorOut(linkColors.color),
-                });
-            }
-            nestedWorkaround(trimTrailingCommas(s), linkColors.$nest);
-        });
-    }
+    mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
 };
 
 export const mixinTextLinkNoDefaultLinkAppearance = selector => {

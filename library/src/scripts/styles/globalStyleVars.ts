@@ -92,7 +92,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         primaryContrast: isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
         statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
         secondary: offsetLightness(colorPrimary, 0.05),
-        stateSecondary: offsetLightness(colorPrimary, 0.2), // Default state color change
+        stateSecondary: undefined, // Calculated below, but you can overwrite it here.
         secondaryContrast: isLightColor(colorSecondary) ? elementaryColors.almostBlack : elementaryColors.white,
     });
 
@@ -130,20 +130,27 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const linkDerivedColors = makeThemeVars("linkDerivedColors", {
-        default: mainColors.secondary,
-        state: mainColors.stateSecondary,
-    });
-
     const links = makeThemeVars("links", {
         colors: {
-            default: linkDerivedColors.default,
-            hover: linkDerivedColors.state,
-            focus: linkDerivedColors.state,
-            keyboardFocus: linkDerivedColors.state,
-            active: linkDerivedColors.state,
+            default: mainColors.secondary,
+            hover: undefined,
+            focus: undefined,
+            keyboardFocus: undefined,
+            active: undefined,
             visited: undefined,
         },
+    });
+
+    // Generated derived colors from mainColors.
+    // You can set all of them by setting generatedMainColors.stateSecondary
+    // You can set individual states with links.colors["your state"]
+    // Will default to variation of links.colors.default (which is by default the secondary color)
+    Object.keys(links.colors).forEach(state => {
+        if (state !== "default" && state !== "visited") {
+            if (!links[state]) {
+                links.colors[state] = generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.2);
+            }
+        }
     });
 
     interface IBody {

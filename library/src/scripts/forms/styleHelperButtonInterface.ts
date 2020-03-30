@@ -28,7 +28,7 @@ export interface IButtonType {
     padding?: {
         top?: TLength;
         bottom?: TLength;
-        side?: TLength;
+        horizontal?: TLength;
     };
     fonts?: IFont;
     state?: {

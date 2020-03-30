@@ -167,10 +167,12 @@ select::-ms-expand {
     }
 }
 
-#Form_OK,
-.Button:not(.GroupOptionsTitle),
-.Buttons .btn-primary {
-    @include Button;
+@if($staticVariables) {
+    #Form_OK,
+    .Button:not(.GroupOptionsTitle),
+    .Buttons .btn-primary {
+        @include Button;
+    }
 }
 
 .Buttons .Close,

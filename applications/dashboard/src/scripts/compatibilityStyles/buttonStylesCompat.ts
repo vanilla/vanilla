@@ -25,8 +25,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 export const buttonCSS = () => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const mainColors = globalVars.mainColors;
-    const primary = colorOut(mainColors.primary);
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
@@ -50,6 +48,8 @@ export const buttonCSS = () => {
     mixinButton(".Button.Handle", ButtonTypes.PRIMARY);
     mixinButton("div.Popup .Body .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".ButtonGroup.Multi .Button.Handle", ButtonTypes.PRIMARY);
+    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
+    mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
 
     const buttonBorderRadius = parseInt(globalVars.borderType.formElements.buttons.toString(), 10);
     const borderOffset = globalVars.border.width * 2;
@@ -64,9 +64,6 @@ export const buttonCSS = () => {
             lineHeight: unit(handleSize),
         });
     }
-
-    mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
-    mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
 
     cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         height: unit(handleSize),

@@ -162,7 +162,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             minHeight: unit(globalVars.icon.sizes.large),
         },
         padding: {
-            side: 6,
+            horizontal: 6,
         },
         borders: {
             style: "none",

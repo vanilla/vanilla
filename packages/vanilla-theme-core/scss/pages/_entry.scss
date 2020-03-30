@@ -28,14 +28,16 @@ body.Section-Entry {
         margin-left: $utility-baseUnit;
     }
 
-    .ForgotPassword,
-    .CreateAccount a {
-        color: $link-default_color;
+    @if($staticVariables) {
+        .ForgotPassword,
+        .CreateAccount a {
+            color: $link-default_color;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $link-default-hover_color;
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $link-default-hover_color;
+            }
         }
     }
 

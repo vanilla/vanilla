@@ -140,9 +140,9 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
             buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined
                 ? buttonTypeVars.fonts.size
                 : buttonGlobals.font.size,
-            buttonTypeVars.padding && buttonTypeVars.padding.side !== undefined
-                ? buttonTypeVars.padding.side
-                : buttonGlobals.padding.side,
+            buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined
+                ? buttonTypeVars.padding.horizontal
+                : buttonGlobals.padding.horizontal,
             formElVars,
         ),
         display: "inline-flex",

@@ -97,28 +97,30 @@ export default function TitleBar(_props: IProps) {
     }, [isPreviewFirstRender]);
 
     const headerContent = (
-        <HashOffsetReporter className={classes.bgContainer}>
-            <animated.div
-                {...bgProps}
-                className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
-            ></animated.div>
-            {!isPreviewFirstRender && (
+        <HashOffsetReporter className={classes.container}>
+            <div className={classes.bgContainer}>
                 <animated.div
-                    {...bg2Props}
-                    className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
-                >
-                    {/* Cannot be a background image there will be flickering. */}
-                    {vars.colors.bgImage && (
-                        <img
-                            src={vars.colors.bgImage}
-                            className={classes.bgImage}
-                            alt={"titleBarImage"}
-                            aria-hidden={true}
-                        />
-                    )}
-                    {vars.overlay && <div className={classes.overlay}></div>}
-                </animated.div>
-            )}
+                    {...bgProps}
+                    className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+                ></animated.div>
+                {!isPreviewFirstRender && (
+                    <animated.div
+                        {...bg2Props}
+                        className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
+                    >
+                        {/* Cannot be a background image there will be flickering. */}
+                        {vars.colors.bgImage && (
+                            <img
+                                src={vars.colors.bgImage}
+                                className={classes.bgImage}
+                                alt={"titleBarImage"}
+                                aria-hidden={true}
+                            />
+                        )}
+                        {vars.overlay && <div className={classes.overlay}></div>}
+                    </animated.div>
+                )}
+            </div>
             <Container fullGutter>
                 <div className={classNames(classes.bar, { isHome: showSubNav })}>
                     {isCompact &&

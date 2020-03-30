@@ -435,7 +435,7 @@ export const titleBarClasses = useThemeCache(() => {
         left: 0,
         margin: `0 auto`,
         position: `absolute`,
-        height: calc(`100% - ${unit(vars.border.width + 1)}`),
+        height: calc(`80% - ${unit(vars.border.width + 1)}`),
         transform: translateX(`-10vw`),
         width: `120vw`,
         borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
@@ -470,13 +470,22 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const bgContainer = style("bgContainer", {
+    const container = style("container", {
         position: "relative",
         height: percent(100),
         width: percent(100),
         paddingTop: unit(vars.spacing.padding.top),
         paddingBottom: unit(vars.spacing.padding.bottom),
+    });
+
+    const bgContainer = style("bgContainer", {
+        ...absolutePosition.fullSizeOfParent(),
+        height: percent(100),
+        width: percent(100),
+        paddingTop: unit(vars.spacing.padding.top),
+        paddingBottom: unit(vars.spacing.padding.bottom),
         boxSizing: "content-box",
+        overflow: "hidden",
     });
 
     const bgImage = style("bgImage", {
@@ -956,22 +965,11 @@ export const titleBarClasses = useThemeCache(() => {
         background: vars.overlay.background,
     });
 
-    const curvedBackground = style("curvedBackground", {
-        content: quote(``),
-        background: `linear-gradient(-180deg,#fdfcfa,#f0e8de)`,
-        borderRadius: `0 0 100% 100%/0 0 60% 60%`,
-        boxShadow: `0 4px 0 #e2d5c7`,
-        height: calc(`100% - 5px`),
-        left: `-10vw`,
-        margin: `0 auto`,
-        position: "absolute",
-        width: `120vw`,
-    });
-
     return {
         root,
         bg1,
         bg2,
+        container,
         bgContainer,
         bgImage,
         negativeSpacer,

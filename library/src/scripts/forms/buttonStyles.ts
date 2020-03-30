@@ -23,6 +23,7 @@ import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export enum ButtonPreset {
     SOLID = "solid",
@@ -308,24 +309,6 @@ export const overwriteButtonClass = (
     buttonVars.name = `${buttonTypeVars.name}-${overwriteVars.name}`;
     return generateButtonClass(buttonVars, setZIndexOnState);
 };
-
-export enum ButtonTypes {
-    STANDARD = "standard",
-    PRIMARY = "primary",
-    TRANSPARENT = "transparent",
-    TRANSLUCID = "translucid",
-    CUSTOM = "custom",
-    RESET = "reset",
-    TEXT = "text",
-    TEXT_PRIMARY = "textPrimary",
-    ICON = "icon",
-    ICON_COMPACT = "iconCompact",
-    TITLEBAR_LINK = "titleBarLink",
-    DASHBOARD_STANDARD = "dashboardStandard",
-    DASHBOARD_PRIMARY = "dashboardPrimary",
-    DASHBOARD_SECONDARY = "dashboardSecondary",
-    DASHBOARD_LINK = "dashboardLink",
-}
 
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();

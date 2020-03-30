@@ -15,7 +15,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { color } from "csx";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { StandardNavLinksStory } from "@library/navigation/navLinksWithHeadings.story";
 
 export default {

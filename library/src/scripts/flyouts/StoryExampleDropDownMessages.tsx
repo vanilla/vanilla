@@ -6,16 +6,16 @@
 
 import React from "react";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { assetUrl, t } from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
-import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import classNames from "classnames";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/titleBar";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";

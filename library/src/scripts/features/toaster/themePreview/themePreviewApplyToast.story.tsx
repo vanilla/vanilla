@@ -8,7 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import Toast from "../Toast";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LoadStatus } from "@library/@types/api/core";
 
 const formsStory = storiesOf("Toast", module);

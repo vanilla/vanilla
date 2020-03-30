@@ -40,10 +40,10 @@ import {
 } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";

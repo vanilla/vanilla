@@ -5,7 +5,8 @@
 
 import { IApiError, LoadStatus } from "@library/@types/api/core";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";

@@ -19,10 +19,9 @@ import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonTypes, ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { isLightColor } from "@library/styles/styleHelpersColors";
-import { element } from "prop-types";
 
 export enum GlobalPreset {
     DARK = "dark",

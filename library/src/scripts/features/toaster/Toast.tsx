@@ -7,7 +7,7 @@
 import React from "react";
 import { toastClasses } from "@library/features/toaster/toastStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import classNames from "classnames";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 

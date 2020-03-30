@@ -911,7 +911,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 // Sign the user in.
-                Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $userID]);
+                Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $this->Form->getFormValue('UserID')]);
                 Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                 Gdn::userModel()->fireEvent('AfterSignIn');
 

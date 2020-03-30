@@ -14,7 +14,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";

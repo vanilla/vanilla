@@ -8,7 +8,7 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import SearchOption from "@library/features/search/SearchOption";
 import { t } from "@library/utility/appUtils";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import SearchBar from "@library/features/search/SearchBar";
 import { useUniqueID } from "@library/utility/idUtils";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";

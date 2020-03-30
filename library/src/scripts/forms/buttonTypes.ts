@@ -1,0 +1,17 @@
+export enum ButtonTypes {
+    STANDARD = "standard",
+    PRIMARY = "primary",
+    TRANSPARENT = "transparent",
+    TRANSLUCID = "translucid",
+    CUSTOM = "custom",
+    RESET = "reset",
+    TEXT = "text",
+    TEXT_PRIMARY = "textPrimary",
+    ICON = "icon",
+    ICON_COMPACT = "iconCompact",
+    TITLEBAR_LINK = "titleBarLink",
+    DASHBOARD_STANDARD = "dashboardStandard",
+    DASHBOARD_PRIMARY = "dashboardPrimary",
+    DASHBOARD_SECONDARY = "dashboardSecondary",
+    DASHBOARD_LINK = "dashboardLink",
+}

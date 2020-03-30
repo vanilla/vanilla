@@ -7,7 +7,7 @@
 import { useBannerContext } from "@library/banner/BannerContext";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
@@ -127,7 +127,7 @@ export default function TitleBar(_props: IProps) {
                         ) : (
                             <FlexSpacer className="pageHeading-leftSpacer" />
                         ))}
-                    {!isCompact && (
+                    {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
                         <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
                             <HeaderLogo
                                 className={classNames(

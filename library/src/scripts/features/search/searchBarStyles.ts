@@ -16,7 +16,7 @@ import {
     fonts,
     flexHelper,
 } from "@library/styles/styleHelpers";
-import { calc, important, percent, px, rgba, translateX } from "csx";
+import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";

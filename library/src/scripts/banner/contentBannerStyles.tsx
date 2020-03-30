@@ -7,6 +7,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { bannerVariables, bannerClasses, BannerAlignment } from "@library/banner/bannerStyles";
 import clamp from "lodash/clamp";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { EMPTY_SPACING } from "@library/styles/styleHelpers";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
@@ -28,6 +29,19 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
         enabled: false,
         alignment: BannerAlignment.CENTER,
         mobileAlignment: BannerAlignment.LEFT,
+    });
+
+    const contentContainer = makeVars("contentContainer", {
+        padding: {
+            ...EMPTY_SPACING,
+        },
+        mobile: {
+            padding: {
+                ...EMPTY_SPACING,
+                top: 0,
+                bottom: 0,
+            },
+        },
     });
 
     const normalBannerVars = bannerVariables();
@@ -60,14 +74,7 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
                         bottom: 0,
                     },
                 },
-                contentContainer: {
-                    mobile: {
-                        padding: {
-                            top: 0,
-                            bottom: 0,
-                        },
-                    },
-                },
+                contentContainer,
             },
         },
         "contentBanner",

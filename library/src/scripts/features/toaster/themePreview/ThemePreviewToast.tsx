@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Toast from "@library/features/toaster/Toast";
 import { getMeta } from "@library/utility/appUtils";
 import { useThemeActions, PreviewStatusType } from "@library/theming/ThemeActions";

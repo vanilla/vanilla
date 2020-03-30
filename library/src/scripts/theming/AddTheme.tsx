@@ -9,7 +9,7 @@ import classNames from "classnames";
 import React from "react";
 import addThemeClasses from "./addThemeStyles";
 import { t } from "@vanilla/i18n";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {
     onAdd?: React.ReactNode;

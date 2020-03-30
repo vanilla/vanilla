@@ -71,3 +71,20 @@ export function BannerContextProvider(props: { children: React.ReactNode }) {
         </context.Provider>
     );
 }
+
+export function BannerContextProviderNoHistory(props: { children: React.ReactNode }) {
+    const [bannerExists, setBannerExists] = useState(false);
+    const [bannerRect, setBannerRect] = useState<DOMRect | null>(null);
+    return (
+        <context.Provider
+            value={{
+                bannerExists,
+                setBannerExists,
+                bannerRect,
+                setBannerRect,
+            }}
+        >
+            {props.children}
+        </context.Provider>
+    );
+}

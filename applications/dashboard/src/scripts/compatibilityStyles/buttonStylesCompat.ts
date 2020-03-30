@@ -5,8 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { cssOut, trimTrailingCommas, mixinCloseButton } from "@dashboard/compatibilityStyles/index";
-import { buttonGlobalVariables, ButtonTypes, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
+import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { buttonGlobalVariables, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import {
     absolutePosition,
@@ -20,11 +20,11 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, rgba } from "csx";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const mainColors = globalVars.mainColors;
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);

@@ -127,7 +127,7 @@ export default function TitleBar(_props: IProps) {
                         ) : (
                             <FlexSpacer className="pageHeading-leftSpacer" />
                         ))}
-                    {!isCompact && (
+                    {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
                         <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
                             <HeaderLogo
                                 className={classNames(

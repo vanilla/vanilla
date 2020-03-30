@@ -84,6 +84,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const makeThemeVars = variableFactory("button", forcedVars);
     const vars = buttonGlobalVariables(forcedVars);
+    const buttonGlobals = buttonGlobalVariables();
 
     const standardPresetInit = makeThemeVars("standard", {
         preset: {
@@ -130,11 +131,12 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         borders: {
             color: standardPreset.preset.border,
-            radius: globalVars.border.radius,
+            radius: buttonGlobals.border.radius,
         },
         state: {
             borders: {
                 ...globalVars.borderType.formElements.buttons,
+                radius: buttonGlobals.border.radius,
                 color: standardPreset.preset.borderState,
             },
             colors: {
@@ -185,7 +187,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         borders: {
             color: primaryPreset.preset.border,
-            radius: globalVars.border.radius,
+            radius: buttonGlobals.border.radius,
         },
         state: {
             colors: {
@@ -193,6 +195,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 fg: primaryPreset.preset.fgState,
             },
             borders: {
+                radius: buttonGlobals.border.radius,
                 color: primaryPreset.preset.borderState,
             },
         },

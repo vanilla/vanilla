@@ -20,6 +20,8 @@ import {
     sticky,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    isLightColor,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -75,10 +77,18 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
     });
 
-    const colors = makeThemeVars("colors", {
+    const colorsInit = makeThemeVars("colors", {
         fg: globalVars.mainColors.primaryContrast,
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
+    });
+
+    const colors = makeThemeVars("colors", {
+        ...colorsInit,
+        state: {
+            bg: isLightColor(colorsInit.bg) ? rgba(0, 0, 0, 0.1) : rgba(255, 255, 255, 0.1),
+            fg: colorsInit.fg,
+        },
     });
 
     const border = makeThemeVars("border", {
@@ -94,8 +104,13 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             ? border.width
             : 0;
 
-    const swoop = makeThemeVars("swoop", {
+    const swoopInit = makeThemeVars("swoop", {
         amount: 0,
+    });
+
+    const swoop = makeThemeVars("swoop", {
+        ...swoopInit,
+        swoopOffset: (16 * swoopInit.amount) / 50,
     });
 
     const fullBleed = makeThemeVars("fullBleed", {
@@ -124,7 +139,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             width: buttonSize,
         },
         state: {
-            bg: globalVars.mainColors.statePrimary,
+            bg: colors.state.bg,
         },
     });
 
@@ -139,6 +154,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             fg: colors.fg,
         },
         fonts: {
+            ...EMPTY_FONTS,
             color: colors.fg,
         },
         sizing: {
@@ -402,9 +418,16 @@ export const titleBarClasses = useThemeCache(() => {
                 backgroundColor: colorOut(vars.compactSearch.bg),
             },
         },
-        ...mediaQueries.compact({
-            height: px(vars.sizing.mobile.height),
-        }).$nest,
+        ...(vars.swoop.amount
+            ? {
+                  $nest: {
+                      "& + *": {
+                          // Offset the next element to account for the swoop. (next element should go under the swoop slightly).
+                          marginTop: -vars.swoop.swoopOffset,
+                      },
+                  },
+              }
+            : {}),
     });
 
     const swoopStyles = {
@@ -428,7 +451,7 @@ export const titleBarClasses = useThemeCache(() => {
     const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: colorOut(vars.colors.bg),
+        // backgroundColor: colorOut(vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
         $nest: {
@@ -528,7 +551,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
-            justifyContent: vars.mobileLogo.justifyContent,
+            justifyContent: vars.logo.justifyContent,
             ...logoOffsetDesktop,
             $nest: {
                 "&&": {
@@ -692,23 +715,7 @@ export const titleBarClasses = useThemeCache(() => {
                 "&&": {
                     ...allButtonStates(
                         {
-                            active: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            hover: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            focus: {
+                            allStates: {
                                 color: colorOut(vars.colors.fg),
                                 $nest: {
                                     "& .meBox-buttonContent": {

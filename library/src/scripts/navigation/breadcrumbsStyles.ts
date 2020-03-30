@@ -8,17 +8,38 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { px, em } from "csx";
-import { colorOut, margins, singleLineEllipsis, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    margins,
+    singleLineEllipsis,
+    unit,
+    userSelect,
+    EMPTY_FONTS,
+    fonts,
+    ensureColorHelper,
+} from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeVariables = variableFactory("breadcrumbs");
 
     const sizing = makeVariables("sizing", {
         minHeight: 16,
     });
 
-    return { sizing };
+    const linkColors = clickableItemStates();
+    const link = makeVariables("link", {
+        textTransform: "uppercase",
+        font: {
+            ...EMPTY_FONTS,
+            color: ensureColorHelper(linkColors.color as string),
+            size: globalVars.fonts.size.small,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
+    });
+
+    return { sizing, link };
 });
 
 export const breadcrumbsClasses = useThemeCache(() => {
@@ -29,10 +50,8 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        fontSize: unit(globalVars.fonts.size.small),
-        lineHeight: globalVars.lineHeights.condensed,
-        textTransform: "uppercase",
-        color: linkColors.color ? colorOut(linkColors.color as any) : undefined,
+        ...fonts(vars.link.font),
+        textTransform: vars.link.textTransform as any,
         $nest: linkColors.$nest,
     });
 

@@ -10,6 +10,7 @@ namespace Vanilla\Web;
 use Garden\EventManager;
 use \Gdn_Request;
 use Gdn;
+use PocketsPlugin;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
 use Vanilla\Contracts\AddonProviderInterface;
@@ -199,6 +200,23 @@ class TwigEnhancer {
     }
 
     /**
+     * Render a pocket if it exists.
+     *
+     * @param string $pocketName The name of the pocket.
+     * @param array $pocketArgs Arguments to pass to PocketsPlugin::pocketString().
+     *
+     * @return \Twig\Markup
+     */
+    public function renderPocket(string $pocketName, array $pocketArgs = []): \Twig\Markup {
+        if (!class_exists(PocketsPlugin::class)) {
+            return new \Twig\Markup('', 'utf-8');
+        }
+
+        $result = PocketsPlugin::pocketString($pocketName, $pocketArgs);
+        return new \Twig\Markup($result, 'utf-8');
+    }
+
+    /**
      * Get a config key. The result will then be cached for the instance of the twig enhancer.
      *
      * @param string $key Config key.
@@ -243,6 +261,15 @@ class TwigEnhancer {
     }
 
     /**
+     * Make an asset URL.
+     *
+     * @param string $url
+     */
+    public function assetUrl(string $url) {
+        return asset($url, true, true);
+    }
+
+    /**
      * Render out breadcrumbs from the controller.
      *
      * @param array $options
@@ -282,6 +309,7 @@ class TwigEnhancer {
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
             'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
+            'renderPocket' => [$this, 'renderPocket'],
             'renderBanner' => $this->bannerImageModel ? [$this->bannerImageModel, 'renderBanner'] : [$this, 'renderNoop'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
@@ -292,6 +320,7 @@ class TwigEnhancer {
             'inSection' => [\Gdn_Theme::class, 'inSection'],
 
             // Routing.
+            'assetUrl' => [$this, 'assetUrl'],
             'url' => [$this->request, 'url'],
         ];
     }

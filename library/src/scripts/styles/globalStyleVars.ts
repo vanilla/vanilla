@@ -218,7 +218,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
     });
 
-    const fonts = makeThemeVars("fonts", {
+    const fontsInit = makeThemeVars("fonts", {
         size: {
             large: 16,
             medium: 14,
@@ -238,16 +238,23 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bold: 700,
         },
         forceGoogleFont: false,
+        customFontUrl: undefined as undefined | string,
         families: {
             body: ["Open Sans"],
             monospace: [],
         },
+    });
+
+    const isOpenSans = fontsInit.families.body[0] === "Open Sans";
+
+    const fonts = makeThemeVars("fonts", {
+        ...fontsInit,
         alignment: {
             headings: {
-                capitalLetterRatio: 0.73, // Calibrated for Open Sans
-                verticalOffset: 1, // Calibrated for Open Sans
-                horizontal: -0.03, // Calibrated for Open Sans
-                verticalOffsetForAdjacentElements: "-.13em", // Calibrated for Open Sans
+                capitalLetterRatio: isOpenSans ? 0.73 : 0.75, // Calibrated for Open Sans
+                verticalOffset: 1,
+                horizontal: isOpenSans ? -0.03 : 0, // Calibrated for Open Sans
+                verticalOffsetForAdjacentElements: isOpenSans ? "-.13em" : "0em", // Calibrated for Open Sans
             },
         },
     });

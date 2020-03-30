@@ -131,25 +131,38 @@ export default function TitleBar(_props: IProps) {
                         ))}
                     {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
                         <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
-                            <HeaderLogo
-                                className={classNames(
-                                    "titleBar-logoContainer",
-                                    classes.logoContainer,
-                                    isDesktopLogoCentered && classes.logoCenterer,
-                                )}
-                                logoClassName="titleBar-logo"
-                                logoType={LogoType.DESKTOP}
-                            />
+                            <span
+                                className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
+                                ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
+                            >
+                                <HeaderLogo
+                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                    logoClassName="titleBar-logo"
+                                    logoType={LogoType.DESKTOP}
+                                />
+                            </span>
                         </animated.div>
                     )}
-                    {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
+                    {!isCompact && !isDesktopLogoCentered && (
+                        <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
+                    )}
                     {!isSearchOpen && !isCompact && (
                         <TitleBarNav
                             isCentered={vars.navAlignment.alignment === "center"}
-                            containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
+                            containerRef={
+                                vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                    ? collisionSourceRef
+                                    : undefined
+                            }
                             className={classes.nav}
                             linkClassName={classes.topElement}
                             linkContentClassName="titleBar-navLinkContent"
+                            afterNode={
+                                !isCompact &&
+                                isDesktopLogoCentered && (
+                                    <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
+                                )
+                            }
                         />
                     )}
                     {isCompact && (
@@ -176,7 +189,9 @@ export default function TitleBar(_props: IProps) {
                             )}
                         </>
                     )}
-                    {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
+                    {!isCompact && !isDesktopLogoCentered && (
+                        <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
+                    )}
                     <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
                         {!isSearchOpen && (
                             <div className={classes.extraMeBoxIcons}>

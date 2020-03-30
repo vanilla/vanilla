@@ -567,6 +567,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Sign the user in.
+            Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $userID]);
             Gdn::session()->start($userID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
             Gdn::userModel()->fireEvent('AfterSignIn');
 
@@ -659,6 +660,7 @@ class EntryController extends Gdn_Controller {
                             ]);
 
                             // Sign the user in.
+                            Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $userID]);
                             Gdn::session()->start($userID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                             Gdn::userModel()->fireEvent('AfterSignIn');
                             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
@@ -787,6 +789,7 @@ class EntryController extends Gdn_Controller {
                     $this->Form->setFormValue('UserSelect', false);
 
                     // Sign in as the new user.
+                    Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $userID]);
                     Gdn::session()->start($userID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                     Gdn::userModel()->fireEvent('AfterSignIn');
 
@@ -908,6 +911,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 // Sign the user in.
+                Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $userID]);
                 Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                 Gdn::userModel()->fireEvent('AfterSignIn');
 
@@ -1106,6 +1110,7 @@ class EntryController extends Gdn_Controller {
                                 Gdn::userModel()->setField(val('UserID', $user), ['Password' => $pw, 'HashMethod' => 'Vanilla']);
                             }
 
+                            Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $user->UserID]);
                             Gdn::session()->start(val('UserID', $user), true, (bool)$this->Form->getFormValue('RememberMe'));
                             Gdn::userModel()->fireEvent('AfterSignIn');
                             if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {

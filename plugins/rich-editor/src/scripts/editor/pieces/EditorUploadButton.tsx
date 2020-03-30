@@ -14,6 +14,9 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
 import { getMeta } from "@library/utility/appUtils";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import { t } from "@vanilla/i18n/src";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -30,6 +33,9 @@ export class EditorUploadButton extends React.Component<IProps, { uploadCount: n
 
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
+
+        const text = this.props.type === "image" ? t("Upload Image") : t("Upload File");
+
         return (
             <button
                 className={classNames(
@@ -39,10 +45,11 @@ export class EditorUploadButton extends React.Component<IProps, { uploadCount: n
                     classesRichEditor.button,
                 )}
                 type="button"
-                aria-pressed="false"
                 disabled={this.props.disabled}
                 onClick={this.onFakeButtonClick}
+                title={text}
             >
+                <ScreenReaderContent>{text}</ScreenReaderContent>
                 <IconForButtonWrap icon={this.icon} />
                 <input
                     key={this.state.uploadCount}

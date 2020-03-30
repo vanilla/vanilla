@@ -60,6 +60,8 @@ addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    compatibilityStyles();
-    applyCompatibilityIcons();
+    onReady(() => {
+        compatibilityStyles();
+        applyCompatibilityIcons();
+    });
 }

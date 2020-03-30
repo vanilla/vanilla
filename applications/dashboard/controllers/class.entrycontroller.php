@@ -1110,7 +1110,7 @@ class EntryController extends Gdn_Controller {
                                 Gdn::userModel()->setField(val('UserID', $user), ['Password' => $pw, 'HashMethod' => 'Vanilla']);
                             }
 
-                            Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $user->UserID]);
+                            Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $user->UserID ?? false]);
                             Gdn::session()->start(val('UserID', $user), true, (bool)$this->Form->getFormValue('RememberMe'));
                             if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
                                 $this->Form->addError('ErrorPermission');

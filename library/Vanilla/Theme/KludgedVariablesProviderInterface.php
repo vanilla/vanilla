@@ -7,5 +7,8 @@
 
 namespace Vanilla\Theme;
 
+/**
+ * A variable provider than can be ignored by the ThemeFeature 'DisableKludgedVars'.
+ */
 interface KludgedVariablesProviderInterface extends VariablesProviderInterface {
 }

@@ -404,7 +404,6 @@ class ThemeModel {
                 $provider = $this->getThemeProvider("FILE");
                 $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
             }
-
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             // If we had some exception during this, fallback to the default.

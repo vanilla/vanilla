@@ -25,6 +25,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -217,7 +218,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             }),
         } as NestedCSSProperties,
         excerpt: {
-            marginTop: unit(6),
+            marginTop: unit(searchResultsVariables().excerpt.margin),
             ...fonts({
                 size: globalVars.fonts.size.medium,
                 color: vars.results.fg,

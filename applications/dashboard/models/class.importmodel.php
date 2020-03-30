@@ -2228,7 +2228,7 @@ class ImportModel extends Gdn_Model {
                 $inserts .= ',';
             }
             $inserts .= '('.implode(',', $row).')';
-            $inserts = str_replace("'NULL',", "null", $inserts);  // Need to replace any 'NULL',  values with actual null value for database
+            $inserts = str_replace("'NULL',", "null,", $inserts);  // Need to replace any 'NULL',  values with actual null value for database
 
             if ($count >= $chunk) {
                 // Insert in chunks.

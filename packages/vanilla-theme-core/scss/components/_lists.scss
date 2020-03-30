@@ -530,17 +530,19 @@
                 }
             }
 
-            .InlineTags {
-                padding-left: 0;
+            @if ($staticVariables) {
+                .InlineTags {
+                    padding-left: 0;
 
-                a {
-                    font-size: inherit;
-                    color: $component-meta-link_color;
+                    a {
+                        font-size: inherit;
+                        color: $component-meta-link_color;
 
-                    &:hover,
-                    &:focus,
-                    &:active {
-                        color: $component-meta-link-hover_color;
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            color: $component-meta-link-hover_color;
+                        }
                     }
                 }
             }
@@ -716,16 +718,18 @@
         margin-right: 0;
     }
 
-    .MItem-Author a {
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: $component-meta-link_color;
+    @if($staticVariables) {
+        .MItem-Author a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            color: $component-meta-link_color;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
         }
     }
 }

@@ -11,14 +11,14 @@ import { px, em } from "csx";
 import {
     colorOut,
     margins,
-    paddings,
-    clickableItemStates,
     singleLineEllipsis,
     unit,
     userSelect,
     EMPTY_FONTS,
     fonts,
+    ensureColorHelper,
 } from "@library/styles/styleHelpers";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -28,10 +28,12 @@ export const breadcrumbsVariables = useThemeCache(() => {
         minHeight: 16,
     });
 
+    const linkColors = clickableItemStates();
     const link = makeVariables("link", {
         textTransform: "uppercase",
         font: {
             ...EMPTY_FONTS,
+            color: ensureColorHelper(linkColors.color as string),
             size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
         },
@@ -50,7 +52,6 @@ export const breadcrumbsClasses = useThemeCache(() => {
         display: "inline-flex",
         ...fonts(vars.link.font),
         textTransform: vars.link.textTransform as any,
-        color: colorOut(linkColors.color),
         $nest: linkColors.$nest,
     });
 

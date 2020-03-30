@@ -104,17 +104,19 @@ $tag-hover_borderColor:           $global-color_primary !default;
             @include Tag($global-color_primary, transparent, $global-color_primary);
         }
 
-        //Tags that are links get hover state
-        .IdeationTag,
-        .tag-tracker,
-        .MItem.RoleTracker {
+        @if ($staticVariables) {
+            //Tags that are links get hover state
+            .IdeationTag,
+            .tag-tracker,
+            .MItem.RoleTracker {
 
-            &:focus,
-            &:hover,
-            &:active {
-                background-color: $tag-hover_bg;
-                border-color: $tag-hover_borderColor;
-                color: $tag-hover_fg;
+                &:focus,
+                &:hover,
+                &:active {
+                    background-color: $tag-hover_bg;
+                    border-color: $tag-hover_borderColor;
+                    color: $tag-hover_fg;
+                }
             }
         }
 

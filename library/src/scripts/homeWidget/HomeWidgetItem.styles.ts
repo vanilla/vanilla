@@ -17,14 +17,13 @@ import {
     fonts,
     IBackground,
     paddings,
-    clickableItemStates,
     unit,
-    linkStyleFallbacks,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",
@@ -153,6 +152,8 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         marginBottom: unit(globalVars.gutter.half),
     });
 
+    const nestedStyles = buttonStateStyles.$nest ?? undefined;
+
     const root = style(
         {
             height: percent(100),
@@ -162,10 +163,12 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
             overflow: "hidden",
             minWidth: unit(vars.sizing.minWidth),
             $nest: {
-                [`&:hover .${name}`]: buttonStateStyles.$nest["&&:hover"],
-                [`&:focus .${name}`]: buttonStateStyles.$nest["&&:focus"],
-                [`&:focus-visible .${name}`]: buttonStateStyles.$nest["&&:focus-visible"],
-                [`&:active .${name}`]: buttonStateStyles.$nest["&&:active"],
+                [`&:hover .${name}`]: nestedStyles && nestedStyles["&&:hover"] ? nestedStyles["&&:hover"] : undefined,
+                [`&:focus .${name}`]: nestedStyles && nestedStyles["&&:focus"] ? nestedStyles["&&:focus"] : undefined,
+                [`&:focus-visible .${name}`]:
+                    nestedStyles && nestedStyles["&&:focus-visible"] ? nestedStyles["&&:focus-visible"] : undefined,
+                [`&:active .${name}`]:
+                    nestedStyles && nestedStyles["&&:active"] ? nestedStyles["&&:active"] : undefined,
             },
         },
         borderStyling,

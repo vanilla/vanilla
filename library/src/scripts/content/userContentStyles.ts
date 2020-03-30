@@ -4,16 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    fonts,
-    margins,
-    paddings,
-    clickableItemStates,
-    unit,
-    singleBorder,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -22,6 +13,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
 import { cssOut } from "@dashboard/compatibilityStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");
@@ -244,7 +236,7 @@ export const userContentClasses = useThemeCache(() => {
     const linkColors = clickableItemStates();
     const linkStyle = {
         "& a": {
-            color: colorOut(linkColors.color),
+            color: colorOut(linkColors.color as string),
         },
         "& a:hover": {
             color: colorOut(globalVars.links.colors.hover),

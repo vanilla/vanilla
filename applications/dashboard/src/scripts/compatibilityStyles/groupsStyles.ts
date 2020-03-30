@@ -83,10 +83,6 @@ export const groupsCSS = () => {
         opacity: 0,
     });
 
-    // cssOut(`body.Section-Group .Group-Banner`, {
-    //     ...absolutePosition.fullSizeOfParent(),
-    // });
-
     cssOut(`.DataTableContainer.Group-Box.ApplicantList .PageControls .H`, {
         position: "relative",
     });
@@ -146,20 +142,6 @@ export const groupsCSS = () => {
             fontSize: unit(globalVars.fonts.size.medium),
         },
     );
-
-    // cssOut(
-    //     `
-    //     .DataList a,
-    //     .DataList-Search a,
-    //     .Breadcrumbs a,
-    //     .MessageList a,
-    //     .DataTableWrap a,
-    //     .Container .Frame-contentWrap .ChildCategories a
-    //     `,
-    //     {
-    //         fontSize: unit(globalVars.fonts.size.medium),
-    //     },
-    // );
 
     cssOut(`.Groups .Name.Group-Name .Options .Button`, {
         minWidth: 0,

@@ -61,6 +61,8 @@ addComponent("community-banner", CommunityBanner);
 addComponent("community-content-banner", CommunityContentBanner);
 
 if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    compatibilityStyles();
-    applyCompatibilityIcons();
+    onReady(() => {
+        compatibilityStyles();
+        applyCompatibilityIcons();
+    });
 }

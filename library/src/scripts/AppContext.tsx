@@ -21,6 +21,7 @@ import { SearchFilterContextProvider } from "@library/contexts/SearchFilterConte
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import { BannerContextProvider, BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -57,7 +58,9 @@ export function AppContext(props: IProps) {
                                     <FontSizeCalculatorProvider>
                                         <SearchFilterContextProvider>
                                             <TitleBarDeviceProvider>
-                                                <DeviceProvider>{props.children}</DeviceProvider>
+                                                <BannerContextProviderNoHistory>
+                                                    <DeviceProvider>{props.children}</DeviceProvider>
+                                                </BannerContextProviderNoHistory>
                                             </TitleBarDeviceProvider>
                                         </SearchFilterContextProvider>
                                     </FontSizeCalculatorProvider>

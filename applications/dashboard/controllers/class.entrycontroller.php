@@ -1112,7 +1112,6 @@ class EntryController extends Gdn_Controller {
 
                             Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $user->UserID]);
                             Gdn::session()->start(val('UserID', $user), true, (bool)$this->Form->getFormValue('RememberMe'));
-                            Gdn::userModel()->fireEvent('AfterSignIn');
                             if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
                                 $this->Form->addError('ErrorPermission');
                                 Gdn::session()->end();
@@ -1126,6 +1125,8 @@ class EntryController extends Gdn_Controller {
                                 if ($hourOffset != Gdn::session()->User->HourOffset) {
                                     Gdn::userModel()->setProperty(Gdn::session()->UserID, 'HourOffset', $hourOffset);
                                 }
+
+                                Gdn::userModel()->fireEvent('AfterSignIn');
 
                                 $this->_setRedirect();
                             }

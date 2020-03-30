@@ -123,7 +123,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof AddonInterface)) {
-            $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
             if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");

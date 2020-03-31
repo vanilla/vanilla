@@ -734,7 +734,7 @@ class UsersApiController extends AbstractApiController {
      * @return array
      */
     public function put_ban($id, array $body) {
-        $this->permission('Garden.Users.Edit');
+        $this->permission(['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban']);
 
         $this->idParamSchema('in');
         $in = $this
@@ -754,8 +754,11 @@ class UsersApiController extends AbstractApiController {
             throw new \Garden\Web\Exception\ForbiddenException(t('You are not allowed to ban a user with the same permission level as you.'));
         }
 
-        $banned = intval($body['banned']);
-        $this->userModel->setField($id, 'Banned', $banned);
+        if ($body['banned']) {
+            $this->userModel->ban($id);
+        } else {
+            $this->userModel->unBan($id);
+        }
 
         $result = $this->userByID($id);
         return $out->validate($result);

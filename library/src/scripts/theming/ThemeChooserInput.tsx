@@ -42,6 +42,8 @@ export function ThemeChooserInput(props: IProps) {
 
     const { templates, themes } = themeSettingsState.themes.data;
 
+    const defaultTheme = themeSettingsState.themes.data.currentTheme ?? "null";
+
     const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function(theme, index) {
         return {
             value: theme.themeID,
@@ -65,7 +67,7 @@ export function ThemeChooserInput(props: IProps) {
                 value: option.value,
             };
         }
-    }) ?? { label: t("Unknown"), value: props.initialValue };
+    }) ?? { label: `Default (${defaultTheme.name})`, value: props.initialValue };
 
     return (
         <>

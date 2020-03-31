@@ -147,7 +147,7 @@ interface ThemeProviderInterface {
     /**
      * Check if a theme exists.
      *
-     * @param $themeKey
+     * @param string|int $themeKey
      * @return bool
      */
     public function themeExists($themeKey): bool;

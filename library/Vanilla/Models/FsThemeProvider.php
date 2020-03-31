@@ -134,6 +134,8 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * Verify if a theme exists by it's theme identifier.
+     *
      * @param $themeKey
      * @return bool
      */
@@ -353,7 +355,6 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Get theme assets by by themeID.
      *
      * @param string $themeID
-     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */

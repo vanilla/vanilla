@@ -11,7 +11,6 @@ import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import Translate from "@library/content/Translate";
-import ProfileLink from "@library/navigation/ProfileLink";
 
 interface IProps {
     value?: number | string | null;

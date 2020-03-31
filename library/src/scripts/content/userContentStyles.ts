@@ -57,6 +57,9 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
         ...tableInit,
         striped: [TableStyle.HORIZONTAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER_STRIPED].includes(tableInit.style),
         stripeColor: globalVars.mixBgAndFg(0.05),
+        outerBorderRadius: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style)
+            ? 4
+            : 0,
         horizontalBorders: {
             enabled: true, // All current variants have horizontal borders.
             borders: tableInit.borders,
@@ -396,6 +399,7 @@ export const userContentClasses = useThemeCache(() => {
         "& > .tableWrapper > table": {
             width: percent(100),
         },
+        // Rest of the table styles
         "& > .tableWrapper th": {
             whiteSpace: "nowrap",
         },
@@ -436,6 +440,51 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
+    const outerBorderMixin = (): NestedCSSProperties => {
+        return {
+            borderRadius: vars.tables.outerBorderRadius,
+            borderTop: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderBottom: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderLeft: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+            borderRight: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+        };
+    };
+
+    // Apply outer border radii.
+    // border-collapse prevents our outer radius from applying.
+    const tableOuterRadiusQuery = media(
+        { minWidth: vars.tables.mobileBreakpoint + 1 },
+        {
+            $nest: {
+                "& .tableWrapper": outerBorderMixin(),
+                "& > .tableWrapper thead tr:first-child > *, & > .tableWrapper tbody:first-child tr:first-child > *": {
+                    // Get rid of the outer border radius.
+                    borderTop: "none",
+                },
+                "& > .tableWrapper :not(thead) tr:last-child > *": {
+                    // Get rid of the outer border radius.
+                    borderBottom: "none",
+                },
+                "& > .tableWrapper tr > *:last-child": {
+                    // Get rid of the outer border radius.
+                    borderRight: "none",
+                },
+                "& > .tableWrapper tr > *:first-child, & > .tableWrapper tr > .mobileTableHead:first-child + *": {
+                    // Get rid of the outer border radius.
+                    borderLeft: "none",
+                },
+            },
+        },
+    );
+
     const tableMobileQuery = media(
         { maxWidth: vars.tables.mobileBreakpoint },
         {
@@ -449,6 +498,7 @@ export const userContentClasses = useThemeCache(() => {
                     width: percent(100),
                     background: "none !important",
                     marginBottom: vars.blocks.margin,
+                    ...outerBorderMixin(),
                 },
                 "& .tableWrapper tr .mobileStripe": vars.tables.striped
                     ? {
@@ -460,16 +510,27 @@ export const userContentClasses = useThemeCache(() => {
                           borderTop: "none",
                           borderBottom: "none",
                       },
-                "& .tableWrapper tr .mobileStripe:last-of-type": {
-                    borderBottom: singleBorder(vars.tables.borders),
+                // First row.
+                "& .tableWrapper tr > *:first-child, & .tableWrapper tr > .mobileTableHead:first-child + *": {
+                    borderTop: "none",
+                },
+                // Last row.
+                "& .tableWrapper tr > *:last-child": {
+                    borderBottom: "none",
+                },
+                "& .tableWrapper tr > .mobileTableHead:last-of-type": {
+                    borderBottom: "none",
                 },
                 "& .tableWrapper .mobileTableHead": {
                     width: percent(30),
                     wordWrap: "break-word",
                     display: "block",
+                    borderLeft: "none",
+                    borderRight: "none",
                 },
                 "& .tableWrapper tr > :not(.mobileTableHead)": {
                     width: percent(100),
+                    borderRight: "none",
                 },
                 "& .tableWrapper tr > .mobileTableHead + :not(.mobileTableHead)": {
                     width: percent(70),
@@ -505,6 +566,7 @@ export const userContentClasses = useThemeCache(() => {
                 ...linkStyle,
             },
         },
+        tableOuterRadiusQuery,
         tableMobileQuery,
     );
 

@@ -82,11 +82,11 @@ class Gdn_CookieIdentity {
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
         if (!stringEndsWith($currentHost, trim($this->CookieDomain, '.'))) {
-            $this->CookieDomain = '';
             trigger_error(
                 sprintf('Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).', $currentHost, $this->CookieDomain),
                 E_USER_WARNING
             );
+            $this->CookieDomain = '';
         }
 
         $this->CookieHashMethod = val('HashMethod', $config, $defaultConfig['HashMethod']);

@@ -136,7 +136,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * Verify if a theme exists by it's theme identifier.
      *
-     * @param $themeKey
+     * @param string|int $themeKey
      * @return bool
      */
     public function themeExists($themeKey): bool {

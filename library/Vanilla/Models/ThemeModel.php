@@ -356,7 +356,7 @@ class ThemeModel {
     /**
      * Verify if ThemeKey or ID is valid.
      *
-     * @param $themeKey
+     * @param string|int $themeKey
      * @return bool
      */
     public function verifyThemeIdentifierIsValid($themeKey) {

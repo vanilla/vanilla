@@ -755,9 +755,9 @@ class UsersApiController extends AbstractApiController {
         }
 
         if ($body['banned']) {
-            $this->userModel->ban($id);
+            $this->userModel->ban($id, []);
         } else {
-            $this->userModel->unBan($id);
+            $this->userModel->unBan($id, []);
         }
 
         $result = $this->userByID($id);

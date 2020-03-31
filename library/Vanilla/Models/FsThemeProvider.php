@@ -140,11 +140,10 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @return bool
      */
     public function themeExists($themeKey): bool {
-        $themeExists = true;
+        $themeExists = false;
         $theme = $this->addonManager->lookupTheme($themeKey);
-
-        if (!($theme instanceof AddonInterface) || is_null($theme)) {
-            $themeExists = false;
+        if ($theme instanceof AddonInterface) {
+            $themeExists = true;
         }
 
         return $themeExists;

@@ -68,7 +68,7 @@ export function ThemeChooserInput(props: IProps) {
                 value: option.value,
             };
         }
-    }) ?? { label: <Translate source="Default  <0/>" c0={defaultTheme.name} />, value: props.initialValue };
+    }) ?? { label: <Translate source="Default  <0/>" c0={defaultTheme.name} /> as IComboBoxOption, value: props.initialValue };
 
     return (
         <>

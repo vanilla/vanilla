@@ -75,7 +75,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
     }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey, cacheID]);
 
-    if (props.disabled) {
+    if (props.disabled || props.variablesOnly) {
         return <>{props.children}</>;
     }
 

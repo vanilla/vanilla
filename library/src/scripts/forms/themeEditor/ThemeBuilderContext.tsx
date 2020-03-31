@@ -14,6 +14,7 @@ import unset from "lodash/unset";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 ///
 /// Types
@@ -194,6 +195,7 @@ function variableGenerator(variables: IThemeVariables) {
         banner: bannerVariables(variables),
         contentBanner: contentBannerVariables(variables),
         titleBar: titleBarVariables(variables),
+        userContent: userContentVariables(variables),
     };
 
     // Mix in the addons generator variables.

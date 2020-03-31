@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, unit, EMPTY_BORDER, singleBorder } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -14,10 +14,19 @@ import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
 import { cssOut } from "@dashboard/compatibilityStyles";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { media } from "typestyle";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const userContentVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("userContent");
-    const globalVars = globalVariables();
+export enum TableStyle {
+    HORIZONTAL_BORDER = "horizontalBorder",
+    HORIZONTAL_BORDER_STRIPED = "horizontalBorderStriped",
+    VERTICAL_BORDER = "verticalBorder",
+    VERTICAL_BORDER_STRIPED = "verticalBorderStriped",
+}
+
+export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeThemeVars = variableFactory("userContent", forcedVars);
+    const globalVars = globalVariables(forcedVars);
     const { mainColors } = globalVars;
 
     const fonts = makeThemeVars("fonts", {
@@ -29,6 +38,32 @@ export const userContentVariables = useThemeCache(() => {
             h4: "1em",
             h5: ".875em",
             h6: ".85em",
+        },
+    });
+
+    const tableInit = makeThemeVars("tables", {
+        style: TableStyle.HORIZONTAL_BORDER_STRIPED,
+        borders: {
+            ...EMPTY_BORDER,
+            ...globalVars.border,
+        },
+        cell: {
+            alignment: "left" as "center" | "left" | "right",
+        },
+        mobileBreakpoint: 600,
+    });
+
+    const tables = makeThemeVars("tables", {
+        ...tableInit,
+        striped: [TableStyle.HORIZONTAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER_STRIPED].includes(tableInit.style),
+        stripeColor: globalVars.mixBgAndFg(0.05),
+        horizontalBorders: {
+            enabled: true, // All current variants have horizontal borders.
+            borders: tableInit.borders,
+        },
+        verticalBorders: {
+            enabled: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style),
+            borders: tableInit.borders,
         },
     });
 
@@ -92,6 +127,7 @@ export const userContentVariables = useThemeCache(() => {
         codeBlock,
         embeds,
         spacing,
+        tables,
     };
 });
 
@@ -353,47 +389,124 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const tables: NestedCSSSelectors = {
-        "& > table": {
-            width: "100% !important",
+        "& .tableWrapper": {
+            overflowX: "auto",
+            width: percent(100),
         },
-        "& > table td": {
-            ...borders(),
+        "& > .tableWrapper > table": {
+            width: percent(100),
+        },
+        "& > .tableWrapper th": {
+            whiteSpace: "nowrap",
+        },
+        "& > .tableWrapper td, & > .tableWrapper th": {
+            overflowWrap: "break-word",
+            minWidth: 80,
             ...paddings({
                 vertical: 6,
                 horizontal: 12,
             }),
+            border: "none",
+            textAlign: vars.tables.cell.alignment,
+            ...(vars.tables.horizontalBorders.enabled
+                ? {
+                      borderTop: singleBorder(vars.tables.horizontalBorders.borders),
+                      borderBottom: singleBorder(vars.tables.horizontalBorders.borders),
+                  }
+                : {}),
+            ...(vars.tables.verticalBorders.enabled
+                ? {
+                      borderLeft: singleBorder(vars.tables.verticalBorders.borders),
+                      borderRight: singleBorder(vars.tables.verticalBorders.borders),
+                  }
+                : {}),
         },
-        "& > table tr td": {
+        "& > .tableWrapper tr:nth-child(even)": vars.tables.striped
+            ? {
+                  background: colorOut(vars.tables.stripeColor),
+              }
+            : {},
+        "& > .tableWrapper th, & > .tableWrapper thead td": {
             fontWeight: globalVars.fonts.weights.bold,
+        },
+
+        // Mobile table styles.
+        "& .mobileTableHead": {
+            display: "none",
         },
     };
 
-    const root = style({
-        // These CAN'T be flexed. That breaks margin collapsing.
-        display: important("block"),
-        position: "relative",
-        width: percent(100),
-        wordBreak: "break-word",
-        lineHeight: globalVars.lineHeights.base,
-        fontSize: vars.fonts.size,
-        $nest: {
-            // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
-            "&::before": {
-                marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+    const tableMobileQuery = media(
+        { maxWidth: vars.tables.mobileBreakpoint },
+        {
+            $nest: {
+                "& .tableWrapper .tableHead": {
+                    display: "none",
+                },
+                "& .tableWrapper tr": {
+                    display: "flex",
+                    flexWrap: "wrap",
+                    width: percent(100),
+                    background: "none !important",
+                    marginBottom: vars.blocks.margin,
+                },
+                "& .tableWrapper tr .mobileStripe": vars.tables.striped
+                    ? {
+                          borderTop: "none",
+                          borderBottom: "none",
+                          background: colorOut(vars.tables.stripeColor),
+                      }
+                    : {
+                          borderTop: "none",
+                          borderBottom: "none",
+                      },
+                "& .tableWrapper tr .mobileStripe:last-of-type": {
+                    borderBottom: singleBorder(vars.tables.borders),
+                },
+                "& .tableWrapper .mobileTableHead": {
+                    width: percent(30),
+                    wordWrap: "break-word",
+                    display: "block",
+                },
+                "& .tableWrapper tr > :not(.mobileTableHead)": {
+                    width: percent(100),
+                },
+                "& .tableWrapper tr > .mobileTableHead + :not(.mobileTableHead)": {
+                    width: percent(70),
+                },
             },
-            "& iframe": {
-                width: percent(100),
-            },
-            ...tables,
-            ...headings,
-            ...lists,
-            ...paragraphSpacing,
-            ...codeStyles,
-            ...spoilersAndQuotes,
-            ...blockquotes,
-            ...linkStyle,
         },
-    });
+    );
+
+    const root = style(
+        {
+            // These CAN'T be flexed. That breaks margin collapsing.
+            display: important("block"),
+            position: "relative",
+            width: percent(100),
+            wordBreak: "break-word",
+            lineHeight: globalVars.lineHeights.base,
+            fontSize: vars.fonts.size,
+            $nest: {
+                // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+                "&::before": {
+                    marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+                },
+                "& iframe": {
+                    width: percent(100),
+                },
+                ...tables,
+                ...headings,
+                ...lists,
+                ...paragraphSpacing,
+                ...codeStyles,
+                ...spoilersAndQuotes,
+                ...blockquotes,
+                ...linkStyle,
+            },
+        },
+        tableMobileQuery,
+    );
 
     return { root };
 });

@@ -31,6 +31,15 @@ class Permissions implements \JsonSerializable {
         self::CHECK_MODE_RESOURCE_ONLY,
     ];
 
+    /** Array of ranked permissions. */
+    const RANKED_PERMISSIONS = [
+        'Garden.Settings.Manage' => 5,
+        'Garden.Community.Manage' => 4,
+        'Garden.Moderation.Manage' => 3,
+        'Garden.Curation.Manage' => 2,
+        'Garden.SignIn.Allow' => 1,
+    ];
+
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
     const BAN_UPDATING = '!updating';
@@ -404,6 +413,42 @@ class Permissions implements \JsonSerializable {
     public function setPermissions(array $permissions) {
         $this->permissions = $permissions;
         return $this;
+    }
+
+    /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param bool|string $permission The permission to check.  Bool to force true/false.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function checkRankedPermission($permission) {
+        $rankedPermissions = self::RANKED_PERMISSIONS;
+
+        if ($permission === true) {
+            return true;
+        } elseif ($permission === false) {
+            return false;
+        } elseif (in_array($permission, $rankedPermissions)) {
+            // Ordered rank of some permissions, highest to lowest
+            $currentPermissionRank = array_search($permission, $rankedPermissions);
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                if ($this->has($rankedPermissions[$i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Check to see if the user has at least the given permission.
+        return $this->has($permission);
     }
 
     /**

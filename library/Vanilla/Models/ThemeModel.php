@@ -354,6 +354,17 @@ class ThemeModel {
     }
 
     /**
+     * Verify if ThemeKey or ID is valid.
+     *
+     * @param $themeKey
+     * @return bool
+     */
+    public function verifyThemeIdentifierIsValid($themeKey) {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->themeExists($themeKey);
+    }
+
+    /**
      * Get current theme.
      *
      * @return array|void If no currnt theme set returns null
@@ -405,7 +416,7 @@ class ThemeModel {
                 $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            trigger_error($e->getMessage(), E_USER_NOTICE);
             // If we had some exception during this, fallback to the default.
             $provider = $this->getThemeProvider("FILE");
             $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
@@ -574,6 +585,7 @@ class ThemeModel {
 
         // A little fixup to ensure current variables are always applied to asset compat themes.
         $currentID = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
+        $currentID = $this->verifyThemeIdentifierIsValid($currentID) ? $currentID : ThemeModel::FALLBACK_THEME_KEY;
 
         if (in_array($themeID, self::ASSET_COMPAT_THEMES, true) &&
             $currentID !== null &&

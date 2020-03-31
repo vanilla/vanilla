@@ -123,6 +123,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof AddonInterface)) {
+            $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
             if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
@@ -130,6 +131,21 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         return $theme;
+    }
+
+    /**
+     * @param $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool {
+        $themeExists = true;
+        $theme = $this->addonManager->lookupTheme($themeKey);
+
+        if (!($theme instanceof AddonInterface) || is_null($theme)) {
+            $themeExists = false;
+        }
+
+        return $themeExists;
     }
 
     /**

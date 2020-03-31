@@ -143,4 +143,12 @@ interface ThemeProviderInterface {
      * @return array
      */
     public function sparseAsset(int $themeID, string $assetKey, string $data): array;
+
+    /**
+     * Check if a theme exists.
+     *
+     * @param $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool;
 }

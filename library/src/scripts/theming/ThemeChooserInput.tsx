@@ -10,6 +10,8 @@ import { useThemeActions } from "@library/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
+import Translate from "@library/content/Translate";
+import ProfileLink from "@library/navigation/ProfileLink";
 
 interface IProps {
     value?: number | string | null;
@@ -42,7 +44,7 @@ export function ThemeChooserInput(props: IProps) {
 
     const { templates, themes } = themeSettingsState.themes.data;
 
-    const defaultTheme = themeSettingsState.themes.data.currentTheme ?? "null";
+    const defaultTheme = themeSettingsState.themes.data.currentTheme;
 
     const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function(theme, index) {
         return {
@@ -67,7 +69,7 @@ export function ThemeChooserInput(props: IProps) {
                 value: option.value,
             };
         }
-    }) ?? { label: `Default (${defaultTheme.name})`, value: props.initialValue };
+    }) ?? { label: <Translate source="Default  <0/>" c0={defaultTheme.name} />, value: props.initialValue };
 
     return (
         <>

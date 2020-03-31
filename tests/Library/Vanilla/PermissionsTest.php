@@ -9,7 +9,18 @@ namespace VanillaTests\Library\Vanilla;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Permissions;
 
+/**
+ * Tests for the `Permissions` class.
+ */
 class PermissionsTest extends SharedBootstrapTestCase {
+    private const RANKED_PERMISSIONS = [
+        'Garden.Admin.Allow', // virtual permission for isAdmin
+        'Garden.Settings.Manage',
+        'Garden.Community.Manage',
+        'Garden.Moderation.Manage',
+        'Garden.Curation.Manage',
+        'Garden.SignIn.Allow',
+    ];
 
     public function testAdd() {
         $permissions = new Permissions();
@@ -419,5 +430,54 @@ class PermissionsTest extends SharedBootstrapTestCase {
         $perm->set('foo', true)
             ->addBan(Permissions::BAN_BANNED);
         return $perm;
+    }
+
+    /**
+     * Admins should have the virtual ranking permission
+     */
+    public function testAdminRank() {
+        $perms = new Permissions();
+        $perms->setAdmin(true);
+        $this->assertSame('Garden.Admin.Allow', $perms->getRankingPermission());
+    }
+
+    /**
+     * Admins should be higher than settings manage.
+     */
+    public function testAdminHigherThanSettings() {
+        $admin = new Permissions();
+        $admin->setAdmin(true);
+        $settings = new Permissions();
+        $settings->set('Garden.Settings.Manage', true);
+        $this->assertSame(1, $admin->compareRankTo($settings));
+        $this->assertSame(-1, $settings->compareRankTo($admin));
+    }
+
+    /**
+     * The settings manage should have all other ranked permissions.
+     */
+    public function testHasRanked() {
+        $settings = new Permissions();
+        $settings->set('Garden.Settings.Manage', true);
+
+        foreach (self::RANKED_PERMISSIONS as $i => $perm) {
+            if ($i === 0) {
+                $this->assertFalse($settings->hasRanked($perm));
+            } else {
+                $this->assertTrue($settings->hasRanked($perm));
+            }
+        }
+    }
+
+    /**
+     * Non-ranking permissions should behave gracefully.
+     */
+    public function testNonRankingPermissionCheck() {
+        $perms = new Permissions();
+        $perms->set('foo', true);
+
+        $this->assertTrue($perms->hasRanked('foo'));
+        $this->assertSame('', $perms->getRankingPermission());
+        $this->assertFalse($perms->hasRanked('Garden.SignIn.Allow'));
     }
 }

@@ -13,6 +13,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\KludgedVariablesProviderInterface;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
@@ -531,14 +532,11 @@ class ThemeModel {
      * @return mixed The updated asset.
      */
     private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
-        $features = new ThemeFeatures($this->config, $themeAddon);
-
         // Mix in addon variables to the variables asset.
         if (preg_match('/^variables/', $assetName) &&
             $assetContents instanceof JsonAsset
-            && !$features->disableKludgedVars()
         ) {
-            $newJson = $this->mixAddonVariables($assetContents->getData());
+            $newJson = $this->mixAddonVariables($assetContents->getData(), $themeAddon);
             return new JsonAsset($newJson);
         } else {
             return $assetContents;
@@ -590,12 +588,17 @@ class ThemeModel {
      * Addon provided variables will override the theme variables.
      *
      * @param string $baseAssetContent Variables json theme asset string.
+     * @param Addon $themeAddon
      * @return string The updated asset content.
      */
-    private function mixAddonVariables(string $baseAssetContent): string {
+    private function mixAddonVariables(string $baseAssetContent, Addon $themeAddon): string {
+        $features = new ThemeFeatures($this->config, $themeAddon);
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
+            if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
+                continue;
+            }
             $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 

@@ -47,7 +47,8 @@ export const ifExistsWithFallback = checkProp => {
 };
 
 export const unit = (val: string | number | undefined, unitFunction = px) => {
-    const valIsNumeric = val ? isNumeric(val.toString().trim()) : false;
+    const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
+
     if (typeof val === "string" && !valIsNumeric) {
         return val;
     } else if (val !== undefined && val !== null && valIsNumeric) {

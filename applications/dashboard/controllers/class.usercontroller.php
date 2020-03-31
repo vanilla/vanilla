@@ -390,8 +390,7 @@ class UserController extends DashboardController {
     /**
      * Ban a user and optionally delete their content.
      *
-     * @since 2.1
-     * @param type $userID
+     * @param int $userID
      */
     public function ban($userID, $unban = false) {
         $this->permission(['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban'], false);
@@ -401,19 +400,13 @@ class UserController extends DashboardController {
             throw notFoundException($user);
         }
 
-        $userModel = Gdn::userModel();
 
-        // Block banning the super admin or system accounts.
-        $user = $userModel->getID($userID);
-        if (val('Admin', $user) == 2) {
-            throw forbiddenException("@You may not ban a system user.");
-        } elseif (val('Admin', $user)) {
-            throw forbiddenException("@You may not ban a super admin.");
-        }
-
-        // Check to make sure the session user has a higher permission level than the user to be banned.
-        if (!Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID)) {
-            throw permissionException();
+        $userPermissions = $this->userModel->getPermissions($userID);
+        $rankCompare = Gdn::session()->getPermissions()->compareRankTo($userPermissions);
+        if ($rankCompare < 0) {
+            throw forbiddenException('@'.t('You are not allowed to ban a user that has higher permissions than you.'));
+        } elseif ($rankCompare === 0) {
+            throw forbiddenException('@'.t('You are not allowed to ban a user with the same permission level as you.'));
         }
 
         // Is the user banned for other reasons?
@@ -422,7 +415,7 @@ class UserController extends DashboardController {
 
         if ($this->Form->authenticatedPostBack(true)) {
             if ($unban) {
-                $userModel->unban($userID, ['RestoreContent' => $this->Form->getFormValue('RestoreContent')]);
+                $this->userModel->unban($userID, ['RestoreContent' => $this->Form->getFormValue('RestoreContent')]);
             } else {
                 if (!validateRequired($this->Form->getFormValue('Reason'))) {
                     $this->Form->addError('ValidateRequired', 'Reason');
@@ -440,7 +433,7 @@ class UserController extends DashboardController {
 
                     // Just because we're banning doesn't mean we can nuke their content
                     $deleteContent = (checkPermission('Garden.Moderation.Manage')) ? $this->Form->getFormValue('DeleteContent') : false;
-                    $userModel->ban($userID, ['Reason' => $reason, 'DeleteContent' => $deleteContent]);
+                    $this->userModel->ban($userID, ['Reason' => $reason, 'DeleteContent' => $deleteContent]);
                 }
             }
 

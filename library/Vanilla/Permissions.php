@@ -32,7 +32,8 @@ class Permissions implements \JsonSerializable {
     ];
 
     /** Array of ranked permissions. */
-    const RANKED_PERMISSIONS = [
+    private const RANKED_PERMISSIONS = [
+        'Garden.Admin.Allow' => 6, // virtual permission for isAdmin
         'Garden.Settings.Manage' => 5,
         'Garden.Community.Manage' => 4,
         'Garden.Moderation.Manage' => 3,
@@ -350,7 +351,7 @@ class Permissions implements \JsonSerializable {
     /**
      * Remove a permission.
      *
-     * @param $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
+     * @param string $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
      * @param int|array $ids One or more IDs of foreign objects (e.g. category IDs).
      * @return $this;
      */
@@ -418,19 +419,14 @@ class Permissions implements \JsonSerializable {
     /**
      * Check the given permission, but also return true if the user has a higher permission.
      *
-     * @param bool|string $permission The permission to check.  Bool to force true/false.
+     * @param string $permission The permission to check.
      * @return boolean True on valid authorization, false on failure to authorize
      */
-    public function checkRankedPermission($permission) {
-        $rankedPermissions = self::RANKED_PERMISSIONS;
-
-        if ($permission === true) {
-            return true;
-        } elseif ($permission === false) {
-            return false;
-        } elseif (in_array($permission, $rankedPermissions)) {
-            // Ordered rank of some permissions, highest to lowest
-            $currentPermissionRank = array_search($permission, $rankedPermissions);
+    public function hasRanked(string $permission): bool {
+        if (!isset(self::RANKED_PERMISSIONS[$permission])) {
+            return $this->has($permission);
+        } else {
+            $minRank = self::RANKED_PERMISSIONS[$permission];
 
             /**
              * If the current permission is in our ranked list, iterate through the list, starting from the highest
@@ -439,16 +435,43 @@ class Permissions implements \JsonSerializable {
              * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
              * assigned to their role.
              */
-            for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                if ($this->has($rankedPermissions[$i])) {
+            foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+                if ($rank < $minRank) {
+                    return false;
+                } elseif ($this->has($name)) {
                     return true;
                 }
             }
             return false;
         }
+    }
 
-        // Check to see if the user has at least the given permission.
-        return $this->has($permission);
+    /**
+     * Return the highest ranking permission the user has.
+     *
+     * @return string
+     */
+    public function getRankingPermission(): string {
+        foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+            if ($this->has($name)) {
+                return $name;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Compare this permission set to another set to see which has the higher rank.
+     *
+     * @param Permissions $permissions The permissions to compare to.
+     * @return int Returns -1, 0, 1 for less than, equal, or greater than.
+     */
+    public function compareRankTo(Permissions $permissions): int {
+        $myRank = $this->getRankingPermission();
+        $otherRank = $permissions->getRankingPermission();
+
+        $r = (self::RANKED_PERMISSIONS[$myRank] ?? 0) <=> (self::RANKED_PERMISSIONS[$otherRank] ?? 0);
+        return $r;
     }
 
     /**

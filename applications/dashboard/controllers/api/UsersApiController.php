@@ -729,7 +729,8 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @param array $body The request body.
-     * @throws NotFoundException if unable to find the user.
+     * @throws NotFoundException If unable to find the user.
+     * @throws \Garden\Web\Exception\ForbiddenException If the user doesn't have permission to ban the user.
      * @return array
      */
     public function put_ban($id, array $body) {
@@ -743,6 +744,16 @@ class UsersApiController extends AbstractApiController {
 
         $row = $this->userByID($id);
         $body = $in->validate($body);
+
+        // Check ranking permissions.
+        $userPermissions = $this->userModel->getPermissions($id);
+        $rankCompare = Gdn::session()->getPermissions()->compareRankTo($userPermissions);
+        if ($rankCompare < 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(t('You are not allowed to ban a user that has higher permissions than you.'));
+        } elseif ($rankCompare === 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(t('You are not allowed to ban a user with the same permission level as you.'));
+        }
+
         $banned = intval($body['banned']);
         $this->userModel->setField($id, 'Banned', $banned);
 

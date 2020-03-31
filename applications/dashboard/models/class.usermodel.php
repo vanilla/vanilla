@@ -15,7 +15,6 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\UserFragmentSchema;
-use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -5512,43 +5511,5 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     public function setEmailUnique(bool $emailUnique) {
         $this->emailUnique = $emailUnique;
         return $this;
-    }
-
-    /**
-     * Checks the session user's permission level against the permissions level of the user they want
-     * to perform some action on.
-     *
-     * @param int|string|null $userA User A's userID
-     * @param int|string|null $userB User B's userID
-     * @return int
-     */
-    public function hasHigherPermissionLevel(string $userA, $userB) {
-        $rankedPermissions = Permissions::RANKED_PERMISSIONS;
-
-        $permissionsUserA = self::getPermissions($userA);
-        $permissionsUserA = $permissionsUserA->getPermissions();
-
-        $permissionsUserB = self::getPermissions($userB);
-        $permissionsUserB = $permissionsUserB->getPermissions();
-
-        $levelUserA = 0;
-        $levelUserB = 0;
-
-
-        for ($i = 0; $i < sizeof($rankedPermissions); $i++) {
-            if (in_array($rankedPermissions[$i], $permissionsUserA)) {
-                $levelUserA = $rankedPermissions[$i];
-                break;
-            }
-        }
-
-        for ($i = 0; $i < sizeof($rankedPermissions); $i++) {
-            if (in_array($rankedPermissions[$i], $permissionsUserB)) {
-                $levelUserB = $rankedPermissions[$i];
-                break;
-            }
-        }
-
-        return $levelUserA <=> $levelUserB;
     }
 }

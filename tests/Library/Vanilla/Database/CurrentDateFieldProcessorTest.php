@@ -71,7 +71,7 @@ class CurrentDateFieldProcessorTest extends TestCase {
     }
 
     /**
-     * Verify processor adds fields to insert operations default mode.
+     * Verify processor reset fields to current timestamp when operations default mode.
      *
      * @param string $type
      * @param array $dateFields
@@ -108,7 +108,7 @@ class CurrentDateFieldProcessorTest extends TestCase {
         }
     }
     /**
-     * Verify processor adds fields to insert operations import mode.
+     * Verify processor allow date fields to insert with no transformation when operations import mode.
      *
      * @param string $type
      * @param array $dateFields

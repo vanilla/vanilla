@@ -25,9 +25,9 @@ class Operation {
     /** Type identifier for update operations. */
     const TYPE_UPDATE = 'UPDATE';
 
-    const MODE_FORCE = 'force';
-
     const MODE_DEFAULT = 'default';
+
+    const MODE_IMPORT = 'import';
 
     /** @var PipelineModel Reference to the object performing this operation. */
     private $caller;
@@ -44,7 +44,7 @@ class Operation {
     /** @var array Conditions to specify the scope of the operation. */
     private $where = [];
 
-    private $mode = self::MODE_FORCE;
+    private $mode = self::MODE_DEFAULT;
 
     /**
      * Get the reference to the object performing this operation.

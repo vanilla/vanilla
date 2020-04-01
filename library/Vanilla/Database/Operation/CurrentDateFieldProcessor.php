@@ -61,7 +61,7 @@ class CurrentDateFieldProcessor implements Processor {
             $fieldExists = $databaseOperation->getCaller()->getWriteSchema()->getField("properties.{$field}");
             if ($fieldExists) {
                 $set = $databaseOperation->getSet();
-                if (empty($set[$field] ?? null) || $databaseOperation->getMode() === Operation::MODE_FORCE) {
+                if (empty($set[$field] ?? null) || $databaseOperation->getMode() === Operation::MODE_DEFAULT) {
                     $set[$field] = date("Y-m-d H:i:s");
                 } else {
                     if ($set[$field] instanceof \DateTimeImmutable) {

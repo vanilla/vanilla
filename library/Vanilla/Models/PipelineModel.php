@@ -94,7 +94,7 @@ class PipelineModel extends Model implements InjectableInterface {
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, string $mode = Operation::MODE_FORCE) {
+    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_INSERT);
         $databaseOperation->setCaller($this);
@@ -115,7 +115,7 @@ class PipelineModel extends Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_FORCE): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_UPDATE);
         $databaseOperation->setCaller($this);

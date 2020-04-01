@@ -75,10 +75,17 @@ function responsifyTable(table: HTMLTableElement) {
         head.classList.add("tableHead");
         // Apply labels for each table cell.
         headLabels = Array.from(head.querySelectorAll("th")).map(th => th.innerText);
+        head.querySelectorAll("th").forEach(th => th.setAttribute("scope", "col"));
     }
 
     const rows = table.querySelectorAll("tbody tr");
     rows.forEach(tr => {
+        // Apply a scope on existing first ths.
+        const firstTh = tr.querySelector("th");
+        if (firstTh) {
+            firstTh.setAttribute("scope", "row");
+        }
+
         const cells = tr.querySelectorAll("td, th");
         cells.forEach((td, i) => {
             const mobileTh = document.createElement("th");
@@ -87,6 +94,7 @@ function responsifyTable(table: HTMLTableElement) {
                 const label = headLabels[i] ?? "";
                 mobileTh.textContent = label;
                 mobileTh.classList.add("mobileTableHead");
+                mobileTh.setAttribute("aria-hidden", "true");
                 tr.insertBefore(mobileTh, td);
             }
 

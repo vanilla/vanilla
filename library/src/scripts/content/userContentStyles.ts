@@ -493,7 +493,7 @@ export const userContentClasses = useThemeCache(() => {
                     display: "none",
                 },
                 "& .tableWrapper tr": {
-                    display: "flex",
+                    display: "block",
                     flexWrap: "wrap",
                     width: percent(100),
                     background: "none !important",
@@ -511,29 +511,29 @@ export const userContentClasses = useThemeCache(() => {
                           borderBottom: "none",
                       },
                 // First row.
-                "& .tableWrapper tr > *:first-child, & .tableWrapper tr > .mobileTableHead:first-child + *": {
+                "& .tableWrapper tr > *:first-child": {
                     borderTop: "none",
                 },
                 // Last row.
                 "& .tableWrapper tr > *:last-child": {
                     borderBottom: "none",
                 },
-                "& .tableWrapper tr > .mobileTableHead:last-of-type": {
+                "& .tableWrapper .mobileTableHead": {
                     borderBottom: "none",
                 },
-                "& .tableWrapper .mobileTableHead": {
-                    width: percent(30),
+                "& .tableWrapper .mobileTableHead + *": {
+                    marginTop: -6,
+                    borderTop: "none",
+                },
+                "& .tableWrapper tr > *": {
+                    width: percent(100),
                     wordWrap: "break-word",
                     display: "block",
                     borderLeft: "none",
                     borderRight: "none",
                 },
                 "& .tableWrapper tr > :not(.mobileTableHead)": {
-                    width: percent(100),
                     borderRight: "none",
-                },
-                "& .tableWrapper tr > .mobileTableHead + :not(.mobileTableHead)": {
-                    width: percent(70),
                 },
             },
         },

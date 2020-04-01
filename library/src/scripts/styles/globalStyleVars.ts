@@ -18,7 +18,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning, notEmpty } from "@vanilla/utils";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { isLightColor } from "@library/styles/styleHelpersColors";
@@ -244,7 +244,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const fontsInit1 = makeThemeVars("fonts", {
         ...fontsInit0,
         families: {
-            body: [fontsInit0.googleFontFamily],
+            body: [fontsInit0.googleFontFamily ?? "Open Sans"],
             monospace: [],
         },
     });

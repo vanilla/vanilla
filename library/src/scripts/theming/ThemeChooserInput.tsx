@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IComboBoxOption, IComboBoxOptionwithNull } from "@library/features/search/SearchBar";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { t } from "@vanilla/i18n";
 import React, { useEffect, useState } from "react";
 import { useThemeActions } from "@library/theming/ThemeActions";

@@ -217,7 +217,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
     });
 
-    const fontsInit = makeThemeVars("fonts", {
+    const fontsInit0 = makeThemeVars("fonts", {
         size: {
             large: 16,
             medium: 14,
@@ -236,18 +236,23 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             semiBold: 600,
             bold: 700,
         },
+        googleFontFamily: "Open Sans" as undefined | string,
         forceGoogleFont: false,
         customFontUrl: undefined as undefined | string,
+    });
+
+    const fontsInit1 = makeThemeVars("fonts", {
+        ...fontsInit0,
         families: {
-            body: ["Open Sans"],
+            body: [fontsInit0.googleFontFamily],
             monospace: [],
         },
     });
 
-    const isOpenSans = fontsInit.families.body[0] === "Open Sans";
+    const isOpenSans = fontsInit1.families.body[0] === "Open Sans";
 
     const fonts = makeThemeVars("fonts", {
-        ...fontsInit,
+        ...fontsInit1,
         alignment: {
             headings: {
                 capitalLetterRatio: isOpenSans ? 0.73 : 0.75, // Calibrated for Open Sans

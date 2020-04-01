@@ -20,7 +20,7 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";

@@ -131,6 +131,8 @@ class RoutesController extends DashboardController {
             redirectTo('dashboard/routes');
         }
 
+        $this->jsonTarget('', '', 'Refresh');
+
         $this->render();
     }
 

@@ -15,7 +15,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
 import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
 import { DownTriangleIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";

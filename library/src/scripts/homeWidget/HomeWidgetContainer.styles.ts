@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";

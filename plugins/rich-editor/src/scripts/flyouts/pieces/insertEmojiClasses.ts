@@ -43,7 +43,7 @@ export const insertEmojiClasses = useThemeCache(() => {
                     active: {
                         opacity: 1,
                     },
-                    accessibleFocus: {
+                    keyboardFocus: {
                         backgroundColor: colorOut(globalVars.states.hover.highlight),
                     },
                 },

@@ -8,7 +8,8 @@ import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 import { IFont } from "@library/styles/styleHelpersTypography";
 import { ColorValues } from "@library/styles/styleHelpersColors";
 import { TLength } from "typestyle/lib/types";
-import { ButtonPreset, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export interface IButtonType {
     name: ButtonTypes | string;
@@ -27,7 +28,7 @@ export interface IButtonType {
     padding?: {
         top?: TLength;
         bottom?: TLength;
-        side?: TLength;
+        horizontal?: TLength;
     };
     fonts?: IFont;
     state?: {

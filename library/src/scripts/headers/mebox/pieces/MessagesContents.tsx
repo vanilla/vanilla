@@ -9,8 +9,8 @@ import ConversationsActions from "@library/features/conversations/ConversationsA
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import { IConversationsStoreState } from "@library/features/conversations/ConversationsModel";
 import Loader from "@library/loaders/Loader";
-import { loaderClasses } from "@library/loaders/loaderStyles";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import apiv2 from "@library/apiv2";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
@@ -43,7 +43,7 @@ export class MessagesContents extends React.Component<IProps> {
                     <FrameHeaderWithAction title={title}>
                         <LinkAsButton
                             title={t("New Message")}
-                            to={"/messages/inbox"}
+                            to={"/messages/add"}
                             baseClass={ButtonTypes.ICON}
                             className={classNames(buttonUtils.pushRight)}
                         >

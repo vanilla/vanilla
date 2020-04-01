@@ -16,15 +16,14 @@ import {
     EMPTY_SPACING,
     fonts,
     IBackground,
-    linkStyleFallbacks,
     paddings,
-    setAllLinkColors,
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",
@@ -144,14 +143,16 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         }
     })();
 
-    const linkStyles = setAllLinkColors();
+    const buttonStateStyles = clickableItemStates();
 
     const name = style("name", {
         color: colorOut(vars.options.fg),
         ...fonts(vars.name.font),
-        ...linkStyleFallbacks,
+        // ...linkStyleFallbacks,
         marginBottom: unit(globalVars.gutter.half),
     });
+
+    const nestedStyles = buttonStateStyles.$nest ?? undefined;
 
     const root = style(
         {
@@ -162,9 +163,12 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
             overflow: "hidden",
             minWidth: unit(vars.sizing.minWidth),
             $nest: {
-                [`&:active .${name}`]: linkStyles.nested["&&:active"],
-                [`&:focus .${name}`]: linkStyles.nested["&&:focus"],
-                [`&:hover .${name}`]: linkStyles.nested["&&:hover"],
+                [`&:hover .${name}`]: nestedStyles && nestedStyles["&&:hover"] ? nestedStyles["&&:hover"] : undefined,
+                [`&:focus .${name}`]: nestedStyles && nestedStyles["&&:focus"] ? nestedStyles["&&:focus"] : undefined,
+                [`&:focus-visible .${name}`]:
+                    nestedStyles && nestedStyles["&&:focus-visible"] ? nestedStyles["&&:focus-visible"] : undefined,
+                [`&:active .${name}`]:
+                    nestedStyles && nestedStyles["&&:active"] ? nestedStyles["&&:active"] : undefined,
             },
         },
         borderStyling,

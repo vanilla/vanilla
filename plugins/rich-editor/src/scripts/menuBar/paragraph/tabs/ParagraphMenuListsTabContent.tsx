@@ -62,7 +62,9 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         tabIndex={indentDisabled ? -1 : 0}
                         data-firstletter={indentLabel.toLowerCase().substr(0, 1)}
                     >
-                        <span className={checkRadioClasses.icon}>{<IndentIcon />}</span>
+                        <span aria-hidden={"true"} className={checkRadioClasses.icon}>
+                            {<IndentIcon />}
+                        </span>
                         <span className={checkRadioClasses.checkRadioLabel}>{indentLabel}</span>
                     </button>
                     <button
@@ -73,7 +75,9 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         tabIndex={outdentDisabled ? -1 : 0}
                         data-firstletter={outdentLabel.toLowerCase().substr(0, 1)}
                     >
-                        <span className={checkRadioClasses.icon}>{<OutdentIcon />}</span>
+                        <span aria-hidden={true} className={checkRadioClasses.icon}>
+                            {<OutdentIcon />}
+                        </span>
                         <span className={checkRadioClasses.checkRadioLabel}>{outdentLabel}</span>
                     </button>
                 </div>

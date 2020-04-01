@@ -23,6 +23,7 @@ import { tileVariables } from "@library/features/tiles/tileStyles";
 import { tilesVariables } from "@library/features/tiles/tilesStyles";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { inputClasses } from "@library/forms/inputStyles";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -37,6 +38,7 @@ interface IContext {
         tiles?: DeepPartial<ReturnType<typeof tilesVariables>>;
         tile?: DeepPartial<ReturnType<typeof tileVariables>>;
         banner?: DeepPartial<ReturnType<typeof bannerVariables>>;
+        userContent?: DeepPartial<ReturnType<typeof userContentVariables>>;
         [key: string]: any;
     };
     useWrappers?: boolean;

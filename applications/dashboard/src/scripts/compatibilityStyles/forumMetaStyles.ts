@@ -8,9 +8,12 @@
 import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 import trim from "validator/lib/trim";
+import { logDebugConditionnal } from "@vanilla/utils";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
@@ -60,7 +63,7 @@ export const forumMetaCSS = () => {
     });
 
     // Links
-    cssOut(linkSelectors, {
+    cssOut(trimTrailingCommas(linkSelectors).trim(), {
         display: "inline-flex",
         alignItems: "center",
         opacity: important(1),
@@ -71,8 +74,10 @@ export const forumMetaCSS = () => {
     trimTrailingCommas(linkSelectors)
         .split(",")
         .map(s => {
-            cssOut(trim(s), {
-                ...allLinkStates({
+            const selector = trim(s);
+            const debug = false;
+            const linkStates = allLinkStates(
+                {
                     noState: {
                         color: colorOut(globalVars.mainColors.fg),
                     },
@@ -84,16 +89,26 @@ export const forumMetaCSS = () => {
                         color: colorOut(globalVars.links.colors.focus),
                         textDecoration: "underline",
                     },
-                    accessibleFocus: {
-                        color: colorOut(globalVars.links.colors.accessibleFocus),
+                    keyboardFocus: {
+                        color: colorOut(globalVars.links.colors.keyboardFocus),
                         textDecoration: "underline",
                     },
                     active: {
                         color: colorOut(globalVars.links.colors.active),
                         textDecoration: "underline",
                     },
-                }),
-            });
+                },
+                {},
+            );
+
+            logDebugConditionnal(debug, linkStates);
+
+            const nested = linkStates.$nest;
+            delete linkStates["$nest"];
+
+            cssOut(selector, linkStates);
+
+            nested && nestedWorkaround(selector, nested as NestedCSSProperties);
         });
 
     cssOut(
@@ -110,19 +125,6 @@ export const forumMetaCSS = () => {
             ...margins({
                 all: 0,
             }),
-        },
-    );
-
-    cssOut(
-        `
-        .Container .Frame-contentWrap .ChildCategories,
-        .Container .Frame-contentWrap .ChildCategories a,
-        .DiscussionName .Wrap > a,
-        .Gloss
-        `,
-        {
-            fontSize: unit(globalVars.meta.text.fontSize),
-            color: colorOut(globalVars.meta.text.color),
         },
     );
 
@@ -230,6 +232,13 @@ export const forumMetaCSS = () => {
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
         marginLeft: unit(negative(globalVars.meta.text.margin)),
+    });
+
+    const linkColors = clickableItemStates();
+    const inlineTagSelector = `.InlineTags.Meta a`;
+    cssOut(inlineTagSelector, {
+        color: linkColors.color,
+        ...(linkColors.$nest ? nestedWorkaround(inlineTagSelector, linkColors.$nest as NestedCSSProperties) : {}),
     });
 };
 

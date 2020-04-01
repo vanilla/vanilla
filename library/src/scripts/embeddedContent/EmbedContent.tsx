@@ -5,10 +5,8 @@
 import { FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
 import { embedContentClasses } from "@library/embeddedContent/embedStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon } from "@library/icons/common";
-import { t } from "@library/utility/appUtils";
-import { useUniqueID } from "@library/utility/idUtils";
 import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";

@@ -11,36 +11,48 @@ import { px, em } from "csx";
 import {
     colorOut,
     margins,
-    paddings,
-    setAllLinkColors,
     singleLineEllipsis,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    fonts,
+    ensureColorHelper,
 } from "@library/styles/styleHelpers";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const breadcrumbsVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeVariables = variableFactory("breadcrumbs");
 
     const sizing = makeVariables("sizing", {
         minHeight: 16,
     });
 
-    return { sizing };
+    const linkColors = clickableItemStates();
+    const link = makeVariables("link", {
+        textTransform: "uppercase",
+        font: {
+            ...EMPTY_FONTS,
+            color: ensureColorHelper(linkColors.color as string),
+            size: globalVars.fonts.size.small,
+            lineHeight: globalVars.lineHeights.condensed,
+        },
+    });
+
+    return { sizing, link };
 });
 
 export const breadcrumbsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = breadcrumbsVariables();
     const style = styleFactory("breadcrumbs");
-    const linkColors = setAllLinkColors();
+    const linkColors = clickableItemStates();
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        fontSize: unit(globalVars.fonts.size.small),
-        lineHeight: globalVars.lineHeights.condensed,
-        textTransform: "uppercase",
-        color: colorOut(linkColors.color),
-        $nest: linkColors.nested,
+        ...fonts(vars.link.font),
+        textTransform: vars.link.textTransform as any,
+        $nest: linkColors.$nest,
     });
 
     const root = style({
@@ -61,6 +73,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
         display: "inline-flex",
         fontSize: unit(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
+        overflow: "hidden",
     });
 
     const list = style("list", {

@@ -5,56 +5,54 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, ILinkColorOverwritesWithOptions, setAllLinkColors } from "@library/styles/styleHelpers";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { throwError } from "rxjs";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();
 
     // Various links
-    mixinTextLink(".Navigation-linkContainer a");
-    mixinTextLink(".Panel .PanelInThisDiscussion a");
-    mixinTextLink(".Panel .Leaderboard a");
-    mixinTextLink(".Panel .InThisConversation a");
-    mixinTextLink(".FieldInfo a");
+    mixinClickInput(".Navigation-linkContainer a");
+    mixinClickInput(".Panel .PanelInThisDiscussion a");
+    mixinClickInput(".Panel .Leaderboard a");
+    mixinClickInput(".Panel .InThisConversation a");
+    mixinClickInput(".FieldInfo a");
 
-    mixinTextLink("div.Popup .Body a");
-    mixinTextLink(".selectBox-toggle");
-    mixinTextLink(".followButton");
-    mixinTextLink(".SelectWrapper::after");
-    mixinTextLink(".Back a");
-    mixinTextLink(".OptionsLink-Clipboard");
-    mixinTextLink("a.OptionsLink");
-    mixinTextLink("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
-    mixinTextLink(`body.Section-BestOf .Tile .Message a`);
-    mixinTextLink(
+    mixinClickInput("div.Popup .Body a");
+    mixinClickInput(".selectBox-toggle");
+    mixinClickInput(".followButton");
+    mixinClickInput(".SelectWrapper::after");
+    mixinClickInput(".Back a");
+    mixinClickInput(".OptionsLink-Clipboard");
+    mixinClickInput("a.OptionsLink");
+    mixinClickInput("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
+    mixinClickInput(`body.Section-BestOf .Tile .Message a`);
+    mixinClickInput(
         `
         .DataList .IdeationTag,
-        .DataList .tag-tracker,
         .DataList .MItem.RoleTracker,
         .MessageList .IdeationTag,
         .MessageList .tag-tracker,
-        .MessageList .MItem.RoleTracker,
         .DataTableWrap .IdeationTag,
         .DataTableWrap .tag-tracker,
         .DataTableWrap .MItem.RoleTracker
         `,
     );
-    mixinTextLink(`
+    mixinClickInput(`
         .Container .userContent a,
         .Container .UserContent a
     `);
-    mixinTextLink(".BreadcrumbsBox .Breadcrumbs a", {
+    mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
     });
+    mixinClickInput(".DataList .Item .Title a");
+    mixinClickInput(`.DataTable.DiscussionsTable a.Title`);
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
-    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item .Title a");
+
     mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");
@@ -62,29 +60,11 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
     mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
-};
-
-// Mixins replacement
-export const mixinTextLink = (selector: string, overwrite?: {}) => {
-    selector = trimTrailingCommas(selector);
-    const selectors = selector.split(",");
-    const linkColors = setAllLinkColors(overwrite);
-    if (!selectors) {
-        cssOut(selector, {
-            color: colorOut(linkColors.color),
-        });
-        nestedWorkaround(trimTrailingCommas(selector), linkColors.nested);
-    } else {
-        selectors.map(s => {
-            cssOut(selector, {
-                color: colorOut(linkColors.color),
-            });
-            nestedWorkaround(trimTrailingCommas(s), linkColors.nested);
-        });
-    }
+    mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
 };
 
 export const mixinTextLinkNoDefaultLinkAppearance = selector => {
     const globalVars = globalVariables();
-    mixinTextLink(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
+    mixinClickInput(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
 };

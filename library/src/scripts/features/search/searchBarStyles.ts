@@ -12,13 +12,11 @@ import {
     borders,
     colorOut,
     unit,
-    paddings,
-    importantUnit,
     getVerticalPaddingForTextInput,
     fonts,
     flexHelper,
 } from "@library/styles/styleHelpers";
-import { calc, important, percent, px, rgba, translateX } from "csx";
+import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -26,6 +24,8 @@ import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { inputVariables } from "@library/forms/inputStyles";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -204,26 +204,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const searchResultsStyles = {
-        option: {
-            ...buttonResetMixin(),
-            width: percent(100),
-            ...paddings({
-                vertical: 9,
-                horizontal: 12,
-            }),
-            ...fonts({
-                size: globalVars.fonts.size.medium,
-            }),
-            textAlign: "left",
-            display: "block",
-            color: "inherit",
-            $nest: {
-                "&:hover, &:focus, &.isFocused": {
-                    color: "inherit",
-                    backgroundColor: globalVars.states.hover.highlight.toString(),
-                },
-            },
-        } as NestedCSSProperties,
         title: {
             ...fonts({
                 size: globalVars.fonts.size.large,
@@ -238,7 +218,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             }),
         } as NestedCSSProperties,
         excerpt: {
-            marginTop: unit(6),
+            marginTop: unit(searchResultsVariables().excerpt.margin),
             ...fonts({
                 size: globalVars.fonts.size.medium,
                 color: vars.results.fg,
@@ -266,7 +246,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-option": searchResultsStyles.option,
+            "& .suggestedTextInput-option": suggestedTextStyleHelper().option,
             "& .suggestedTextInput-menuItems": {
                 margin: 0,
                 padding: 0,

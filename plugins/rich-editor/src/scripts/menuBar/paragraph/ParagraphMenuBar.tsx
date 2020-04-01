@@ -32,6 +32,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import Formatter from "@rich-editor/quill/Formatter";
 import { TabHandler } from "@vanilla/dom-utils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     className?: string;
@@ -57,6 +58,7 @@ interface IProps {
 interface IMenuBarContent {
     component: any;
     label: string;
+    accessibleLabel: string;
     className?: string;
     toggleMenu: () => void;
     icon: JSX.Element;
@@ -110,6 +112,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 activeFormats: menuActiveFormats.headings,
                 open: this.state.headingMenuOpen,
                 openMenu: this.openHeadingsMenu,
+                accessibleLabel: t("Toggle Heading Menu"),
                 items: [
                     {
                         formatFunction: formatter.h2,
@@ -139,8 +142,9 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
             },
             {
                 component: ParagraphMenuListsTabContent,
-                accessibleInstructions: t("Lists Menu"),
                 label: t("Lists Menu"),
+                accessibleLabel: t("Toggle Lists Menu"),
+                accessibleInstructions: t("Lists Menu"),
                 toggleMenu: this.toggleListsMenu,
                 icon: this.props.topLevelIcons.listMenuIcon,
                 activeFormats: menuActiveFormats.lists,
@@ -175,8 +179,9 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
             },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
-                accessibleInstructions: t("Toggle Special Formats Menu"),
                 label: t("Special Formats"),
+                accessibleLabel: t("Toggle Special Formats Menu"),
+                accessibleInstructions: t("Toggle Special Formats Menu"),
                 toggleMenu: this.toggleSpecialBlockMenu,
                 icon: this.props.topLevelIcons.specialBlockMenuIcon,
                 activeFormats: menuActiveFormats.specialFormats,
@@ -242,7 +247,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
 
             return (
                 <ParagraphMenuBarTab
-                    accessibleButtonLabel={"Toggle Heading Menu"}
+                    accessibleButtonLabel={menu.accessibleLabel}
                     className={menu.className}
                     index={index}
                     parentID={this.props.parentID}

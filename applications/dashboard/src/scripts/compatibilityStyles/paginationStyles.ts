@@ -5,25 +5,53 @@
  * @license GPL-2.0-only
  */
 
-import { borders, colorOut, unit, margins } from "@library/styles/styleHelpers";
+import { colorOut, unit, userSelect, importantColorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { important } from "csx";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
     const primary = colorOut(mainColors.primary);
-    cssOut(
+    const primaryContrast = colorOut(mainColors.primaryContrast);
+
+    mixinClickInput(
         `
         .Pager > span,
-        .Pager > a`,
+        .Pager > a,
+    `,
+        {},
         {
-            ...borders({
-                ...globalVars.borderType.formElements.buttons,
-                radius: 0,
-            }),
-            backgroundColor: colorOut(globalVars.mainColors.bg),
-            color: colorOut(globalVars.mainColors.fg),
+            default: {
+                ...userSelect(),
+            },
+            allStates: {
+                ...userSelect(),
+                backgroundColor: colorOut(globalVars.mainColors.fg.fade(0.05)),
+            },
+        },
+    );
+
+    mixinClickInput(
+        `
+        .Pager > a.Highlight
+    `,
+        {
+            default: primary,
+            allStates: primary,
+        },
+        {
+            default: {
+                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                cursor: "pointer",
+                ...userSelect(),
+            },
+            allStates: {
+                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                ...userSelect(),
+            },
         },
     );
 
@@ -32,17 +60,16 @@ export const paginationCSS = () => {
         borderBottomRightRadius: globalVars.border.radius,
     });
 
-    cssOut(`.Pager .Prev`, {
+    cssOut(`.Pager .Previous`, {
         borderBottomLeftRadius: globalVars.border.radius,
         borderTopLeftRadius: globalVars.border.radius,
     });
 
     cssOut(`.Pager span`, {
-        $nest: {
-            [`&:hover, &:focus, &:active`]: {
-                color: primary,
-            },
-        },
+        cursor: important("default"),
+        backgroundColor: importantColorOut(globalVars.mainColors.bg),
+        color: importantColorOut(globalVars.links.colors.default),
+        opacity: 0.5,
     });
 
     cssOut(`.Content .PageControls`, {

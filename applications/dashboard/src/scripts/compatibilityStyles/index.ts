@@ -39,6 +39,7 @@ import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
+import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -49,6 +50,7 @@ export const compatibilityStyles = useThemeCache(() => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
+    const primaryContrast = colorOut(mainColors.primaryContrast);
 
     fullBackgroundCompat();
 
@@ -59,7 +61,6 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".Frame", {
         background: "none",
-        overflow: "auto",
     });
 
     cssOut(
@@ -129,11 +130,12 @@ export const compatibilityStyles = useThemeCache(() => {
 
     const panelSelectors = `
         .About a,
-        .Panel.Panel-main .FilterMenu a,
-        .Panel.Panel-main .BoxFilter a,
         .Panel.Panel-main .PanelInfo a.ItemLink,
-        .Panel.Panel-main .FilterMenu a,
         `;
+
+    //.Panel.Panel-main .BoxFilter a,
+    //.Panel.Panel-main .FilterMenu a,
+    //.Panel.Panel-main .FilterMenu a,
 
     // Panel
     cssOut(panelSelectors, {
@@ -185,10 +187,6 @@ export const compatibilityStyles = useThemeCache(() => {
             color: fg,
         },
     );
-
-    cssOut(".Pager > a.Highlight, .Pager > a.Highlight:focus, .Pager > a.Highlight:hover", {
-        color: primary,
-    });
 
     cssOut(
         `
@@ -287,6 +285,7 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".MenuItems, .Flyout.Flyout", {
         ...borders(vars.borderType.dropDowns.content),
+        overflow: "hidden",
     });
 
     cssOut(`.Frame-content`, {
@@ -325,6 +324,10 @@ export const compatibilityStyles = useThemeCache(() => {
 
     cssOut(".Panel > * + *", {
         marginTop: unit(vars.gutter.size),
+    });
+
+    cssOut(`.Panel > .PhotoWrapLarge`, {
+        padding: 0,
     });
 
     cssOut(".Panel li a", {
@@ -384,6 +387,7 @@ export const compatibilityStyles = useThemeCache(() => {
     photoGridCSS();
     messagesCSS();
     signaturesCSS();
+    signInMethodsCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {
@@ -417,30 +421,40 @@ export const camelCaseToDash = (str: string) => {
     return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 };
 
-export const nestedWorkaround = (selector: string, nestedObject: {}) => {
+export const nestedWorkaround = (selector: string, nestedObject) => {
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
 
-    let rawStyles = `\n`;
-    Object.keys(nestedObject).forEach(key => {
-        const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
-        if (selector !== "") {
-            const targetStyles = nestedObject[key];
-            const keys = Object.keys(targetStyles);
-            if (keys.length > 0) {
-                rawStyles += `${finalSelector} { `;
-                keys.forEach(property => {
-                    const style = targetStyles[property];
-                    if (style) {
-                        rawStyles += `\n    ${camelCaseToDash(property)}: ${
-                            style instanceof ColorHelper ? colorOut(style) : style
-                        };`;
-                    }
-                });
-                rawStyles += `\n}\n\n`;
-            }
-        }
-    });
+    if (nestedObject) {
+        let rawStyles = `\n`;
+        Object.keys(nestedObject).forEach(key => {
+            const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
+            let newStyleDeclaration = "";
+            if (selector !== "") {
+                const targetStyles = nestedObject[key];
+                const styleProps = targetStyles ? Object.keys(targetStyles) : [];
 
-    cssRaw(rawStyles);
+                let emptyStyles = true;
+
+                if (styleProps.length > 0) {
+                    newStyleDeclaration += `${finalSelector} { `;
+                    styleProps.forEach(property => {
+                        const style = targetStyles[property];
+                        if (style !== undefined && style !== "") {
+                            newStyleDeclaration += `\n    ${camelCaseToDash(property)}: ${
+                                style instanceof ColorHelper ? colorOut(style) : style
+                            };`;
+                            emptyStyles = false;
+                        }
+                    });
+                    newStyleDeclaration += `\n}\n\n`;
+                }
+
+                if (!emptyStyles) {
+                    rawStyles += newStyleDeclaration;
+                }
+            }
+        });
+        cssRaw(rawStyles);
+    }
 };

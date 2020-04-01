@@ -10,6 +10,7 @@ import { useThemeActions } from "@library/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
+import Translate from "@library/content/Translate";
 
 interface IProps {
     value?: number | string | null;
@@ -42,6 +43,13 @@ export function ThemeChooserInput(props: IProps) {
 
     const { templates, themes } = themeSettingsState.themes.data;
 
+    const defaultTheme = themeSettingsState.themes.data.currentTheme;
+
+    const defaultOption: IComboBoxOption = {
+        value: "",
+        label: ((<Translate source="Default <0/>" c0={`(${defaultTheme.name})`} />) as unknown) as string,
+    };
+
     const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function(theme, index) {
         return {
             value: theme.themeID,
@@ -56,16 +64,23 @@ export function ThemeChooserInput(props: IProps) {
         };
     });
 
-    const themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
+    let themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
+    themeGroupOptions = themeGroupOptions.filter(option => option.value !== defaultTheme.themeID);
+    themeGroupOptions.push(defaultOption);
 
-    let selectedTheme = themeGroupOptions.find(option => {
-        if (props.initialValue !== null && props.initialValue !== undefined && option.value === props.initialValue) {
-            return {
-                label: option.label,
-                value: option.value,
-            };
-        }
-    }) ?? { label: t("Unknown"), value: props.initialValue };
+    const selectedTheme =
+        themeGroupOptions.find(option => {
+            if (
+                props.initialValue !== null &&
+                props.initialValue !== undefined &&
+                option.value === props.initialValue
+            ) {
+                return {
+                    label: option.label,
+                    value: option.value,
+                };
+            }
+        }) ?? defaultOption;
 
     return (
         <>

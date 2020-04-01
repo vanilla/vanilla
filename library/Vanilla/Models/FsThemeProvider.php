@@ -28,10 +28,7 @@ use Vanilla\Theme\TwigAsset;
  */
 class FsThemeProvider implements ThemeProviderInterface {
 
-    const FALLBACK_THEME_KEY = "theme-foundation";
-
     use FsThemeMissingTrait;
-    use ThemeVariablesTrait;
 
     /** @var AddonProviderInterface $addonManager */
     private $addonManager;
@@ -103,15 +100,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeViewPath($themeKey): string {
-        $theme = $this->getThemeAddon($themeKey);
-        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
-        return $path;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->getThemeAddon($themeKey);
         return $theme->getKey();
@@ -135,7 +123,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): AddonInterface {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!($theme instanceof AddonInterface)) {
-            $theme = $this->addonManager->lookupTheme(self::FALLBACK_THEME_KEY);
+            $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
             if (!($theme instanceof AddonInterface)) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
@@ -143,6 +131,22 @@ class FsThemeProvider implements ThemeProviderInterface {
         }
 
         return $theme;
+    }
+
+    /**
+     * Verify if a theme exists by it's theme identifier.
+     *
+     * @param string|int $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool {
+        $themeExists = false;
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if ($theme instanceof AddonInterface) {
+            $themeExists = true;
+        }
+
+        return $themeExists;
     }
 
     /**
@@ -268,12 +272,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             throw new ServerException("File key missing for theme asset.");
         }
 
-        $data = $this->getFileAsset($theme, $asset);
-
-        // Mix in addon variables to the variables asset.
-        if (preg_match('/^variables/', $key)) {
-            $data = $this->addAddonVariables($data);
-        }
+        $data = $this->getFileAsset($theme, $key, $asset);
 
         switch ($type) {
             case "data":
@@ -312,26 +311,31 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Cast themeAssetModel data to out schema data by calculating and casting required fields.
      *
      * @param Addon $theme
+     * @param string $assetKey
      * @param array $asset
      *
      * @return string
      */
-    private function getFileAsset(Addon $theme, array $asset): string {
+    private function getFileAsset(Addon $theme, string $assetKey, array $asset): string {
         $filename = basename($asset['file']);
-        if (!isset($asset['placeholder'])) {
+        if ($filename) {
             $fullFilename = $theme->path("/assets/{$filename}");
-            if (!file_exists($fullFilename)) {
-                throw new ServerException("Theme asset file does not exist: {$fullFilename}");
+            if (!file_exists($fullFilename) || !is_readable($fullFilename)) {
+                if (!$asset['isDefault']) {
+                    $message = "Theme asset file does not exist or is not readable: {$fullFilename}";
+                    if (debug()) {
+                        throw new ServerException($message);
+                    } else {
+                        trigger_error($message, E_USER_WARNING);
+                    }
+                }
+            } else {
+                return file_get_contents($fullFilename);
             }
-            if (!is_readable($fullFilename)) {
-                throw new ServerException("Unable to read theme asset file: {$fullFilename}");
-            }
-            $assetContent = file_get_contents($fullFilename);
-        } else {
-            $assetContent = $asset['placeholder'];
         }
 
-        return $assetContent;
+        $defaultAsset = ThemeModel::ASSET_LIST[$assetKey];
+        return $defaultAsset['default'];
     }
 
     /**
@@ -347,7 +351,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         $assets = $this->getAssets($themeKey);
 
         if (array_key_exists($assetKey, $assets)) {
-            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assets[$assetKey]);
+            return $assets[$assetKey]['data'] ?? $this->getFileAsset($theme, $assetKey, $assets[$assetKey]);
         } else {
             throw new NotFoundException("Asset");
         }
@@ -357,7 +361,6 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Get theme assets by by themeID.
      *
      * @param string $themeID
-     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
@@ -392,6 +395,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     private function getDefaultAssets(): array {
         return [
             "variables" => [
+                'isDefault' => true,
                 "type" => "json",
                 "file" => "variables.json",
                 "placeholder" => '{}',

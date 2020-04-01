@@ -640,19 +640,21 @@ div.FileUpload .CurrentImage {
       color: $grey-1;
       background: $grey-5;
     }
-}
 
-/* Split Button Dropdown */
-.ButtonGroup.Multi > .NavButton:first-child,
-.ButtonGroup.Multi > .Button:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+    /* Split Button Dropdown */
+    .ButtonGroup.Multi > .NavButton:first-child,
+    .ButtonGroup.Multi > .Button:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 }
 
 .ButtonGroup.Multi > .NavButton.Handle,
 .ButtonGroup.Multi > .Button.Handle {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  @if ($staticVariables) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
   border-left: 0;
 }
 
@@ -870,22 +872,25 @@ div.Warning {
   background: url('images/progress.gif') center center no-repeat !important;
 }
 
-.Pager {
-  font-weight: bold;
-  float: right;
-}
 
-.Pager a, .Pager span {
-  display: inline-block;
-  margin: 0 3px;
-}
+@if($staticVariables) {
+    .Pager {
+      font-weight: bold;
+      float: right;
+    }
 
-.Pager span {
-  color: $grey-3;
-}
+    .Pager a, .Pager span {
+      display: inline-block;
+      margin: 0 3px;
+    }
 
-.Pager .Highlight {
-  color: $black;
+    .Pager span {
+      color: $grey-3;
+    }
+
+    .Pager .Highlight {
+      color: $black;
+    }
 }
 
 .MoreWrap {

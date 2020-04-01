@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React, { useDebugValue, useState } from "react";
+import React from "react";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { t } from "@library/utility/appUtils";
-import { ButtonTypes, buttonClasses } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { MenuListComponentProps, MenuProps } from "react-select/lib/components/Menu";
@@ -17,8 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { CloseCompactIcon, CloseTinyIcon, CheckIcon, CheckCompactIcon } from "@library/icons/common";
+import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 

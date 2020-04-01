@@ -7,6 +7,8 @@
 import { important, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
+export type areaHiddenType = "true" | "false" | boolean | undefined;
+
 export function srOnly() {
     return {
         position: important("absolute"),

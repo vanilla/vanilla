@@ -13,8 +13,10 @@ import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EmojiIcon } from "@library/icons/editorIcons";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     disabled?: boolean;
@@ -32,7 +34,7 @@ export default class EmojiFlyout extends React.Component<IProps> {
      */
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
-
+        const label = t("Emoji Picker");
         return (
             <FlyoutToggle
                 id={this.id}
@@ -40,8 +42,13 @@ export default class EmojiFlyout extends React.Component<IProps> {
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}
-                name={t("Emoji Picker")}
-                buttonContents={<IconForButtonWrap icon={<EmojiIcon />} />}
+                name={label}
+                buttonContents={
+                    <>
+                        <ScreenReaderContent>{label}</ScreenReaderContent>
+                        <IconForButtonWrap icon={<EmojiIcon />} />
+                    </>
+                }
                 buttonBaseClass={ButtonTypes.ICON}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}

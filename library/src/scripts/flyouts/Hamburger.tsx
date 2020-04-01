@@ -9,7 +9,7 @@ import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import { CloseTinyIcon, HamburgerIcon } from "@library/icons/common";
 import Modal from "@library/modal/Modal";

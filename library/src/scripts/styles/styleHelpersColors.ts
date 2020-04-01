@@ -29,7 +29,7 @@ export const ensureColorHelper = (colorValue: string | ColorHelper) => {
 };
 
 export const importantColorOut = (colorValue: ColorValues | string) => {
-    return colorOut(colorValue, true);
+    return colorOut(colorValue, true) as string;
 };
 
 /**

@@ -93,9 +93,9 @@ class ComposerHelper {
      */
     public static function postUpdate() {
         $vanillaRoot = realpath(__DIR__ . "/../../");
-        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
+        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
         if ($skipBuild) {
-            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.\n");
+            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
             return;
         }
 

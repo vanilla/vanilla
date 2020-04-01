@@ -16,6 +16,7 @@ import "@library/theming/reset";
 import { ScrollOffsetContext, SCROLL_OFFSET_DEFAULTS } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import { roleReducer } from "@dashboard/roles/roleReducer";
+import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -33,7 +34,7 @@ applySharedPortalContext(props => {
         }
     }, [setNavHeight]);
     return (
-        <AppContext noTheme errorComponent={ErrorPage}>
+        <AppContext variablesOnly errorComponent={ErrorPage}>
             <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
                 {props.children}
             </ScrollOffsetContext.Provider>
@@ -50,13 +51,7 @@ const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
 
     if (app) {
-        mountReact(
-            // Error component is set as null until we can refactor a non-kb specific Error page.
-            <AppContext errorComponent={<ErrorPage /> || null}>
-                <Router disableDynamicRouting />
-            </AppContext>,
-            app,
-        );
+        mountReact(<Router disableDynamicRouting />, app);
     }
 };
 onReady(render);

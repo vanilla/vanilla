@@ -145,14 +145,17 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 focus: {
                     color: colorOut(globalVars.links.colors.focus),
                 },
-                accessibleFocus: {
-                    color: colorOut(globalVars.links.colors.accessibleFocus),
+                keyboardFocus: {
+                    color: colorOut(globalVars.links.colors.keyboardFocus),
                 },
                 active: {
                     color: colorOut(globalVars.links.colors.active),
                 },
             }).$nest,
-            "&:not(.focus-visible):active, &:focus": {
+            "&:not(.focus-visible):active": {
+                outline: 0,
+            },
+            "&:focus": {
                 outline: 0,
             },
             "&.hasChildren": {
@@ -166,7 +169,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
                     },
                 },
             },
-        };
+        } as any;
 
         if (selector) {
             const selectors = selector.split(",");

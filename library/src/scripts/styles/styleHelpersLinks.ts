@@ -5,16 +5,16 @@
  */
 
 import { ColorHelper } from "csx";
-import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 import { IButtonStates } from "@library/styles/styleHelpersButtons";
+import { EMPTY_STATE_COLORS } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export interface ILinkStates {
     allStates?: object; // Applies to all
     noState?: object;
     hover?: object;
     focus?: object;
-    accessibleFocus?: object;
+    keyboardFocus?: object;
     active?: object;
     visited?: object;
 }
@@ -29,11 +29,11 @@ export const linkStyleFallbacks = (
     globalDefault: undefined | ColorHelper | string,
 ) => {
     if (specificOverwrite) {
-        return specificOverwrite as ColorValues;
+        return specificOverwrite as undefined | ColorHelper | string;
     } else if (defaultOverwrite) {
-        return defaultOverwrite as ColorValues;
+        return defaultOverwrite as undefined | ColorHelper | string;
     } else {
-        return globalDefault as ColorValues;
+        return globalDefault as undefined | ColorHelper | string;
     }
 };
 
@@ -41,84 +41,29 @@ export interface ILinkColorOverwrites {
     default?: ColorValues;
     hover?: ColorValues;
     focus?: ColorValues;
-    accessibleFocus?: ColorValues;
+    clickFocus?: ColorValues;
+    keyboardFocus?: ColorValues;
     active?: ColorValues;
     visited?: ColorValues;
     allStates?: ColorValues;
 }
 
-export const EMPTY_LINK_COLOR_OVERWRITES = {
-    default: undefined as undefined | ColorValues,
-    hover: undefined as undefined | ColorValues,
-    focus: undefined as undefined | ColorValues,
-    accessibleFocus: undefined as undefined | ColorValues,
-    active: undefined as undefined | ColorValues,
-    visited: undefined as undefined | ColorValues,
-    allStates: undefined as undefined | ColorValues,
-};
+export interface ILinkColorOverwrites {
+    default?: ColorValues;
+    hover?: ColorValues;
+    focus?: ColorValues;
+    clickFocus?: ColorValues;
+    keyboardFocus?: ColorValues;
+    active?: ColorValues;
+    visited?: ColorValues;
+    allStates?: ColorValues;
+}
 
 export interface ILinkColorOverwritesWithOptions extends ILinkColorOverwrites {
     skipDefault?: boolean;
 }
 
 export const EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS = {
-    ...EMPTY_LINK_COLOR_OVERWRITES,
+    ...EMPTY_STATE_COLORS,
     skipDefault: undefined as undefined | boolean,
-};
-
-export const setAllLinkColors = (overwriteValues?: ILinkColorOverwritesWithOptions) => {
-    const vars = globalVariables();
-    // We want to default to the standard styles and only overwrite what we want/need
-    const linkColors = vars.links.colors;
-    const overwrites = overwriteValues ? overwriteValues : {};
-    const mergedColors = {
-        default: !overwrites.skipDefault
-            ? linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default)
-            : undefined,
-        hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
-        focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
-        accessibleFocus: linkStyleFallbacks(
-            overwrites.accessibleFocus,
-            overwrites.allStates,
-            linkColors.accessibleFocus,
-        ),
-        active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
-        visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
-    };
-
-    const styles = {
-        default: {
-            color: !overwrites.skipDefault ? colorOut(mergedColors.default) : undefined,
-        },
-        hover: {
-            color: colorOut(mergedColors.hover),
-            cursor: "pointer",
-        },
-        focus: {
-            color: colorOut(mergedColors.focus),
-        },
-        accessibleFocus: {
-            color: colorOut(mergedColors.accessibleFocus),
-        },
-        active: {
-            color: colorOut(mergedColors.active),
-            cursor: "pointer",
-        },
-        visited: {
-            color: mergedColors.visited ? colorOut(mergedColors.visited) : undefined,
-        },
-    };
-
-    const final = {
-        color: styles.default.color as ColorValues,
-        nested: {
-            "&&:hover": styles.hover,
-            "&&:focus": styles.focus,
-            "&&.focus-visible": styles.accessibleFocus,
-            "&&:active": styles.active,
-            "&:visited": styles.visited ?? undefined,
-        },
-    };
-
-    return final;
 };

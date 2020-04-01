@@ -8,7 +8,7 @@ import { uploadFile } from "@library/apiv2";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardImageUpload } from "@dashboard/forms/DashboardImageUpload";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
 import { IFieldError } from "@library/@types/api/core";
 import ModalConfirm from "@library/modal/ModalConfirm";

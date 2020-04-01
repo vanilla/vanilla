@@ -18,7 +18,7 @@ interface ThemeProviderInterface {
     /**
      * Returns type of themeKey used for this provider
      *
-     * @return bool When theme key is numeric return TRUE if alphanumeric FALSE
+     * @return int One of TYPE_FS or TYPE_DB
      */
     public function themeKeyType(): int;
 
@@ -99,18 +99,9 @@ interface ThemeProviderInterface {
 
     /**
      * Get "current" theme.
-     *
      * @return array
      */
     public function getCurrent(): ?array;
-
-    /**
-     * Get theme view folder path
-     *
-     * @param strig|int $themeKey Theme key or id
-     * @return string
-     */
-    public function getThemeViewPath($themeKey): string;
 
     /**
      * Get master (parent) theme key.
@@ -154,10 +145,10 @@ interface ThemeProviderInterface {
     public function sparseAsset(int $themeID, string $assetKey, string $data): array;
 
     /**
-     * Set variable providers
+     * Check if a theme exists.
      *
-     * @param array $variableProviders
-     * @return mixed
+     * @param string|int $themeKey
+     * @return bool
      */
-    public function setVariableProviders(array $variableProviders = []);
+    public function themeExists($themeKey): bool;
 }

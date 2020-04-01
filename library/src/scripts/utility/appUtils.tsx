@@ -139,7 +139,12 @@ export function siteUrl(path: string): string {
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
-    const urlBase = window.location.origin + getMeta("context.host", "");
+    let urlBase = window.location.origin;
+
+    const host = getMeta("context.host", "");
+    if (!path.startsWith(host)) {
+        urlBase += host;
+    }
     return urlBase + path;
 }
 

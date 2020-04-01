@@ -189,7 +189,7 @@ class VanillaHtmlFormatter {
             'valid_xhtml' => 0
         ];
 
-        if ($options['allowedExtendedContent'] ?? null) {
+        if ($options['allowedExtendedContent'] ?? false) {
             $elements = $config['elements'] ?? null;
             $config['elements'] = str_replace('-iframe', '', $elements);
         }
@@ -203,7 +203,9 @@ class VanillaHtmlFormatter {
         }
 
         // Turn embedded videos into simple links (legacy workaround)
-        $html = $this->legacyEmbedReplacer->unembedContent($html);
+        if (!($options['allowedExtendedContent'] ?? false)) {
+            $html = $this->legacyEmbedReplacer->unembedContent($html);
+        }
 
         // We check the flag within Gdn_Format to see
         // if htmLawed should place rel="nofollow" links

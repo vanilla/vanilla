@@ -25,6 +25,13 @@ class MessageModule extends Gdn_Module {
     public function __construct($sender = '', $message = false) {
         parent::__construct($sender);
 
+        // Filter message markup, if present.
+        if (is_string($message['Content'] ?? null)) {
+            /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+            $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+            $message['Content'] = $htmlSanitizer->filter($message['Content']);
+        }
+
         $this->_ApplicationFolder = 'dashboard';
         $this->_Message = $message;
     }

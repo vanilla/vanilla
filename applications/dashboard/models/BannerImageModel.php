@@ -56,6 +56,8 @@ class BannerImageModel {
         $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
         if (inSection(c("Theme.Banner.VisibleSections"))) {
             $html = "<div data-react='community-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
+        } else {
+            $html = "<div data-react='community-content-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
         }
         return new \Twig\Markup($html, 'utf-8');
     }

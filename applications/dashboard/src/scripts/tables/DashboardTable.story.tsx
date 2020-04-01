@@ -9,7 +9,7 @@ import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon, EditIcon } from "@library/icons/common";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";

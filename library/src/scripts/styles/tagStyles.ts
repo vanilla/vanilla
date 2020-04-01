@@ -5,11 +5,12 @@ import { EMPTY_SPACING } from "@library/styles/styleHelpersSpacing";
 import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
 import {
     ILinkColorOverwritesWithOptions,
-    setAllLinkColors,
     EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS,
 } from "@library/styles/styleHelpersLinks";
 import merge from "lodash/merge";
 import { important } from "csx";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const tagVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");
@@ -23,14 +24,17 @@ export const tagVariables = useThemeCache(() => {
         textDecoration: important("none"),
     };
 
-    const linkColors = setAllLinkColors(colorOverwrite);
-
+    const linkColors = clickableItemStates(colorOverwrite);
+    const allStateColor =
+        linkColors.$nest && linkColors.$nest["&&:hover"] && linkColors.$nest["&&:hover"].color
+            ? linkColors.$nest["&&:hover"].color
+            : undefined;
     const allStates = {
-        color: linkColors.nested["&&:hover"].color,
-        ...borders({ color: linkColors.nested["&&:hover"].color } as IBorderStyles, {}),
+        color: allStateColor,
+        ...borders({ color: allStateColor } as IBorderStyles, {}),
     };
 
-    const nested = merge(linkColors.nested, {
+    const $nest = merge(linkColors.$nest, {
         "&&:hover": {
             ...allStyles,
             ...allStates,
@@ -48,7 +52,7 @@ export const tagVariables = useThemeCache(() => {
             ...allStates,
         },
         "&:visited": undefined,
-    });
+    }) as NestedCSSProperties;
 
     const colors = makeThemeVars("color", {
         fg: linkColors.color,
@@ -92,8 +96,8 @@ export const tagVariables = useThemeCache(() => {
         font,
         padding,
         border,
-        nested,
         margin,
+        $nest,
     };
 
     return output;

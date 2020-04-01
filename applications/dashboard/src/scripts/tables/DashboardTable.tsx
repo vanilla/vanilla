@@ -13,7 +13,6 @@ interface IProps {
 }
 
 export function DashboardTable(props: IProps) {
-    dashboardClasses();
     return (
         <div className="table-wrap">
             <table className="table-data">

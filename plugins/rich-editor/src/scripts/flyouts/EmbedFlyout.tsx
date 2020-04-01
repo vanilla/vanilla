@@ -22,6 +22,7 @@ import KeyboardModule from "quill/modules/keyboard";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { style } from "typestyle";
 import { EmbedIcon } from "@library/icons/editorIcons";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     disabled?: boolean;
@@ -107,7 +108,12 @@ export default function EmbedFlyout(props: IProps) {
                 title={t("Insert Media")}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
-                buttonContents={<IconForButtonWrap icon={<EmbedIcon />} />}
+                buttonContents={
+                    <>
+                        <ScreenReaderContent>{t("Insert Media")}</ScreenReaderContent>
+                        <IconForButtonWrap icon={<EmbedIcon />} />
+                    </>
+                }
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}

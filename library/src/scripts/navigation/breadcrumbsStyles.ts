@@ -73,6 +73,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
         display: "inline-flex",
         fontSize: unit(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
+        overflow: "hidden",
     });
 
     const list = style("list", {

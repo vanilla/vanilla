@@ -13,6 +13,9 @@ import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import { t } from "@vanilla/i18n/src";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -50,9 +53,11 @@ export function ImageEmbed(props: IProps) {
                             setIsOpen(true);
                         }}
                     >
+                        <ScreenReaderContent>{t("Accessibility")}</ScreenReaderContent>
                         <AccessibleImageMenuIcon />
                     </Button>
                     <Button baseClass={ButtonTypes.ICON} onClick={props.deleteSelf}>
+                        <ScreenReaderContent>{t("Delete")}</ScreenReaderContent>
                         <DeleteIcon />
                     </Button>
                 </EmbedMenu>

@@ -8,6 +8,9 @@ import React from "react";
 import classnames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@vanilla/i18n/src";
 
 export interface IMenuItemData {
     icon: JSX.Element;
@@ -15,6 +18,7 @@ export interface IMenuItemData {
     isActive: boolean;
     isDisabled?: boolean;
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    onlyIcon?: boolean;
 }
 
 export interface IProps extends IMenuItemData {
@@ -33,7 +37,7 @@ export default class MenuItem extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const { label, isDisabled, isActive, onClick, icon, role } = this.props;
+        const { label, isDisabled, isActive, onClick, icon, role, onlyIcon } = this.props;
         const buttonClasses = classnames(
             "richEditor-button",
             "richEditor-formatButton",
@@ -65,6 +69,7 @@ export default class MenuItem extends React.PureComponent<IProps> {
                 onKeyDown={this.handleKeyPress}
                 ref={this.buttonRef}
             >
+                {onlyIcon && label && <ScreenReaderContent>{label}</ScreenReaderContent>}
                 <IconForButtonWrap icon={icon} />
             </button>
         );

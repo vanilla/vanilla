@@ -99,6 +99,7 @@ export const themeBuilderVariables = () => {
         fonts: {
             ...defaultFont,
             size: 13,
+            lineHeight: 1.5,
         },
     };
 

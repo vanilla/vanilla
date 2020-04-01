@@ -827,6 +827,7 @@ export const bannerClasses = useThemeCache(
         const root = style(
             {
                 position: "relative",
+                zIndex: 1, // To make sure it sites on top of panel layout overflow indicators.
                 maxWidth: percent(100),
                 backgroundColor: colorOut(vars.outerBackground.color),
                 $nest: {

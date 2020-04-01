@@ -18,7 +18,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning, notEmpty } from "@vanilla/utils";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { isLightColor } from "@library/styles/styleHelpersColors";
@@ -217,7 +217,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
     });
 
-    const fontsInit = makeThemeVars("fonts", {
+    const fontsInit0 = makeThemeVars("fonts", {
         size: {
             large: 16,
             medium: 14,
@@ -236,18 +236,23 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             semiBold: 600,
             bold: 700,
         },
+        googleFontFamily: "Open Sans" as undefined | string,
         forceGoogleFont: false,
         customFontUrl: undefined as undefined | string,
+    });
+
+    const fontsInit1 = makeThemeVars("fonts", {
+        ...fontsInit0,
         families: {
-            body: ["Open Sans"],
+            body: [fontsInit0.googleFontFamily ?? "Open Sans"],
             monospace: [],
         },
     });
 
-    const isOpenSans = fontsInit.families.body[0] === "Open Sans";
+    const isOpenSans = fontsInit1.families.body[0] === "Open Sans";
 
     const fonts = makeThemeVars("fonts", {
-        ...fontsInit,
+        ...fontsInit1,
         alignment: {
             headings: {
                 capitalLetterRatio: isOpenSans ? 0.73 : 0.75, // Calibrated for Open Sans

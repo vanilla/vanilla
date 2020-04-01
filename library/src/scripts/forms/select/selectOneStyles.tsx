@@ -14,7 +14,7 @@ export const selectOneVariables = useThemeCache(() => {
 
     const padding = vars("padding", {
         right: 30,
-        left: inputMixin().paddingRight,
+        left: inputMixin().paddingRight as string,
     });
 
     return { padding };

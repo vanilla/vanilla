@@ -5,7 +5,6 @@
 
 import React from "react";
 import { DashboardTableHeadItem } from "@dashboard/tables/DashboardTableHeadItem";
-import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
 interface IProps {
     head: React.ReactNode;

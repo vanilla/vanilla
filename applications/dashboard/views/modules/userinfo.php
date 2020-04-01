@@ -6,6 +6,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
     ?>
     <div class="About P">
         <h2 class="H"><?php echo t('About'); ?></h2>
+        <?php  $this->fireEvent('BeforeAboutList');  ?>
         <dl class="About">
             <?php
             if ($this->User->Banned) {
@@ -74,6 +75,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             $this->fireEvent('OnBasicInfo');
             ?>
         </dl>
+        <?php  $this->fireEvent('AfterAboutList');  ?>
     </div>
 <?php
 }

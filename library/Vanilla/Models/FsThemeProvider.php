@@ -134,6 +134,22 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * Verify if a theme exists by it's theme identifier.
+     *
+     * @param string|int $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool {
+        $themeExists = false;
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if ($theme instanceof AddonInterface) {
+            $themeExists = true;
+        }
+
+        return $themeExists;
+    }
+
+    /**
      * Get all theme assets
      *
      * @param Addon $theme
@@ -345,7 +361,6 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Get theme assets by by themeID.
      *
      * @param string $themeID
-     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */

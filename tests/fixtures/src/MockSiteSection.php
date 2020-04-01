@@ -47,6 +47,7 @@ class MockSiteSection implements SiteSectionInterface {
      * @param string $sectionID
      * @param string $sectionGroup
      * @param array $defaultRoute
+     * @param string $themeID
      */
     public function __construct(
         string $sectionName,
@@ -54,7 +55,8 @@ class MockSiteSection implements SiteSectionInterface {
         string $basePath,
         string $sectionID,
         string $sectionGroup,
-        array $defaultRoute
+        array $defaultRoute,
+        string $themeID
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
@@ -63,7 +65,7 @@ class MockSiteSection implements SiteSectionInterface {
         $this->sectionGroup = $sectionGroup;
         $this->defaultRoute = $defaultRoute;
         $this->apps = ['forum' => true];
-        $this->themeID = 'keystone';
+        $this->themeID = $themeID;
     }
     /**
      * @inheritdoc

@@ -146,6 +146,8 @@ const titleBarNavClasses = useThemeCache(() => {
         },
     });
 
+    const offsetWidth = vars.linkActive.offset * 2;
+
     const linkActive = style("linkActive", {
         $nest: {
             "&:after": {
@@ -157,7 +159,7 @@ const titleBarNavClasses = useThemeCache(() => {
                 height: unit(vars.linkActive.height),
                 left: percent(50),
                 marginLeft: unit(negative(vars.linkActive.offset)),
-                width: calc(`100% + ${unit(vars.linkActive.offset * 2)}`),
+                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${unit(offsetWidth)}`),
                 backgroundColor: colorOut(vars.linkActive.bg),
                 transform: `translate(-50%, ${unit(titleBarVars.sizing.height / 2)})`,
             },

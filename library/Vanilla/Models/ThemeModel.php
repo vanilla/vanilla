@@ -13,6 +13,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\KludgedVariablesProviderInterface;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
@@ -354,6 +355,17 @@ class ThemeModel {
     }
 
     /**
+     * Verify if ThemeKey or ID is valid.
+     *
+     * @param string|int $themeKey
+     * @return bool
+     */
+    public function verifyThemeIdentifierIsValid($themeKey) {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->themeExists($themeKey);
+    }
+
+    /**
      * Get current theme.
      *
      * @return array|void If no currnt theme set returns null
@@ -405,7 +417,7 @@ class ThemeModel {
                 $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_ERROR);
+            trigger_error($e->getMessage(), E_USER_WARNING);
             // If we had some exception during this, fallback to the default.
             $provider = $this->getThemeProvider("FILE");
             $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
@@ -531,14 +543,11 @@ class ThemeModel {
      * @return mixed The updated asset.
      */
     private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
-        $features = new ThemeFeatures($this->config, $themeAddon);
-
         // Mix in addon variables to the variables asset.
         if (preg_match('/^variables/', $assetName) &&
             $assetContents instanceof JsonAsset
-            && !$features->disableKludgedVars()
         ) {
-            $newJson = $this->mixAddonVariables($assetContents->getData());
+            $newJson = $this->mixAddonVariables($assetContents->getData(), $themeAddon);
             return new JsonAsset($newJson);
         } else {
             return $assetContents;
@@ -574,6 +583,8 @@ class ThemeModel {
 
         // A little fixup to ensure current variables are always applied to asset compat themes.
         $currentID = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
+        $currentID = $this->verifyThemeIdentifierIsValid($currentID) ? $currentID : ThemeModel::FALLBACK_THEME_KEY;
+
         if (in_array($themeID, self::ASSET_COMPAT_THEMES, true) &&
             $currentID !== null &&
             !in_array($currentID, self::ASSET_COMPAT_THEMES, true) // To prevent infinite loops.
@@ -590,12 +601,17 @@ class ThemeModel {
      * Addon provided variables will override the theme variables.
      *
      * @param string $baseAssetContent Variables json theme asset string.
+     * @param Addon $themeAddon
      * @return string The updated asset content.
      */
-    private function mixAddonVariables(string $baseAssetContent): string {
+    private function mixAddonVariables(string $baseAssetContent, Addon $themeAddon): string {
+        $features = new ThemeFeatures($this->config, $themeAddon);
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
+            if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
+                continue;
+            }
             $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 

@@ -22,6 +22,7 @@ export interface ITitleBarNavProps {
     excludeExtraNavItems?: boolean;
     containerRef?: React.RefObject<HTMLElement | null>;
     isCentered?: boolean;
+    afterNode?: React.ReactNode;
 }
 
 /**
@@ -98,6 +99,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                                 })}
                         </>
                     </ul>
+                    {this.props.afterNode}
                 </nav>
             </>
         );

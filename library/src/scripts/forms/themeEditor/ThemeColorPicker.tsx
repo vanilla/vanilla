@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useRef, useState, useLayoutEffect } from
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 import Pickr from "@simonwep/pickr";
 import "./ThemeColorPicker.scss";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
@@ -241,7 +242,7 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
             tabIndex={-1}
             baseClass={ButtonTypes.CUSTOM}
         >
-            <span className={visibility().visuallyHidden}>{props.validColorString}</span>
+            <ScreenReaderContent>{props.validColorString}</ScreenReaderContent>
         </Button>
     );
 }

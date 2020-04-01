@@ -4,7 +4,17 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, unit, EMPTY_BORDER, singleBorder } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    margins,
+    paddings,
+    unit,
+    EMPTY_BORDER,
+    singleBorder,
+    visibility,
+    srOnly,
+} from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -490,7 +500,7 @@ export const userContentClasses = useThemeCache(() => {
         {
             $nest: {
                 "& .tableWrapper .tableHead": {
-                    display: "none",
+                    ...srOnly(),
                 },
                 "& .tableWrapper tr": {
                     display: "block",

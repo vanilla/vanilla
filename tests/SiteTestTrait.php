@@ -253,9 +253,9 @@ TEMPLATE;
             $sx = (string)(time() . mt_rand(1000, 9999));
         }
 
-        $this->adminID = $this->createTestUser('Administrator', $sx);
-        $this->moderatorID = $this->createTestUser('Moderator', $sx);
-        $this->memberID = $this->createTestUser('Member', $sx);
+        $this->adminID = $this->createUserFixture('Administrator', $sx);
+        $this->moderatorID = $this->createUserFixture('Moderator', $sx);
+        $this->memberID = $this->createUserFixture('Member', $sx);
     }
 
     /**
@@ -265,7 +265,7 @@ TEMPLATE;
      * @param string $sx
      * @return int
      */
-    protected function createTestUser(string $role, string $sx): int {
+    protected function createUserFixture(string $role, string $sx): int {
         static $roleIDs;
         if (!isset($roleIDs)) {
             $roleIDs = array_column(

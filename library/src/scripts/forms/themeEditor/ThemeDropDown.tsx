@@ -8,7 +8,7 @@ import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import React, { useState } from "react";
 import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 
@@ -25,6 +25,7 @@ export function ThemeDropDown(_props: IProps) {
     const { generatedValue, initialValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
     const onChange = (option: IComboBoxOption | undefined) => {
+        setPrevValue(rawValue);
         const newValue = option ? option.value.toString() : undefined;
         setValue(newValue);
         afterChange?.(newValue);
@@ -45,6 +46,10 @@ export function ThemeDropDown(_props: IProps) {
         value: generatedValue,
     };
 
+    console.log("defaultOption.value: ", defaultOption.value);
+
+    const [prevValue, setPrevValue] = useState(defaultOption.value);
+
     return (
         <>
             <div className={themeDropDownClasses().root}>
@@ -63,7 +68,7 @@ export function ThemeDropDown(_props: IProps) {
                     onChange={onChange}
                 />
             </div>
-            <ThemeBuilderRevert variableKey={variableKey} />
+            <ThemeBuilderRevert variableKey={variableKey} fallbackValue={prevValue} />
         </>
     );
 }

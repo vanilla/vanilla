@@ -14,16 +14,19 @@ import isEqual from "lodash/isEqual";
 
 interface IProps extends Omit<React.ComponentProps<typeof Button>, "children" | "onClick"> {
     variableKey: string;
+    fallbackValue?: any;
 }
 
 export function ThemeBuilderRevert(_props: IProps) {
-    const { variableKey, ...props } = _props;
+    const { variableKey, fallbackValue, ...props } = _props;
     const classes = themeBuilderClasses();
     const { initialValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
     if (isEqual(initialValue, rawValue)) {
         return null;
     }
+
+    console.log("fallbackValue: ", fallbackValue);
 
     return (
         <Button
@@ -32,7 +35,7 @@ export function ThemeBuilderRevert(_props: IProps) {
             baseClass={ButtonTypes.ICON_COMPACT}
             title={t("Reset")}
             onClick={() => {
-                setValue(initialValue);
+                setValue(initialValue ?? fallbackValue);
             }}
         >
             <ResetIcon />

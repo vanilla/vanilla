@@ -5,6 +5,7 @@
 
 import React from "react";
 import { DashboardTableHeadItem } from "@dashboard/tables/DashboardTableHeadItem";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
 interface IProps {
     head: React.ReactNode;
@@ -12,6 +13,7 @@ interface IProps {
 }
 
 export function DashboardTable(props: IProps) {
+    dashboardClasses();
     return (
         <div className="table-wrap">
             <table className="table-data">

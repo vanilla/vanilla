@@ -90,21 +90,27 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPresetInit = makeThemeVars("standard", {
         preset: {
             style: ButtonPreset.OUTLINE,
-            border: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+            bg: globalVars.mainColors.bg,
+            fg: globalVars.mainColors.fg,
         },
     });
 
     const standardPresetInit1 = makeThemeVars("standard", {
         preset: {
             ...standardPresetInit.preset,
+            border:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? standardPresetInit.preset.bg.mix(standardPresetInit.preset.fg, vars.constants.borderMixRatio)
+                    : standardPresetInit.preset.fg.mix(standardPresetInit.preset.bg, vars.constants.borderMixRatio),
             bg:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
-                    ? globalVars.mainColors.bg
-                    : standardPresetInit.preset.border,
+                    ? standardPresetInit.preset.bg
+                    : standardPresetInit.preset.fg,
             fg:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
-                    ? globalVars.mainColors.fg
-                    : offsetLightness(globalVars.mainColors.fg, 0.1),
+                    ? standardPresetInit.preset.fg
+                    : standardPresetInit.preset.bg,
+            //offsetLightness(standardPresetInit.preset.fg, 0.1),
         },
     });
 
@@ -158,14 +164,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const primaryPresetInit2 = makeThemeVars("primary", {
         preset: {
             ...primaryPresetInit.preset,
-            border: primaryPresetInit.preset.bg,
+            border: primaryPresetInit.preset.fg,
             bg:
                 primaryPresetInit.preset.style === ButtonPreset.SOLID
-                    ? globalVars.mainColors.primary
-                    : globalVars.mainColors.bg,
+                    ? primaryPresetInit.preset.bg
+                    : primaryPresetInit.preset.fg,
             fg:
                 primaryPresetInit.preset.style === ButtonPreset.SOLID
-                    ? globalVars.mainColors.primaryContrast
+                    ? primaryPresetInit.preset.fg
                     : primaryPresetInit.preset.bg,
             bgState: globalVars.mainColors.secondary,
             fgState: globalVars.mainColors.secondaryContrast,

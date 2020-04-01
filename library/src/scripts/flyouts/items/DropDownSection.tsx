@@ -16,6 +16,7 @@ interface IProps {
     className?: string;
     level?: 2 | 3;
     children: React.ReactNode;
+    noSeparator?: boolean;
 }
 
 /**
@@ -26,7 +27,7 @@ export default class DropDownSection extends React.Component<IProps> {
         const classes = dropDownClasses();
         return (
             <React.Fragment>
-                <DropDownItemSeparator />
+                {!this.props.noSeparator && <DropDownItemSeparator />}
                 <DropDownItem className={classNames("dropDown-section", classes.section, this.props.className)}>
                     <Heading
                         title={this.props.title}

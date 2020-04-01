@@ -98,7 +98,7 @@ export const themeBuilderVariables = () => {
         width: panel.width - 2 * panel.padding - undo.width - label.width,
         fonts: {
             ...defaultFont,
-            size: 13,
+            size: 14,
             lineHeight: 1.5,
         },
     };

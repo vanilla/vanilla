@@ -33,7 +33,7 @@
         "ext-fileinfo": "*",
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
-        "firebase/php-jwt": "~5.0",
+        "firebase/php-jwt": "^5.2",
         "michelf/php-markdown": "~1.9",
         "pclzip/pclzip": "~2.0",
         "phpmailer/phpmailer": "~5.2",
@@ -49,6 +49,7 @@
         "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
+        "vanilla/js-connect-php": "dev-feature/jwt-protocol-support",
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
@@ -111,5 +112,11 @@
         "metasyntactical/composer-plugin-license-check": {
             "whitelist": ["MIT", "BSD-2-Clause", "BSD-3-Clause", "LGPL-2.1", "LGPL-3.0", "GPL-2.0", "GPL-2.0+"]
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/vanilla/jsConnectPHP"
+        }
+    ]
 }

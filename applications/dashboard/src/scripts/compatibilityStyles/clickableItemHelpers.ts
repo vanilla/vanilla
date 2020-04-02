@@ -14,7 +14,6 @@ import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compati
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import merge from "lodash/merge";
-import { emptyObject } from "expect/build/utils";
 import { NestedCSSSelectors } from "typestyle/src/types";
 
 export const EMPTY_STATE_COLORS = {
@@ -45,7 +44,7 @@ export const clickStyleFallback = (
     defaultOverwrite: undefined | NestedCSSProperties,
 ) => {
     const mergedStyles = merge(specificOverwrite || {}, defaultOverwrite || {});
-    return emptyObject(mergedStyles) ? undefined : mergedStyles;
+    return Object.keys(mergedStyles).length === 0 ? undefined : mergedStyles;
 };
 
 export const mixinClickInput = (selector: string, overwriteColors?: {}, overwriteSpecial?: {}) => {

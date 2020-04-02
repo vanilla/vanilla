@@ -54,7 +54,8 @@ class BBCode extends Gdn_Pluggable {
             $src = htmlspecialchars(Gdn_Upload::url(val('Path', $media)));
             $name = htmlspecialchars(val('Name', $media));
 
-            if (val('ImageWidth', $media)) {
+            // Test to see if this is an image
+            if (exif_imagetype($src)) {
                 return "<div class=\"Attachment Image\"><img src=\"{$src}\" alt=\"{$name}\" /></div>";
             } else {
                 return anchor($name, $src, 'Attachment File');

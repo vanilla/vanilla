@@ -7,7 +7,7 @@ import { LeftChevronCompactIcon } from "@library/icons/common";
 import { RouteComponentProps, useHistory } from "react-router";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import {t} from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import BackLink from "@library/routing/links/BackLink";
 
 interface IProps {
@@ -22,11 +22,7 @@ export function DashboardHeaderBlock(props: IProps) {
     return (
         <header className="header-block">
             <div className="title-block">
-                {props.showBackLink && history && (
-                    <BackLink aria-label="Return"
-                        onClick={props.onBackClick}
-                    />
-                )}
+                {props.showBackLink && history && <BackLink aria-label="Return" onClick={props.onBackClick} />}
                 <h1>{props.title}</h1>
             </div>
             {props.actionButtons}

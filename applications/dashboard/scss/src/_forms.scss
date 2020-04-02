@@ -190,6 +190,14 @@ label,
             margin-right: $spacer / 4;
         }
     }
+    &.grid {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        label {
+            flex-basis: 50%;
+        }
+    }
 }
 
 .form-control {

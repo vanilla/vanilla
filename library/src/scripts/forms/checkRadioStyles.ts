@@ -15,7 +15,7 @@ import {
     srOnly,
     unit,
     userSelect,
-    margins,
+    margins, paddings,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -224,6 +224,18 @@ export const checkRadioClasses = useThemeCache(() => {
         marginTop: unit(globalVars.spacer.size / 2),
     });
 
+
+    const grid = style("grid", {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-end",
+        $nest: {
+            [`.${root}`]: {
+                flexBasis: "50%",
+            }
+        },
+    });
+
     return {
         root,
         label,
@@ -235,6 +247,7 @@ export const checkRadioClasses = useThemeCache(() => {
         diskIcon,
         input,
         group,
+        grid,
         isDashboard,
     };
 });

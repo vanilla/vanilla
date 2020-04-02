@@ -54,7 +54,13 @@ class ContentSecurityPolicyModel {
      * @return Policy[]
      */
     public function getPolicies(): array {
-        $policies[] = new Policy(Policy::SCRIPT_SRC, '\'nonce-'.$this->getNonce().'\'');
+        $nonce = $this->getNonce();
+        // Note:
+        // In modern browsers that support `nonce-` unsafe-inline is ignored.
+        // Older browsers need unsafe inline applied.
+        // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+        // "Specifying nonce makes a modern browser ignore 'unsafe-inline' which could still be set for older browsers without nonce support."
+        $policies[] = new Policy(Policy::SCRIPT_SRC, "'nonce-$nonce' 'unsafe-inline'");
         foreach ($this->providers as $provider) {
             $policies = array_merge($policies, $provider->getPolicies());
         }

@@ -31,6 +31,16 @@ class Permissions implements \JsonSerializable {
         self::CHECK_MODE_RESOURCE_ONLY,
     ];
 
+    /** Array of ranked permissions. */
+    private const RANKED_PERMISSIONS = [
+        'Garden.Admin.Allow' => 6, // virtual permission for isAdmin
+        'Garden.Settings.Manage' => 5,
+        'Garden.Community.Manage' => 4,
+        'Garden.Moderation.Manage' => 3,
+        'Garden.Curation.Manage' => 2,
+        'Garden.SignIn.Allow' => 1,
+    ];
+
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
     const BAN_UPDATING = '!updating';
@@ -341,7 +351,7 @@ class Permissions implements \JsonSerializable {
     /**
      * Remove a permission.
      *
-     * @param $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
+     * @param string $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
      * @param int|array $ids One or more IDs of foreign objects (e.g. category IDs).
      * @return $this;
      */
@@ -404,6 +414,64 @@ class Permissions implements \JsonSerializable {
     public function setPermissions(array $permissions) {
         $this->permissions = $permissions;
         return $this;
+    }
+
+    /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param string $permission The permission to check.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function hasRanked(string $permission): bool {
+        if (!isset(self::RANKED_PERMISSIONS[$permission])) {
+            return $this->has($permission);
+        } else {
+            $minRank = self::RANKED_PERMISSIONS[$permission];
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+                if ($rank < $minRank) {
+                    return false;
+                } elseif ($this->has($name)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Return the highest ranking permission the user has.
+     *
+     * @return string
+     */
+    public function getRankingPermission(): string {
+        foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+            if ($this->has($name)) {
+                return $name;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Compare this permission set to another set to see which has the higher rank.
+     *
+     * @param Permissions $permissions The permissions to compare to.
+     * @return int Returns -1, 0, 1 for less than, equal, or greater than.
+     */
+    public function compareRankTo(Permissions $permissions): int {
+        $myRank = $this->getRankingPermission();
+        $otherRank = $permissions->getRankingPermission();
+
+        $r = (self::RANKED_PERMISSIONS[$myRank] ?? 0) <=> (self::RANKED_PERMISSIONS[$otherRank] ?? 0);
+        return $r;
     }
 
     /**

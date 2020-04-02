@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
- namespace Vanilla\Theme;
+namespace Vanilla\Theme;
 
  /**
   * Interface for providing variables on a theme.

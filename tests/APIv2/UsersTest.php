@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
@@ -33,6 +34,11 @@ class UsersTest extends AbstractResourceTest {
     private $configuration;
 
     /**
+     * @var \UserModel
+     */
+    private $userModel;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
@@ -49,14 +55,25 @@ class UsersTest extends AbstractResourceTest {
      * Disable email before running tests.
      */
     public function setUp(): void {
+        $this->backupSession();
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');
         $this->configuration->set('Garden.Email.Disabled', true);
 
+        $this->userModel = static::container()->get(\UserModel::class);
+
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
         $middleware->setIsPrivate(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->restoreSession();
     }
 
     /**
@@ -616,6 +633,40 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * A moderator should be able to ban a member.
+     */
+    public function testBanWithPermission() {
+        $this->createUserFixtures('testBanWithPermission');
+        $this->api()->setUserID($this->moderatorID);
+        $r = $this->api()->put("/users/{$this->memberID}/ban", ['banned' => true]);
+        $this->assertTrue($r['banned']);
+    }
+
+    /**
+     * A moderator should not be able to ban an administrator.
+     */
+    public function testBanWithoutPermission() {
+        $this->createUserFixtures('testBanWithoutPermission');
+        $this->api()->setUserID($this->moderatorID);
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You are not allowed to ban a user that has higher permissions than you.');
+        $r = $this->api()->put("/users/{$this->adminID}/ban", ['banned' => true]);
+    }
+
+    /**
+     * A moderator should not be able to ban another moderator.
+     */
+    public function testBanSamePermissionRank() {
+        $this->createUserFixtures('testBanSamePermissionRank');
+        $moderatorID = $this->moderatorID;
+        $this->createUserFixtures('testBanSamePermissionRank2');
+        $this->api()->setUserID($this->moderatorID);
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You are not allowed to ban a user with the same permission level as you.');
+        $r = $this->api()->put("/users/{$moderatorID}/ban", ['banned' => true]);
+    }
+
+    /**
      * Perform a registration and verify the result.
      *
      * @param array $fields
@@ -631,5 +682,4 @@ class UsersTest extends AbstractResourceTest {
         ksort($registeredUser);
         $this->assertEquals($registration, $registeredUser);
     }
-
 }

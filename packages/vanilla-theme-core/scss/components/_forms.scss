@@ -167,10 +167,12 @@ select::-ms-expand {
     }
 }
 
-#Form_OK,
-.Button:not(.GroupOptionsTitle),
-.Buttons .btn-primary {
-    @include Button;
+@if($staticVariables) {
+    #Form_OK,
+    .Button:not(.GroupOptionsTitle),
+    .Buttons .btn-primary {
+        @include Button;
+    }
 }
 
 .Buttons .Close,
@@ -317,8 +319,10 @@ div.token-input-dropdown {
     > .Button:first-child {
         width: 100%;
         text-align: center;
-        border-top-right-radius: $formButton_borderRadius;
-        border-bottom-right-radius: $formButton_borderRadius;
+        @if ($staticVariables) {
+            border-top-right-radius: $formButton_borderRadius;
+            border-bottom-right-radius: $formButton_borderRadius;
+        }
     }
 
     .Button.Handle,
@@ -423,4 +427,3 @@ div.token-input-dropdown {
 .CommentForm .DraftButton {
     display: none !important;
 }
-

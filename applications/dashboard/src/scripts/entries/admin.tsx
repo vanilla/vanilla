@@ -16,6 +16,8 @@ import "@library/theming/reset";
 import { ScrollOffsetContext, SCROLL_OFFSET_DEFAULTS } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import { roleReducer } from "@dashboard/roles/roleReducer";
+import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
+import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -27,6 +29,7 @@ applySharedPortalContext(props => {
     const [navHeight, setNavHeight] = useState(0);
 
     useLayoutEffect(() => {
+        bodyCSS();
         const navbar = document.querySelector(".js-navbar");
         if (navbar) {
             setNavHeight(navbar.getBoundingClientRect().height);

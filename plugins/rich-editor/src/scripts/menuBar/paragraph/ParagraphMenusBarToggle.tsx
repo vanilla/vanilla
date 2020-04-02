@@ -34,6 +34,7 @@ import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -129,7 +130,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         const formatter = new Formatter(this.quill, this.props.lastGoodSelection);
         const menuActiveFormats = menuState(formatter, this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
-
+        const label = t("Toggle Paragraph Format Menu");
         return (
             <div
                 id={this.componentID}
@@ -145,7 +146,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     type="button"
                     id={this.buttonID}
                     ref={this.buttonRef}
-                    aria-label={t("Toggle Paragraph Format Menu")}
+                    aria-label={label}
                     aria-controls={this.menuID}
                     aria-expanded={this.isMenuVisible}
                     disabled={this.props.disabled}
@@ -157,6 +158,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handleEscape}
                 >
+                    <ScreenReaderContent>{label}</ScreenReaderContent>
                     <IconForButtonWrap icon={<ActiveFormatIcon activeFormats={menuActiveFormats} />} />
                 </button>
                 <div

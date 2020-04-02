@@ -47,30 +47,35 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
                 icon: <BoldIcon />,
                 isActive: activeFormats.bold === true,
                 onClick: this.formatBold,
+                onlyIcon: true,
             },
             {
                 label: t("Format as Italic"),
                 icon: <ItalicIcon />,
                 isActive: activeFormats.italic === true,
                 onClick: this.formatItalic,
+                onlyIcon: true,
             },
             {
                 label: t("Format as Strikethrough"),
                 icon: <StrikeIcon />,
                 isActive: activeFormats.strike === true,
                 onClick: this.formatStrike,
+                onlyIcon: true,
             },
             {
                 label: t("Format as Inline Code"),
                 icon: <CodeIcon />,
                 isActive: activeFormats.code === true,
                 onClick: this.formatCode,
+                onlyIcon: true,
             },
             {
                 label: t("Format as Link"),
                 icon: <LinkIcon />,
                 isActive: typeof activeFormats.link === "string",
                 onClick: onLinkClick,
+                onlyIcon: true,
             },
         ];
     }

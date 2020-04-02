@@ -139,7 +139,8 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
                 [
                     'Destination' => 'discussions',
                     'Type' => 'Internal'
-                ]
+                ],
+                'keystone'
             );
 
             $siteSections[] = new MockSiteSection(
@@ -151,7 +152,8 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
                 [
                     'Destination' => 'discussions',
                     'Type' => 'Internal'
-                ]
+                ],
+                'keystone'
             );
         }
 

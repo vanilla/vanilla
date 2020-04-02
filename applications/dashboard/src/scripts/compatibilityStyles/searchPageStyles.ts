@@ -222,4 +222,14 @@ export const searchPageCSS = () => {
             },
         },
     });
+
+    cssOut(`.Item-Search .Media .ImgExt`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    });
+
+    cssOut(`.Item-Search .Summary`, {
+        marginTop: unit(searchResultsVars.excerpt.margin),
+    });
 };

@@ -6,9 +6,10 @@
 
 import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
-import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonUtilityClasses } from "../forms/buttonStyles";
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;

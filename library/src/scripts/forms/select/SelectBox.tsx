@@ -8,7 +8,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { useUniqueID } from "@library/utility/idUtils";

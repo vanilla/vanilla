@@ -137,7 +137,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 'ProfileKeyPhoto' => 'picture',
                 'ProfileKeyName' => 'nickname',
                 'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'sub'
+                'ProfileKeyUniqueID' => 'sub',
+                'ProfileKeyRoles' => 'roles'
             ];
 
             $model->save($provider);
@@ -377,6 +378,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
             'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
             'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.'],
+            'ProfileKeyRoles' => ['LabelCode' => 'Roles', 'Description' => 'The Key in the JSON array to designate Roles.'],
             'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => $promptOptions]
         ];
         return $formFields;
@@ -788,13 +790,13 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
-        $email = val('ProfileKeyEmail', $provider, 'email');
         $translatedKeys = [
-            val('ProfileKeyEmail', $provider, 'email') => 'Email',
-            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
-            val('ProfileKeyName', $provider, 'displayname') => 'Name',
-            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
-            val('ProfileKeyUniqueID', $provider, 'user_id') => 'UniqueID'
+            ($provider['ProfileKeyEmail'] ?? 'email') => 'Email',
+            ($provider['ProfileKeyPhoto'] ?? 'picture') => 'Photo',
+            ($provider['ProfileKeyName'] ?? 'displayname') => 'Name',
+            ($provider['ProfileKeyFullName'] ?? 'name') => 'FullName',
+            ($provider['ProfileKeyUniqueID'] ?? 'user_id') => 'UniqueID',
+            ($provider['ProfileKeyRoles'] ?? 'roles') => 'Roles'
         ];
 
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);

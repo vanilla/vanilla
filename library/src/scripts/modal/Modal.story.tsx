@@ -10,7 +10,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { StoryContent } from "@library/storybook/StoryContent";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { Tabs } from "@library/sectioning/Tabs";

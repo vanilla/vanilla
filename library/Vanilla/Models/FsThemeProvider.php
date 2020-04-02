@@ -134,6 +134,22 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * Verify if a theme exists by it's theme identifier.
+     *
+     * @param string|int $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool {
+        $themeExists = false;
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if ($theme instanceof AddonInterface) {
+            $themeExists = true;
+        }
+
+        return $themeExists;
+    }
+
+    /**
      * Get all theme assets
      *
      * @param Addon $theme
@@ -305,7 +321,14 @@ class FsThemeProvider implements ThemeProviderInterface {
         if ($filename) {
             $fullFilename = $theme->path("/assets/{$filename}");
             if (!file_exists($fullFilename) || !is_readable($fullFilename)) {
-                trigger_error("Theme asset file does not exist or is not readable: {$fullFilename}", E_USER_WARNING);
+                if (!$asset['isDefault']) {
+                    $message = "Theme asset file does not exist or is not readable: {$fullFilename}";
+                    if (debug()) {
+                        throw new ServerException($message);
+                    } else {
+                        trigger_error($message, E_USER_WARNING);
+                    }
+                }
             } else {
                 return file_get_contents($fullFilename);
             }
@@ -338,7 +361,6 @@ class FsThemeProvider implements ThemeProviderInterface {
      * Get theme assets by by themeID.
      *
      * @param string $themeID
-     *
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
@@ -373,6 +395,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     private function getDefaultAssets(): array {
         return [
             "variables" => [
+                'isDefault' => true,
                 "type" => "json",
                 "file" => "variables.json",
                 "placeholder" => '{}',

@@ -20,6 +20,8 @@ import {
     sticky,
     unit,
     userSelect,
+    EMPTY_FONTS,
+    isLightColor,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -38,10 +40,10 @@ import {
 } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { iconClasses } from "@library/icons/iconClasses";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
@@ -75,10 +77,18 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
     });
 
-    const colors = makeThemeVars("colors", {
+    const colorsInit = makeThemeVars("colors", {
         fg: globalVars.mainColors.primaryContrast,
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
+    });
+
+    const colors = makeThemeVars("colors", {
+        ...colorsInit,
+        state: {
+            bg: isLightColor(colorsInit.bg) ? rgba(0, 0, 0, 0.1) : rgba(255, 255, 255, 0.1),
+            fg: colorsInit.fg,
+        },
     });
 
     const border = makeThemeVars("border", {
@@ -94,8 +104,13 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             ? border.width
             : 0;
 
-    const swoop = makeThemeVars("swoop", {
+    const swoopInit = makeThemeVars("swoop", {
         amount: 0,
+    });
+
+    const swoop = makeThemeVars("swoop", {
+        ...swoopInit,
+        swoopOffset: (16 * swoopInit.amount) / 50,
     });
 
     const fullBleed = makeThemeVars("fullBleed", {
@@ -124,7 +139,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             width: buttonSize,
         },
         state: {
-            bg: globalVars.mainColors.statePrimary,
+            bg: colors.state.bg,
         },
     });
 
@@ -139,6 +154,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             fg: colors.fg,
         },
         fonts: {
+            ...EMPTY_FONTS,
             color: colors.fg,
         },
         sizing: {
@@ -146,7 +162,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             minHeight: unit(globalVars.icon.sizes.large),
         },
         padding: {
-            side: 6,
+            horizontal: 6,
         },
         borders: {
             style: "none",
@@ -402,9 +418,16 @@ export const titleBarClasses = useThemeCache(() => {
                 backgroundColor: colorOut(vars.compactSearch.bg),
             },
         },
-        ...mediaQueries.compact({
-            height: px(vars.sizing.mobile.height),
-        }).$nest,
+        ...(vars.swoop.amount
+            ? {
+                  $nest: {
+                      "& + *": {
+                          // Offset the next element to account for the swoop. (next element should go under the swoop slightly).
+                          marginTop: -vars.swoop.swoopOffset,
+                      },
+                  },
+              }
+            : {}),
     });
 
     const swoopStyles = {
@@ -412,7 +435,7 @@ export const titleBarClasses = useThemeCache(() => {
         left: 0,
         margin: `0 auto`,
         position: `absolute`,
-        height: calc(`100% - ${unit(vars.border.width + 1)}`),
+        height: calc(`80% - ${unit(vars.border.width + 1)}`),
         transform: translateX(`-10vw`),
         width: `120vw`,
         borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
@@ -428,7 +451,7 @@ export const titleBarClasses = useThemeCache(() => {
     const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: colorOut(vars.colors.bg),
+        // backgroundColor: colorOut(vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
         $nest: {
@@ -447,13 +470,22 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const bgContainer = style("bgContainer", {
+    const container = style("container", {
         position: "relative",
         height: percent(100),
         width: percent(100),
         paddingTop: unit(vars.spacing.padding.top),
         paddingBottom: unit(vars.spacing.padding.bottom),
+    });
+
+    const bgContainer = style("bgContainer", {
+        ...absolutePosition.fullSizeOfParent(),
+        height: percent(100),
+        width: percent(100),
+        paddingTop: unit(vars.spacing.padding.top),
+        paddingBottom: unit(vars.spacing.padding.bottom),
         boxSizing: "content-box",
+        overflow: "hidden",
     });
 
     const bgImage = style("bgImage", {
@@ -528,7 +560,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
-            justifyContent: vars.mobileLogo.justifyContent,
+            justifyContent: vars.logo.justifyContent,
             ...logoOffsetDesktop,
             $nest: {
                 "&&": {
@@ -692,23 +724,7 @@ export const titleBarClasses = useThemeCache(() => {
                 "&&": {
                     ...allButtonStates(
                         {
-                            active: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            hover: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            focus: {
+                            allStates: {
                                 color: colorOut(vars.colors.fg),
                                 $nest: {
                                     "& .meBox-buttonContent": {
@@ -949,22 +965,11 @@ export const titleBarClasses = useThemeCache(() => {
         background: vars.overlay.background,
     });
 
-    const curvedBackground = style("curvedBackground", {
-        content: quote(``),
-        background: `linear-gradient(-180deg,#fdfcfa,#f0e8de)`,
-        borderRadius: `0 0 100% 100%/0 0 60% 60%`,
-        boxShadow: `0 4px 0 #e2d5c7`,
-        height: calc(`100% - 5px`),
-        left: `-10vw`,
-        margin: `0 auto`,
-        position: "absolute",
-        width: `120vw`,
-    });
-
     return {
         root,
         bg1,
         bg2,
+        container,
         bgContainer,
         bgImage,
         negativeSpacer,

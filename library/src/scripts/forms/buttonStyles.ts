@@ -23,6 +23,7 @@ import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export enum ButtonPreset {
     SOLID = "solid",
@@ -55,7 +56,7 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     const padding = makeThemeVars("padding", {
         top: 2,
         bottom: 3,
-        side: 12,
+        horizontal: 12,
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -84,6 +85,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const makeThemeVars = variableFactory("button", forcedVars);
     const vars = buttonGlobalVariables(forcedVars);
+    const buttonGlobals = buttonGlobalVariables();
 
     const standardPresetInit = makeThemeVars("standard", {
         preset: {
@@ -130,11 +132,12 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         borders: {
             color: standardPreset.preset.border,
-            radius: globalVars.border.radius,
+            radius: buttonGlobals.border.radius,
         },
         state: {
             borders: {
                 ...globalVars.borderType.formElements.buttons,
+                radius: buttonGlobals.border.radius,
                 color: standardPreset.preset.borderState,
             },
             colors: {
@@ -185,7 +188,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         borders: {
             color: primaryPreset.preset.border,
-            radius: globalVars.border.radius,
+            radius: buttonGlobals.border.radius,
         },
         state: {
             colors: {
@@ -193,6 +196,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 fg: primaryPreset.preset.fgState,
             },
             borders: {
+                radius: buttonGlobals.border.radius,
                 color: primaryPreset.preset.borderState,
             },
         },
@@ -306,24 +310,6 @@ export const overwriteButtonClass = (
     return generateButtonClass(buttonVars, setZIndexOnState);
 };
 
-export enum ButtonTypes {
-    STANDARD = "standard",
-    PRIMARY = "primary",
-    TRANSPARENT = "transparent",
-    TRANSLUCID = "translucid",
-    CUSTOM = "custom",
-    RESET = "reset",
-    TEXT = "text",
-    TEXT_PRIMARY = "textPrimary",
-    ICON = "icon",
-    ICON_COMPACT = "iconCompact",
-    TITLEBAR_LINK = "titleBarLink",
-    DASHBOARD_STANDARD = "dashboardStandard",
-    DASHBOARD_PRIMARY = "dashboardPrimary",
-    DASHBOARD_SECONDARY = "dashboardSecondary",
-    DASHBOARD_LINK = "dashboardLink",
-}
-
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
@@ -383,7 +369,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonIcon = style(
-        "icon",
+        "buttonIcon",
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
             height: vars.sizing.compactHeight,

@@ -7,12 +7,14 @@ import { useThemeCache, styleFactory, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
 
     const padding = vars("padding", {
         right: 30,
+        left: inputMixin().paddingRight as string,
     });
 
     return { padding };
@@ -33,6 +35,7 @@ export const selectOneClasses = useThemeCache(() => {
             },
             "& .inputBlock-inputText": {
                 paddingRight: unit(vars.padding.right),
+                paddingLeft: unit(vars.padding.left),
                 position: "relative",
             },
             "& .SelectOne__indicators": {

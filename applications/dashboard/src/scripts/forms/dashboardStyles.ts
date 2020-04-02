@@ -21,8 +21,6 @@ export const dashboardClasses = useThemeCache(() => {
         marginBottom: globalVars.gutter.size,
     });
 
-    cssOut(`.form-group .suggestedTextInput-option`, suggestedTextStyleHelper().option);
-
     return {
         formList,
         helpAsset,

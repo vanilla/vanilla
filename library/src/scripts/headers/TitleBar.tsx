@@ -7,7 +7,7 @@
 import { useBannerContext } from "@library/banner/BannerContext";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
@@ -97,28 +97,30 @@ export default function TitleBar(_props: IProps) {
     }, [isPreviewFirstRender]);
 
     const headerContent = (
-        <HashOffsetReporter className={classes.bgContainer}>
-            <animated.div
-                {...bgProps}
-                className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
-            ></animated.div>
-            {!isPreviewFirstRender && (
+        <HashOffsetReporter className={classes.container}>
+            <div className={classes.bgContainer}>
                 <animated.div
-                    {...bg2Props}
-                    className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
-                >
-                    {/* Cannot be a background image there will be flickering. */}
-                    {vars.colors.bgImage && (
-                        <img
-                            src={vars.colors.bgImage}
-                            className={classes.bgImage}
-                            alt={"titleBarImage"}
-                            aria-hidden={true}
-                        />
-                    )}
-                    {vars.overlay && <div className={classes.overlay}></div>}
-                </animated.div>
-            )}
+                    {...bgProps}
+                    className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+                ></animated.div>
+                {!isPreviewFirstRender && (
+                    <animated.div
+                        {...bg2Props}
+                        className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
+                    >
+                        {/* Cannot be a background image there will be flickering. */}
+                        {vars.colors.bgImage && (
+                            <img
+                                src={vars.colors.bgImage}
+                                className={classes.bgImage}
+                                alt={"titleBarImage"}
+                                aria-hidden={true}
+                            />
+                        )}
+                        {vars.overlay && <div className={classes.overlay}></div>}
+                    </animated.div>
+                )}
+            </div>
             <Container fullGutter>
                 <div className={classNames(classes.bar, { isHome: showSubNav })}>
                     {isCompact &&
@@ -127,27 +129,40 @@ export default function TitleBar(_props: IProps) {
                         ) : (
                             <FlexSpacer className="pageHeading-leftSpacer" />
                         ))}
-                    {!isCompact && (
+                    {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
                         <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
-                            <HeaderLogo
-                                className={classNames(
-                                    "titleBar-logoContainer",
-                                    classes.logoContainer,
-                                    isDesktopLogoCentered && classes.logoCenterer,
-                                )}
-                                logoClassName="titleBar-logo"
-                                logoType={LogoType.DESKTOP}
-                            />
+                            <span
+                                className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
+                                ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
+                            >
+                                <HeaderLogo
+                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                    logoClassName="titleBar-logo"
+                                    logoType={LogoType.DESKTOP}
+                                />
+                            </span>
                         </animated.div>
                     )}
-                    {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
+                    {!isCompact && !isDesktopLogoCentered && (
+                        <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
+                    )}
                     {!isSearchOpen && !isCompact && (
                         <TitleBarNav
                             isCentered={vars.navAlignment.alignment === "center"}
-                            containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
+                            containerRef={
+                                vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                    ? collisionSourceRef
+                                    : undefined
+                            }
                             className={classes.nav}
                             linkClassName={classes.topElement}
                             linkContentClassName="titleBar-navLinkContent"
+                            afterNode={
+                                !isCompact &&
+                                isDesktopLogoCentered && (
+                                    <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
+                                )
+                            }
                         />
                     )}
                     {isCompact && (
@@ -174,7 +189,9 @@ export default function TitleBar(_props: IProps) {
                             )}
                         </>
                     )}
-                    {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
+                    {!isCompact && !isDesktopLogoCentered && (
+                        <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
+                    )}
                     <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
                         {!isSearchOpen && (
                             <div className={classes.extraMeBoxIcons}>

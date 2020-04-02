@@ -82,9 +82,9 @@ describe("styleHelperBorders", () => {
                     right: 29,
                 };
                 const expected: IBorderRadiusOutput = {
-                    borderBottomLeftRadius: 0,
+                    borderBottomLeftRadius: "0px",
                     borderBottomRightRadius: "29px",
-                    borderTopLeftRadius: 0,
+                    borderTopLeftRadius: "0px",
                     borderTopRightRadius: "29px",
                 };
 
@@ -99,8 +99,8 @@ describe("styleHelperBorders", () => {
                 const expected: IBorderRadiusOutput = {
                     borderBottomLeftRadius: "12px",
                     borderBottomRightRadius: "12px",
-                    borderTopLeftRadius: 0,
-                    borderTopRightRadius: 0,
+                    borderTopLeftRadius: "0px",
+                    borderTopRightRadius: "0px",
                 };
 
                 expect(standardizeBorderRadius(input)).deep.eq(expected);

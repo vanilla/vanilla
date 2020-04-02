@@ -7,7 +7,6 @@
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { unit } from "@library/styles/styleHelpers";
 import { calc } from "csx";
-import { emptyObject } from "expect/build/utils";
 
 export interface ISpacing {
     top?: string | number;

@@ -41,6 +41,7 @@ import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShado
 import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper } from "csx";
 import { media } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -818,20 +819,31 @@ export const bannerClasses = useThemeCache(
                   }
                 : {};
 
+        const titleBarVars = titleBarVariables();
+
         // NOTE FOR FUTURE
         // Do no apply overflow hidden here.
         // It will cut off the search box in the banner.
-        const root = style({
-            position: "relative",
-            maxWidth: percent(100),
-            backgroundColor: colorOut(vars.outerBackground.color),
-            $nest: {
-                [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
-                "& .searchBar": {
-                    height: unit(vars.searchBar.sizing.height),
+        const root = style(
+            {
+                position: "relative",
+                zIndex: 1, // To make sure it sites on top of panel layout overflow indicators.
+                maxWidth: percent(100),
+                backgroundColor: colorOut(vars.outerBackground.color),
+                $nest: {
+                    [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
+                    "& .searchBar": {
+                        height: unit(vars.searchBar.sizing.height),
+                    },
                 },
             },
-        });
+            titleBarVars.swoop.amount > 0
+                ? {
+                      marginTop: -titleBarVars.swoop.swoopOffset,
+                      paddingTop: titleBarVars.swoop.swoopOffset,
+                  }
+                : {},
+        );
 
         // Use this for cutting of the right image with overflow hidden.
         const overflowRightImageContainer = style("overflowRightImageContainer", {

@@ -11,14 +11,7 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import Button from "@library/forms/Button";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { StoryTile } from "@library/storybook/StoryTile";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
-import { CheckCompactIcon, CloseCompactIcon } from "@library/icons/common";
-import { ComposeIcon } from "@library/icons/titleBar";
-import Paragraph from "@library/layout/Paragraph";
 
 const story = storiesOf("Components", module);
 

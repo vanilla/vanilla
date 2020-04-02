@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";

@@ -11,7 +11,7 @@ import { LiveMessage } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
 import Container from "@library/layout/components/Container";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 

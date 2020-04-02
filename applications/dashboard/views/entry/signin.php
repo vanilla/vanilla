@@ -39,7 +39,7 @@ echo '</div>';
 // Render the buttons to select other methods of signing in.
 if (count($Methods) > 0) {
     echo '<div class="Methods">'
-        .wrap('<b>'.t('Or you can...').'</b>', 'div');
+        .wrap('<b class="Methods-label">'.t('Or you can...').'</b>', 'div');
 
     foreach ($Methods as $Key => $Method) {
         $CssClass = 'Method Method_'.$Key;

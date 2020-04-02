@@ -6,10 +6,8 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    colorOut,
     margins,
     paddings,
-    clickableItemStates,
     unit,
     fonts,
     extendItemContainer,
@@ -22,6 +20,7 @@ import { percent, px } from "csx";
 import { media } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { containerVariables } from "@library/layout/components/containerStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");

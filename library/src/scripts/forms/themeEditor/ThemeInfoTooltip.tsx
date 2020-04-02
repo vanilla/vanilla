@@ -5,7 +5,7 @@
 
 import React from "react";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { WarningIcon } from "@library/icons/common";
+import { WarningIcon, InformationIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 
@@ -17,7 +17,7 @@ export function ThemeInfoTooltip(props: IProps) {
         <span className={classes.tooltip}>
             <ToolTip {...props}>
                 <ToolTipIcon>
-                    <WarningIcon warningMessage={t("Info")} />
+                    <InformationIcon informationMessage={t("Info")} />
                 </ToolTipIcon>
             </ToolTip>
         </span>

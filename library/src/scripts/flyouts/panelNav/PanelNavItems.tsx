@@ -8,7 +8,7 @@ import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/cor
 import { useSiteNavContext } from "@library/navigation/SiteNavContext";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 import classNames from "classnames";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";

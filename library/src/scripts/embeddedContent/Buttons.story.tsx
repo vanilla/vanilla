@@ -14,9 +14,10 @@ import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
-import { ButtonPreset, ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { ButtonPreset, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export default {
     title: "Buttons",

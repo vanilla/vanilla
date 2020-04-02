@@ -791,12 +791,12 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
         $translatedKeys = [
-            $provider['ProfileKeyEmail'] ?? 'email' => 'Email',
-            $provider['ProfileKeyPhoto'] ?? 'picture' => 'Photo',
-            $provider['ProfileKeyName'] ?? 'displayname' => 'Name',
-            $provider['ProfileKeyFullName'] ?? 'name' => 'FullName',
-            $provider['ProfileKeyUniqueID'] ?? 'user_id' => 'UniqueID',
-            $provider['ProfileKeyRoles'] ?? 'roles' => 'Roles'
+            ($provider['ProfileKeyEmail'] ?? 'email') => 'Email',
+            ($provider['ProfileKeyPhoto'] ?? 'picture') => 'Photo',
+            ($provider['ProfileKeyName'] ?? 'displayname') => 'Name',
+            ($provider['ProfileKeyFullName'] ?? 'name') => 'FullName',
+            ($provider['ProfileKeyUniqueID'] ?? 'user_id') => 'UniqueID',
+            ($provider['ProfileKeyRoles'] ?? 'roles') => 'Roles'
         ];
 
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);

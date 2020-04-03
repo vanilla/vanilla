@@ -490,7 +490,7 @@ export const bannerClasses = useThemeCache(
                         },
                         ...borderRadii({
                             left: vars.border.radius,
-                            right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+                            right: mirrorLeftRadius ? importantUnit(vars.border.radius) : importantUnit(0),
                         }),
                         borderColor: colorOut(vars.searchBar.border.color),
                     },

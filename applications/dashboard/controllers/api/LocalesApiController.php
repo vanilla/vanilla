@@ -73,7 +73,7 @@ class LocalesApiController extends Controller {
         foreach ($locales as $localeID => $locale) {
             $localeItem = [
                 'localeID' => $localeID,
-                'localeKey' => substr($locale['Locale'], 0, 2),
+                'localeKey' => $locale['Locale'],
                 'regionalKey' => $locale['Locale'],
             ];
 
@@ -111,7 +111,8 @@ class LocalesApiController extends Controller {
             $displayNames = [];
             foreach ($locales as $locale) {
                 $displayName = \Locale::getDisplayLanguage($row["localeKey"], $locale);
-
+                $displayNameRegion = \Locale::getDisplayRegion($row["localeKey"], $locale);
+                $displayName = (empty($displayNameRegion)) ? $displayName : $displayName . " ($displayNameRegion)";
                 // Standardize capitalization
                 $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
 

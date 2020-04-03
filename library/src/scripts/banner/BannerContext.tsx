@@ -6,6 +6,7 @@
 import React, { useContext, useState, useEffect, useRef, useDebugValue } from "react";
 import { useHistory } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
+import { usePageChangeListener } from "@library/pageViews/pageViewTracking";
 
 interface IContextValue {
     bannerExists: boolean;
@@ -49,15 +50,10 @@ export function useBannerContainerDivRef() {
 export function BannerContextProvider(props: { children: React.ReactNode }) {
     const [bannerExists, setBannerExists] = useState(false);
     const [bannerRect, setBannerRect] = useState<DOMRect | null>(null);
-    const history = useHistory();
-    useEffect(() => {
-        // Clear the banner information when navigating between pages.
-        return history.listen(() => {
-            setBannerExists(false);
-            setBannerRect(null);
-        });
-    }, [history]);
-
+    usePageChangeListener(() => {
+        setBannerExists(false);
+        setBannerRect(null);
+    });
     return (
         <context.Provider
             value={{

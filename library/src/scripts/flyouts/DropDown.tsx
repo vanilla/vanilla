@@ -136,7 +136,13 @@ export default function DropDown(props: IDropDownProps) {
                                 {mobileTitle ?? title}
                             </FrameHeaderMinimal>
                         )}
-                        <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
+                        {openAsModal ? (
+                            props.children
+                        ) : (
+                            <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                {props.children}
+                            </ContentTag>
+                        )}
                     </DropDownContents>
                 );
             }}

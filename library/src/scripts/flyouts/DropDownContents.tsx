@@ -45,6 +45,9 @@ export default class DropDownContents extends React.Component<IProps> {
               })
             : undefined;
         const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
+        if (this.props.openAsModal) {
+            return this.props.children;
+        }
 
         return (
             <div

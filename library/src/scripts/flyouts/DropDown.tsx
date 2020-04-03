@@ -136,7 +136,7 @@ export default function DropDown(props: IDropDownProps) {
                                 {mobileTitle ?? title}
                             </FrameHeaderMinimal>
                         )}
-                        {openAsModal ? (
+                        {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
                             props.children
                         ) : (
                             <ContentTag className={classNames("dropDownItems", classes.items)}>

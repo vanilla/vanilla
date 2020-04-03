@@ -71,12 +71,9 @@ class LocalesApiController extends Controller {
         $hasEnLocale = false;
         $result = [];
         foreach ($locales as $localeID => $locale) {
-            $localKey = (strlen($locale['Locale']) === 5) ?
-                substr($locale['Locale'], 0, 5) :
-                substr($locale['Locale'], 0, 2);
             $localeItem = [
                 'localeID' => $localeID,
-                'localeKey' => $localKey,
+                'localeKey' => $locale['Locale'],
                 'regionalKey' => $locale['Locale'],
             ];
 

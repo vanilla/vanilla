@@ -19,13 +19,18 @@ class HeadingHtmlProcessor extends HtmlProcessor {
      * @inheritDoc
      */
     public function processDocument(): HtmlDocument {
+        $this->getHeadings(true);
         return $this->document;
     }
 
     /**
+     * Get all the headings in the document.
+     *
+     * @param bool $applyToDom Whether or not to apply the heading ids into the dom.
+     *
      * @return Heading[]
      */
-    public function getHeadings(): array {
+    public function getHeadings(bool $applyToDom = false): array {
         $domHeadings = $this->queryXPath('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
 
         /** @var Heading[] $headings */
@@ -39,11 +44,20 @@ class HeadingHtmlProcessor extends HtmlProcessor {
             $level = (int) str_replace('h', '', $domHeading->tagName);
 
             $text = $domHeading->textContent;
+            if ($text === "") {
+                // Ignore empty slugs.
+                continue;
+            }
             $slug = slugify($text);
+
             $count = $slugKeyCache[$slug] ?? 0;
             $slugKeyCache[$slug] = $count + 1;
             if ($count > 0) {
                 $slug .= '-' . $count;
+            }
+
+            if ($applyToDom) {
+                $domHeading->setAttribute('data-id', $slug);
             }
 
             $headings[] = new Heading(

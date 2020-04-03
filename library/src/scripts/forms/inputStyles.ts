@@ -48,8 +48,7 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         color: colors.fg,
     });
 
-    const border: IBordersWithRadius = makeThemeVars("borders", {
-        ...EMPTY_BORDER,
+    const border = makeThemeVars("borders", {
         ...globalVars.borderType.formElements.default,
     });
 

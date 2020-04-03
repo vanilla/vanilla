@@ -24,6 +24,7 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\LegacySpoilerTrait;
 use Vanilla\Formatting\Html\Processor\HeadingHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
+use Vanilla\Formatting\Html\Processor\ZendeskWysiwygProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
 
 /**
@@ -49,6 +50,8 @@ class HtmlFormat extends BaseFormat {
 
     /** @var bool allowExtendedContent */
     private $allowExtendedContent;
+
+    protected $processors = [UserContentCssProcessor::class, HeadingHtmlProcessor::class];
 
     /**
      * Constructor for dependency injection.
@@ -89,7 +92,7 @@ class HtmlFormat extends BaseFormat {
             $result = $this->htmlEnhancer->enhance($result);
         }
 
-        $result = $this->processsDocument($result);
+        $result = $this->processDocument($result);
         return $result;
     }
 
@@ -115,7 +118,7 @@ class HtmlFormat extends BaseFormat {
 
         // No Embeds
         $result = $this->htmlEnhancer->enhance($result, true, false);
-        $result = $this->processsDocument($result);
+        $result = $this->processDocument($result);
         return $result;
     }
 
@@ -165,10 +168,10 @@ class HtmlFormat extends BaseFormat {
      * @param string $content
      * @return string
      */
-    private function processsDocument(string $content) {
+    private function processDocument(string $content) {
         // Normalization
         $document = new HtmlDocument($content);
-        $document = $document->applyProcessors([UserContentCssProcessor::class, HeadingHtmlProcessor::class]);
+        $document = $document->applyProcessors($this->processors);
         return $document->getInnerHtml();
     }
 

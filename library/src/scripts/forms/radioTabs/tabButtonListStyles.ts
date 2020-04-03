@@ -41,7 +41,7 @@ export const tabButtonListClasses = useThemeCache(() => {
             "&:focus, &:active, &.focus-visible": {
                 color: colorOut(globalVars.mainColors.primary),
             },
-            [`& .${classesCount.text()}`]: {
+            [`& .${classesCount.text}`]: {
                 color: colorOut(compactMeBoxVars.colors.bg),
             },
         },

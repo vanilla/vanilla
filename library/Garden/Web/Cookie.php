@@ -191,7 +191,7 @@ class Cookie {
         $expire = time() - 3600;
         $result = [];
         foreach ($deletes as $name => $_) {
-            $result[$name] = ['', $expire];
+            $result[$name] = ['', $expire, $this->path];
         }
         return $result;
     }

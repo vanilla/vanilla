@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f326a3342280dc82d1f5bdace4df0b55",
+    "content-hash": "1e4efe7a18964ba1fd0038ce0e252d49",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -1500,16 +1500,16 @@
         },
         {
             "name": "vanilla/js-connect-php",
-            "version": "dev-feature/jwt-protocol-support",
+            "version": "v3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/jsConnectPHP.git",
-                "reference": "2dfb563b898765311ec636fb4cc976dcb7540640"
+                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/jsConnectPHP/zipball/2dfb563b898765311ec636fb4cc976dcb7540640",
-                "reference": "2dfb563b898765311ec636fb4cc976dcb7540640",
+                "url": "https://api.github.com/repos/vanilla/jsConnectPHP/zipball/9b7317b15ef8ef514905b287dde3c2e965ea138b",
+                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b",
                 "shasum": ""
             },
             "require": {
@@ -1533,11 +1533,7 @@
                     "Vanilla\\JsConnect\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Vanilla\\JsConnect\\Tests\\": "tests"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1548,11 +1544,7 @@
                 }
             ],
             "description": "Client library for Vanilla's jsConnect SSO system.",
-            "support": {
-                "source": "https://github.com/vanilla/jsConnectPHP/tree/feature/jwt-protocol-support",
-                "issues": "https://github.com/vanilla/jsConnectPHP/issues"
-            },
-            "time": "2020-04-02T12:06:40+00:00"
+            "time": "2020-04-03T16:13:41+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -3943,7 +3935,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "vanilla/js-connect-php": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,

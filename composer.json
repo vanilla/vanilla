@@ -49,7 +49,7 @@
         "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
-        "vanilla/js-connect-php": "dev-feature/jwt-protocol-support",
+        "vanilla/js-connect-php": "^3",
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
@@ -120,11 +120,5 @@
                 "GPL-2.0+"
             ]
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/vanilla/jsConnectPHP"
-        }
-    ]
+    }
 }

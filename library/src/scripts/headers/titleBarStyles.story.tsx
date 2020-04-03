@@ -20,6 +20,7 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import Container from "@library/layout/components/Container";
 import { PanelArea } from "@library/layout/PanelLayout";
+import { StoryLongText } from "@library/storybook/StoryLongText";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -64,11 +65,6 @@ const initialState = testStoreState({
 });
 
 function StoryTitleBar(props: { title: string }) {
-    let dummyData: React.ReactNode[] = [];
-    for (let i = 0; i < 1000; i++) {
-        dummyData.push(<p>Scrollable content</p>);
-    }
-
     return (
         <PageContext.Provider
             value={{
@@ -84,7 +80,9 @@ function StoryTitleBar(props: { title: string }) {
                         <StoryHeading depth={2}>{props.title}</StoryHeading>
                         <TitleBar useMobileBackButton={false} isFixed={true} />
                         <Container>
-                            <PanelArea>{dummyData}</PanelArea>
+                            <PanelArea>
+                                <StoryLongText />
+                            </PanelArea>
                         </Container>
                     </TitleBarDeviceProvider>
                 </BannerContextProvider>

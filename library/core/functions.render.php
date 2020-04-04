@@ -1262,7 +1262,7 @@ if (!function_exists('plural')) {
      * @param $number
      * @param $singular
      * @param $plural
-     * @param bool $formattedNumber
+     * @param string|false $formattedNumber
      * @return string
      */
     function plural($number, $singular, $plural, $formattedNumber = false) {

@@ -854,10 +854,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
 
         $canonicalUrl = url($this->makeCanonicalUrl($controller, $method, $args), true);
-        $canonicalUrlOld = $this->makeCanonicalUrlOld($controller);
-        if ($canonicalUrl !== $canonicalUrlOld) {
-            trigger_error("Canonical URL $canonicalUrl !== $canonicalUrlOld.", E_USER_NOTICE);
-        }
         $controller->canonicalUrl($canonicalUrl);
 
         // Now that we have everything its time to call the callback for the controller.
@@ -970,8 +966,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Add args after known names to the querystring.
         $query = [];
         $split = false;
+        $hasSender = false;
         foreach ($args as $key => $value) {
             if (is_object($value)) {
+                $hasSender = true;
                 continue;
             } elseif (in_array($key, ['search', 'query']) || $split) {
                 if (!empty($value) && $value != ($defaults[$key] ?? '')) {
@@ -980,7 +978,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 $split = true;
             } elseif (is_numeric($key)) {
                 break;
-            } else {
+            } elseif ($key === 'args' && is_array($value) && $hasSender) {
+                $parts = array_merge($parts, $value);
+            } elseif (is_scalar($value)) {
                 $parts[$key] = $value;
             }
         }

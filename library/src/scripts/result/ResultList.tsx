@@ -28,8 +28,7 @@ export default class ResultList extends React.Component<IProps> {
     public render() {
         const hasResults = this.props.results && this.props.results.length > 0;
         let content;
-        const classes = searchBarClasses();
-        const classesSearchResults = searchResultsClasses();
+        const classes = searchResultsClasses();
 
         if (hasResults) {
             const ResultComponent = this.props.result ? this.props.result : Result;
@@ -38,13 +37,13 @@ export default class ResultList extends React.Component<IProps> {
             });
         } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
             content = (
-                <Paragraph className={classNames("searchResults-noResults", classesSearchResults.noResults)}>
+                <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>
                     {this.props.emptyMessage ? this.props.emptyMessage : t("No results found.")}
                 </Paragraph>
             );
         } else {
             content = (
-                <Paragraph className={classNames("searchResults-noResults", "isEmpty", classesSearchResults.noResults)}>
+                <Paragraph className={classNames("searchResults-noResults", "isEmpty", classes.noResults)}>
                     <Translate source="No results for '<0/>'." c0={this.props.searchTerm} />
                 </Paragraph>
             );
@@ -52,17 +51,6 @@ export default class ResultList extends React.Component<IProps> {
 
         const Tag = hasResults ? `ul` : `div`;
 
-        return (
-            <Tag
-                className={classNames(
-                    "searchResults",
-                    classesSearchResults.root,
-                    this.props.className,
-                    classes.results,
-                )}
-            >
-                {content}
-            </Tag>
-        );
+        return <Tag className={classNames("searchResults", classes.root, this.props.className)}>{content}</Tag>;
     }
 }

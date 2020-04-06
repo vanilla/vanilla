@@ -47,7 +47,7 @@ export const themeDropDownClasses = useThemeCache(() => {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-valueContainer": {
+            "& .suggestedTextInput-valueContainer.suggestedTextInput-valueContainer": {
                 minHeight: unit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,

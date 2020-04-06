@@ -7,6 +7,7 @@
 namespace Vanilla\Models;
 
 use Garden\Web\Exception\ServerException;
+use Vanilla\Database\Operation;
 
 /**
  * Limited pipeline model.
@@ -29,9 +30,9 @@ class LimitedPipelineModel extends PipelineModel {
     /**
      * @inheritdoc
      */
-    public function insert(array $set) {
+    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
         if (in_array('insert', $this->operations)) {
-            return parent::insert($set);
+            return parent::insert($set, $mode);
         } else {
             throw new ServerException('Method insert() is not supported.');
         }
@@ -62,9 +63,9 @@ class LimitedPipelineModel extends PipelineModel {
     /**
      * @inheritdoc
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         if (in_array('update', $this->operations)) {
-            return parent::update($set, $where);
+            return parent::update($set, $where, $mode);
         } else {
             throw new ServerException('Method update() is not supported.');
         }

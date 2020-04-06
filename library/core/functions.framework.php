@@ -1841,10 +1841,9 @@ if (!function_exists('t')) {
      *
      * @param string $code The code related to the language-specific definition.
      *   Codes that begin with an '@' symbol are treated as literals and not translated.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
-     * @deprecated
      */
     function t($code, $default = false) {
         return Gdn::translate($code, $default);

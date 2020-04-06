@@ -5,10 +5,16 @@
 import React from "react";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { colorOut } from "@library/styles/styleHelpers";
+import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 
-export function DefaultBannerBg() {
-    const classes = bannerClasses();
-    const vars = bannerVariables();
+interface IProps {
+    isContentBanner?: boolean;
+}
+
+export function DefaultBannerBg(props: IProps) {
+    const { isContentBanner } = props;
+    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
 
     return (
         <svg

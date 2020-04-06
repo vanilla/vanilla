@@ -14,6 +14,7 @@ import {
     colorOut,
     absolutePosition,
     importantColorOut,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { inputMixin } from "@library/forms/inputStyles";
 
@@ -54,7 +55,7 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         color: colorOut(globalVars.elementaryColors.white),
     });
     const optionButton = style("optionButton", {
-        height: themeBuilderVars.input.height - 2,
+        height: importantUnit(themeBuilderVars.input.height - 2),
         color: colorOut(globalVars.elementaryColors.white),
         $nest: {
             "&:hover, &:active, &:focus": {

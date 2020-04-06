@@ -147,7 +147,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     Object.keys(links.colors).forEach(state => {
         if (state !== "default" && state !== "visited") {
             if (!links[state]) {
-                links.colors[state] = generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.2);
+                links.colors[state] =
+                    generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.008);
             }
         }
     });
@@ -173,7 +174,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const borderType = makeThemeVars("borderType", {
         formElements: {
-            default: border,
+            default: { ...border, color: mixBgAndFg(0.35).saturate(0.1) },
             buttons: border,
         },
         modals: border,

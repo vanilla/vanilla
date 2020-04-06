@@ -657,7 +657,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * Alias for requestAddress()
      *
-     * @return type
+     * @return string
      */
     public function ipAddress() {
         return $this->_Environment['ADDRESS'];

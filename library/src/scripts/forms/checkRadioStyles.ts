@@ -29,9 +29,8 @@ export const checkRadioVariables = useThemeCache(() => {
     const themeVars = variableFactory("checkRadio");
 
     const border = themeVars("border", {
-        width: formElementVars.border.width,
+        ...formElementVars.border,
         radius: 2,
-        color: globalVars.mixBgAndFg(0.5),
     });
 
     const main = themeVars("check", {
@@ -97,7 +96,6 @@ export const checkRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = checkRadioVariables();
     const style = styleFactory("checkRadio");
-    const flexes = flexHelper();
 
     const isDashboard = style("isDashboard", {});
 

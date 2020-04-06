@@ -121,7 +121,9 @@ export default function Banner(props: IProps) {
                     <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
                         {!props.backgroundImage &&
                             !vars.outerBackground.image &&
-                            !vars.outerBackground.unsetBackground && <DefaultBannerBg />}
+                            !vars.outerBackground.unsetBackground && (
+                                <DefaultBannerBg isContentBanner={isContentBanner} />
+                            )}
                     </div>
                     {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                     <Container fullGutter className={classes.fullHeight}>

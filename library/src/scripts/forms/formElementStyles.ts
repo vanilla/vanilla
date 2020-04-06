@@ -32,7 +32,7 @@ export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables
     const border = makeThemeVars("border", {
         width: vars.borderType.formElements.default.width ?? vars.border.width,
         color: vars.borderType.formElements.default.color ?? vars.border.color,
-        style: vars.borderType.formElements.default.radius ?? vars.border.style,
+        style: vars.borderType.formElements.default.style ?? vars.border.style,
         radius: vars.borderType.formElements.default.radius ?? vars.border.radius,
     });
 

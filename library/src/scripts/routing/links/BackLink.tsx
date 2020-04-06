@@ -122,7 +122,7 @@ export default function BackLink(props: IProps) {
         );
     }
 
-    return <div className={classNames('backLink', classes.root, props.className)}>{content}</div>;
+    return <div className={classNames("backLink", classes.root, props.className)}>{content}</div>;
 }
 
 BackLink.defaultProps = {

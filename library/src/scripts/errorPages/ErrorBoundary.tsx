@@ -40,9 +40,12 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
             return (
                 <Message
                     onCancel={() => {
+                        this.setState({ error: null });
+                    }}
+                    onConfirm={() => {
                         window.location.reload();
                     }}
-                    cancelText={t("Reload")}
+                    confirmText={t("Reload")}
                     isFixed
                     icon={<ErrorIcon />}
                     stringContents={error.message}

@@ -147,7 +147,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     Object.keys(links.colors).forEach(state => {
         if (state !== "default" && state !== "visited") {
             if (!links[state]) {
-                links.colors[state] = generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.2);
+                links.colors[state] =
+                    generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.008);
             }
         }
     });

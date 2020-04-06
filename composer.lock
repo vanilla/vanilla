@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d50e8c422cdf8d1361c9f36eea147e3",
+    "content-hash": "1e4efe7a18964ba1fd0038ce0e252d49",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -134,23 +134,23 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v5.0.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e"
+                "reference": "feb0e820b8436873675fd3aca04f3728eb2185cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
-                "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/feb0e820b8436873675fd3aca04f3728eb2185cb",
+                "reference": "feb0e820b8436873675fd3aca04f3728eb2185cb",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": " 4.8.35"
+                "phpunit/phpunit": ">=4.8 <=9"
             },
             "type": "library",
             "autoload": {
@@ -176,7 +176,11 @@
             ],
             "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
             "homepage": "https://github.com/firebase/php-jwt",
-            "time": "2017-06-27T22:17:23+00:00"
+            "keywords": [
+                "jwt",
+                "php"
+            ],
+            "time": "2020-03-25T18:49:23+00:00"
         },
         {
             "name": "metasyntactical/composer-plugin-license-check",
@@ -1493,6 +1497,54 @@
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
             "time": "2019-10-16T15:36:02+00:00"
+        },
+        {
+            "name": "vanilla/js-connect-php",
+            "version": "v3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/jsConnectPHP.git",
+                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/jsConnectPHP/zipball/9b7317b15ef8ef514905b287dde3c2e965ea138b",
+                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "firebase/php-jwt": "^5.2",
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "classpreloader/classpreloader": "^4.0",
+                "classpreloader/console": "^3.0",
+                "phpunit/phpunit": "~7.0",
+                "vanilla/standards": "^1.3",
+                "vimeo/psalm": "^3.10"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.compat.php"
+                ],
+                "psr-4": {
+                    "Vanilla\\JsConnect\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "Client library for Vanilla's jsConnect SSO system.",
+            "time": "2020-04-03T16:13:41+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -3896,5 +3948,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

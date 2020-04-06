@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, colorOut, ColorValues, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, ColorValues, unit, isLightColor } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
@@ -35,30 +35,28 @@ export const countClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = countVariables();
     const style = styleFactory("count");
+    const fg = isLightColor(vars.notifications.bg)
+        ? globalVars.elementaryColors.almostBlack
+        : globalVars.elementaryColors.white;
 
-    const root = (countBg?: ColorValues) => {
-        return style({
-            ...absolutePosition.topRight(4),
-            display: "block",
-            backgroundColor: countBg ? colorOut(countBg) : colorOut(vars.notifications.bg),
-            height: unit(vars.sizing.height),
-            lineHeight: unit(vars.sizing.height),
-            minWidth: unit(vars.sizing.height),
-            fontSize: unit(vars.font.size),
-            fontWeight: globalVars.fonts.weights.semiBold,
-            borderRadius: unit(vars.sizing.height / 2),
-            whiteSpace: "nowrap",
-            padding: `0 3px`,
-        });
-    };
-
-    const text = (countFg?: ColorValues) => {
-        return style("text", {
-            display: "block",
-            textAlign: "center",
-            color: countFg ? colorOut(countFg) : "inherit",
-        });
-    };
+    const root = style({
+        ...absolutePosition.topRight(4),
+        display: "block",
+        backgroundColor: colorOut(vars.notifications.bg),
+        height: unit(vars.sizing.height),
+        lineHeight: unit(vars.sizing.height),
+        minWidth: unit(vars.sizing.height),
+        fontSize: unit(vars.font.size),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        borderRadius: unit(vars.sizing.height / 2),
+        whiteSpace: "nowrap",
+        padding: `0 3px`,
+    });
+    const text = style("text", {
+        display: "block",
+        textAlign: "center",
+        color: colorOut(fg),
+    });
 
     return { root, text };
 });

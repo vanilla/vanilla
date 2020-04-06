@@ -7,6 +7,7 @@ import React from "react";
 import { logError } from "@vanilla/utils";
 import Message from "@library/messages/Message";
 import { ErrorIcon } from "@library/icons/common";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     children: React.ReactNode;
@@ -22,10 +23,14 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
         error: null,
     };
 
+    static getDerivedStateFromError(error: Error) {
+        // Update state so the next render will show the fallback UI.
+        return { error };
+    }
+
     componentDidCatch(error: Error, errorInfo: any) {
         // You can also log the error to an error reporting service
         logError(error, errorInfo);
-        this.setState({ error });
     }
 
     render() {
@@ -35,8 +40,9 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
             return (
                 <Message
                     onCancel={() => {
-                        this.setState({ error: null });
+                        window.location.reload();
                     }}
+                    cancelText={t("Reload")}
                     isFixed
                     icon={<ErrorIcon />}
                     stringContents={error.message}

@@ -199,6 +199,21 @@ label,
             margin-top: 0;
             flex-basis: 50%;
             display: block !important;
+
+            @include media-breakpoint-down(xs) {
+                flex-basis: 100%;
+                margin-top: $spacer / 2;
+            }
+        }
+        label:nth-child(n + 3) {
+            margin-top: $spacer / 2;
+        }
+        label:nth-child(odd) {
+            padding-right: $spacer / 2;
+
+            @include media-breakpoint-down(xs) {
+                padding-right: initial;
+            }
         }
         span {
             white-space: normal;

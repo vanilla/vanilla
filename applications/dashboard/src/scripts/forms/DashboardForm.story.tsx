@@ -102,6 +102,7 @@ const longDescription =
 export function RadioGroups() {
     const [group1, setGroup1] = useState("option1");
     const [group2, setGroup2] = useState("option1");
+    const [group3, setGroup3] = useState("option1");
 
     return (
         <StoryContent>
@@ -124,7 +125,7 @@ export function RadioGroups() {
                         </DashboardRadioGroup>
                     </DashboardFormGroup>
                     <DashboardFormGroup label="Radio Group Grid">
-                        <DashboardRadioGroup onChange={setGroup2} value={group2} isGrid>
+                        <DashboardRadioGroup onChange={setGroup3} value={group3} isGrid>
                             <DashboardRadioButton value={"option1"} label="Option 1" />
                             <DashboardRadioButton
                                 value={"option2"}

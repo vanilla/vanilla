@@ -194,9 +194,14 @@ label,
         display: flex;
         flex-wrap: wrap;
         align-items: stretch;
+
         label {
+            margin-top: 0;
             flex-basis: 50%;
-            display: "block";
+            display: block !important;
+        }
+        span {
+            white-space: normal;
         }
     }
 }

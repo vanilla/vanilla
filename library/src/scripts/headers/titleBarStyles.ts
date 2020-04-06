@@ -268,6 +268,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         mobile: {
             url: undefined,
+            maxWidth: undefined,
+            heightOffset: sizing.height / 3,
         }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         offsetVertical: {
             amount: 0,
@@ -1016,13 +1018,12 @@ export const titleBarClasses = useThemeCache(() => {
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
-    const logoHeight = px(vars.sizing.height - vars.logo.heightOffset);
 
     const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
 
     const logo = style("logo", {
         display: "block",
-        maxHeight: logoHeight,
+        maxHeight: px(vars.sizing.height - vars.logo.heightOffset),
         maxWidth: unit(vars.logo.maxWidth),
         width: "auto",
         $nest: {
@@ -1033,7 +1034,10 @@ export const titleBarLogoClasses = useThemeCache(() => {
     });
 
     const mobileLogo = style("mobileLogo", {
+        display: "flex",
         justifyContent: vars.mobileLogo.justifyContent,
+        maxHeight: px(vars.sizing.mobile.height - (vars.logo.mobile.heightOffset ?? vars.logo.heightOffset)),
+        maxWidth: unit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
     });
 
     const isCenter = style("isCenter", {

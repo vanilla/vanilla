@@ -658,7 +658,7 @@ export const bannerClasses = useThemeCache(
             height: unit(formElementVars.sizing.height),
             width: unit(formElementVars.sizing.height),
             flexBasis: unit(formElementVars.sizing.height),
-            transform: translateX(px(formElementVars.sizing.height - globalVars.icon.sizes.default / 2 - 13)),
+            transform: translateX(px((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2 + 3)), // The "3" is to offset the pencil that visually doesn't look aligned without a cheat.
             $nest: {
                 ".searchBar-actionButton:after": {
                     content: quote(""),

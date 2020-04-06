@@ -174,7 +174,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const borderType = makeThemeVars("borderType", {
         formElements: {
-            default: border,
+            default: { ...border, color: mixBgAndFg(0.35).saturate(0.1) },
             buttons: border,
         },
         modals: border,

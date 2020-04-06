@@ -26,6 +26,7 @@ export function ThemeBuilderCheckBox(props: IProps) {
             <span className={classes.label}></span>
             <span className={classes.checkBoxWrap}>
                 <CheckBox
+                    className={classes.checkBox}
                     label={label}
                     isHorizontal
                     checked={!!generatedValue}

@@ -3,32 +3,30 @@
  * @license GPL-2.0-only
  */
 
+import { cssOut } from "@dashboard/compatibilityStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
     borders,
     colorOut,
     EMPTY_BORDER,
+    EMPTY_FONTS,
     fonts,
-    IBorderRadiusValue,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
     unit,
-    EMPTY_FONTS,
-    paddings,
 } from "@library/styles/styleHelpers";
-import { cssRule } from "typestyle";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { IThemeVariables } from "@library/theming/themeReducer";
 import { percent } from "csx";
 import merge from "lodash/merge";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
-export const inputVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const makeThemeVars = variableFactory("input");
+export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const formElementVars = formElementsVariables(forcedVars);
+    const makeThemeVars = variableFactory("input", forcedVars);
 
     const colors = makeThemeVars("colors", {
         placeholder: globalVars.mixBgAndFg(0.5),
@@ -50,8 +48,7 @@ export const inputVariables = useThemeCache(() => {
         color: colors.fg,
     });
 
-    const border: IBordersWithRadius = makeThemeVars("borders", {
-        ...EMPTY_BORDER,
+    const border = makeThemeVars("borders", {
         ...globalVars.borderType.formElements.default,
     });
 

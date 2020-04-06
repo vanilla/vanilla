@@ -502,7 +502,7 @@ export const titleBarClasses = useThemeCache(() => {
             paddingTop: px(vars.sizing.height / 2),
         },
         mediaQueries.compact({
-            paddingTop: px(vars.sizing.mobile.height / 2),
+            paddingTop: px(vars.sizing.mobile.height / 2 + 20),
         }),
     );
 

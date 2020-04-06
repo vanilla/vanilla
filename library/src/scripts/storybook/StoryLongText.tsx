@@ -11,7 +11,7 @@ import React from "react";
 export function StoryLongText(props: { times?: number }) {
     let longText: React.ReactNode[] = [];
     for (let i = 0; i < (props.times ?? 1000); i++) {
-        longText.push(<p>Scrollable content</p>);
+        longText.push(<p key={i}>Scrollable content</p>);
     }
     return <>{longText}</>;
 }

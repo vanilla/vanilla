@@ -22,6 +22,7 @@ import {
     userSelect,
     EMPTY_FONTS,
     isLightColor,
+    negativeUnit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -784,7 +785,7 @@ export const titleBarClasses = useThemeCache(() => {
         transform: `translateX(6px)`,
     });
 
-    const centeredButtonClass = style("centeredButtonClass", {
+    const centeredButton = style("centeredButton", {
         ...flex.middle(),
     });
 
@@ -940,6 +941,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const hamburger = style("hamburger", {
         marginRight: unit(12),
+        marginLeft: negativeUnit(globalVars.buttonIcon.offset),
         $nest: {
             "&&": {
                 ...allButtonStates({
@@ -965,6 +967,10 @@ export const titleBarClasses = useThemeCache(() => {
     const overlay = style("overlay", {
         ...absolutePosition.fullSizeOfParent(),
         background: vars.overlay.background,
+    });
+
+    const signInIconOffset = style("signInIconOffset", {
+        marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
     return {
@@ -1000,7 +1006,7 @@ export const titleBarClasses = useThemeCache(() => {
         leftFlexBasis,
         signIn,
         register,
-        centeredButtonClass,
+        centeredButton,
         compactSearchResults,
         clearButtonClass,
         guestButton,
@@ -1012,6 +1018,7 @@ export const titleBarClasses = useThemeCache(() => {
         logoAnimationWrap,
         overlay,
         swoop,
+        signInIconOffset,
     };
 });
 

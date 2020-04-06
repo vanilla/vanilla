@@ -390,7 +390,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const centeredButtonClass = style("centeredButtonClass", {
+    const centeredButton = style("centeredButton", {
         ...flex.middle(),
     });
 
@@ -585,7 +585,7 @@ export const titleBarClasses = useThemeCache(() => {
         leftFlexBasis,
         signIn,
         register,
-        centeredButtonClass,
+        centeredButton,
         compactSearchResults,
         clearButtonClass,
         guestButton,

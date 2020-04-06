@@ -125,7 +125,11 @@ export default function TitleBar(_props: IProps) {
                 <div className={classNames(classes.bar, { isHome: showSubNav })}>
                     {isCompact &&
                         (props.useMobileBackButton ? (
-                            <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
+                            <BackLink
+                                hideIfNoHistory={true}
+                                className={classes.leftFlexBasis}
+                                linkClassName={classes.button}
+                            />
                         ) : (
                             <FlexSpacer className="pageHeading-leftSpacer" />
                         ))}
@@ -421,7 +425,7 @@ function MobileMeBox() {
     if (isGuest) {
         return (
             <SmartLink
-                className={classNames(classes.centeredButtonClass, classes.button)}
+                className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
                 to={`/entry/signin?target=${window.location.pathname}`}
             >
                 <SignInIcon className={"titleBar-signInIcon"} />

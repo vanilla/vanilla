@@ -227,10 +227,22 @@ export const checkRadioClasses = useThemeCache(() => {
     const grid = style("grid", {
         display: "flex",
         flexWrap: "wrap",
-        alignItems: "flex-end",
+        alignItems: "strech",
         $nest: {
             [`.${root}`]: {
                 flexBasis: "50%",
+                display: "block",
+                ...margins({
+                    top: 0,
+                }),
+            },
+            [`.${root}:nth-child:odd`]: {
+                ...margins({
+                    left: unit(2),
+                }),
+            },
+            [`.${label}`]: {
+                whiteSpace: "normal",
             },
         },
     });

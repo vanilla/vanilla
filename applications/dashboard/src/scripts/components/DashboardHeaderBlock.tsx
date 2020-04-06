@@ -22,7 +22,7 @@ export function DashboardHeaderBlock(props: IProps) {
     return (
         <header className="header-block">
             <div className="title-block">
-                {props.showBackLink && history && <BackLink aria-label="Return" onClick={props.onBackClick} />}
+                {props.showBackLink && history && <BackLink aria-label={t("Return")} onClick={props.onBackClick} />}
                 <h1>{props.title}</h1>
             </div>
             {props.actionButtons}

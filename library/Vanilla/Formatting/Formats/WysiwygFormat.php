@@ -11,6 +11,7 @@ use Vanilla\Formatting\FormatUtil;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Formatting\Html\Processor\ZendeskWysiwygProcessor;
 
 /**
  * Class for rendering content of the markdown format.
@@ -32,6 +33,7 @@ class WysiwygFormat extends HtmlFormat {
         HtmlPlainTextConverter $plainTextConverter
     ) {
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
+        $this->processors[] = ZendeskWysiwygProcessor::class;
     }
 
     /**

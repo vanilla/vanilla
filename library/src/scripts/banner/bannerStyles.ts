@@ -110,7 +110,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
-        primaryContrast: globalVars.mainColors.bg,
+        primaryContrast: globalVars.mainColors.primaryContrast,
         secondary: globalVars.mainColors.secondary,
         secondaryContrast: globalVars.mainColors.secondaryContrast,
         bg: globalVars.mainColors.bg,

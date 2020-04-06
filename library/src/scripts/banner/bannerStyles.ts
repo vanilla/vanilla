@@ -238,8 +238,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
         margins: {
             ...EMPTY_SPACING,
-            top: 14,
-            bottom: 12,
+            top: 18,
+            bottom: 8,
         },
         text: "How can we help you?",
     });
@@ -658,7 +658,7 @@ export const bannerClasses = useThemeCache(
             height: unit(formElementVars.sizing.height),
             width: unit(formElementVars.sizing.height),
             flexBasis: unit(formElementVars.sizing.height),
-            transform: translateX(px(formElementVars.sizing.height - globalVars.icon.sizes.default / 2 - 13)),
+            transform: translateX(px((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2 - 1)), // The "3" is to offset the pencil that visually doesn't look aligned without a cheat.
             $nest: {
                 ".searchBar-actionButton:after": {
                     content: quote(""),

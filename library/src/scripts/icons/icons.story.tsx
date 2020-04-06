@@ -296,7 +296,7 @@ story.add("Icons", () => {
                     </div>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`VanillaLogo`}>
-                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} />}
+                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} isMobile={true} />}
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>

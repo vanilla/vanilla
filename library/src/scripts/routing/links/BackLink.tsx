@@ -40,6 +40,9 @@ interface IProps {
 
     /** Whether or not to display the label visibly. */
     visibleLabel?: boolean;
+
+    /** Check history and hide if there's no where to go **/
+    hideIfNoHistory?: boolean;
 }
 
 /**
@@ -59,6 +62,10 @@ export default function BackLink(props: IProps) {
     const classes = backLinkClasses();
     const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
     const title = props.title || t("Back");
+
+    if (!canGoBack && props.hideIfNoHistory && !props.fallbackUrl) {
+        return null;
+    }
 
     let content = (
         <>

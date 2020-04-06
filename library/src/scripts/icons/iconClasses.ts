@@ -34,6 +34,10 @@ export const iconVariables = useThemeCache(() => {
     const vanillaLogo = themeVars("vanillaLogo", {
         width: 80,
         height: 32.3,
+        mobile: {
+            width: undefined,
+            height: undefined,
+        },
     });
 
     const compact = themeVars("compact", {
@@ -194,6 +198,11 @@ export const iconClasses = useThemeCache(() => {
         ...pointerEvents(),
         width: unit(vars.vanillaLogo.width),
         height: unit(vars.vanillaLogo.height),
+    });
+
+    const vanillaLogoMobile = style("vanillaLogoMobile", {
+        width: unit(vars.vanillaLogo.mobile.width ?? vars.vanillaLogo.width),
+        height: unit(vars.vanillaLogo.mobile.height ?? vars.vanillaLogo.height),
     });
 
     const compact = style("compact", {
@@ -359,6 +368,7 @@ export const iconClasses = useThemeCache(() => {
         fileType,
         attachmentError,
         vanillaLogo,
+        vanillaLogoMobile,
         compact,
         settings,
         search,

@@ -4,11 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, unit, sticky, colorOut } from "@library/styles/styleHelpers";
+import { absolutePosition, flexHelper, unit, sticky, colorOut, negativeUnit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, viewHeight } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const compactMeBoxVariables = useThemeCache(() => {
     const themeVars = variableFactory("compactMeBox");
@@ -33,6 +35,7 @@ export const compactMeBoxClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        marginRight: negativeUnit((titleBarVariables().sizing.mobile.width - userPhotoVariables().sizing.small) / 2),
     });
 
     const openButton = style("openButton", {

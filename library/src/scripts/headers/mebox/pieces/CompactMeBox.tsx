@@ -58,7 +58,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
             <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
                     title={t("My Account")}
-                    className={classNames(classes.openButton, titleBarVars.centeredButtonClass, titleBarVars.button)}
+                    className={classNames(classes.openButton, titleBarVars.centeredButton, titleBarVars.button)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}

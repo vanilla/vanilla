@@ -21,13 +21,14 @@ class ThemeLogo extends React.Component<IProps> {
         const themeDesktopUrl = titleBarVariables().logo.desktop.url;
         const themeMobileUrl = titleBarVariables().logo.mobile.url;
 
-        const themeUrl = this.props.type === LogoType.DESKTOP ? themeDesktopUrl : themeMobileUrl;
+        const isDesktop = this.props.type === LogoType.DESKTOP;
+        const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;
         const finalUrl = themeUrl ?? this.props.logoUrl;
 
         if (finalUrl) {
             content = <img className={this.props.className} src={finalUrl} />;
         } else {
-            content = <VanillaLogo className={this.props.className} />;
+            content = <VanillaLogo className={this.props.className} isMobile={!isDesktop} />;
         }
 
         return content;

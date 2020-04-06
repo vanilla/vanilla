@@ -67,14 +67,18 @@ export function DownloadIcon(props: { className?: string }) {
     );
 }
 
-export function VanillaLogo(props: { className?: string; fill?: string }) {
+export function VanillaLogo(props: { className?: string; fill?: string; isMobile?: boolean }) {
+    const { className, isMobile } = props;
     const title = `Vanilla`;
     const classes = iconClasses();
     const fill = props.fill ? props.fill : "currentColor";
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={classNames(props.className, classes.vanillaLogo)}
+            className={classNames(props.className, {
+                [classes.vanillaLogo]: !isMobile,
+                [classes.vanillaLogoMobile]: isMobile,
+            })}
             viewBox="0 0 296.866 119.883"
             role="img"
             aria-label={title}

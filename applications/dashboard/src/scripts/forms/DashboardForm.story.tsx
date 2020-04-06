@@ -126,7 +126,10 @@ export function RadioGroups() {
                     <DashboardFormGroup label="Radio Group Grid">
                         <DashboardRadioGroup onChange={setGroup2} value={group2} isGrid>
                             <DashboardRadioButton value={"option1"} label="Option 1" />
-                            <DashboardRadioButton value={"option2"} label="Option 2 with a little bit more text to test layout responsiveness" />
+                            <DashboardRadioButton
+                                value={"option2"}
+                                label="Option 2 with a little bit more text to test layout responsiveness"
+                            />
                             <DashboardRadioButton value={"option3"} label="Option 3" />
                             <DashboardRadioButton value={"option4"} label="Option 4" disabled />
                         </DashboardRadioGroup>

@@ -232,14 +232,6 @@ export const checkRadioClasses = useThemeCache(() => {
             [`.${root}`]: {
                 flexBasis: "50%",
                 display: "block",
-                ...margins({
-                    top: 0,
-                }),
-            },
-            [`.${root}:nth-child:odd`]: {
-                ...margins({
-                    left: unit(2),
-                }),
             },
             [`.${label}`]: {
                 whiteSpace: "normal",

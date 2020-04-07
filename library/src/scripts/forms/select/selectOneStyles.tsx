@@ -61,6 +61,10 @@ export const selectOneClasses = useThemeCache(() => {
                 cursor: "pointer",
                 opacity: 0.5,
             },
+            "& .SelectOne__menu-notice--no-options": {
+                padding: 10,
+                overflow: "hidden",
+            },
         },
     });
 

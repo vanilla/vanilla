@@ -16,6 +16,7 @@ import {
     unit,
     userSelect,
     margins,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -126,7 +127,7 @@ export const checkRadioClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.sizing.width),
         height: unit(vars.sizing.width),
-        verticalAlign: em(-0.18),
+        verticalAlign: "middle",
         cursor: "pointer",
         backgroundColor: colorOut(vars.main.bg),
         ...borders(vars.border),
@@ -222,6 +223,34 @@ export const checkRadioClasses = useThemeCache(() => {
         marginTop: unit(globalVars.spacer.size / 2),
     });
 
+    const grid = style("grid", {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "strech",
+        $nest: {
+            [`.${root}`]: {
+                flexBasis: "50%",
+                display: "block !important",
+                ...margins({
+                    top: 0,
+                }),
+            },
+            [`.${root}:nth-child(n + 3)`]: {
+                ...margins({
+                    top: unit(globalVars.gutter.half),
+                }),
+            },
+            [`.${root}:nth-child(odd)`]: {
+                ...paddings({
+                    right: unit(globalVars.gutter.half),
+                }),
+            },
+            [`.${label}`]: {
+                whiteSpace: "normal",
+            },
+        },
+    });
+
     return {
         root,
         label,
@@ -233,6 +262,7 @@ export const checkRadioClasses = useThemeCache(() => {
         diskIcon,
         input,
         group,
+        grid,
         isDashboard,
     };
 });

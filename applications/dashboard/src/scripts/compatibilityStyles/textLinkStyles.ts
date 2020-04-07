@@ -7,15 +7,15 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles/index";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();
 
     // Various links
     mixinClickInput(".Navigation-linkContainer a");
-    mixinClickInput(".Panel .PanelInThisDiscussion a");
+
     mixinClickInput(".Panel .Leaderboard a");
-    mixinClickInput(".Panel .InThisConversation a");
     mixinClickInput(".FieldInfo a");
 
     mixinClickInput("div.Popup .Body a");
@@ -62,6 +62,18 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
     mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
     mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Panel .InThisConversation a`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Panel .PanelInThisDiscussion a`);
+
+    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Aside`, {
+        paddingLeft: 0,
+        paddingRight: "1ex",
+        display: "inline",
+    });
+
+    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Username`, {
+        fontWeight: globalVars.fonts.weights.semiBold,
+    });
 };
 
 export const mixinTextLinkNoDefaultLinkAppearance = selector => {

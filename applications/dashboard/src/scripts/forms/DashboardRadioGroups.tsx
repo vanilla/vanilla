@@ -12,6 +12,7 @@ import { IFieldError } from "@library/@types/api/core";
 
 interface IRadioGroupContext {
     isInline?: boolean;
+    isGrid?: boolean;
     onChange?: (value: string) => void;
     value?: string;
     errors?: IFieldError[];
@@ -46,7 +47,7 @@ export function DashboardRadioGroup(props: IProps) {
     return (
         <RadioGroupContext.Provider value={props}>
             <div
-                className={classNames(rootClass, { inline: props.isInline })}
+                className={classNames(rootClass, { inline: props.isInline }, { grid: props.isGrid })}
                 role={props.type}
                 aria-labelledby={labelID}
             >

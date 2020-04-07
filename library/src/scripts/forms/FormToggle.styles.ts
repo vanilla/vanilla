@@ -59,8 +59,8 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         height: vars.well.height,
         width: vars.well.width,
         ...borders(vars.well.border),
-        background: colorOut(vars.well.color),
-        ...defaultTransition("background", "border"),
+        backgroundColor: colorOut(vars.well.color),
+        transition: "0.3s linear background, 0.3s linear border",
     });
 
     const slider = style("slider", {
@@ -72,8 +72,8 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         top: vars.sizing.gutter,
         bottom: vars.sizing.gutter,
         left: vars.sizing.gutter,
-        background: colorOut(vars.slider.color),
-        transition: "0.2 ease border, 0.5s ease left, 0.5s ease right",
+        backgroundColor: colorOut(vars.slider.color),
+        transition: "0.3s linear border, 0.2s linear left",
     });
 
     const root = style({
@@ -83,18 +83,15 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         width: vars.well.width,
         $nest: {
             [`&.isEnabled .${slider}`]: {
-                left: "initial",
-                right: vars.sizing.gutter,
+                left: vars.well.width / 2 + vars.sizing.gutter,
                 ...borders({ ...vars.slider.border, color: vars.slider.color }),
             },
             [`&.isEnabled .${well}`]: {
-                background: colorOut(vars.well.colorActive),
+                backgroundColor: colorOut(vars.well.colorActive),
                 ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
             },
             [`&.isIndeterminate .${slider}`]: {
-                left: 0,
-                right: 0,
-                margin: "0 auto",
+                left: vars.slider.width / 2 + vars.sizing.gutter,
             },
             [`&.isFocused .${well}, &:hover .${well}`]: {
                 ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
@@ -104,7 +101,7 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
             },
             [`&.isEnabled.isFocused .${well}, &.isEnabled:hover .${well}`]: {
                 ...borders({ ...vars.well.border, color: vars.well.colorActiveState }),
-                background: colorOut(vars.well.colorActiveState),
+                backgroundColor: colorOut(vars.well.colorActiveState),
             },
             [`&.isEnabled.isFocused .${slider}, &.isEnabled:hover .${slider}`]: {
                 ...borders({ ...vars.slider.border, color: vars.slider.color }),

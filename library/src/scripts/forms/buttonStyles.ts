@@ -24,6 +24,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import isNumeric from "validator/lib/isNumeric";
 
 export enum ButtonPreset {
     SOLID = "solid",
@@ -57,6 +58,9 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         top: 2,
         bottom: 3,
         horizontal: 12,
+        fullBorderRadius: {
+            extraHorizontalPadding: 8, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
+        },
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -65,7 +69,7 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         compactHeight: 24,
     });
 
-    const border = makeThemeVars("border", globalVars.border);
+    const border = makeThemeVars("border", globalVars.borderType.formElements.buttons);
 
     const constants = makeThemeVars("constants", {
         borderMixRatio: 0.24,
@@ -131,8 +135,9 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg: standardPreset.preset.bg,
         },
         borders: {
-            color: standardPreset.preset.border,
+            ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
+            color: standardPreset.preset.border,
         },
         state: {
             borders: {
@@ -187,8 +192,9 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg: primaryPreset.preset.bg,
         },
         borders: {
-            color: primaryPreset.preset.border,
+            ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
+            color: primaryPreset.preset.border,
         },
         state: {
             colors: {
@@ -276,13 +282,75 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const buttonSizing = (minHeight, minWidth, fontSize, paddingHorizontal, formElementVars, debug?: boolean) => {
-    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobalVariables().border.width;
+export interface IPaddingBasedOnRadius {
+    radius?: number | string; // pixel value in integer or percentage in string
+    extraPadding?: number | string; // If undefined, return 0 for both sides
+    height?: number; // Min height of element
+    side?: "horizontal" | "left" | "right"; // defaults to horizontal
+}
+
+export const getPaddingOffsetBasedOnBorderRadius = (props: IPaddingBasedOnRadius) => {
+    let leftOffset = 0;
+    let rightOffset = 0;
+    const height = props.height ?? formElementsVariables().sizing.height;
+
+    if (props && props.radius && props.extraPadding) {
+        const maxValue = parseInt(props.extraPadding.toString());
+        const rawRadius = props.radius.toString().trim();
+        const workingBorderRadius = parseFloat(rawRadius);
+        const halfHeight = height / 2;
+
+        let finalBorderRadiusRatio = 0;
+        if (rawRadius.endsWith("%")) {
+            const percent = Math.min(50, workingBorderRadius); // you can't go over 50% anyways.
+            finalBorderRadiusRatio = percent * height;
+        } else {
+            //assume pixels, we don't currently support "ems" or any other units.
+            finalBorderRadiusRatio =
+                (Math.min(halfHeight, parseInt(workingBorderRadius.toString())) / halfHeight) * 100; // anything above have half the height is too much
+        }
+
+        const offset = (finalBorderRadiusRatio / 100) * maxValue;
+        if (props.side !== "right") {
+            leftOffset = offset;
+        }
+        if (props.side !== "left") {
+            rightOffset = offset;
+        }
+    }
+
+    return {
+        left: leftOffset,
+        right: rightOffset,
+    };
+};
+
+export const buttonSizing = (
+    minHeight,
+    minWidth,
+    fontSize,
+    paddingHorizontal,
+    formElementVars,
+    borderRadius,
+    debug?: boolean,
+) => {
+    const buttonGlobals = buttonGlobalVariables();
+    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
+    const globalVars = globalVariables();
+
+    const paddingOffsets = getPaddingOffsetBasedOnBorderRadius({
+        radius: borderRadius,
+        extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
+        height: buttonGlobals.sizing.minHeight,
+    });
+
     return {
         minHeight: unit(minHeight ? minHeight : formElementVars.sizing.minHeight),
         minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
-        padding: `${unit(0)} ${px(paddingHorizontal)}`,
+        padding: `0px ${px(paddingHorizontal + paddingOffsets.right ?? 0)} 0px ${px(
+            paddingHorizontal + paddingOffsets.left ?? 0,
+        )}`,
         lineHeight: unit(formElementVars.sizing.height - borderWidth * 2),
     };
 };

@@ -25,8 +25,11 @@ export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables
 
     const spacing = makeThemeVars("spacing", {
         margin: 12,
-        horizontalPadding: 12,
         verticalPadding: 6,
+        horizontalPadding: 12,
+        fullBorderRadius: {
+            extraHorizontalPadding: 4, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
+        },
     });
 
     const border = makeThemeVars("border", {

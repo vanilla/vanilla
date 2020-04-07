@@ -40,6 +40,7 @@ import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -284,7 +285,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(vars.borderType.dropDowns.content),
+        ...borders(vars.borderType.dropDowns),
         overflow: "hidden",
     });
 
@@ -364,6 +365,8 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(".Bullet, .QuickSearch", {
         display: "none",
     });
+
+    cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
 
     buttonCSS();
     flyoutCSS();

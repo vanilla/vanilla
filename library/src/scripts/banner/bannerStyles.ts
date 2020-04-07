@@ -476,6 +476,7 @@ export const bannerClasses = useThemeCache(
                             vars.searchBar.sizing.height,
                             vars.searchBar.font.size,
                             vars.searchBar.border.width * 2,
+                            vars.searchBar.border.radius.left,
                         ),
                         boxSizing: "border-box",
                         paddingLeft: unit(searchBarVariables().searchIcon.gap),

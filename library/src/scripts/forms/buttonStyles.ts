@@ -25,6 +25,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import isNumeric from "validator/lib/isNumeric";
+import { logDebugConditionnal } from "@vanilla/utils";
 
 export enum ButtonPreset {
     SOLID = "solid",
@@ -287,12 +288,18 @@ export interface IPaddingBasedOnRadius {
     extraPadding?: number | string; // If undefined, return 0 for both sides
     height?: number; // Min height of element
     side?: "horizontal" | "left" | "right"; // defaults to horizontal
+    debug?: boolean;
 }
 
 export const getPaddingOffsetBasedOnBorderRadius = (props: IPaddingBasedOnRadius) => {
     let leftOffset = 0;
     let rightOffset = 0;
     const height = props.height ?? formElementsVariables().sizing.height;
+    const debug = props.debug;
+
+    logDebugConditionnal(debug, "============== getPaddingOffsetBasedOnBorderRadius ==============");
+    logDebugConditionnal(debug, "props: ", props);
+    logDebugConditionnal(debug, "height: ", height);
 
     if (props && props.radius && props.extraPadding) {
         const maxValue = parseInt(props.extraPadding.toString());
@@ -300,14 +307,22 @@ export const getPaddingOffsetBasedOnBorderRadius = (props: IPaddingBasedOnRadius
         const workingBorderRadius = parseFloat(rawRadius);
         const halfHeight = height / 2;
 
+        logDebugConditionnal(debug, "maxValue: ", maxValue);
+        logDebugConditionnal(debug, "rawRadius: ", rawRadius);
+        logDebugConditionnal(debug, "workingBorderRadius: ", workingBorderRadius);
+
         let finalBorderRadiusRatio = 0;
         if (rawRadius.endsWith("%")) {
             const percent = Math.min(50, workingBorderRadius); // you can't go over 50% anyways.
             finalBorderRadiusRatio = percent * height;
+
+            logDebugConditionnal(debug, "case 1 - percent", percent);
+            logDebugConditionnal(debug, "case 1 - finalBorderRadiusRatio", finalBorderRadiusRatio);
         } else {
             //assume pixels, we don't currently support "ems" or any other units.
             finalBorderRadiusRatio =
                 (Math.min(halfHeight, parseInt(workingBorderRadius.toString())) / halfHeight) * 100; // anything above have half the height is too much
+            logDebugConditionnal(debug, "case 2 - finalBorderRadiusRatio", finalBorderRadiusRatio);
         }
 
         const offset = (finalBorderRadiusRatio / 100) * maxValue;
@@ -319,10 +334,14 @@ export const getPaddingOffsetBasedOnBorderRadius = (props: IPaddingBasedOnRadius
         }
     }
 
-    return {
+    const result = {
         left: leftOffset,
         right: rightOffset,
     };
+
+    logDebugConditionnal(debug, "result: ", result);
+
+    return result;
 };
 
 export const buttonSizing = (
@@ -336,7 +355,6 @@ export const buttonSizing = (
 ) => {
     const buttonGlobals = buttonGlobalVariables();
     const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
-    const globalVars = globalVariables();
 
     const paddingOffsets = getPaddingOffsetBasedOnBorderRadius({
         radius: borderRadius,

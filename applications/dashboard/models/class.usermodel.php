@@ -4560,6 +4560,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         $email->setEmailTemplate($emailTemplate);
 
+        // Apply rate limiting
+        self::rateLimit($user);
+
         try {
             $email->send();
         } catch (Exception $e) {

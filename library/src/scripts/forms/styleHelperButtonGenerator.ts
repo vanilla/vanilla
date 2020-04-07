@@ -27,7 +27,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
-    const buttonVars = buttonVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 

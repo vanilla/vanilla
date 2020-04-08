@@ -27,7 +27,12 @@ export const pageTitleClasses = useThemeCache(() => {
         $nest: lineHeightAdjustment(),
     } as NestedCSSProperties);
 
+    const marginBottom = style("marginBottom", {
+        marginBottom: "16px",
+    });
+
     return {
         root,
+        marginBottom,
     };
 });

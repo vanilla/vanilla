@@ -5,12 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { importantColorOut, unit, colorOut } from "@library/styles/styleHelpers";
+import { importantColorOut, unit, colorOut, backgroundHelper } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
+import { percent, quote } from "csx";
 
 export const discussionCSS = () => {
-    const globalVars = globalVariables();
+    const vars = globalVariables();
 
     cssOut(
         `
@@ -19,8 +21,8 @@ export const discussionCSS = () => {
         .MessageList.Discussion
         `,
         {
-            color: colorOut(globalVars.mainColors.fg),
-            fontSize: unit(globalVars.fonts.size.medium),
+            color: colorOut(vars.mainColors.fg),
+            fontSize: unit(vars.fonts.size.medium),
         },
     );
 
@@ -34,7 +36,7 @@ export const discussionCSS = () => {
         .userContent.userContent h6
     `,
         {
-            color: colorOut(globalVars.mainColors.fg),
+            color: colorOut(vars.mainColors.fg),
         },
     );
 
@@ -55,8 +57,8 @@ export const discussionCSS = () => {
         .Item .Poll .PollOptions .PollColor.PollColor10,
     `,
         {
-            color: colorOut(globalVars.mainColors.primaryContrast),
-            backgroundColor: importantColorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis)),
+            color: colorOut(vars.mainColors.primaryContrast),
+            backgroundColor: importantColorOut(vars.mixPrimaryAndBg(vars.constants.stateColorEmphasis)),
             opacity: 1,
         },
     );
@@ -96,4 +98,46 @@ export const discussionCSS = () => {
         margin: 0,
         padding: 0,
     });
+
+    cssOut(`.Options a.Bookmark`, {
+        opacity: 1,
+        width: unit(14),
+        height: unit(20),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    });
+
+    cssOut(
+        `
+        .Content a.Bookmark::before,
+        .Content a.Bookmarking::before,
+        .Content a.Bookmarked::before`,
+        {
+            content: quote(``),
+            display: "block",
+            width: unit(12),
+            height: unit(16),
+            fontSize: unit(12),
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmark::before,
+        .Content a.Bookmarking::before
+        `,
+        {
+            ...backgroundHelper({ size: "100%", image: bookmarkBackground(false, vars.mainColors.fg) }),
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmarked::before
+        `,
+        {
+            ...backgroundHelper({ size: "100%", image: bookmarkBackground(true, vars.mainColors.fg) }),
+        },
+    );
 };

@@ -11,8 +11,17 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { calc, ColorHelper, important } from "csx";
+import {
+    backgroundHelper,
+    borders,
+    importantUnit,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
+import { calc, ColorHelper, important, quote } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
@@ -40,10 +49,12 @@ import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
+import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
-export const compatibilityStyles = useThemeCache(() => {
+export let compatibilityStyles: () => void;
+compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
@@ -98,29 +109,6 @@ export const compatibilityStyles = useThemeCache(() => {
     cssOut(".ReactButton.PopupWindow&:hover .Sprite::before", {
         color: primary,
     });
-
-    cssOut(`a.Bookmark`, {
-        opacity: 1,
-        $nest: {
-            "&::before": {
-                color: primary,
-            },
-            "&:hover::before": {
-                color: colorOut(mainColors.secondary),
-            },
-        },
-    });
-
-    cssOut(
-        `
-        .Content a.Bookmarked::before,
-        .Content a.Bookmark::before,
-        .Content a.Bookmarking::before
-        `,
-        {
-            color: important(colorOut(mainColors.fg.fade(0.5)) as string),
-        },
-    );
 
     cssOut(".Box h4", { color: fg });
 

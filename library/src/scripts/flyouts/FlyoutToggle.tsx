@@ -15,6 +15,7 @@ import classNames from "classnames";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { forceRenderStyles } from "typestyle";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -190,6 +191,7 @@ export default function FlyoutToggle(props: IProps) {
                 baseClass={props.buttonBaseClass}
                 buttonRef={buttonRef}
             >
+                <ScreenReaderContent>{props.name}</ScreenReaderContent>
                 {props.buttonContents}
             </Button>
 

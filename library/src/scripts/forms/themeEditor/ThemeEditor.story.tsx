@@ -17,6 +17,7 @@ import { action } from "@storybook/addon-actions";
 import { t } from "@vanilla/i18n";
 import React, { useState } from "react";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
+import { ThemeBuilderBreakpoints, BreakpointViewType } from "@library/forms/themeEditor/ThemeBuilderBreakpoints";
 
 export default {
     title: "Forms",
@@ -67,6 +68,11 @@ export function ThemeEditor() {
                     <ThemeBuilderBlock label={t("Number Radius")}>
                         <ThemeInputNumber variableKey="global.border.radius" max={10} step={2} min={2} />
                     </ThemeBuilderBlock>
+                    <ThemeBuilderBreakpoints
+                        baseKey="contentBanner.outerBackground"
+                        responsiveKey="image"
+                        enabledView={BreakpointViewType.IMAGE}
+                    ></ThemeBuilderBreakpoints>
                 </ThemeBuilderSection>
             </ThemeBuilderContextProvider>
         </div>

@@ -23,7 +23,6 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { Col } from "@jest/types/build/Global";
-import { getPaddingOffsetBasedOnBorderRadius } from "@library/forms/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const fontFallbacks = [
@@ -101,7 +100,7 @@ export const textInputSizingFromFixedHeight = (
 
     const formElementVars = formElementsVariables();
 
-    const paddingOffsets = getPaddingOffsetBasedOnBorderRadius({
+    const paddingOffsets = paddingOffsetBasedOnBorderRadius({
         radius: borderRadius ?? globalVariables().borderType.formElements.default.radius,
         extraPadding: formElementVars.spacing.fullBorderRadius.extraHorizontalPadding,
         height: height,

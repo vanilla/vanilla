@@ -19,12 +19,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import {
-    buttonGlobalVariables,
-    buttonResetMixin,
-    buttonVariables,
-    getPaddingOffsetBasedOnBorderRadius,
-} from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
@@ -32,6 +27,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
+import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -119,7 +115,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
 
     const buttonBorderRadius = buttonVariables().primary.borders.radius;
 
-    const paddingOffset = getPaddingOffsetBasedOnBorderRadius({
+    const paddingOffset = paddingOffsetBasedOnBorderRadius({
         radius: buttonBorderRadius,
         extraPadding: vars.search.fullBorderRadius.extraHorizontalPadding,
         height: vars.sizing.height,

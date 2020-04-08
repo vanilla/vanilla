@@ -9,7 +9,7 @@ import { importantColorOut, unit, colorOut, backgroundHelper } from "@library/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
-import { percent, quote } from "csx";
+import { important, percent, quote } from "csx";
 
 export const discussionCSS = () => {
     const vars = globalVariables();
@@ -99,14 +99,19 @@ export const discussionCSS = () => {
         padding: 0,
     });
 
-    cssOut(`.Options a.Bookmark`, {
-        opacity: 1,
-        width: unit(14),
-        height: unit(20),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    });
+    cssOut(
+        `
+        .Options a.Bookmark,
+        .Options a.Bookmarking,
+        .Options a.Bookmarked
+        `,
+        {
+            opacity: 1,
+            width: unit(14),
+            height: unit(20),
+            display: "block",
+        },
+    );
 
     cssOut(
         `
@@ -128,16 +133,22 @@ export const discussionCSS = () => {
         .Content a.Bookmarking::before
         `,
         {
-            ...backgroundHelper({ size: "100%", image: bookmarkBackground(false, vars.mainColors.fg) }),
+            ...backgroundHelper({ size: "100%", image: bookmarkBackground(false, vars.mixPrimaryAndBg(0.8)) }),
         },
     );
+
+    cssOut(`.Content a.Bookmarking`, {
+        cursor: important("wait"),
+        background: "none",
+        opacity: ".5",
+    });
 
     cssOut(
         `
         .Content a.Bookmarked::before
         `,
         {
-            ...backgroundHelper({ size: "100%", image: bookmarkBackground(true, vars.mainColors.fg) }),
+            ...backgroundHelper({ size: "100%", image: bookmarkBackground(true, vars.mainColors.primary) }),
         },
     );
 };

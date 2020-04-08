@@ -38,10 +38,12 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper } from "csx";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color } from "csx";
 import { media } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
+import { t } from "@vanilla/i18n";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -185,15 +187,26 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
     });
 
-    const outerBackground = makeThemeVars("outerBackground", {
+    const outerBackgroundInit = makeThemeVars("outerBackground", {
         ...EMPTY_BACKGROUND,
         color: colors.primary.lighten("12%"),
         repeat: "no-repeat",
         position: "50% 50%",
         size: "cover",
-        mobile: {
-            image: undefined as undefined | string,
-        },
+    });
+
+    const outerBackground = makeThemeVars("outerBackground", {
+        ...outerBackgroundInit,
+        ...breakpointVariables({
+            tablet: {
+                breakpointUILabel: t("Tablet"),
+                ...EMPTY_BACKGROUND,
+            },
+            mobile: {
+                breakpointUILabel: t("Mobile"),
+                ...EMPTY_BACKGROUND,
+            },
+        }),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -507,6 +520,8 @@ export const bannerClasses = useThemeCache(
 
         const outerBackground = useThemeCache((url?: string) => {
             const finalUrl = url ?? vars.outerBackground.image ?? undefined;
+            const finalTabletUrl = url ?? vars.outerBackground.breakpoints.tablet.image;
+            const finalMobileUrl = url ?? vars.outerBackground.breakpoints.mobile.image;
             const finalVars = {
                 ...vars.outerBackground,
                 image: finalUrl,
@@ -524,9 +539,10 @@ export const bannerClasses = useThemeCache(
                     display: "block",
                     ...backgroundHelper(finalVars),
                 },
-                mediaQueries.oneColumnDown({
-                    image: vars.outerBackground.mobile.image,
-                } as NestedCSSProperties),
+                finalTabletUrl &&
+                    mediaQueries.twoColumnsDown(backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl })),
+                finalMobileUrl &&
+                    mediaQueries.oneColumnDown(backgroundHelper({ ...vars.outerBackground, image: finalMobileUrl })),
             );
         });
 

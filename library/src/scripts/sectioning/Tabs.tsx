@@ -17,11 +17,11 @@ interface IData {
 }
 interface IProps {
     data: IData[];
+    classes?: any;
 }
 
 export function Tabs(props: IProps) {
-    const { data } = props;
-    const classes = tabClasses();
+    const { data, classes = tabClasses() } = props;
     const [activeTab, setActiveTab] = useState(0);
 
     return (

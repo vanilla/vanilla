@@ -24,6 +24,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 
 export enum ButtonPreset {
     SOLID = "solid",
@@ -57,6 +58,9 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         top: 2,
         bottom: 3,
         horizontal: 12,
+        fullBorderRadius: {
+            extraHorizontalPadding: 8, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
+        },
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -65,7 +69,7 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         compactHeight: 24,
     });
 
-    const border = makeThemeVars("border", globalVars.border);
+    const border = makeThemeVars("border", globalVars.borderType.formElements.buttons);
 
     const constants = makeThemeVars("constants", {
         borderMixRatio: 0.24,
@@ -131,8 +135,9 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg: standardPreset.preset.bg,
         },
         borders: {
-            color: standardPreset.preset.border,
+            ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
+            color: standardPreset.preset.border,
         },
         state: {
             borders: {
@@ -187,8 +192,9 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg: primaryPreset.preset.bg,
         },
         borders: {
-            color: primaryPreset.preset.border,
+            ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
+            color: primaryPreset.preset.border,
         },
         state: {
             colors: {
@@ -276,13 +282,31 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const buttonSizing = (minHeight, minWidth, fontSize, paddingHorizontal, formElementVars, debug?: boolean) => {
-    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobalVariables().border.width;
+export const buttonSizing = (
+    minHeight,
+    minWidth,
+    fontSize,
+    paddingHorizontal,
+    formElementVars,
+    borderRadius,
+    debug?: boolean,
+) => {
+    const buttonGlobals = buttonGlobalVariables();
+    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
+
+    const paddingOffsets = paddingOffsetBasedOnBorderRadius({
+        radius: borderRadius,
+        extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
+        height: buttonGlobals.sizing.minHeight,
+    });
+
     return {
         minHeight: unit(minHeight ? minHeight : formElementVars.sizing.minHeight),
         minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
-        padding: `${unit(0)} ${px(paddingHorizontal)}`,
+        padding: `0px ${px(paddingHorizontal + paddingOffsets.right ?? 0)} 0px ${px(
+            paddingHorizontal + paddingOffsets.left ?? 0,
+        )}`,
         lineHeight: unit(formElementVars.sizing.height - borderWidth * 2),
     };
 };

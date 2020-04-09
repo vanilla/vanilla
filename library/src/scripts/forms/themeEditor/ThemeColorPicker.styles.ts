@@ -37,7 +37,7 @@ export const colorPickerClasses = useThemeCache(() => {
 
     const textInput = style("textInput", {
         position: "relative",
-        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size, 2),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size, 2, 0),
         width: unit(inputWidth),
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(inputWidth),

@@ -5,7 +5,7 @@
  */
 
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
-import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -28,7 +28,6 @@ import {
     importantUnit,
     isLightColor,
     modifyColorBasedOnLightness,
-    negative,
     textInputSizingFromFixedHeight,
     unit,
     unitIfDefined,
@@ -470,6 +469,7 @@ export const bannerClasses = useThemeCache(
         const mediaQueries = layoutVariables().mediaQueries();
 
         const isCentered = vars.options.alignment === "center";
+
         const searchButton = style("searchButton", {
             $nest: {
                 "&.searchBar-submitButton": {
@@ -489,6 +489,7 @@ export const bannerClasses = useThemeCache(
                             vars.searchBar.sizing.height,
                             vars.searchBar.font.size,
                             vars.searchBar.border.width * 2,
+                            vars.searchBar.border.radius.left,
                         ),
                         boxSizing: "border-box",
                         paddingLeft: unit(searchBarVariables().searchIcon.gap),

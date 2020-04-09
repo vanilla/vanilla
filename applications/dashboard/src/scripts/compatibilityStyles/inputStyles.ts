@@ -75,7 +75,7 @@ export const inputCSS = () => {
 
     cssOut(`div.token-input-dropdown`, {
         // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
-        ...borders(globalVars.borderType.dropDowns.content),
+        ...borders(globalVars.borderType.dropDowns),
         transform: translateY(unit(globalVars.border.width) as string),
     });
 

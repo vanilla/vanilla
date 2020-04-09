@@ -33,8 +33,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
         zIndex: 6,
         overflow: "hidden",
         backgroundColor: colorOut(vars.colors.bg),
-        ...borders(globalVars.borderType.dropDowns.content),
-
+        ...borders(globalVars.borderType.dropDowns),
         $nest: {
             "&& .ReactVirtualized__Grid": {
                 width: important(unit(vars.richEditorWidth) as string),

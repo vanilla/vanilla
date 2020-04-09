@@ -22,8 +22,8 @@ import {
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { Col } from "@jest/types/build/Global";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 
 export const fontFallbacks = [
     "-apple-system",

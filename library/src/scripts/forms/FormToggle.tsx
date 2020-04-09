@@ -53,6 +53,7 @@ export function FormToggle(props: IProps) {
                     type="checkbox"
                     aria-labelledby={labelID}
                     id={id}
+                    checked={enabled}
                     onChange={e => {
                         onChange(e.target.checked);
                     }}

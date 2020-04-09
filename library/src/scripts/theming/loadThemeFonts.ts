@@ -39,9 +39,8 @@ export function loadThemeFonts() {
             custom: {
                 families: fonts.map(font => font.name),
                 urls: fonts.map(font => {
-                    const url = new URL(siteUrl(assetUrl(font.url)));
-                    url.searchParams.append("v", getMeta("context.cacheBuster"));
-                    return url.href;
+                    const fontUrl = assetUrl(`${font.url}?v=${getMeta("context.cacheBuster")}`);
+                    return fontUrl;
                 }),
             },
         };

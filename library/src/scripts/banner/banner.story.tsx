@@ -650,8 +650,10 @@ export const bannerImageOnly = storyWithConfig(
                     position: "50% 100%",
                     color: color("#54367c"),
                     image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
-                    mobile: {
-                        image: "https://us.v-cdn.net/5022541/uploads/470/U68ZI0LRPRBQ.png",
+                    breakpoints: {
+                        mobile: {
+                            image: "https://us.v-cdn.net/5022541/uploads/470/U68ZI0LRPRBQ.png",
+                        },
                     },
                 },
             },

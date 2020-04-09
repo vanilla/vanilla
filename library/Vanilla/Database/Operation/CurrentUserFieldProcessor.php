@@ -74,7 +74,9 @@ class CurrentUserFieldProcessor implements Processor {
             $fieldExists = $databaseOperation->getCaller()->getWriteSchema()->getField("properties.{$field}");
             if ($fieldExists) {
                 $set = $databaseOperation->getSet();
-                $set[$field] = $this->session->UserID;
+                if (empty($set[$field] ?? null) || $databaseOperation->getMode() === Operation::MODE_DEFAULT) {
+                    $set[$field] = $this->session->UserID;
+                };
                 $databaseOperation->setSet($set);
             }
         }

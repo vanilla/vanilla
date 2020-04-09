@@ -15,10 +15,11 @@ import {
     getVerticalPaddingForTextInput,
     fonts,
     flexHelper,
+    importantUnit,
 } from "@library/styles/styleHelpers";
 import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
@@ -26,6 +27,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
+import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,6 +36,9 @@ export const searchBarVariables = useThemeCache(() => {
 
     const search = themeVars("search", {
         minWidth: 109,
+        fullBorderRadius: {
+            extraHorizontalPadding: 10, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
+        },
     });
 
     const sizing = themeVars("sizing", {
@@ -108,10 +113,23 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     );
     const calculatedHeight = vars.sizing.height - verticalPadding * 2 - formElementVars.border.width * 2;
 
+    const buttonBorderRadius = buttonVariables().primary.borders.radius;
+
+    const paddingOffset = paddingOffsetBasedOnBorderRadius({
+        radius: buttonBorderRadius,
+        extraPadding: vars.search.fullBorderRadius.extraHorizontalPadding,
+        height: vars.sizing.height,
+        side: "right",
+    });
+
     const root = style(
         {
             cursor: "pointer",
             $nest: {
+                ".inputText.inputText": {
+                    borderTopLeftRadius: importantUnit(buttonBorderRadius),
+                    borderBottomLeftRadius: importantUnit(buttonBorderRadius),
+                },
                 "& .searchBar__placeholder": {
                     color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",
@@ -143,6 +161,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     },
                     borderTopLeftRadius: important(0),
                     borderBottomLeftRadius: important(0),
+                    paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
                 },
                 "& .searchBar__control": {
                     border: 0,

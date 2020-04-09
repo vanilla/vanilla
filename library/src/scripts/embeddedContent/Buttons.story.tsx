@@ -18,6 +18,7 @@ import { ButtonPreset, buttonUtilityClasses } from "@library/forms/buttonStyles"
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export default {
     title: "Buttons",
@@ -175,6 +176,40 @@ export const PresetsSolid = storyWithConfig(
             global: {
                 buttonPreset: {
                     style: ButtonPreset.SOLID,
+                },
+            },
+        },
+    },
+    () => <StoryButton />,
+);
+
+export const NoBorderRadius = storyWithConfig(
+    {
+        themeVars: {
+            global: {
+                borderType: {
+                    formElements: {
+                        buttons: {
+                            radius: 0,
+                        },
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryButton />,
+);
+
+export const FullBorderRadius = storyWithConfig(
+    {
+        themeVars: {
+            global: {
+                borderType: {
+                    formElements: {
+                        buttons: {
+                            radius: formElementsVariables().sizing.height / 2,
+                        },
+                    },
                 },
             },
         },

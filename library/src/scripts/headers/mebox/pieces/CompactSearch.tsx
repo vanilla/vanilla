@@ -104,7 +104,7 @@ export function CompactSearch(props: ICompactSearchProps) {
             {!props.open && (
                 <Button
                     onClick={props.onSearchButtonClick}
-                    className={classNames(classesTitleBar.centeredButtonClass, props.buttonClass)}
+                    className={classNames(classesTitleBar.centeredButton, props.buttonClass)}
                     title={t("Search")}
                     aria-expanded={false}
                     aria-haspopup="true"

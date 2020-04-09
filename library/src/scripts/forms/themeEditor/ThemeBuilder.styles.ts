@@ -7,11 +7,22 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { colorOut, margins, negativeUnit, paddings, unit, sticky, flexHelper } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    margins,
+    negativeUnit,
+    paddings,
+    unit,
+    sticky,
+    flexHelper,
+    importantUnit,
+} from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { inputVariables } from "@library/forms/inputStyles";
 
 export const themeBuilderVariables = () => {
+    const inputVars = inputVariables();
     // Intentionally not overwritable with theming system.
     const fontFamily = ["Open Sans"];
 
@@ -72,9 +83,7 @@ export const themeBuilderVariables = () => {
         },
     };
     const border = {
-        color: color("#bfcbd8"),
-        width: 1,
-        style: "solid",
+        ...inputVars.border,
         radius: 3,
     };
     const wrap = {
@@ -193,6 +202,10 @@ export const themeBuilderClasses = useThemeCache(() => {
         position: "relative",
     });
 
+    const checkBox = style("checkBox", {
+        marginRight: importantUnit(0),
+    });
+
     const checkBoxWrap = style("checkBoxWrap", {
         display: "flex",
         flexWrap: "wrap",
@@ -285,6 +298,7 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const tooltip = style("tooltip", {
         ...flexHelper().middle(),
+        marginLeft: globalVars.gutter.half,
         $nest: {
             "&:hover": {
                 color: colorOut(globalVars.mainColors.primary),
@@ -309,6 +323,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         label,
         undoWrap,
         inputWrap,
+        checkBox,
         checkBoxWrap,
         title,
         section,

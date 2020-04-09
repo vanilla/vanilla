@@ -9,12 +9,14 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { useThrowError } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useContext } from "react";
+import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
 
 interface IProps {
     label: string;
     undo?: boolean;
     children: React.ReactNode;
     inputWrapClass?: string;
+    info?: React.ReactNode;
 }
 
 interface IThemeBlockContext {
@@ -46,6 +48,7 @@ export function ThemeBuilderBlock(props: IProps) {
         <div className={classes.block}>
             <label htmlFor={labelID} className={classes.label}>
                 {props.label}
+                {props.info && <ThemeInfoTooltip label={props.info} />}
             </label>
             <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
                 <ThemeBlockContext.Provider value={{ inputID, labelID }}>{props.children}</ThemeBlockContext.Provider>

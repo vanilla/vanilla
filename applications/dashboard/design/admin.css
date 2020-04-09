@@ -9636,6 +9636,12 @@ ul {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.title-block .backLink {
+  margin-left: 0;
 }
 
 .btn-return {

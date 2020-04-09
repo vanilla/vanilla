@@ -14,7 +14,9 @@ import unset from "lodash/unset";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
-import { userContentVariables } from "@library/content/userContentStyles";
+import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
+import { escapeHTML } from "@vanilla/dom-utils";
+import UserContent from "@library/content/UserContent";
 
 ///
 /// Types
@@ -64,7 +66,7 @@ export function useThemeVariableField<T>(variableKey: string) {
         initialValue: get(context.initialThemeVariables, variableKey, undefined) as T | null | undefined,
         generatedValue: get(context.generatedThemeVariables, variableKey, undefined) as T | null | undefined,
         error: get(context.variableErrors, variableKey, undefined) as string | null | undefined,
-        setValue: (value: T | null) => {
+        setValue: (value: T | null | undefined) => {
             context.setVariableValue(variableKey, value);
         },
         setError: (value: T | null) => {
@@ -112,20 +114,23 @@ export function ThemeBuilderContextProvider(props: IProps) {
         const newErrors = calculateNewErrors(variableKey, null);
         const hasErrors = getErrorCount(newErrors) > 0;
         let cloned = cloneDeep(rawValueRef.current);
+
         rawValueRef.current = cloned;
+
         if (value === "" || value === undefined) {
             // Null does not clear this. Null is a valid value.
             unset(cloned, variableKey);
         } else {
             cloned = set(cloned, variableKey, value);
         }
+
         onChange(cloned, hasErrors);
     };
 
     return (
         <context.Provider
             value={{
-                rawThemeVariables,
+                rawThemeVariables: rawValueRef.current,
                 defaultThemeVariables,
                 generatedThemeVariables,
                 initialThemeVariables,

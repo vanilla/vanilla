@@ -22,6 +22,7 @@ import {
     userSelect,
     EMPTY_FONTS,
     isLightColor,
+    negativeUnit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -268,6 +269,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         mobile: {
             url: undefined,
+            maxWidth: undefined,
+            heightOffset: sizing.height / 3,
         }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         offsetVertical: {
             amount: 0,
@@ -499,7 +502,7 @@ export const titleBarClasses = useThemeCache(() => {
             paddingTop: px(vars.sizing.height / 2),
         },
         mediaQueries.compact({
-            paddingTop: px(vars.sizing.mobile.height / 2),
+            paddingTop: px(vars.sizing.mobile.height / 2 + 20),
         }),
     );
 
@@ -782,7 +785,7 @@ export const titleBarClasses = useThemeCache(() => {
         transform: `translateX(6px)`,
     });
 
-    const centeredButtonClass = style("centeredButtonClass", {
+    const centeredButton = style("centeredButton", {
         ...flex.middle(),
     });
 
@@ -938,6 +941,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const hamburger = style("hamburger", {
         marginRight: unit(12),
+        marginLeft: negativeUnit(globalVars.buttonIcon.offset),
         $nest: {
             "&&": {
                 ...allButtonStates({
@@ -963,6 +967,10 @@ export const titleBarClasses = useThemeCache(() => {
     const overlay = style("overlay", {
         ...absolutePosition.fullSizeOfParent(),
         background: vars.overlay.background,
+    });
+
+    const signInIconOffset = style("signInIconOffset", {
+        marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
     return {
@@ -998,7 +1006,7 @@ export const titleBarClasses = useThemeCache(() => {
         leftFlexBasis,
         signIn,
         register,
-        centeredButtonClass,
+        centeredButton,
         compactSearchResults,
         clearButtonClass,
         guestButton,
@@ -1010,19 +1018,19 @@ export const titleBarClasses = useThemeCache(() => {
         logoAnimationWrap,
         overlay,
         swoop,
+        signInIconOffset,
     };
 });
 
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
-    const logoHeight = px(vars.sizing.height - vars.logo.heightOffset);
 
     const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
 
     const logo = style("logo", {
         display: "block",
-        maxHeight: logoHeight,
+        maxHeight: px(vars.sizing.height - vars.logo.heightOffset),
         maxWidth: unit(vars.logo.maxWidth),
         width: "auto",
         $nest: {
@@ -1033,7 +1041,10 @@ export const titleBarLogoClasses = useThemeCache(() => {
     });
 
     const mobileLogo = style("mobileLogo", {
+        display: "flex",
         justifyContent: vars.mobileLogo.justifyContent,
+        maxHeight: px(vars.sizing.mobile.height - (vars.logo.mobile.heightOffset ?? vars.logo.heightOffset)),
+        maxWidth: unit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
     });
 
     const isCenter = style("isCenter", {

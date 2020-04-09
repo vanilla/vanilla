@@ -26,15 +26,13 @@ import "@library/forms/datePicker.scss";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { StorySmallContent } from "@library/storybook/StorySmallContent";
+import { FormToggle } from "@library/forms/FormToggle";
+import { flexHelper } from "@library/styles/styleHelpers";
 
-const story = storiesOf("Form Elements", module);
+const story = storiesOf("Forms/User Facing", module);
 
-story.add("Inputs", () => {
+story.add("Elements", () => {
     let activeTab = "Tab A";
-
-    const doNothing = () => {
-        return;
-    };
 
     /**
      * Simple form setter.
@@ -68,6 +66,20 @@ story.add("Inputs", () => {
                 <Checkbox label="Option C" />
                 <Checkbox label="Option D" />
             </CheckboxGroup>
+            <StoryHeading>Toggles</StoryHeading>
+            <div style={flexHelper().middle()}>
+                <StoryToggle accessibleLabel="Enabled" enabled={true} />
+                <StoryToggle accessibleLabel="Disabled" enabled={false} />
+                <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} />
+                <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={false} />
+            </div>
+            <StoryHeading>Toggles (Slim)</StoryHeading>
+            <div style={flexHelper().middle()}>
+                <StoryToggle accessibleLabel="Enabled" enabled={true} slim />
+                <StoryToggle accessibleLabel="Disabled" enabled={false} slim />
+                <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} slim />
+                <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={false} slim />
+            </div>
             <StoryHeading>Radio Buttons - In a Group</StoryHeading>
             <RadioButtonGroup label={"Gaggle of radio buttons"}>
                 <RadioButton label={"Option A"} name={radioButtonGroup1} defaultChecked />
@@ -133,3 +145,15 @@ story.add("Inputs", () => {
         </StoryContent>
     );
 });
+
+const doNothing = () => {
+    return;
+};
+
+function StoryToggle(props: Omit<React.ComponentProps<typeof FormToggle>, "onChange">) {
+    return (
+        <InputBlock label={props.accessibleLabel}>
+            <FormToggle {...props} onChange={doNothing} />
+        </InputBlock>
+    );
+}

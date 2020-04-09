@@ -5,7 +5,7 @@
  */
 
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
-import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -28,7 +28,6 @@ import {
     importantUnit,
     isLightColor,
     modifyColorBasedOnLightness,
-    negative,
     textInputSizingFromFixedHeight,
     unit,
     unitIfDefined,
@@ -38,10 +37,12 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper } from "csx";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color } from "csx";
 import { media } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
+import { t } from "@vanilla/i18n";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -110,7 +111,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
-        primaryContrast: globalVars.mainColors.bg,
+        primaryContrast: globalVars.mainColors.primaryContrast,
         secondary: globalVars.mainColors.secondary,
         secondaryContrast: globalVars.mainColors.secondaryContrast,
         bg: globalVars.mainColors.bg,
@@ -185,15 +186,26 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
     });
 
-    const outerBackground = makeThemeVars("outerBackground", {
+    const outerBackgroundInit = makeThemeVars("outerBackground", {
         ...EMPTY_BACKGROUND,
         color: colors.primary.lighten("12%"),
         repeat: "no-repeat",
         position: "50% 50%",
         size: "cover",
-        mobile: {
-            image: undefined as undefined | string,
-        },
+    });
+
+    const outerBackground = makeThemeVars("outerBackground", {
+        ...outerBackgroundInit,
+        ...breakpointVariables({
+            tablet: {
+                breakpointUILabel: t("Tablet"),
+                ...EMPTY_BACKGROUND,
+            },
+            mobile: {
+                breakpointUILabel: t("Mobile"),
+                ...EMPTY_BACKGROUND,
+            },
+        }),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
@@ -238,8 +250,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
         margins: {
             ...EMPTY_SPACING,
-            top: 14,
-            bottom: 12,
+            top: 18,
+            bottom: 8,
         },
         text: "How can we help you?",
     });
@@ -457,6 +469,7 @@ export const bannerClasses = useThemeCache(
         const mediaQueries = layoutVariables().mediaQueries();
 
         const isCentered = vars.options.alignment === "center";
+
         const searchButton = style("searchButton", {
             $nest: {
                 "&.searchBar-submitButton": {
@@ -476,6 +489,7 @@ export const bannerClasses = useThemeCache(
                             vars.searchBar.sizing.height,
                             vars.searchBar.font.size,
                             vars.searchBar.border.width * 2,
+                            vars.searchBar.border.radius.left,
                         ),
                         boxSizing: "border-box",
                         paddingLeft: unit(searchBarVariables().searchIcon.gap),
@@ -507,6 +521,8 @@ export const bannerClasses = useThemeCache(
 
         const outerBackground = useThemeCache((url?: string) => {
             const finalUrl = url ?? vars.outerBackground.image ?? undefined;
+            const finalTabletUrl = url ?? vars.outerBackground.breakpoints.tablet.image;
+            const finalMobileUrl = url ?? vars.outerBackground.breakpoints.mobile.image;
             const finalVars = {
                 ...vars.outerBackground,
                 image: finalUrl,
@@ -524,9 +540,10 @@ export const bannerClasses = useThemeCache(
                     display: "block",
                     ...backgroundHelper(finalVars),
                 },
-                mediaQueries.oneColumnDown({
-                    image: vars.outerBackground.mobile.image,
-                } as NestedCSSProperties),
+                finalTabletUrl &&
+                    mediaQueries.twoColumnsDown(backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl })),
+                finalMobileUrl &&
+                    mediaQueries.oneColumnDown(backgroundHelper({ ...vars.outerBackground, image: finalMobileUrl })),
             );
         });
 
@@ -658,7 +675,7 @@ export const bannerClasses = useThemeCache(
             height: unit(formElementVars.sizing.height),
             width: unit(formElementVars.sizing.height),
             flexBasis: unit(formElementVars.sizing.height),
-            transform: translateX(px(formElementVars.sizing.height - globalVars.icon.sizes.default / 2 - 13)),
+            transform: translateX(px((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2 - 1)), // The "3" is to offset the pencil that visually doesn't look aligned without a cheat.
             $nest: {
                 ".searchBar-actionButton:after": {
                     content: quote(""),

@@ -41,7 +41,11 @@ interface IProps {
     /** Whether or not to display the label visibly. */
     visibleLabel?: boolean;
 
+    /** Optional extra class for chevron **/
     chevronClass?: string;
+
+    /** Check history and hide if there's no where to go **/
+    hideIfNoHistory?: boolean;
 }
 
 /**
@@ -61,6 +65,10 @@ export default function BackLink(props: IProps) {
     const classes = backLinkClasses();
     const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
     const title = props.title || t("Back");
+
+    if (!canGoBack && props.hideIfNoHistory && !props.fallbackUrl) {
+        return null;
+    }
 
     let content = (
         <>
@@ -117,7 +125,7 @@ export default function BackLink(props: IProps) {
         );
     }
 
-    return <div className={classNames(classes.root, props.className)}>{content}</div>;
+    return <div className={classNames("backLink", classes.root, props.className)}>{content}</div>;
 }
 
 BackLink.defaultProps = {

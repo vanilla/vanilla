@@ -140,6 +140,11 @@
 
 .title-block {
   display: flex;
+  align-items: center;
+
+  .backLink {
+      margin-left: 0;
+  }
 }
 
 // Header Block with Return Button

@@ -81,8 +81,6 @@ export default function DropDown(props: IDropDownProps) {
 
     const { title } = props;
     const mobileTitle = props.mobileTitle ?? title;
-    const classesDropDown = dropDownClasses();
-    const classesFrameHeader = frameHeaderClasses();
     const classes = dropDownClasses();
     const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
     const openAsModal = props.openAsModal || device === Devices.MOBILE || device === Devices.XS;
@@ -136,7 +134,13 @@ export default function DropDown(props: IDropDownProps) {
                                 {mobileTitle ?? title}
                             </FrameHeaderMinimal>
                         )}
-                        <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
+                        {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
+                            props.children
+                        ) : (
+                            <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                {props.children}
+                            </ContentTag>
+                        )}
                     </DropDownContents>
                 );
             }}

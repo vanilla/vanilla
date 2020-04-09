@@ -474,6 +474,21 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         $sender->render('settings', '', $view);
     }
 
+    /**
+     * Set the 'IsDefault' field to zero before disabling to prevent conflicts.
+     *
+     * @param Gdn_Controller $sender The Controller info.
+     * @param Gdn_Controller $args Event args.
+     */
+    public function settingsController_beforeDisablePlugin_handler($sender, $args) {
+        if (isset($args['PluginName'])) {
+            $authenticationProvider = new Gdn_AuthenticationProviderModel();
+            $providerData = Gdn_AuthenticationProviderModel::getProviderByKey($args['PluginName']);
+            $providerData['IsDefault'] = 0;
+            $authenticationProvider->save($providerData);
+        }
+    }
+
 
 
     /** ------------------- Connection Related Methods --------------------- */

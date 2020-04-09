@@ -78,7 +78,9 @@ export default class SiteNavNode extends React.Component<IProps> {
                             tabIndex={0}
                             to={this.props.url}
                         >
-                            <span className={classes.label}>{this.props.name}</span>
+                            <span className={classNames(classes.label, this.props.isLink && classes.activeLink)}>
+                                {this.props.name}
+                            </span>
                         </SmartLink>
                     )}
                 </Hoverable>

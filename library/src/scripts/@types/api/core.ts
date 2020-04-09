@@ -59,6 +59,7 @@ export interface INavigationItem {
     recordID: number;
     sort: number | null;
     recordType: string;
+    isLink?: boolean;
 }
 
 export interface IApiDateInfo {

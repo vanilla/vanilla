@@ -236,6 +236,11 @@ export const siteNavNodeClasses = useThemeCache(() => {
         transform: `translateY(-50%)`,
     });
 
+    const activeLink = style("active", {
+        fontWeight: globalVars.fonts.weights.semiBold,
+        color: colorOut(globalVars.links.colors.active),
+    });
+
     return {
         root,
         children,
@@ -246,5 +251,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
         spacer,
         toggle,
         buttonOffset,
+        activeLink,
     };
 });

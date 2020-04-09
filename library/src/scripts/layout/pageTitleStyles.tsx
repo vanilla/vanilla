@@ -12,14 +12,13 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 import { pageHeadingVariables } from "./pageHeadingStyles";
 import { iconVariables } from "@library/icons/iconClasses";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 export const pageTitleClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = pageHeadingVariables();
-    const chevronDimensions = iconVariables().chevronLeftCompact;
+    // const chevronDimensions = iconVariables().chevronLeftCompact;
     const style = styleFactory("pageTitle");
-
-    const chevronToFontRatio = 0.95;
 
     const root = style({
         fontSize: globalVars.fonts.size.title,
@@ -31,12 +30,21 @@ export const pageTitleClasses = useThemeCache(() => {
         $nest: lineHeightAdjustment(),
     } as NestedCSSProperties);
 
-    const subTitleBackLink = style("subTitleBackLink", {
-        marginTop: "0.9ex",
+    const iconSizing = iconVariables().chevronLeftCompact(true);
+
+    const smallBackLink = style("smallBackLink", {
+        $nest: {
+            [`& .${backLinkClasses().root}`]: {
+                height: unit(iconSizing.height),
+            },
+            [`& .${backLinkClasses().link}`]: {
+                height: unit(iconSizing.height),
+            },
+        },
     });
 
     return {
         root,
-        subTitleBackLink,
+        smallBackLink,
     };
 });

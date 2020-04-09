@@ -95,10 +95,19 @@ export const iconVariables = useThemeCache(() => {
         height: 10,
     });
 
-    const chevronLeftCompact = themeVars("chevronLeftCompact", {
-        width: 12,
-        height: 21,
-    });
+    const chevronLeftCompact = (isSmall?: boolean) => {
+        const defaultWidth = 12;
+        const defaultHeight = 21;
+        const smallHeight = 16; // width is calculated
+
+        const width = !isSmall ? defaultWidth : (smallHeight * defaultWidth) / defaultHeight;
+        const height = !isSmall ? defaultHeight : smallHeight;
+
+        return themeVars("chevronLeftCompact", {
+            width: width,
+            height: height,
+        });
+    };
 
     const selectedCategory = themeVars("selectedCategory", {
         width: 16.8,
@@ -277,8 +286,18 @@ export const iconClasses = useThemeCache(() => {
 
     const chevronLeftCompact = style("chevronLeftCompact", {
         ...pointerEvents(),
-        width: unit(vars.chevronLeftCompact.width),
-        height: unit(vars.chevronLeftCompact.height),
+        width: unit(vars.chevronLeftCompact().width),
+        height: unit(vars.chevronLeftCompact().height),
+    });
+
+    const chevronLeftSmallCompact = style("chevronLeftSmallCompact", {
+        ...pointerEvents(),
+        $nest: {
+            [`&&, &.${chevronLeftCompact}`]: {
+                width: unit(vars.chevronLeftCompact(true).width),
+                height: unit(vars.chevronLeftCompact(true).height),
+            },
+        },
     });
 
     const selectedCategory = style("selectedCategory", {
@@ -380,6 +399,7 @@ export const iconClasses = useThemeCache(() => {
         closeCompact,
         closeTiny,
         chevronLeftCompact,
+        chevronLeftSmallCompact,
         selectedCategory,
         signIn,
         chevronUp,

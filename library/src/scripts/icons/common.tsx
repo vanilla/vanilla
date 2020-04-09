@@ -69,7 +69,11 @@ export function LeftChevronIcon(props: { className?: string; "aria-hidden"?: are
     );
 }
 
-export function LeftChevronCompactIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function LeftChevronCompactIcon(props: {
+    className?: string;
+    "aria-hidden"?: areaHiddenType;
+    isSmall?: boolean;
+}) {
     const title = `<`;
     const classes = iconClasses();
     return (

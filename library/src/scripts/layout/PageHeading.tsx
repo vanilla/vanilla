@@ -42,8 +42,9 @@ export function PageHeading(props: IPageHeading) {
             <div className={classes.main}>
                 {includeBackLink && (
                     <BackLink
-                        className={classNames(linkClasses.inHeading(fontSize), props.backLinkClass)}
+                        className={classNames(linkClasses.inHeading(fontSize), classes)}
                         chevronClass={props.chevronClass}
+                        linkClassName={props.backLinkClass}
                     />
                 )}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>

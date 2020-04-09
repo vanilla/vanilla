@@ -8,6 +8,8 @@ import { bannerVariables, bannerClasses, BannerAlignment } from "@library/banner
 import clamp from "lodash/clamp";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { EMPTY_SPACING } from "@library/styles/styleHelpers";
+import merge from "lodash/merge";
+import clone from "lodash/clone";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
@@ -44,41 +46,39 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
         },
     });
 
-    const normalBannerVars = bannerVariables();
+    const normalBannerVars = bannerVariables(forcedVars, "contentBanner");
 
-    return bannerVariables(
-        {
-            contentBanner: {
-                options: {
-                    ...options,
-                    hideDescription: true,
-                    hideTitle: true,
-                    hideSearch: true,
-                },
-                dimensions: {
-                    minHeight: minHeight,
-                    mobile: {
-                        minHeight: minHeightMobile,
-                    },
-                },
-                logo: {
-                    height: minHeight - normalBannerVars.logo.padding.all * 2,
-                    width: "auto",
-                    mobile: {
-                        height: minHeightMobile - normalBannerVars.logo.padding.all * 2,
-                    },
-                },
-                spacing: {
-                    padding: {
-                        top: 0,
-                        bottom: 0,
-                    },
-                },
-                contentContainer,
+    const forced = merge(clone(forcedVars), {
+        contentBanner: {
+            options: {
+                ...options,
+                hideDescription: true,
+                hideTitle: true,
+                hideSearch: true,
             },
+            dimensions: {
+                minHeight: minHeight,
+                mobile: {
+                    minHeight: minHeightMobile,
+                },
+            },
+            logo: {
+                height: minHeight - normalBannerVars.logo.padding.all * 2,
+                width: "auto",
+                mobile: {
+                    height: minHeightMobile - normalBannerVars.logo.padding.all * 2,
+                },
+            },
+            spacing: {
+                padding: {
+                    top: 0,
+                    bottom: 0,
+                },
+            },
+            contentContainer,
         },
-        "contentBanner",
-    );
+    });
+    return bannerVariables(forced, "contentBanner");
 });
 
 export const contentBannerClasses = useThemeCache(() => {

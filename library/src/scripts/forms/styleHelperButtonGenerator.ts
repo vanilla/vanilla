@@ -27,7 +27,6 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
-    const buttonVars = buttonVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
@@ -70,11 +69,13 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         buttonTypeVars.borders = EMPTY_BORDER;
     }
 
-    let defaultBorder = borders({
+    const borderVars = {
         ...EMPTY_BORDER,
         ...buttonGlobals.border,
         ...buttonTypeVars.borders,
-    });
+    };
+
+    let defaultBorder = borders(borderVars) as NestedCSSProperties;
 
     // Remove debug and fallback
 
@@ -144,6 +145,7 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
                 ? buttonTypeVars.padding.horizontal
                 : buttonGlobals.padding.horizontal,
             formElVars,
+            borderVars.radius,
         ),
         display: "inline-flex",
         alignItems: "center",

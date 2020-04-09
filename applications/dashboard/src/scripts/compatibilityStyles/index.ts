@@ -11,17 +11,8 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import {
-    backgroundHelper,
-    borders,
-    importantUnit,
-    margins,
-    negative,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
-import { calc, ColorHelper, important, quote } from "csx";
+import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
@@ -49,7 +40,7 @@ import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
-import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -120,10 +111,6 @@ compatibilityStyles = useThemeCache(() => {
         .About a,
         .Panel.Panel-main .PanelInfo a.ItemLink,
         `;
-
-    //.Panel.Panel-main .BoxFilter a,
-    //.Panel.Panel-main .FilterMenu a,
-    //.Panel.Panel-main .FilterMenu a,
 
     // Panel
     cssOut(panelSelectors, {
@@ -272,7 +259,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(vars.borderType.dropDowns.content),
+        ...borders(vars.borderType.dropDowns),
         overflow: "hidden",
     });
 
@@ -353,6 +340,8 @@ compatibilityStyles = useThemeCache(() => {
         display: "none",
     });
 
+    cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -369,6 +358,7 @@ compatibilityStyles = useThemeCache(() => {
     ideaCSS();
     tableCSS();
     discussionCSS();
+
     searchPageCSS();
     groupsCSS();
     profilePageCSS();

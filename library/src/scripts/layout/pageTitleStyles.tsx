@@ -31,24 +31,12 @@ export const pageTitleClasses = useThemeCache(() => {
         $nest: lineHeightAdjustment(),
     } as NestedCSSProperties);
 
-    const subTitleChevron = style("subTitleChevron", {
-        $nest: {
-            "&&": {
-                width: `${chevronToFontRatio}ex`,
-                fontSize: unit(globalVars.fonts.size.subTitle),
-                height: `${(chevronToFontRatio * chevronDimensions.height) / chevronDimensions.width}ex`,
-                marginBottom: "16px",
-            },
-        },
-    });
-
     const subTitleBackLink = style("subTitleBackLink", {
         marginTop: "0.9ex",
     });
 
     return {
         root,
-        subTitleChevron,
         subTitleBackLink,
     };
 });

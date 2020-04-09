@@ -40,6 +40,8 @@ interface IProps {
 
     /** Whether or not to display the label visibly. */
     visibleLabel?: boolean;
+
+    chevronClass?: string;
 }
 
 /**
@@ -62,7 +64,7 @@ export default function BackLink(props: IProps) {
 
     let content = (
         <>
-            <LeftChevronCompactIcon className={classes.icon} />
+            <LeftChevronCompactIcon className={classNames(classes.icon, props.chevronClass)} />
             {props.visibleLabel && <span className={classes.label}>{title}</span>}
         </>
     );

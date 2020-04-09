@@ -20,6 +20,8 @@ interface IPageHeading {
     headingClassName?: string;
     actions?: React.ReactNode;
     includeBackLink?: boolean;
+    chevronClass?: string;
+    backLinkClass?: string;
 }
 
 /**
@@ -38,7 +40,12 @@ export function PageHeading(props: IPageHeading) {
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && <BackLink className={linkClasses.inHeading(fontSize)} />}
+                {includeBackLink && (
+                    <BackLink
+                        className={classNames(linkClasses.inHeading(fontSize), props.backLinkClass)}
+                        chevronClass={props.chevronClass}
+                    />
+                )}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
                     <Heading depth={1} title={title} className={headingClassName}>
                         {children}

@@ -5,11 +5,19 @@
  * @license GPL-2.0-only
  */
 
-import { importantColorOut, unit, colorOut, backgroundHelper } from "@library/styles/styleHelpers";
+import {
+    importantColorOut,
+    unit,
+    colorOut,
+    backgroundHelper,
+    ColorValues,
+    absolutePosition,
+    negativeUnit,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
-import { important, percent, quote } from "csx";
+import { important, percent, quote, translate } from "csx";
 
 export const discussionCSS = () => {
     const vars = globalVariables();
@@ -107,9 +115,10 @@ export const discussionCSS = () => {
         `,
         {
             opacity: 1,
-            width: unit(14),
-            height: unit(20),
+            width: unit(24),
+            height: unit(24),
             display: "block",
+            position: "relative",
         },
     );
 
@@ -119,21 +128,75 @@ export const discussionCSS = () => {
         .Content a.Bookmarking::before,
         .Content a.Bookmarked::before`,
         {
+            ...absolutePosition.topLeft("50%", "50%"),
             content: quote(``),
             display: "block",
             width: unit(12),
             height: unit(16),
             fontSize: unit(12),
+            transform: translate(`-50%`, `-50%`),
         },
     );
 
     cssOut(
         `
         .Content a.Bookmark::before,
+        `,
+        {
+            ...backgroundHelper({
+                size: "100%",
+                image: bookmarkBackground({
+                    bookmarked: false,
+                    color: vars.mixBgAndFg(0.7),
+                }),
+            }),
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmark:not(.Bookmarked):hover::before,
+        `,
+        {
+            ...backgroundHelper({
+                size: "100%",
+                image: bookmarkBackground({
+                    bookmarked: false,
+                    color: vars.mainColors.primary,
+                }),
+            }),
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmarked::before
+        `,
+        {
+            ...backgroundHelper({
+                size: "100%",
+                image: bookmarkBackground({
+                    bookmarked: true,
+                    color: vars.mainColors.primary,
+                }),
+            }),
+        },
+    );
+
+    cssOut(
+        `
         .Content a.Bookmarking::before
         `,
         {
-            ...backgroundHelper({ size: "100%", image: bookmarkBackground(false, vars.mixPrimaryAndBg(0.8)) }),
+            ...backgroundHelper({
+                size: "100%",
+                image: bookmarkBackground({
+                    bookmarked: false,
+                    loading: true,
+                    color: vars.mixBgAndFg(0.7),
+                    loadingColor: vars.mainColors.primary,
+                }),
+            }),
         },
     );
 
@@ -145,10 +208,11 @@ export const discussionCSS = () => {
 
     cssOut(
         `
-        .Content a.Bookmarked::before
-        `,
+        body.Discussions .DataList .Options,
+        body.Discussions .MessageList .Options
+    `,
         {
-            ...backgroundHelper({ size: "100%", image: bookmarkBackground(true, vars.mainColors.primary) }),
+            marginTop: negativeUnit(2),
         },
     );
 };

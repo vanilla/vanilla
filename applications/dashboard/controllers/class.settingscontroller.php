@@ -1454,6 +1454,7 @@ class SettingsController extends DashboardController {
         }
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
+        $this->fireEvent('BeforeDisablePlugin', ['PluginName' => $pluginName]);
 
         try {
             Gdn::pluginManager()->disablePlugin($pluginName);

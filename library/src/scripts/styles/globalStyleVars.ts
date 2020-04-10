@@ -241,12 +241,13 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         googleFontFamily: "Open Sans" as undefined | string,
         forceGoogleFont: false,
         customFontUrl: undefined as undefined | string,
+        customFontFamilyName: undefined as undefined | string,
     });
 
     const fontsInit1 = makeThemeVars("fonts", {
         ...fontsInit0,
         families: {
-            body: [fontsInit0.googleFontFamily ?? "Open Sans"],
+            body: [fontsInit0.customFontFamilyName ?? fontsInit0.googleFontFamily ?? "Open Sans"],
             monospace: [],
         },
     });

@@ -14,10 +14,11 @@ import isEqual from "lodash/isEqual";
 
 interface IProps extends Omit<React.ComponentProps<typeof Button>, "children" | "onClick"> {
     variableKey: string;
+    afterChange?: () => void;
 }
 
 export function ThemeBuilderRevert(_props: IProps) {
-    const { variableKey, ...props } = _props;
+    const { variableKey, afterChange, ...props } = _props;
     const classes = themeBuilderClasses();
     const { initialValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
@@ -33,6 +34,7 @@ export function ThemeBuilderRevert(_props: IProps) {
             title={t("Reset")}
             onClick={() => {
                 setValue(initialValue);
+                afterChange && afterChange();
             }}
         >
             <ResetIcon />

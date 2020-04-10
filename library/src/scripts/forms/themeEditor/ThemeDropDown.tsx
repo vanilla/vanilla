@@ -8,15 +8,17 @@ import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import React, { useEffect } from "react";
 import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 interface IProps extends IMenuPlacement {
     variableKey: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
     options: IComboBoxOption[];
     disabled?: boolean;
     afterChange?: (value: string | null | undefined) => void;
+    triggerOnChangeOnInit?: boolean;
 }
 
 export function ThemeDropDown(_props: IProps) {
@@ -27,6 +29,10 @@ export function ThemeDropDown(_props: IProps) {
     const onChange = (option: IComboBoxOption | undefined) => {
         const newValue = option ? option.value.toString() : undefined;
         setValue(newValue);
+
+        console.log("after Change on Drop down:");
+        console.log("newValue:", newValue);
+
         afterChange?.(newValue);
     };
 
@@ -44,6 +50,13 @@ export function ThemeDropDown(_props: IProps) {
         label: t("Unknown"),
         value: generatedValue,
     };
+
+    useEffect(() => {
+        if (afterChange) {
+            console.log("trigger use effect Theme Dropdown");
+            onChange(defaultOption);
+        }
+    }, []);
 
     return (
         <>
@@ -63,7 +76,23 @@ export function ThemeDropDown(_props: IProps) {
                     onChange={onChange}
                 />
             </div>
-            <ThemeBuilderRevert variableKey={variableKey} />
+            <ThemeBuilderRevert
+                variableKey={variableKey}
+                afterChange={
+                    afterChange
+                        ? () => {
+                              console.log("after Change on revert:");
+                              console.log(
+                                  "selectedOption && selectedOption.value ? selectedOption.value.toString() : undefined: ",
+                                  selectedOption && selectedOption.value ? selectedOption.value.toString() : undefined,
+                              );
+                              afterChange(
+                                  selectedOption && selectedOption.value ? selectedOption.value.toString() : undefined,
+                              );
+                          }
+                        : undefined
+                }
+            />
         </>
     );
 }

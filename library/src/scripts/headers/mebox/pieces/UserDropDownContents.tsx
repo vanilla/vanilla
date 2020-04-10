@@ -5,6 +5,7 @@
  */
 
 import apiv2 from "@library/apiv2";
+import gdn from "@library/gdn";
 import Permission from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -24,6 +25,7 @@ import { connect } from "react-redux";
  */
 function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
+    const signOutUrl = gdn.meta.signOutUrl ?? `/entry/signout?target=${window.location.href}`;
     const siteSection = getSiteSection();
     if (!userInfo) {
         return null;
@@ -84,7 +86,7 @@ function UserDropDownContents(props: IProps) {
             <Permission permission={["site.manage", "settings.view"]}>
                 <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
             </Permission>
-            <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
+            <DropDownItemLink to={signOutUrl} name={t("Sign Out")} />
         </div>
     );
 }

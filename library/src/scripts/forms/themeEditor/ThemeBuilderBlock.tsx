@@ -8,12 +8,8 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import { useUniqueID } from "@library/utility/idUtils";
 import { useThrowError } from "@vanilla/react-utils";
 import classNames from "classnames";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
-import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
-import { t } from "@vanilla/i18n/src";
-import { CustomFontURL } from "@themingapi/theme/CustomFontFamilyName";
-import { FontFamilyName } from "@themingapi/theme/FontFamilyName";
 
 interface IProps {
     label: string;
@@ -58,29 +54,5 @@ export function ThemeBuilderBlock(props: IProps) {
                 <ThemeBlockContext.Provider value={{ inputID, labelID }}>{props.children}</ThemeBlockContext.Provider>
             </span>
         </div>
-    );
-}
-
-export function ThemeBuilderFontBlock() {
-    const [customFont, setCustomFont] = useState(null);
-
-    console.log("state of ThemeFontBlock: ", customFont);
-
-    return (
-        <>
-            <ThemeBuilderBlock label={t("Font")}>
-                <GoogleFontDropdown setCustomFont={setCustomFont as any} setInitialValue={!!customFont} />
-            </ThemeBuilderBlock>
-            {customFont && (
-                <>
-                    <ThemeBuilderBlock label={t("Font URL")} info={undefined}>
-                        <CustomFontURL />
-                    </ThemeBuilderBlock>
-                    <ThemeBuilderBlock label={t("Font Name")} info={undefined}>
-                        <FontFamilyName />
-                    </ThemeBuilderBlock>
-                </>
-            )}
-        </>
     );
 }

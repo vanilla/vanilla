@@ -853,7 +853,7 @@ export function BookmarkIcon(props: {
 }) {
     return (
         <svg
-            className={classNames("svgBookmark", iconClasses().bookmark(props.iconProps), props.className)}
+            className={classNames("svgBookmark", props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 12.733 16.394"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}

@@ -4,12 +4,14 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { scale } from "csx";
+import { important, scale } from "csx";
 import { unit, colorOut, pointerEvents, ColorValues } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 import { logDebugConditionnal } from "@vanilla/utils";
+import main from "@storybook/api/dist/initial-state";
+import { debuglog } from "util";
 
 interface IPathState {
     stroke?: ColorValues | StrokeProperty;
@@ -18,25 +20,24 @@ interface IPathState {
     strokeWidth?: StrokeWidthProperty<TLength>;
 }
 
-interface ISVGState extends IPathState {
+interface INestedPathState extends IPathState {
     state?: IPathState;
 }
 
-interface IBookmarkLoading extends IPathState {
+interface IBookmarkLoading extends INestedPathState {
     halfFill?: ColorValues | string;
 }
 
 export interface IBookmarkProps {
-    normalState: ISVGState | undefined;
+    normalState: INestedPathState | undefined;
     loadingState: IBookmarkLoading | undefined;
-    bookmarkedState: ISVGState | undefined;
+    bookmarkedState: INestedPathState | undefined;
 }
 
-export const svgStyles = (props: IPathState | ISVGState, debug?: boolean) => {
-    logDebugConditionnal(debug, "svgSteyls props: ", props);
-    logDebugConditionnal(debug, "props.fill: ", props.fill);
-    logDebugConditionnal(debug, "colorOut(props.fill): ", colorOut(props.fill));
-
+export const svgStyles = (props: INestedPathState | undefined, debug?: boolean) => {
+    if (props === undefined) {
+        return {};
+    }
     let stroke = props.stroke;
     if (stroke !== "none") {
         stroke = props.stroke ? colorOut(props.stroke) : props.stroke;
@@ -51,7 +52,7 @@ export const svgStyles = (props: IPathState | ISVGState, debug?: boolean) => {
         stroke: stroke,
         fill: fill,
         strokeWidth: props.strokeWidth ? unit(props.strokeWidth) : undefined,
-        opacity: props.strokeWidth ? unit(props.strokeWidth) : undefined,
+        opacity: props.opacity,
     };
 };
 
@@ -413,13 +414,16 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
+    // Goes on link, not SVG to handle states
     const bookmark = (
-        props: IBookmarkProps = { normalState: undefined, loadingState: undefined, bookmarkedState: undefined },
+        props: IBookmarkProps = {
+            normalState: undefined as undefined | INestedPathState,
+            loadingState: undefined as undefined | INestedPathState,
+            bookmarkedState: undefined as undefined | INestedPathState,
+        },
     ) => {
         const globalVars = globalVariables();
         const mainColors = globalVars.mainColors;
-
-        console.log("props: ", props);
 
         const {
             normalState = {
@@ -430,9 +434,9 @@ export const iconClasses = useThemeCache(() => {
                 },
             },
             loadingState = {
-                stroke: mainColors.primary,
                 opacity: 0.7,
                 fill: mainColors.primary,
+                strokeWidth: 0,
             },
             bookmarkedState = {
                 stroke: mainColors.primary,
@@ -440,28 +444,32 @@ export const iconClasses = useThemeCache(() => {
             },
         } = props;
 
-        console.log("normalState: ", normalState);
-
         return style("bookmark", {
-            ...pointerEvents(),
             width: unit(vars.bookmarkIcon.width),
             height: unit(vars.bookmarkIcon.height),
             opacity: 1,
             display: "block",
             position: "relative",
             $nest: {
-                "&.Bookmarked": svgStyles(bookmarkedState),
-                "&.Bookmarking .svgBookmark-loadingPath": {
-                    display: "block",
+                "& .svgBookmark": {
+                    ...pointerEvents(),
                 },
-                "&:hover:not(.Bookmarked), &:not(.Bookmarked):focus, &:not(.Bookmarked).focus-visible": {
-                    $nest: {
-                        "& .svgBookmark-mainPath": svgStyles(bookmarkedState),
-                    },
-                },
-                "& .svgBookmark-mainPath": svgStyles(normalState, true),
+                "& .svgBookmark-mainPath": svgStyles(normalState),
+                "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
+                "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:Bookmarking .svgBookmark-mainPath": svgStyles({
+                    fill: important("none"),
+                    opacity: loadingState.opacity,
+                }),
+                "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
                 "& .svgBookmark-loadingPath": {
                     display: "none",
+                },
+                "&.Bookmarking .svgBookmark-loadingPath": {
+                    display: "block",
+                    ...svgStyles(loadingState, true),
                 },
             },
         });

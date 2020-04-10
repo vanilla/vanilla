@@ -163,6 +163,9 @@ class SiteMeta implements \JsonSerializable {
 
         $this->session = $session;
 
+        //Sign Out URL
+        $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
+
         // Theming
         $currentTheme = $themeModel->getCurrentTheme();
         $currentThemeAddon = $themeModel->getCurrentThemeAddon();
@@ -230,6 +233,7 @@ class SiteMeta implements \JsonSerializable {
                 'maxUploads' => $this->maxUploads,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
+            'signOutUrl' => $this->signOutUrl,
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,

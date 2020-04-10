@@ -16,8 +16,8 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { bookmarkBackground } from "@dashboard/compatibilityStyles/svgsAsBackgrounds";
 import { important, percent, quote, translate } from "csx";
+import { iconClasses } from "@library/icons/iconClasses";
 
 export const discussionCSS = () => {
     const vars = globalVariables();
@@ -124,9 +124,19 @@ export const discussionCSS = () => {
 
     cssOut(
         `
-        .Content a.Bookmark::before,
-        .Content a.Bookmarking::before,
-        .Content a.Bookmarked::before`,
+        .Content a.Bookmark,
+        .Content a.Bookmarking,
+        .Content a.Bookmarked`,
+        {
+            cursor: "pointer",
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmark .svgBookmark,
+        .Content a.Bookmarking .svgBookmark,
+        .Content a.Bookmarked .svgBookmark`,
         {
             ...absolutePosition.topLeft("50%", "50%"),
             content: quote(``),
@@ -137,74 +147,73 @@ export const discussionCSS = () => {
             transform: translate(`-50%`, `-50%`),
         },
     );
+    // cssOut(
+    //     `
+    //     .Content a.Bookmark::before,
+    //     `,
+    //     {
+    //         ...backgroundHelper({
+    //             size: "100%",
+    //             image: bookmarkBackground({
+    //                 bookmarked: false,
+    //                 color: vars.mixBgAndFg(0.7),
+    //             }),
+    //         }),
+    //     },
+    // );
 
-    cssOut(
-        `
-        .Content a.Bookmark::before,
-        `,
-        {
-            ...backgroundHelper({
-                size: "100%",
-                image: bookmarkBackground({
-                    bookmarked: false,
-                    color: vars.mixBgAndFg(0.7),
-                }),
-            }),
-        },
-    );
+    // cssOut(
+    //     `
+    //     .Content a.Bookmark:not(.Bookmarked):hover::before,
+    //     `,
+    //     {
+    //         ...backgroundHelper({
+    //             size: "100%",
+    //             image: bookmarkBackground({
+    //                 bookmarked: false,
+    //                 color: vars.mainColors.primary,
+    //             }),
+    //         }),
+    //     },
+    // );
 
-    cssOut(
-        `
-        .Content a.Bookmark:not(.Bookmarked):hover::before,
-        `,
-        {
-            ...backgroundHelper({
-                size: "100%",
-                image: bookmarkBackground({
-                    bookmarked: false,
-                    color: vars.mainColors.primary,
-                }),
-            }),
-        },
-    );
+    // cssOut(
+    //     `
+    //     .Content a.Bookmarked::before
+    //     `,
+    //     {
+    //         ...backgroundHelper({
+    //             size: "100%",
+    //             image: bookmarkBackground({
+    //                 bookmarked: true,
+    //                 color: vars.mainColors.primary,
+    //             }),
+    //         }),
+    //     },
+    // );
+    //
+    // cssOut(
+    //     `
+    //     .Content a.Bookmarking::before
+    //     `,
+    //     {
+    //         ...backgroundHelper({
+    //             size: "100%",
+    //             image: bookmarkBackground({
+    //                 bookmarked: false,
+    //                 loading: true,
+    //                 color: vars.mixBgAndFg(0.7),
+    //                 loadingColor: vars.mainColors.primary,
+    //             }),
+    //         }),
+    //     },
+    // );
 
-    cssOut(
-        `
-        .Content a.Bookmarked::before
-        `,
-        {
-            ...backgroundHelper({
-                size: "100%",
-                image: bookmarkBackground({
-                    bookmarked: true,
-                    color: vars.mainColors.primary,
-                }),
-            }),
-        },
-    );
-
-    cssOut(
-        `
-        .Content a.Bookmarking::before
-        `,
-        {
-            ...backgroundHelper({
-                size: "100%",
-                image: bookmarkBackground({
-                    bookmarked: false,
-                    loading: true,
-                    color: vars.mixBgAndFg(0.7),
-                    loadingColor: vars.mainColors.primary,
-                }),
-            }),
-        },
-    );
-
-    cssOut(`.Content a.Bookmarking`, {
-        cursor: important("wait"),
-        background: "none",
-        opacity: ".5",
-    });
+    // cssOut(`.Content a.Bookmarking`, {
+    //     cursor: important("wait"),
+    //     background: "none",
+    //     opacity: ".5",
+    // });
 
     cssOut(
         `

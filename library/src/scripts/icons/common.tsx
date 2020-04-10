@@ -7,8 +7,10 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { iconClasses } from "@library/icons/iconClasses";
+import { IBookmarkProps, iconClasses, iconVariables } from "@library/icons/iconClasses";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
+import { ColorValues, colorOut } from "@library/styles/styleHelpersColors";
+import { unit } from "@library/styles/styleHelpers";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -840,6 +842,31 @@ export function ResetIcon(props: { className?: string; "aria-hidden"?: areaHidde
                 fillRule="evenodd"
                 d="M12 6c3.315 0 6 2.685 6 6s-2.685 6-6 6-6-2.685-6-6 2.685-6 6-6zm-.006 3a2.988 2.988 0 00-2.066.83l-.432-.43A.29.29 0 009 9.604v1.622c0 .16.13.29.29.29h1.622a.29.29 0 00.205-.495l-.505-.506a2.032 2.032 0 11.05 3.015.145.145 0 00-.198.006l-.48.48a.144.144 0 00.006.21A3 3 0 1011.994 9z"
             ></path>
+        </svg>
+    );
+}
+
+export function BookmarkIcon(props: {
+    className?: string;
+    iconProps?: IBookmarkProps;
+    "aria-hidden"?: areaHiddenType;
+}) {
+    return (
+        <svg
+            className={classNames("svgBookmark", iconClasses().bookmark(props.iconProps), props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 12.733 16.394"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Bookmark")}</title>
+            <path
+                className={"svgBookmark-mainPath"}
+                d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
+            />
+            <path
+                d="M11.7,0.5H6.4v11.4c0.1,0,0.2,0,0.3,0.1l4.6,3.8c0.1,0.1,0.2,0.1,0.4,0.1c0.3,0,0.5-0.2,0.5-0.6V1.1C12.2,0.7,12,0.5,11.7,0.5z"
+                className={"svgBookmark-loadingPath"}
+            />
         </svg>
     );
 }

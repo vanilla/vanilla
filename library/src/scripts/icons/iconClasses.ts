@@ -5,8 +5,55 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { scale } from "csx";
-import { unit, colorOut, pointerEvents } from "@library/styles/styleHelpers";
+import { unit, colorOut, pointerEvents, ColorValues } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
+import { logDebugConditionnal } from "@vanilla/utils";
+
+interface IPathState {
+    stroke?: ColorValues | StrokeProperty;
+    fill?: ColorValues | FillProperty;
+    opacity?: OpacityProperty;
+    strokeWidth?: StrokeWidthProperty<TLength>;
+}
+
+interface ISVGState extends IPathState {
+    state?: IPathState;
+}
+
+interface IBookmarkLoading extends IPathState {
+    halfFill?: ColorValues | string;
+}
+
+export interface IBookmarkProps {
+    normalState: ISVGState | undefined;
+    loadingState: IBookmarkLoading | undefined;
+    bookmarkedState: ISVGState | undefined;
+}
+
+export const svgStyles = (props: IPathState | ISVGState, debug?: boolean) => {
+    logDebugConditionnal(debug, "svgSteyls props: ", props);
+    logDebugConditionnal(debug, "props.fill: ", props.fill);
+    logDebugConditionnal(debug, "colorOut(props.fill): ", colorOut(props.fill));
+
+    let stroke = props.stroke;
+    if (stroke !== "none") {
+        stroke = props.stroke ? colorOut(props.stroke) : props.stroke;
+    }
+
+    let fill = props.fill;
+    if (fill !== "none") {
+        fill = props.fill ? colorOut(props.fill) : props.fill;
+    }
+
+    return {
+        stroke: stroke,
+        fill: fill,
+        strokeWidth: props.strokeWidth ? unit(props.strokeWidth) : undefined,
+        opacity: props.strokeWidth ? unit(props.strokeWidth) : undefined,
+    };
+};
 
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
@@ -136,6 +183,12 @@ export const iconVariables = useThemeCache(() => {
         opacity: 0.8,
     });
 
+    const bookmarkIcon = themeVars("bookmarkIcon", {
+        width: 12,
+        height: 16,
+        strokeWidth: 1,
+    });
+
     return {
         standard,
         newFolder,
@@ -161,13 +214,14 @@ export const iconVariables = useThemeCache(() => {
         categoryIcon,
         deleteIcon,
         editIcon,
+        bookmarkIcon,
     };
 });
 
 export const iconClasses = useThemeCache(() => {
     const vars = iconVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("iconSizes");
+    const style = styleFactory("icon");
 
     const standard = style("defaultIcon", {
         ...pointerEvents(),
@@ -359,6 +413,60 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
+    const bookmark = (
+        props: IBookmarkProps = { normalState: undefined, loadingState: undefined, bookmarkedState: undefined },
+    ) => {
+        const globalVars = globalVariables();
+        const mainColors = globalVars.mainColors;
+
+        console.log("props: ", props);
+
+        const {
+            normalState = {
+                stroke: globalVars.mixPrimaryAndBg(0.7),
+                fill: "none",
+                state: {
+                    stroke: mainColors.primary,
+                },
+            },
+            loadingState = {
+                stroke: mainColors.primary,
+                opacity: 0.7,
+                fill: mainColors.primary,
+            },
+            bookmarkedState = {
+                stroke: mainColors.primary,
+                fill: mainColors.primary,
+            },
+        } = props;
+
+        console.log("normalState: ", normalState);
+
+        return style("bookmark", {
+            ...pointerEvents(),
+            width: unit(vars.bookmarkIcon.width),
+            height: unit(vars.bookmarkIcon.height),
+            opacity: 1,
+            display: "block",
+            position: "relative",
+            $nest: {
+                "&.Bookmarked": svgStyles(bookmarkedState),
+                "&.Bookmarking .svgBookmark-loadingPath": {
+                    display: "block",
+                },
+                "&:hover:not(.Bookmarked), &:not(.Bookmarked):focus, &:not(.Bookmarked).focus-visible": {
+                    $nest: {
+                        "& .svgBookmark-mainPath": svgStyles(bookmarkedState),
+                    },
+                },
+                "& .svgBookmark-mainPath": svgStyles(normalState, true),
+                "& .svgBookmark-loadingPath": {
+                    display: "none",
+                },
+            },
+        });
+    };
+
     return {
         standard,
         newFolder,
@@ -391,5 +499,6 @@ export const iconClasses = useThemeCache(() => {
         globeIcon,
         isSmall,
         hamburger,
+        bookmark,
     };
 });

@@ -9,17 +9,32 @@ import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderCo
 import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { t } from "@vanilla/i18n/src";
-import { ThemeBuilderFontDeclaration } from "./ThemeBuilderFontDeclaration";
+import { CustomFontFamily } from "@themingapi/theme/customFontFamily";
+import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 
 export function ThemeBuilderFontBlock() {
-    const { generatedValue, rawValue } = useThemeVariableField(fontKey);
-    const customFont = (generatedValue ?? rawValue) === "custom";
+    const { generatedValue } = useThemeVariableField(fontKey);
+    const customFont = generatedValue === "custom";
     return (
         <>
             <ThemeBuilderBlock label={t("Font")}>
                 <GoogleFontDropdown />
             </ThemeBuilderBlock>
-            {customFont && <ThemeBuilderFontDeclaration />}
+            {customFont && (
+                <>
+                    <ThemeBuilderBlock
+                        label={t("Font URL")}
+                        info={t(
+                            "You can upload a Custom Font in your Theming System. Just copy & paste the URL in the field.",
+                        )}
+                    >
+                        <CustomFontUrl />
+                    </ThemeBuilderBlock>
+                    <ThemeBuilderBlock label={t("Font Name")}>
+                        <CustomFontFamily />
+                    </ThemeBuilderBlock>
+                </>
+            )}
         </>
     );
 }

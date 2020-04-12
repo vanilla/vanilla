@@ -48,7 +48,7 @@ export interface IThemeFooter {
 export interface IThemeFont {
     name: string;
     url: string;
-    fallbacks: string[];
+    fallbacks?: string[];
 }
 
 export interface IThemeExternalAsset {

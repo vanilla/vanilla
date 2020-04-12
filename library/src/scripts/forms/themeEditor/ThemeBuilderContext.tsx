@@ -15,8 +15,6 @@ import { bannerVariables } from "@library/banner/bannerStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
-import { escapeHTML } from "@vanilla/dom-utils";
-import UserContent from "@library/content/UserContent";
 
 ///
 /// Types

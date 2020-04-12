@@ -13,6 +13,8 @@ import {
     radiusValue,
     EMPTY_BACKGROUND,
     getRatioBasedOnDarkness,
+    fontFallbacks,
+    monoFallbacks,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
@@ -27,6 +29,8 @@ export enum GlobalPreset {
     DARK = "dark",
     LIGHT = "light",
 }
+
+export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#0291db");
@@ -238,21 +242,29 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             semiBold: 600,
             bold: 700,
         },
-        googleFontFamily: "Open Sans" as undefined | string,
+        googleFontFamily: defaultFontFamily as undefined | string,
         forceGoogleFont: false,
-        customFontUrl: undefined as undefined | string,
-        customFontFamilyName: undefined as undefined | string,
+        customFont: {
+            name: undefined as undefined | string,
+            url: undefined as undefined | string,
+            fallbacks: [],
+        },
     });
 
     const fontsInit1 = makeThemeVars("fonts", {
         ...fontsInit0,
         families: {
-            body: [fontsInit0.customFontFamilyName ?? fontsInit0.googleFontFamily ?? "Open Sans"],
-            monospace: [],
+            body: [
+                fontsInit0.customFont.name && !fontsInit0.forceGoogleFont
+                    ? fontsInit0.customFont.name
+                    : fontsInit0.googleFontFamily ?? defaultFontFamily,
+                ...fontFallbacks,
+            ],
+            monospace: monoFallbacks,
         },
     });
 
-    const isOpenSans = fontsInit1.families.body[0] === "Open Sans";
+    const isOpenSans = fontsInit1.families.body[0] === defaultFontFamily;
 
     const fonts = makeThemeVars("fonts", {
         ...fontsInit1,

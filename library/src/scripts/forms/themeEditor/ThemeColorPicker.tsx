@@ -11,13 +11,12 @@ import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
 import { ensureColorHelper } from "@library/styles/styleHelpers";
-import { visibility } from "@library/styles/styleHelpersVisibility";
 import { stringIsValidColor } from "@library/styles/styleUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
-import React, { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 import Pickr from "@simonwep/pickr";
 import "./ThemeColorPicker.scss";
@@ -26,16 +25,15 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
     inputClass?: string;
+    disabled?: boolean;
 }
 
 export function ThemeColorPicker(_props: IProps) {
-    const { variableKey, inputClass, ...inputProps } = _props;
+    const { variableKey, inputClass, disabled, ...inputProps } = _props;
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, initialValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(
-        variableKey,
-    );
+    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(variableKey);
 
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -95,7 +93,7 @@ export function ThemeColorPicker(_props: IProps) {
             (colorString: string) => {
                 handleColorChangeRef.current(colorString);
             },
-            16,
+            5,
             { trailing: true },
         ),
         [],
@@ -118,6 +116,7 @@ export function ThemeColorPicker(_props: IProps) {
             <span className={classes.root}>
                 {/*Text Input*/}
                 <input
+                    id={inputID}
                     ref={textInput}
                     type="text"
                     aria-describedby={labelID}
@@ -129,6 +128,8 @@ export function ThemeColorPicker(_props: IProps) {
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
                     auto-correct="false"
+                    disabled={disabled}
+                    aria-disabled={disabled}
                 />
                 <Picker onChange={onPickerChange} validColorString={validColorString} />
             </span>

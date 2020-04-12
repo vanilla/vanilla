@@ -40,7 +40,7 @@ export const fontFallbacks = [
     "Segoe UI Symbol",
 ];
 
-const monoFallbacks = [
+export const monoFallbacks = [
     "Consolas",
     "Andale Mono WT",
     "Andale Mono",

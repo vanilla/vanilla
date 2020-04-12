@@ -18,13 +18,13 @@ import {
     importantUnit,
 } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
     // Intentionally not overwritable with theming system.
-    const fontFamily = ["Open Sans"];
+    const fontFamily = [defaultFontFamily];
 
     const mainColors = {
         primary: color("#0291db"),

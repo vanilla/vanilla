@@ -12,6 +12,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
 import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadingContext";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IPageHeading {
     title: React.ReactNode;
@@ -20,8 +21,7 @@ interface IPageHeading {
     headingClassName?: string;
     actions?: React.ReactNode;
     includeBackLink?: boolean;
-    chevronClass?: string;
-    backLinkClass?: string;
+    isCompactHeading?: boolean;
 }
 
 /**
@@ -31,22 +31,25 @@ interface IPageHeading {
 // export class PageHeading extends React.Component<IPageHeading> {
 
 export function PageHeading(props: IPageHeading) {
-    const { includeBackLink = true, actions, children, headingClassName, title, className } = props;
+    const { includeBackLink = true, actions, children, headingClassName, title, className, isCompactHeading } = props;
     const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
     const linkClasses = backLinkClasses();
 
+    const backLink = isCompactHeading ? (
+        <BackLink
+            className={classNames(linkClasses.inHeading(fontSize), classes)}
+            chevronClass={iconClasses().chevronLeftSmallCompact}
+        />
+    ) : (
+        <BackLink className={classNames(linkClasses.inHeading(fontSize), classes)} />
+    );
+
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && (
-                    <BackLink
-                        className={classNames(linkClasses.inHeading(fontSize), classes)}
-                        chevronClass={props.chevronClass}
-                        linkClassName={props.backLinkClass}
-                    />
-                )}
+                {includeBackLink && backLink}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
                     <Heading depth={1} title={title} className={headingClassName}>
                         {children}

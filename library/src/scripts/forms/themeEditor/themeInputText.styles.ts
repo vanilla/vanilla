@@ -5,18 +5,36 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-
-export const themeInputTextVariables = useThemeCache(() => {
-    // Intentionally not overwritable with theming system.
-    return {};
-});
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
+import { inputMixin } from "@library/forms/inputStyles";
+import { borders } from "@library/styles/styleHelpersBorders";
 
 export const themeInputTextClasses = useThemeCache(() => {
-    const vars = themeInputTextVariables();
+    const vars = themeBuilderVariables();
     const style = styleFactory("themeInputText");
-    const root = style({});
+    const classesInput = inputBlockClasses();
+    const root = style({
+        $nest: {
+            [`& .${classesInput.inputWrap}`]: {
+                margin: 0,
+            },
+        },
+    });
+    const input = style("input", {
+        $nest: {
+            [`&&.${classesInput.inputText}`]: inputMixin({
+                sizing: {
+                    height: vars.input.height,
+                },
+                font: vars.input.fonts,
+                border: vars.border,
+            }),
+        },
+    });
 
     return {
         root,
+        input,
     };
 });

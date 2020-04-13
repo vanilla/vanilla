@@ -9,7 +9,6 @@ import { getMeta, assetUrl, siteUrl, isAllowedUrl } from "@library/utility/appUt
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { THEME_CACHE_EVENT } from "@library/styles/styleUtils";
 import { IThemeFont } from "@library/theming/themeReducer";
-import { fontFallbacks, monoFallbacks } from "@library/styles/styleHelpersTypography";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
@@ -45,7 +44,6 @@ const getGoogleFontUrl = (
 };
 
 const validCustomFont = (customFont?: IThemeFont) => {
-    console.log(`validate font: `, customFont);
     return customFont && customFont.url && customFont.url !== "" && customFont.name && customFont.name !== "";
 };
 
@@ -73,23 +71,23 @@ export function loadThemeFonts() {
     const assets = state.theme.assets.data || {};
     const { fonts = { data: [] } } = assets;
 
-    const globalFontVars = globalVariables().fonts;
+    const globalVars = globalVariables();
+    const globalFontVars = globalVars.fonts;
     const forceGoogleFont = globalFontVars.forceGoogleFont;
     const customFont = globalFontVars.customFont;
+    const defaultFallback = globalVars.fonts.families[0];
 
-    const defaultFallback = globalVariables().fonts.families[0];
-
-    if (!forceGoogleFont && validCustomFont(customFont as IThemeFont)) {
-        //const [firstFamily, ...restFamilies] = fonts;
-        // const props = { ...fonts.data } as IThemeFont;
-        console.log("customFont - props: ", customFont);
-
+    if (globalVars.fonts.customFontUrl) {
+        // Legacy case, do not use globalVars.fonts.customFontUrl in the future
+        const [firstFamily, ...restFamilies] = globalVars.fonts.families.body;
+        WebFont.load(
+            makeFontConfigFromFontVar([
+                { name: firstFamily, url: globalVars.fonts.customFontUrl, fallbacks: restFamilies },
+            ]),
+        );
+    } else if (!forceGoogleFont && validCustomFont(customFont as IThemeFont)) {
         const fontLoaderProps = [
             customFont as IThemeFont,
-            // {
-            //     name: defaultFontFamily,
-            //     url: getGoogleFontUrl({ name: defaultFontFamily }, true),
-            // },
             ...[...customFont.fallbacks, defaultFontFamily].map(fontFamily => {
                 return {
                     name: fontFamily,
@@ -100,8 +98,6 @@ export function loadThemeFonts() {
             return font && customFont.name && customFont.name !== "";
         });
 
-        console.log("fontLoaderProps: ", fontLoaderProps);
-
         const customConfig = {
             families: fontLoaderProps.map(font => font.name),
             urls: fontLoaderProps.map(font => {
@@ -109,13 +105,10 @@ export function loadThemeFonts() {
             }),
         };
 
-        console.log("customConfig: ", customConfig);
-
         const mainFont = WebFont.load({
             custom: customConfig,
         });
     } else if (forceGoogleFont) {
-        console.log("2. forceGoogleFont", forceGoogleFont);
         const webFontConfig: WebFont.Config = {
             google: {
                 // families: [`"${assets.variables?.data.global.fonts.firstFont}":400,400italic,600,700`],
@@ -124,13 +117,11 @@ export function loadThemeFonts() {
         };
         WebFont.load(webFontConfig);
     } else if (fonts && fonts.data.length > 0) {
-        console.log("3. fonts && fonts.data.length > 0", fonts);
         const webFontConfig = makeFontConfigFromFontVar(fonts.data);
         if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
             WebFont.load(webFontConfig);
         }
     } else {
-        console.log("4. else: ");
         // If the theme has no font config of its own, load the default.
         WebFont.load(defaultFontConfig);
     }

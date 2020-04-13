@@ -244,6 +244,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         googleFontFamily: defaultFontFamily as undefined | string,
         forceGoogleFont: false,
+        customFontUrl: undefined as undefined | string, // legacy
         customFont: {
             name: undefined as undefined | string,
             url: undefined as undefined | string,

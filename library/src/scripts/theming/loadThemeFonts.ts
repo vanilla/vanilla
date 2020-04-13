@@ -90,10 +90,10 @@ export function loadThemeFonts() {
             //     name: defaultFontFamily,
             //     url: getGoogleFontUrl({ name: defaultFontFamily }, true),
             // },
-            ...[defaultFontFamily].map(fontFamily => {
+            ...[...customFont.fallbacks, defaultFontFamily].map(fontFamily => {
                 return {
                     name: fontFamily,
-                    url: fontFamily === defaultFontFamily ? getGoogleFontUrl({ name: defaultFontFamily }, true) : "",
+                    url: fontFamily === defaultFontFamily ? getGoogleFontUrl({ name: defaultFallback }, true) : "",
                 };
             }),
         ].filter(font => {
@@ -119,7 +119,7 @@ export function loadThemeFonts() {
         const webFontConfig: WebFont.Config = {
             google: {
                 // families: [`"${assets.variables?.data.global.fonts.firstFont}":400,400italic,600,700`],
-                families: [getGoogleFontUrl(defaultFallback)],
+                families: [getGoogleFontUrl({ name: defaultFallback })],
             },
         };
         WebFont.load(webFontConfig);

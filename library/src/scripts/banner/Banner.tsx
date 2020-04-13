@@ -112,21 +112,59 @@ export default function Banner(props: IProps) {
                 - Spacer elements for all the main content, but no actual content.
                 - Overflow hidden can't be applied to the main content, because it has a search box that can't be cut off.
             */}
-            <div className={classes.overflowRightImageContainer}>
+            <div className={classes.bannerContainer}>
+                <div className={classes.overflowRightImageContainer}>
+                    <div
+                        className={classNames(classes.middleContainer, {
+                            [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
+                        })}
+                    >
+                        <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
+                            {!props.backgroundImage &&
+                                !vars.outerBackground.image &&
+                                !vars.outerBackground.unsetBackground && (
+                                    <DefaultBannerBg isContentBanner={isContentBanner} />
+                                )}
+                        </div>
+                        {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
+                        <Container fullGutter className={classes.fullHeight}>
+                            <div className={classes.imagePositioner}>
+                                {/*For SEO & accessibility*/}
+                                {options.hideTitle && (
+                                    <Heading className={visibility().visuallyHidden} depth={1}>
+                                        {title}
+                                    </Heading>
+                                )}
+                                <ConditionalWrap
+                                    className={classes.contentContainer(!rightImageSrc)}
+                                    condition={
+                                        showMiddleSearch ||
+                                        !options.hideTitle ||
+                                        !options.hideDescription ||
+                                        !!logoImageSrc
+                                    }
+                                ></ConditionalWrap>
+                                {rightImageSrc && (
+                                    <div className={classes.imageElementContainer}>
+                                        {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                        <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
+                                    </div>
+                                )}
+                            </div>
+                        </Container>
+                        {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }}></div>}
+                    </div>
+                </div>
+                {/* Main Content Area
+                - Note that background is up in the previous grouping.
+                - Overflow hidden CAN NEVER BE APPLIED HERE.
+            */}
                 <div
                     className={classNames(classes.middleContainer, {
                         [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
                     })}
                 >
-                    <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
-                        {!props.backgroundImage &&
-                            !vars.outerBackground.image &&
-                            !vars.outerBackground.unsetBackground && (
-                                <DefaultBannerBg isContentBanner={isContentBanner} />
-                            )}
-                    </div>
-                    {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-                    <Container fullGutter className={classes.fullHeight}>
+                    <Container fullGutter>
                         <div className={classes.imagePositioner}>
                             {/*For SEO & accessibility*/}
                             {options.hideTitle && (
@@ -139,70 +177,39 @@ export default function Banner(props: IProps) {
                                 condition={
                                     showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
                                 }
-                            ></ConditionalWrap>
-                            {rightImageSrc && (
-                                <div className={classes.imageElementContainer}>
-                                    {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                    <img className={classes.rightImage} src={rightImageSrc} aria-hidden={true} />
-                                </div>
-                            )}
+                            >
+                                {!!logoImageSrc && (
+                                    <div className={classes.logoSpacer}>
+                                        <div className={classes.logoContainer}>
+                                            {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                            <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
+                                        </div>
+                                    </div>
+                                )}
+                                {!options.hideTitle && (
+                                    <div className={classes.titleWrap}>
+                                        <FlexSpacer className={classes.titleFlexSpacer} />
+                                        {title && (
+                                            <Heading className={classes.title} depth={1} isLarge>
+                                                {title}
+                                            </Heading>
+                                        )}
+                                        <div className={classNames(classes.text, classes.titleFlexSpacer)}>
+                                            {action}
+                                        </div>
+                                    </div>
+                                )}
+                                {!options.hideDescription && description && (
+                                    <div className={classes.descriptionWrap}>
+                                        <p className={classNames(classes.description, classes.text)}>{description}</p>
+                                    </div>
+                                )}
+                                {showMiddleSearch && searchComponent}
+                            </ConditionalWrap>
+                            {rightImageSrc && <div className={classes.imageElementContainer} />}
                         </div>
                     </Container>
-                    {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }}></div>}
                 </div>
-            </div>
-            {/* Main Content Area
-                - Note that background is up in the previous grouping.
-                - Overflow hidden CAN NEVER BE APPLIED HERE.
-            */}
-            <div
-                className={classNames(classes.middleContainer, {
-                    [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
-                })}
-            >
-                <Container fullGutter>
-                    <div className={classes.imagePositioner}>
-                        {/*For SEO & accessibility*/}
-                        {options.hideTitle && (
-                            <Heading className={visibility().visuallyHidden} depth={1}>
-                                {title}
-                            </Heading>
-                        )}
-                        <ConditionalWrap
-                            className={classes.contentContainer(!rightImageSrc)}
-                            condition={
-                                showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
-                            }
-                        >
-                            {!!logoImageSrc && (
-                                <div className={classes.logoSpacer}>
-                                    <div className={classes.logoContainer}>
-                                        {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
-                                        <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
-                                    </div>
-                                </div>
-                            )}
-                            {!options.hideTitle && (
-                                <div className={classes.titleWrap}>
-                                    <FlexSpacer className={classes.titleFlexSpacer} />
-                                    {title && (
-                                        <Heading className={classes.title} depth={1} isLarge>
-                                            {title}
-                                        </Heading>
-                                    )}
-                                    <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
-                                </div>
-                            )}
-                            {!options.hideDescription && description && (
-                                <div className={classes.descriptionWrap}>
-                                    <p className={classNames(classes.description, classes.text)}>{description}</p>
-                                </div>
-                            )}
-                            {showMiddleSearch && searchComponent}
-                        </ConditionalWrap>
-                        {rightImageSrc && <div className={classes.imageElementContainer} />}
-                    </div>
-                </Container>
             </div>
             {showBottomSearch && (
                 <div className={classes.searchStrip}>

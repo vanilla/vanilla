@@ -845,6 +845,10 @@ export const bannerClasses = useThemeCache(
                 : {},
         );
 
+        const bannerContainer = style("bannerContainer", {
+            position: "relative",
+        });
+
         // Use this for cutting of the right image with overflow hidden.
         const overflowRightImageContainer = style("overflowRightImageContainer", {
             ...absolutePosition.fullSizeOfParent(),
@@ -909,6 +913,7 @@ export const bannerClasses = useThemeCache(
 
         return {
             root,
+            bannerContainer,
             overflowRightImageContainer,
             fullHeight,
             outerBackground,

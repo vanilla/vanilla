@@ -84,7 +84,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         {
             ...options,
             innerBackground: {
-                color: options.borderType !== BorderType.NONE ? globalVars.mainColors.bg : undefined,
+                color: options.borderType !== BorderType.NONE ? globalVars.body.backgroundImage.color : undefined,
             },
         },
         optionOverrides,

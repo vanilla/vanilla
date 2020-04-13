@@ -47,7 +47,6 @@ export function ThemeDropDown(_props: IProps) {
 
     useEffect(() => {
         if (afterChange) {
-            console.log("trigger use effect Theme Dropdown");
             afterChange(defaultOption.value);
         }
     }, []);

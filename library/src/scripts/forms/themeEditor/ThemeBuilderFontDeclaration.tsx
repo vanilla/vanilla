@@ -9,7 +9,7 @@
 // import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 // import { t } from "@vanilla/i18n/src";
 // import { isAllowedUrl } from "@library/utility/appUtils";
-// import { customFontFamily } from "@themingapi/theme/customFontFamily";
+// import { customFontFamily } from "@themingapi/theme/CustomFontFamily";
 // import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 //
 // export const fontURLKey = "global.fonts.customFont.url";

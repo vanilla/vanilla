@@ -23,8 +23,6 @@ export function ThemeInputText(props: IProps) {
 
     const { generatedValue, defaultValue, setValue } = useThemeVariableField(varKey);
 
-    console.log(`useThemeVariableField(${varKey})`, useThemeVariableField(varKey));
-
     // const { generatedValue, initialValue } = useThemeVariableField(customFontUrlKey);
     const [valid, setValid] = useState(false);
 

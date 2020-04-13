@@ -60,7 +60,6 @@ const makeFontConfigFromFontVar = (fonts: IThemeFont[], isMonoSpace?: boolean) =
             }),
         },
     };
-    console.log("webFontConfig: ", webFontConfig);
     return webFontConfig;
 };
 
@@ -72,58 +71,43 @@ export function loadThemeFonts() {
     const state = getStore().getState();
     const assets = state.theme.assets.data || {};
     const { fonts = { data: [] } } = assets;
-    // const forceGoogleFont = assets.variables?.data.global.fonts.forceGoogleFont;
+
     const globalFontVars = globalVariables().fonts;
     const forceGoogleFont = globalFontVars.forceGoogleFont;
     const customFont = globalFontVars.customFont;
 
-    // console.log("fonts: ", fonts);
-    // console.log("state: ", state);
-    console.log("globals.fonts.customFont: ", globalVariables().fonts.customFont);
-
-    // const customFont = fonts.unshift();
-    // if (
-    //     !forceGoogleFont &&
-    //     customFont &&
-    //     customFont.name &&
-    //     customFont.name != "" &&
-    //     customFont.url &&
-    //     isAllowedUrl(customFont.url)
-    // ) {
-    //     fonts.data.unshift(customFont);
-    //     isCustomFont = true;
-    // }
-
-    // const families = assets.variables?.data.global.fonts.families.body;
-
-    // const customFont: IThemeFont = assets.variables?.data.global.fonts.customFont;
+    const defaultFallback = globalVariables().fonts.families[0];
 
     if (!forceGoogleFont && validCustomFont(customFont as IThemeFont)) {
         //const [firstFamily, ...restFamilies] = fonts;
         // const props = { ...fonts.data } as IThemeFont;
         console.log("customFont - props: ", customFont);
-        WebFont.load(
-            makeFontConfigFromFontVar([
-                customFont as IThemeFont,
-                {
-                    name: defaultFontFamily,
-                    url: getGoogleFontUrl({ name: defaultFontFamily }, true),
-                },
-                ...fontFallbacks.map(fontFamily => {
-                    return {
-                        name: fontFamily,
-                        url: "",
-                    };
-                }),
-            ]),
-        );
+
+        const fontLoaderProps = [
+            customFont as IThemeFont,
+            // {
+            //     name: defaultFontFamily,
+            //     url: getGoogleFontUrl({ name: defaultFontFamily }, true),
+            // },
+            ...[...customFont.fallbacks, defaultFontFamily, ...fontFallbacks].map(fontFamily => {
+                return {
+                    name: fontFamily,
+                    url: fontFamily === defaultFontFamily ? getGoogleFontUrl({ name: defaultFontFamily }, true) : "",
+                };
+            }),
+        ].filter(font => {
+            return font && customFont.url && customFont.name && customFont.name !== "";
+        });
+
+        console.log("fontLoaderProps: ", fontLoaderProps);
+
+        const mainFont = WebFont.load(makeFontConfigFromFontVar(fontLoaderProps));
     } else if (forceGoogleFont) {
         console.log("2. forceGoogleFont", forceGoogleFont);
-        const firstFont = globalVariables().fonts.families[0];
         const webFontConfig: WebFont.Config = {
             google: {
                 // families: [`"${assets.variables?.data.global.fonts.firstFont}":400,400italic,600,700`],
-                families: [getGoogleFontUrl(firstFont)],
+                families: [getGoogleFontUrl(defaultFallback)],
             },
         };
         WebFont.load(webFontConfig);

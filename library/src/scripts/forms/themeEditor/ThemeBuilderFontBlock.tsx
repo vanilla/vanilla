@@ -9,7 +9,7 @@ import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderCo
 import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { t } from "@vanilla/i18n/src";
-import { CustomFontFamily } from "@themingapi/theme/customFontFamily";
+import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
 import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 
 export function ThemeBuilderFontBlock() {

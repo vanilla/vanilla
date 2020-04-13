@@ -22,6 +22,7 @@ import { ThemeBuilderBreakpoints, BreakpointViewType } from "@library/forms/them
 export default {
     title: "Forms",
 };
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 
 export function ThemeEditor() {
     const [vars, setVars] = useState({});
@@ -73,6 +74,7 @@ export function ThemeEditor() {
                         responsiveKey="image"
                         enabledView={BreakpointViewType.IMAGE}
                     ></ThemeBuilderBreakpoints>
+                    <ThemeInputText varKey={"global.fonts.customFont.name"} />
                 </ThemeBuilderSection>
             </ThemeBuilderContextProvider>
         </div>

@@ -28,7 +28,7 @@ export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceEr
                             "You can upload a Custom Font in your Theming System. Just copy & paste the URL in the field.",
                         )}
                     >
-                        <CustomFontUrl forceError={true} />
+                        <CustomFontUrl forceError={props.forceError} />
                     </ThemeBuilderBlock>
                     <ThemeBuilderBlock label={t("Font Name")}>
                         <CustomFontFamily />

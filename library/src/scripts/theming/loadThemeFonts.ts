@@ -45,6 +45,7 @@ const getGoogleFontUrl = (
 };
 
 const validCustomFont = (customFont?: IThemeFont) => {
+    console.log(`validate font: `, customFont);
     return customFont && customFont.url && customFont.url !== "" && customFont.name && customFont.name !== "";
 };
 
@@ -89,19 +90,30 @@ export function loadThemeFonts() {
             //     name: defaultFontFamily,
             //     url: getGoogleFontUrl({ name: defaultFontFamily }, true),
             // },
-            ...[...customFont.fallbacks, defaultFontFamily, ...fontFallbacks].map(fontFamily => {
+            ...[defaultFontFamily].map(fontFamily => {
                 return {
                     name: fontFamily,
                     url: fontFamily === defaultFontFamily ? getGoogleFontUrl({ name: defaultFontFamily }, true) : "",
                 };
             }),
         ].filter(font => {
-            return font && customFont.url && customFont.name && customFont.name !== "";
+            return font && customFont.name && customFont.name !== "";
         });
 
         console.log("fontLoaderProps: ", fontLoaderProps);
 
-        const mainFont = WebFont.load(makeFontConfigFromFontVar(fontLoaderProps));
+        const customConfig = {
+            families: fontLoaderProps.map(font => font.name),
+            urls: fontLoaderProps.map(font => {
+                return assetUrl(`${font.url}?v=${getMeta("context.cacheBuster")}`);
+            }),
+        };
+
+        console.log("customConfig: ", customConfig);
+
+        const mainFont = WebFont.load({
+            custom: customConfig,
+        });
     } else if (forceGoogleFont) {
         console.log("2. forceGoogleFont", forceGoogleFont);
         const webFontConfig: WebFont.Config = {

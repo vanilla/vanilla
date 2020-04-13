@@ -12,13 +12,13 @@ import { t } from "@vanilla/i18n/src";
 import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
 import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 
-export function ThemeBuilderFontBlock() {
+export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string }) {
     const { generatedValue } = useThemeVariableField(fontKey);
-    const customFont = generatedValue === "custom";
+    const customFont = generatedValue === "custom" || props.forceDefaultKey === "custom";
     return (
         <>
             <ThemeBuilderBlock label={t("Font")}>
-                <GoogleFontDropdown />
+                <GoogleFontDropdown forceDefaultKey={props.forceDefaultKey} />
             </ThemeBuilderBlock>
             {customFont && (
                 <>

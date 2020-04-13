@@ -93,7 +93,7 @@ export function ThemeColorPicker(_props: IProps) {
             (colorString: string) => {
                 handleColorChangeRef.current(colorString);
             },
-            5,
+            16,
             { trailing: true },
         ),
         [],

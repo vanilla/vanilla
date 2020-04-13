@@ -17,31 +17,42 @@ interface IProps {
     baseKey: string;
     responsiveKey: string;
     enabledView: BreakpointViewType | BreakpointCallback;
+    forceState?: boolean;
+    label?: string;
+    info?: string;
+    toggleDisabled?: boolean;
 }
 
 export function ThemeBuilderBreakpoints(props: IProps) {
-    const { baseKey, responsiveKey, enabledView } = props;
+    const { baseKey, responsiveKey, enabledView, forceState, label, info, toggleDisabled } = props;
     const {
         rawValue: rawBreakpoints = {},
         generatedValue: breakpoints = {},
         setValue: setBreakpoints,
     } = useThemeVariableField(baseKey + ".breakpoints");
-    const { rawValue: isEnabled } = useThemeVariableField(baseKey + ".breakpointUIEnabled");
+    const { rawValue: isOn } = useThemeVariableField(baseKey + ".breakpointUIEnabled");
 
     // We have 1 key here by default. "breakpointUIEnabled".
     // If we have more, than means some breakpoints have been configured.
-    const isForceEnabled = rawBreakpoints && Object.keys(rawBreakpoints).length > 1 ? true : undefined;
-    const isExpanded = isEnabled || isForceEnabled;
+    const isForcedOn =
+        forceState !== undefined
+            ? forceState
+            : rawBreakpoints && Object.keys(rawBreakpoints).length > 1
+            ? true
+            : undefined;
     const callback = typeof enabledView === "function" ? enabledView : breakpointCallbackForType(enabledView);
+    const isForceEnabled = forceState || (rawBreakpoints && Object.keys(rawBreakpoints).length > 1 ? true : undefined);
+    const isExpanded = isOn || isForceEnabled;
 
     return (
         <>
             <ThemeBuilderBlock
-                label={t("Responsive Breakpoints")}
-                info={t("You can configure some values differently for different screensizes.")}
+                label={label ?? t("Responsive Breakpoints")}
+                info={info ?? t("You can configure some values differently for different screensizes.")}
             >
                 <ThemeToggle
-                    forcedValue={isForceEnabled}
+                    disabled={toggleDisabled}
+                    forcedValue={isForcedOn}
                     afterChange={value => {
                         if (!value) {
                             // We were turned off, so clear all of the breakpoint values.

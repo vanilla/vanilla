@@ -12,7 +12,7 @@ import { t } from "@vanilla/i18n/src";
 import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
 import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 
-export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string }) {
+export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);
     const customFont = generatedValue === "custom" || props.forceDefaultKey === "custom";
     return (
@@ -28,7 +28,7 @@ export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string }) {
                             "You can upload a Custom Font in your Theming System. Just copy & paste the URL in the field.",
                         )}
                     >
-                        <CustomFontUrl />
+                        <CustomFontUrl forceError={true} />
                     </ThemeBuilderBlock>
                     <ThemeBuilderBlock label={t("Font Name")}>
                         <CustomFontFamily />

@@ -8,7 +8,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { inputMixin } from "@library/forms/inputStyles";
-import { borders } from "@library/styles/styleHelpersBorders";
 
 export const themeInputTextClasses = useThemeCache(() => {
     const vars = themeBuilderVariables();
@@ -18,6 +17,10 @@ export const themeInputTextClasses = useThemeCache(() => {
         $nest: {
             [`& .${classesInput.inputWrap}`]: {
                 margin: 0,
+            },
+            [`&& .${classesInput.errors}`]: {
+                paddingLeft: 0,
+                paddingRight: 0,
             },
         },
     });

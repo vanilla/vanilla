@@ -85,7 +85,7 @@ export function ThemeEditor() {
                     />
                 </ThemeBuilderSection>
                 <ThemeBuilderSection label="Font">
-                    <ThemeBuilderFontBlock forceDefaultKey={"custom"} />
+                    <ThemeBuilderFontBlock forceDefaultKey={"custom"} forceError={true} />
                 </ThemeBuilderSection>
             </ThemeBuilderContextProvider>
         </div>

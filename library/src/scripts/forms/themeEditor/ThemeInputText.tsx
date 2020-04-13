@@ -8,16 +8,18 @@ import { useThemeVariableField } from "@vanilla/library/src/scripts/forms/themeE
 import InputTextBlock from "@library/forms/InputTextBlock";
 import debounce from "lodash/debounce";
 import { themeInputTextClasses } from "@library/forms/themeEditor/themeInputText.styles";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 interface IProps {
     debounceTime?: boolean | number;
     varKey: string;
     validation?: (newValue: string) => boolean;
     errorMessage?: string;
+    forceError?: boolean;
 }
 
 export function ThemeInputText(props: IProps) {
-    const { varKey, validation, errorMessage } = props;
+    const { varKey, validation, errorMessage, forceError } = props;
     const classes = themeInputTextClasses();
 
     const hasDebounce = !!props.debounceTime;
@@ -54,15 +56,7 @@ export function ThemeInputText(props: IProps) {
     return (
         <span className={classes.root}>
             <InputTextBlock
-                errors={
-                    valid || !errorMessage
-                        ? undefined
-                        : [
-                              {
-                                  message: errorMessage,
-                              },
-                          ]
-                }
+                errors={!forceError && (valid || !errorMessage) ? undefined : ([{ message: errorMessage }] as IError[])}
                 inputProps={{
                     defaultValue: defaultValue,
                     className: classes.input,

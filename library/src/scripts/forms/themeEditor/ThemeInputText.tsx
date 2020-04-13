@@ -9,6 +9,7 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import debounce from "lodash/debounce";
 import { themeInputTextClasses } from "@library/forms/themeEditor/themeInputText.styles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { t } from "@vanilla/i18n/src";
 
 interface IProps {
     debounceTime?: boolean | number;
@@ -19,7 +20,14 @@ interface IProps {
 }
 
 export function ThemeInputText(props: IProps) {
-    const { varKey, validation, errorMessage, forceError } = props;
+    const {
+        varKey,
+        validation = () => {
+            return true; // always valid if no function is defined
+        },
+        errorMessage,
+        forceError,
+    } = props;
     const classes = themeInputTextClasses();
 
     const hasDebounce = !!props.debounceTime;
@@ -27,19 +35,13 @@ export function ThemeInputText(props: IProps) {
 
     const { generatedValue, defaultValue, setValue } = useThemeVariableField(varKey);
 
-    // const { generatedValue, initialValue } = useThemeVariableField(customFontUrlKey);
-    const [valid, setValid] = useState(false);
-
-    useEffect(() => {
-        validation && setValid(validation(generatedValue));
-        // setValid(generatedValue !== "" || urlValidation(generatedValue));
-    }, [generatedValue]);
+    const [valid, setValid] = useState(true);
+    const [focus, setFocus] = useState(false);
 
     // initial value
     useEffect(() => {
-        validation && setValid(validation(generatedValue));
-        // setValid(generatedValue !== "" || urlValidation(initialValue));
-    }, []);
+        setValid(validation(generatedValue));
+    }, [focus]);
 
     // Debounced internal function for input text.
     const _debounceInput = useCallback(
@@ -53,17 +55,30 @@ export function ThemeInputText(props: IProps) {
         [],
     );
 
+    const errors = [{ message: errorMessage || t("Error") }] as IError[];
+
     return (
         <span className={classes.root}>
             <InputTextBlock
-                errors={!forceError && (valid || !errorMessage) ? undefined : ([{ message: errorMessage }] as IError[])}
+                errors={forceError || (!valid && !focus) ? errors : undefined}
                 inputProps={{
                     defaultValue: defaultValue,
                     className: classes.input,
                     value: generatedValue,
+                    onFocus: () => {
+                        setFocus(true);
+                    },
+                    onBlur: () => {
+                        setFocus(false);
+                    },
                     onChange: event => {
                         const newValue = event.target.value;
-                        hasDebounce ? _debounceInput(newValue) : setValue(newValue);
+                        hasDebounce
+                            ? _debounceInput(newValue)
+                            : () => {
+                                  setValue(newValue);
+                                  setValid(validation(newValue));
+                              };
                     },
                 }}
             />

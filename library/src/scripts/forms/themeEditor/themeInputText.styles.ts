@@ -8,6 +8,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { inputMixin } from "@library/forms/inputStyles";
+import { colorOut, importantColorOut } from "@library/styles/styleHelpersColors";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const themeInputTextClasses = useThemeCache(() => {
     const vars = themeBuilderVariables();
@@ -21,6 +23,11 @@ export const themeInputTextClasses = useThemeCache(() => {
             [`&& .${classesInput.errors}`]: {
                 paddingLeft: 0,
                 paddingRight: 0,
+            },
+            [`&&.hasError .${classesInput.inputText}`]: {
+                borderColor: importantColorOut(globalVariables().messageColors.error.fg),
+                color: colorOut(globalVariables().messageColors.error.fg),
+                backgroundColor: colorOut(globalVariables().messageColors.error.bg),
             },
         },
     });

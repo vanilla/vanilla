@@ -10,6 +10,7 @@ import debounce from "lodash/debounce";
 import { themeInputTextClasses } from "@library/forms/themeEditor/themeInputText.styles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { t } from "@vanilla/i18n/src";
+import classNames from "classnames";
 
 interface IProps {
     debounceTime?: boolean | number;
@@ -56,11 +57,12 @@ export function ThemeInputText(props: IProps) {
     );
 
     const errors = [{ message: errorMessage || t("Error") }] as IError[];
+    const showError = forceError || (!valid && !focus);
 
     return (
-        <span className={classes.root}>
+        <span className={classNames(classes.root, { hasError: showError })}>
             <InputTextBlock
-                errors={forceError || (!valid && !focus) ? errors : undefined}
+                errors={showError ? errors : undefined}
                 inputProps={{
                     defaultValue: defaultValue,
                     className: classes.input,

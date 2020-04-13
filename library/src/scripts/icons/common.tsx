@@ -7,10 +7,8 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { IBookmarkProps, iconClasses, iconVariables } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconClasses";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
-import { ColorValues, colorOut } from "@library/styles/styleHelpersColors";
-import { unit } from "@library/styles/styleHelpers";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -846,11 +844,7 @@ export function ResetIcon(props: { className?: string; "aria-hidden"?: areaHidde
     );
 }
 
-export function BookmarkIcon(props: {
-    className?: string;
-    iconProps?: IBookmarkProps;
-    "aria-hidden"?: areaHiddenType;
-}) {
+export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     return (
         <svg
             className={classNames("svgBookmark", props.className)}

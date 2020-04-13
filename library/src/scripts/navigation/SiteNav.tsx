@@ -11,10 +11,11 @@ import { siteNavClasses } from "@library/navigation/siteNavStyles";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
-import { getRequiredID, useUniqueID } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { TabHandler } from "@vanilla/dom-utils";
+import { panelListClasses } from "@library/layout/panelListStyles";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -41,9 +42,9 @@ export function SiteNav(props: IProps) {
     const { activeRecord, collapsible, onItemHover, children } = props;
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
+    const classesPanelList = panelListClasses();
 
     const handleKeyDown = useKeyboardHandler();
-
     const content = hasChildren
         ? children.map((child, i) => {
               return (
@@ -65,11 +66,17 @@ export function SiteNav(props: IProps) {
         return (
             <nav onKeyDownCapture={handleKeyDown} className={classNames("siteNav", props.className, classes.root)}>
                 {props.title ? (
-                    <ConditionalWrap condition={!!props.hiddenTitle} className={"sr-only"}>
-                        <PanelWidgetVerticalPadding>
-                            <Heading title={props.title} className={classNames("siteNav-title", classes.title)} />
-                        </PanelWidgetVerticalPadding>
-                    </ConditionalWrap>
+                    <>
+                        <Heading
+                            title={props.title}
+                            className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
+                        />
+                        <ConditionalWrap condition={!!props.hiddenTitle} className={"sr-only"}>
+                            <PanelWidgetVerticalPadding>
+                                <Heading title={props.title} className={classNames("siteNav-title", classes.title)} />
+                            </PanelWidgetVerticalPadding>
+                        </ConditionalWrap>
+                    </>
                 ) : (
                     <h2 id={titleID} className="sr-only">
                         {t("Navigation")}

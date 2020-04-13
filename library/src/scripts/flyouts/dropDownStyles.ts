@@ -460,7 +460,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
         width: percent(100),
         textAlign: "left",
         minHeight: unit(vars.item.minHeight),
-        lineHeight: unit(globalVars.lineHeights.condensed),
+        lineHeight: globalVars.lineHeights.condensed,
         ...paddings({
             vertical: 4,
             horizontal: vars.item.padding.horizontal,

@@ -42,7 +42,7 @@ export function ThemeInputText(props: IProps) {
     // initial value
     useEffect(() => {
         setValid(validation(generatedValue));
-    }, [focus]);
+    }, [focus, generatedValue]);
 
     // Debounced internal function for input text.
     const _debounceInput = useCallback(
@@ -74,13 +74,7 @@ export function ThemeInputText(props: IProps) {
                         setFocus(false);
                     },
                     onChange: event => {
-                        const newValue = event.target.value;
-                        hasDebounce
-                            ? _debounceInput(newValue)
-                            : () => {
-                                  setValue(newValue);
-                                  setValid(validation(newValue));
-                              };
+                        _debounceInput(event.target.value);
                     },
                 }}
             />

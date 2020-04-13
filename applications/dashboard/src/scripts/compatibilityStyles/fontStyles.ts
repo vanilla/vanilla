@@ -166,10 +166,10 @@ export const fontCSS = () => {
         // Headings
         cssOut(
             `
-            .Panel.Panel-main .Box .Heading[aria-level='${i}'],
+            .Panel.Panel-main .Box .Heading.Heading[aria-level='${i}'],
         `,
             {
-                fontSize: unit(globalVars.fonts.size.large),
+                fontSize: i === 1 ? unit(globalVars.fonts.size.large) : unit(globalVars.fonts.size.small),
                 paddingLeft: offset,
             },
         );

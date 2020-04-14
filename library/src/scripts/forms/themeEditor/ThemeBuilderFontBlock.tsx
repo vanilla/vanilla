@@ -9,11 +9,11 @@ import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderCo
 import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { t } from "@vanilla/i18n/src";
-import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 import { CustomFontFamily } from "@library/forms/themeEditor/CustomFontFamily";
+import { CustomFontUrl } from "@library/forms/themeEditor/CustomFontUrl";
 
 export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);

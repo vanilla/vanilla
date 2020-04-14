@@ -84,7 +84,7 @@ class Pipeline {
     public function process(Operation $databaseOperation, callable $primaryAction) {
         $this->primaryAction = $primaryAction;
         $result = call_user_func($this->stack, $databaseOperation);
-//        call_user_func($this->postProcessStack, $databaseOperation);
+        call_user_func($this->postProcessStack, $databaseOperation);
         return $result;
     }
 }

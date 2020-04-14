@@ -20,6 +20,7 @@ import {
 import { TextTransformProperty } from "csstype";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
+import { toolTipClasses } from "@library/toolTip/toolTipStyles";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
@@ -325,8 +326,32 @@ export const themeBuilderClasses = useThemeCache(() => {
         height: unit(16),
     });
 
-    const docBlockText = style("docBlockText", {
-        ...fonts(globalVars.meta.text),
+    const docBlockTextContainer = style("docBlockTextContainer", {
+        display: "block",
+        ...fonts({
+            size: 12,
+            color: globalVars.meta.text.color,
+            lineHeight: globalVars.meta.lineHeights.default,
+            align: "right",
+        }),
+        padding: 0,
+        ...margins({
+            top: unit(-3),
+            bottom: 8,
+        }),
+    });
+
+    const small = style("small", {
+        $nest: {
+            [`& .${toolTipClasses().noPointerTrigger}`]: {
+                minWidth: 20,
+                minHeight: 20,
+            },
+        },
+    });
+
+    const iconLink = style("iconLink", {
+        marginLeft: unit(8),
     });
 
     return {
@@ -349,6 +374,8 @@ export const themeBuilderClasses = useThemeCache(() => {
         tooltip,
         resetButton,
         documentationIconLink,
-        docBlockText,
+        docBlockTextContainer,
+        small,
+        iconLink,
     };
 });

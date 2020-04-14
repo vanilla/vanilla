@@ -191,8 +191,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const documentation = themeVars("documentation", {
-        width: 20,
-        height: 20,
+        width: 12.6,
+        height: 16.02,
     });
 
     const bookmarkIcon = themeVars("bookmarkIcon", {
@@ -438,6 +438,7 @@ export const iconClasses = useThemeCache(() => {
 
     const documentation = style("documentation", {
         ...pointerEvents(),
+        display: "block",
         width: unit(vars.documentation.width),
         height: unit(vars.documentation.height),
     });

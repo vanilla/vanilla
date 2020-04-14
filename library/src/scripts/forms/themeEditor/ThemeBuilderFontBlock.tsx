@@ -35,30 +35,24 @@ export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceEr
                             "You can upload a Custom Font in your Theming System. Just copy & paste the URL in the field.",
                         )}
                         docUrl={docUrl}
-                        docBlock={
-                            <>
-                                <WarningIcon />
-                                <p className={classes.docBlockText}>
-                                    <Translate
-                                        source={
-                                            "You need to add the font url’s domain to your <0>AllowedDomains</0> configuration. <1>See documentation for details.</1>"
-                                        }
-                                        c0={text => <code>{text}</code>}
-                                        c1={text => (
-                                            <SmartLink to={docUrl} className={classes.documentationIconLink}>
-                                                <ScreenReaderContent>
-                                                    {t("Custom Font Documentation.")}
-                                                </ScreenReaderContent>
-                                                <DocumentationIcon />
-                                            </SmartLink>
-                                        )}
-                                    />
-                                </p>
-                            </>
-                        }
                     >
                         <CustomFontUrl forceError={props.forceError} />
                     </ThemeBuilderBlock>
+                    <div className={classes.block}>
+                        <p className={classes.docBlockTextContainer}>
+                            <Translate
+                                source={
+                                    "You need to add the font url’s domain to <0>AllowedDomains</0>, in the site's configuration. <1>Learn more about custom fonts.</1>."
+                                }
+                                c0={text => <code>{text}</code>}
+                                c1={text => (
+                                    <SmartLink to={docUrl} target={"_blank"}>
+                                        {text}
+                                    </SmartLink>
+                                )}
+                            />
+                        </p>
+                    </div>
                     <ThemeBuilderBlock label={t("Font Name")}>
                         <CustomFontFamily />
                     </ThemeBuilderBlock>

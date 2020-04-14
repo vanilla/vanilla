@@ -136,6 +136,11 @@ export const iconVariables = useThemeCache(() => {
         opacity: 0.8,
     });
 
+    const documentation = themeVars("documentation", {
+        width: 20,
+        height: 20,
+    });
+
     return {
         standard,
         newFolder,
@@ -161,6 +166,7 @@ export const iconVariables = useThemeCache(() => {
         categoryIcon,
         deleteIcon,
         editIcon,
+        documentation,
     };
 });
 
@@ -359,6 +365,12 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
+    const documentation = style("documentation", {
+        ...pointerEvents(),
+        width: unit(vars.documentation.width),
+        height: unit(vars.documentation.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -391,5 +403,6 @@ export const iconClasses = useThemeCache(() => {
         globeIcon,
         isSmall,
         hamburger,
+        documentation,
     };
 });

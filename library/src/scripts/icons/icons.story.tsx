@@ -140,6 +140,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`InformationIcon`}>
                     <InformationIcon />
                 </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`DocumentationIcon`}>
+                    <CommonIcons.DocumentationIcon />
+                </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
             <StoryTiles>

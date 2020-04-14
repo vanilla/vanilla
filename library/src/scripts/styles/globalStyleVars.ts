@@ -273,7 +273,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             headings: {
                 capitalLetterRatio: isOpenSans ? 0.73 : 0.75, // Calibrated for Open Sans
                 verticalOffset: 1,
-                horizontal: isOpenSans ? -0.03 : 0, // Calibrated for Open Sans
+                horizontalOffset: isOpenSans ? -0.03 : 0, // Calibrated for Open Sans
                 verticalOffsetForAdjacentElements: isOpenSans ? "-.13em" : "0em", // Calibrated for Open Sans
             },
         },

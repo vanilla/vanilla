@@ -28,7 +28,7 @@ export const typographyClasses = useThemeCache(() => {
         {
             fontSize: unit(globalVars.fonts.size.title),
             lineHeight: globalVars.lineHeights.condensed,
-            transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
+            transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             $nest: {
                 ...lineHeightAdjustment(),
                 [`&.${largeTitle}`]: {

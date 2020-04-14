@@ -839,7 +839,26 @@ export function ResetIcon(props: { className?: string; "aria-hidden"?: areaHidde
                 fillOpacity="0.7"
                 fillRule="evenodd"
                 d="M12 6c3.315 0 6 2.685 6 6s-2.685 6-6 6-6-2.685-6-6 2.685-6 6-6zm-.006 3a2.988 2.988 0 00-2.066.83l-.432-.43A.29.29 0 009 9.604v1.622c0 .16.13.29.29.29h1.622a.29.29 0 00.205-.495l-.505-.506a2.032 2.032 0 11.05 3.015.145.145 0 00-.198.006l-.48.48a.144.144 0 00.006.21A3 3 0 1011.994 9z"
-            ></path>
+            />
+        </svg>
+    );
+}
+
+export function DocumentationIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.documentation, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Documentation")}</title>
+            <path
+                fill="currentColor"
+                fillRule="evenodd"
+                d="M15.856 5.942l-2.928-3.3c-.08-.09-.196-.142-.318-.142H4.591c-.234 0-.424.19-.424.424v14.152c0 .234.19.424.424.424h10.947c.235 0 .424-.19.424-.424V6.224c0-.104-.038-.204-.106-.282zm-2.828-1.908l1.585 1.786h-1.585V4.034zm2.086 12.617H5.015V3.35h7.164v2.896c0 .234.19.424.424.424h2.51v9.982zM6.535 8.898c0 .234.19.424.424.424h6.21c.235 0 .425-.19.425-.424 0-.235-.19-.425-.424-.425H6.96c-.235 0-.425.19-.425.425zm6.635 1.869H6.96c-.235 0-.425.19-.425.424 0 .235.19.425.424.425h6.21c.235 0 .425-.19.425-.425 0-.234-.19-.424-.424-.424zm0 2.293H6.96c-.235 0-.425.19-.425.424 0 .234.19.424.424.424h6.21c.235 0 .425-.19.425-.424 0-.234-.19-.424-.424-.424z"
+            />
         </svg>
     );
 }

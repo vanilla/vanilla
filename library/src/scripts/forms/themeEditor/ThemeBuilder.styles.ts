@@ -317,6 +317,18 @@ export const themeBuilderClasses = useThemeCache(() => {
         marginBottom: "auto",
     });
 
+    const documentationIconLink = style("documentationIconLink", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: unit(16),
+        height: unit(16),
+    });
+
+    const docBlockText = style("docBlockText", {
+        ...fonts(globalVars.meta.text),
+    });
+
     return {
         root,
         block,
@@ -336,5 +348,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         colorErrorMessage,
         tooltip,
         resetButton,
+        documentationIconLink,
+        docBlockText,
     };
 });

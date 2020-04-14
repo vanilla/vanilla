@@ -110,6 +110,7 @@
   padding: $spacer $padding-row;
 
   .media-title {
+    display: flex;
     font-weight: 600;
     margin-bottom: $spacer / 4;
     margin-top: 0;
@@ -149,6 +150,11 @@
   position: relative;
   vertical-align: 1px;
   margin-left: 1px;
+  &.compatIcons {
+      display: "block";
+      width: 20px;
+      height: 20px;
+  }
 }
 
 //
@@ -216,6 +222,7 @@
   padding-left: 0;
 
   .media-title {
+    display: flex;
     font-weight: 400;
     margin-bottom: $spacer / 2;
   }

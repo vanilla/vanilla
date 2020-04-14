@@ -100,7 +100,7 @@ export const storyBookClasses = useThemeCache(() => {
             weight: globalVars.fonts.weights.bold,
             lineHeight: 1.25,
         }),
-        transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
+        transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
     });
 
     const headingH2 = style("headingH2", {

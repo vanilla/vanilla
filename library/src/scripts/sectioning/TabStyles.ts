@@ -18,12 +18,16 @@ import {
     extendItemContainer,
     flexHelper,
     modifyColorBasedOnLightness,
+    margins,
+    singleBorder,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, viewHeight, calc } from "csx";
+import { percent, viewHeight, calc, quote } from "csx";
+import { TabsTypes } from "./tabsTypes";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -66,9 +70,9 @@ export const tabsVariables = useThemeCache(() => {
     };
 });
 
-export const tabClasses = useThemeCache(() => {
+export const tabStandardClasses = useThemeCache(() => {
     const vars = tabsVariables();
-    const style = styleFactory("tabs");
+    const style = styleFactory(TabsTypes.STANDARD);
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
@@ -156,7 +160,7 @@ export const tabClasses = useThemeCache(() => {
         }),
     );
 
-    const tabPanels = style("tab", {
+    const tabPanels = style("tabPanels", {
         flexGrow: 1,
         height: percent(100),
         flexDirection: "column",
@@ -182,4 +186,63 @@ export const tabClasses = useThemeCache(() => {
         panel,
         isActive,
     };
+});
+
+export const tabBrowseClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const style = styleFactory(TabsTypes.BROWSE);
+
+    const horizontalPadding = 18;
+    const verticalPadding = globalVars.gutter.size / 2;
+    const activeStyles = {
+        "&::before": {
+            content: quote(""),
+            display: "block",
+            position: "absolute",
+            bottom: 0,
+            ...margins({
+                vertical: 0,
+                horizontal: "auto",
+            }),
+            height: "2px",
+            backgroundColor: colorOut(globalVars.mainColors.primary),
+            width: calc(`${percent(100)} - ${horizontalPadding * 2}px`),
+        },
+    };
+
+    const root = style({});
+    const tabPanels = style("tabPanels", {});
+
+    const tabList = style("tabList", {
+        display: "flex",
+        borderBottom: singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size }),
+    });
+
+    const tab = style("tab", {
+        fontSize: globalVars.fonts.size.small,
+        fontWeight: globalVars.fonts.weights.bold,
+        position: "relative",
+        textTransform: "uppercase",
+        ...paddings({
+            vertical: verticalPadding,
+            horizontal: horizontalPadding,
+        }),
+        ...margins({
+            bottom: "-1px",
+        }),
+        $nest: {
+            "&:active": activeStyles as NestedCSSProperties,
+        },
+    });
+
+    const panel = style("panel", {
+        ...paddings({
+            vertical: "24px",
+            horizontal: horizontalPadding,
+        }),
+    });
+
+    const isActive = style("isActive", activeStyles as NestedCSSProperties);
+
+    return { root, tab, tabPanels, tabList, panel, isActive };
 });

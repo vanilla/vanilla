@@ -1,11 +1,12 @@
 import React, { ReactElement, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
-import { tabClasses } from "@library/sectioning/TabStyles";
+import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/TabStyles";
 import classNames from "classnames";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { ErrorIcon, WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
+import { TabsTypes } from "./tabsTypes";
 
 interface IData {
     label: string;
@@ -17,12 +18,13 @@ interface IData {
 }
 interface IProps {
     data: IData[];
-    classes?: any;
+    tabType?: TabsTypes;
 }
 
 export function Tabs(props: IProps) {
-    const { data, classes = tabClasses() } = props;
+    const { data, tabType } = props;
     const [activeTab, setActiveTab] = useState(0);
+    const classes = tabType && tabType === TabsTypes.BROWSE ? tabBrowseClasses() : tabStandardClasses();
 
     return (
         <ReachTabs

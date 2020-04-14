@@ -62,7 +62,7 @@ class Pipeline {
      */
     public function addPostProcessor(Processor $processor) {
         $stack = $this->postProcessStack;
-        $this->stack = function ($value) use ($processor, $stack) {
+        $this->postProcessStack = function ($value) use ($processor, $stack) {
             /**
              * Passing the stack allows a processor to control whether it will be executed before or after the rest of
              * the stack, or to avoid processing the rest of the stack, altogether.

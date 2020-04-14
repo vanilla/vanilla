@@ -10,12 +10,14 @@ use Vanilla\Web\CurlWrapper;
 /**
  * Class FacebookPlugin
  */
-class FacebookPlugin extends Gdn_Plugin {
+class FacebookPlugin extends SSOAddon {
 
     const API_VERSION = '2.7';
 
     /** Authentication table key. */
     const PROVIDER_KEY = 'Facebook';
+
+    private const AUTHENTICATION_SCHEME = 'facebook';
 
     /** @var string  */
     protected $_AccessToken = null;
@@ -25,6 +27,15 @@ class FacebookPlugin extends Gdn_Plugin {
 
     /** @var SsoUtils */
     private $ssoUtils;
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationScheme(): string {
+        return self::AUTHENTICATION_SCHEME;
+    }
 
     /**
      * Constructor.
@@ -472,7 +483,7 @@ class FacebookPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
-        
+
         $contents = CurlWrapper::curlExec($c, false);
         $info = curl_getinfo($c);
         if (strpos(val('content_type', $info, ''), '/javascript') !== false) {
@@ -666,7 +677,12 @@ class FacebookPlugin extends Gdn_Plugin {
         // Save the facebook provider type.
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
-            ['AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
+            [
+                'AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME,
+                'URL' => '...',
+                'AssociationSecret' => '...',
+                'AssociationHashMethod' => '...'
+            ],
             ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );

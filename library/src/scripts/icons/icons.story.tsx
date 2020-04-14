@@ -39,7 +39,8 @@ import {
 } from "@library/icons/revision";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { ErrorIcon, WarningIcon, InformationIcon } from "@library/icons/common";
+import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const story = storiesOf("Components", module);
 
@@ -139,6 +140,12 @@ story.add("Icons", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`InformationIcon`}>
                     <InformationIcon />
+                </StoryTileAndTextCompact>
+
+                <StoryTileAndTextCompact text={`BookmarkIcon`}>
+                    <a href="#" className={iconClasses().bookmark()}>
+                        <BookmarkIcon />
+                    </a>
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>

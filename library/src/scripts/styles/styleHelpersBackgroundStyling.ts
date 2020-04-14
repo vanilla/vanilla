@@ -73,7 +73,7 @@ export const backgroundHelper = (props: IBackground) => {
         backgroundPosition: props.position || `50% 50%`,
         backgroundRepeat: props.repeat || "no-repeat",
         backgroundSize: props.size || "cover",
-        background: image,
+        backgroundImage: image,
         opacity: props.opacity ?? undefined,
     };
 };

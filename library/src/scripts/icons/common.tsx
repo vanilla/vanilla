@@ -847,3 +847,24 @@ export function ResetIcon(props: { className?: string; "aria-hidden"?: areaHidde
         </svg>
     );
 }
+
+export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    return (
+        <svg
+            className={classNames("svgBookmark", props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 12.733 16.394"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Bookmark")}</title>
+            <path
+                className={"svgBookmark-mainPath"}
+                d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
+            />
+            <path
+                d="M11.7,0.5H6.4v11.4c0.1,0,0.2,0,0.3,0.1l4.6,3.8c0.1,0.1,0.2,0.1,0.4,0.1c0.3,0,0.5-0.2,0.5-0.6V1.1C12.2,0.7,12,0.5,11.7,0.5z"
+                className={"svgBookmark-loadingPath"}
+            />
+        </svg>
+    );
+}

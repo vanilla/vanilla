@@ -6,7 +6,6 @@
 
 import React from "react";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
-import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { t } from "@vanilla/i18n/src";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
@@ -14,6 +13,7 @@ import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 import { CustomFontUrl } from "@library/forms/themeEditor/CustomFontUrl";
 import { CustomFontFamily } from "@library/forms/themeEditor/CustomFontFamily";
+import { fontKey, GoogleFontDropdown } from "./GoogleFontDropdown";
 
 export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);

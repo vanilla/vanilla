@@ -9,13 +9,11 @@ import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderCo
 import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { t } from "@vanilla/i18n/src";
-import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
 import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { DocumentationIcon, WarningIcon } from "@library/icons/common";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
 
 export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);

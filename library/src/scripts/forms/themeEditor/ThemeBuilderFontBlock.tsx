@@ -12,8 +12,8 @@ import { t } from "@vanilla/i18n/src";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
-import { CustomFontFamily } from "@library/forms/themeEditor/CustomFontFamily";
 import { CustomFontUrl } from "@library/forms/themeEditor/CustomFontUrl";
+import { CustomFontFamily } from "@library/forms/themeEditor/CustomFontFamily";
 
 export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);

@@ -26,7 +26,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote } from "csx";
-import { TabsTypes } from "./tabsTypes";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const tabsVariables = useThemeCache(() => {

@@ -10,6 +10,7 @@ import { Tabs } from "@library/sectioning/Tabs";
 import React from "react";
 import TextEditor from "@library/textEditor/TextEditor";
 import { StoryTextContent } from "@library/storybook/storyData";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
 
 export default {
     title: "Tabs",
@@ -37,7 +38,7 @@ export function TabWithErrors() {
     return (
         <>
             <StoryContent>
-                <StoryHeading>Simple Tab List </StoryHeading>
+                <StoryHeading>Standard Tab Styles</StoryHeading>
             </StoryContent>
             <Tabs
                 data={[
@@ -71,6 +72,36 @@ export function TabWithErrors() {
                             </>
                         ),
                         contents: <StoryTextContent firstTitle={"Tab 4 (Disabled)"} />,
+                    },
+                ]}
+            />
+        </>
+    );
+}
+
+export function TabBrowse() {
+    return (
+        <>
+            <StoryContent>
+                <StoryHeading>Browse Tab Styles</StoryHeading>
+            </StoryContent>
+            <Tabs
+                tabType={TabsTypes.BROWSE}
+                data={[
+                    {
+                        label: "Tab 1",
+                        panelData: "",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 1"} />,
+                    },
+                    {
+                        label: "Tab 2",
+                        panelData: "",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 2"} />,
+                    },
+                    {
+                        label: "Tab 3",
+                        panelData: "",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 3"} />,
                     },
                 ]}
             />

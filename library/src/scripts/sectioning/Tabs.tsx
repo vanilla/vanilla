@@ -6,7 +6,7 @@ import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { ErrorIcon, WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
-import { TabsTypes } from "./tabsTypes";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
 
 interface IData {
     label: string;

@@ -70,6 +70,7 @@ date_default_timezone_set('UTC');
 if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding('UTF-8');
 }
+ini_set("default_charset", "UTF-8");
 
 // Include the core autoloader.
 if (!include_once PATH_ROOT.'/vendor/autoload.php') {

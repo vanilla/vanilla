@@ -332,7 +332,6 @@ export const themeBuilderClasses = useThemeCache(() => {
             size: 12,
             color: globalVars.meta.text.color,
             lineHeight: globalVars.meta.lineHeights.default,
-            align: "right",
         }),
         padding: 0,
         ...margins({

@@ -111,7 +111,6 @@ export function loadThemeFonts() {
     } else if (forceGoogleFont) {
         const webFontConfig: WebFont.Config = {
             google: {
-                // families: [`"${assets.variables?.data.global.fonts.firstFont}":400,400italic,600,700`],
                 families: [getGoogleFontUrl({ name: defaultFallback })],
             },
         };

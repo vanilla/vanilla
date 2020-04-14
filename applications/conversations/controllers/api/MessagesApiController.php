@@ -357,7 +357,6 @@ class MessagesApiController extends AbstractApiController {
                     'conversationID',
                     'body:s' => [
                         'maxLength' => $this->config->get('Conversations.Message.MaxLength', 2000),
-                        'description' => 'The body of the message.',
                     ],
                     'format' => new \Vanilla\Models\FormatSchema(),
                 ])->add($this->fullSchema()),

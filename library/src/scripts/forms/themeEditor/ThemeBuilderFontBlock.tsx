@@ -13,7 +13,7 @@ import { CustomFontUrl } from "@themingapi/theme/CustomFontUrl";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
-import { CustomFontFamily } from "@themingapi/theme/CustomFontFamily";
+import { CustomFontFamily } from "@library/forms/themeEditor/CustomFontFamily";
 
 export function ThemeBuilderFontBlock(props: { forceDefaultKey?: string; forceError?: boolean }) {
     const { generatedValue } = useThemeVariableField(fontKey);

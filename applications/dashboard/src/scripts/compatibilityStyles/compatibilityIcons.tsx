@@ -4,10 +4,10 @@
  */
 
 import ReactDOM from "react-dom";
-import React from "react";
-import { DropDownMenuIcon, DocumentationIcon } from "@vanilla/library/src/scripts/icons/common";
 import { cssRule } from "typestyle";
 import { important } from "csx";
+import { iconClasses } from "@library/icons/iconClasses";
+import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
 
 export function applyCompatibilityIcons(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
@@ -29,4 +29,15 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     });
 
     // Bookmarks
+    cssRule(".Content a.Bookmark::before", {
+        display: important("none"),
+    });
+
+    const bookmarks = scope.querySelectorAll(".Bookmark:not(.compatIcons)");
+    const bookmarkLinkClass = iconClasses().bookmark();
+    bookmarks.forEach(bookmark => {
+        bookmark.classList.add(bookmarkLinkClass);
+        bookmark.classList.add("compatIcons");
+        ReactDOM.render(<BookmarkIcon />, bookmark);
+    });
 }

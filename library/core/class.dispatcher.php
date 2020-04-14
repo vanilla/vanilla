@@ -11,6 +11,7 @@
 
 use Garden\Container\Container;
 use Garden\Web\Dispatcher;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -880,9 +881,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $inputArgs = $pathArgs;
         }
         $method = is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
-        $args = reflectArgs($method, $inputArgs, $reflectionArguments);
+        $args = Dispatcher::reflectArgs($method, array_merge($inputArgs, $reflectionArguments), $this->container, false);
         $controller->ReflectArgs = $args;
-
 
         $canonicalUrl = url($this->makeCanonicalUrl($controller, $method, $args), true);
         $controller->canonicalUrl($canonicalUrl);

@@ -5,12 +5,22 @@
  * @license GPL-2.0-only
  */
 
-import { importantColorOut, unit, colorOut } from "@library/styles/styleHelpers";
+import {
+    importantColorOut,
+    unit,
+    colorOut,
+    backgroundHelper,
+    ColorValues,
+    absolutePosition,
+    negativeUnit,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { important, percent, quote, translate } from "csx";
+import { iconClasses } from "@library/icons/iconClasses";
 
 export const discussionCSS = () => {
-    const globalVars = globalVariables();
+    const vars = globalVariables();
 
     cssOut(
         `
@@ -19,8 +29,8 @@ export const discussionCSS = () => {
         .MessageList.Discussion
         `,
         {
-            color: colorOut(globalVars.mainColors.fg),
-            fontSize: unit(globalVars.fonts.size.medium),
+            color: colorOut(vars.mainColors.fg),
+            fontSize: unit(vars.fonts.size.medium),
         },
     );
 
@@ -34,7 +44,7 @@ export const discussionCSS = () => {
         .userContent.userContent h6
     `,
         {
-            color: colorOut(globalVars.mainColors.fg),
+            color: colorOut(vars.mainColors.fg),
         },
     );
 
@@ -55,8 +65,8 @@ export const discussionCSS = () => {
         .Item .Poll .PollOptions .PollColor.PollColor10,
     `,
         {
-            color: colorOut(globalVars.mainColors.primaryContrast),
-            backgroundColor: importantColorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis)),
+            color: colorOut(vars.mainColors.primaryContrast),
+            backgroundColor: importantColorOut(vars.mixPrimaryAndBg(vars.constants.stateColorEmphasis)),
             opacity: 1,
         },
     );
@@ -96,4 +106,55 @@ export const discussionCSS = () => {
         margin: 0,
         padding: 0,
     });
+
+    cssOut(
+        `
+        .Options a.Bookmark,
+        .Options a.Bookmarking,
+        .Options a.Bookmarked
+        `,
+        {
+            opacity: 1,
+            width: unit(24),
+            height: unit(24),
+            display: "block",
+            position: "relative",
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmark,
+        .Content a.Bookmarking,
+        .Content a.Bookmarked`,
+        {
+            cursor: "pointer",
+        },
+    );
+
+    cssOut(
+        `
+        .Content a.Bookmark .svgBookmark,
+        .Content a.Bookmarking .svgBookmark,
+        .Content a.Bookmarked .svgBookmark`,
+        {
+            ...absolutePosition.topLeft("50%", "50%"),
+            content: quote(``),
+            display: "block",
+            width: unit(12),
+            height: unit(16),
+            fontSize: unit(12),
+            transform: translate(`-50%`, `-50%`),
+        },
+    );
+
+    cssOut(
+        `
+        body.Discussions .DataList .Options,
+        body.Discussions .MessageList .Options
+    `,
+        {
+            marginTop: negativeUnit(2),
+        },
+    );
 };

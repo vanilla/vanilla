@@ -69,7 +69,11 @@ export function LeftChevronIcon(props: { className?: string; "aria-hidden"?: are
     );
 }
 
-export function LeftChevronCompactIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function LeftChevronCompactIcon(props: {
+    className?: string;
+    "aria-hidden"?: areaHiddenType;
+    isSmall?: boolean;
+}) {
     const title = `<`;
     const classes = iconClasses();
     return (
@@ -858,6 +862,27 @@ export function DocumentationIcon(props: { className?: string; "aria-hidden"?: a
                 fill="currentColor"
                 fillRule="evenodd"
                 d="M15.856 5.942l-2.928-3.3c-.08-.09-.196-.142-.318-.142H4.591c-.234 0-.424.19-.424.424v14.152c0 .234.19.424.424.424h10.947c.235 0 .424-.19.424-.424V6.224c0-.104-.038-.204-.106-.282zm-2.828-1.908l1.585 1.786h-1.585V4.034zm2.086 12.617H5.015V3.35h7.164v2.896c0 .234.19.424.424.424h2.51v9.982zM6.535 8.898c0 .234.19.424.424.424h6.21c.235 0 .425-.19.425-.424 0-.235-.19-.425-.424-.425H6.96c-.235 0-.425.19-.425.425zm6.635 1.869H6.96c-.235 0-.425.19-.425.424 0 .235.19.425.424.425h6.21c.235 0 .425-.19.425-.425 0-.234-.19-.424-.424-.424zm0 2.293H6.96c-.235 0-.425.19-.425.424 0 .234.19.424.424.424h6.21c.235 0 .425-.19.425-.424 0-.234-.19-.424-.424-.424z"
+            />
+        </svg>
+    );
+}
+
+export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    return (
+        <svg
+            className={classNames("svgBookmark", props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 12.733 16.394"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Bookmark")}</title>
+            <path
+                className={"svgBookmark-mainPath"}
+                d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
+            />
+            <path
+                d="M11.7,0.5H6.4v11.4c0.1,0,0.2,0,0.3,0.1l4.6,3.8c0.1,0.1,0.2,0.1,0.4,0.1c0.3,0,0.5-0.2,0.5-0.6V1.1C12.2,0.7,12,0.5,11.7,0.5z"
+                className={"svgBookmark-loadingPath"}
             />
         </svg>
     );

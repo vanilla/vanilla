@@ -64,5 +64,9 @@ if (getMeta("themeFeatures.DataDrivenTheme", false)) {
     onReady(() => {
         compatibilityStyles();
         applyCompatibilityIcons();
+
+        $(document).on("contentLoad", function(e) {
+            applyCompatibilityIcons(e.target && e.target.parentElement ? e.target.parentElement : undefined);
+        });
     });
 }

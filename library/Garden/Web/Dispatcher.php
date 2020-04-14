@@ -444,4 +444,60 @@ class Dispatcher {
             $response->render();
         }
     }
+
+    /**
+     * Reflect arguments on a reflected function.
+     *
+     * @param \ReflectionFunctionAbstract $function The reflected functions.
+     * @param array $args The route arguments.
+     * @param ContainerInterface $container A container to satisfy type hinted arguments.
+     * @param bool $throw Whether or not to throw an exception.
+     * @return array
+     */
+    public static function reflectArgs(
+        \ReflectionFunctionAbstract $function,
+        array $args,
+        ContainerInterface $container,
+        bool $throw = true
+    ): array {
+        $largs = array_change_key_case($args);
+
+        $result = [];
+        $missing = [];
+        foreach ($function->getParameters() as $index => $param) {
+            /* @var \ReflectionParameter $param */
+            $lname = strtolower($param->getName());
+
+            if ($param->getClass() !== null) {
+                if ($container->has($param->getClass()->getName())) {
+                    $value = $container->get($param->getClass()->getName());
+                } else {
+                    $value = null;
+                    $missing[$lname] = '$'.$param->getName();
+                }
+            } elseif (isset($largs[$lname])) {
+                $value = $largs[$lname];
+            } elseif (isset($largs[$index])) {
+                $value = $largs[$index];
+            } elseif ($param->isDefaultValueAvailable()) {
+                $value = $param->getDefaultValue();
+            } else {
+                $value = null;
+                $missing[$lname] = '$'.$param->getName();
+            }
+            $result[$param->getName()] = $value;
+        }
+
+        if ($throw && !empty($missing)) {
+            if ($function instanceof \ReflectionMethod) {
+                $name = $function->getDeclaringClass()->getName().'::'.$function->getName();
+            } else {
+                $name = $function->getName();
+            }
+
+            throw new \ReflectionException("$name() expects the following parameters: ".implode(', ', $missing).'.', 400);
+        }
+
+        return $result;
+    }
 }

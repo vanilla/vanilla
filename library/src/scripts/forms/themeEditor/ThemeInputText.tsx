@@ -32,7 +32,7 @@ export function ThemeInputText(props: IProps) {
     const classes = themeInputTextClasses();
 
     const hasDebounce = !!props.debounceTime;
-    const debounceTime = typeof props.debounceTime === "number" ? props.debounceTime : props.debounceTime ? 10 : 0;
+    const debounceTime = typeof props.debounceTime === "number" ? props.debounceTime : props.debounceTime ? 250 : 0;
 
     const { generatedValue, defaultValue, setValue } = useThemeVariableField(varKey);
 

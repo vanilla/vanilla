@@ -118,7 +118,7 @@ class MessagesApiController extends AbstractApiController {
                 'messageID:i' => 'The ID of the message.',
                 'conversationID:i' => 'The ID of the conversation.',
                 'body:s' => [
-                    'maxLength' => $this->config->get('MaxLength', 2000),
+                    'maxLength' => $this->config->get('Conversations.Message.MaxLength', 2000),
                     'description' => 'The body of the message.',
                 ],
                 'insertUserID:i' => 'The user that created the message.',

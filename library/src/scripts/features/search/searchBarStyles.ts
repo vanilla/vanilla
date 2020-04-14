@@ -126,10 +126,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         {
             cursor: "pointer",
             $nest: {
-                ".inputText.inputText": {
-                    borderTopLeftRadius: importantUnit(buttonBorderRadius),
-                    borderBottomLeftRadius: importantUnit(buttonBorderRadius),
-                },
                 "& .searchBar__placeholder": {
                     color: colorOut(formElementVars.placeholder.color),
                     margin: "auto",

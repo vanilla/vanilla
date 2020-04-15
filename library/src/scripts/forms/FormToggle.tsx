@@ -19,10 +19,11 @@ interface IProps {
     labelID?: string;
     accessibleLabel?: string;
     slim?: boolean;
+    disabled?: boolean;
 }
 
 export function FormToggle(props: IProps) {
-    const { enabled, onChange, className, indeterminate, accessibleLabel, slim, ...IDs } = props;
+    const { enabled, onChange, className, indeterminate, accessibleLabel, slim, disabled, ...IDs } = props;
     const [isFocused, setIsFocused] = useState(false);
 
     if (IDs.labelID == null && accessibleLabel == null) {
@@ -37,12 +38,22 @@ export function FormToggle(props: IProps) {
 
     return (
         <label
+            onClick={e => {
+                if (disabled !== undefined && !disabled) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            }}
+            tabIndex={0}
             className={classNames(
                 props.className,
                 classes.root,
-                enabled && "isEnabled",
+                enabled && "isOn",
                 indeterminate && "isIndeterminate",
                 isFocused && "isFocused",
+                {
+                    isDisabled: disabled,
+                },
             )}
         >
             <ScreenReaderContent>
@@ -50,6 +61,8 @@ export function FormToggle(props: IProps) {
                 <input
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
+                    disabled={disabled}
+                    aria-disabled={disabled}
                     type="checkbox"
                     aria-labelledby={labelID}
                     id={id}

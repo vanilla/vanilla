@@ -3,9 +3,9 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import ReactDOM from "react-dom";
-import React, { DOMElement } from "react";
-import { DropDownMenuIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
+import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
 import { cssRule } from "typestyle";
 import { important } from "csx";
 import { iconClasses } from "@library/icons/iconClasses";
@@ -21,6 +21,12 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     cogWheels.forEach(wheel => {
         wheel.classList.add("compatIcons");
         ReactDOM.render(<DropDownMenuIcon />, wheel);
+    });
+
+    const docLinks = scope.querySelectorAll("a.documentationLink");
+    docLinks.forEach(doc => {
+        doc.classList.add("compatIcons");
+        ReactDOM.render(<DocumentationIcon />, doc);
     });
 
     // Bookmarks

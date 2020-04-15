@@ -18,13 +18,14 @@ import {
     importantUnit,
 } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
+import { toolTipClasses } from "@library/toolTip/toolTipStyles";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
     // Intentionally not overwritable with theming system.
-    const fontFamily = ["Open Sans"];
+    const fontFamily = [defaultFontFamily];
 
     const mainColors = {
         primary: color("#0291db"),
@@ -317,6 +318,41 @@ export const themeBuilderClasses = useThemeCache(() => {
         marginBottom: "auto",
     });
 
+    const documentationIconLink = style("documentationIconLink", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: unit(16),
+        height: unit(16),
+    });
+
+    const docBlockTextContainer = style("docBlockTextContainer", {
+        display: "block",
+        ...fonts({
+            size: 12,
+            color: globalVars.meta.text.color,
+            lineHeight: globalVars.meta.lineHeights.default,
+        }),
+        padding: 0,
+        ...margins({
+            top: unit(-3),
+            bottom: 8,
+        }),
+    });
+
+    const small = style("small", {
+        $nest: {
+            [`& .${toolTipClasses().noPointerTrigger}`]: {
+                minWidth: 20,
+                minHeight: 20,
+            },
+        },
+    });
+
+    const iconLink = style("iconLink", {
+        marginLeft: unit(8),
+    });
+
     return {
         root,
         block,
@@ -336,5 +372,9 @@ export const themeBuilderClasses = useThemeCache(() => {
         colorErrorMessage,
         tooltip,
         resetButton,
+        documentationIconLink,
+        docBlockTextContainer,
+        small,
+        iconLink,
     };
 });

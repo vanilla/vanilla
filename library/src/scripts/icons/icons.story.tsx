@@ -141,7 +141,9 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`InformationIcon`}>
                     <InformationIcon />
                 </StoryTileAndTextCompact>
-
+                <StoryTileAndTextCompact text={`DocumentationIcon`}>
+                    <CommonIcons.DocumentationIcon />
+                </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`BookmarkIcon`}>
                     <a href="#" className={iconClasses().bookmark()}>
                         <BookmarkIcon />

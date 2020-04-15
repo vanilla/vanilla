@@ -10,6 +10,10 @@ import { useThrowError } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useContext } from "react";
 import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
+import SmartLink from "@library/routing/links/SmartLink";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@vanilla/i18n";
+import { DocumentationIcon } from "@library/icons/common";
 
 interface IProps {
     label: string;
@@ -17,6 +21,7 @@ interface IProps {
     children: React.ReactNode;
     inputWrapClass?: string;
     info?: React.ReactNode;
+    docUrl?: string;
 }
 
 interface IThemeBlockContext {
@@ -45,14 +50,24 @@ export function ThemeBuilderBlock(props: IProps) {
     const labelID = useUniqueID("themeBlockLabel");
     const classes = themeBuilderClasses();
     return (
-        <div className={classes.block}>
-            <label htmlFor={labelID} className={classes.label}>
-                {props.label}
-                {props.info && <ThemeInfoTooltip label={props.info} />}
-            </label>
-            <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
-                <ThemeBlockContext.Provider value={{ inputID, labelID }}>{props.children}</ThemeBlockContext.Provider>
-            </span>
-        </div>
+        <>
+            <div className={classes.block}>
+                <label htmlFor={labelID} className={classes.label}>
+                    {props.label}
+                    {props.info && <ThemeInfoTooltip label={props.info} small={true} />}
+                    {props.docUrl && (
+                        <SmartLink to={props.docUrl} target={"_blank"} className={classes.iconLink}>
+                            <ScreenReaderContent>{t("Custom Font Documentation.")}</ScreenReaderContent>
+                            <DocumentationIcon />
+                        </SmartLink>
+                    )}
+                </label>
+                <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
+                    <ThemeBlockContext.Provider value={{ inputID, labelID }}>
+                        {props.children}
+                    </ThemeBlockContext.Provider>
+                </span>
+            </div>
+        </>
     );
 }

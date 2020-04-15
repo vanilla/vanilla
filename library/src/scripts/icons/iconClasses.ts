@@ -9,9 +9,6 @@ import { unit, colorOut, pointerEvents, ColorValues } from "@library/styles/styl
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
-import { logDebugConditionnal } from "@vanilla/utils";
-import main from "@storybook/api/dist/initial-state";
-import { debuglog } from "util";
 
 interface IPathState {
     stroke?: ColorValues | StrokeProperty;
@@ -193,6 +190,11 @@ export const iconVariables = useThemeCache(() => {
         opacity: 0.8,
     });
 
+    const documentation = themeVars("documentation", {
+        width: 12.6,
+        height: 16.02,
+    });
+
     const bookmarkIcon = themeVars("bookmarkIcon", {
         width: 12,
         height: 16,
@@ -224,6 +226,7 @@ export const iconVariables = useThemeCache(() => {
         categoryIcon,
         deleteIcon,
         editIcon,
+        documentation,
         bookmarkIcon,
     };
 });
@@ -433,6 +436,13 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
+    const documentation = style("documentation", {
+        ...pointerEvents(),
+        display: "block",
+        width: unit(vars.documentation.width),
+        height: unit(vars.documentation.height),
+    });
+
     // Goes on link, not SVG to handle states
     const bookmark = (
         props: IBookmarkProps = {
@@ -527,6 +537,7 @@ export const iconClasses = useThemeCache(() => {
         globeIcon,
         isSmall,
         hamburger,
+        documentation,
         bookmark,
     };
 });

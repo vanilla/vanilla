@@ -92,6 +92,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
+                    ...border,
                     color: colors.state.fg,
                 }),
             },

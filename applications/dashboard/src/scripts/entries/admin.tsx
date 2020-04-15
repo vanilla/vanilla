@@ -5,7 +5,7 @@
 
 import React, { useState, useLayoutEffect } from "react";
 import { initAllUserContent } from "@library/content";
-import { onContent, onReady } from "@library/utility/appUtils";
+import { getMeta, onContent, onReady } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
 import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
@@ -18,6 +18,8 @@ import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegis
 import { roleReducer } from "@dashboard/roles/roleReducer";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
+import { compatibilityStyles } from "@dashboard/compatibilityStyles";
+import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -54,6 +56,8 @@ const render = () => {
 
     if (app) {
         mountReact(<Router disableDynamicRouting />, app);
+    } else {
+        applyCompatibilityIcons();
     }
 };
 onReady(render);

@@ -6705,6 +6705,46 @@ label,
 .input-wrap.inline label, .inline.color-picker label {
   margin-right: 4.5px;
 }
+.input-wrap.grid, .grid.color-picker {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-align-items: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+}
+.input-wrap.grid label, .grid.color-picker label {
+  margin-top: 0;
+  -webkit-flex-basis: 50%;
+      -ms-flex-preferred-size: 50%;
+          flex-basis: 50%;
+  display: block !important;
+}
+@media (max-width: 543px) {
+  .input-wrap.grid label, .grid.color-picker label {
+    -webkit-flex-basis: 100%;
+        -ms-flex-preferred-size: 100%;
+            flex-basis: 100%;
+    margin-top: 9px;
+  }
+}
+.input-wrap.grid label:nth-child(n+3), .grid.color-picker label:nth-child(n+3) {
+  margin-top: 9px;
+}
+.input-wrap.grid label:nth-child(odd), .grid.color-picker label:nth-child(odd) {
+  padding-right: 9px;
+}
+@media (max-width: 543px) {
+  .input-wrap.grid label:nth-child(odd), .grid.color-picker label:nth-child(odd) {
+    padding-right: initial;
+  }
+}
+.input-wrap.grid span, .grid.color-picker span {
+  white-space: normal;
+}
 
 .form-control, .ac_input {
   line-height: 1.5;
@@ -7733,6 +7773,9 @@ label[id^=iCheck] {
 }
 .media-addon .media-title,
 .media-callout .media-title {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   font-weight: 600;
   margin-bottom: 4.5px;
   margin-top: 0;
@@ -7778,6 +7821,11 @@ label[id^=iCheck] {
   vertical-align: 1px;
   margin-left: 1px;
 }
+.documentationLink.compatIcons {
+  display: "block";
+  width: 20px;
+  height: 20px;
+}
 
 .media-right {
   padding-left: 18px;
@@ -7800,6 +7848,9 @@ label[id^=iCheck] {
   padding-left: 0;
 }
 .media-callout .media-title {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   font-weight: 400;
   margin-bottom: 9px;
 }

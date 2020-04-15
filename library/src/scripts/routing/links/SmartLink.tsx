@@ -41,6 +41,7 @@ export default function SmartLink(props: IProps) {
                 if (context.isDynamicNavigation(href)) {
                     return (
                         <NavLink
+                            rel={props.target === "_blank" ? "noreferer noopener ugc" : undefined}
                             {...passthru}
                             to={makeLocationDescriptorObject(props.to, href)}
                             activeClassName="isCurrent"

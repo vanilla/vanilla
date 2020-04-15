@@ -26,6 +26,7 @@ interface IProps
     step?: number;
     min?: number;
     max?: number;
+    disabled?: boolean;
 }
 
 enum StepAction {
@@ -135,13 +136,15 @@ export function ThemeInputNumber(_props: IProps) {
                     step={step}
                     min={min}
                     max={max}
+                    disabled={inputProps.disabled}
+                    aria-disabled={inputProps.disabled}
                 />
                 <span className={classes.spinner}>
                     <span className={classes.spinnerSpacer}>
                         <Button
                             onClick={stepUp}
                             {...stepUpIntervalProps}
-                            disabled={max != undefined && generatedValue >= max}
+                            disabled={inputProps.disabled || (max != undefined && generatedValue >= max)}
                             className={classes.stepUp}
                             baseClass={ButtonTypes.CUSTOM}
                         >
@@ -150,7 +153,7 @@ export function ThemeInputNumber(_props: IProps) {
                         <Button
                             onClick={stepDown}
                             {...stepDownIntervalProps}
-                            disabled={generatedValue <= min}
+                            disabled={inputProps.disabled || generatedValue <= min}
                             className={classes.stepDown}
                             baseClass={ButtonTypes.CUSTOM}
                         >

@@ -22,6 +22,8 @@ import { ThemeBuilderBreakpoints, BreakpointViewType } from "@library/forms/them
 export default {
     title: "Forms",
 };
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
+import { ThemeBuilderFontBlock } from "@library/forms/themeEditor/ThemeBuilderFontBlock";
 
 export function ThemeEditor() {
     const [vars, setVars] = useState({});
@@ -69,10 +71,21 @@ export function ThemeEditor() {
                         <ThemeInputNumber variableKey="global.border.radius" max={10} step={2} min={2} />
                     </ThemeBuilderBlock>
                     <ThemeBuilderBreakpoints
+                        baseKey="contentBanner.outerBackground.bogus"
+                        responsiveKey="image"
+                        enabledView={BreakpointViewType.IMAGE}
+                    />
+                    <ThemeBuilderBreakpoints
+                        label={"Open by default"}
                         baseKey="contentBanner.outerBackground"
                         responsiveKey="image"
                         enabledView={BreakpointViewType.IMAGE}
-                    ></ThemeBuilderBreakpoints>
+                        forceState={true}
+                        toggleDisabled={true}
+                    />
+                </ThemeBuilderSection>
+                <ThemeBuilderSection label="Font">
+                    <ThemeBuilderFontBlock forceDefaultKey={"custom"} forceError={true} />
                 </ThemeBuilderSection>
             </ThemeBuilderContextProvider>
         </div>

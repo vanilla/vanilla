@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
 import { borders, colorOut, defaultTransition, timedTransition } from "@library/styles/styleHelpers";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { important } from "csx";
 
 export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -82,29 +83,39 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         height: vars.well.height,
         width: vars.well.width,
         $nest: {
-            [`&.isEnabled .${slider}`]: {
+            [`&.isOn .${slider}`]: {
                 left: vars.well.width / 2 + vars.sizing.gutter,
                 ...borders({ ...vars.slider.border, color: vars.slider.color }),
             },
-            [`&.isEnabled .${well}`]: {
+            [`&.isOn .${well}`]: {
                 backgroundColor: colorOut(vars.well.colorActive),
                 ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
             },
             [`&.isIndeterminate .${slider}`]: {
                 left: vars.slider.width / 2 + vars.sizing.gutter,
             },
-            [`&.isFocused .${well}, &:hover .${well}`]: {
+            [`&.isFocused:not(.isDisabled):not(.isFocused) .${well}, &:not(.isDisabled):hover .${well}`]: {
                 ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isFocused .${slider}, &:hover .${slider}`]: {
+            [`&.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &:not(.isDisabled):hover .${slider}`]: {
                 ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isEnabled.isFocused .${well}, &.isEnabled:hover .${well}`]: {
+            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${well}, &.isOn:not(.isDisabled):hover .${well}`]: {
                 ...borders({ ...vars.well.border, color: vars.well.colorActiveState }),
                 backgroundColor: colorOut(vars.well.colorActiveState),
             },
-            [`&.isEnabled.isFocused .${slider}, &.isEnabled:hover .${slider}`]: {
+            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &.isOn:not(.isDisabled):hover .${slider}`]: {
                 ...borders({ ...vars.slider.border, color: vars.slider.color }),
+            },
+            [`&.isDisabled`]: {
+                cursor: important("default"),
+                opacity: 0.5,
+            },
+            [`&.isDisabled .${slider}`]: {
+                cursor: important("default"),
+            },
+            [`&.isDisabled .${well}`]: {
+                cursor: important("default"),
             },
         },
     });

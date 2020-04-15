@@ -217,6 +217,8 @@ export const navLinksClasses = useThemeCache(() => {
         default: globalVars.mainColors.primary,
     });
 
+    const noItemLink = style("noItemLink", { ...clickableItemStates(), marginTop: globalVars.gutter.quarter });
+
     const viewAll = style("viewAll", {
         display: "block",
         ...fonts({
@@ -284,6 +286,7 @@ export const navLinksClasses = useThemeCache(() => {
         root,
         items,
         item,
+        noItemLink,
         title,
         topTitle,
         link,

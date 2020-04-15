@@ -12,7 +12,7 @@ import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
-import NavLinks from "@library/navigation/NavLinks";
+import NavLinks, { INavLinkNoItemComponent } from "@library/navigation/NavLinks";
 import Container from "@library/layout/components/Container";
 import { visibility } from "@library/styles/styleHelpers";
 

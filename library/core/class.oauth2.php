@@ -27,13 +27,16 @@ use Vanilla\Permissions;
  * any of its methods of constants.
  *
  */
-class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
+class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
     /** @var string token provided by authenticator  */
     protected $accessToken;
 
     /** @var array response to token request by authenticator  */
     protected $accessTokenResponse;
+
+    /** @var string AuthenticationSchemeAlias value */
+    protected $authenticationScheme = '';
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -58,6 +61,18 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
 
     /** @var  @var string optional set the settings view */
     protected $settingsView;
+
+    /**
+     * Gets the $authenticaitonScheme variable
+     *
+     * @return string
+     */
+    protected function getAuthenticationScheme(): string {
+        if (!$this->authenticationScheme) {
+            return '';
+        }
+        return $this->authenticationScheme;
+    }
 
     /**
      * @var SsoUtils

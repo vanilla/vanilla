@@ -26,7 +26,7 @@ export function CustomFontUrl(props: IProps) {
                 if (props.forceError) {
                     return false;
                 } else {
-                    return newValue === "" || urlValidation(newValue);
+                    return !newValue || urlValidation(newValue);
                 }
             }}
             errorMessage={t("Invalid URL")}

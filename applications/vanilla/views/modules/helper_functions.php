@@ -16,8 +16,12 @@ if (!function_exists('WriteModuleDiscussion')):
    </span>
 
             <div class="Title"><?php
-                echo anchor(htmlspecialchars($discussion->Name), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
-                ?></div>
+                echo anchor(
+                    Gdn::formatService()->renderHTML($discussion->Name, \Vanilla\Formatting\Formats\TextFormat::FORMAT_KEY),
+                    discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''),
+                    'DiscussionLink'
+                );
+            ?></div>
             <div class="Meta DiscussionsModuleMeta">
                 <?php
                 $last = new stdClass();

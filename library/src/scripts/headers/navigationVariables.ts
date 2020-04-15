@@ -35,7 +35,7 @@ export const navigationVariables = useThemeCache(() => {
     });
 
     const logo = makeVars("logo", {
-        url: formatUrl("/"),
+        url: "/",
     });
 
     const currentLocale = getCurrentLocale();

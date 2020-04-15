@@ -124,6 +124,7 @@ class SmartIDMiddlewareTest extends TestCase {
             'basic' => [['categoryID' => '$name:foo'], ['categoryID' => '(Category.CategoryID.name:foo)']],
             'suffix' => [['parentCategoryID' => '$urlcode:foo'], ['parentCategoryID' => '(Category.CategoryID.urlcode:foo)']],
             'callback' => [['insertUserID' => '$name:baz'], ['insertUserID' => '(User.UserID.name:baz)']],
+            'fully qualified' => [['parentID' => '$userID.name:baz'], ['parentID' => '(User.UserID.name:baz)']],
         ];
 
         return $r;
@@ -152,6 +153,7 @@ class SmartIDMiddlewareTest extends TestCase {
             'basic' => [['categoryID' => '$name:foo'], ['categoryID' => '(Category.CategoryID.name:foo)']],
             'nested' => [['r' => ['categoryID' => '$urlcode:foo']], ['r' => ['categoryID' => '(Category.CategoryID.urlcode:foo)']]],
             'callback' => [['insertUserID' => '$name:baz'], ['insertUserID' => '(User.UserID.name:baz)']],
+            'fully qualified' => [['parentID' => '$userID.name:baz'], ['parentID' => '(User.UserID.name:baz)']],
         ];
 
         return $r;
@@ -261,5 +263,37 @@ class SmartIDMiddlewareTest extends TestCase {
         $request = new Request('/users/$me');
         $r = $this->callMiddleware($request);
         $this->assertEquals($r->getPath(), '/users/0');
+    }
+
+    /**
+     * Test the basic full ID suffix access.
+     */
+    public function testAddRemoveFullSuffix(): void {
+        $this->middleware->addFullSuffix('foo');
+        $this->assertTrue($this->middleware->hasFullSuffix('foo'));
+        $this->middleware->removeFullSuffix('foo');
+        $this->assertFalse($this->middleware->hasFullSuffix('foo'));
+    }
+
+    /**
+     * When you remove a fully qualified suffix you should not match its smart ID.
+     */
+    public function testNoFullSuffix(): void {
+        $request = new Request('/', 'POST', [
+            'parentID' => '$userID.name:baz'
+        ]);
+        $r = $this->callMiddleware($request);
+        $this->assertEquals(['parentID' => '(User.UserID.name:baz)'], $r->getBody());
+        $this->middleware->removeFullSuffix('ID');
+        $r = $this->callMiddleware($request);
+        $this->assertEquals($request->getBody(), $r->getBody());
+    }
+
+    /**
+     * Test the basic accessors for the base path.
+     */
+    public function testBasePathAccessors() {
+        $this->middleware->setBasePath('/foo');
+        $this->assertSame('/foo', $this->middleware->getBasePath());
     }
 }

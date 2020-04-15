@@ -8,6 +8,7 @@
 namespace Garden;
 
 use Vanilla\Adapters\SphinxClient;
+
 /**
  * For classes that want Sphinx search to incorporate.
  *

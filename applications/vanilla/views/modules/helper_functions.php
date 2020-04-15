@@ -2,6 +2,9 @@
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+
         ?>
         <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
             <?php if ($showPhotos) :
@@ -17,7 +20,7 @@ if (!function_exists('WriteModuleDiscussion')):
 
             <div class="Title"><?php
                 echo anchor(
-                    Gdn::formatService()->renderHTML($discussion->Name, \Vanilla\Formatting\Formats\TextFormat::FORMAT_KEY),
+                    $htmlSanitizer->filter($discussion->Name), // Should already be encoded, but filter as an additional measure.
                     discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''),
                     'DiscussionLink'
                 );

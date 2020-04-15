@@ -77,7 +77,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const classesInputBlock = inputBlockClasses();
 
         const { inputProps = {}, multiLineProps = {}, ...blockProps } = this.props;
-        const classes = classNames(classesInputBlock.inputText, "inputText", inputProps.inputClassNames, {
+        const classes = classNames(classesInputBlock.inputText, inputProps.inputClassNames, {
             InputBox: this.props.legacyMode,
             [classesInput.text]: !this.props.legacyMode,
         });

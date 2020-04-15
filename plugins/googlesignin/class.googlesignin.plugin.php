@@ -22,6 +22,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     public function __construct() {
         $this->setProviderKey('googlesignin');
         $this->settingsView = 'plugins/settings/googlesignin';
+        $this->authenticationScheme = 'googlesignin';
     }
 
     /**

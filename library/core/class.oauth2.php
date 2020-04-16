@@ -440,6 +440,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         } else {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+            $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationScheme());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');

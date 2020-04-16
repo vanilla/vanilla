@@ -27,13 +27,16 @@ use Vanilla\Permissions;
  * any of its methods of constants.
  *
  */
-class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
+class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
     /** @var string token provided by authenticator  */
     protected $accessToken;
 
     /** @var array response to token request by authenticator  */
     protected $accessTokenResponse;
+
+    /** @var string AuthenticationSchemeAlias value */
+    protected $authenticationSchemeAlias = '';
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -87,6 +90,24 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             // We passed in a connection
             $this->accessToken = $accessToken;
         }
+    }
+
+    /**
+     * Gets the $authenticaitonSchemeAlias variable
+     *
+     * @return string
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return $this->authenticationSchemeAlias ?: $this->providerKey;
+    }
+
+    /**
+     * Sets the $authenticationSchemeAlias variable
+     *
+     * @param string $alias The AuthenticationSchemeAlias name.
+     */
+    protected function setAuthenticationSchemeAlias(string $alias): void {
+        $this->authenticationSchemeAlias = $alias;
     }
 
     /**
@@ -419,6 +440,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         } else {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+            $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationSchemeAlias());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');

@@ -29,15 +29,6 @@ class FacebookPlugin extends SSOAddon {
     private $ssoUtils;
 
     /**
-     * Get the AuthenticationSchemeAlias value.
-     *
-     * @return string The AuthenticationSchemeAlias.
-     */
-    protected function getAuthenticationScheme(): string {
-        return self::AUTHENTICATION_SCHEME;
-    }
-
-    /**
      * Constructor.
      *
      * @param SsoUtils $ssoUtils
@@ -45,6 +36,15 @@ class FacebookPlugin extends SSOAddon {
     public function __construct(SsoUtils $ssoUtils) {
         parent::__construct();
         $this->ssoUtils = $ssoUtils;
+    }
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
     }
 
     /**

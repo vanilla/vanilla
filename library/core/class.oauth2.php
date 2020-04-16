@@ -63,24 +63,6 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     protected $settingsView;
 
     /**
-     * Gets the $authenticaitonSchemeAlias variable
-     *
-     * @return string
-     */
-    protected function getAuthenticationSchemeAlias(): string {
-        return $this->authenticationSchemeAlias ?: $this->providerKey;
-    }
-
-    /**
-     * Sets the $authenticationSchemeAlias variable
-     *
-     * @param string $alias The AuthenticationSchemeAlias name.
-     */
-    protected function setAuthenticationSchemeAlias(string $alias): void {
-        $this->authenticationSchemeAlias = $alias;
-    }
-
-    /**
      * @var SsoUtils
      */
     private $ssoUtils;
@@ -108,6 +90,24 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
             // We passed in a connection
             $this->accessToken = $accessToken;
         }
+    }
+
+    /**
+     * Gets the $authenticaitonSchemeAlias variable
+     *
+     * @return string
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return $this->authenticationSchemeAlias ?: $this->providerKey;
+    }
+
+    /**
+     * Sets the $authenticationSchemeAlias variable
+     *
+     * @param string $alias The AuthenticationSchemeAlias name.
+     */
+    protected function setAuthenticationSchemeAlias(string $alias): void {
+        $this->authenticationSchemeAlias = $alias;
     }
 
     /**
@@ -440,7 +440,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         } else {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
-            $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationScheme());
+            $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationSchemeAlias());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');

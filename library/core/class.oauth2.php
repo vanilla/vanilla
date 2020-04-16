@@ -36,7 +36,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     protected $accessTokenResponse;
 
     /** @var string AuthenticationSchemeAlias value */
-    protected $authenticationScheme = '';
+    protected $authenticationSchemeAlias = '';
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -63,15 +63,21 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     protected $settingsView;
 
     /**
-     * Gets the $authenticaitonScheme variable
+     * Gets the $authenticaitonSchemeAlias variable
      *
      * @return string
      */
-    protected function getAuthenticationScheme(): string {
-        if (!$this->authenticationScheme) {
-            return '';
-        }
-        return $this->authenticationScheme;
+    protected function getAuthenticationSchemeAlias(): string {
+        return $this->authenticationSchemeAlias ?: $this->providerKey;
+    }
+
+    /**
+     * Sets the $authenticationSchemeAlias variable
+     *
+     * @param string $alias The AuthenticationSchemeAlias name.
+     */
+    protected function setAuthenticationSchemeAlias(string $alias): void {
+        $this->authenticationSchemeAlias = $alias;
     }
 
     /**

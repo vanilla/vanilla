@@ -42,12 +42,7 @@ Router.addRoutes([
 
 applySharedPortalContext(props => {
     return (
-        <AppContext
-            variablesOnly={
-                !getMeta("themeFeatures.DataDrivenTheme", false) && !getMeta("themeFeatures.SharedMasterView", false)
-            }
-            errorComponent={ErrorPage}
-        >
+        <AppContext variablesOnly errorComponent={ErrorPage}>
             {props.children}
         </AppContext>
     );

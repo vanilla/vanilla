@@ -14,6 +14,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { t } from "@vanilla/i18n";
 import { DocumentationIcon } from "@library/icons/common";
+import { ThemeInfoDocs } from "@library/forms/themeEditor/ThemeInfoDocs";
 
 interface IProps {
     label: string;
@@ -21,6 +22,7 @@ interface IProps {
     children: React.ReactNode;
     inputWrapClass?: string;
     info?: React.ReactNode;
+    infoUrl?: string;
     docUrl?: string;
 }
 
@@ -54,13 +56,8 @@ export function ThemeBuilderBlock(props: IProps) {
             <div className={classes.block}>
                 <label htmlFor={labelID} className={classes.label}>
                     {props.label}
-                    {props.info && <ThemeInfoTooltip label={props.info} small={true} />}
-                    {props.docUrl && (
-                        <SmartLink to={props.docUrl} target={"_blank"} className={classes.iconLink}>
-                            <ScreenReaderContent>{t("Custom Font Documentation.")}</ScreenReaderContent>
-                            <DocumentationIcon />
-                        </SmartLink>
-                    )}
+                    {props.info && <ThemeInfoTooltip label={props.info} href={props.infoUrl} small={true} />}
+                    {props.docUrl && <ThemeInfoDocs href={props.docUrl} />}
                 </label>
                 <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
                     <ThemeBlockContext.Provider value={{ inputID, labelID }}>

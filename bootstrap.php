@@ -87,7 +87,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\Site\ApplicationProvider::class)
     ->addCall('add', [new Reference(
         \Vanilla\Site\Application::class,
-        ['garden', ['api', 'entry', 'sso', 'utility']]
+        ['garden', ['api', 'entry', 'sso', 'utility', 'robots.txt']]
     )])
     ->setShared(true)
 

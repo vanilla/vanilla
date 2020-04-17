@@ -5,23 +5,33 @@
 
 import React from "react";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { WarningIcon, InformationIcon } from "@library/icons/common";
+import { InformationIcon, DocumentationIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import classNames from "classnames";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps extends Omit<React.ComponentProps<typeof ToolTip>, "children"> {
     small?: boolean;
+    href?: string;
 }
 
 export function ThemeInfoTooltip(props: IProps) {
     const classes = themeBuilderClasses();
+
+    let icon = <InformationIcon informationMessage={t("Info")} />;
+    if (props.href) {
+        icon = (
+            <SmartLink className={classes.documentationIconLink} to={props.href}>
+                <DocumentationIcon />
+            </SmartLink>
+        );
+    }
+
     return (
-        <span className={classNames(classes.tooltip, { [classes.small]: props.small })}>
+        <span className={classNames(classes.blockInfo, { [classes.small]: props.small })}>
             <ToolTip {...props}>
-                <ToolTipIcon>
-                    <InformationIcon informationMessage={t("Info")} />
-                </ToolTipIcon>
+                <ToolTipIcon>{icon}</ToolTipIcon>
             </ToolTip>
         </span>
     );

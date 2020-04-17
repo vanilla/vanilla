@@ -41,7 +41,7 @@ interface IProps {
  */
 export default function Banner(props: IProps) {
     const device = useDevice();
-    const ref = useBannerContainerDivRef();
+    const bannerContextRef = useBannerContainerDivRef();
 
     const { action, className, title, isContentBanner } = props;
 
@@ -100,9 +100,9 @@ export default function Banner(props: IProps) {
 
     return (
         <div
-            ref={ref}
+            ref={options.overlayTitleBar ? bannerContextRef : undefined}
             className={classNames(className, classes.root, {
-                [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled,
+                [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,
             })}
         >
             {/* First container holds:

@@ -469,7 +469,13 @@ class Dispatcher {
             $lname = strtolower($param->getName());
 
             if ($param->getClass() !== null) {
-                if ($container->has($param->getClass()->getName())) {
+                $className = $param->getClass()->getName();
+
+                if (isset($largs[$lname]) && is_a($largs[$lname], $className)) {
+                    $value = $largs[$lname];
+                } elseif (isset($largs[$index]) && is_a($largs[$index], $className)) {
+                    $value = $largs[$index];
+                } elseif ($container->has($className)) {
                     $value = $container->get($param->getClass()->getName());
                 } else {
                     $value = null;

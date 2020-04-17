@@ -64,6 +64,7 @@ export function ThemeInputText(props: IProps) {
             <InputTextBlock
                 errors={showError ? errors : undefined}
                 inputProps={{
+                    autoComplete: false,
                     defaultValue: defaultValue,
                     className: classes.input,
                     value: generatedValue,

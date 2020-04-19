@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
@@ -2307,7 +2308,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 } else {
                     // Inserting.
                     if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
-                        $fields['Format'] = c('Garden.InputFormatter', '');
+                        /** @var EventManager $eventManager */
+                        $eventManager = Gdn::getContainer()->get(EventManager::class);
+                        $format = $eventManager->fireFilter('discussionModel_inputFormatter', $fields);
+                        $fields['Format'] = $format ?? c('Garden.InputFormatter', '');
                     }
 
                     // Check for approval

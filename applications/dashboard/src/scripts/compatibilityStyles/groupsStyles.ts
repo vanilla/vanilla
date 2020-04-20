@@ -107,6 +107,17 @@ export const groupsCSS = () => {
         },
     });
 
+    cssOut(`.Group-Header.NoBanner .Photo.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
+        position: "relative",
+        top: "auto",
+        float: "none",
+        marginBottom: 0,
+    });
+
+    cssOut(`.Group-Header.NoBanner`, {
+        alignItems: "center",
+    });
+
     cssOut(`.Groups .DataTable .Item td, .DataTable .Item td`, {
         borderBottom: singleBorder(),
         ...paddings({
@@ -125,8 +136,8 @@ export const groupsCSS = () => {
 
     cssOut(`.PhotoWrap:hover a.ChangePicture`, {
         opacity: 0,
-        backgroundColor: importantColorOut(globalVars.mainColors.bg.fade(0.5)),
-        color: colorOut(globalVars.mainColors.fg),
+        backgroundColor: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
+        color: colorOut(globalVars.elementaryColors.white),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -253,6 +264,12 @@ export const groupsCSS = () => {
 
     cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
         order: 1,
+        $nest: {
+            [`& .ToggleFlyout.OptionsMenu`]: {
+                display: "flex",
+                alignItems: "center",
+            },
+        },
     });
 
     cssOut(`.Group-Box .PageControls .Button-Controls`, {

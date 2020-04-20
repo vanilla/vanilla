@@ -2308,10 +2308,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 } else {
                     // Inserting.
                     if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
-                        /** @var EventManager $eventManager */
-                        $eventManager = Gdn::getContainer()->get(EventManager::class);
-                        $format = $eventManager->fireFilter('discussionModel_inputFormatter', $fields);
-                        $fields['Format'] = $format ?? c('Garden.InputFormatter', '');
+                        $forcedFormat = $fields['forcedFormat'] ?? false;
+                        $fields['Format'] = ($forcedFormat && $fields['Format'])
+                            ? $fields['Format']
+                            : c('Garden.InputFormatter', '');
                     }
 
                     // Check for approval

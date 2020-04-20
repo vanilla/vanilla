@@ -234,11 +234,7 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
-        paddingLeft: unit(8),
-    });
-
-    cssOut(`.Group-Box .Item .Options`, {
-        paddingLeft: unit(8),
+        paddingLeft: unit(0),
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons`, {
@@ -259,12 +255,11 @@ export const groupsCSS = () => {
         order: 1,
     });
 
-    cssOut(`body.Groups .DataList .Item`, {
-        paddingLeft: 0,
-        paddingRight: 0,
-    });
-
     cssOut(`.Group-Box .PageControls .Button-Controls`, {
         ...absolutePosition.middleRightOfParent(),
+    });
+
+    cssOut(`.Group-Box`, {
+        marginBottom: unit(36),
     });
 };

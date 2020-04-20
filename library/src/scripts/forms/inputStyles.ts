@@ -12,6 +12,7 @@ import {
     EMPTY_BORDER,
     EMPTY_FONTS,
     fonts,
+    getHorizontalPaddingForTextInput,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
@@ -60,9 +61,9 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+export const inputMixinVars = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
     const inputVars = inputVariables();
-    const variables = {
+    return {
         sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
         font: merge(inputVars.font, vars?.font ?? {}),
         colors: merge(inputVars.colors, vars?.colors ?? {}),
@@ -72,7 +73,10 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             ...(vars?.border ?? {}),
         },
     };
+};
 
+export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+    const variables = inputMixinVars(vars);
     const { sizing, font, colors, border } = variables;
 
     return {

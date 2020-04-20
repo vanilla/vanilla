@@ -9,15 +9,17 @@ import {
     absolutePosition,
     colorOut,
     importantColorOut,
+    negativeUnit,
     paddings,
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, percent } from "csx";
+import { calc, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { metaContainerStyles } from "@library/styles/metasStyles";
 
 export const groupVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -165,11 +167,7 @@ export const groupsCSS = () => {
     cssOut(
         `.Group-Box .PageControls .H`,
         {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            margin: "auto",
+            margin: 0,
         },
         mediaQueries.xs({
             position: "relative",
@@ -195,5 +193,51 @@ export const groupsCSS = () => {
 
     cssOut(`.Event-Title`, {
         marginTop: unit(75),
+    });
+
+    cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
+
+    cssOut(`body.Groups .Button.Handle .Sprite, body.Groups .NavButton.Handle .Sprite`, {
+        marginRight: negativeUnit(2),
+        transform: translateX(`5px`),
+    });
+
+    cssOut(`body.Groups .StructuredForm .Buttons-Confirm`, {
+        textAlign: "left",
+    });
+
+    // Group Box
+    cssOut(`.Group-Box .Item`, {
+        display: "flex",
+        flexDirection: "row-reverse",
+        width: percent(100),
+        alignItems: "center",
+    });
+
+    cssOut(`.Group-Box .ItemContent`, {
+        flexGrow: 1,
+    });
+
+    cssOut(`.Groups .DataList .Item > .PhotoWrap`, {
+        ...absolutePosition.topLeft(13, 8),
+        float: "none",
+    });
+
+    cssOut(`.Groups .DataList .ItemContent`, {
+        paddingLeft: unit(58),
+    });
+
+    cssOut(`.Group-Box .Item .Options`, {
+        paddingLeft: unit(8),
+    });
+
+    cssOut(`.Group-Box .Item .Options .Buttons`, {
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
+    });
+
+    cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
+        marginRight: unit(4),
     });
 };

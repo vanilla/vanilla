@@ -15,6 +15,7 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\KludgedVariablesProviderInterface;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeProviderCleanupInterface;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -111,6 +112,9 @@ class ThemeModel {
     /** @var string $themeManagePageUrl */
     private $themeManagePageUrl = '/dashboard/settings/themes';
 
+    /** @var FsThemeProvider */
+    private $fallbackThemeProvider;
+
     /**
      * ThemeModel constructor.
      *
@@ -120,6 +124,7 @@ class ThemeModel {
      * @param ThemeModelHelper $themeHelper
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
+     * @param FsThemeProvider $fallbackThemeProvider
      */
     public function __construct(
         ConfigurationInterface $config,
@@ -127,7 +132,8 @@ class ThemeModel {
         AddonProviderInterface $addonManager,
         ThemeModelHelper $themeHelper,
         ThemeSectionModel $themeSections,
-        SiteSectionModel $siteSectionModel
+        SiteSectionModel $siteSectionModel,
+        FsThemeProvider $fallbackThemeProvider
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -135,6 +141,7 @@ class ThemeModel {
         $this->themeHelper = $themeHelper;
         $this->themeSections = $themeSections;
         $this->siteSectionModel = $siteSectionModel;
+        $this->fallbackThemeProvider = $fallbackThemeProvider;
     }
 
     /**
@@ -247,24 +254,17 @@ class ThemeModel {
      * @return array
      */
     public function setCurrentTheme($themeID): array {
-        $provider = $this->getThemeProvider($themeID);
+        $previousTheme = $this->getCurrentTheme();
+        $previousProvider = $this->getThemeProvider($previousTheme['themeID']);
+        $newProvider = $this->getThemeProvider($themeID);
+        $newTheme = $newProvider->setCurrent($themeID);
 
-        if ($theme = $provider->setCurrent($themeID)) {
-            if ($provider->themeKeyType() === 0) {
-                try {
-                    $dbThemeProvider = $this->getThemeProvider(1);
-                    $dbThemeProvider->resetCurrent();
-                } catch (ClientException $e) {
-                    if ($e->getMessage() !== 'No custom theme provider found!') {
-                        throw $e;
-                    }
-                    //do nothing if db provider does not exist
-                }
-            }
+        if ($previousProvider !== $newProvider && $previousProvider instanceof ThemeProviderCleanupInterface) {
+            $previousProvider->afterCurrentProviderChange();
         }
 
-        $theme = $this->normalizeTheme($theme);
-        return $theme;
+        $newTheme = $this->normalizeTheme($newTheme);
+        return $newTheme;
     }
 
     /**
@@ -368,10 +368,9 @@ class ThemeModel {
     /**
      * Get current theme.
      *
-     * @return array|void If no currnt theme set returns null
-     * @throws ClientException If no theme is found.
+     * @return array The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(): ?array {
+    public function getCurrentTheme(): array {
         $current = null;
 
         try {
@@ -472,7 +471,10 @@ class ThemeModel {
                 return $provider;
             }
         }
-        throw new ClientException('No custom theme provider found!', 501);
+
+        trigger_error('No custom theme provider found!', E_USER_WARNING);
+        // It is never acceptable to throw an exception in the theming system.
+        return $this->fallbackThemeProvider;
     }
 
     /**

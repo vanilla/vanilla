@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
- namespace Vanilla\Theme;
+namespace Vanilla\Theme;
 
- use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\NotFoundException;
 
  /**
   * Interface for providing variables on a theme.
@@ -106,7 +106,7 @@ interface ThemeProviderInterface {
     /**
      * Get master (parent) theme key.
      *
-     * @param strig|int $themeKey Theme key or id
+     * @param string|int $themeKey Theme key or id
      * @throws NotFoundException Throws an exception when theme is not found.
      * @return string
      */
@@ -115,7 +115,7 @@ interface ThemeProviderInterface {
     /**
      * Get theme name.
      *
-     * @param strig|int $themeKey Theme key or id
+     * @param string|int $themeKey Theme key or id
      * @return string
      */
     public function getName($themeKey): string;

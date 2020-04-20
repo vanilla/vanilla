@@ -51,14 +51,12 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
             $session,
             $config
         );
-        $themeModel = new ThemeModel(
+        $themeModel = self::container()->getArgs(ThemeModel::class, [
             $config,
             $session,
             $addonManager,
             $themeHelper,
-            self::container()->get(ThemeSectionModel::class),
-            self::container()->get(SiteSectionModel::class)
-        );
+        ]);
         $request = new Request();
         $fsThemeProvider = new FsThemeProvider(
             $addonManager,

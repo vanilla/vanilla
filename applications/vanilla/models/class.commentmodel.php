@@ -481,11 +481,11 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface {
      * @param bool $permissionFilter Filter results by the current user's permissions.
      * @param int|null $limit Max number to get.
      * @param int $offset Number to skip.
-     * @param string $sort The column to sort by.
      * @param string $order Order comments ascending (asc) or descending (desc) by ID.
+     * @param string $sort The column to sort by.
      * @return Gdn_DataSet SQL results.
      */
-    public function lookup(array $where = [], $permissionFilter = true, $limit = null, $offset = 0, $order = 'desc', $sort = 'CommentID') {
+    public function lookup(array $where = [], $permissionFilter = true, $limit = null, $offset = 0, $order = 'desc', string $sort = 'CommentID') {
         if ($limit === null) {
             $limit = $this->getDefaultLimit();
         }

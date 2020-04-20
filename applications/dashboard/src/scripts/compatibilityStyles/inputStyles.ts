@@ -21,10 +21,11 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent, translateY } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputVariables, inputMixin } from "@library/forms/inputStyles";
+import { inputVariables, inputMixin, inputMixinVars } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { mixinTextLinkNoDefaultLinkAppearance } from "@dashboard/compatibilityStyles/textLinkStyles";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { forumLayoutVariables } from "@dashboard/compatibilityStyles/layoutStyles";
+import { mixinTextLinkNoDefaultLinkAppearance, textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const inputCSS = () => {
     wrapSelects();
@@ -36,6 +37,7 @@ export const inputCSS = () => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
+    const mediaQueries = forumLayoutVariables().mediaQueries();
 
     cssOut(
         `
@@ -272,7 +274,7 @@ export const inputCSS = () => {
 
     cssOut(`.StructuredForm .P`, {
         ...margins({
-            vertical: globalVars.gutter.size,
+            vertical: 15,
             horizontal: 0,
         }),
     });

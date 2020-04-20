@@ -19,9 +19,10 @@ import { calc, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { metaContainerStyles } from "@library/styles/metasStyles";
 
 export const groupVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("groups");
 
     const banner = makeThemeVars("banner", {
@@ -195,9 +196,6 @@ export const groupsCSS = () => {
     });
 
     cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
-    cssOut(`body.Groups .Group-Content .Meta .MItem`, {
-        ...metaItemStyle(),
-    });
 
     cssOut(`body.Groups .Button.Handle .Sprite, body.Groups .NavButton.Handle .Sprite`, {
         marginRight: negativeUnit(2),
@@ -226,15 +224,7 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.Groups .DataList .ItemContent`, {
-        order: 11,
-    });
-
-    cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
         paddingLeft: unit(58),
-    });
-
-    cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
-        paddingLeft: unit(8),
     });
 
     cssOut(`.Group-Box .Item .Options`, {
@@ -249,22 +239,5 @@ export const groupsCSS = () => {
 
     cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
         marginRight: unit(4),
-    });
-
-    cssOut(`.DataList .Item.Event.event .DateTile`, {
-        order: 2,
-    });
-
-    cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
-        order: 1,
-    });
-
-    cssOut(`body.Groups .DataList .Item`, {
-        paddingLeft: 0,
-        paddingRight: 0,
-    });
-
-    cssOut(`.Group-Box .PageControls .Button-Controls`, {
-        ...absolutePosition.middleRightOfParent(),
     });
 };

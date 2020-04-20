@@ -12,8 +12,9 @@ import { containerMainStyles } from "@library/layout/components/containerStyles"
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { paddings } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, color, percent } from "csx";
+import { calc, color, percent, px } from "csx";
 import { unit } from "@library/styles/styleHelpers";
+import { media } from "typestyle";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -24,9 +25,8 @@ export const forumLayoutVariables = useThemeCache(() => {
         fullGutter: globalVars.constants.fullGutter,
         panelWidth: 220, // main calculated based on panel width
         breakPoints: {
-            // Other break points are calculated
-            // twoColumns: 1200,
-            // xs: 500,
+            tablet: 992,
+            mobile: 576,
         },
     });
 
@@ -46,10 +46,48 @@ export const forumLayoutVariables = useThemeCache(() => {
         width: calc(`100% - ${unit(panel.paddedWidth)}`),
     });
 
+    const mediaQueries = () => {
+        const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return media(
+                {
+                    maxWidth: px(panel.paddedWidth),
+                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.tablet + 1) : undefined,
+                },
+                styles,
+            );
+        };
+
+        const tablet = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return media(
+                {
+                    maxWidth: px(foundationalWidths.breakPoints.tablet),
+                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.mobile + 1) : undefined,
+                },
+                styles,
+            );
+        };
+
+        const mobile = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return media(
+                {
+                    maxWidth: px(foundationalWidths.breakPoints.mobile),
+                },
+                styles,
+            );
+        };
+
+        return {
+            noBleed,
+            tablet,
+            mobile,
+        };
+    };
+
     return {
         gutter,
         panel,
         main,
+        mediaQueries,
     };
 });
 

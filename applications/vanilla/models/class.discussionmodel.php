@@ -2308,9 +2308,11 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
                 } else {
                     // Inserting.
-                    if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
-                        $fields['Format'] = ($forcedFormat && $fields['Format'])
-                            ? $fields['Format']
+                    $format = $fields['Format'] ?? null;
+                    if (!$format || c('Garden.ForceInputFormatter')) {
+
+                        $fields['Format'] = ($forcedFormat && $format)
+                            ? $format
                             : c('Garden.InputFormatter', '');
                     }
 

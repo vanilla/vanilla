@@ -15,6 +15,8 @@ use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
@@ -177,6 +179,9 @@ class EmbedService implements EmbedCreatorInterface {
             // YouTube
             ->registerFactory($dic->get(YouTubeEmbedFactory::class))
             ->registerEmbed(YouTubeEmbed::class, YouTubeEmbed::TYPE)
+            // Panopto Vanilla quote embed.
+            ->registerFactory($dic->get(PanoptoEmbedFactory::class))
+            ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
             // Scrape-able Embeds
             ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)

@@ -10,6 +10,11 @@ import { useThrowError } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useContext } from "react";
 import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
+import SmartLink from "@library/routing/links/SmartLink";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@vanilla/i18n";
+import { DocumentationIcon } from "@library/icons/common";
+import { ThemeInfoDocs } from "@library/forms/themeEditor/ThemeInfoDocs";
 
 interface IProps {
     label: string;
@@ -17,6 +22,8 @@ interface IProps {
     children: React.ReactNode;
     inputWrapClass?: string;
     info?: React.ReactNode;
+    infoUrl?: string;
+    docUrl?: string;
 }
 
 interface IThemeBlockContext {
@@ -45,14 +52,19 @@ export function ThemeBuilderBlock(props: IProps) {
     const labelID = useUniqueID("themeBlockLabel");
     const classes = themeBuilderClasses();
     return (
-        <div className={classes.block}>
-            <label htmlFor={labelID} className={classes.label}>
-                {props.label}
-                {props.info && <ThemeInfoTooltip label={props.info} />}
-            </label>
-            <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
-                <ThemeBlockContext.Provider value={{ inputID, labelID }}>{props.children}</ThemeBlockContext.Provider>
-            </span>
-        </div>
+        <>
+            <div className={classes.block}>
+                <label htmlFor={labelID} className={classes.label}>
+                    {props.label}
+                    {props.info && <ThemeInfoTooltip label={props.info} href={props.infoUrl} small={true} />}
+                    {props.docUrl && <ThemeInfoDocs href={props.docUrl} />}
+                </label>
+                <span className={classNames(classes.inputWrap, props.inputWrapClass)}>
+                    <ThemeBlockContext.Provider value={{ inputID, labelID }}>
+                        {props.children}
+                    </ThemeBlockContext.Provider>
+                </span>
+            </div>
+        </>
     );
 }

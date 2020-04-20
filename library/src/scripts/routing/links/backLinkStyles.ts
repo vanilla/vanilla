@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, margins, negative, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, px } from "csx";
+import { important, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
@@ -54,6 +54,7 @@ const backLinkClasses = useThemeCache(() => {
                 left: negative(22),
                 right: globalVars.gutter.half,
             }),
+            transform: translateY("-0.1em"),
         },
         mediaQueries.oneColumnDown({
             ...margins({

@@ -951,3 +951,38 @@ if (!function_exists('\Gdn::config()->touch')) {
         Gdn::config()->touch($name, $default);
     }
 }
+
+if (!function_exists('attribute')) {
+    /**
+     * Takes an attribute (or array of attributes) and formats them in attribute="value" format.
+     *
+     * @param string|array $name The attribute array or the name of the attribute.
+     * @param mixed $valueOrExclude The value of the attribute or a prefix of attribute names to exclude.
+     * @return string Returns a string in attribute="value" format.
+     * @deprecated Use HtmlUtils::attributes() instead.
+     */
+    function attribute($name, $valueOrExclude = '') {
+        $return = '';
+        if (!is_array($name)) {
+            $name = [$name => $valueOrExclude];
+            $exclude = '';
+        } else {
+            $exclude = $valueOrExclude;
+        }
+
+        foreach ($name as $attribute => $val) {
+            if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
+                continue;
+            }
+
+            if (is_array($val) && strpos($attribute, 'data-') === 0) {
+                $val = json_encode($val);
+            }
+
+            if ($val != '' && $attribute != 'Standard') {
+                $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
+            }
+        }
+        return $return;
+    }
+}

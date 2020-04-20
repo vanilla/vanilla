@@ -46,7 +46,6 @@ export const textLinkCSS = () => {
         default: globalVars.links.colors.default,
     });
     mixinClickInput(".DataList .Item .Title a");
-    mixinClickInput(`.DataTable.DiscussionsTable a.Title`);
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
@@ -62,6 +61,7 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
     mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
     mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable.DiscussionsTable a.Title`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .InThisConversation a`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .PanelInThisDiscussion a`);
 

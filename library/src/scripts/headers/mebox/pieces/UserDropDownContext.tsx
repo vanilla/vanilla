@@ -21,12 +21,14 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import gdn from "@library/gdn";
 
 /**
  * Implements User Drop down for header
  */
 function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
+    const signOutUrl = gdn.meta.signOutUrl ?? `/entry/signout?target=${window.location.href}`;
     if (!userInfo) {
         return null;
     }
@@ -82,7 +84,7 @@ function UserDropDownContents(props: IProps) {
             <Permission permission={["site.manage", "settings.view"]}>
                 <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
             </Permission>
-            <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
+            <DropDownItemLink to={signOutUrl} name={t("Sign Out")} />
         </div>
     );
 }

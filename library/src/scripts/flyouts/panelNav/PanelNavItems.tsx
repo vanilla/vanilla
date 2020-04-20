@@ -93,7 +93,12 @@ export function PanelNavItems(props: IProps) {
                                     </DropDownItemButton>
                                 );
                             } else {
-                                return (
+                                return navItem.isLink ? (
+                                    <DropDownItemLink isActive={isActive} key={i} to={navItem.url}>
+                                        <span className={classes.text}>{navItem.name}</span>
+                                        <RightChevronIcon className={classes.arrow} />
+                                    </DropDownItemLink>
+                                ) : (
                                     <DropDownItemLink isActive={isActive} key={i} to={navItem.url}>
                                         {navItem.name}
                                     </DropDownItemLink>

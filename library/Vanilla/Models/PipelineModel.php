@@ -41,6 +41,15 @@ class PipelineModel extends Model implements InjectableInterface {
     }
 
     /**
+     * Add a database operations processor to the pipeline.
+     *
+     * @param Processor $processor
+     */
+    public function addPipelinePostProcessor(Processor $processor) {
+        $this->pipeline->addPostProcessor($processor);
+    }
+
+    /**
      * Get resource rows from a database table.
      *
      * @param array $where Conditions for the select query.

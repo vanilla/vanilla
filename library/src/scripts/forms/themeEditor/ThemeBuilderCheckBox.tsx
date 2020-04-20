@@ -8,6 +8,7 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import CheckBox from "@library/forms/Checkbox";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { ThemeInfoTooltip } from "@library/forms/themeEditor/ThemeInfoTooltip";
+import classNames from "classnames";
 
 interface IProps {
     variableKey: string;
@@ -22,7 +23,7 @@ export function ThemeBuilderCheckBox(props: IProps) {
     const { rawValue, generatedValue, setValue } = useThemeVariableField(variableKey);
 
     return (
-        <div className={classes.block}>
+        <div className={classNames(classes.block, "checkBoxBlock")}>
             <span className={classes.label}></span>
             <span className={classes.checkBoxWrap}>
                 <CheckBox

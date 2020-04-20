@@ -78,7 +78,9 @@ export default class SiteNavNode extends React.Component<IProps> {
                             tabIndex={0}
                             to={this.props.url}
                         >
-                            <span className={classes.label}>{this.props.name}</span>
+                            <span className={classNames(classes.label, this.props.isLink && classes.activeLink)}>
+                                {this.props.name}
+                            </span>
                         </SmartLink>
                     )}
                 </Hoverable>
@@ -110,7 +112,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible ? (
+                {collapsible && this.props.children.length > 0 ? (
                     <div
                         className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,

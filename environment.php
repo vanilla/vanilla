@@ -22,7 +22,7 @@ if (!defined('APPLICATION')) {
 if (!defined('APPLICATION_VERSION')) {
     // Rules for the versioning
     // {OSS version}-{Cloud release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', '4.0-2020.007-SNAPSHOT');
+    define('APPLICATION_VERSION', '4.0-2020.008-SNAPSHOT');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
@@ -70,6 +70,7 @@ date_default_timezone_set('UTC');
 if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding('UTF-8');
 }
+ini_set("default_charset", "UTF-8");
 
 // Include the core autoloader.
 if (!include_once PATH_ROOT.'/vendor/autoload.php') {

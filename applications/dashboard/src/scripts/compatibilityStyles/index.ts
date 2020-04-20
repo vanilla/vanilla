@@ -40,10 +40,12 @@ import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
-export const compatibilityStyles = useThemeCache(() => {
+export let compatibilityStyles: () => void;
+compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
@@ -99,29 +101,6 @@ export const compatibilityStyles = useThemeCache(() => {
         color: primary,
     });
 
-    cssOut(`a.Bookmark`, {
-        opacity: 1,
-        $nest: {
-            "&::before": {
-                color: primary,
-            },
-            "&:hover::before": {
-                color: colorOut(mainColors.secondary),
-            },
-        },
-    });
-
-    cssOut(
-        `
-        .Content a.Bookmarked::before,
-        .Content a.Bookmark::before,
-        .Content a.Bookmarking::before
-        `,
-        {
-            color: important(colorOut(mainColors.fg.fade(0.5)) as string),
-        },
-    );
-
     cssOut(".Box h4", { color: fg });
 
     cssOut(`.CategoryBox > .OptionsMenu`, {
@@ -132,10 +111,6 @@ export const compatibilityStyles = useThemeCache(() => {
         .About a,
         .Panel.Panel-main .PanelInfo a.ItemLink,
         `;
-
-    //.Panel.Panel-main .BoxFilter a,
-    //.Panel.Panel-main .FilterMenu a,
-    //.Panel.Panel-main .FilterMenu a,
 
     // Panel
     cssOut(panelSelectors, {
@@ -284,7 +259,7 @@ export const compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(vars.borderType.dropDowns.content),
+        ...borders(vars.borderType.dropDowns),
         overflow: "hidden",
     });
 
@@ -365,6 +340,8 @@ export const compatibilityStyles = useThemeCache(() => {
         display: "none",
     });
 
+    cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -381,6 +358,7 @@ export const compatibilityStyles = useThemeCache(() => {
     ideaCSS();
     tableCSS();
     discussionCSS();
+
     searchPageCSS();
     groupsCSS();
     profilePageCSS();

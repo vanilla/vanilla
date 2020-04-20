@@ -3,17 +3,42 @@
  * @license GPL-2.0-only
  */
 
-import ReactDOM from "react-dom";
 import React from "react";
-import { DropDownMenuIcon } from "@vanilla/library/src/scripts/icons/common";
+import ReactDOM from "react-dom";
+import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
 import { cssRule } from "typestyle";
 import { important } from "csx";
+import { iconClasses } from "@library/icons/iconClasses";
 
-export function applyCompatibilityIcons() {
+export function applyCompatibilityIcons(scope: HTMLElement | Document | undefined = document) {
+    if (scope === undefined) {
+        return;
+    }
+    // Cog Wheels
     cssRule(".Arrow.SpFlyoutHandle::before", { display: important("none") });
 
-    const cogWheels = document.querySelectorAll(".Arrow.SpFlyoutHandle");
+    const cogWheels = scope.querySelectorAll(".Arrow.SpFlyoutHandle:not(.compatIcons)");
     cogWheels.forEach(wheel => {
+        wheel.classList.add("compatIcons");
         ReactDOM.render(<DropDownMenuIcon />, wheel);
+    });
+
+    const docLinks = scope.querySelectorAll("a.documentationLink");
+    docLinks.forEach(doc => {
+        doc.classList.add("compatIcons");
+        ReactDOM.render(<DocumentationIcon />, doc);
+    });
+
+    // Bookmarks
+    cssRule(".Content a.Bookmark::before", {
+        display: important("none"),
+    });
+
+    const bookmarks = scope.querySelectorAll(".Bookmark:not(.compatIcons)");
+    const bookmarkLinkClass = iconClasses().bookmark();
+    bookmarks.forEach(bookmark => {
+        bookmark.classList.add(bookmarkLinkClass);
+        bookmark.classList.add("compatIcons");
+        ReactDOM.render(<BookmarkIcon />, bookmark);
     });
 }

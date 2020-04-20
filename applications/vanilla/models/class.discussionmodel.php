@@ -3669,7 +3669,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
-        $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
+        $result['type'] = !empty($result['type']) ? lcfirst($result['type']) : null;
 
         return $result;
     }

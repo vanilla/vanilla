@@ -8,7 +8,7 @@ import SelectOne, { IMenuPlacement, MenuPlacement } from "@library/forms/select/
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import React, { useEffect } from "react";
 import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 
@@ -17,10 +17,11 @@ interface IProps extends IMenuPlacement {
     options: IComboBoxOption[];
     disabled?: boolean;
     afterChange?: (value: string | null | undefined) => void;
+    forceDefaultKey?: string;
 }
 
 export function ThemeDropDown(_props: IProps) {
-    const { options, variableKey, disabled, afterChange } = _props;
+    const { options, variableKey, disabled, afterChange, forceDefaultKey } = _props;
     const { inputID, labelID } = useThemeBlock();
     const { generatedValue, initialValue, rawValue, setValue } = useThemeVariableField(variableKey);
 
@@ -37,13 +38,21 @@ export function ThemeDropDown(_props: IProps) {
     });
 
     const defaultOption = options.find(option => {
-        if (option.value === generatedValue) {
-            return true;
+        if (forceDefaultKey) {
+            return option.value === forceDefaultKey;
+        } else {
+            return option.value === generatedValue;
         }
     }) ?? {
         label: t("Unknown"),
         value: generatedValue,
     };
+
+    useEffect(() => {
+        if (afterChange) {
+            afterChange(defaultOption.value);
+        }
+    }, []);
 
     return (
         <>
@@ -63,7 +72,18 @@ export function ThemeDropDown(_props: IProps) {
                     onChange={onChange}
                 />
             </div>
-            <ThemeBuilderRevert variableKey={variableKey} />
+            <ThemeBuilderRevert
+                variableKey={variableKey}
+                afterChange={
+                    afterChange
+                        ? () => {
+                              afterChange(
+                                  selectedOption && selectedOption.value ? selectedOption.value.toString() : undefined,
+                              );
+                          }
+                        : undefined
+                }
+            />
         </>
     );
 }

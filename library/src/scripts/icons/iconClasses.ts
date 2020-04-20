@@ -4,9 +4,54 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { scale } from "csx";
-import { unit, colorOut, pointerEvents } from "@library/styles/styleHelpers";
+import { important, scale } from "csx";
+import { unit, colorOut, pointerEvents, ColorValues } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
+
+interface IPathState {
+    stroke?: ColorValues | StrokeProperty;
+    fill?: ColorValues | FillProperty;
+    opacity?: OpacityProperty;
+    strokeWidth?: StrokeWidthProperty<TLength>;
+}
+
+interface INestedPathState extends IPathState {
+    state?: IPathState;
+}
+
+interface IBookmarkLoading extends INestedPathState {
+    halfFill?: ColorValues | string;
+}
+
+export interface IBookmarkProps {
+    normalState: INestedPathState | undefined;
+    loadingState: IBookmarkLoading | undefined;
+    bookmarkedState: INestedPathState | undefined;
+}
+
+export const svgStyles = (props: INestedPathState | undefined, debug?: boolean) => {
+    if (props === undefined) {
+        return {};
+    }
+    let stroke = props.stroke;
+    if (stroke !== "none") {
+        stroke = props.stroke ? colorOut(props.stroke) : props.stroke;
+    }
+
+    let fill = props.fill;
+    if (fill !== "none") {
+        fill = props.fill ? colorOut(props.fill) : props.fill;
+    }
+
+    return {
+        stroke: stroke,
+        fill: fill,
+        strokeWidth: props.strokeWidth ? unit(props.strokeWidth) : undefined,
+        opacity: props.opacity,
+    };
+};
 
 export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
@@ -95,10 +140,19 @@ export const iconVariables = useThemeCache(() => {
         height: 10,
     });
 
-    const chevronLeftCompact = themeVars("chevronLeftCompact", {
-        width: 12,
-        height: 21,
-    });
+    const chevronLeftCompact = (isSmall?: boolean) => {
+        const defaultWidth = 12;
+        const defaultHeight = 21;
+        const smallHeight = 16; // width is calculated
+
+        const width = !isSmall ? defaultWidth : (smallHeight * defaultWidth) / defaultHeight;
+        const height = !isSmall ? defaultHeight : smallHeight;
+
+        return themeVars("chevronLeftCompact", {
+            width: width,
+            height: height,
+        });
+    };
 
     const selectedCategory = themeVars("selectedCategory", {
         width: 16.8,
@@ -136,6 +190,17 @@ export const iconVariables = useThemeCache(() => {
         opacity: 0.8,
     });
 
+    const documentation = themeVars("documentation", {
+        width: 12.6,
+        height: 16.02,
+    });
+
+    const bookmarkIcon = themeVars("bookmarkIcon", {
+        width: 12,
+        height: 16,
+        strokeWidth: 1,
+    });
+
     return {
         standard,
         newFolder,
@@ -161,13 +226,15 @@ export const iconVariables = useThemeCache(() => {
         categoryIcon,
         deleteIcon,
         editIcon,
+        documentation,
+        bookmarkIcon,
     };
 });
 
 export const iconClasses = useThemeCache(() => {
     const vars = iconVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("iconSizes");
+    const style = styleFactory("icon");
 
     const standard = style("defaultIcon", {
         ...pointerEvents(),
@@ -277,8 +344,18 @@ export const iconClasses = useThemeCache(() => {
 
     const chevronLeftCompact = style("chevronLeftCompact", {
         ...pointerEvents(),
-        width: unit(vars.chevronLeftCompact.width),
-        height: unit(vars.chevronLeftCompact.height),
+        width: unit(vars.chevronLeftCompact().width),
+        height: unit(vars.chevronLeftCompact().height),
+    });
+
+    const chevronLeftSmallCompact = style("chevronLeftSmallCompact", {
+        ...pointerEvents(),
+        $nest: {
+            [`&&, &.${chevronLeftCompact}`]: {
+                width: unit(vars.chevronLeftCompact(true).width),
+                height: unit(vars.chevronLeftCompact(true).height),
+            },
+        },
     });
 
     const selectedCategory = style("selectedCategory", {
@@ -359,6 +436,74 @@ export const iconClasses = useThemeCache(() => {
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
+    const documentation = style("documentation", {
+        ...pointerEvents(),
+        display: "block",
+        width: unit(vars.documentation.width),
+        height: unit(vars.documentation.height),
+    });
+
+    // Goes on link, not SVG to handle states
+    const bookmark = (
+        props: IBookmarkProps = {
+            normalState: undefined as undefined | INestedPathState,
+            loadingState: undefined as undefined | INestedPathState,
+            bookmarkedState: undefined as undefined | INestedPathState,
+        },
+    ) => {
+        const globalVars = globalVariables();
+        const mainColors = globalVars.mainColors;
+
+        const {
+            normalState = {
+                stroke: globalVars.mixPrimaryAndBg(0.7),
+                fill: "none",
+                state: {
+                    stroke: mainColors.primary,
+                },
+            },
+            loadingState = {
+                opacity: 0.7,
+                fill: mainColors.primary,
+                strokeWidth: 0,
+            },
+            bookmarkedState = {
+                stroke: mainColors.primary,
+                fill: mainColors.primary,
+            },
+        } = props;
+
+        return style("bookmark", {
+            width: unit(vars.bookmarkIcon.width),
+            height: unit(vars.bookmarkIcon.height),
+            opacity: 1,
+            display: "block",
+            position: "relative",
+            $nest: {
+                "& .svgBookmark": {
+                    ...pointerEvents(),
+                },
+                "& .svgBookmark-mainPath": svgStyles(normalState),
+                "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
+                "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+                "&:Bookmarking .svgBookmark-mainPath": svgStyles({
+                    fill: important("none"),
+                    opacity: loadingState.opacity,
+                }),
+                "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
+                "& .svgBookmark-loadingPath": {
+                    display: "none",
+                },
+                "&.Bookmarking .svgBookmark-loadingPath": {
+                    display: "block",
+                    ...svgStyles(loadingState, true),
+                },
+            },
+        });
+    };
+
     return {
         standard,
         newFolder,
@@ -380,6 +525,7 @@ export const iconClasses = useThemeCache(() => {
         closeCompact,
         closeTiny,
         chevronLeftCompact,
+        chevronLeftSmallCompact,
         selectedCategory,
         signIn,
         chevronUp,
@@ -391,5 +537,7 @@ export const iconClasses = useThemeCache(() => {
         globeIcon,
         isSmall,
         hamburger,
+        documentation,
+        bookmark,
     };
 });

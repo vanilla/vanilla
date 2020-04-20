@@ -69,7 +69,11 @@ export function LeftChevronIcon(props: { className?: string; "aria-hidden"?: are
     );
 }
 
-export function LeftChevronCompactIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function LeftChevronCompactIcon(props: {
+    className?: string;
+    "aria-hidden"?: areaHiddenType;
+    isSmall?: boolean;
+}) {
     const title = `<`;
     const classes = iconClasses();
     return (
@@ -839,7 +843,48 @@ export function ResetIcon(props: { className?: string; "aria-hidden"?: areaHidde
                 fillOpacity="0.7"
                 fillRule="evenodd"
                 d="M12 6c3.315 0 6 2.685 6 6s-2.685 6-6 6-6-2.685-6-6 2.685-6 6-6zm-.006 3a2.988 2.988 0 00-2.066.83l-.432-.43A.29.29 0 009 9.604v1.622c0 .16.13.29.29.29h1.622a.29.29 0 00.205-.495l-.505-.506a2.032 2.032 0 11.05 3.015.145.145 0 00-.198.006l-.48.48a.144.144 0 00.006.21A3 3 0 1011.994 9z"
-            ></path>
+            />
+        </svg>
+    );
+}
+
+export function DocumentationIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.documentation, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 11.795 15"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Documentation")}</title>
+            <path
+                fill="currentColor"
+                fillRule="evenodd"
+                d="M11.689,3.442,8.761.142A.429.429,0,0,0,8.443,0H.424A.424.424,0,0,0,0,.424V14.576A.424.424,0,0,0,.424,15H11.371a.424.424,0,0,0,.424-.424V3.724A.429.429,0,0,0,11.689,3.442ZM8.861,1.534,10.446,3.32H8.861Zm2.086,12.617H.848V.85H8.012v2.9a.424.424,0,0,0,.424.424h2.51v9.977ZM2.368,6.4a.424.424,0,0,0,.424.424H9a.425.425,0,0,0,0-.849H2.793a.425.425,0,0,0-.425.425ZM9,8.269H2.793a.425.425,0,1,0-.041.849H9a.425.425,0,0,0,0-.849Zm0,2.293H2.793a.424.424,0,0,0,0,.848H9a.424.424,0,0,0,0-.848Z"
+                style={{ fill: "currentColor", fillRule: "evenodd" }}
+            />
+        </svg>
+    );
+}
+
+export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    return (
+        <svg
+            className={classNames("svgBookmark", props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 12.733 16.394"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Bookmark")}</title>
+            <path
+                className={"svgBookmark-mainPath"}
+                d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
+            />
+            <path
+                d="M11.7,0.5H6.4v11.4c0.1,0,0.2,0,0.3,0.1l4.6,3.8c0.1,0.1,0.2,0.1,0.4,0.1c0.3,0,0.5-0.2,0.5-0.6V1.1C12.2,0.7,12,0.5,11.7,0.5z"
+                className={"svgBookmark-loadingPath"}
+            />
         </svg>
     );
 }

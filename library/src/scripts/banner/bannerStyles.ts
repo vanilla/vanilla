@@ -5,7 +5,7 @@
  */
 
 import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
-import { ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -28,7 +28,6 @@ import {
     importantUnit,
     isLightColor,
     modifyColorBasedOnLightness,
-    negative,
     textInputSizingFromFixedHeight,
     unit,
     unitIfDefined,
@@ -71,6 +70,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         hideTitle: false,
         hideSearch: false,
         searchPlacement: "middle" as SearchPlacement,
+        overlayTitleBar: true,
     });
     const compactSearchVars = compactSearchVariables(forcedVars);
 
@@ -470,6 +470,7 @@ export const bannerClasses = useThemeCache(
         const mediaQueries = layoutVariables().mediaQueries();
 
         const isCentered = vars.options.alignment === "center";
+
         const searchButton = style("searchButton", {
             $nest: {
                 "&.searchBar-submitButton": {
@@ -489,6 +490,7 @@ export const bannerClasses = useThemeCache(
                             vars.searchBar.sizing.height,
                             vars.searchBar.font.size,
                             vars.searchBar.border.width * 2,
+                            vars.searchBar.border.radius.left,
                         ),
                         boxSizing: "border-box",
                         paddingLeft: unit(searchBarVariables().searchIcon.gap),
@@ -861,6 +863,10 @@ export const bannerClasses = useThemeCache(
                 : {},
         );
 
+        const bannerContainer = style("bannerContainer", {
+            position: "relative",
+        });
+
         // Use this for cutting of the right image with overflow hidden.
         const overflowRightImageContainer = style("overflowRightImageContainer", {
             ...absolutePosition.fullSizeOfParent(),
@@ -925,6 +931,7 @@ export const bannerClasses = useThemeCache(
 
         return {
             root,
+            bannerContainer,
             overflowRightImageContainer,
             fullHeight,
             outerBackground,

@@ -17,6 +17,7 @@ class TestSmartIDMiddleware extends SmartIDMiddleware {
      * TestSmartIDMiddleware constructor.
      */
     public function __construct() {
+        $this->addFullSuffix('ID');
     }
 
     /**

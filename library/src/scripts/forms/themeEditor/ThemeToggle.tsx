@@ -12,10 +12,11 @@ interface IProps {
     variableKey: string;
     forcedValue?: boolean;
     afterChange?: (value: boolean) => void;
+    disabled?: boolean;
 }
 
 export function ThemeToggle(props: IProps) {
-    const { variableKey, forcedValue, afterChange } = props;
+    const { variableKey, forcedValue, afterChange, disabled } = props;
     const { generatedValue, setValue } = useThemeVariableField(variableKey);
     const { inputID, labelID } = useThemeBlock();
 
@@ -27,6 +28,7 @@ export function ThemeToggle(props: IProps) {
             labelID={labelID}
             slim
             enabled={value}
+            disabled={disabled}
             onChange={newValue => {
                 setValue(newValue);
                 afterChange?.(newValue);

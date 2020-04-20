@@ -2952,12 +2952,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         // Check to see if the search exactly matches a role name.
         $roleID = false;
-        if (strtolower($keywords) == 'banned') {
-            $this->SQL->where('u.Banned >', 0);
-        } else {
-            $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
+        if ($keywords !== "") {
+            if (strtolower($keywords) == 'banned') {
+                $this->SQL->where('u.Banned >', 0);
+            } else {
+                $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
+            }
         }
-
         if (isset($where)) {
             $this->SQL->where($where, null, false);
         }
@@ -4559,6 +4560,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             ->setButton($url, t('Confirm My Email Address'));
 
         $email->setEmailTemplate($emailTemplate);
+
+        // Apply rate limiting
+        self::rateLimit($user);
 
         try {
             $email->send();

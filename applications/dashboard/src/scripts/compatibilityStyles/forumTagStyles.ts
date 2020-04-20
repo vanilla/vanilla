@@ -46,6 +46,7 @@ export const forumTagCSS = () => {
         textDecoration: important("none"),
     });
 
+    mixinTag(`.TagCloud a`);
     mixinTag(`.Tag`);
     mixinTag(`.DataTableWrap a.Tag`);
     mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a.Tag`);

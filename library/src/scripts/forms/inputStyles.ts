@@ -66,7 +66,11 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
         font: merge(inputVars.font, vars?.font ?? {}),
         colors: merge(inputVars.colors, vars?.colors ?? {}),
-        border: merge(inputVars.border, vars?.border ?? {}),
+        border: {
+            ...EMPTY_BORDER,
+            ...inputVars.border,
+            ...(vars?.border ?? {}),
+        },
     };
 
     const { sizing, font, colors, border } = variables;
@@ -88,6 +92,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({
+                    ...border,
                     color: colors.state.fg,
                 }),
             },

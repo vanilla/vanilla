@@ -18,13 +18,15 @@ import {
     importantUnit,
 } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
+import { toolTipClasses } from "@library/toolTip/toolTipStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
     // Intentionally not overwritable with theming system.
-    const fontFamily = ["Open Sans"];
+    const fontFamily = [defaultFontFamily];
 
     const mainColors = {
         primary: color("#0291db"),
@@ -170,6 +172,11 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...paddings({
             horizontal: unit(vars.panel.padding),
         }),
+        $nest: {
+            "&.checkBoxBlock + .checkBoxBlock": {
+                marginTop: negativeUnit(8),
+            },
+        },
     });
 
     const label = style("label", {
@@ -296,7 +303,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         textAlign: "right",
     });
 
-    const tooltip = style("tooltip", {
+    const blockInfo = style("blockInfo", {
         ...flexHelper().middle(),
         marginLeft: globalVars.gutter.half,
         $nest: {
@@ -317,6 +324,41 @@ export const themeBuilderClasses = useThemeCache(() => {
         marginBottom: "auto",
     });
 
+    const documentationIconLink = style("documentationIconLink", {
+        ...clickableItemStates({ skipDefault: true }),
+        color: "inherit",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    });
+
+    const docBlockTextContainer = style("docBlockTextContainer", {
+        display: "block",
+        ...fonts({
+            size: 12,
+            color: globalVars.meta.text.color,
+            lineHeight: globalVars.meta.lineHeights.default,
+        }),
+        padding: 0,
+        ...margins({
+            top: unit(-3),
+            bottom: 8,
+        }),
+    });
+
+    const small = style("small", {
+        $nest: {
+            [`& .${toolTipClasses().noPointerTrigger}`]: {
+                minWidth: 20,
+                minHeight: 20,
+            },
+        },
+    });
+
+    const iconLink = style("iconLink", {
+        marginLeft: unit(8),
+    });
+
     return {
         root,
         block,
@@ -334,7 +376,11 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSectionTitle,
         invalidField,
         colorErrorMessage,
-        tooltip,
+        blockInfo,
         resetButton,
+        documentationIconLink,
+        docBlockTextContainer,
+        small,
+        iconLink,
     };
 });

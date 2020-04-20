@@ -890,6 +890,7 @@ $Construct
     ->column("reactionValue", "int", false)
     ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
+    ->column('foreignID', 'varchar(32)', true, 'index')
     ->set($Explicit, $Drop);
 
 $Construct

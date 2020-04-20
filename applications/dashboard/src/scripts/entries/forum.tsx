@@ -42,12 +42,7 @@ Router.addRoutes([
 
 applySharedPortalContext(props => {
     return (
-        <AppContext
-            variablesOnly={
-                !getMeta("themeFeatures.DataDrivenTheme", false) && !getMeta("themeFeatures.SharedMasterView", false)
-            }
-            errorComponent={ErrorPage}
-        >
+        <AppContext variablesOnly errorComponent={ErrorPage}>
             {props.children}
         </AppContext>
     );
@@ -64,5 +59,9 @@ if (getMeta("themeFeatures.DataDrivenTheme", false)) {
     onReady(() => {
         compatibilityStyles();
         applyCompatibilityIcons();
+
+        $(document).on("contentLoad", function(e) {
+            applyCompatibilityIcons(e.target && e.target.parentElement ? e.target.parentElement : undefined);
+        });
     });
 }

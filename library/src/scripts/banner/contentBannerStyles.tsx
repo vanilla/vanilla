@@ -31,6 +31,7 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
         enabled: false,
         alignment: BannerAlignment.CENTER,
         mobileAlignment: BannerAlignment.LEFT,
+        overlayTitleBar: false,
     });
 
     const contentContainer = makeVars("contentContainer", {

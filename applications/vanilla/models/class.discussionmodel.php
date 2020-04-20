@@ -2244,6 +2244,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
             // If the post is new and it validates, make sure the user isn't spamming
             if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
+                $forcedFormat = $formPostValues['forcedFormat'] ?? false;
                 // Get all fields on the form that relate to the schema
                 $fields = $this->Validation->schemaValidationFields();
 
@@ -2308,7 +2309,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                 } else {
                     // Inserting.
                     if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
-                        $forcedFormat = $fields['forcedFormat'] ?? false;
                         $fields['Format'] = ($forcedFormat && $fields['Format'])
                             ? $fields['Format']
                             : c('Garden.InputFormatter', '');

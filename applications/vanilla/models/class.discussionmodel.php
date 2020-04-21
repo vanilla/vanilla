@@ -8,7 +8,6 @@
  * @since 2.0
  */
 
-use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;

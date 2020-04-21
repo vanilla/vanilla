@@ -633,6 +633,12 @@ if (!function_exists('cssClass')) {
             }
         }
 
+        if (array_key_exists('imageSource', $row)) {
+            $cssClass .= " hasPhotoWrap";
+        } else {
+            $cssClass .= " noPhotoWrap";
+        }
+
         return trim($cssClass);
     }
 }

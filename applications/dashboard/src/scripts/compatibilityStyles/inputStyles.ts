@@ -6,6 +6,7 @@
  */
 
 import {
+    absolutePosition,
     borders,
     colorOut,
     getHorizontalPaddingForTextInput,
@@ -13,6 +14,7 @@ import {
     importantUnit,
     margins,
     negative,
+    negativeUnit,
     textInputSizingFromFixedHeight,
     unit,
 } from "@library/styles/styleHelpers";
@@ -21,6 +23,8 @@ import { calc, important, percent, translateY } from "csx";
 import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { inputVariables, inputMixin } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { mixinTextLinkNoDefaultLinkAppearance } from "@dashboard/compatibilityStyles/textLinkStyles";
+import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 
 export const inputCSS = () => {
     wrapSelects();
@@ -74,7 +78,6 @@ export const inputCSS = () => {
     );
 
     cssOut(`div.token-input-dropdown`, {
-        // outline: `solid ${unit(globalVars.border.width * 2)} ${colorOut(globalVars.mainColors.primary)}`,
         ...borders(globalVars.borderType.dropDowns),
         transform: translateY(unit(globalVars.border.width) as string),
     });
@@ -90,8 +93,6 @@ export const inputCSS = () => {
     mixinInputStyles("textarea");
     mixinInputStyles("input.InputBox");
     mixinInputStyles(".InputBox");
-    // mixinInputStyles(".AdvancedSearch select");
-    // mixinInputStyles("select");
     mixinInputStyles(".InputBox.BigInput");
     mixinInputStyles("ul.token-input-list, div.Popup .Body ul.token-input-list");
     mixinInputStyles(`
@@ -253,6 +254,11 @@ export const inputCSS = () => {
         }),
     });
 
+    cssOut(`.EventTime`, {
+        display: "flex",
+        flexWrap: "nowrap",
+    });
+
     cssOut(`.InputBox.DatePicker`, {
         flexGrow: 1,
         minWidth: unit(200),
@@ -260,6 +266,78 @@ export const inputCSS = () => {
         ...margins({
             all: globalVars.meta.spacing.default,
         }),
+    });
+
+    const formSpacer = 8;
+
+    cssOut(`.StructuredForm .P`, {
+        ...margins({
+            vertical: globalVars.gutter.size,
+            horizontal: 0,
+        }),
+    });
+
+    cssOut(`.EventTime`, {
+        ...margins({
+            left: negativeUnit(formSpacer),
+        }),
+        width: calc(`100% + ${unit(formSpacer * 2)}`), // 2 inputs side by side
+    });
+
+    cssOut(`.EventTime .From, .EventTime .To`, {
+        position: "relative",
+        boxSizing: "border-box",
+        width: calc(`50% - ${unit(formSpacer * 2)}`),
+        ...margins({
+            top: 0,
+            horizontal: formSpacer,
+        }),
+    });
+
+    cssOut(`.Event.add .DatePicker, .Event.edit .DatePicker`, {
+        paddingRight: unit(36),
+        ...margins({
+            horizontal: 0,
+            vertical: formSpacer,
+        }),
+    });
+
+    cssOut(`.EventTime.Times .Timebased.EndTime`, {
+        ...margins({
+            top: formSpacer,
+            bottom: 0,
+            horizontal: 0,
+        }),
+    });
+
+    mixinTextLinkNoDefaultLinkAppearance(`.EventTime.Times .Timebased.NoEndTime a`);
+
+    cssOut(`.EventTime.Times .Timebased.NoEndTime a`, {
+        color: colorOut(globalVars.mainColors.fg),
+        fontSize: unit(20),
+        cursor: "pointer",
+    });
+
+    cssOut(`.js-datetime-picker`, {
+        margin: 0,
+        width: percent(100),
+    });
+
+    cssOut(`.InputBox.InputBox.InputBox.TimePicker`, {
+        flexGrow: 1,
+        width: percent(100),
+        ...margins({
+            all: 0,
+        }),
+    });
+
+    cssOut(`.EventTime.Times.Both .Timebased.NoEndTime`, {
+        ...absolutePosition.topRight(0, 6),
+    });
+
+    cssOut(`.StructuredForm input.hasDatepicker, .StructuredForm input.hasDatepicker:focus`, {
+        backgroundPosition: "99% 50%", // Intentional, to have fallback in case `calc` is not supported
+        backgroundPositionX: calc(`100% - ${unit(5)}`),
     });
 };
 

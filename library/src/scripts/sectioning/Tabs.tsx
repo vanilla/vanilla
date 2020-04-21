@@ -1,10 +1,9 @@
 import React, { ReactElement, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
-import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/TabStyles";
+import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { ErrorIcon, WarningIcon } from "@library/icons/common";
+import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 

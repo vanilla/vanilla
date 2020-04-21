@@ -888,3 +888,22 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
         </svg>
     );
 }
+
+export function NewActionIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.newAction)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 56 56"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("NewAction")}</title>
+            <circle cx="28" cy="28" r="28" className={classNames(classes.newActionCircle)} />
+            <path
+                d="M28,20a1,1,0,0,1,1,1v6h6a1,1,0,0,1,.993.883L36,28a1,1,0,0,1-1,1H29v6a1,1,0,0,1-.883.993L28,36a1,1,0,0,1-1-1V29H21a1,1,0,0,1-.993-.883L20,28a1,1,0,0,1,1-1h6V21a1,1,0,0,1,.883-.994Z"
+                className={classNames(classes.newActionPath)}
+            />
+        </svg>
+    );
+}

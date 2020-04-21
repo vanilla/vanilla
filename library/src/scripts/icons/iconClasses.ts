@@ -201,6 +201,11 @@ export const iconVariables = useThemeCache(() => {
         strokeWidth: 1,
     });
 
+    const newActionIcon = themeVars("newActionIcon", {
+        width: 56,
+        height: 56,
+    });
+
     return {
         standard,
         newFolder,
@@ -228,6 +233,7 @@ export const iconVariables = useThemeCache(() => {
         editIcon,
         documentation,
         bookmarkIcon,
+        newActionIcon,
     };
 });
 
@@ -504,6 +510,19 @@ export const iconClasses = useThemeCache(() => {
         });
     };
 
+    const newAction = style("newAction", {
+        width: unit(vars.newActionIcon.width),
+        height: unit(vars.newActionIcon.height),
+    });
+
+    const newActionCircle = style("newActionCircle", {
+        fill: colorOut(globalVars.mainColors.primary),
+    });
+
+    const newActionPath = style("newActionPath", {
+        fill: colorOut(globalVars.mainColors.primaryContrast),
+    });
+
     return {
         standard,
         newFolder,
@@ -539,5 +558,8 @@ export const iconClasses = useThemeCache(() => {
         hamburger,
         documentation,
         bookmark,
+        newAction,
+        newActionCircle,
+        newActionPath,
     };
 });

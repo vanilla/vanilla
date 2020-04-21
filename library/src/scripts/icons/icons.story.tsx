@@ -320,6 +320,12 @@ story.add("Icons", () => {
                     <RevisionStatusPublishedIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
+            <StoryHeading>ActionFlyout</StoryHeading>
+            <StoryTiles>
+                <StoryTileAndTextCompact text={`NewActionIcon`}>
+                    <CommonIcons.NewActionIcon />
+                </StoryTileAndTextCompact>
+            </StoryTiles>
         </StoryContent>
     );
 });

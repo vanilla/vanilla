@@ -84,6 +84,7 @@ export const tabStandardClasses = useThemeCache(() => {
             flexDirection: "column",
             justifyContent: "stretch",
             height: calc(`100% - ${unit(vars.navHeight.height)}`),
+            overflow: "hidden",
         },
         mediaQueries.oneColumnDown({
             height: calc(`100% - ${unit(titleBarVars.sizing.mobile.height)}`),

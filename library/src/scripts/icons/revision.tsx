@@ -8,7 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { CheckCompactIcon } from "./common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 const currentColorFill = {
     fill: "currentColor",

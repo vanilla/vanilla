@@ -18,8 +18,7 @@ import { border, calc, color, em, important, percent, scale, translateX } from "
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
-import { iconVariables } from "@library/icons/iconClasses";
+import { iconVariables } from "@library/icons/iconStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const storyBookVariables = useThemeCache(() => {

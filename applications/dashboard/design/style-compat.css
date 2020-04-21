@@ -2124,4 +2124,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 5px 0;
 }
 
+svg {
+  pointer-events: none !important;
+}
+
 /*# sourceMappingURL=style-compat.css.map */

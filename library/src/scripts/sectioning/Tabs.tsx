@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { ErrorIcon, WarningIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 
 interface IData {

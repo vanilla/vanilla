@@ -17,6 +17,8 @@ import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
 import { formatDate, parseDate } from "react-day-picker/moment";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
+import RelativePortal from "react-relative-portal";
+import DayPicker, { DayPickerInputProps } from "react-day-picker";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -178,9 +180,11 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
             isRightAligned: this.props.alignment === "right",
         });
         return (
-            <div className={classNames("dropDown", classes.root)} {...props}>
-                <div className={contentsClasses}>{children}</div>
-            </div>
+            <RelativePortal component="div" top={0} right={0}>
+                <div className={classNames("dropDown", classes.root)} {...props}>
+                    <div className={contentsClasses}>{children}</div>
+                </div>
+            </RelativePortal>
         );
     };
 

@@ -272,7 +272,7 @@ export const inputCSS = () => {
 
     cssOut(`.StructuredForm .P`, {
         ...margins({
-            vertical: 15,
+            vertical: globalVars.gutter.size,
             horizontal: 0,
         }),
     });

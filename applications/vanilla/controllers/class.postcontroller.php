@@ -455,8 +455,9 @@ class PostController extends VanillaController {
         // Verify we can add to the category content
         $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
 
-        if (c('Garden.ForceInputFormatter')) {
-            $this->Form->removeFormValue('Format');
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            $format = Gdn::config('Garden.InputFormatter', '');
+            $this->Form->setFormValue('Format', $format);
         }
 
         $this->setData('_CancelUrl', discussionUrl($this->data('Discussion')));
@@ -987,8 +988,9 @@ class PostController extends VanillaController {
         // Normalize the edit data.
         $this->applyFormatCompatibility($this->Comment, 'Body', 'Format');
 
-        if (c('Garden.ForceInputFormatter')) {
-            $this->Form->removeFormValue('Format');
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            $format = Gdn::config('Garden.InputFormatter', '');
+            $this->Form->setFormValue('Format', $format);
         }
 
         $this->View = 'editcomment';

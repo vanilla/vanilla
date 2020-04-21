@@ -10,12 +10,11 @@ import React, { useLayoutEffect } from "react";
 import { useThrowError } from "@vanilla/react-utils";
 import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 
-
 interface IProps extends IBaseEmbedProps {
-    sessionId: string,
-    domain: string,
-    width: number,
-    height: number
+    sessionId: string;
+    domain: string;
+    width: number;
+    height: number;
 }
 
 const PANOPTO_SCRIPT = "https://developers.panopto.com/scripts/embedapi.min.js";
@@ -42,15 +41,17 @@ export function PanoptoEmbed(props: IProps): JSX.Element {
                         data-height={props.height}
                         data-width={props.width}
                     >
-                        <div id={"player-" + props.sessionId}>
-                        </div>
+                        <div id={"player-" + props.sessionId}></div>
                     </div>
                 </EmbedContent>
             </EmbedContainer>
         </>
-    )
+    );
 }
 
+/**
+ * Convert all of the Panopto embeds in the page.
+ */
 async function convertPanoptoEmbeds() {
     const panoptoEmbeds = Array.from(document.querySelectorAll(".panopto-media"));
 
@@ -62,17 +63,28 @@ async function convertPanoptoEmbeds() {
     }
 }
 
+/**
+ * Render a single Panopto embed.
+ */
 async function renderPanoptoEmbed(element: HTMLElement) {
     const sessionId = element.getAttribute("data-sessionid");
+    if (sessionId == null) {
+        throw new Error("Attempted to embed a Panopto video but the sessionId could not be found.");
+    }
+
+    const domain = element.getAttribute("data-domain");
+    if (domain == null) {
+        throw new Error("Attempted to embed a Panopto video but the domain could not be found.");
+    }
+
     const height = element.getAttribute("data-height");
     const width = element.getAttribute("data-width");
-    const domain = element.getAttribute("data-domain");
 
     let embedApi = new window.EmbedApi("player-" + sessionId, {
         width: width,
         height: height,
         serverName: domain,
-        sessionId: sessionId
+        sessionId: sessionId,
     });
 
     embedApi.loadVideo();

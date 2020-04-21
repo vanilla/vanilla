@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 const currentColorFill = {
     fill: "currentColor",

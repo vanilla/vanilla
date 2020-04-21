@@ -10,7 +10,7 @@ import { embedErrorClasses } from "@library/embeddedContent/embedErrorStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
 import classNames from "classnames";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 interface IProps {
     url: string;

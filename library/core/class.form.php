@@ -2266,6 +2266,12 @@ PASSWORDMETER;
             $attributes['class'] = $this->translateClasses($cssClass);
         }
 
+        // Add css class for wysiwyg
+        $isWysiwig = c('Garden.InputFormatter') === 'Wysiwyg';
+        if ($isWysiwig) {
+            $attributes['class'] .= ' isWysiwig';
+        }
+
         // Add error class to input element
         if ($showErrors) {
             $this->addErrorClass($attributes);

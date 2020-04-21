@@ -27,6 +27,7 @@ interface IThemeBuilderContext {
     variableErrors: IThemeVariables;
     setVariableValue: (variableKey: string, value: any) => void;
     setVariableError: (variableKey: string, value: any) => void;
+    variableStatus: boolean;
 }
 
 type IProps = Pick<IThemeBuilderContext, "rawThemeVariables"> & {
@@ -46,6 +47,7 @@ const context = React.createContext<IThemeBuilderContext>({
     variableErrors: {},
     setVariableValue: () => {},
     setVariableError: () => {},
+    variableStatus: false,
 });
 
 /**
@@ -84,13 +86,14 @@ export function ThemeBuilderContextProvider(props: IProps) {
     const { rawThemeVariables, onChange } = props;
     const defaultThemeVariables = useMemo(() => variableGenerator({}), []);
     const generatedThemeVariables = variableGenerator(rawThemeVariables);
-
     const rawValueRef = useRef<IThemeVariables>(rawThemeVariables);
 
     // Lock the value to the one on first render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
     const initialThemeVariables = useMemo(() => cloneDeep(rawThemeVariables), []);
     const [errors, setErrors] = useState<IThemeVariables>({});
+    const [variableStatus, setVariableChanged] = useState<boolean>(false);
 
     const calculateNewErrors = (variableKey: string, error: string | null) => {
         let newErrors = cloneDeep(errors);
@@ -121,7 +124,6 @@ export function ThemeBuilderContextProvider(props: IProps) {
         } else {
             cloned = set(cloned, variableKey, value);
         }
-
         onChange(cloned, hasErrors);
     };
 
@@ -135,6 +137,7 @@ export function ThemeBuilderContextProvider(props: IProps) {
                 variableErrors: errors,
                 setVariableValue,
                 setVariableError,
+                variableStatus,
             }}
         >
             {props.children}

@@ -107,7 +107,7 @@ export const groupsCSS = () => {
         },
     });
 
-    cssOut(`.Group-Header.NoBanner .Photo.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
+    cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
         position: "relative",
         top: "auto",
         float: "none",

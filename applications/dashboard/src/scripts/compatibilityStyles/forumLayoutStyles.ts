@@ -227,12 +227,6 @@ export const forumLayoutCSS = () => {
 
     cssOut(`.Container`, containerMainStyles() as NestedCSSProperties);
 
-    cssOut(`.Frame-contentWrap`, {
-        // ...paddings({
-        //     all: globalVars.gutter.half,
-        // }),
-    });
-
     cssOut(`.Frame-row`, {
         display: "flex",
         flexWrap: "nowrap",

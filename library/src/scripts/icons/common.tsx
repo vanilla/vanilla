@@ -880,6 +880,7 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
             <title>{t("Bookmark")}</title>
             <path
                 className={"svgBookmark-mainPath"}
+                strokeWidth={2}
                 d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
             />
             <path

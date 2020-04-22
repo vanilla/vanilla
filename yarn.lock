@@ -8189,7 +8189,7 @@ executable@^4.1.0:
   dependencies:
     pify "^2.2.0"
 
-exenv@^1.2.2:
+exenv@^1.2.1, exenv@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/exenv/-/exenv-1.2.2.tgz#2ae78e85d9894158670b03d47bec1f03bd91bb9d"
   integrity sha1-KueOhdmJQVhnCwPUe+wfA72Ru50=
@@ -15962,6 +15962,15 @@ react-refresh@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.6.0.tgz#81971b8f3c8c05aaa6ce87491ae41b396133f896"
   integrity sha512-Wv48N+GFt6Azvtl/LMvzNW9hvEyJdRQ48oVKIBAN7hjtvXXfxfVJXbPl/11SM1C/NIquIFXzzWCo6ZNH0I8I4g==
+
+react-relative-portal@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/react-relative-portal/-/react-relative-portal-1.8.0.tgz#fa774fc6d202d818f8403e0c1b5f94a7ec28de91"
+  integrity sha512-pSyaWbtOeSrIQxpKdGt0oZL1bjCNzr/6IdzQCbN+6pRyoAJZD5dAYTmwh2Aav7bupNInQoVS3MySw01ZvSgERw==
+  dependencies:
+    exenv "^1.2.1"
+    lodash.throttle "^4.1.1"
+    prop-types "^15.6.0"
 
 react-router-dom@^5.1.0:
   version "5.1.2"

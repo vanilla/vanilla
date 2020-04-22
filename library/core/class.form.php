@@ -2267,9 +2267,9 @@ PASSWORDMETER;
         }
 
         // Add css class for wysiwyg
-        $isWysiwig = c('Garden.InputFormatter') === 'Wysiwyg';
-        if ($isWysiwig) {
-            $attributes['class'] .= ' isWysiwig';
+        $isWysiwyg = c('Garden.InputFormatter') === 'Wysiwyg';
+        if ($isWysiwyg) {
+            $attributes['class'] .= ' isWysiwyg';
         }
 
         // Add error class to input element

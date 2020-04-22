@@ -15,7 +15,7 @@ import { useBannerContainerDivRef } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { useDebugValue } from "react";
+import React from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -43,13 +43,15 @@ export default function Banner(props: IProps) {
     const device = useDevice();
     const bannerContextRef = useBannerContainerDivRef();
 
-    const { action, className, title, isContentBanner } = props;
+    const { action, className, isContentBanner } = props;
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
     const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
     const { options } = vars;
+
+    const { title = vars.title.text } = props;
 
     useComponentDebug({ vars });
 
@@ -181,7 +183,7 @@ export default function Banner(props: IProps) {
                                 {!!logoImageSrc && (
                                     <div className={classes.logoSpacer}>
                                         <div className={classes.logoContainer}>
-                                            {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
+                                            {/*We rely on the       for screen readers as we don't yet have alt text hooked up to image*/}
                                             <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
                                         </div>
                                     </div>

@@ -47,7 +47,7 @@ trait FsThemeMissingTrait {
     /**
      * @inheritdoc
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
         return [];
     }
@@ -63,7 +63,7 @@ trait FsThemeMissingTrait {
     /**
      * @inheritdoc
      */
-    public function sparseAsset(int $themeID, string $assetKey, string $data): array {
+    public function sparseAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
         return [];
     }

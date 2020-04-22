@@ -504,12 +504,15 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface {
             }
         }
 
+        $this->orderBy('c.'.$sort);
+        $orderBy = $this->orderBy();
+
         $query = $this->SQL
             ->select('c.*')
             ->select('d.CategoryID')
             ->from('Comment c')
             ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->orderBy('c.'.$sort, $order);
+            ->orderBy($orderBy[0][0], $order);
         if (!empty($where)) {
             $query->where($where);
         }

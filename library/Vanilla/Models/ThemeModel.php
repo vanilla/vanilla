@@ -503,6 +503,13 @@ class ThemeModel {
         return $provider->deleteAsset($themeKey, $assetKey);
     }
 
+    /**
+     * Get theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     * @throws ClientException
+     */
     public function getThemeRevisions(int $themeKey): array {
         $provider = $this->getThemeProvider($themeKey);
         $revisions = $provider->getThemeRevisions($themeKey);

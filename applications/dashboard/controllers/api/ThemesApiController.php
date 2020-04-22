@@ -78,9 +78,9 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a theme assets.
+     * Get a theme revisions.
      *
-     * @param string $themeKey The unique theme key or theme ID.
+     * @param int $themeID The unique theme key or theme ID.
      * @return array
      */
     public function get_revisions(int $themeID): array {

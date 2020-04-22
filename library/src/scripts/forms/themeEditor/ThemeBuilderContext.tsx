@@ -65,8 +65,8 @@ export function useThemeVariableField<T>(variableKey: string) {
         initialValue: get(context.initialThemeVariables, variableKey, undefined) as T | null | undefined,
         generatedValue: get(context.generatedThemeVariables, variableKey, undefined) as T | null | undefined,
         error: get(context.variableErrors, variableKey, undefined) as string | null | undefined,
-        setValue: (value: T | null | undefined, allowNull = false) => {
-            context.setVariableValue(variableKey, value, allowNull);
+        setValue: (value: T | null | undefined, allowEmpty = false) => {
+            context.setVariableValue(variableKey, value, allowEmpty);
         },
         setError: (value: T | null) => {
             context.setVariableError(variableKey, value);
@@ -109,13 +109,13 @@ export function ThemeBuilderContextProvider(props: IProps) {
         onChange(rawValueRef.current, hasErrors);
     };
 
-    const setVariableValue = (variableKey: string, value: any, allowNull: boolean = false) => {
+    const setVariableValue = (variableKey: string, value: any, allowEmpty: boolean = false) => {
         const newErrors = calculateNewErrors(variableKey, null);
         const hasErrors = getErrorCount(newErrors) > 0;
         let cloned = cloneDeep(rawValueRef.current);
         rawValueRef.current = cloned;
 
-        if ((value === "" || value === undefined) && !allowNull) {
+        if ((value === "" || value === undefined) && !allowEmpty) {
             // Null does not clear this. Null is a valid value.
             unset(cloned, variableKey);
         } else {

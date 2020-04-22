@@ -503,6 +503,15 @@ class ThemeModel {
         return $provider->deleteAsset($themeKey, $assetKey);
     }
 
+    public function getThemeRevisions(int $themeKey): array {
+        $provider = $this->getThemeProvider($themeKey);
+        $revisions = $provider->getThemeRevisions($themeKey);
+        foreach ($revisions as &$revision) {
+            $revision = $this->normalizeTheme($revision);
+        }
+        return $revisions;
+    }
+
     /**
      * Basic input string validation function for html and json assets
      *

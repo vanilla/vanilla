@@ -80,6 +80,22 @@ class ThemesApiController extends AbstractApiController {
     /**
      * Get a theme assets.
      *
+     * @param string $themeKey The unique theme key or theme ID.
+     * @return array
+     */
+    public function get_revisions(int $themeID): array {
+        $this->permission();
+        $in = $this->schema([], 'in');
+        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
+
+        $themeRevisions = $this->themeModel->getThemeRevisions($themeID);
+        $result = $out->validate($themeRevisions);
+        return $result;
+    }
+
+    /**
+     * Get a theme assets.
+     *
      * @return array
      */
     public function index(): array {

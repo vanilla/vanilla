@@ -36,6 +36,33 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'revisionID:i?',
+                'active:b?',
+                'current:b?',
+                'parentTheme:s?',
+                'assets?' => $this->assetsSchema(),
+                'supportedSections:a',
+                'features' => new InstanceValidatorSchema(ThemeFeatures::class),
+                'preview?' => [":a" => $this->assetsPreviewSchema()]
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    /**
+     * Result theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    private function themeRevisionsSchema(string $type = 'out'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'themeID:s',
+                'type:s',
+                'name:s?',
+                'version:s?',
+                'revisionID:i?',
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),

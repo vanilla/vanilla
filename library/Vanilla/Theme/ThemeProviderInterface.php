@@ -153,4 +153,12 @@ interface ThemeProviderInterface {
      * @return bool
      */
     public function themeExists($themeKey): bool;
+
+    /**
+     * Get list of theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     */
+    public function getThemeRevisions(int $themeKey): array;
 }

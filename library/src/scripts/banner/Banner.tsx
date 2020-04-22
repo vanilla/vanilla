@@ -183,7 +183,7 @@ export default function Banner(props: IProps) {
                                 {!!logoImageSrc && (
                                     <div className={classes.logoSpacer}>
                                         <div className={classes.logoContainer}>
-                                            {/*We rely on the       for screen readers as we don't yet have alt text hooked up to image*/}
+                                            {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
                                             <img className={classes.logo} src={logoImageSrc} aria-hidden={true} />
                                         </div>
                                     </div>

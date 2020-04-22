@@ -63,7 +63,8 @@ class ThemesApiController extends AbstractApiController {
         $this->permission();
         $out = $this->themeResultSchema('out');
         $in = $this->schema([
-            'allowAddonVariables:b?'
+            'allowAddonVariables:b?',
+            'revisionID:i?'
         ]);
         $params = $in->validate($query);
 
@@ -71,7 +72,7 @@ class ThemesApiController extends AbstractApiController {
             $this->themeModel->clearVariableProviders();
         }
 
-        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey);
+        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey, $query);
         $result = $out->validate($themeWithAssets);
         return $result;
     }

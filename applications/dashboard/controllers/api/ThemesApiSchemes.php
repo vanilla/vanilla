@@ -35,6 +35,7 @@ trait ThemesApiSchemes {
                 'type:s',
                 'name:s?',
                 'version:s?',
+                'revisionID:i?',
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),

@@ -430,14 +430,15 @@ class ThemeModel {
      * Set theme asset (update existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.
+     * @param int $revisionID Theme revision ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      * @param string $data Data content for asset to set
      *
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
-        $asset = $provider->setAsset($themeID, $assetKey, $data);
+        $asset = $provider->setAsset($themeID, $revisionID, $assetKey, $data);
         return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 

@@ -351,7 +351,7 @@ jQuery(document).ready(function($) {
         $(btn).closest('.CommentForm, .EditCommentForm').remove();
         $container.removeClass('Editing');
         $container.find(".ToggleFlyout.OptionsMenu").removeClass("Open");
-        $container.find('.Flyout.MenuItems').css('display',"").attr("aria-hidden", "true");
+        $container.find(".Flyout.MenuItems").css('display',"").attr("aria-hidden", "true");
         return false;
     });
 

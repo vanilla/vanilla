@@ -508,7 +508,6 @@ class ThemeModel {
      *
      * @param int $themeKey
      * @return array
-     * @throws ClientException
      */
     public function getThemeRevisions(int $themeKey): array {
         $provider = $this->getThemeProvider($themeKey);

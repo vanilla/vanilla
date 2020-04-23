@@ -182,11 +182,12 @@ class ThemeModel {
      * Get theme with all assets from provider detected
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $query Request query arguments
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $query = []): array {
         $provider = $this->getThemeProvider($themeKey);
-        $theme = $provider->getThemeWithAssets($themeKey);
+        $theme = $provider->getThemeWithAssets($themeKey, $query);
         $theme = $this->normalizeTheme($theme);
         return $theme;
     }

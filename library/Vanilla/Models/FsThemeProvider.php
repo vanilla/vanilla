@@ -76,7 +76,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $args = []): array {
         $theme = $this->normalizeTheme(
             $this->getThemeByName($themeKey),
             $this->getAssets($themeKey)

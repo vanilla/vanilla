@@ -33,9 +33,10 @@ interface ThemeProviderInterface {
      * Returns type of theme with all assets
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $args Arguments list.
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array;
+    public function getThemeWithAssets($themeKey, array $args = []): array;
 
     /**
      * Get asset data

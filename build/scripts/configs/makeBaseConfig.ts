@@ -57,7 +57,7 @@ ${chalk.green(aliases)}`;
                             "p-debounce",
                             "@vanilla/.*",
                             "react-redux",
-                            "react-spring/.*",
+                            "react-spring/?.*",
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 

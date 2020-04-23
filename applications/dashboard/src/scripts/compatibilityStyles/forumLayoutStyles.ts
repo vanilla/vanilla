@@ -125,6 +125,7 @@ export const forumLayoutVariables = useThemeCache(() => {
 
     const main = makeThemeVars("main", {
         width: calc(`100% - ${unit(panel.paddedWidth + gutter.mainGutterOffset)}`),
+        topSpacing: 40,
     });
 
     const cell = makeThemeVars("cell", {

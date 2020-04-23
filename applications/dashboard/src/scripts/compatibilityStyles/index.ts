@@ -264,7 +264,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(vars.gutter.size * 2),
+        marginTop: unit(layoutVars.main.topSpacing - vars.gutter.size),
     });
 
     cssOut(`.Content .PageControls`, {

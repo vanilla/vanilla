@@ -17,7 +17,7 @@ describe.only("DateTime", () => {
     });
 
     it("Formats a pretty date", () => {
-        const { container, asFragment } = render(<DateTime timestamp={timeStamp} />);
+        const { container, asFragment } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);
@@ -29,7 +29,7 @@ describe.only("DateTime", () => {
         // Type of locale our backend returns.
         // An actual JS locale would be zh-TW.
         setCurrentLocale("zh_TW");
-        const { container, asFragment } = render(<DateTime timestamp={timeStamp} />);
+        const { container, asFragment } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);

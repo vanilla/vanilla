@@ -44,6 +44,7 @@ interface IProps {
     onPreview?: VoidFunction;
     onCopy?: ClickHandlerOrUrl;
     onEdit?: ClickHandlerOrUrl;
+    onRevision?: ClickHandlerOrUrl;
     onDelete?: ClickHandlerOrUrl;
     isActiveTheme: boolean;
     noActions?: boolean;
@@ -52,6 +53,7 @@ interface IProps {
     canEdit?: boolean;
     canCopyCustom?: boolean;
     forceHover?: boolean;
+    revisions?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -339,6 +341,11 @@ export default function ThemePreviewCard(props: IProps) {
                                         {props.canCopyCustom && props.onCopy && (
                                             <LinkOrButton isDropdown onClick={props.onCopy}>
                                                 {t("Copy")}
+                                            </LinkOrButton>
+                                        )}
+                                        {props.revisions && props.onRevision && (
+                                            <LinkOrButton isDropdown onClick={props.onRevision}>
+                                                {t("Revisions")}
                                             </LinkOrButton>
                                         )}
                                         <DropDownItemSeparator />

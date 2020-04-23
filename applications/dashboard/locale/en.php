@@ -71,6 +71,7 @@ $Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 $Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';
 $Definition['PageDetailsMessage'] = '%1$s to %2$s';
 $Definition['RoleID'] = 'role';
+$Definition['Garden.api.ssoIDPermission.description'] = 'Roles with this permission will be able to expand SSO IDs in API v2 calls.';
 $Definition['Garden.Registration.DefaultRoles'] = 'default role';
 $Definition['Garden.Title'] = 'Banner Title';
 $Definition['Garden.Email.SupportName'] = 'Support name';
@@ -119,6 +120,10 @@ Follow the link below to check it out:
 %2$s
 
 Have a great day!';
+$Definition['permissions.member'] = 'Member';
+$Definition['permissions.moderator'] = 'Moderator';
+$Definition['permissions.communityManager'] = 'Community Manager';
+$Definition['permissions.admin'] = 'Admin';
 $Definition['PluginHelp'] = "Plugins allow you to add functionality to your site.<br />Once a plugin has been added to your %s folder, you can enable or disable it here.";
 $Definition['ApplicationHelp'] = "Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.";
 $Definition['ThemeHelp'] = "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";

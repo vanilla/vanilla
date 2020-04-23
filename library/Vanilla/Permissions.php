@@ -41,6 +41,16 @@ class Permissions implements \JsonSerializable {
         'Garden.SignIn.Allow' => 1,
     ];
 
+    /**
+     * An array of ranked permissions that won't ever change. Suitable for storing in the config.
+     */
+    private const RANKED_PERMISSION_ALIASES = [
+        self::RANK_MEMBER => 'Garden.SignIn.Allow',
+        self::RANK_MODERATOR => 'Garden.Moderation.Manage',
+        self::RANK_COMMUNITY_MANAGER => 'Garden.Community.Manage',
+        self::RANK_ADMIN => 'Garden.Settings.Manage',
+    ];
+
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
     const BAN_UPDATING = '!updating';
@@ -48,6 +58,11 @@ class Permissions implements \JsonSerializable {
     const BAN_2FA = '!2fa';
     const BAN_CSRF = '!csrf';
     const BAN_UNINSTALLED = '!uninstalled';
+
+    const RANK_MEMBER = 'member';
+    const RANK_MODERATOR = 'moderator';
+    const RANK_COMMUNITY_MANAGER = 'communityManager';
+    const RANK_ADMIN = 'admin';
 
     /**
      * Global permissions are stored as numerical indexes.
@@ -423,6 +438,10 @@ class Permissions implements \JsonSerializable {
      * @return boolean True on valid authorization, false on failure to authorize
      */
     public function hasRanked(string $permission): bool {
+        if (isset(self::RANKED_PERMISSION_ALIASES[$permission])) {
+            $permission = self::RANKED_PERMISSION_ALIASES[$permission];
+        }
+
         if (!isset(self::RANKED_PERMISSIONS[$permission])) {
             return $this->has($permission);
         } else {
@@ -458,6 +477,17 @@ class Permissions implements \JsonSerializable {
             }
         }
         return '';
+    }
+
+    /**
+     * Get the names of the ranked permissions, suitable for drop downs and whatnot.
+     *
+     * @return array
+     */
+    public static function getRankedPermissionAliases(): array {
+        $aliases = array_keys(self::RANKED_PERMISSION_ALIASES);
+        $result = array_combine($aliases, $aliases);
+        return $result;
     }
 
     /**

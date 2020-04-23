@@ -7,7 +7,7 @@
 import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
 import moment from "moment";
-import { getCurrentLocale } from "@vanilla/i18n";
+import { getJSLocaleKey } from "@vanilla/i18n";
 
 interface IProps {
     /** The timestamp to format and display */
@@ -54,7 +54,7 @@ export default class DateTime extends Component<IProps> {
      */
     private get titleTime(): string {
         const date = new Date(this.props.timestamp);
-        return date.toLocaleString(getCurrentLocale(), {
+        return date.toLocaleString(getJSLocaleKey(), {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -81,7 +81,7 @@ export default class DateTime extends Component<IProps> {
         } else {
             return inputMoment
                 .toDate()
-                .toLocaleString(getCurrentLocale(), { year: "numeric", month: "short", day: "numeric" });
+                .toLocaleString(getJSLocaleKey(), { year: "numeric", month: "short", day: "numeric" });
         }
     }
 }

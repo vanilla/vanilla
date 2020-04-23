@@ -47,7 +47,9 @@ export function ThemeChooserInput(props: IProps) {
 
     const defaultOption: IComboBoxOption = {
         value: "",
-        label: ((<Translate source="Default <0/>" c0={`(${defaultTheme.name})`} />) as unknown) as string,
+        label: defaultTheme
+            ? (((<Translate source="Default <0/>" c0={`(${defaultTheme.name})`} />) as unknown) as string)
+            : t("Loading"),
     };
 
     const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function(theme, index) {
@@ -65,7 +67,7 @@ export function ThemeChooserInput(props: IProps) {
     });
 
     let themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
-    themeGroupOptions = themeGroupOptions.filter(option => option.value !== defaultTheme.themeID);
+    themeGroupOptions = themeGroupOptions.filter(option => option.value !== defaultTheme?.themeID);
     themeGroupOptions.push(defaultOption);
 
     const selectedTheme =

@@ -345,7 +345,7 @@ class CommentsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc', 'DateInserted')->resultArray();
         $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         // Expand associated rows.

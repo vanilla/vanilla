@@ -123,7 +123,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPreset = makeThemeVars("standard", {
         preset: {
             ...standardPresetInit2.preset,
-            borderState: standardPresetInit2.preset.bgState,
+            border:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? standardPresetInit2.preset.border
+                    : standardPresetInit2.preset.bg,
+            borderState:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? standardPresetInit2.preset.fgState
+                    : standardPresetInit2.preset.bgState,
         },
     });
 

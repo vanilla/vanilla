@@ -6,11 +6,23 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import { percent, translateX } from "csx";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { containerVariables } from "@library/layout/components/containerStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("dateRange");
+    const mediaQueries = layoutVariables().mediaQueries();
+
+    const mobileGutterSize =
+        panelWidgetVariables().spacing.padding + containerVariables().spacing.mobile.padding.horizontal;
+
+    const input = style("input", {
+        width: unit(136),
+        maxWidth: percent(100),
+    });
 
     const root = style({
         display: "block",
@@ -38,11 +50,6 @@ export const dateRangeClasses = useThemeCache(() => {
         textOverflow: "ellipsis",
         maxWidth: percent(100),
         paddingLeft: unit(8),
-    });
-
-    const input = style("input", {
-        width: unit(136),
-        maxWidth: percent(100),
     });
 
     return {

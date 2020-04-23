@@ -342,6 +342,10 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
 
+    cssOut(`.DataList .Item .Options .OptionsMenu`, {
+        order: 10, // we want it last
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

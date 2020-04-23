@@ -12,7 +12,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
 import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadingContext";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 interface IPageHeading {
     title: React.ReactNode;

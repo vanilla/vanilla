@@ -26,6 +26,7 @@ echo $this->Form->errors();
         <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Message', 'Content'); ?>
+            <?php echo wrap(t("This field partially supports HTML."), 'div', ['class' => 'info']); ?>
             </div>
             <div class="input-wrap">
             <?php echo $this->Form->textBox('Content', ['MultiLine' => TRUE]); ?>

@@ -7,11 +7,13 @@
 import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
 import moment from "moment";
-import { getCurrentLocale } from "@vanilla/i18n";
+import { getJSLocaleKey } from "@vanilla/i18n";
 
 interface IProps {
     /** The timestamp to format and display */
     timestamp: string;
+    /** Pass an explicit time zone to format in. */
+    timezone: string;
     /** An additional classname to apply to the root of the component */
     className?: string;
     /** Display a fixed or relative visible time. */
@@ -54,13 +56,14 @@ export default class DateTime extends Component<IProps> {
      */
     private get titleTime(): string {
         const date = new Date(this.props.timestamp);
-        return date.toLocaleString(getCurrentLocale(), {
+        return date.toLocaleString(getJSLocaleKey(), {
             year: "numeric",
             month: "long",
             day: "numeric",
             weekday: "long",
             hour: "numeric",
             minute: "numeric",
+            timeZone: this.props.timezone,
         });
     }
 
@@ -79,9 +82,12 @@ export default class DateTime extends Component<IProps> {
 
             return inputMoment.from(moment());
         } else {
-            return inputMoment
-                .toDate()
-                .toLocaleString(getCurrentLocale(), { year: "numeric", month: "short", day: "numeric" });
+            return inputMoment.toDate().toLocaleString(getJSLocaleKey(), {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                timeZone: this.props.timezone,
+            });
         }
     }
 }

@@ -84,12 +84,18 @@ class CategoryController extends VanillaController {
             'Followed' => $result
         ]);
 
+        $parentCategory = false;
+        if ($category['ParentCategoryID'] != -1) {
+            $parentCategory = $categoryModel::categories($category['ParentCategoryID'])['UrlCode'];
+        }
+
         switch ($this->deliveryType()) {
             case DELIVERY_TYPE_DATA:
                 $this->render('Blank', 'Utility', 'Dashboard');
                 return;
             case DELIVERY_TYPE_ALL:
-                redirectTo('/categories');
+                // If this is a subcategories, redirect to parent category. Otherwise, redirect to categories page.
+                $parentCategory ? redirectTo('/categories/'.$parentCategory) : redirectTo('/categories');
         }
 
         // Return the appropriate bookmark.

@@ -21,7 +21,7 @@ describe.only("DateTime", () => {
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);
-        expect(time?.getAttribute("title")).equals("Wednesday, April 22, 2020, 10:31 AM");
+        expect(time?.getAttribute("title")).equals("Wednesday, April 22, 2020, 2:31 PM");
         expect(time?.textContent).equals("Apr 22, 2020");
     });
 
@@ -33,7 +33,7 @@ describe.only("DateTime", () => {
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);
-        expect(time?.getAttribute("title")).equals("2020年4月22日 星期三 上午10:31");
+        expect(time?.getAttribute("title")).equals("2020年4月22日 星期三 下午2:31");
         expect(time?.textContent).equals("2020年4月22日");
     });
 });

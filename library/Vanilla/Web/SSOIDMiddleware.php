@@ -8,11 +8,14 @@ namespace Vanilla\Web;
 
 
 use Garden\Web\RequestInterface;
+use Garden\BasePathTrait;
 
 /**
  * Middleware to lookup foreign user IDs and add them to API responses.
  */
 class SSOIDMiddleware {
+
+    use BasePathTrait;
 
     private const EXPAND_FIELD = "expand";
 
@@ -22,8 +25,11 @@ class SSOIDMiddleware {
 
     /**
      * Setup the middleware.
+     *
+     * @param string $basePath
      */
-    public function __construct() {
+    public function __construct(string $basePath) {
+        $this->setBasePath($basePath);
     }
 
     /**
@@ -74,7 +80,7 @@ class SSOIDMiddleware {
         return $fields;
     }
 
-    private function scrubExpand(RequestInterface $request, array $fields) {
+    private function scrubExpand(RequestInterface $request, array $fields): void {
         $query = $request->getQuery();
         $expand = $this->readExpand($request);
         if (empty($expand)) {
@@ -82,16 +88,17 @@ class SSOIDMiddleware {
         }
 
         $scrubbedExpand = [];
-        foreach ($fields as $field) {
+        foreach ($expand as $field) {
             if (!in_array($field . "." . self::ID_FIELD, $expand)) {
                 $scrubbedExpand[] = $field;
             }
         }
 
+        $scrubbedExpand = [];
         if (empty($scrubbedExpand)) {
             unset($query[self::EXPAND_FIELD]);
         } else {
-            $query[self::EXPAND_FIELD] = $scrubbedExpand;
+            $query[self::EXPAND_FIELD] = implode(",", $scrubbedExpand);
         }
         $request->setQuery($query);
     }

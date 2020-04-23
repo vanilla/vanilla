@@ -31,6 +31,11 @@ class OpenAPIBuilder {
     private $request;
 
     /**
+     * @var callable[]
+     */
+    private $filters;
+
+    /**
      * OpenAPIBuilder constructor.
      *
      * @param AddonManager $addonManager The addon manager used to get a list of addons to combine.
@@ -204,6 +209,10 @@ class OpenAPIBuilder {
 
         $result = $this->applyRequestBasedApiBasePath($result);
 
+        foreach ($this->filters as $callback) {
+            $callback($result);
+        }
+
         return $result;
     }
 
@@ -297,5 +306,29 @@ class OpenAPIBuilder {
         });
 
         $data['info'] = $data['info'] ?: [];
+    }
+
+    /**
+     * Add a filter to augment the generated OpenAPI.
+     *
+     * Filters are all called on the generated OpenAPI definition.
+     *
+     * @param callable $filter
+     */
+    public function addFilter(callable  $filter): void {
+        $this->filters[] = $filter;
+    }
+
+    /**
+     * Remove a filter.
+     *
+     * @param callable $filter
+     */
+    public function removeFilter(callable $filter): void {
+        foreach ($this->filters as $i => $row) {
+            if ($row === $filter) {
+                unset($this->filters[$i]);
+            }
+        }
     }
 }

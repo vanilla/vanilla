@@ -102,4 +102,41 @@ class SSOIDMiddleware {
         }
         $request->setQuery($query);
     }
+
+    /**
+     * Add the extra SSO ID expand parameters to the
+     *
+     * @param array $openAPI
+     */
+    public function filterOpenAPI(array &$openAPI) {
+        foreach ($openAPI as $key => &$value) {
+            if (is_array($value)) {
+                if (isset($value['parameters']) && is_array($value['parameters'])) {
+                    foreach ($value['parameters'] as &$parameter) {
+                        if ('expand' === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
+                            $enum = $parameter['schema']['items']['enum'];
+                            foreach ($enum as $item) {
+                                if (in_array($item, $this->userFields)) {
+                                    $enum[] = $item . '.' . self::ID_FIELD;
+                                }
+                            }
+                            $parameter['schema']['items']['enum'] = $enum;
+                        }
+                    }
+                } else {
+                    $this->filterOpenAPI($value);
+                }
+            }
+        }
+    }
+
+    /**
+     * A higher order function for getting the middleware, useful for container config.
+     *
+     * @param SSOIDMiddleware $middleware
+     * @return array
+     */
+    public static function filterOpenAPIFactory(SSOIDMiddleware $middleware) {
+        return [$middleware, 'filterOpenAPI'];
+    }
 }

@@ -73,7 +73,10 @@ if (!function_exists('getOptions')):
         $tk = urlencode(Gdn::session()->transientKey());
         $followed = val('Followed', $category);
 
-        $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
+        if (c('EnabledPlugins.AllViewed')) {
+            // We should probably also check whether there are any unread discussions in the category as well.
+            $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
+        }
 
         if (c('Vanilla.EnableCategoryFollowing') && val('DisplayAs', $category) == 'Discussions') {
             $dropdown->addLink(

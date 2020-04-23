@@ -182,11 +182,12 @@ class ThemeModel {
      * Get theme with all assets from provider detected
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $query Request query arguments
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $query = []): array {
         $provider = $this->getThemeProvider($themeKey);
-        $theme = $provider->getThemeWithAssets($themeKey);
+        $theme = $provider->getThemeWithAssets($themeKey, $query);
         $theme = $this->normalizeTheme($theme);
         return $theme;
     }
@@ -430,14 +431,15 @@ class ThemeModel {
      * Set theme asset (update existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.
+     * @param int $revisionID Theme revision ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      * @param string $data Data content for asset to set
      *
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
-        $asset = $provider->setAsset($themeID, $assetKey, $data);
+        $asset = $provider->setAsset($themeID, $revisionID, $assetKey, $data);
         return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
@@ -500,6 +502,21 @@ class ThemeModel {
     public function deleteAsset(string $themeKey, string $assetKey) {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * Get theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     */
+    public function getThemeRevisions(int $themeKey): array {
+        $provider = $this->getThemeProvider($themeKey);
+        $revisions = $provider->getThemeRevisions($themeKey);
+        foreach ($revisions as &$revision) {
+            $revision = $this->normalizeTheme($revision);
+        }
+        return $revisions;
     }
 
     /**

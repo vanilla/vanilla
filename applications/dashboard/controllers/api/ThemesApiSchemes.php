@@ -35,6 +35,8 @@ trait ThemesApiSchemes {
                 'type:s',
                 'name:s?',
                 'version:s?',
+                'revisionID:i?',
+                'active:b?',
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
@@ -139,6 +141,9 @@ trait ThemesApiSchemes {
                 ],
                 'parentVersion:s?' => [
                     'description' => 'Parent theme template version/revision.',
+                ],
+                'revisionID:i?' => [
+                    'description' => 'Theme revision ID.',
                 ],
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),

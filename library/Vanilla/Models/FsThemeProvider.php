@@ -76,7 +76,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $args = []): array {
         $theme = $this->normalizeTheme(
             $this->getThemeByName($themeKey),
             $this->getAssets($themeKey)
@@ -346,7 +346,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @return string
      * @throws NotFoundException If no asset found throw an exception.
      */
-    public function getAssetData($themeKey, string $assetKey): string {
+    public function getAssetData($themeKey, string $assetKey, int $revisionID = null): string {
         $theme = $this->getThemeByName($themeKey);
         $assets = $this->getAssets($themeKey);
 

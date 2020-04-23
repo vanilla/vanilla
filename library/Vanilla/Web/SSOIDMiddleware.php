@@ -6,20 +6,21 @@
 
 namespace Vanilla\Web;
 
-
 use Garden\Web\RequestInterface;
 use Garden\BasePathTrait;
 
 /**
  * Middleware to lookup foreign user IDs and add them to API responses.
+ *
+ * 1. Read the request query string.
+ * 2. Find the "expand" parameter, if available.
+ * 3. Look for one of the supported fields.
+ * 4. Remove the values from the expand parameter.
+ * 5. Reset the request query.
  */
 class SSOIDMiddleware {
 
     use BasePathTrait;
-
-    private const EXPAND_FIELD = "expand";
-
-    private const ID_FIELD = "ssoID";
 
     private $userFields = ["insertUser", "updateUser"];
 
@@ -40,8 +41,10 @@ class SSOIDMiddleware {
      * @return mixed
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        $fields = $this->fieldsFromRequest($request);
-        $this->scrubExpand($request, $fields);
+        if ($this->inBasePath($request->getPath())) {
+            $fields = $this->fieldsFromRequest($request);
+            $this->scrubExpand($request, $fields);
+        }
 
         $response = $next($request);
         return $response;
@@ -57,8 +60,8 @@ class SSOIDMiddleware {
         $result = [];
 
         $expand = $this->readExpand($request);
-        foreach ($this->userFields as $field) {
-            if (in_array($field . "." . self::ID_FIELD, $expand)) {
+        foreach ($expand as $field) {
+            if ($this->isValidField($field)) {
                 $result[] = $field;
             }
         }
@@ -75,11 +78,19 @@ class SSOIDMiddleware {
     private function readExpand(RequestInterface $request): array {
         $query = $request->getQuery();
         $expand = $query[self::EXPAND_FIELD] ?? "";
-        $fields = explode(",", $expand);
+        if (is_string($expand)) {
+            $fields = explode(",", $expand);
+        }
         array_walk($fields, "trim");
         return $fields;
     }
 
+    /**
+     * Remove any ID field values from the expand parameter.
+     *
+     * @param RequestInterface $request
+     * @param array $fields
+     */
     private function scrubExpand(RequestInterface $request, array $fields): void {
         $query = $request->getQuery();
         $expand = $this->readExpand($request);
@@ -89,12 +100,11 @@ class SSOIDMiddleware {
 
         $scrubbedExpand = [];
         foreach ($expand as $field) {
-            if (!in_array($field . "." . self::ID_FIELD, $expand)) {
+            if (!$this->isValidField($field)) {
                 $scrubbedExpand[] = $field;
             }
         }
 
-        $scrubbedExpand = [];
         if (empty($scrubbedExpand)) {
             unset($query[self::EXPAND_FIELD]);
         } else {
@@ -138,5 +148,22 @@ class SSOIDMiddleware {
      */
     public static function filterOpenAPIFactory(SSOIDMiddleware $middleware) {
         return [$middleware, 'filterOpenAPI'];
+    }
+
+    /**
+    * Is the value a supported fully-qualified field?
+    *
+    * @param string $field
+    * @return bool
+    */
+    private function isValidField(string $field): bool {
+        foreach ($this->userFields as $userField) {
+            $fullUserField = $userField . "." . self::ID_FIELD;
+            if ($field === $fullUserField) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

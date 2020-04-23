@@ -47,6 +47,16 @@ export function getCurrentLocale() {
 }
 
 /**
+ * Get the current locale in format accepted by Javascript localization functions.
+ *
+ * PHP canonicalized locales use `_` for the regional separator.
+ * Javascript uses `-`.
+ */
+export function getJSLocaleKey() {
+    return currentLocale.replace("_", "-");
+}
+
+/**
  * Load a group of locales.
  */
 export function loadLocales(locales: ILocale[]) {

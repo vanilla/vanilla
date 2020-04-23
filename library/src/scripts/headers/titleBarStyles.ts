@@ -976,7 +976,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const titleBarContainer = style("titleBarContainer", {
         ...paddings({
-            all: globalVars.gutter.half,
+            horizontal: globalVars.gutter.half,
         }),
     });
 

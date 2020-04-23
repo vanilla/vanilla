@@ -71,7 +71,6 @@ function mixinTag(selector: string, overwrite?: {}) {
 
     selectors.map(s => {
         cssOut(selector, {
-            color: colorOut(vars.font.color),
             maxWidth: percent(100),
             display: "inline-block",
             whiteSpace: "normal",

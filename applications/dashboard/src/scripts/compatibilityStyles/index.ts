@@ -346,6 +346,12 @@ compatibilityStyles = useThemeCache(() => {
         order: 10, // we want it last
     });
 
+    cssOut(`.Breadcrumbs`, {
+        ...paddings({
+            vertical: vars.gutter.half,
+        }),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

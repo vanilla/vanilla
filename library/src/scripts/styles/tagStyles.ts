@@ -60,7 +60,7 @@ export const tagVariables = useThemeCache(() => {
 
     const font = makeThemeVars("font", {
         ...EMPTY_FONTS,
-        fg: colors.fg,
+        color: colors.fg,
         lineHeight: globalVars.lineHeights.meta,
         size: globalVars.fonts.size.small,
     } as IFont);

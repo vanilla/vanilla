@@ -12,6 +12,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { media } from "typestyle";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -114,6 +115,7 @@ export const forumLayoutVariables = useThemeCache(() => {
         size: foundationalWidths.fullGutter / 2, // 24
         halfSize: foundationalWidths.fullGutter / 4, // 12
         quarterSize: foundationalWidths.fullGutter / 8, // 6
+        mainGutterOffset: 60 - globalVars.gutter.size,
     });
 
     const panel = makeThemeVars("panel", {
@@ -122,7 +124,7 @@ export const forumLayoutVariables = useThemeCache(() => {
     });
 
     const main = makeThemeVars("main", {
-        width: calc(`100% - ${unit(panel.paddedWidth)}`),
+        width: calc(`100% - ${unit(panel.paddedWidth + gutter.mainGutterOffset)}`),
     });
 
     const cell = makeThemeVars("cell", {
@@ -159,11 +161,16 @@ export const forumLayoutCSS = () => {
 
     cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles() as NestedCSSProperties);
 
+    cssOut(`.Frame-content .HomepageTitle`, {
+        $nest: lineHeightAdjustment(),
+    });
+
     cssOut(
         `.Frame-row`,
         {
             display: "flex",
             flexWrap: "nowrap",
+            justifyContent: "space-between",
             ...paddings({
                 horizontal: globalVars.gutter.half,
             }),
@@ -190,25 +197,11 @@ export const forumLayoutCSS = () => {
         {
             width: unit(vars.panel.paddedWidth),
             ...paddings({
-                all: globalVars.gutter.half,
+                vertical: globalVars.gutter.half,
             }),
-            $nest: {
-                "& > *": {
-                    ...paddings({
-                        horizontal: globalVars.gutter.half,
-                    }),
-                },
-            },
         },
         mediaQueries.oneColumnDown({
             width: percent(100),
-            $nest: {
-                "& > *": {
-                    ...paddings({
-                        horizontal: 0,
-                    }),
-                },
-            },
         }),
     );
 
@@ -231,20 +224,6 @@ export const forumLayoutCSS = () => {
         display: "flex",
         flexWrap: "nowrap",
         ...paddings({
-            horizontal: globalVars.gutter.half,
-        }),
-        $nest: {
-            "& > *": {
-                ...paddings({
-                    horizontal: globalVars.gutter.half,
-                }),
-            },
-        },
-    });
-
-    cssOut(`.Panel`, {
-        width: unit(vars.panel.paddedWidth),
-        ...paddings({
             all: globalVars.gutter.half,
         }),
         $nest: {
@@ -254,12 +233,5 @@ export const forumLayoutCSS = () => {
                 }),
             },
         },
-    });
-
-    cssOut(`.Content.MainContent`, {
-        width: unit(vars.main.width),
-        ...paddings({
-            all: globalVars.gutter.half,
-        }),
     });
 };

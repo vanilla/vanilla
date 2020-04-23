@@ -280,6 +280,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\SSOIDMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 

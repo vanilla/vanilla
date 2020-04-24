@@ -17,11 +17,9 @@ interface IProps extends IBaseEmbedProps {
     height: number;
 }
 
-/** @constant {string} */
-const PANOPTO_SCRIPT = "https://developers.panopto.com/scripts/embedapi.min.js";
+const PANOPTO_SCRIPT: string = "https://developers.panopto.com/scripts/embedapi.min.js";
 
-/** @constant {string} */
-const EMBED_LOADED_CLASS = "isLoaded";
+const EMBED_LOADED_CLASS: string = "isLoaded";
 
 /**
  * A class for rendering Twitter embeds.

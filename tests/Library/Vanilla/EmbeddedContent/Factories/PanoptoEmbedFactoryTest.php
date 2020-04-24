@@ -53,35 +53,32 @@ class PanoptoEmbedFactoryTest extends MinimalContainerTestCase {
 
     /**
      * Test the Panopto Embed instantiation.
+     *
+     * @param string $urlToTest
+     * @dataProvider supportedUrlsProvider
      */
-    public function testCreateEmbedForUrl() {
-        $urlsToTest = $this->supportedUrlsProvider();
+    public function testCreateEmbedForUrl(string $urlToTest) {
+        $parameters = [];
+        parse_str(
+            parse_url($urlToTest, PHP_URL_QUERY) ?? "",
+            $parameters
+        );
 
-        foreach ($urlsToTest as $urlToTest) {
-            $urlToTest = $urlToTest[0];
+        $data = [
+            'embedType' => PanoptoEmbed::TYPE,
+            'domain' => parse_url($urlToTest, PHP_URL_HOST),
+            'url' => $urlToTest,
+            'height' => 360,
+            'width' => 640,
+            'sessionId' => $parameters['id'] ?? null,
+        ];
 
-            $parameters = [];
-            parse_str(
-                parse_url($urlToTest, PHP_URL_QUERY) ?? "",
-                $parameters
-            );
+        $panoptoEmbed = $this->factory->createEmbedForUrl($urlToTest);
+        $embedData = $panoptoEmbed->jsonSerialize();
 
-            $data = [
-                'embedType' => PanoptoEmbed::TYPE,
-                'domain' => parse_url($urlToTest, PHP_URL_HOST),
-                'url' => $urlToTest,
-                'height' => 360,
-                'width' => 640,
-                'sessionId' => $parameters['id'] ?? null,
-            ];
+        $this->assertEquals($data, $embedData, 'Data can be used to render embed.');
 
-            $panoptoEmbed = $this->factory->createEmbedForUrl($urlToTest);
-            $embedData = $panoptoEmbed->jsonSerialize();
-
-            $this->assertEquals($data, $embedData, 'Data can be used to render embed.');
-
-            $embed = new PanoptoEmbed($embedData);
-            $this->assertInstanceOf(PanoptoEmbed::class, $embed);
-        }
+        $embed = new PanoptoEmbed($embedData);
+        $this->assertInstanceOf(PanoptoEmbed::class, $embed);
     }
 }

@@ -7,6 +7,8 @@
 
 namespace Garden;
 
+use Garden\Sphinx\SphinxClient;
+
 /**
  * For classes that want Sphinx search to incorporate.
  *
@@ -41,14 +43,14 @@ trait SphinxTrait {
      *
      * @return SphinxClient
      */
-    public static function sphinxClient(): \SphinxClient {
+    public static function sphinxClient(): SphinxClient {
         if (!self::checkSphinxClient()) {
             throw new \Exception('Sphinx client class not found.');
         }
         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
         $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-        $client = new \SphinxClient();
+        $client = new SphinxClient();
         $client->setServer($sphinxHost, $sphinxPort);
 
         // Set some defaults

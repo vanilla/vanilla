@@ -6,6 +6,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Garden\BasePathTrait;
 
@@ -19,6 +20,10 @@ use Garden\BasePathTrait;
  * 5. Reset the request query.
  */
 class SSOIDMiddleware {
+
+    private const EXPAND_FIELD = "expand";
+
+    private const ID_FIELD = "ssoID";
 
     use BasePathTrait;
 
@@ -47,6 +52,12 @@ class SSOIDMiddleware {
         }
 
         $response = $next($request);
+
+        if (empty($fields)) {
+            return $response;
+        }
+
+        $this->updateBody($response, $fields);
         return $response;
     }
 
@@ -60,9 +71,9 @@ class SSOIDMiddleware {
         $result = [];
 
         $expand = $this->readExpand($request);
-        foreach ($expand as $field) {
-            if ($this->isValidField($field)) {
-                $result[] = $field;
+        foreach ($expand as $expandField) {
+            if ($userField = $this->fieldFromExpand($expandField)) {
+                $result[] = $userField;
             }
         }
 
@@ -100,7 +111,7 @@ class SSOIDMiddleware {
 
         $scrubbedExpand = [];
         foreach ($expand as $field) {
-            if (!$this->isValidField($field)) {
+            if ($this->fieldFromExpand($field) === null) {
                 $scrubbedExpand[] = $field;
             }
         }
@@ -156,14 +167,53 @@ class SSOIDMiddleware {
     * @param string $field
     * @return bool
     */
-    private function isValidField(string $field): bool {
+    private function fieldFromExpand(string $field): ?string {
         foreach ($this->userFields as $userField) {
             $fullUserField = $userField . "." . self::ID_FIELD;
             if ($field === $fullUserField) {
-                return true;
+                return $userField;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    /**
+     * Update the body of a response to include the expanded fields.
+     *
+     * @param array|Data $response
+     * @param array $fields
+     */
+    private function updateBody($response, array $fields): Data {
+        $response = Data::box($response);
+
+        if (empty($fields)) {
+            return $response;
+        }
+
+        $userIDs = $this->extractUserIDs($response, $fields);
+        return $response;
+    }
+
+    /**
+     * Extract user IDs from a response body, based on specified fields.
+     *
+     * @param Data $response
+     * @param array $fields
+     * @return array
+     */
+    private function extractUserIDs(Data $response, array $fields): array {
+        $result = [];
+        $idFields = array_map(function (string $value) {
+            return "{$value}ID";
+        }, $fields);
+
+        array_walk_recursive($response, function ($value, $key, $idFields) use (&$result) {
+            if (in_array($key, $idFields) && !in_array($value, $result)) {
+                $result[] = $value;
+            }
+        }, $idFields);
+
+        return $result;
     }
 }

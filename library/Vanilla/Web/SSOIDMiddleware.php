@@ -141,7 +141,7 @@ class SSOIDMiddleware {
             if (is_array($value)) {
                 if (isset($value['parameters']) && is_array($value['parameters'])) {
                     foreach ($value['parameters'] as &$parameter) {
-                        if ('expand' === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
+                        if (self::EXPAND_FIELD === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
                             $enum = $parameter['schema']['items']['enum'];
                             foreach ($enum as $item) {
                                 if (in_array($item, $this->userFields)) {

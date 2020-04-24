@@ -189,4 +189,158 @@ class SSOIDMiddlewareTest extends TestCase {
             'insertUserID' => 1,
         ], Data::box($actual)->getData());
     }
+
+    /**
+     * Don't crash if there is a bad parameter.
+     */
+    public function testBadExpandParameter() {
+        $request = new Request();
+        $request->setQuery(['expand' => (object)['haha' => 'haha']]);
+        $next = function ($r) {
+            return [];
+        };
+
+        $actual = call_user_func($this->middleware, $request, $next);
+    }
+
+    /**
+     * A more realistic version of a bad parameter.
+     */
+    public function testBadExpandParameter2() {
+        $request = new Request();
+        $request->setQuery(['expand' => [['nested' => true]]]);
+        $next = function ($r) {
+            return [];
+        };
+
+        $actual = call_user_func($this->middleware, $request, $next);
+    }
+
+    /**
+     * A basic test for the OpenAPI factory.
+     */
+    public function testOpenAPIFactory() {
+        $actual = SSOIDMiddleware::filterOpenAPIFactory($this->middleware);
+        $this->assertSame($actual[0], $this->middleware);
+    }
+
+    /**
+     * Open API parameters should be augmented with the `".ssoID"` parameters.
+     */
+    public function testBasicOpenAPIAugmentation() {
+        $in = json_decode(<<<EOT
+{
+  "/articles/drafts": {
+    "get": {
+      "parameters": [
+        {
+          "in": "query",
+          "name": "expand",
+          "schema": {
+            "items": {
+              "enum": [
+                "insertUser",
+                "updateUser"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      ]
+    }
+  }
+}
+EOT
+            , true);
+
+        $expected = json_decode(<<<EOT
+{
+  "/articles/drafts": {
+    "get": {
+      "parameters": [
+        {
+          "in": "query",
+          "name": "expand",
+          "schema": {
+            "items": {
+              "enum": [
+                "insertUser",
+                "updateUser",
+                "insertUser.ssoID",
+                "updateUser.ssoID"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      ]
+    }
+  }
+}
+EOT
+            , true);
+
+        $this->middleware->filterOpenAPI($in);
+        $this->assertSame($expected, $in);
+    }
+
+    /**
+     * Expand parameters should work in the components section of an OpenAPI schema too.
+     */
+    public function testOpenAPIAugmentationComponents() {
+        $in = json_decode(<<<EOT
+{
+  "components": {
+    "parameters": {
+      "foo": {
+        "in": "query",
+        "name": "expand",
+        "schema": {
+          "items": {
+            "enum": [
+              "insertUser",
+              "updateUser"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      }
+    }
+  }
+}
+EOT
+, true);
+
+        $expected = json_decode(<<<EOT
+{
+  "components": {
+    "parameters": {
+      "foo": {
+        "in": "query",
+        "name": "expand",
+        "schema": {
+          "items": {
+            "enum": [
+              "insertUser",
+              "updateUser",
+              "insertUser.ssoID",
+              "updateUser.ssoID"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      }
+    }
+  }
+}
+EOT
+            , true);
+
+        $this->middleware->filterOpenAPI($in);
+        $this->assertSame($expected, $in);
+    }
 }

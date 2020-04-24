@@ -345,7 +345,7 @@ export default function ThemePreviewCard(props: IProps) {
                                         )}
                                         {props.revisions && props.onRevision && (
                                             <LinkOrButton isDropdown onClick={props.onRevision}>
-                                                {t("Revisions")}
+                                                {t("Revision History")}
                                             </LinkOrButton>
                                         )}
                                         <DropDownItemSeparator />

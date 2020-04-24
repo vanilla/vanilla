@@ -11,8 +11,12 @@ import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
+import { History } from "history";
+import { PageType } from "@themingapi/theme/ThemeEditorActions";
 
 const createAction = actionCreatorFactory("@@themes");
+
+type IGetThemeResponse = ITheme;
 
 export enum PreviewStatusType {
     PREVIEW = "preview",
@@ -78,6 +82,10 @@ export default class ThemeActions extends ReduxActions {
         "DELETE",
     );
 
+    public static getThemeRevisions_ACs = createAction.async<{ themeID: number }, IGetThemeResponse, IApiError>(
+        "GET_THEME",
+    );
+
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
             const params = { expand: "all" };
@@ -115,6 +123,19 @@ export default class ThemeActions extends ReduxActions {
             return response.data;
         })({ themeID });
         return this.dispatch(apiThunk);
+    };
+
+    public getThemeRevisions(themeID: number) {
+        const thunk = bindThunkAction(ThemeActions.getThemeRevisions_ACs, async () => {
+            const response = await this.api.get(`/themes/${themeID}/revisions`);
+            return response.data;
+        })({ themeID });
+
+        return this.dispatch(thunk);
+    }
+
+    public getThemeRevisionsByID = async (themeID: number) => {
+        return await this.getThemeRevisions(themeID);
     };
 }
 

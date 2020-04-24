@@ -201,9 +201,14 @@ export const iconVariables = useThemeCache(() => {
         strokeWidth: 1,
     });
 
-    const newActionIcon = themeVars("newActionIcon", {
+    const postFlyoutIcon = themeVars("postFlyoutIcon", {
         width: 56,
         height: 56,
+    });
+
+    const itemFlyoutIcon = themeVars("itemFlyoutIcon", {
+        width: 24,
+        height: 24,
     });
 
     return {
@@ -233,7 +238,8 @@ export const iconVariables = useThemeCache(() => {
         editIcon,
         documentation,
         bookmarkIcon,
-        newActionIcon,
+        postFlyoutIcon,
+        itemFlyoutIcon,
     };
 });
 
@@ -510,17 +516,22 @@ export const iconClasses = useThemeCache(() => {
         });
     };
 
-    const newAction = style("newAction", {
-        width: unit(vars.newActionIcon.width),
-        height: unit(vars.newActionIcon.height),
+    const postFlyout = style("postFlyout", {
+        width: unit(vars.postFlyoutIcon.width),
+        height: unit(vars.postFlyoutIcon.height),
     });
 
-    const newActionCircle = style("newActionCircle", {
+    const postFlyoutCircle = style("postFlyoutCircle", {
         fill: colorOut(globalVars.mainColors.primary),
     });
 
-    const newActionPath = style("newActionPath", {
+    const postFlyoutPath = style("postFlyoutPath", {
         fill: colorOut(globalVars.mainColors.primaryContrast),
+    });
+
+    const itemFlyout = style("itemFlyout", {
+        width: unit(vars.itemFlyoutIcon.width),
+        height: unit(vars.itemFlyoutIcon.height),
     });
 
     return {
@@ -558,8 +569,9 @@ export const iconClasses = useThemeCache(() => {
         hamburger,
         documentation,
         bookmark,
-        newAction,
-        newActionCircle,
-        newActionPath,
+        postFlyout,
+        postFlyoutCircle,
+        postFlyoutPath,
+        itemFlyout,
     };
 });

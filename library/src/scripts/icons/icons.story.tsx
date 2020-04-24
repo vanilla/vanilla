@@ -322,8 +322,17 @@ story.add("Icons", () => {
             </StoryTiles>
             <StoryHeading>ActionFlyout</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`NewActionIcon`}>
-                    <CommonIcons.NewActionIcon />
+                <StoryTileAndTextCompact text={`PostFlyoutIcon`}>
+                    <CommonIcons.PostFlyoutIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
+                    <CommonIcons.NewDiscussionIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewIdeaIcon`}>
+                    <CommonIcons.NewIdeaIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewPollIcon`}>
+                    <CommonIcons.NewPollIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

@@ -320,10 +320,10 @@ story.add("Icons", () => {
                     <RevisionStatusPublishedIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
-            <StoryHeading>ActionFlyout</StoryHeading>
+            <StoryHeading>New Post Menu</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`PostFlyoutIcon`}>
-                    <CommonIcons.PostFlyoutIcon />
+                <StoryTileAndTextCompact text={`NewPostMenuIcon`}>
+                    <CommonIcons.NewPostMenuIcon />
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
                     <CommonIcons.NewDiscussionIcon />

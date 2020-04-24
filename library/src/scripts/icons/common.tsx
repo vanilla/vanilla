@@ -891,10 +891,10 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
     );
 }
 
-export function PostFlyoutIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function NewPostMenuIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     return (
         <svg
-            className={classNames(iconClasses().postFlyout, props.className)}
+            className={classNames(iconClasses().newPostMenuIcon, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}

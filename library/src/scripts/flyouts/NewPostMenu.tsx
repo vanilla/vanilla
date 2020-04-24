@@ -1,27 +1,28 @@
 import React, { ReactNode, useState } from "react";
 import classNames from "classnames";
-import { actionFlyoutClasses } from "@library/flyouts/actionFlyoutStyles";
-import { PostFlyoutIcon } from "@library/icons/common";
+
+import { NewPostMenuIcon, newPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 
-export enum ActionTypes {
+export enum PostTypes {
     LINK = "link",
     BUTTON = "button",
 }
 
-interface IAction {
+export interface IAddPost {
     action: (() => void) | string;
-    type: ActionTypes;
+    type: PostTypes;
     className?: string;
     label: string;
     icon: JSX.Element;
 }
 
-function ActionItem(props: IAction) {
+function ActionItem(props: IAddPost) {
     const { action, className, type, label, icon } = props;
-    const classes = actionFlyoutClasses();
+    const classes = newPostMenuClasses();
 
     const contents = (
         <>
@@ -30,7 +31,7 @@ function ActionItem(props: IAction) {
         </>
     );
 
-    return type === ActionTypes.BUTTON ? (
+    return type === PostTypes.BUTTON ? (
         <Button onClick={action as () => void} className={classNames(className, classes.action)}>
             {contents}
         </Button>
@@ -41,18 +42,31 @@ function ActionItem(props: IAction) {
     );
 }
 
-export default function ActionFlyout(actions: IAction[]) {
+export function NewPostMenuItems(props: { items: IAddPost[] | [] }) {
+    const { items } = props;
+
+    if (!items || items.length === 0) {
+        return null;
+    }
+    const classes = newPostMenuClasses();
+    return (
+        <div className={classes.menu}>
+            {(items as []).map((action, i) => {
+                return <ActionItem key={i} {...action} />;
+            })}
+        </div>
+    );
+}
+
+export default function NewPostMenu(props: { items: IAddPost[] | [] }) {
+    const { items } = props;
     const [open, setOpen] = useState(false);
 
     const toggle = () => setOpen(!open);
 
-    const classes = actionFlyoutClasses();
+    const classes = newPostMenuClasses();
     return (
         <div className={classNames(classes.root)}>
-            {open &&
-                actions.map((action, i) => {
-                    return <ActionItem key={i} {...action} />;
-                })}
             <Button
                 baseClass={ButtonTypes.CUSTOM}
                 onClick={toggle}
@@ -60,8 +74,9 @@ export default function ActionFlyout(actions: IAction[]) {
                     [classes.isOpen]: open,
                 })}
             >
-                <PostFlyoutIcon />
+                <NewPostMenuIcon />
             </Button>
+            {open && <NewPostMenuItems {...props} />}
         </div>
     );
 }

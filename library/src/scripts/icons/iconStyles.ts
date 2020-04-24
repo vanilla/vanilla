@@ -201,7 +201,7 @@ export const iconVariables = useThemeCache(() => {
         strokeWidth: 1,
     });
 
-    const postFlyoutIcon = themeVars("postFlyoutIcon", {
+    const newPostMenuIcon = themeVars("newPostMenuIcon", {
         width: 16,
         height: 16,
     });
@@ -238,7 +238,7 @@ export const iconVariables = useThemeCache(() => {
         editIcon,
         documentation,
         bookmarkIcon,
-        postFlyoutIcon,
+        newPostMenuIcon,
         // itemFlyoutIcon,
     };
 });
@@ -484,15 +484,16 @@ export const iconClasses = useThemeCache(() => {
         });
     };
 
-    const postFlyout = style("postFlyout", {
-        width: unit(vars.postFlyoutIcon.width),
-        height: unit(vars.postFlyoutIcon.height),
+    const newPostMenuIcon = style("newPostMenuIcon", {
+        width: unit(vars.newPostMenuIcon.width),
+        height: unit(vars.newPostMenuIcon.height),
         color: colorOut(globalVars.mainColors.primaryContrast),
+        margin: "auto",
     });
 
     const itemFlyout = style("itemFlyout", {
-        width: unit(vars.itemFlyoutIcon.width),
-        height: unit(vars.itemFlyoutIcon.height),
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
     });
 
     return {
@@ -530,7 +531,7 @@ export const iconClasses = useThemeCache(() => {
         hamburger,
         documentation,
         bookmark,
-        postFlyout,
+        newPostMenuIcon,
         itemFlyout,
     };
 });

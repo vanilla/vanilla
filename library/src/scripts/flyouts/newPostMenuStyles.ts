@@ -1,15 +1,13 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut } from "@library/styles/styleHelpers";
-import { BorderRadiusProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
 import { iconClasses } from "@library/icons/iconStyles";
 import { translateX } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 
-export const actionFlyoutVariables = useThemeCache(() => {
+export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("actionFlyout");
+    const themeVars = variableFactory("newPostMenu");
 
     const position = themeVars("position", {
         bottom: 40,
@@ -18,7 +16,6 @@ export const actionFlyoutVariables = useThemeCache(() => {
 
     const item = themeVars("itemAction", {
         position: {
-            right: 6,
             top: 16,
         },
         padding: {
@@ -37,10 +34,6 @@ export const actionFlyoutVariables = useThemeCache(() => {
         },
     });
 
-    // const iconActionFlyout = themeVars("iconActionFlyout", {
-    //     marginRight: 10,
-    // });
-
     return {
         position,
         item,
@@ -48,9 +41,9 @@ export const actionFlyoutVariables = useThemeCache(() => {
     };
 });
 
-export const actionFlyoutClasses = useThemeCache(() => {
-    const style = styleFactory("actionFlyout");
-    const vars = actionFlyoutVariables();
+export const newPostMenuClasses = useThemeCache(() => {
+    const style = styleFactory("newPostMenu");
+    const vars = newPostMenuVariables();
     const globalVars = globalVariables();
 
     const root = style({
@@ -62,14 +55,12 @@ export const actionFlyoutClasses = useThemeCache(() => {
     const isOpen = style("isOpen", {});
 
     const item = style("item", {
-        marginRight: unit(vars.item.position.right),
         marginTop: unit(vars.item.position.top),
     });
 
     const action = style("action", {
         borderRadius: unit(vars.item.border.radius),
         backgroundColor: colorOut(globalVars.mainColors.bg),
-
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -82,18 +73,25 @@ export const actionFlyoutClasses = useThemeCache(() => {
         alignItems: "center",
         justifyItems: "center",
         borderRadius: "50%",
-        // cursor: "pointer",
         height: unit(vars.toggle.size),
         width: unit(vars.toggle.size),
         backgroundColor: colorOut(globalVars.mainColors.primary),
         $nest: {
-            [`& .${isOpen} .${iconClasses().postFlyout}`]: {
+            [`& .${isOpen} .${iconClasses().newPostMenuIcon}`]: {
                 transform: translateX(vars.toggle.on.rotation),
             },
         },
     });
 
     const label = style("label", {});
+
+    const menu = style("menu", {
+        ...absolutePosition.bottomRight("100%"),
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+    });
 
     return {
         root,
@@ -102,5 +100,6 @@ export const actionFlyoutClasses = useThemeCache(() => {
         isOpen,
         toggle,
         label,
+        menu,
     };
 });

@@ -264,7 +264,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(vars.gutter.size * 2),
+        marginTop: unit(layoutVars.main.topSpacing - vars.gutter.size),
     });
 
     cssOut(`.Content .PageControls`, {
@@ -341,6 +341,16 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
+
+    cssOut(`.DataList .Item .Options .OptionsMenu`, {
+        order: 10, // we want it last
+    });
+
+    cssOut(`.Breadcrumbs`, {
+        ...paddings({
+            vertical: vars.gutter.half,
+        }),
+    });
 
     buttonCSS();
     flyoutCSS();

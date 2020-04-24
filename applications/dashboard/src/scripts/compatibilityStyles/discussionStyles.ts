@@ -17,7 +17,7 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { important, percent, quote, translate } from "csx";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 export const discussionCSS = () => {
     const vars = globalVariables();

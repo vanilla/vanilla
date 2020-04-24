@@ -249,32 +249,27 @@ export const iconClasses = useThemeCache(() => {
     const style = styleFactory("icon");
 
     const standard = style("defaultIcon", {
-        ...pointerEvents(),
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
     });
 
     const fileType = style("fileType", {
-        ...pointerEvents(),
         width: unit(vars.fileType.width),
         height: unit(vars.fileType.height),
     });
 
     const newFolder = style("newFolder", {
-        ...pointerEvents(),
         width: unit(vars.newFolder.width),
         height: unit(vars.newFolder.height),
         paddingRight: unit(1),
     });
 
     const attachmentError = style("attachmentError", {
-        ...pointerEvents(),
         width: unit(vars.attachmentError.width),
         height: unit(vars.attachmentError.height),
     });
 
     const vanillaLogo = style("vanillaLogo", {
-        ...pointerEvents(),
         width: unit(vars.vanillaLogo.width),
         height: unit(vars.vanillaLogo.height),
     });
@@ -285,69 +280,58 @@ export const iconClasses = useThemeCache(() => {
     });
 
     const compact = style("compact", {
-        ...pointerEvents(),
         width: unit(vars.compact.width),
         height: unit(vars.compact.height),
     });
 
     const settings = style("settings", {
-        ...pointerEvents(),
         width: unit(vars.settings.width),
         height: unit(vars.settings.height),
     });
 
     const warning = style("warning", {
-        ...pointerEvents(),
         width: unit(vars.warning.width),
         height: unit(vars.warning.height),
     });
 
     const search = style("search", {
-        ...pointerEvents(),
         width: unit(vars.search.width),
         height: unit(vars.search.height),
     });
 
     const notifications = style("notifications", {
-        ...pointerEvents(),
         width: unit(vars.notifications.width),
         height: unit(vars.notifications.height),
     });
 
     const messages = style("messages", {
-        ...pointerEvents(),
         width: unit(vars.messages.width),
         height: unit(vars.messages.height),
     });
 
     const user = style("user", {
-        ...pointerEvents(),
         width: unit(vars.user.width),
         height: unit(vars.user.height),
     });
 
     const userWarning = style("userWarning", {
-        ...pointerEvents(),
         width: unit(vars.userWarning.width),
         height: unit(vars.userWarning.height),
     });
 
     const close = style("close", {
-        ...pointerEvents(),
         width: unit(vars.close.width),
         height: unit(vars.close.height),
     });
 
     // Same as close, but without extra padding
     const closeCompact = style("closeCompact", {
-        ...pointerEvents(),
         width: unit(vars.closeCompact.width),
         height: unit(vars.closeCompact.height),
     });
 
     // For really small close buttons, like on tokens
     const closeTiny = style("closeTiny", {
-        ...pointerEvents(),
         display: "block",
         width: unit(vars.closeTiny.width),
         height: unit(vars.closeTiny.height),
@@ -355,13 +339,11 @@ export const iconClasses = useThemeCache(() => {
     });
 
     const chevronLeftCompact = style("chevronLeftCompact", {
-        ...pointerEvents(),
         width: unit(vars.chevronLeftCompact().width),
         height: unit(vars.chevronLeftCompact().height),
     });
 
     const chevronLeftSmallCompact = style("chevronLeftSmallCompact", {
-        ...pointerEvents(),
         $nest: {
             [`&&, &.${chevronLeftCompact}`]: {
                 width: unit(vars.chevronLeftCompact(true).width),
@@ -371,31 +353,26 @@ export const iconClasses = useThemeCache(() => {
     });
 
     const selectedCategory = style("selectedCategory", {
-        ...pointerEvents(),
         width: unit(vars.selectedCategory.width),
         height: unit(vars.selectedCategory.height),
     });
 
     const signIn = style("signIn", {
-        ...pointerEvents(),
         width: unit(vars.signIn.width),
         height: unit(vars.signIn.height),
     });
 
     const chevronUp = style("chevronUp", {
-        ...pointerEvents(),
         width: unit(vars.chevronUp.width),
         height: unit(vars.chevronUp.height),
     });
 
     const plusCircle = style("plusCircle", {
-        ...pointerEvents(),
         width: unit(vars.plusCircle.width),
         height: unit(vars.plusCircle.height),
     });
 
     const categoryIcon = style("categoryIcon", {
-        ...pointerEvents(),
         width: unit(vars.categoryIcon.width),
         height: unit(vars.categoryIcon.height),
         opacity: vars.categoryIcon.opacity,
@@ -403,53 +380,44 @@ export const iconClasses = useThemeCache(() => {
     });
 
     const deleteIcon = style("deleteIcon", {
-        ...pointerEvents(),
         width: unit(vars.deleteIcon.width),
         height: unit(vars.deleteIcon.height),
     });
 
     const isSmall = style("isSmall", {
-        ...pointerEvents(),
         transform: scale(0.85),
         transformOrigin: "50% 50%",
     });
 
     const editIcon = style("editIcon", {
-        ...pointerEvents(),
         width: unit(vars.editIcon.width),
         height: unit(vars.editIcon.height),
     });
 
     const discussionIcon = style("discussionIcon", {
-        ...pointerEvents(),
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
     });
 
     const globeIcon = style("globeIcon", {
-        ...pointerEvents(),
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
     });
 
     const hamburger = style("alertIconCompact", {
-        ...pointerEvents(),
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
     });
 
     const errorFgColor = style("errorFgColor", {
-        ...pointerEvents(),
         color: colorOut(globalVars.messageColors.error.fg),
     });
 
     const warningFgColor = style("warningFgColor", {
-        ...pointerEvents(),
         color: colorOut(globalVars.messageColors.warning.fg),
     });
 
     const documentation = style("documentation", {
-        ...pointerEvents(),
         display: "block",
         width: unit(vars.documentation.width),
         height: unit(vars.documentation.height),

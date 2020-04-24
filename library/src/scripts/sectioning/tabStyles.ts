@@ -8,12 +8,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     colorOut,
     unit,
-    fonts,
     paddings,
-    borders,
     negative,
-    srOnly,
-    IFont,
     sticky,
     extendItemContainer,
     flexHelper,
@@ -49,10 +45,6 @@ export const tabsVariables = useThemeCache(() => {
         },
     });
 
-    const navHeight = makeVars("navHeight", {
-        height: titlebarVars.sizing.height,
-    });
-
     const border = makeVars("border", {
         width: globalVars.border.width,
         color: globalVars.border.color,
@@ -61,6 +53,10 @@ export const tabsVariables = useThemeCache(() => {
         active: {
             color: globalVars.mixPrimaryAndBg(0.5),
         },
+    });
+
+    const navHeight = makeVars("navHeight", {
+        height: titlebarVars.sizing.height + 2 * globalVars.border.width,
     });
 
     return {
@@ -101,14 +97,21 @@ export const tabStandardClasses = useThemeCache(() => {
 
     const tabList = style("tabList", {
         display: "flex",
-        // Offset for the outer borders.
-        ...extendItemContainer(globalVariables().border.width),
         justifyContent: "space-between",
         alignItems: "stretch",
         background: colorOut(vars.colors.bg),
         ...sticky(),
         top: 0,
         zIndex: 1,
+        // Offset for the outer borders.
+        $nest: {
+            "button:first-child": {
+                borderLeft: 0,
+            },
+            "button:last-child": {
+                borderRight: 0,
+            },
+        },
     });
 
     const tab = style(
@@ -244,5 +247,12 @@ export const tabBrowseClasses = useThemeCache(() => {
 
     const isActive = style("isActive", activeStyles as NestedCSSProperties);
 
-    return { root, tab, tabPanels, tabList, panel, isActive };
+    return {
+        root,
+        tab,
+        tabPanels,
+        tabList,
+        panel,
+        isActive,
+    };
 });

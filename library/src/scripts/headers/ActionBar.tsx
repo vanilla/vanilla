@@ -35,6 +35,7 @@ interface IProps {
     title?: React.ReactNode;
     fullWidth?: boolean;
     backTitle?: string;
+    handleCancel?: (e: React.MouseEvent) => void;
 }
 
 /**
@@ -61,7 +62,12 @@ export function ActionBar(props: IProps) {
     const content = (
         <ul className={classNames(classes.items)}>
             <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                <BackLink title={props.backTitle || t("Cancel")} visibleLabel={true} className={classes.backLink} />
+                <BackLink
+                    title={props.backTitle || t("Cancel")}
+                    visibleLabel={true}
+                    className={classes.backLink}
+                    onClick={props.handleCancel}
+                />
             </li>
             {props.statusItem}
             {showMobileDropDown ? (

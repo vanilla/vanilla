@@ -70,6 +70,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         hideTitle: false,
         hideSearch: false,
         searchPlacement: "middle" as SearchPlacement,
+        overlayTitleBar: true,
     });
     const compactSearchVars = compactSearchVariables(forcedVars);
 

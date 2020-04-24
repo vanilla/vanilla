@@ -482,9 +482,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface {
      * @param int|null $limit Max number to get.
      * @param int $offset Number to skip.
      * @param string $order Order comments ascending (asc) or descending (desc) by ID.
+     * @param string $sort The column to sort by.
      * @return Gdn_DataSet SQL results.
      */
-    public function lookup(array $where = [], $permissionFilter = true, $limit = null, $offset = 0, $order = 'desc') {
+    public function lookup(array $where = [], $permissionFilter = true, $limit = null, $offset = 0, $order = 'desc', string $sort = 'CommentID') {
         if ($limit === null) {
             $limit = $this->getDefaultLimit();
         }
@@ -503,12 +504,15 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface {
             }
         }
 
+        $this->orderBy('c.'.$sort);
+        $orderBy = $this->orderBy();
+
         $query = $this->SQL
             ->select('c.*')
             ->select('d.CategoryID')
             ->from('Comment c')
             ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->orderBy('c.CommentID', $order);
+            ->orderBy($orderBy[0][0], $order);
         if (!empty($where)) {
             $query->where($where);
         }

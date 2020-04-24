@@ -16,9 +16,8 @@ import "@library/theming/reset";
 import { ScrollOffsetContext, SCROLL_OFFSET_DEFAULTS } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import { roleReducer } from "@dashboard/roles/roleReducer";
-import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
+import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
-import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
@@ -26,6 +25,7 @@ addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true })
 disableComponentTheming();
 onContent(() => initAllUserContent());
 registerReducer("roles", roleReducer);
+registerReducer("themeSettings", themeSettingsReducer);
 
 applySharedPortalContext(props => {
     const [navHeight, setNavHeight] = useState(0);

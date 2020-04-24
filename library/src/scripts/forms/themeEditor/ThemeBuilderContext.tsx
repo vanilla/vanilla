@@ -112,7 +112,6 @@ export function ThemeBuilderContextProvider(props: IProps) {
         const newErrors = calculateNewErrors(variableKey, null);
         const hasErrors = getErrorCount(newErrors) > 0;
         let cloned = cloneDeep(rawValueRef.current);
-
         rawValueRef.current = cloned;
 
         if (value === "" || value === undefined) {

@@ -46,6 +46,7 @@ export const forumTagCSS = () => {
         textDecoration: important("none"),
     });
 
+    mixinTag(`.TagCloud a`);
     mixinTag(`.Tag`);
     mixinTag(`.DataTableWrap a.Tag`);
     mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a.Tag`);
@@ -70,7 +71,6 @@ function mixinTag(selector: string, overwrite?: {}) {
 
     selectors.map(s => {
         cssOut(selector, {
-            color: colorOut(vars.font.color),
             maxWidth: percent(100),
             display: "inline-block",
             whiteSpace: "normal",

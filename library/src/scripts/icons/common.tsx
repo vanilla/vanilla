@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 
 const currentColorFill = {
@@ -466,6 +466,7 @@ export function ComposeIcon(props: { className?: string; "aria-hidden"?: areaHid
             className={classNames(classes.standard, "icon-compose", props.className)}
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
+            <title>{t("Compose")}</title>
             <path
                 fill="currentColor"
                 d="M23.591,1.27l-.9-.9a1.289,1.289,0,0,0-1.807,0l-.762.863,2.6,2.587.868-.751a1.24,1.24,0,0,0,.248-.373,1.255,1.255,0,0,0,0-1.052A1.232,1.232,0,0,0,23.591,1.27ZM19.5,20.5H3.5V4.5H15.4l1.4-1.431H2.751A1,1,0,0,0,2,4.07V20.939a1,1,0,0,0,1,1H20.011a1,1,0,0,0,1-1V7L19.5,8.445ZM21.364,3.449l-9.875,9.8-.867-.861,9.874-9.8-.867-.863-4.938,4.9-4.938,4.9L8.74,15.167l3.617-1.055,9.875-9.8Z"
@@ -879,6 +880,7 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
             <title>{t("Bookmark")}</title>
             <path
                 className={"svgBookmark-mainPath"}
+                strokeWidth={2}
                 d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"
             />
             <path

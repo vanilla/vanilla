@@ -22,10 +22,12 @@ import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
-import { fullBackgroundCompat } from "@vanilla/library/src/scripts/layout/Backgrounds";
-import { applySharedPortalContext } from "@vanilla/react-utils";
+import { createBrowserHistory, History } from "history";
+import { applySharedPortalContext, mountPortal } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
+import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
+import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -42,12 +44,7 @@ Router.addRoutes([
 
 applySharedPortalContext(props => {
     return (
-        <AppContext
-            variablesOnly={
-                !getMeta("themeFeatures.DataDrivenTheme", false) && !getMeta("themeFeatures.SharedMasterView", false)
-            }
-            errorComponent={ErrorPage}
-        >
+        <AppContext variablesOnly errorComponent={ErrorPage}>
             {props.children}
         </AppContext>
     );
@@ -55,6 +52,14 @@ applySharedPortalContext(props => {
 
 // Routing
 addComponent("App", () => <Router disableDynamicRouting />);
+
+// The community is still very tied into the global.js and legacyAnalyticsTick.json.
+enableLegacyAnalyticsTick(true);
+
+// Configure page view tracking
+onReady(() => {
+    initPageViewTracking(createBrowserHistory());
+});
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);

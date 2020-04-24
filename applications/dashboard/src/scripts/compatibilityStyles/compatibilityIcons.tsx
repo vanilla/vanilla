@@ -8,7 +8,7 @@ import ReactDOM from "react-dom";
 import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
 import { cssRule } from "typestyle";
 import { important } from "csx";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 export function applyCompatibilityIcons(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {

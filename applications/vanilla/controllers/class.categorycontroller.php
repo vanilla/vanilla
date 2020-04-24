@@ -85,7 +85,7 @@ class CategoryController extends VanillaController {
         ]);
 
         $parentCategory = false;
-        if ($category['ParentCategoryID'] != -1) {
+        if ($category['ParentCategoryID'] > 0) {
             $parentCategory = $categoryModel::categories($category['ParentCategoryID'])['UrlCode'];
         }
 

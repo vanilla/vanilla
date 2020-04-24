@@ -39,7 +39,7 @@ trait BasePathTrait {
      *
      * @param string $basePath
      */
-    protected function setBasePath(string $basePath): void {
+    public function setBasePath(string $basePath): void {
         $this->basePath = $basePath;
     }
 }

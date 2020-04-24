@@ -280,6 +280,12 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Web\SSOIDMiddleware::class)
     ->setConstructorArgs(["/api/v2/"])
 
+    ->rule(\Vanilla\OpenAPIBuilder::class)
+    ->addCall('addFilter', ['filter' => new Reference('@ssoid-filter')])
+
+    ->rule('@ssoid-filter')
+    ->setFactory([\Vanilla\Web\SSOIDMiddleware::class, 'filterOpenAPIFactory'])
+
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])

@@ -185,13 +185,14 @@ class SSOIDMiddleware {
      * @param array $fields
      */
     private function updateBody($response, array $fields): Data {
-        $response = Data::box($response);
-
         if (empty($fields)) {
             return $response;
         }
 
+        $response = Data::box($response);
         $userIDs = $this->extractUserIDs($response, $fields);
+        $userIDs = $this->joinSSOIDs($userIDs);
+        $response = $this->updateResponse($response, $fields, $userIDs);
         return $response;
     }
 
@@ -208,12 +209,32 @@ class SSOIDMiddleware {
             return "{$value}ID";
         }, $fields);
 
-        array_walk_recursive($response, function ($value, $key, $idFields) use (&$result) {
+        array_walk_recursive($response, function ($value, $key) use (&$result, $idFields) {
             if (in_array($key, $idFields) && !in_array($value, $result)) {
                 $result[] = $value;
             }
         }, $idFields);
 
         return $result;
+    }
+
+    /**
+     * Grab users SSO IDs and return them mapped to the original user IDs.
+     *
+     * @param array $userIDs
+     * @return array
+     */
+    protected function joinSSOIDs(array $userIDs): array {
+        return [];
+    }
+
+    /**
+     * Update a response to include SSO user IDs.
+     *
+     * @param Data $response
+     * @param array $fields
+     * @param array $userIDs
+     */
+    protected function updateResponse(Data $response, array $fields, array $userIDs): void {
     }
 }

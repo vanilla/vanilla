@@ -36,6 +36,8 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'revisionID:i?',
+                'insertUser:o?',
+                'dateInserted:dt?',
                 'active:b?',
                 'current:b?',
                 'parentTheme:s?',
@@ -144,6 +146,9 @@ trait ThemesApiSchemes {
                 ],
                 'revisionID:i?' => [
                     'description' => 'Theme revision ID.',
+                ],
+                'dateInserted:d?' => [
+                    'description' => 'Theme revision date inserted.',
                 ],
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),

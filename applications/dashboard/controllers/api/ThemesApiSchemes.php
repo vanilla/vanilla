@@ -147,8 +147,8 @@ trait ThemesApiSchemes {
                 'revisionID:i?' => [
                     'description' => 'Theme revision ID.',
                 ],
-                'dateInserted:d?' => [
-                    'description' => 'Theme revision date inserted.',
+                'revisionName:s?' => [
+                    'description' => 'Theme revision name.',
                 ],
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),

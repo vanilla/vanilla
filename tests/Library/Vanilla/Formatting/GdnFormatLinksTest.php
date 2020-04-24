@@ -63,7 +63,7 @@ class GdnFormatLinksTest extends TestCase {
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
     }
-    
+
     /**
      * Testing a link with Right-To-Left character override.
      */
@@ -78,7 +78,7 @@ class GdnFormatLinksTest extends TestCase {
      *
      * @param string $punc The puncuation marks to check.
      *
-     * @dataProvider providePuncuation
+     * @dataProvider providePunctuation
      */
     public function testPunctuation(string $punc) {
         $input = "https://test.com{$punc} Other text";
@@ -92,7 +92,7 @@ HTML;
     /**
      * @return array
      */
-    public function providePuncuation(): array {
+    public function providePunctuation(): array {
         return [
             ['.'],
             ['?'],
@@ -102,6 +102,40 @@ HTML;
             [';'],
             ['&nbsp;'],
         ];
+    }
+
+    /**
+     * Test that parentheses are allowed after the '//', but not before.
+     *
+     * @param string $input String with parentheses to test.
+     * @param string $expected Expected output.
+     * @dataProvider provideTestCommasData
+     */
+    public function testCommas($input, $expected) {
+        $actual = Gdn_Format::links($input);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return array Array of strings to test.
+     */
+    public function provideTestCommasData(): array {
+        $r = [
+            'parensBeforeSlashes' => [
+                'h(tt)p://www.foo.bar',
+                'h(tt)p://www.foo.bar',
+            ],
+            'parensBetweenSlashes' => [
+               'http:/(/www.foo.bar',
+               'http:/(/www.foo.bar',
+            ],
+            'parensAfterSlashes' => [
+                'http://www.(foo).bar',
+                '<a href="http://www.(foo).bar" rel="nofollow">http://www.(foo).bar</a>'
+            ],
+        ];
+
+        return $r;
     }
 
     /**

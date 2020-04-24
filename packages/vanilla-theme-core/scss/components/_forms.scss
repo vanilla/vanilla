@@ -38,6 +38,10 @@
             outline: none;
         }
     }
+
+    textarea.isWysiwyg {
+        padding: $formElement_paddingHorizontal;
+    }
 }
 
 ::-ms-clear {

@@ -7,7 +7,7 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");

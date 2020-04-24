@@ -21,6 +21,7 @@ import { TextTransformProperty } from "csstype";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
 import { toolTipClasses } from "@library/toolTip/toolTipStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
@@ -171,6 +172,11 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...paddings({
             horizontal: unit(vars.panel.padding),
         }),
+        $nest: {
+            "&.checkBoxBlock + .checkBoxBlock": {
+                marginTop: negativeUnit(8),
+            },
+        },
     });
 
     const label = style("label", {
@@ -297,7 +303,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         textAlign: "right",
     });
 
-    const tooltip = style("tooltip", {
+    const blockInfo = style("blockInfo", {
         ...flexHelper().middle(),
         marginLeft: globalVars.gutter.half,
         $nest: {
@@ -319,11 +325,11 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const documentationIconLink = style("documentationIconLink", {
+        ...clickableItemStates({ skipDefault: true }),
+        color: "inherit",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: unit(16),
-        height: unit(16),
     });
 
     const docBlockTextContainer = style("docBlockTextContainer", {
@@ -370,7 +376,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         subGroupSectionTitle,
         invalidField,
         colorErrorMessage,
-        tooltip,
+        blockInfo,
         resetButton,
         documentationIconLink,
         docBlockTextContainer,

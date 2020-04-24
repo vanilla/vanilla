@@ -9,6 +9,8 @@ use VanillaTests\NullContainer;
 // Use consistent timezone for all tests.
 date_default_timezone_set("UTC");
 
+ini_set("default_charset", "UTF-8");
+
 error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [

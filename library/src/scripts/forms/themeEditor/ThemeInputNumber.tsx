@@ -73,6 +73,9 @@ export function ThemeInputNumber(_props: IProps) {
         const intVal = ensureInteger(e.target.value);
         if (Number.isInteger(intVal)) {
             setValue(intVal);
+        } else if (e.target.value === "") {
+            // Clearing the input is always allowed.
+            setValue("");
         } else {
             e.preventDefault();
         }

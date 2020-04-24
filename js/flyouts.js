@@ -12,7 +12,7 @@
  * @param {jQuery} $
  */
 (function(window, $) {
-    var USE_NEW_FLYOUTS = gdn.getMeta("useNewFlyouts", false);
+    var USE_NEW_FLYOUTS = window.gdn.meta.themeFeatures.NewFlyouts || false;
     var OPEN_CLASS = "Open";
 
     /**

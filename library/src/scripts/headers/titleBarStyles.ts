@@ -23,6 +23,7 @@ import {
     EMPTY_FONTS,
     isLightColor,
     negativeUnit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -973,6 +974,12 @@ export const titleBarClasses = useThemeCache(() => {
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
+    const titleBarContainer = style("titleBarContainer", {
+        ...paddings({
+            horizontal: globalVars.gutter.half,
+        }),
+    });
+
     return {
         root,
         bg1,
@@ -1019,6 +1026,7 @@ export const titleBarClasses = useThemeCache(() => {
         overlay,
         swoop,
         signInIconOffset,
+        titleBarContainer,
     };
 });
 

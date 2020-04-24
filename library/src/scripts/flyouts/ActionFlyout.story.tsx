@@ -48,16 +48,30 @@ const items: Array<IActionLink | IActionButton> = [
     },
 ];
 
-export const Basic = () => (
+export const WithItemsClosed = () => (
     <StoryContent>
-        <StoryHeading depth={1}> Basic </StoryHeading>
-        <ActionFlyout actions={items} />
+        <StoryHeading depth={1}> With Items Closed </StoryHeading>
+        <ActionFlyout actions={items} openStatus={false} />
     </StoryContent>
 );
 
-export const Empty = () => (
+export const WithItemsOpen = () => (
     <StoryContent>
-        <StoryHeading depth={1}> Empty </StoryHeading>
-        <ActionFlyout actions={[]} />
+        <StoryHeading depth={1}> With Items Open </StoryHeading>
+        <ActionFlyout actions={items} openStatus />
+    </StoryContent>
+);
+
+export const NoItemsClosed = () => (
+    <StoryContent>
+        <StoryHeading depth={1}> No Items Closed </StoryHeading>
+        <ActionFlyout actions={[]} openStatus={false} />
+    </StoryContent>
+);
+
+export const NoItemsOpen = () => (
+    <StoryContent>
+        <StoryHeading depth={1}> No Items Open </StoryHeading>
+        <ActionFlyout actions={[]} openStatus />
     </StoryContent>
 );

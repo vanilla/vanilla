@@ -323,7 +323,7 @@ story.add("Icons", () => {
             <StoryHeading>ActionFlyout</StoryHeading>
             <StoryTiles>
                 <StoryTileAndTextCompact text={`PostFlyoutIcon`}>
-                    <CommonIcons.PostFlyoutIcon />
+                    <CommonIcons.PostFlyoutIcon rotated={false} />
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
                     <CommonIcons.NewDiscussionIcon />

@@ -891,11 +891,12 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
     );
 }
 
-export function PostFlyoutIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function PostFlyoutIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; rotated: boolean }) {
     const classes = iconClasses();
+
     return (
         <svg
-            className={classNames(classes.postFlyout)}
+            className={classNames({ [classes.postFlyout]: true, [classes.postFlyoutOpen]: props.rotated })}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 56 56"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}

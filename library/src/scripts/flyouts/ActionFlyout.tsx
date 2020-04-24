@@ -2,11 +2,12 @@ import React, { ReactNode, useState } from "react";
 import classNames from "classnames";
 import { actionFlyoutClasses } from "@library/flyouts/ActionFlyoutStyles";
 import { PostFlyoutIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { assetUrl } from "@library/utility/appUtils";
 import { action } from "@storybook/addon-actions";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 type Icon = ReactNode;
 
@@ -36,6 +37,7 @@ export interface IActionLink {
 
 interface IProps {
     actions: Array<IActionLink | IActionButton>;
+    openStatus: boolean;
 }
 
 function ActionItem({
@@ -54,12 +56,20 @@ function ActionItem({
     return (
         <div className={classNames(className)}>
             {action.type === ActionType.BUTTON ? (
-                <Button onClick={(action as IActionButton).action} className={classNames(buttonClass)}>
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    onClick={(action as IActionButton).action}
+                    className={classNames(buttonClass)}
+                >
                     <span className={classNames(iconClass)}> {icon} </span>
                     <span> {label} </span>
                 </Button>
             ) : (
-                <LinkAsButton to={(action as IActionLink).link} className={classNames(buttonClass)}>
+                <LinkAsButton
+                    baseClass={ButtonTypes.CUSTOM}
+                    to={(action as IActionLink).link}
+                    className={classNames(buttonClass)}
+                >
                     <span className={classNames(iconClass)}> {icon} </span>
                     <span> {label} </span>
                 </LinkAsButton>
@@ -68,8 +78,8 @@ function ActionItem({
     );
 }
 
-export default function ActionFlyout({ actions }: IProps) {
-    const [open, setOpen] = useState(false);
+export default function ActionFlyout({ actions, openStatus = false }: IProps) {
+    const [open, setOpen] = useState(openStatus);
 
     const openToggle = () => setOpen(!open);
 
@@ -86,8 +96,8 @@ export default function ActionFlyout({ actions }: IProps) {
                         action={action}
                     />
                 ))}
-            <div onClick={openToggle} className={classNames({ [classes.click]: true, [classes.clickOpen]: open })}>
-                <PostFlyoutIcon />
+            <div onClick={openToggle} className={classNames(classes.click)}>
+                <PostFlyoutIcon rotated={open} />
             </div>
         </div>
     );

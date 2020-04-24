@@ -61,7 +61,7 @@ export const actionFlyoutClasses = useThemeCache(() => {
     });
 
     const clickOpen = style({
-        transform: "rotate(-45deg)",
+        // transform: "rotate(-45deg)",
     });
 
     const item = style({

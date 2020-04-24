@@ -489,6 +489,10 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.postFlyoutIcon.height),
     });
 
+    const postFlyoutOpen = style("postFlyoutOpen", {
+        transform: "rotate(-45deg)",
+    });
+
     const postFlyoutCircle = style("postFlyoutCircle", {
         fill: colorOut(globalVars.mainColors.primary),
     });
@@ -538,6 +542,7 @@ export const iconClasses = useThemeCache(() => {
         documentation,
         bookmark,
         postFlyout,
+        postFlyoutOpen,
         postFlyoutCircle,
         postFlyoutPath,
         itemFlyout,

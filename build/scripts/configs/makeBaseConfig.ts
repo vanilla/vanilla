@@ -57,8 +57,12 @@ ${chalk.green(aliases)}`;
                             "p-debounce",
                             "@vanilla/.*",
                             "react-redux",
-                            "react-spring/?.*",
                         ];
+
+                        if (section !== "storybook") {  //dont's transpile react-spring for storybook, it breaks exports
+                            modulesRequiringTranspilation.push("react-spring");
+                        }
+
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
                         if (modulePath.includes("core-js")) {

@@ -36,6 +36,7 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'revisionID:i?',
+                'revisionName:s?',
                 'insertUser:o?',
                 'dateInserted:dt?',
                 'active:b?',

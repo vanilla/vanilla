@@ -9,6 +9,7 @@ namespace Vanilla\Web;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Garden\BasePathTrait;
+use UserModel;
 
 /**
  * Middleware to lookup foreign user IDs and add them to API responses.
@@ -21,21 +22,27 @@ use Garden\BasePathTrait;
  */
 class SSOIDMiddleware {
 
+    use BasePathTrait;
+
     private const EXPAND_FIELD = "expand";
 
     private const ID_FIELD = "ssoID";
 
-    use BasePathTrait;
-
+    /** @var string[] */
     private $userFields = ["insertUser", "updateUser"];
+
+    /** @var UserModel */
+    private $userModel;
 
     /**
      * Setup the middleware.
      *
      * @param string $basePath
+     * @param UserModel $userModel
      */
-    public function __construct(string $basePath) {
+    public function __construct(string $basePath, UserModel $userModel) {
         $this->setBasePath($basePath);
+        $this->userModel = $userModel;
     }
 
     /**
@@ -57,7 +64,7 @@ class SSOIDMiddleware {
             return $response;
         }
 
-        $this->updateBody($response, $fields);
+        $response = $this->updateBody($response, $fields);
         return $response;
     }
 
@@ -183,8 +190,9 @@ class SSOIDMiddleware {
      *
      * @param array|Data $response
      * @param array $fields
+     * @return mixed
      */
-    private function updateBody($response, array $fields): Data {
+    private function updateBody($response, array $fields) {
         if (empty($fields)) {
             return $response;
         }
@@ -192,7 +200,7 @@ class SSOIDMiddleware {
         $response = Data::box($response);
         $userIDs = $this->extractUserIDs($response, $fields);
         $userIDs = $this->joinSSOIDs($userIDs);
-        $response = $this->updateResponse($response, $fields, $userIDs);
+        $this->updateResponse($response, $fields, $userIDs);
         return $response;
     }
 
@@ -201,7 +209,7 @@ class SSOIDMiddleware {
      *
      * @param Data $response
      * @param array $fields
-     * @return array
+     * @return int[]
      */
     private function extractUserIDs(Data $response, array $fields): array {
         $result = [];
@@ -225,7 +233,8 @@ class SSOIDMiddleware {
      * @return array
      */
     protected function joinSSOIDs(array $userIDs): array {
-        return [];
+        $result = $this->userModel->getDefaultSSOIDs($userIDs);
+        return $result;
     }
 
     /**

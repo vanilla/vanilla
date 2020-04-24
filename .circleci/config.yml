@@ -83,9 +83,6 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     yarn build
-                    npx es-check es5 ./dist/polyfills.min.js
-                    npx es-check es5 ./dist/forum/vendors.min.js
-                    npx es-check es5 ./dist/forum/shared.min.js
     frontend_test:
         executor: core/node
         steps:

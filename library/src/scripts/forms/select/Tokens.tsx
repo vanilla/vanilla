@@ -100,7 +100,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                         }}
                     >
                         <input
-                            className={classNames("js-tokenInput", "js-" + this.prefix + "-tokenInput")}
+                            className={"js-" + this.prefix + "-tokenInput"}
                             aria-hidden={true}
                             value={JSON.stringify(this.props.value)}
                             type="hidden"

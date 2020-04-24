@@ -100,11 +100,11 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                         }}
                     >
                         <input
-                            id={"testMe"}
-                            className={"js-tokenInputTests"}
+                            className={classNames("js-tokenInput", "js-tokenInput-" + this.prefix)}
                             aria-hidden={true}
                             value={JSON.stringify(this.props.value)}
                             type="hidden"
+                            tabIndex={-1}
                         />
                     </MutationObserver>
                 </div>

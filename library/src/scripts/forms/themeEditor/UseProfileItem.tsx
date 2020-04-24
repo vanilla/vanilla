@@ -17,7 +17,7 @@ export function UserProfileItem(props: IProps) {
     // const profileLink = `${window.location.origin}/profile/${currentUser.name}`;
     const classesUserDropDown = userDropDownClasses();
     return (
-        <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>
+        <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard")}>
             <SmartLink
                 to={}
                 className={classNames("userDropDown-userCardPhotoLink", classesUserDropDown.userCardPhotoLink)}

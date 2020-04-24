@@ -27,7 +27,6 @@ export interface ITheme {
     parentTheme?: string;
     current: boolean;
     version: string;
-    revisionID: number;
 }
 
 export interface IThemeAssets {

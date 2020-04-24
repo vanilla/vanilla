@@ -17,7 +17,11 @@ interface IProps extends IBaseEmbedProps {
     height: number;
 }
 
+/** @constant {string} */
 const PANOPTO_SCRIPT = "https://developers.panopto.com/scripts/embedapi.min.js";
+
+/** @constant {string} */
+const EMBED_LOADED_CLASS = "isLoaded";
 
 /**
  * A class for rendering Twitter embeds.
@@ -34,7 +38,7 @@ export function PanoptoEmbed(props: IProps): JSX.Element {
             <EmbedContainer>
                 <EmbedContent type={props.embedType}>
                     <div
-                        className="panopto-media"
+                        className="panoptoVideo"
                         data-sessionid={props.sessionId}
                         data-domain={props.domain}
                         data-url={props.url}
@@ -53,12 +57,15 @@ export function PanoptoEmbed(props: IProps): JSX.Element {
  * Convert all of the Panopto embeds in the page.
  */
 async function convertPanoptoEmbeds() {
-    const panoptoEmbeds = Array.from(document.querySelectorAll(".panopto-media"));
+    const panoptoEmbeds = Array.from(document.querySelectorAll(".panoptoVideo"));
 
     if (panoptoEmbeds.length > 0) {
         await ensureScript(PANOPTO_SCRIPT);
         panoptoEmbeds.map(contentElement => {
-            renderPanoptoEmbed(contentElement as HTMLElement);
+            // Only render the embed if its not loaded yet.
+            if (!contentElement.classList.contains(EMBED_LOADED_CLASS)) {
+                renderPanoptoEmbed(contentElement as HTMLElement);
+            }
         });
     }
 }
@@ -88,4 +95,5 @@ async function renderPanoptoEmbed(element: HTMLElement) {
     });
 
     embedApi.loadVideo();
+    element.classList.add(EMBED_LOADED_CLASS);
 }

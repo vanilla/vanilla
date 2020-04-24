@@ -179,7 +179,7 @@ class EmbedService implements EmbedCreatorInterface {
             // YouTube
             ->registerFactory($dic->get(YouTubeEmbedFactory::class))
             ->registerEmbed(YouTubeEmbed::class, YouTubeEmbed::TYPE)
-            // Panopto Vanilla quote embed.
+            // Panopto
             ->registerFactory($dic->get(PanoptoEmbedFactory::class))
             ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
             // Scrape-able Embeds

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useRef } from "react";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
@@ -14,6 +14,7 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import MutationObserver from "react-mutation-observer";
 
 export interface ITokenProps extends IOptionalComponentID {
     label: string;
@@ -40,6 +41,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
     private prefix = "tokens";
     private id: string = getRequiredID(this.props, this.prefix);
     private inputID: string = this.id + "-tokenInput";
+
     public state: IState = {
         inputValue: "",
         focus: false,
@@ -51,44 +53,62 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
         const classesInputBlock = inputBlockClasses();
 
         return (
-            <div className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root)}>
-                <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
-                    <span className={classesInputBlock.labelText}>{this.props.label}</span>
-                    <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
-                </label>
+            <>
+                <div className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root)}>
+                    <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
+                        <span className={classesInputBlock.labelText}>{this.props.label}</span>
+                        <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+                    </label>
 
-                <div
-                    className={classNames(classesInputBlock.inputWrap, classes.inputWrap, {
-                        hasFocus: this.state.focus,
-                    })}
-                >
-                    <Select
-                        id={this.id}
-                        inputId={this.inputID}
-                        components={this.componentOverwrites}
-                        onChange={this.props.onChange}
-                        inputValue={this.state.inputValue}
-                        value={this.props.value}
-                        onInputChange={this.handleInputChange}
-                        isClearable={true}
-                        isDisabled={disabled}
-                        options={options}
-                        isLoading={this.showLoader}
-                        classNamePrefix={this.prefix}
-                        className={classNames(this.prefix, className)}
-                        placeholder={this.props.placeholder}
-                        aria-label={t("Search")}
-                        escapeClearsValue={true}
-                        pageSize={20}
-                        theme={this.getTheme}
-                        styles={this.getStyles()}
-                        backspaceRemovesValue={true}
-                        isMulti={true}
-                        onFocus={this.onFocus}
-                        onBlur={this.onBlur}
-                    />
+                    <div
+                        className={classNames(classesInputBlock.inputWrap, classes.inputWrap, {
+                            hasFocus: this.state.focus,
+                        })}
+                    >
+                        <Select
+                            id={this.id}
+                            inputId={this.inputID}
+                            components={this.componentOverwrites}
+                            onChange={this.props.onChange}
+                            inputValue={this.state.inputValue}
+                            value={this.props.value}
+                            onInputChange={this.handleInputChange}
+                            isClearable={true}
+                            isDisabled={disabled}
+                            options={options}
+                            isLoading={this.showLoader}
+                            classNamePrefix={this.prefix}
+                            className={classNames(this.prefix, className)}
+                            placeholder={this.props.placeholder}
+                            aria-label={t("Search")}
+                            escapeClearsValue={true}
+                            pageSize={20}
+                            theme={this.getTheme}
+                            styles={this.getStyles()}
+                            backspaceRemovesValue={true}
+                            isMulti={true}
+                            onFocus={this.onFocus}
+                            onBlur={this.onBlur}
+                        />
+                    </div>
+
+                    <MutationObserver
+                        onAttributeChange={e => {
+                            if (e.to && e.to !== e.from) {
+                                this.props.onChange(JSON.parse(e.to));
+                            }
+                        }}
+                    >
+                        <input
+                            id={"testMe"}
+                            className={"js-tokenInputTests"}
+                            aria-hidden={true}
+                            value={JSON.stringify(this.props.value)}
+                            type="hidden"
+                        />
+                    </MutationObserver>
                 </div>
-            </div>
+            </>
         );
     }
 

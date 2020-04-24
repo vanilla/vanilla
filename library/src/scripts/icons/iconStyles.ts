@@ -202,14 +202,14 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const postFlyoutIcon = themeVars("postFlyoutIcon", {
-        width: 56,
-        height: 56,
+        width: 16,
+        height: 16,
     });
 
-    const itemFlyoutIcon = themeVars("itemFlyoutIcon", {
-        width: 24,
-        height: 24,
-    });
+    // const itemFlyoutIcon = themeVars("itemFlyoutIcon", {
+    //     width: 24,
+    //     height: 24,
+    // });
 
     return {
         standard,
@@ -239,7 +239,7 @@ export const iconVariables = useThemeCache(() => {
         documentation,
         bookmarkIcon,
         postFlyoutIcon,
-        itemFlyoutIcon,
+        // itemFlyoutIcon,
     };
 });
 
@@ -487,14 +487,7 @@ export const iconClasses = useThemeCache(() => {
     const postFlyout = style("postFlyout", {
         width: unit(vars.postFlyoutIcon.width),
         height: unit(vars.postFlyoutIcon.height),
-    });
-
-    const postFlyoutCircle = style("postFlyoutCircle", {
-        fill: colorOut(globalVars.mainColors.primary),
-    });
-
-    const postFlyoutPath = style("postFlyoutPath", {
-        fill: colorOut(globalVars.mainColors.primaryContrast),
+        color: colorOut(globalVars.mainColors.primaryContrast),
     });
 
     const itemFlyout = style("itemFlyout", {
@@ -538,8 +531,6 @@ export const iconClasses = useThemeCache(() => {
         documentation,
         bookmark,
         postFlyout,
-        postFlyoutCircle,
-        postFlyoutPath,
         itemFlyout,
     };
 });

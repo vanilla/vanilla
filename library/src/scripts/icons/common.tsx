@@ -892,19 +892,17 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
 }
 
 export function PostFlyoutIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
     return (
         <svg
-            className={classNames(classes.postFlyout)}
+            className={classNames(iconClasses().postFlyout, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 56 56"
+            viewBox="0 0 16 16"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
-            <title>{t("New Action")}</title>
-            <circle cx="28" cy="28" r="28" className={classNames(classes.postFlyoutCircle)} />
+            <title>{t("New Post")}</title>
             <path
-                d="M28,20a1,1,0,0,1,1,1v6h6a1,1,0,0,1,.993.883L36,28a1,1,0,0,1-1,1H29v6a1,1,0,0,1-.883.993L28,36a1,1,0,0,1-1-1V29H21a1,1,0,0,1-.993-.883L20,28a1,1,0,0,1,1-1h6V21a1,1,0,0,1,.883-.994Z"
-                className={classNames(classes.postFlyoutPath)}
+                d="M8,0A1,1,0,0,1,9,1V7h6a1,1,0,0,1,.993.883L16,8a1,1,0,0,1-1,1H9v6a1,1,0,0,1-.883.993L8,16a1,1,0,0,1-1-1V9H1a1,1,0,0,1-.993-.883L0,8A1,1,0,0,1,1,7H7V1A1,1,0,0,1,7.883.006Z"
+                fill="currentColor"
             />
         </svg>
     );

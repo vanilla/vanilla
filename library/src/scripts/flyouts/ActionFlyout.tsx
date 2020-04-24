@@ -1,94 +1,67 @@
 import React, { ReactNode, useState } from "react";
 import classNames from "classnames";
-import { actionFlyoutClasses } from "@library/flyouts/ActionFlyoutStyles";
+import { actionFlyoutClasses } from "@library/flyouts/actionFlyoutStyles";
 import { PostFlyoutIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
-import { assetUrl } from "@library/utility/appUtils";
-import { action } from "@storybook/addon-actions";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
-type Icon = ReactNode;
-
-export enum ActionType {
+export enum ActionTypes {
     LINK = "link",
     BUTTON = "button",
 }
 
-export interface IAssets {
-    icon: Icon;
+interface IAction {
+    action: (() => void) | string;
+    type: ActionTypes;
+    className?: string;
     label: string;
+    icon: JSX.Element;
 }
 
-export interface IActionButton {
-    id: string;
-    type: ActionType;
-    assets: IAssets;
-    action: () => void;
-}
+function ActionItem(props: IAction) {
+    const { action, className, type, label, icon } = props;
+    const classes = actionFlyoutClasses();
 
-export interface IActionLink {
-    id: string;
-    type: ActionType;
-    assets: IAssets;
-    link: string;
-}
+    const contents = (
+        <>
+            {icon}
+            <span className={classes.label}>{label}</span>
+        </>
+    );
 
-interface IProps {
-    actions: Array<IActionLink | IActionButton>;
-}
-
-function ActionItem({
-    action,
-    className,
-    buttonClass,
-    iconClass,
-}: {
-    action: IActionButton | IActionLink;
-    className: string;
-    buttonClass: string;
-    iconClass: string;
-}) {
-    const { icon, label } = action.assets;
-
-    return (
-        <div className={classNames(className)}>
-            {action.type === ActionType.BUTTON ? (
-                <Button onClick={(action as IActionButton).action} className={classNames(buttonClass)}>
-                    <span className={classNames(iconClass)}> {icon} </span>
-                    <span> {label} </span>
-                </Button>
-            ) : (
-                <LinkAsButton to={(action as IActionLink).link} className={classNames(buttonClass)}>
-                    <span className={classNames(iconClass)}> {icon} </span>
-                    <span> {label} </span>
-                </LinkAsButton>
-            )}
-        </div>
+    return type === ActionTypes.BUTTON ? (
+        <Button onClick={action as () => void} className={classNames(className, classes.action)}>
+            {contents}
+        </Button>
+    ) : (
+        <LinkAsButton to={action as string} className={classNames(className, classes.action)}>
+            {contents}
+        </LinkAsButton>
     );
 }
 
-export default function ActionFlyout({ actions }: IProps) {
+export default function ActionFlyout(actions: IAction[]) {
     const [open, setOpen] = useState(false);
 
-    const openToggle = () => setOpen(!open);
+    const toggle = () => setOpen(!open);
 
     const classes = actionFlyoutClasses();
     return (
         <div className={classNames(classes.root)}>
             {open &&
-                actions.map(action => (
-                    <ActionItem
-                        key={action.id}
-                        className={classes.item}
-                        buttonClass={classes.button}
-                        iconClass={classes.icon}
-                        action={action}
-                    />
-                ))}
-            <div onClick={openToggle} className={classNames({ [classes.click]: true, [classes.clickOpen]: open })}>
+                actions.map((action, i) => {
+                    return <ActionItem key={i} {...action} />;
+                })}
+            <Button
+                baseClass={ButtonTypes.CUSTOM}
+                onClick={toggle}
+                className={classNames(classes.toggle, {
+                    [classes.isOpen]: open,
+                })}
+            >
                 <PostFlyoutIcon />
-            </div>
+            </Button>
         </div>
     );
 }

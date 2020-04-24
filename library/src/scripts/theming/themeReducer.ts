@@ -10,6 +10,7 @@ import produce from "immer";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IThemesState } from "@library/theming/themeSettingsReducer";
+import { IUserFragment } from "@library/@types/api/users";
 
 export enum ThemeType {
     DB = "themeDB",
@@ -27,6 +28,9 @@ export interface ITheme {
     parentTheme?: string;
     current: boolean;
     version: string;
+    insertUser?: IUserFragment;
+    dateInserted?: string;
+    revisionID?: number;
 }
 
 export interface IThemeAssets {
@@ -122,7 +126,7 @@ export const themeReducer = produce(
         .case(ThemeActions.getThemeRevisions_ACs.done, (state, payload) => {
             if (state.themeRevisions) {
                 state.themeRevisions.status = LoadStatus.SUCCESS;
-                state.themeRevisions.data = [payload.result];
+                state.themeRevisions.data = payload.result;
             }
             return state;
         }),

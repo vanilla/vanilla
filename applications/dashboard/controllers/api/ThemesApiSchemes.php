@@ -147,7 +147,7 @@ trait ThemesApiSchemes {
                 'revisionID:i?' => [
                     'description' => 'Theme revision ID.',
                 ],
-                'dateInserted:d?' => [
+                'dateInserted:dt?' => [
                     'description' => 'Theme revision date inserted.',
                 ],
                 'assets?' => Schema::parse([

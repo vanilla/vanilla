@@ -51,6 +51,9 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var string|int */
     private $forcedThemeKey;
 
+    /** @var string|null */
+    private $revisionID;
+
     /**
      * DI.
      *
@@ -77,15 +80,33 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @param int|string $forcedThemeKey
      */
-    public function setForcedThemeKey($forcedThemeKey): void {
+    public function setForcedThemeKey($forcedThemeKey, $revisionID = null): void {
         $this->forcedThemeKey = $forcedThemeKey;
+
     }
+
+    /**
+     * @param int|string $revisionID
+     */
+    public function setForcedRevisionID($revisionID = null): void {
+        $this->revisionID = $revisionID;
+
+    }
+
+
 
     /**
      * @return string|int
      */
     private function getThemeKeyToPreload() {
         return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
+    }
+
+    /**
+     * @return int
+     */
+    private function getThemeRevisionID() {
+        return $this->revisionID;
     }
 
     /**
@@ -124,6 +145,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
                     [
                         // Forced theme keys disable addon variables.
                         'allowAddonVariables' => !$this->forcedThemeKey,
+                        'revisionID' => $this->revisionID,
                     ]
                 );
             } catch (\Throwable $e) {

@@ -11,8 +11,6 @@ import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
-import { History } from "history";
-import { PageType } from "@themingapi/theme/ThemeEditorActions";
 
 const createAction = actionCreatorFactory("@@themes");
 
@@ -41,18 +39,23 @@ interface IPutCurrentThemeRequest {
  */
 
 export default class ThemeActions extends ReduxActions {
-    public static getAssets = createAction.async<{ themeKey: string }, ITheme, IApiError>("GET");
+    public static getAssets = createAction.async<{ themeKey: string; revisionID: number | null }, ITheme, IApiError>(
+        "GET",
+    );
 
-    public getAssets = (themeKey: string) => {
+    public getAssets = (themeKey: string, revisionID: number | null = null) => {
         const { theme } = this.getState();
         if (theme.assets.data) {
             return theme.assets.data;
         }
 
         const apiThunk = bindThunkAction(ThemeActions.getAssets, async () => {
-            const response = await this.api.get(`/themes/${themeKey}`);
+            const response = await this.api.get(`/themes/${themeKey}`, {
+                params: { revisionID: revisionID },
+            });
+
             return response.data;
-        })({ themeKey });
+        })({ themeKey, revisionID });
         return this.dispatch(apiThunk);
     };
 
@@ -133,10 +136,6 @@ export default class ThemeActions extends ReduxActions {
 
         return this.dispatch(thunk);
     }
-
-    public getThemeRevisionsByID = async (themeID: number) => {
-        return await this.getThemeRevisions(themeID);
-    };
 }
 
 export function useThemeActions() {

@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import classNames from "classnames";
 
-import { NewPostMenuIcon, newPostMenuIcon } from "@library/icons/common";
+import { NewPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";

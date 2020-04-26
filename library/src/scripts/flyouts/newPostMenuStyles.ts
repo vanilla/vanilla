@@ -52,7 +52,9 @@ export const newPostMenuClasses = useThemeCache(() => {
         right: unit(vars.position.right),
     });
 
-    const isOpen = style("isOpen", {});
+    const isOpen = style("isOpen", {
+        transform: `rotate(${vars.toggle.on.rotation})`,
+    });
 
     const item = style("item", {
         marginTop: unit(vars.item.position.top),

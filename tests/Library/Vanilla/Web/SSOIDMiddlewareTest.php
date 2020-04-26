@@ -343,4 +343,62 @@ EOT
         $this->middleware->filterOpenAPI($in);
         $this->assertSame($expected, $in);
     }
+
+    /**
+     * Expansion shouldn't overly recurse into expanded records.
+     */
+    public function testNoDoubleExpand(): void {
+        $request = new Request('/?expand=user.ssoID');
+        $next = function ($r) {
+            return [
+                'userID' => 1,
+                'user' => [
+                    'userID' => 1,
+                    'name' => 'foo',
+                ]
+            ];
+        };
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, $next);
+        $this->assertSame([
+            'userID' => 1,
+            'user' => [
+                'userID' => 1,
+                'name' => 'foo',
+                'ssoID' => 'sso-1',
+            ]
+        ], $actual->getData());
+    }
+
+    /**
+     * Expansion has a supported nesting with a dot separator.
+     */
+    public function testExpandDotNotation(): void {
+        $request = new Request('/?expand=lastPost.insertUser.ssoID');
+        $next = function ($r) {
+            return [
+                'insertUserID' => 1,
+                'lastPostID' => 2,
+                'lastPost' => [
+                    'name' => 'Pizza',
+                    'insertUserID' => 3,
+                ],
+            ];
+        };
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, $next);
+        $this->assertSame([
+            'insertUserID' => 1,
+            'lastPostID' => 2,
+            'lastPost' => [
+                'name' => 'Pizza',
+                'insertUserID' => 3,
+                'insertUser' => [
+                    'ssoID' => 'sso-3',
+                ],
+            ],
+        ], $actual->getData());
+    }
 }

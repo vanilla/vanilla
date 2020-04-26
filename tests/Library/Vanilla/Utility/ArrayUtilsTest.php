@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
+use ArrayAccess;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Fixtures\DumbArray;
@@ -54,6 +55,67 @@ class ArrayUtilsTest extends TestCase {
         ];
 
         return $r;
+    }
+
+    /**
+     * Test getting an array element by its path.
+     *
+     * @param string $path
+     * @param array|ArrayAccess $array
+     * @param mixed $expected
+     * @dataProvider  provideGetByPathTests
+     */
+    public function testGetByPath(string $path, $array, $expected): void {
+        $actual = ArrayUtils::getByPath($path, $array);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide data for testing path resolution.
+     *
+     * @return array
+     */
+    public function provideGetByPathTests(): array {
+        $result = [
+            "simple path" => [
+                "foo",
+                ["foo" => "Hello world."],
+                "Hello world.",
+            ],
+            "complex path" => [
+                "a.b.c",
+                [
+                    "a" => [
+                        "b" => ["c" => 123],
+                    ]
+                ],
+                123,
+            ],
+            "unknown path" => [
+                "foo.bar",
+                ["foo" => "xyz"],
+                null
+            ],
+            "escaped path" => [
+                "foo.b\.ar.baz",
+                [
+                    "foo" => [
+                        "b.ar" => ["baz" => "Hello world."],
+                    ],
+                ],
+                "Hello world."
+            ],
+            "array object" => [
+                "w.x.y",
+                new \ArrayObject([
+                    "w" => [
+                        "x" => ["y" => "Hello world."],
+                    ]
+                ]),
+                "Hello world.",
+            ]
+        ];
+        return $result;
     }
 
     /**

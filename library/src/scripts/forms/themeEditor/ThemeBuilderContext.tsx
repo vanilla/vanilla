@@ -26,7 +26,7 @@ interface IThemeBuilderContext {
     initialThemeVariables: IThemeVariables;
     generatedThemeVariables: IThemeVariables;
     variableErrors: IThemeVariables;
-    setVariableValue: (variableKey: string, value: any, allowNull: boolean) => void;
+    setVariableValue: (variableKey: string, value: any, allowNull?: boolean) => void;
     setVariableError: (variableKey: string, value: any) => void;
 }
 

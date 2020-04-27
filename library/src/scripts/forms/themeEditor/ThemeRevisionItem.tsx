@@ -9,23 +9,23 @@ import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import DateTime from "@library/content/DateTime";
+import { ITheme } from "@library/theming/themeReducer";
 
 interface IProps {
-    name?: string;
-    imageUrl?: string;
-    date?: string;
+    revision: ITheme;
     isSelected?: boolean;
     userInfo: IUserFragment;
-    revisionID: number;
     onClick?: (event: any) => void;
-    isLoading?: boolean;
+    disabled?: boolean;
+    isActive?: boolean;
 }
 
 export function ThemeRevisionItem(props: IProps) {
+    const { revision, isSelected, userInfo, isActive } = props;
     const visibilityClasses = visibility();
     const classes = dropdownSwitchButtonClasses();
 
-    const checkStatus = props.isSelected ? (
+    const checkStatus = isSelected ? (
         <>
             <CheckCompactIcon aria-hidden={true} />
             <span className={visibilityClasses.visuallyHidden}>{t("on")}</span>
@@ -38,30 +38,24 @@ export function ThemeRevisionItem(props: IProps) {
 
     const content = (
         <>
-            <div style={{ display: "flex" }}>
-                <UserPhoto userInfo={props.userInfo} size={UserPhotoSize.MEDIUM} />
-                <div style={{ margin: "10px", width: "150px" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <UserPhoto userInfo={userInfo} size={UserPhotoSize.MEDIUM} />
+                <div style={{ margin: "10px", width: "250px" }}>
                     <span style={{ display: "block" }} className={classes.itemLabel}>
-                        {props.name}
+                        {revision.name}
                     </span>
                     <span style={{ display: "block" }} className={classes.itemLabel}>
-                        <DateTime timestamp={props.date} />
+                        <DateTime timestamp={revision.dateInserted} />
                     </span>
+                    {isActive && <span>active</span>}
                 </div>
-                <span className={classNames(classes.checkContainer, "sc-only")}>
-                    {props.isLoading ? <ButtonLoader /> : checkStatus}
-                </span>
+                <span className={classNames(classes.checkContainer, "sc-only")}>{checkStatus}</span>
             </div>
         </>
     );
 
     return (
-        <DropDownItemButton
-            onClick={props.onClick}
-            role={"switch"}
-            aria-checked={props.isSelected}
-            disabled={props.isLoading}
-        >
+        <DropDownItemButton onClick={props.onClick} role={"switch"} aria-checked={isSelected} disabled={props.disabled}>
             {content}
         </DropDownItemButton>
     );

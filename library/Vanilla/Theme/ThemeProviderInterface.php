@@ -33,18 +33,20 @@ interface ThemeProviderInterface {
      * Returns type of theme with all assets
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $args Arguments list.
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array;
+    public function getThemeWithAssets($themeKey, array $args = []): array;
 
     /**
      * Get asset data
      *
      * @param string|int $themeKey Theme key or id
      * @param string $assetKey Asset key
+     * @param int $revisionID Theme revision id
      * @return string Asset data (content)
      */
-    public function getAssetData($themeKey, string $assetKey): string;
+    public function getAssetData($themeKey, string $assetKey, int $revisionID = null): string;
 
     /**
      * DELETE theme asset.
@@ -123,13 +125,14 @@ interface ThemeProviderInterface {
     /**
      * Set theme asset (replace existing or create new if asset does not exist).
      *
-     * @param int $themeID The unique theme ID.
+     * @param int $themeID Theme ID.
+     * @param int $revisionID Revision ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      * @param string $data Data content for asset.
      *
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array;
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array;
 
     /**
      * Sparse update/set theme asset (update existing or create new if asset does not exist).
@@ -142,7 +145,7 @@ interface ThemeProviderInterface {
      *
      * @return array
      */
-    public function sparseAsset(int $themeID, string $assetKey, string $data): array;
+    public function sparseAsset(int $themeID, int $revisionID, string $assetKey, string $data): array;
 
     /**
      * Check if a theme exists.
@@ -151,4 +154,12 @@ interface ThemeProviderInterface {
      * @return bool
      */
     public function themeExists($themeKey): bool;
+
+    /**
+     * Get list of theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     */
+    public function getThemeRevisions(int $themeKey): array;
 }

@@ -7,8 +7,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 import { Trail } from "react-spring/renderprops";
-import { useSpring, animated } from "react-spring";
-import { shadowHelper } from "@library/styles/shadowHelpers";
+import { useSpring, animated, interpolate } from "react-spring";
 
 export enum PostTypes {
     LINK = "link",
@@ -100,7 +99,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                             output: [1, 0.97, 0.7, 0.9, 1],
                         })
                         .interpolate(x => `${x}`),
-                    transform: d.interpolate(d => `rotate(${d}deg)`),
+                    transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
                 }}
                 baseClass={ButtonTypes.CUSTOM}
                 onClick={toggle}

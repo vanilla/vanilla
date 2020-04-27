@@ -86,14 +86,12 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     }
 
     /**
-     * @param int|string $revisionID
+     * @param int|null $revisionID
      */
-    public function setForcedRevisionID($revisionID = null): void {
+    public function setForcedRevisionID(?int $revisionID = null): void {
         $this->revisionID = $revisionID;
 
     }
-
-
 
     /**
      * @return string|int
@@ -105,8 +103,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @return int
      */
-    private function getThemeRevisionID() {
-        return $this->revisionID;
+    private function getThemeRevisionID(): ?int {
+        return $this->revisionID ?? $this->siteMeta->getActiveThemeRevisionID();
     }
 
     /**
@@ -139,14 +137,18 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     public function getThemeData(): ?array {
         if (!$this->themeData) {
             $themeKey = $this->getThemeKeyToPreload();
+
+            // Forced theme keys disable addon variables.
+            $args = ['allowAddonVariables' => !$this->forcedThemeKey];
+//            if (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+//                $args['revisionID'] = $revisionID;
+//            }
+            $args['revisionID'] = $this->revisionID;
+
             try {
                 $this->themeData = $this->themesApi->get(
                     $themeKey,
-                    [
-                        // Forced theme keys disable addon variables.
-                        'allowAddonVariables' => !$this->forcedThemeKey,
-                        'revisionID' => $this->revisionID,
-                    ]
+                    $args
                 );
             } catch (\Throwable $e) {
                 // Prevent infinite loops.

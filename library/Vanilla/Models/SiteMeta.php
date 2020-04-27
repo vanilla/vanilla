@@ -57,6 +57,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $activeThemeKey;
 
+    /** @var int $activeThemeRevisionID */
+    private $activeThemeRevisionID;
+
     /** @var string */
     private $mobileThemeKey;
 
@@ -171,6 +174,7 @@ class SiteMeta implements \JsonSerializable {
         $currentThemeAddon = $themeModel->getCurrentThemeAddon();
 
         $this->activeThemeKey = $currentTheme['themeID'];
+        $this->activeThemeRevisionID = $currentTheme['revisionID'];
         $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
         $this->desktopThemeKey = $config->get('Garden.Theme', ThemeModel::FALLBACK_THEME_KEY);
@@ -309,6 +313,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getActiveThemeKey(): string {
         return $this->activeThemeKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActiveThemeRevisionID(): ?int {
+        return $this->activeThemeRevisionID;
     }
 
     /**

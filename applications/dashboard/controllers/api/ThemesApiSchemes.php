@@ -36,6 +36,7 @@ trait ThemesApiSchemes {
                 'name:s?',
                 'version:s?',
                 'revisionID:i?',
+                'revisionName:s?',
                 'insertUser:o?',
                 'dateInserted:dt?',
                 'active:b?',
@@ -147,8 +148,8 @@ trait ThemesApiSchemes {
                 'revisionID:i?' => [
                     'description' => 'Theme revision ID.',
                 ],
-                'dateInserted:dt?' => [
-                    'description' => 'Theme revision date inserted.',
+                'revisionName:s?' => [
+                    'description' => 'Theme revision name.',
                 ],
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),
@@ -199,6 +200,9 @@ trait ThemesApiSchemes {
             Schema::parse([
                 'themeID:s?' => [
                     'description' => 'Theme ID or Theme Key',
+                ],
+                'revisionID:i?' => [
+                    'description' => 'Theme revision ID',
                 ],
             ]),
             $type

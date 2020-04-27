@@ -273,15 +273,16 @@ class ThemeModel {
      * (pseudo current theme for current session user only)
      *
      * @param int|string $themeID Theme ID to set current.
+     * @param int $revisionID Theme revision ID.
      * @return array
      */
-    public function setPreviewTheme($themeID): array {
+    public function setPreviewTheme($themeID, ?int $revisionID = null): array {
         if (empty($themeID)) {
             $theme = $this->getCurrentTheme();
             $this->themeHelper->cancelSessionPreviewTheme();
         } else {
             $provider = $this->getThemeProvider($themeID);
-            $theme = $provider->setPreviewTheme($themeID);
+            $theme = $provider->setPreviewTheme($themeID, $revisionID);
         }
         $theme = $this->normalizeTheme($theme);
         return $theme;
@@ -402,7 +403,15 @@ class ThemeModel {
 
             $previewThemeKey = $this->session->getPreference('PreviewThemeKey');
             if ($previewThemeKey) { // May be stuck to empty string so falsy check is required.
-                $previewTheme = $this->getThemeProvider($previewThemeKey)->getThemeWithAssets($previewThemeKey);
+                $previewThemeRevisionID = $this->session->getPreference('PreviewThemeRevisionID');
+                $args = [];
+
+                if (!empty($previewThemeRevisionID)) {
+                    $args['revisionID'] = $previewThemeRevisionID;
+                }
+
+                $themeProvider = $this->getThemeProvider($previewThemeKey);
+                $previewTheme = $themeProvider->getThemeWithAssets($previewThemeKey, $args);
                 if ($previewTheme === null) {
                     // if we stored wrong preview key store in session, lets reset it.
                     $this->themeHelper->cancelSessionPreviewTheme();

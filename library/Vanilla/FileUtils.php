@@ -30,4 +30,32 @@ class FileUtils {
         $result = move_uploaded_file($filename, $destination);
         return $result;
     }
+
+    /**
+     * Generate a unique path for an upload.
+     *
+     * @param string $extension
+     * @param bool $chunk
+     * @param string $name
+     * @param string $targetDirectory
+     * @return string
+     */
+    public static function generateUniqueUploadPath(
+        string $extension,
+        bool $chunk = true,
+        string $name = '',
+        string $targetDirectory = PATH_UPLOADS
+    ) {
+        do {
+            $subdir = '';
+            if (!$name) {
+                $name = randomString(12);
+            }
+            if ($chunk) {
+                $subdir = sprintf('%03d', mt_rand(0, 999)).'/';
+            }
+            $path = "${targetDirectory}/{$subdir}${name}.${extension}";
+        } while (file_exists($path));
+        return $path;
+    }
 }

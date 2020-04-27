@@ -826,6 +826,9 @@ $Construct
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)
+
+    // Lowercase to match new schemas.
+    ->column('foreignUrl', 'varchar(255)', true, 'unique')
     ->set(false, false);
 
 // Merge backup.

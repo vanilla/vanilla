@@ -4,17 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React, {useEffect, useState} from "react";
-import {ButtonTypes} from "@library/forms/buttonTypes";
+import React, { useEffect, useState } from "react";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Toast from "@library/features/toaster/Toast";
-import {getMeta} from "@library/utility/appUtils";
-import {PreviewStatusType, useThemeActions} from "@library/theming/ThemeActions";
-import {useThemePreviewToasterState} from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
-import {LoadStatus} from "@library/@types/api/core";
+import { getMeta } from "@library/utility/appUtils";
+import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
+import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
+import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import {useThemeEditorActions} from "@themingapi/theme/ThemeEditorActions";
-import {t} from "@vanilla/i18n/src";
-import {useThemeEditorState} from "@themingapi/theme/themeEditorReducer";
+import { useThemeEditorActions } from "@themingapi/theme/ThemeEditorActions";
+import { t } from "@vanilla/i18n/src";
+import { useThemeEditorState } from "@themingapi/theme/themeEditorReducer";
 
 interface IThemePreview {
     name: string;
@@ -39,12 +39,15 @@ export function ThemePreviewToast() {
         }
         if (isRevisionPreview) {
             setRestoringRevision(true);
-           const updatedTheme = await patchThemeWithRevisionID({ themeID: themePreview.themeID, revisionID: themePreview.revisionID });
-           if (updatedTheme) {
-               setRestoringRevision(false);
-               setRevisionRestored(true);
-           }
-           putPreviewTheme({themeID: "", revisionID: undefined, type: PreviewStatusType.APPLY});
+            const updatedTheme = await patchThemeWithRevisionID({
+                themeID: themePreview.themeID,
+                revisionID: themePreview.revisionID,
+            });
+            if (updatedTheme) {
+                setRestoringRevision(false);
+                setRevisionRestored(true);
+            }
+            putPreviewTheme({ themeID: "", revisionID: undefined, type: PreviewStatusType.APPLY });
         } else {
             putCurrentTheme(themePreview.themeID);
             putPreviewTheme({ themeID: "", type: PreviewStatusType.APPLY });
@@ -61,9 +64,12 @@ export function ThemePreviewToast() {
         }
         if (
             (themePreview.name && applyStatus.status === LoadStatus.SUCCESS) ||
-            cancelStatus.status === LoadStatus.SUCCESS || revisionRestored
+            cancelStatus.status === LoadStatus.SUCCESS ||
+            revisionRestored
         ) {
-            window.location.href = (isRevisionPreview) ? `/theme/theme-settings/${themePreview.themeID}/revisions`: themePreview.redirect;
+            window.location.href = isRevisionPreview
+                ? `/theme/theme-settings/${themePreview.themeID}/revisions`
+                : themePreview.redirect;
         }
     });
 
@@ -75,10 +81,13 @@ export function ThemePreviewToast() {
         <Toast
             links={[
                 {
-                    name: (isRevisionPreview) ? t("Restore"): t("Apply"),
+                    name: isRevisionPreview ? t("Restore") : t("Apply"),
                     type: ButtonTypes.TEXT,
                     onClick: handleApply,
-                    isLoading: applyStatus.status === LoadStatus.LOADING || applyStatus.status === LoadStatus.SUCCESS || restoringRevision,
+                    isLoading:
+                        applyStatus.status === LoadStatus.LOADING ||
+                        applyStatus.status === LoadStatus.SUCCESS ||
+                        restoringRevision,
                 },
                 {
                     name: t("Cancel"),

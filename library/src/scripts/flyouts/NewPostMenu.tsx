@@ -13,6 +13,7 @@ export enum PostTypes {
 }
 
 export interface IAddPost {
+    id: string;
     action: (() => void) | string;
     type: PostTypes;
     className?: string;
@@ -31,42 +32,40 @@ function ActionItem(props: IAddPost) {
         </>
     );
 
-    return type === PostTypes.BUTTON ? (
-        <Button onClick={action as () => void} className={classNames(className, classes.action)}>
-            {contents}
-        </Button>
-    ) : (
-        <LinkAsButton to={action as string} className={classNames(className, classes.action)}>
-            {contents}
-        </LinkAsButton>
-    );
-}
-
-export function NewPostMenuItems(props: { items: IAddPost[] | [] }) {
-    const { items } = props;
-
-    if (!items || items.length === 0) {
-        return null;
-    }
-    const classes = newPostMenuClasses();
     return (
-        <div className={classes.menu}>
-            {(items as []).map((action, i) => {
-                return <ActionItem key={i} {...action} />;
-            })}
+        <div className={classNames(classes.item)}>
+            {type === PostTypes.BUTTON ? (
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(className, classes.action)}
+                    onClick={action as () => void}
+                >
+                    {contents}
+                </Button>
+            ) : (
+                <LinkAsButton
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(className, classes.action)}
+                    to={action as string}
+                >
+                    {contents}
+                </LinkAsButton>
+            )}
         </div>
     );
 }
 
-export default function NewPostMenu(props: { items: IAddPost[] | [] }) {
-    const { items } = props;
+export default function NewPostMenu(props: { items: IAddPost[] }) {
     const [open, setOpen] = useState(false);
-
     const toggle = () => setOpen(!open);
 
     const classes = newPostMenuClasses();
+    const { items } = props;
+
     return (
         <div className={classNames(classes.root)}>
+            {open && items.map(item => <ActionItem key={item.id} {...item} />)}
+
             <Button
                 baseClass={ButtonTypes.CUSTOM}
                 onClick={toggle}
@@ -76,7 +75,6 @@ export default function NewPostMenu(props: { items: IAddPost[] | [] }) {
             >
                 <NewPostMenuIcon />
             </Button>
-            {open && <NewPostMenuItems {...props} />}
         </div>
     );
 }

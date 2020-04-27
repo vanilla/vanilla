@@ -113,6 +113,20 @@ class JobExecutionStatus {
     }
 
     /**
+     * @return JobExecutionStatus
+     */
+    public static function intended() {
+        return new JobExecutionStatus('intended');
+    }
+
+    /**
+     * @return JobExecutionStatus
+     */
+    public static function unknown() {
+        return new JobExecutionStatus('unknown');
+    }
+
+    /**
      * Set a loose status A.K.A set your own status
      *
      * @param string $status

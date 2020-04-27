@@ -3,7 +3,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import NewPostMenu, { PostTypes, IAddPost } from "@library/flyouts/NewPostMenu";
 import { NewDiscussionIcon, NewIdeaIcon, NewPollIcon } from "@library/icons/common";
-import { NewPostMenuItems } from "@library/flyouts/NewPostMenuItems";
+import NewPostItems from "@library/flyouts/NewPostItems";
 
 export default {
     component: NewPostMenu,
@@ -64,6 +64,6 @@ export const Empty = () => (
 export const Menu = () => (
     <StoryContent>
         <StoryHeading depth={1}> Menu </StoryHeading>
-        <NewPostMenuItems items={items} />
+        <NewPostItems items={items} />
     </StoryContent>
 );

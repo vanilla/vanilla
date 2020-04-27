@@ -10,6 +10,8 @@ import classNames from "classnames";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import DateTime from "@library/content/DateTime";
 import { ITheme } from "@library/theming/themeReducer";
+import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     revision: ITheme;
@@ -24,6 +26,8 @@ export function ThemeRevisionItem(props: IProps) {
     const { revision, isSelected, userInfo, isActive } = props;
     const visibilityClasses = visibility();
     const classes = dropdownSwitchButtonClasses();
+    const revisionPageClasses = themeRevisionPageClasses();
+    const classesMetas = metasClasses();
 
     const checkStatus = isSelected ? (
         <>
@@ -38,14 +42,14 @@ export function ThemeRevisionItem(props: IProps) {
 
     const content = (
         <>
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", height: "55px" }}>
                 <UserPhoto userInfo={userInfo} size={UserPhotoSize.MEDIUM} />
                 <div style={{ margin: "10px", width: "250px" }}>
-                    <span style={{ display: "block" }} className={classes.itemLabel}>
-                        {revision.name}
+                    <span className={classNames(revisionPageClasses.itemLabel, revisionPageClasses.userNameFont)}>
+                        {userInfo.name}
                     </span>
-                    <span style={{ display: "block" }} className={classes.itemLabel}>
-                        <DateTime timestamp={revision.dateInserted} />
+                    <span className={classNames(revisionPageClasses.dateFont, revisionPageClasses.itemLabel)}>
+                        <DateTime timestamp={revision.dateInserted} extended={true} />
                     </span>
                     {isActive && <span>active</span>}
                 </div>

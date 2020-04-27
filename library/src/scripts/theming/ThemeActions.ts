@@ -32,6 +32,7 @@ type IGetAllThemeResponse = IManageTheme[];
 
 interface IPutCurrentThemeRequest {
     themeID: number | string;
+    revisionID?: number;
     type: PreviewStatusType;
 }
 /**
@@ -111,9 +112,9 @@ export default class ThemeActions extends ReduxActions {
     };
 
     public putPreviewTheme = (options: IPutCurrentThemeRequest) => {
-        const { themeID, type } = options;
+        const { themeID, revisionID, type } = options;
         const thunk = bindThunkAction(ThemeActions.putPreviewThemeACs, async () => {
-            const response = await this.api.put(`/themes/preview`, { themeID });
+            const response = await this.api.put(`/themes/preview`, { themeID: themeID, revisionID: revisionID });
 
             return response.data;
         })(options);

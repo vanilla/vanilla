@@ -95,9 +95,10 @@ interface ThemeProviderInterface {
      * (pseudo current theme for current session user only)
      *
      * @param int|string $themeID Theme ID to set current.
+     * @param int $revisionID Theme revision ID.
      * @return array
      */
-    public function setPreviewTheme($themeID): array;
+    public function setPreviewTheme($themeID, int $revisionID = null): array;
 
     /**
      * Get "current" theme.

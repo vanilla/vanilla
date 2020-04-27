@@ -140,10 +140,12 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
 
             // Forced theme keys disable addon variables.
             $args = ['allowAddonVariables' => !$this->forcedThemeKey];
-//            if (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
-//                $args['revisionID'] = $revisionID;
-//            }
-            $args['revisionID'] = $this->revisionID;
+            if (!empty($this->revisionID)) {
+                // when theme-settings/{id}/revisions preview
+                $args['revisionID'] = $this->revisionID;
+            } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+                $args['revisionID'] = $revisionID;
+            }
 
             try {
                 $this->themeData = $this->themesApi->get(

@@ -300,6 +300,7 @@ class ThemeModel {
             $provider = $this->getThemeProvider($previewThemeKey);
             $previewTheme['name'] = $provider->getName($previewThemeKey);
             $previewTheme['redirect'] = $this->getThemeManagePageUrl();
+            $previewTheme['revisionID'] = $this->session->getPreference('PreviewThemeRevisionID');
         }
         return $previewTheme;
     }

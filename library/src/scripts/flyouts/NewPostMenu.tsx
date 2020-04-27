@@ -6,6 +6,7 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
+import { Trail } from "react-spring/renderprops";
 
 export enum PostTypes {
     LINK = "link",
@@ -21,8 +22,13 @@ export interface IAddPost {
     icon: JSX.Element;
 }
 
-function ActionItem(props: IAddPost) {
-    const { action, className, type, label, icon } = props;
+export interface ITransition {
+    opacity: number;
+    transform: string;
+}
+
+function ActionItem({ item, style }: { item: IAddPost; style: ITransition }) {
+    const { action, className, type, label, icon } = item;
     const classes = newPostMenuClasses();
 
     const contents = (
@@ -33,7 +39,7 @@ function ActionItem(props: IAddPost) {
     );
 
     return (
-        <div className={classNames(classes.item)}>
+        <div style={style} className={classNames(classes.item)}>
             {type === PostTypes.BUTTON ? (
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
@@ -64,7 +70,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
     return (
         <div className={classNames(classes.root)}>
-            {open && items.map(item => <ActionItem key={item.id} {...item} />)}
+            {open && (
+                <Trail
+                    items={items}
+                    keys={item => item.id}
+                    from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
+                    to={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
+                >
+                    {item => props => <ActionItem key={item.id} item={item} style={props} />}
+                </Trail>
+            )}
 
             <Button
                 baseClass={ButtonTypes.CUSTOM}

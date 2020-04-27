@@ -7,6 +7,8 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 import { Trail } from "react-spring/renderprops";
+import { useSpring, animated } from "react-spring";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export enum PostTypes {
     LINK = "link",
@@ -68,10 +70,19 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const classes = newPostMenuClasses();
     const { items } = props;
 
+    const { x, d, s } = useSpring({
+        config: { duration: 150 },
+        x: open ? 1 : 0,
+        d: open ? -135 : 0,
+        s: open ? 0.9 : 1,
+        from: { x: 0, d: 0, s: 1 },
+    });
+    const AnimatedButton = animated(Button);
     return (
         <div className={classNames(classes.root)}>
             {open && (
                 <Trail
+                    config={{ mass: 2, tension: 3000, friction: 150 }}
                     items={items}
                     keys={item => item.id}
                     from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
@@ -81,15 +92,25 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 </Trail>
             )}
 
-            <Button
+            <AnimatedButton
+                style={{
+                    opacity: x
+                        .interpolate({
+                            range: [0, 0.25, 0.45, 0.75, 1],
+                            output: [1, 0.97, 0.7, 0.9, 1],
+                        })
+                        .interpolate(x => `${x}`),
+                    transform: d.interpolate(d => `rotate(${d}deg)`),
+                }}
                 baseClass={ButtonTypes.CUSTOM}
                 onClick={toggle}
-                className={classNames(classes.toggle, {
-                    [classes.isOpen]: open,
-                })}
+                // className={classNames(classes.toggle, {
+                //     [classes.isOpen]: open,
+                // })}
+                className={classNames(classes.toggle)}
             >
                 <NewPostMenuIcon />
-            </Button>
+            </AnimatedButton>
         </div>
     );
 }

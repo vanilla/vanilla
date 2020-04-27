@@ -58,7 +58,7 @@ export function copyMonacoEditorModule() {
  *
  * @returns Return if the process exits cleanly.
  */
-function spawnChildProcess(command: string, args: string[], options: any): Promise<boolean> {
+export function spawnChildProcess(command: string, args: string[], options: any): Promise<boolean> {
     return new Promise((resolve, reject) => {
         const task = spawn(command, args, options);
 

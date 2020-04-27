@@ -52,13 +52,7 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
-                        const modulesRequiringTranspilation = [
-                            "quill",
-                            "p-debounce",
-                            "@vanilla/.*",
-                            "react-redux",
-                            "react-spring/.*",
-                        ];
+                        const modulesRequiringTranspilation = ["quill", "p-debounce", "@vanilla/.*"];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
                         if (modulePath.includes("core-js")) {
@@ -148,6 +142,7 @@ ${chalk.green(aliases)}`;
         ] as any[],
         resolve: {
             modules: modulePaths,
+            mainFields: ["browser", "main"],
             alias: {
                 ...hotAliases,
                 ...entryModel.aliases,

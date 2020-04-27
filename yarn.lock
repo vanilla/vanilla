@@ -6339,6 +6339,11 @@ copy-to-clipboard@^3.0.8:
   dependencies:
     toggle-selection "^1.0.6"
 
+core-decorators@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/core-decorators/-/core-decorators-0.19.0.tgz#28c9b44aa6208902934627a28f4f5950bd5b463e"
+  integrity sha1-KMm0SqYgiQKTRieij09ZUL1bRj4=
+
 core-js-compat@^3.1.1:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/core-js-compat/-/core-js-compat-3.4.0.tgz#2a47c51d3dc026d290018cacd987495f68a47c75"
@@ -12579,6 +12584,11 @@ lodash.memoize@^4.1.2:
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
   integrity sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=
 
+lodash.omit@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.omit/-/lodash.omit-4.5.0.tgz#6eb19ae5a1ee1dd9df0b969e66ce0b7fa30b5e60"
+  integrity sha1-brGa5aHuHdnfC5aeZs4Lf6MLXmA=
+
 lodash.restparam@^3.0.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
@@ -12984,7 +12994,7 @@ memoizee@^0.4.12:
     next-tick "1"
     timers-ext "^0.1.5"
 
-memoizerific@^1.11.3:
+memoizerific@^1.11.2, memoizerific@^1.11.3:
   version "1.11.3"
   resolved "https://registry.yarnpkg.com/memoizerific/-/memoizerific-1.11.3.tgz#7c87a4646444c32d75438570905f2dbd1b1a805a"
   integrity sha1-fIekZGREwy11Q4VwkF8tvRsagFo=
@@ -16025,6 +16035,17 @@ react-motion@^0.5.2:
     performance-now "^0.2.0"
     prop-types "^15.5.8"
     raf "^3.1.0"
+
+react-mutation-observer@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-mutation-observer/-/react-mutation-observer-1.1.0.tgz#8d3a0015ffdf59bbf64c9d80fab1e99b83adb284"
+  integrity sha1-jToAFf/fWbv2TJ2A+rHpm4OtsoQ=
+  dependencies:
+    core-decorators "^0.19.0"
+    lodash.isequal "^4.5.0"
+    lodash.omit "^4.5.0"
+    memoizerific "^1.11.2"
+    prop-types "^15.5.8"
 
 react-node-resolver@^2.0.1:
   version "2.0.1"

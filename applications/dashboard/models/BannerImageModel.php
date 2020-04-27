@@ -41,16 +41,18 @@ class BannerImageModel {
     public function renderBanner(array $props = []): \Twig\Markup {
         $controller = \Gdn::controller();
         $defaultProps = [
-            'title' => $controller->data(
-                'Category.Name',
-                $this->siteMeta->getSiteTitle()
-            ),
             'description' => $controller->data(
                 'Category.Description',
                 $controller->description()
             ),
             'backgroundImage' => self::getCurrentBannerImageLink(),
         ];
+        $title = $controller->data('Category.Name');
+
+        if ($title) {
+              $defaultProps['title'] = $title;
+        }
+
         $props = array_merge($defaultProps, $props);
         $html = "";
         $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);

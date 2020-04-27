@@ -1,9 +1,9 @@
 import React, { ReactNode, useState } from "react";
 import classNames from "classnames";
 
-import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
+import { newPostMenuClasses } from "@library/flyouts/newPostItemsStyles";
 import { Trail } from "react-spring/renderprops";
-import NewPostItem from "@library/flyouts/NewPostMenuItem";
+import NewPostItem from "@library/flyouts/NewPosItem";
 
 export enum PostTypes {
     LINK = "link",

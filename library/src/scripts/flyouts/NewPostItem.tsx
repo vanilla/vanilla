@@ -4,8 +4,8 @@ import classNames from "classnames";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 import { PostTypes, ITransition, IAddPost } from "./NewPostMenu";
+import { newPostMenuClasses } from "@library/flyouts/newPostItemsStyles";
 
 export default function NewPostItem({ item, style }: { item: IAddPost; style: ITransition }) {
     const { action, className, type, label, icon } = item;

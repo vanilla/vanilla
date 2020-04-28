@@ -123,7 +123,20 @@ class UploadedFile {
         $tmpFilePath = FileUtils::generateUniqueUploadPath($ext, false);
         // Make sure we have our base directory.
 
-        $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, 'r'));
+        // Stream the remote file to locally.
+        // Use a stream to make sure it doens't pass through the FPM process.
+        // Create a stream
+        $streamOpts = [
+            "http" => [
+                "method" => "GET",
+                "header" => implode("\r\n", $requestHeaders),
+            ]
+        ];
+
+        $streamContext = stream_context_create($streamOpts);
+
+        // Open the file using the HTTP headers set above
+        $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, 'r', false, $streamContext));
 
         if (!$successful) {
             throw new \Exception('Failed to copy file locally');

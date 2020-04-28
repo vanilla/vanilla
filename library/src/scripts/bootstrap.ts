@@ -15,6 +15,7 @@ import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
+import { isLegacyAnalyticsTickEnabled } from "@library/analytics/AnalyticsData";
 
 if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
@@ -34,6 +35,10 @@ window.gdn.apiv2 = apiv2;
 
 // Record the page view.
 onPageView((params: { history: History }) => {
+    if (isLegacyAnalyticsTickEnabled()) {
+        // Don't use the new tick if we're still using the old one.
+        return;
+    }
     // Low priority so put a slight delay so other network requests run first.
     setTimeout(() => {
         void apiv2.post("/tick").then(() => {

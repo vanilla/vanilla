@@ -27,7 +27,6 @@ export function ThemeRevisionItem(props: IProps) {
     const visibilityClasses = visibility();
     const classes = dropdownSwitchButtonClasses();
     const revisionPageClasses = themeRevisionPageClasses();
-    const classesMetas = metasClasses();
 
     const checkStatus = isSelected ? (
         <>
@@ -42,16 +41,16 @@ export function ThemeRevisionItem(props: IProps) {
 
     const content = (
         <>
-            <div style={{ display: "flex", alignItems: "center", height: "55px" }}>
+            <div className={revisionPageClasses.revisionItem}>
                 <UserPhoto userInfo={userInfo} size={UserPhotoSize.MEDIUM} />
-                <div style={{ margin: "10px", width: "250px" }}>
+                <div className={revisionPageClasses.itemLabelContainer}>
                     <span className={classNames(revisionPageClasses.itemLabel, revisionPageClasses.userNameFont)}>
                         {userInfo.name}
                     </span>
-                    <span className={classNames(revisionPageClasses.dateFont, revisionPageClasses.itemLabel)}>
+                    <span className={classNames(revisionPageClasses.labelMetas, revisionPageClasses.itemLabel)}>
                         <DateTime timestamp={revision.dateInserted} extended={true} />
                     </span>
-                    {isActive && <span>active</span>}
+                    {isActive && <span className={revisionPageClasses.labelMetas}>active</span>}
                 </div>
                 <span className={classNames(classes.checkContainer, "sc-only")}>{checkStatus}</span>
             </div>

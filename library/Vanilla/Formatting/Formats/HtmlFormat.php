@@ -22,6 +22,7 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\LegacySpoilerTrait;
+use Vanilla\Formatting\Html\Processor\AttachmentHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\HeadingHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ZendeskWysiwygProcessor;
@@ -139,7 +140,10 @@ class HtmlFormat extends BaseFormat {
      * @inheritdoc
      */
     public function parseAttachments(string $content): array {
-        return [];
+        $rendered = $this->renderHtml($content);
+        $document = new HtmlDocument($rendered);
+        $processor = new AttachmentHtmlProcessor($document);
+        return $processor->getAttachments();
     }
 
     /**

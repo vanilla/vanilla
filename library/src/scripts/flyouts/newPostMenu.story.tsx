@@ -3,7 +3,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import NewPostMenu, { PostTypes, IAddPost } from "@library/flyouts/NewPostMenu";
 import { NewDiscussionIcon, NewIdeaIcon, NewPollIcon } from "@library/icons/common";
-import NewPostItems from "@library/flyouts/NewPostItems";
+import { logDebug } from "@vanilla/utils";
 
 export default {
     component: NewPostMenu,
@@ -15,7 +15,7 @@ const items = [
         id: "1",
         type: PostTypes.BUTTON,
         action: () => {
-            alert("hello! 1");
+            logDebug("Some Action");
         },
         icon: <NewPollIcon />,
         label: "New Poll",
@@ -24,7 +24,7 @@ const items = [
         id: "2",
         type: PostTypes.BUTTON,
         action: () => {
-            alert("hello! 2");
+            logDebug("Some Action");
         },
         icon: <NewIdeaIcon />,
         label: "New Idea",
@@ -33,7 +33,7 @@ const items = [
         id: "3",
         type: PostTypes.BUTTON,
         action: () => {
-            alert("hello! 3");
+            logDebug("Some Action");
         },
         icon: <NewDiscussionIcon />,
         label: "New Discussion",

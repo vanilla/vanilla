@@ -40,7 +40,7 @@ class VanillaMediaSchema extends Schema {
                 'insertUserID:i', // The user that created the media item.
                 'foreignType:s|n', // Table the media is linked to.
                 'foreignID:i|n', // The ID of the table
-                'foreignUrl:s|n'
+                'foreignUrl:s?'
             ];
 
             $fields = array_merge($fields, $ownDBFields);

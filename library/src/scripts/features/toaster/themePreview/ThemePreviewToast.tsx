@@ -25,8 +25,7 @@ interface IThemePreview {
 export function ThemePreviewToast() {
     const { applyStatus, cancelStatus } = useThemePreviewToasterState();
     const [themePreview, setThemePreview] = useState<IThemePreview | null>(getMeta("themePreview", null));
-    const { patchThemeWithRevisionID } = useThemeEditorActions();
-    const { putCurrentTheme, putPreviewTheme } = useThemeActions();
+    const { putCurrentTheme, putPreviewTheme, patchThemeWithRevisionID } = useThemeActions();
 
     const [restoringRevision, setRestoringRevision] = useState(false);
     const [revisionRestored, setRevisionRestored] = useState(false);

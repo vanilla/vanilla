@@ -68,7 +68,8 @@ export type IThemeVariables = Record<string, any>;
 export interface IThemeState {
     assets: ILoadable<IThemeAssets>;
     forcedVariables: IThemeVariables | null;
-    themeRevisions: ILoadable<ITheme[]>;
+    themeRevisions: ILoadable<ITheme>;
+    upDateRevision: ILoadable<ITheme>;
 }
 
 export interface IThemesStoreState extends ICoreStoreState {
@@ -81,6 +82,9 @@ export const INITIAL_THEME_STATE: IThemeState = {
     },
     forcedVariables: null,
     themeRevisions: {
+        status: LoadStatus.PENDING,
+    },
+    upDateRevision: {
         status: LoadStatus.PENDING,
     },
 };
@@ -128,6 +132,20 @@ export const themeReducer = produce(
                 state.themeRevisions.status = LoadStatus.SUCCESS;
                 state.themeRevisions.data = payload.result;
             }
+            return state;
+        })
+        .case(ThemeActions.patchTheme_ACs.started, (state, payload) => {
+            state.upDateRevision.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(ThemeActions.patchTheme_ACs.failed, (state, payload) => {
+            state.upDateRevision.status = LoadStatus.ERROR;
+            state.upDateRevision.error = payload.error;
+            return state;
+        })
+        .case(ThemeActions.patchTheme_ACs.done, (state, payload) => {
+            state.upDateRevision.status = LoadStatus.SUCCESS;
+            state.upDateRevision.data = payload.result;
             return state;
         }),
 );

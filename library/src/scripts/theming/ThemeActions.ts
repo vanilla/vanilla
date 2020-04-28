@@ -11,6 +11,7 @@ import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
+import { IPatchThemeRequest } from "@themingapi/theme/ThemeEditorActions";
 
 const createAction = actionCreatorFactory("@@themes");
 
@@ -29,6 +30,7 @@ export interface IManageTheme extends ITheme {
 }
 
 type IGetAllThemeResponse = IManageTheme[];
+type IPatchThemeResponse = ITheme;
 
 interface IPutCurrentThemeRequest {
     themeID: number | string;
@@ -90,6 +92,10 @@ export default class ThemeActions extends ReduxActions {
         "GET_THEME",
     );
 
+    public static patchTheme_ACs = createAction.async<IPatchThemeRequest, IPatchThemeResponse, IApiError>(
+        "PATCH_THEME",
+    );
+
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
             const params = { expand: "all" };
@@ -134,6 +140,22 @@ export default class ThemeActions extends ReduxActions {
             const response = await this.api.get(`/themes/${themeID}/revisions`);
             return response.data;
         })({ themeID });
+
+        return this.dispatch(thunk);
+    }
+
+    public patchThemeWithRevisionID = async (body: IPatchThemeRequest) => {
+        let result = await this.patchTheme({ themeID: body.themeID, revisionID: body.revisionID });
+        return result;
+    };
+
+    public patchTheme(options: IPatchThemeRequest) {
+        const { themeID, ...body } = options;
+
+        const thunk = bindThunkAction(ThemeActions.patchTheme_ACs, async () => {
+            const response = await this.api.patch(`/themes/${options.themeID}`, body);
+            return response.data;
+        })(options);
 
         return this.dispatch(thunk);
     }

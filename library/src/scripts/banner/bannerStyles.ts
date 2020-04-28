@@ -43,6 +43,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
 import { t } from "@vanilla/i18n";
+import { getMeta } from "@library/utility/appUtils";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -254,7 +255,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             top: 18,
             bottom: 8,
         },
-        text: "How can we help you?",
+        text: getMeta("ui.siteName", t("How can we help you?")),
     });
 
     const description = makeThemeVars("description", {

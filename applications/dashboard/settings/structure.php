@@ -261,7 +261,7 @@ $Construct->table('UserAuthenticationProvider')
 $Construct->table('UserAuthenticationNonce')
     ->column('Nonce', 'varchar(100)', false, 'primary')
     ->column('Token', 'varchar(128)', false)
-    ->column('Timestamp', 'timestamp', false, 'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationToken')
@@ -271,7 +271,7 @@ $Construct->table('UserAuthenticationToken')
     ->column('TokenSecret', 'varchar(64)', false)
     ->column('TokenType', ['request', 'access'], false)
     ->column('Authorized', 'tinyint(1)', false)
-    ->column('Timestamp', 'timestamp', false ,'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 

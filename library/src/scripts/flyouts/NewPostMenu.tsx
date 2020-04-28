@@ -95,17 +95,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             }}
         >
             <div className={classNames(classes.root)}>
-                {open && (
-                    <Trail
-                        config={{ mass: 2, tension: 3000, friction: 150 }}
-                        items={items}
-                        keys={item => item.id}
-                        from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
-                        to={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
-                    >
-                        {item => props => <ActionItem key={item.id} item={item} style={props} />}
-                    </Trail>
-                )}
+                <Trail
+                    reverse={open}
+                    config={{ mass: 2, tension: 4000, friction: 100 }}
+                    items={items}
+                    keys={item => item.id}
+                    from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
+                    to={{ opacity: open ? 1 : 0, transform: open ? "translate3d(0, 0, 0)" : "translate3d(0, 100%, 0)" }}
+                >
+                    {item => props => <ActionItem key={item.id} item={item} style={props} />}
+                </Trail>
 
                 <AnimatedButton
                     style={{

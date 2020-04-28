@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Attachment 1",
+        "dateInserted": null,
+        "mediaID": -1,
+        "size": 0,
+        "type": "unknown",
+        "url": "http:\/\/test.com"
+    },
+    {
+        "name": "Attachment 2",
+        "dateInserted": null,
+        "mediaID": -1,
+        "size": 0,
+        "type": "unknown",
+        "url": "http:\/\/test.com"
+    }
+]

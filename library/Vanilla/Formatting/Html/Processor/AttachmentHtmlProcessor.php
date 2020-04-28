@@ -41,7 +41,7 @@ class AttachmentHtmlProcessor extends HtmlProcessor {
             $href = $domLink->getAttribute('href');
             $name = $domLink->textContent;
 
-            if (!$href || $name) {
+            if (!$href || !$name) {
                 continue;
             }
 
@@ -51,7 +51,7 @@ class AttachmentHtmlProcessor extends HtmlProcessor {
                 'size' => 0,
                 'type' => "unknown",
                 'mediaID' => -1,
-                'dateInserted' => new \DateTime()
+                'dateInserted' => null,
             ]);
             $attachemnts[] = $attachment;
         }

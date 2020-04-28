@@ -140,8 +140,7 @@ class HtmlFormat extends BaseFormat {
      * @inheritdoc
      */
     public function parseAttachments(string $content): array {
-        $rendered = $this->renderHtml($content);
-        $document = new HtmlDocument($rendered);
+        $document = new HtmlDocument($content);
         $processor = new AttachmentHtmlProcessor($document);
         return $processor->getAttachments();
     }

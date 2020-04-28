@@ -219,7 +219,12 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
         ]);
 
         // Persist the actual file an get it's final URL.
-        $media['Path'] = $file->persistUpload()->getPersistedUrl();
+        // We might have already persisted the upload.
+        $persistedUrl = $file->getPersistedUrl();
+        if ($persistedUrl === null) {
+            $persistedUrl = $file->persistUpload()->getPersistedUrl();
+        }
+        $media['Path'] = $persistedUrl;
         if ($file->getClientWidth() !== null) {
             $media['ImageWidth'] = $file->getClientWidth();
         }

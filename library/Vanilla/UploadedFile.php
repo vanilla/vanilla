@@ -73,6 +73,61 @@ class UploadedFile {
         }
     }
 
+    /**
+     * Create an uploaded file from a remote resource.
+     *
+     * @param string $remoteUrl The remote URL of the resource.
+     * @param string[] $requestHeaders Headers to apply when fetching the remote resource. Useful for authentication.
+     *
+     * @return UploadedFile
+     * @throws \Garden\SafeCurl\Exception\CurlException If that resource does not exist, does too many redirects, or points to a blacklisted IP.
+     */
+    public static function fromRemoteResourceUrl(string $remoteUrl, array $requestHeaders = []): UploadedFile {
+        $curl = curl_init();
+        // We don't want to load the body in memory. It could be quite large.
+        curl_setopt($curl, CURLOPT_NOBODY, true);
+        $requestHeaders = array_merge([
+            'User-Agent: garden-http/2 (HttpRequest)'
+        ], $requestHeaders);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $requestHeaders);
+
+        // Make sure we validating redirect URLs to be safe.
+        $safeCurl = new SafeCurl($curl);
+        $safeCurl->setFollowLocationLimit(5);
+        $safeCurl->setFollowLocation(true);
+        $safeCurl->execute($remoteUrl);
+        $finalUrl = $redirectedUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+
+        $curlStats = curl_getinfo($curl);
+
+        $contentType = $curlStats['content_type'] ?? null;
+        $downloadSize = $curlStats['download_content_length'] ?? null;
+        if (is_float($downloadSize)) {
+            $downloadSize = (int) $downloadSize;
+        }
+
+        if (!$contentType === null || $downloadSize === null) {
+            throw new \Exception('File missing content type or download size');
+        }
+
+        $name = self::extractNameFromUrl($finalUrl);
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
+        $tmpFilePath = FileUtils::generateUniqueUploadPath($ext, false);
+        $successful = file_put_contents($tmpFilePath, fopen($finalUrl, 'r'));
+
+        if (!$successful) {
+            throw new \Exception('Failed to copy file locally');
+        }
+
+        return new UploadedFile(
+            new \Gdn_Upload(),
+            $tmpFilePath,
+            $downloadSize,
+            UPLOAD_ERR_OK,
+            $name,
+            $contentType
+        );
+    }
 
     /**
      * Extract a name based on the URL of the file.
@@ -104,9 +159,9 @@ class UploadedFile {
      * @return string
      */
     public function generatePersistedUploadPath(string $persistSubDirectory = '', string $nameFormat = '%s'): string {
-        $persistDirectory = PATH_UPLOADS;
+        $persistDirectory = '';
         if ($persistSubDirectory) {
-            $persistDirectory .= "/${persistDirectory}";
+            $persistDirectory .= "/${persistSubDirectory}";
         }
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
         $baseName = basename($this->getClientFilename(), ".${ext}");

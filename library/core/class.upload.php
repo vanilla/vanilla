@@ -376,6 +376,23 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
+     * Check if a URL is one of our own web paths.
+     *
+     * @param string $url
+     *
+     * @return bool
+     */
+    public function isOwnWebPath(string $url): bool {
+        foreach ($this->getUploadWebPaths() as $_ => $ownPath) {
+            if (stringBeginsWith($url, $ownPath, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get an upload web path for a particular type.
      *
      * @param string $type

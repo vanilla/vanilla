@@ -14,7 +14,6 @@ import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useThemeEditorActions } from "@themingapi/theme/ThemeEditorActions";
 import { t } from "@vanilla/i18n/src";
-import { useThemeEditorState } from "@themingapi/theme/themeEditorReducer";
 
 interface IThemePreview {
     name: string;

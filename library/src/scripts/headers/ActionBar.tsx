@@ -83,7 +83,11 @@ export function ActionBar(props: IProps) {
             ) : null}
             {props.title}
             {props.anotherCallToActionTitle && (
-                <li ref={restoreRef} className={classNames(classes.item, "isPullRight")} style={minButtonSizeStyles}>
+                <li
+                    ref={restoreRef}
+                    className={classNames(classes.item, "isPullRight", classes.anotherCallToAction)}
+                    style={minButtonSizeStyles}
+                >
                     <Button
                         submit={false}
                         onClick={props.handleAnotherSubmit}
@@ -96,7 +100,11 @@ export function ActionBar(props: IProps) {
                     </Button>
                 </li>
             )}
-            <li ref={restoreRef} className={classNames(classes.item, "isPullRight")} style={minButtonSizeStyles}>
+            <li
+                ref={restoreRef}
+                className={classNames(classes.item, { isPullRight: !props.anotherCallToActionTitle })}
+                style={minButtonSizeStyles}
+            >
                 <Button
                     submit={true}
                     title={props.callToActionTitle}

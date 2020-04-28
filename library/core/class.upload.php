@@ -384,8 +384,13 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return bool
      */
     public function isOwnWebPath(string $url): bool {
-        foreach ($this->getUploadWebPaths() as $_ => $ownPath) {
-            if (stringBeginsWith($url, $ownPath, true)) {
+        $parsedUrl = parse_url($url);
+        foreach ($this->getUploadWebPaths() as $_ => $ownUrl) {
+            $parsedOwnUrl = parse_url($ownUrl);
+
+            $isSameHost = strcasecmp($parsedUrl['host'] ?? '', $parsedOwnUrl['host']) === 0;
+            $hasRootPath = stringBeginsWith($parsedUrl['path'] ?? '', $parsedOwnUrl['path'], true);
+            if ($isSameHost && $hasRootPath) {
                 return true;
             }
         }

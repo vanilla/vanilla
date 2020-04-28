@@ -49,14 +49,12 @@ const items = [
 
 export const Basic = () => (
     <StoryContent>
-        <StoryHeading depth={1}> Basic </StoryHeading>
         <NewPostMenu items={items} />
     </StoryContent>
 );
 
 export const Empty = () => (
     <StoryContent>
-        <StoryHeading depth={1}> Empty </StoryHeading>
         <NewPostMenu items={[]} />
     </StoryContent>
 );

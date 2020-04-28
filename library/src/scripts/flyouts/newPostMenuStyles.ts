@@ -4,7 +4,6 @@ import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/
 import { iconClasses } from "@library/icons/iconStyles";
 import { translateX } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { relative } from "path";
 
 export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -69,10 +68,6 @@ export const newPostMenuClasses = useThemeCache(() => {
         textAlign: "right",
     });
 
-    const isOpen = style("isOpen", {
-        transform: `rotate(${vars.toggle.on.rotation})`,
-    });
-
     const item = style("item", {
         marginTop: unit(vars.item.position.top),
         marginRight: unit(vars.item.position.right),
@@ -104,11 +99,6 @@ export const newPostMenuClasses = useThemeCache(() => {
         height: unit(vars.toggle.size),
         width: unit(vars.toggle.size),
         backgroundColor: colorOut(globalVars.mainColors.primary),
-        $nest: {
-            [`& .${isOpen} .${iconClasses().newPostMenuIcon}`]: {
-                transform: translateX(vars.toggle.on.rotation),
-            },
-        },
     });
 
     const label = style("label", {
@@ -116,30 +106,11 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-block",
     });
 
-    const container = style("container", {
-        height: "100vh",
-        width: "100vw",
-        position: "relative",
-        zIndex: "9999",
-    });
-
-    const containerOpen = style("containerOpen", {
-        backgroundColor: colorOut(globalVars.mainColors.fg),
-    });
-
-    const containerClose = style("containerClose", {
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-    });
-
     return {
         root,
         item,
         action,
-        isOpen,
         toggle,
         label,
-        container,
-        containerOpen,
-        containerClose,
     };
 });

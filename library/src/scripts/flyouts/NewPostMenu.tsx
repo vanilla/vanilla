@@ -8,6 +8,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 import { Trail } from "react-spring/renderprops";
 import { useSpring, animated, interpolate } from "react-spring";
+import NewPostBackground from "./NewPostBackground";
 
 export enum PostTypes {
     LINK = "link",
@@ -65,35 +66,27 @@ function ActionItem({ item, style }: { item: IAddPost; style: ITransition }) {
 export default function NewPostMenu(props: { items: IAddPost[] }) {
     const [open, setOpen] = useState(false);
     const toggle = () => setOpen(!open);
+    const onClickBackground = () => {
+        if (open) {
+            setOpen(false);
+        }
+    };
 
     const classes = newPostMenuClasses();
     const { items } = props;
 
-    const { x, d, s } = useSpring({
+    // Animation parameters: o (opacity), d (degree), s (scale)
+    const AnimatedButton = animated(Button);
+    const { o, d, s } = useSpring({
         config: { duration: 150 },
-        x: open ? 1 : 0,
+        o: open ? 1 : 0,
         d: open ? -135 : 0,
         s: open ? 0.9 : 1,
-        from: { x: 0, d: 0, s: 1 },
-    });
-    const AnimatedButton = animated(Button);
-
-    const c = useSpring({
-        backgroundColor: open ? "gray" : "white",
-        from: { backgroundColor: "white" },
-        config: { duration: 800 },
+        from: { o: 0, d: 0, s: 1 },
     });
 
     return (
-        <animated.div
-            style={c}
-            className={classNames(classes.container)}
-            onClick={() => {
-                if (open) {
-                    setOpen(false);
-                }
-            }}
-        >
+        <NewPostBackground open={open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <Trail
                     reverse={open}
@@ -108,24 +101,21 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
                 <AnimatedButton
                     style={{
-                        opacity: x
+                        opacity: o
                             .interpolate({
                                 range: [0, 0.25, 0.45, 0.75, 1],
                                 output: [1, 0.97, 0.7, 0.9, 1],
                             })
-                            .interpolate(x => `${x}`),
+                            .interpolate(x => `${o}`),
                         transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
                     }}
                     baseClass={ButtonTypes.CUSTOM}
                     onClick={toggle}
-                    // className={classNames(classes.toggle, {
-                    //     [classes.isOpen]: open,
-                    // })}
                     className={classNames(classes.toggle)}
                 >
                     <NewPostMenuIcon />
                 </AnimatedButton>
             </div>
-        </animated.div>
+        </NewPostBackground>
     );
 }

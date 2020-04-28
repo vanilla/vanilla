@@ -111,11 +111,11 @@ class PostController extends VanillaController {
      *
      * @param int $categoryID Unique ID of the category to add the discussion to.
      */
-    public function discussion($categoryUrlCode = '') {
+    public function discussion($categoryID = '') {
         // Override CategoryID if categories are disabled
         $useCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         if (!$useCategories) {
-            $categoryUrlCode = '';
+            $categoryID = '';
         }
 
         // Setup head
@@ -136,8 +136,8 @@ class PostController extends VanillaController {
         if (isset($this->Discussion)) {
             $this->CategoryID = $this->Discussion->CategoryID;
             $category = CategoryModel::categories($this->CategoryID);
-        } elseif ($categoryUrlCode != '') {
-            $category = CategoryModel::categories($categoryUrlCode);
+        } elseif ($categoryID != '') {
+            $category = CategoryModel::categories($categoryID);
 
             if ($category) {
                 $this->CategoryID = val('CategoryID', $category);

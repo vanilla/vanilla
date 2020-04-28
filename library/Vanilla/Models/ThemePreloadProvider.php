@@ -82,7 +82,6 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function setForcedThemeKey($forcedThemeKey, $revisionID = null): void {
         $this->forcedThemeKey = $forcedThemeKey;
-
     }
 
     /**
@@ -90,7 +89,6 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function setForcedRevisionID(?int $revisionID = null): void {
         $this->revisionID = $revisionID;
-
     }
 
     /**

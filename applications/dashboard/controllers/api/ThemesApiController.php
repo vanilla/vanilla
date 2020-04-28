@@ -216,7 +216,7 @@ class ThemesApiController extends AbstractApiController {
             if (!empty($previewThemeRevisionID)) {
                 $args['revisionID'] = $previewThemeRevisionID;
             }
-            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey,  $args);
+            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey, $args);
         } else {
             $theme = $this->themeModel->getCurrentTheme();
         }

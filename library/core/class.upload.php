@@ -327,14 +327,15 @@ class Gdn_Upload extends Gdn_Pluggable {
                 mkdir(dirname($target), 0777, true);
             }
 
-            if (stringBeginsWith($source, PATH_UPLOADS)) {
-                rename($source, $target);
+            if ($copy) {
+                $result = copy($source, $target);
+            } elseif (stringBeginsWith($source, PATH_UPLOADS)) {
+                $result = rename($source, $target);
             } else {
-                $isUpload = $this->fileUtils->isUploadedFile($source);
-                $result = ($copy && $isUpload) ? copy($source, $target) : $this->fileUtils->moveUploadedFile($source, $target);
-                if (!$result) {
-                    throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
-                }
+                $result = $this->fileUtils->moveUploadedFile($source, $target);
+            }
+            if (!$result) {
+                throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
             }
         }
 

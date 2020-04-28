@@ -58,4 +58,24 @@ class FileUtils {
         } while (file_exists($path));
         return $path;
     }
+
+    /**
+     * Recursively delete a directory.
+     *
+     * @param string $root
+     */
+    public static function deleteRecursively(string $root) {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            $deleteFunction = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $deleteFunction($fileinfo->getRealPath());
+        }
+
+        // Final directory delete.
+        rmdir($root);
+    }
 }

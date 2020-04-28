@@ -6,11 +6,13 @@
 
 namespace Vanilla;
 
+use Garden\Http\HttpClient;
 use Garden\SafeCurl\SafeCurl;
 use InvalidArgumentException;
 use RuntimeException;
 use Gdn_Upload;
 use Vanilla\Formatting\Quill\Nesting\InvalidNestingException;
+use Vanilla\Web\SafeCurlHttpHandler;
 
 /**
  * Value object representing a file uploaded through an HTTP request.
@@ -39,7 +41,13 @@ class UploadedFile {
     private $moved = false;
 
     /** @var string|null */
-    private $persistedUrl = null;
+    private $persistedPath = null;
+
+    /** @var string|null */
+    private $foreignUrl = null;
+
+    /** @var string|null */
+    private $resolvedForeignUrl = null;
 
     /** @var int */
     private $size;
@@ -96,7 +104,7 @@ class UploadedFile {
         $safeCurl->setFollowLocationLimit(5);
         $safeCurl->setFollowLocation(true);
         $safeCurl->execute($remoteUrl);
-        $finalUrl = $redirectedUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+        $resolvedUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
 
         $curlStats = curl_getinfo($curl);
 
@@ -110,16 +118,18 @@ class UploadedFile {
             throw new \Exception('File missing content type or download size');
         }
 
-        $name = self::extractNameFromUrl($finalUrl);
+        $name = self::extractNameFromUrl($resolvedUrl);
         $ext = pathinfo($name, PATHINFO_EXTENSION);
         $tmpFilePath = FileUtils::generateUniqueUploadPath($ext, false);
-        $successful = file_put_contents($tmpFilePath, fopen($finalUrl, 'r'));
+        // Make sure we have our base directory.
+
+        $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, 'r'));
 
         if (!$successful) {
             throw new \Exception('Failed to copy file locally');
         }
 
-        return new UploadedFile(
+        $file = new UploadedFile(
             new \Gdn_Upload(),
             $tmpFilePath,
             $downloadSize,
@@ -127,6 +137,9 @@ class UploadedFile {
             $name,
             $contentType
         );
+        $file->setForeignUrl($remoteUrl);
+        $file->setResolvedForeignUrl($resolvedUrl);
+        return $file;
     }
 
     /**
@@ -160,8 +173,11 @@ class UploadedFile {
      */
     public function generatePersistedUploadPath(string $persistSubDirectory = '', string $nameFormat = '%s'): string {
         $persistDirectory = '';
-        if ($persistSubDirectory) {
-            $persistDirectory .= "/${persistSubDirectory}";
+
+        if (!$persistSubDirectory && $this->foreignUrl !== null) {
+            $persistDirectory .= 'migrated';
+        } elseif ($persistSubDirectory) {
+            $persistDirectory .= $persistSubDirectory;
         }
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
         $baseName = basename($this->getClientFilename(), ".${ext}");
@@ -182,13 +198,15 @@ class UploadedFile {
     public function persistUpload(bool $copy = false, string $persistSubDirectory = '', string $nameFormat = '%s'): UploadedFile {
         $this->tryApplyImageProcessing();
 
+        $persistedPath = $this->generatePersistedUploadPath($persistSubDirectory, $nameFormat);
+
         $result = $this->uploadModel->saveAs(
             $this->getFile(),
-            $this->generatePersistedUploadPath($persistSubDirectory, $nameFormat),
+            $persistedPath,
             ["OriginalFilename" => $this->getClientFilename()],
             $copy
         );
-        $this->setPersistedUrl($result['SaveName']);
+        $this->setPersistedPath($result['SaveName']);
         return $this;
     }
 
@@ -419,15 +437,15 @@ class UploadedFile {
     /**
      * @return string|null
      */
-    public function getPersistedUrl(): ?string {
-        return $this->persistedUrl;
+    public function getPersistedPath(): ?string {
+        return $this->persistedPath;
     }
 
     /**
-     * @param string|null $persistedUrl
+     * @param string|null $persistedPath
      */
-    public function setPersistedUrl(?string $persistedUrl): void {
-        $this->persistedUrl = $persistedUrl;
+    public function setPersistedPath(?string $persistedPath): void {
+        $this->persistedPath = $persistedPath;
     }
 
     /**
@@ -440,5 +458,33 @@ class UploadedFile {
     public function setImageConstraints(array $imageConstraints): UploadedFile {
         $this->imageConstraints = $imageConstraints;
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getForeignUrl(): ?string {
+        return $this->foreignUrl;
+    }
+
+    /**
+     * @param string|null $foreignUrl
+     */
+    public function setForeignUrl(?string $foreignUrl): void {
+        $this->foreignUrl = $foreignUrl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getResolvedForeignUrl(): ?string {
+        return $this->resolvedForeignUrl;
+    }
+
+    /**
+     * @param string|null $resolvedForeignUrl
+     */
+    public function setResolvedForeignUrl(?string $resolvedForeignUrl): void {
+        $this->resolvedForeignUrl = $resolvedForeignUrl;
     }
 }

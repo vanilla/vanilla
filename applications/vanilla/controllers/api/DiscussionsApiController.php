@@ -567,6 +567,8 @@ class DiscussionsApiController extends AbstractApiController {
         $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
+        $category = $this->categoryModel->getID($categoryID);
+        $permissionCategoryID = $category->PermissionCategoryID;
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
         }
@@ -575,9 +577,9 @@ class DiscussionsApiController extends AbstractApiController {
             $categoryID = $discussionData['CategoryID'];
         }
 
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $permissionCategoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $permissionCategoryID);
 
         $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);

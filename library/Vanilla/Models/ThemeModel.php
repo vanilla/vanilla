@@ -608,9 +608,16 @@ class ThemeModel {
             $currentID !== null &&
             !in_array($currentID, self::ASSET_COMPAT_THEMES, true) // To prevent infinite loops.
         ) {
-            // Apply the current themes assets over foundation.
-            $currentTheme = $this->getThemeWithAssets($currentID);
-            $theme['assets'] = $currentTheme['assets'];
+            try {
+                // Apply the current themes assets over foundation.
+                $currentTheme = $this->getThemeWithAssets($currentID);
+                $theme['assets'] = $currentTheme['assets'];
+            } catch (\Exception $e) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                // If we had some exception during this, fallback to the default.
+                $provider = $this->getThemeProvider("FILE");
+                return $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
+            }
         }
         return $theme;
     }

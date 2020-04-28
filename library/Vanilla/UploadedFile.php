@@ -163,7 +163,7 @@ class UploadedFile {
      */
     private static function extractNameFromUrl(string $url): ?string {
         $keys = parse_url($url); // parse the url
-        $path = explode("/", $keys['path']); // splitting the path
+        $path = explode("/", $keys['path'] ?? randomString(12)); // splitting the path
         $last = end($path) ?: null; // get the value of the last element
         return $last;
     }

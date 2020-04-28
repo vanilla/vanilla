@@ -118,7 +118,7 @@ class UploadedFile {
             throw new \Exception('File missing content type or download size');
         }
 
-        $name = self::extractNameFromUrl($resolvedUrl);
+        $name = self::extractNameFromUrl($remoteUrl);
         $ext = pathinfo($name, PATHINFO_EXTENSION);
         $tmpFilePath = FileUtils::generateUniqueUploadPath($ext, false);
         // Make sure we have our base directory.

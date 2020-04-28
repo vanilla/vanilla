@@ -77,39 +77,56 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         from: { x: 0, d: 0, s: 1 },
     });
     const AnimatedButton = animated(Button);
-    return (
-        <div className={classNames(classes.root)}>
-            {open && (
-                <Trail
-                    config={{ mass: 2, tension: 3000, friction: 150 }}
-                    items={items}
-                    keys={item => item.id}
-                    from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
-                    to={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
-                >
-                    {item => props => <ActionItem key={item.id} item={item} style={props} />}
-                </Trail>
-            )}
 
-            <AnimatedButton
-                style={{
-                    opacity: x
-                        .interpolate({
-                            range: [0, 0.25, 0.45, 0.75, 1],
-                            output: [1, 0.97, 0.7, 0.9, 1],
-                        })
-                        .interpolate(x => `${x}`),
-                    transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
-                }}
-                baseClass={ButtonTypes.CUSTOM}
-                onClick={toggle}
-                // className={classNames(classes.toggle, {
-                //     [classes.isOpen]: open,
-                // })}
-                className={classNames(classes.toggle)}
-            >
-                <NewPostMenuIcon />
-            </AnimatedButton>
-        </div>
+    const c = useSpring({
+        backgroundColor: open ? "gray" : "white",
+        from: { backgroundColor: "white" },
+        config: { duration: 800 },
+    });
+
+    return (
+        <animated.div
+            style={c}
+            className={classNames(classes.container)}
+            onClick={() => {
+                if (open) {
+                    setOpen(false);
+                }
+            }}
+        >
+            <div className={classNames(classes.root)}>
+                {open && (
+                    <Trail
+                        config={{ mass: 2, tension: 3000, friction: 150 }}
+                        items={items}
+                        keys={item => item.id}
+                        from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
+                        to={{ opacity: 1, transform: "translate3d(0, 0, 0)" }}
+                    >
+                        {item => props => <ActionItem key={item.id} item={item} style={props} />}
+                    </Trail>
+                )}
+
+                <AnimatedButton
+                    style={{
+                        opacity: x
+                            .interpolate({
+                                range: [0, 0.25, 0.45, 0.75, 1],
+                                output: [1, 0.97, 0.7, 0.9, 1],
+                            })
+                            .interpolate(x => `${x}`),
+                        transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
+                    }}
+                    baseClass={ButtonTypes.CUSTOM}
+                    onClick={toggle}
+                    // className={classNames(classes.toggle, {
+                    //     [classes.isOpen]: open,
+                    // })}
+                    className={classNames(classes.toggle)}
+                >
+                    <NewPostMenuIcon />
+                </AnimatedButton>
+            </div>
+        </animated.div>
     );
 }

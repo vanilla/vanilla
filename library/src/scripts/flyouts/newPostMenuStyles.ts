@@ -116,6 +116,21 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-block",
     });
 
+    const container = style("container", {
+        height: "100vh",
+        width: "100vw",
+        position: "relative",
+        zIndex: "9999",
+    });
+
+    const containerOpen = style("containerOpen", {
+        backgroundColor: colorOut(globalVars.mainColors.fg),
+    });
+
+    const containerClose = style("containerClose", {
+        backgroundColor: colorOut(globalVars.mainColors.bg),
+    });
+
     return {
         root,
         item,
@@ -123,5 +138,8 @@ export const newPostMenuClasses = useThemeCache(() => {
         isOpen,
         toggle,
         label,
+        container,
+        containerOpen,
+        containerClose,
     };
 });

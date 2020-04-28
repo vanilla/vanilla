@@ -4,10 +4,16 @@ import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/
 
 export const newPostBackgroundVariables = useThemeCache(() => {
     const themeVars = variableFactory("newPostBackground");
+    const globalVars = globalVariables();
 
     const container = themeVars("container", {
         top: 0,
         left: 0,
+        color: {
+            open: globalVars.elementaryColors.black.fade(0.4),
+            close: globalVars.mainColors.bg,
+        },
+        duration: 300,
     });
 
     return {
@@ -23,9 +29,9 @@ export const newPostBackgroundClasses = useThemeCache(() => {
         height: "100vh",
         width: "100vw",
         position: "absolute",
-        zIndex: "9999",
         top: unit(vars.container.top),
         left: unit(vars.container.left),
+        zIndex: 9999,
     });
 
     return {

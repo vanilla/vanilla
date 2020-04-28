@@ -3,23 +3,28 @@ import classNames from "classnames";
 import { createPortal } from "react-dom";
 
 import { useSpring, animated } from "react-spring";
-import { newPostBackgroundClasses } from "./newPostBackgroundStyles";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { newPostBackgroundClasses, newPostBackgroundVariables } from "./newPostBackgroundStyles";
 import { colorOut } from "@library/styles/styleHelpers";
 
-export default function NewPostBackground(props) {
-    const classes = newPostBackgroundClasses();
-    const globalVars = globalVariables();
-    const { elementaryColors } = globalVars;
+interface IProps {
+    open: boolean;
+    className?: string;
+    children: React.ReactNode;
+    onClick: () => void;
+}
 
-    const c = useSpring({
-        backgroundColor: props.open ? colorOut(elementaryColors.black.fade(0.4)) : colorOut(globalVars.mainColors.bg),
-        from: { backgroundColor: colorOut(globalVars.mainColors.bg) },
-        config: { duration: 300 },
+export default function NewPostBackground(props: IProps) {
+    const classes = newPostBackgroundClasses();
+    const vars = newPostBackgroundVariables();
+
+    const trans = useSpring({
+        backgroundColor: props.open ? colorOut(vars.container.color.open) : colorOut(vars.container.color.close),
+        from: { backgroundColor: colorOut(vars.container.color.close) },
+        config: { duration: vars.container.duration },
     });
 
     return createPortal(
-        <animated.div className={classNames(classes.container)} style={c} onClick={props.onClick}>
+        <animated.div className={classNames(classes.container)} style={trans} onClick={props.onClick}>
             {props.children}
         </animated.div>,
         document.body,

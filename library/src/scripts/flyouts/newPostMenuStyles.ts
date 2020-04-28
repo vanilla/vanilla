@@ -2,8 +2,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
 import { iconClasses } from "@library/icons/iconStyles";
-import { translateX } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -14,7 +14,7 @@ export const newPostMenuVariables = useThemeCache(() => {
         right: 24,
     });
 
-    const item = themeVars("itemAction", {
+    const item = themeVars("item", {
         position: {
             top: 16,
             right: 6,
@@ -61,7 +61,7 @@ export const newPostMenuClasses = useThemeCache(() => {
     const vars = newPostMenuVariables();
     const globalVars = globalVariables();
 
-    const root = style({
+    const root = style("root", {
         position: "fixed",
         bottom: unit(vars.position.bottom),
         right: unit(vars.position.right),
@@ -76,7 +76,7 @@ export const newPostMenuClasses = useThemeCache(() => {
     const action = style("action", {
         borderRadius: unit(vars.action.borderRadius),
         ...shadowHelper().dropDown(),
-        height: unit(vars.action.size.height),
+        minHeight: unit(vars.action.size.height),
         backgroundColor: colorOut(globalVars.mainColors.bg),
         paddingLeft: unit(vars.action.padding.horizontal),
         paddingRight: unit(vars.action.padding.horizontal),
@@ -87,6 +87,7 @@ export const newPostMenuClasses = useThemeCache(() => {
                 backgroundColor: colorOut(globalVars.mainColors.primary),
             },
         },
+        ...clickableItemStates(),
     });
 
     const toggle = style("toggle", {

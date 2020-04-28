@@ -6,16 +6,24 @@
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
-import { ITheme } from "@library/theming/themeReducer";
+import { ITheme, IThemeAssets } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
-import { IPatchThemeRequest } from "@themingapi/theme/ThemeEditorActions";
 
 const createAction = actionCreatorFactory("@@themes");
 
 type IGetThemeResponse = ITheme;
+export interface IPatchThemeRequest {
+    themeID: string | number;
+    name?: string;
+    parentTheme?: string;
+    parentVersion?: string;
+    revisionID?: number;
+    assets?: Partial<IPostPatchThemeAssets>;
+}
+export type IPostPatchThemeAssets = Partial<IThemeAssets>;
 
 export enum PreviewStatusType {
     PREVIEW = "preview",

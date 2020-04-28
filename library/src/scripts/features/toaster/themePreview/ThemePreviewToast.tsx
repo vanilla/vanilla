@@ -12,7 +12,6 @@ import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeAction
 import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { useThemeEditorActions } from "@themingapi/theme/ThemeEditorActions";
 import { t } from "@vanilla/i18n/src";
 
 interface IThemePreview {

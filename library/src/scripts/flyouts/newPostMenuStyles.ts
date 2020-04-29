@@ -33,9 +33,6 @@ export const newPostMenuVariables = useThemeCache(() => {
 
     const toggle = themeVars("toggle", {
         size: 56,
-        on: {
-            rotation: `-315deg`,
-        },
         position: {
             top: 24,
         },
@@ -82,12 +79,7 @@ export const newPostMenuClasses = useThemeCache(() => {
         paddingRight: unit(vars.action.padding.horizontal),
         display: "inline-flex",
         alignItems: "center",
-        $nest: {
-            "&:hover": {
-                backgroundColor: colorOut(globalVars.mainColors.primary),
-            },
-        },
-        ...clickableItemStates(),
+        ...clickableItemStates({ default: globalVars.mainColors.fg }),
     });
 
     const toggle = style("toggle", {

@@ -1522,7 +1522,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     }
 
     /**
-     *
+     * Get a user count based on like comparisons.
      *
      * @param array|bool $like
      * @return int

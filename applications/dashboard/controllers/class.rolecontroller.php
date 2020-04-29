@@ -326,6 +326,7 @@ class RoleController extends DashboardController {
     /**
      * Do permission check.
      *
+     * @param int $roleID
      * @since 2.0.0
      * @access protected
      */

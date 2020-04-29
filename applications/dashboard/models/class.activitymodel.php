@@ -8,18 +8,28 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
-use \Vanilla\Formatting\Formats;
+use Vanilla\Formatting\Formats;
+use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Dashboard\Events\NotificationEvent;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Activity data management.
  */
-class ActivityModel extends Gdn_Model {
+class ActivityModel extends Gdn_Model implements FormatFieldInterface {
 
     use \Vanilla\FloodControlTrait;
+
+    use FormatFieldTrait;
 
     /** Maximum length of activity story excerpts. */
     private const DEFAULT_EXCERPT_LENGTH = 160;
@@ -66,6 +76,9 @@ class ActivityModel extends Gdn_Model {
     /** @var ActivityEmail[] Emails pending sending. */
     private static $emailQueue = [];
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /** @var Psr\Log\LoggerInterface */
     private $logger;
 
@@ -82,16 +95,27 @@ class ActivityModel extends Gdn_Model {
      *
      * @param Gdn_Validation $validation The validation dependency.
      * @param LoggerInterface $logger
+     * @param FormatService $formatService
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null, ?FormatService $formatService = null) {
+    public function __construct(
+        Gdn_Validation $validation = null,
+        ?LoggerInterface $logger = null,
+        ?FormatService $formatService = null,
+        ?EventDispatcherInterface $eventDispatcher = null
+    ) {
         parent::__construct('Activity', $validation);
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
-        $this->formatService = $formatService instanceof FormatService ? $formatService : Gdn::getContainer()->get(FormatService::class);
-        $this->logger = $logger instanceof LoggerInterface ? $logger : Gdn::getContainer()->get(LoggerInterface::class);
+        $this->formatService = $formatService instanceof FormatService ?
+            $formatService : Gdn::getContainer()->get(FormatService::class);
+        $this->logger = $logger instanceof LoggerInterface ?
+            $logger : Gdn::getContainer()->get(LoggerInterface::class);
+        $this->eventDispatcher = $eventDispatcher instanceof EventDispatcherInterface ?
+            $eventDispatcher : Gdn::getContainer()->get(EventDispatcherInterface::class);
     }
 
     /**
@@ -1700,6 +1724,10 @@ class ActivityModel extends Gdn_Model {
                 $activityID = $this->SQL->insert('Activity', $activity);
                 $activity['ActivityID'] = $activityID;
 
+                if ($activity["Notified"] === self::SENT_PENDING) {
+                    $event = $this->eventFromRow($activity);
+                    $this->eventDispatcher->dispatch($event);
+                }
                 if ($activity['Emailed'] == self::SENT_PENDING) {
                     $this->queueEmail($emailFields + $activity, $options);
                 }
@@ -2162,5 +2190,72 @@ class ActivityModel extends Gdn_Model {
             $email->clear();
             $batchOffset += $batchSize;
         }
+    }
+
+    /**
+     * Generate a notification event object, based on a database row.
+     *
+     * @param array $row
+     * @return NotificationEvent
+     */
+    private function eventFromRow(array $row): NotificationEvent {
+        /** @var UserModel */
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $userModel->expandUsers($row, ["ActivityUserID", "NotifyUserID", "RegardingUserID"]);
+        $notification = $this->normalizeRow($row, true);
+        $notification = $this->schema()->validate($notification);
+        $result = new NotificationEvent(
+            NotificationEvent::ACTION_INSERT,
+            ["notification" => $notification]
+        );
+        return $result;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @return array
+     */
+    public function normalizeRow(array $row): array {
+        $row["Url"] = !empty($row["Route"]) ? url($row["Route"], true) : null;
+
+        $notifyUser = Gdn::userModel()->getID($row["NotifyUserID"], DATASET_TYPE_ARRAY);
+        $row["headline"] = $this->getActivityHeadline($row, $notifyUser);
+
+        $story = $row["Story"] ?? null;
+        $format = $row["Format"] ?? null;
+        if ($story && $format) {
+            $this->formatField($row, "Story", $format);
+        }
+
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
+
+    /**
+     * Get a schema instance comprised of standard activity fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            "activityID:i",
+            "story:s",
+            "dateInserted:dt",
+            "insertUserID:i",
+            "insertUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            "activityUserID:i",
+            "activityUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            "regardingUserID:i",
+            "regardingUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            "headline:s?",
+            "story:s",
+            "url:s?",
+            "recordType:s?",
+            "recordID:i?",
+        ]);
+        return $result;
     }
 }

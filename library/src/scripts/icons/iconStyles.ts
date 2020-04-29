@@ -206,11 +206,6 @@ export const iconVariables = useThemeCache(() => {
         height: 16,
     });
 
-    // const itemFlyoutIcon = themeVars("itemFlyoutIcon", {
-    //     width: 24,
-    //     height: 24,
-    // });
-
     return {
         standard,
         newFolder,
@@ -239,7 +234,6 @@ export const iconVariables = useThemeCache(() => {
         documentation,
         bookmarkIcon,
         newPostMenuIcon,
-        // itemFlyoutIcon,
     };
 });
 

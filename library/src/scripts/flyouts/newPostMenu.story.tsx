@@ -10,7 +10,7 @@ export default {
     title: "NewPostMenu",
 };
 
-const items = [
+const items: IAddPost[] = [
     {
         id: "1",
         type: PostTypes.BUTTON,
@@ -45,7 +45,7 @@ const items = [
         icon: <NewDiscussionIcon />,
         label: "Some Link",
     },
-] as IAddPost[];
+];
 
 export const Basic = () => (
     <StoryContent>

@@ -21,7 +21,7 @@ export interface IAddPost {
     type: PostTypes;
     className?: string;
     label: string;
-    icon: JSX.Element;
+    icon: React.ReactNode;
 }
 
 export interface ITransition {

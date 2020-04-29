@@ -371,7 +371,7 @@ class Gdn_Upload extends Gdn_Pluggable {
             $sender->Returns = [];
             $sender->EventArguments = [];
             $sender->EventArguments['Urls'] =& $this->uploadWebPaths;
-            $this->eventManager->fire('Gdn_Upload_GetUrls', $sender);
+            $this->eventManager->fire('Gdn_Upload_GetUrls', $sender, $sender->EventArguments);
         }
         return $this->uploadWebPaths;
     }

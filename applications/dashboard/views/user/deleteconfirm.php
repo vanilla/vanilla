@@ -16,6 +16,7 @@ echo $this->Form->errors();
         echo t("All of the user content will be replaced with a message stating the user has been deleted.");
     else
         echo t("The user content will be completely deleted.");
+        echo $this->Form->checkBox('DeleteNotes', 'Delete Moderation Notes', ['value' => '1']);
     ?>
 </div>
 <?php

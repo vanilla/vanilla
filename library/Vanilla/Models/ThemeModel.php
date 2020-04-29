@@ -609,26 +609,6 @@ class ThemeModel {
 
         // Generate a preview.
         $theme['preview'] = $this->generateThemePreview($theme);
-
-        // A little fixup to ensure current variables are always applied to asset compat themes.
-        $currentID = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
-        $currentID = $this->verifyThemeIdentifierIsValid($currentID) ? $currentID : ThemeModel::FALLBACK_THEME_KEY;
-
-        if (in_array($themeID, self::ASSET_COMPAT_THEMES, true) &&
-            $currentID !== null &&
-            !in_array($currentID, self::ASSET_COMPAT_THEMES, true) // To prevent infinite loops.
-        ) {
-            try {
-                // Apply the current themes assets over foundation.
-                $currentTheme = $this->getThemeWithAssets($currentID);
-                $theme['assets'] = $currentTheme['assets'];
-            } catch (\Exception $e) {
-                trigger_error($e->getMessage(), E_USER_WARNING);
-                // If we had some exception during this, fallback to the default.
-                $provider = $this->getThemeProvider("FILE");
-                return $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
-            }
-        }
         return $theme;
     }
 

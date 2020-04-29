@@ -21,7 +21,7 @@ use Vanilla\Utility\ArrayUtils;
  * 4. Remove the values from the expand parameter.
  * 5. Reset the request query.
  */
-class SSOIDMiddleware {
+class APIExpandMiddleware {
 
     use BasePathTrait;
 
@@ -31,9 +31,12 @@ class SSOIDMiddleware {
 
     /** @var string[] */
     private $supportedFields = [
+        "firstInsertUser.ssoID" => "firstInsertUserID",
         "insertUser.ssoID" => "insertUserID",
+        "lastInsertUser.ssoID" => "lastInsertUserID",
         "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
         "updateUser.ssoID" => "updateUserID",
+        "user.ssoID" => "userID",
     ];
 
     /** @var UserModel */
@@ -162,10 +165,10 @@ class SSOIDMiddleware {
     /**
      * A higher order function for getting the middleware, useful for container config.
      *
-     * @param SSOIDMiddleware $middleware
+     * @param APIExpandMiddleware $middleware
      * @return array
      */
-    public static function filterOpenAPIFactory(SSOIDMiddleware $middleware) {
+    public static function filterOpenAPIFactory(APIExpandMiddleware $middleware) {
         return [$middleware, 'filterOpenAPI'];
     }
 

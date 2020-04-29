@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla\Web;
 
-use Vanilla\Web\SSOIDMiddleware;
+use Vanilla\Web\APIExpandMiddleware;
 
 /**
  * A test version of the `SSOIDMiddleware` that mocks out some of the functionality.
  */
-class TestSSOIDMiddleware extends SSOIDMiddleware {
+class TestAPIExpandMiddleware extends APIExpandMiddleware {
     /**
      * TestSSOIDMiddleware constructor.
      *

@@ -9,18 +9,18 @@ namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Web\SSOIDMiddleware;
+use Vanilla\Web\APIExpandMiddleware;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\Request;
 
 /**
- * Tests for the `SSOIDMiddleware` class.
+ * Tests for the `APIExpandMiddlewareTest` class.
  */
-class SSOIDMiddlewareTest extends TestCase {
+class APIExpandMiddlewareTest extends TestCase {
     use BootstrapTrait;
 
     /**
-     * @var SSOIDMiddleware
+     * @var APIExpandMiddleware
      */
     protected $middleware;
 
@@ -28,7 +28,7 @@ class SSOIDMiddlewareTest extends TestCase {
      * Create a configured test middleware for each test.
      */
     public function setUp(): void {
-        $this->middleware = new TestSSOIDMiddleware('/');
+        $this->middleware = new TestAPIExpandMiddleware('/');
     }
 
     /**
@@ -123,31 +123,6 @@ class SSOIDMiddlewareTest extends TestCase {
     }
 
     /**
-     * Expansion should be recursive.
-     */
-    public function testRecursiveExpand(): void {
-        $request = new Request('/?expand=insertUser.ssoID');
-        $next = function ($r) {
-            return [
-                'foo' => [
-                    'insertUserID' => 1
-                ]
-            ];
-        };
-
-        /** @var Data $actual */
-        $actual = call_user_func($this->middleware, $request, $next);
-        $this->assertSame([
-            'foo' => [
-                'insertUserID' => 1,
-                'insertUser' => [
-                    'ssoID' => 'sso-1',
-                ]
-            ]
-        ], $actual->getData());
-    }
-
-    /**
      * Expanding SSO IDs should not overwrite the result.
      */
     public function testNonDestructiveExpansion(): void {
@@ -222,7 +197,7 @@ class SSOIDMiddlewareTest extends TestCase {
      * A basic test for the OpenAPI factory.
      */
     public function testOpenAPIFactory() {
-        $actual = SSOIDMiddleware::filterOpenAPIFactory($this->middleware);
+        $actual = APIExpandMiddleware::filterOpenAPIFactory($this->middleware);
         $this->assertSame($actual[0], $this->middleware);
     }
 

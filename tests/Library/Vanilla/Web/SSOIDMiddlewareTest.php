@@ -201,6 +201,7 @@ class SSOIDMiddlewareTest extends TestCase {
         };
 
         $actual = call_user_func($this->middleware, $request, $next);
+        $this->assertTrue(true);
     }
 
     /**
@@ -214,6 +215,7 @@ class SSOIDMiddlewareTest extends TestCase {
         };
 
         $actual = call_user_func($this->middleware, $request, $next);
+        $this->assertTrue(true);
     }
 
     /**
@@ -348,12 +350,12 @@ EOT
      * Expansion shouldn't overly recurse into expanded records.
      */
     public function testNoDoubleExpand(): void {
-        $request = new Request('/?expand=user.ssoID');
+        $request = new Request('/?expand=insertUser.ssoID');
         $next = function ($r) {
             return [
-                'userID' => 1,
-                'user' => [
-                    'userID' => 1,
+                'insertUserID' => 1,
+                'insertUser' => [
+                    'insertUserID' => 1,
                     'name' => 'foo',
                 ]
             ];
@@ -362,9 +364,9 @@ EOT
         /** @var Data $actual */
         $actual = call_user_func($this->middleware, $request, $next);
         $this->assertSame([
-            'userID' => 1,
-            'user' => [
-                'userID' => 1,
+            'insertUserID' => 1,
+            'insertUser' => [
+                'insertUserID' => 1,
                 'name' => 'foo',
                 'ssoID' => 'sso-1',
             ]

@@ -119,6 +119,78 @@ class ArrayUtilsTest extends TestCase {
     }
 
     /**
+     * Verify testIsAssociative method.
+     *
+     * @param array|ArrayAccess $array
+     * @param bool $expected
+     * @dataProvider provideIsAssociativeTests
+     */
+    public function testIsAssociative($array, bool $expected): void {
+        $actual = ArrayUtils::isAssociative($array);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide test data for the isAssociative method.
+     *
+     * @return array
+     */
+    public function provideIsAssociativeTests(): array {
+        $result = [
+            "associative" => [["foo" => "bar"], true],
+            "indexed" => [["Hello world."], false],
+            "mixed" => [["foo" => "bar", "Hello world."], true],
+            "empty" => [[], false],
+            "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), true],
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Verify setByPath method.
+     *
+     * @param mixed $value
+     * @param string $path
+     * @param array|ArrayAccess $array
+     * @param array|ArrayAccess $expected
+     * @dataProvider provideSetByPathTests
+     */
+    public function testSetByPath($value, string $path, $array, $expected): void {
+        $actual = ArrayUtils::setByPath($value, $path, $array);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide test data for the setByPath method.
+     *
+     * @return array
+     */
+    public function provideSetByPathTests(): array {
+        $result = [
+            "simple" => [
+                "Hello world.",
+                "foo.bar.baz",
+                ["foo" => ["bar" => []]],
+                ["foo" => ["bar" => ["baz" => "Hello world."]]],
+            ],
+            "deep" => [
+                "Hello world.",
+                "foo.bar.baz",
+                ["foo" => []],
+                ["foo" => ["bar" => ["baz" => "Hello world."]]],
+            ],
+            "append" => [
+                "Hello world.",
+                "foo.bar.baz",
+                ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three"]]],
+                ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three", "baz" => "Hello world."]]],
+            ],
+        ];
+        return $result;
+    }
+
+    /**
      * Calling `ArrayUtils::walkRecursiveArray()` without an array is an exception.
      */
     public function testWalkArrayRecursiveNotArray(): void {

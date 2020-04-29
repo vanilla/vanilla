@@ -10,6 +10,7 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Garden\BasePathTrait;
 use UserModel;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Middleware to lookup foreign user IDs and add them to API responses.
@@ -29,7 +30,11 @@ class SSOIDMiddleware {
     private const ID_FIELD = "ssoID";
 
     /** @var string[] */
-    private $userFields = ["insertUser", "updateUser"];
+    private $supportedFields = [
+        "insertUser.ssoID" => "insertUserID",
+        "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
+        "updateUser.ssoID" => "updateUserID",
+    ];
 
     /** @var UserModel */
     private $userModel;
@@ -53,37 +58,35 @@ class SSOIDMiddleware {
      * @return mixed
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        if ($this->inBasePath($request->getPath())) {
-            $fields = $this->fieldsFromRequest($request);
-            $this->scrubExpand($request, $fields);
-        }
+        $expands = $this->inBasePath($request->getPath()) ? $this->extractExpands($request) : [];
 
         $response = $next($request);
 
-        if (empty($fields)) {
-            return $response;
+        if (!empty($expands)) {
+            $response = $this->updateResponse($response, $expands);
         }
 
-        $response = $this->updateBody($response, $fields);
         return $response;
     }
 
     /**
-     * Return a list of fields to expand on from the request.
+     * Gather the list of fields to expand and scrub the request.
      *
      * @param RequestInterface $request
      * @return array
      */
-    private function fieldsFromRequest(RequestInterface $request): array {
+    private function extractExpands(RequestInterface $request): array {
         $result = [];
 
         $expand = $this->readExpand($request);
+        $supportedFields = array_keys($this->supportedFields);
         foreach ($expand as $expandField) {
-            if ($userField = $this->fieldFromExpand($expandField)) {
-                $result[] = $userField;
+            if (in_array($expandField, $supportedFields)) {
+                $result[] = $expandField;
             }
         }
 
+        $this->scrubExpand($request, $result);
         return $result;
     }
 
@@ -96,9 +99,7 @@ class SSOIDMiddleware {
     private function readExpand(RequestInterface $request): array {
         $query = $request->getQuery();
         $expand = $query[self::EXPAND_FIELD] ?? "";
-        if (is_string($expand)) {
-            $fields = explode(",", $expand);
-        }
+        $fields = is_string($expand) ? explode(",", $expand) : [];
         array_walk($fields, "trim");
         return $fields;
     }
@@ -118,7 +119,7 @@ class SSOIDMiddleware {
 
         $scrubbedExpand = [];
         foreach ($expand as $field) {
-            if ($this->fieldFromExpand($field) === null) {
+            if (!in_array($field, $fields)) {
                 $scrubbedExpand[] = $field;
             }
         }
@@ -144,7 +145,7 @@ class SSOIDMiddleware {
                         if (self::EXPAND_FIELD === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
                             $enum = $parameter['schema']['items']['enum'];
                             foreach ($enum as $item) {
-                                if (in_array($item, $this->userFields)) {
+                                if (array_key_exists($item . '.' . self::ID_FIELD, $this->supportedFields)) {
                                     $enum[] = $item . '.' . self::ID_FIELD;
                                 }
                             }
@@ -169,61 +170,94 @@ class SSOIDMiddleware {
     }
 
     /**
-    * Is the value a supported fully-qualified field?
-    *
-    * @param string $field
-    * @return bool
-    */
-    private function fieldFromExpand(string $field): ?string {
-        foreach ($this->userFields as $userField) {
-            $fullUserField = $userField . "." . self::ID_FIELD;
-            if ($field === $fullUserField) {
-                return $userField;
+     * Generate an array of resources, grouped by field.
+     *
+     * @param Data $response
+     * @param array $fields
+     * @return array
+     */
+    private function resourceIDs(Data $response, array $fields): array {
+        if (empty($this->supportedFields)) {
+            return [];
+        }
+
+        $idFields = [];
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $this->supportedFields)) {
+                $idFields[$field] = $this->supportedFields[$field];
             }
         }
 
-        return null;
+        $result = [];
+        $idLookup = function (array $array) use ($idFields, &$result) {
+            foreach ($idFields as $field => $idField) {
+                $id = ArrayUtils::getByPath($idField, $array);
+                if ($id !== null) {
+                    if (!array_key_exists($field, $result)) {
+                        $result[$field] = [];
+                    }
+                    if (!in_array($id, $result[$field])) {
+                        $result[$field][] = $id;
+                    }
+                }
+            }
+        };
+
+        $data = $response->getData();
+        if (ArrayUtils::isAssociative($data)) {
+            $idLookup($data);
+        } else {
+            foreach ($data as $row) {
+                $idLookup($row);
+            }
+        }
+        return $result;
     }
 
     /**
-     * Update the body of a response to include the expanded fields.
+     * Update a response to include the expanded fields.
      *
      * @param array|Data $response
      * @param array $fields
      * @return mixed
      */
-    private function updateBody($response, array $fields) {
+    private function updateResponse($response, array $fields): Data {
         if (empty($fields)) {
-            return $response;
+            return Data::box($response);
         }
 
         $response = Data::box($response);
-        $userIDs = $this->extractUserIDs($response, $fields);
-        $userIDs = $this->joinSSOIDs($userIDs);
-        $this->updateResponse($response, $fields, $userIDs);
-        return $response;
-    }
+        $resourceIDs = $this->resourceIDs($response, $fields);
+        $resources = [];
+        foreach ($resourceIDs as $field => $IDs) {
+            $resources[$field] = $this->joinSSOIDs($IDs);
+        }
 
-    /**
-     * Extract user IDs from a response body, based on specified fields.
-     *
-     * @param Data $response
-     * @param array $fields
-     * @return int[]
-     */
-    private function extractUserIDs(Data $response, array $fields): array {
-        $result = [];
-        $idFields = array_map(function (string $value) {
-            return "{$value}ID";
-        }, $fields);
-
-        array_walk_recursive($response, function ($value, $key) use (&$result, $idFields) {
-            if (in_array($key, $idFields) && !in_array($value, $result)) {
-                $result[] = $value;
+        $updateRow = function (array &$row) use ($resources, $fields) {
+            foreach ($fields as $field) {
+                $idField = $this->supportedFields[$field] ?? null;
+                if (!$idField) {
+                    continue;
+                }
+                $id = ArrayUtils::getByPath($idField, $row);
+                if ($id !== null) {
+                    $fieldResources = $resources[$field] ?? [];
+                    $rowResource = $fieldResources[$id] ?? null;
+                    $row = ArrayUtils::setByPath($rowResource, $field, $row);
+                }
             }
-        }, $idFields);
+        };
 
-        return $result;
+        $data = $response->getData();
+        if (ArrayUtils::isAssociative($data)) {
+            $updateRow($data);
+        } else {
+            foreach ($data as &$row) {
+                $updateRow($row);
+            }
+        }
+        $response->setData($data);
+        return $response;
     }
 
     /**
@@ -235,15 +269,5 @@ class SSOIDMiddleware {
     protected function joinSSOIDs(array $userIDs): array {
         $result = $this->userModel->getDefaultSSOIDs($userIDs);
         return $result;
-    }
-
-    /**
-     * Update a response to include SSO user IDs.
-     *
-     * @param Data $response
-     * @param array $fields
-     * @param array $userIDs
-     */
-    protected function updateResponse(Data $response, array $fields, array $userIDs): void {
     }
 }

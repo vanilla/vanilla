@@ -417,7 +417,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function setPreviewTheme($themeKey): array {
+    public function setPreviewTheme($themeKey, int $revisionID = null): array {
         if (!empty($themeKey)) {
             $theme = $this->getThemeWithAssets($themeKey);
         } else {

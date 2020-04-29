@@ -35,6 +35,7 @@ story.add("Current Theme", () => {
                         name: "Keystone",
                         supportedSections: ["Forum", "Knowledge Base", "HomePage"],
                         themeID: "keystone",
+                        revisionID: null,
                         assets: {},
                         features: {},
                         preview: {

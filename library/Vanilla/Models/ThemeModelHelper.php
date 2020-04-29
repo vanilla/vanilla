@@ -125,12 +125,14 @@ class ThemeModelHelper {
      *
      * @param string $themeKey
      * @param ThemeProviderInterface $themeProvider
+     * @param int $revisionID
      * @return array Theme info array
      */
-    public function setSessionPreviewTheme(string $themeKey, ThemeProviderInterface $themeProvider): array {
+    public function setSessionPreviewTheme(string $themeKey, ThemeProviderInterface $themeProvider, ?int $revisionID = null): array {
         $masterTheme = $themeProvider->getMasterThemeKey($themeKey);
         $displayName = $themeProvider->getName($themeKey);
         $this->session->setPreference('PreviewThemeKey', $themeKey);
+        $this->session->setPreference('PreviewThemeRevisionID', $revisionID);
 
         $themeInfo = $this->addonManager->lookupTheme($masterTheme)->getInfo();
 
@@ -157,6 +159,7 @@ class ThemeModelHelper {
         $this->session->setPreference(
             [
                 'PreviewThemeKey' => '',
+                'PreviewThemeRevisionID' => '',
                 'PreviewMobileThemeFolder' => '',
                 'PreviewMobileThemeName' => '',
                 'PreviewThemeFolder' => '',

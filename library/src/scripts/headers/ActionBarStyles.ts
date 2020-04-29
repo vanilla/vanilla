@@ -121,6 +121,10 @@ export const actionBarClasses = useThemeCache(() => {
         width: "100%",
     });
 
+    const anotherCallToAction = style("anotherCallToAction", {
+        paddingRight: unit(10),
+    });
+
     return {
         items,
         centreColumn,
@@ -131,5 +135,6 @@ export const actionBarClasses = useThemeCache(() => {
         backSpacer,
         callToAction,
         fullWidth,
+        anotherCallToAction,
     };
 });

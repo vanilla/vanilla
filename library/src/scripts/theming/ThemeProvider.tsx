@@ -24,12 +24,13 @@ interface IProps {
     errorComponent: React.ReactNode;
     variablesOnly?: boolean;
     disabled?: boolean;
+    revisionID?: number;
 }
 
 let hasMounted = false;
 
 export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
-    const { themeKey, disabled, variablesOnly } = props;
+    const { themeKey, disabled, variablesOnly, revisionID } = props;
     const { getAssets } = useReduxActions(ThemeActions);
     const { assets } = useSelector((state: ICoreStoreState) => state.theme);
     const { setTopOffset } = useScrollOffset();
@@ -47,7 +48,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            void getAssets(themeKey);
+            void getAssets(themeKey, revisionID);
             return;
         }
 

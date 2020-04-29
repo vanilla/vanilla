@@ -201,6 +201,9 @@ trait ThemesApiSchemes {
                 'themeID:s?' => [
                     'description' => 'Theme ID or Theme Key',
                 ],
+                'revisionID:i?' => [
+                    'description' => 'Theme revision ID',
+                ],
             ]),
             $type
         );

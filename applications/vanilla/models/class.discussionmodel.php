@@ -3066,7 +3066,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
 
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
-        $this->updateDiscussionCount($categoryID);
+        /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+        $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+        $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID]);
 
         // Update the last post info for the category and its parents.
         CategoryModel::instance()->refreshAggregateRecentPost($categoryID, true);

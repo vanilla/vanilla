@@ -15,6 +15,6 @@ echo $this->Form->close();
     if ($this->data('DiscussionUrl'))
         echo '<div>', sprintf(t('Click <a href="%s">here</a> to go back to the discussion.'), url($this->data('DiscussionUrl'))), '</div>';
     else
-        echo '<div>', anchor('Back to the discussions list.', 'discussions'), '</div>';
+        echo '<div>', anchor(t('Back to the discussions list.'), 'discussions'), '</div>';
     ?>
 </div>

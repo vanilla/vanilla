@@ -201,6 +201,11 @@ export const iconVariables = useThemeCache(() => {
         strokeWidth: 1,
     });
 
+    const newPostMenuIcon = themeVars("newPostMenuIcon", {
+        width: 16,
+        height: 16,
+    });
+
     return {
         standard,
         newFolder,
@@ -228,6 +233,7 @@ export const iconVariables = useThemeCache(() => {
         editIcon,
         documentation,
         bookmarkIcon,
+        newPostMenuIcon,
     };
 });
 
@@ -472,6 +478,18 @@ export const iconClasses = useThemeCache(() => {
         });
     };
 
+    const newPostMenuIcon = style("newPostMenuIcon", {
+        width: unit(vars.newPostMenuIcon.width),
+        height: unit(vars.newPostMenuIcon.height),
+        color: colorOut(globalVars.mainColors.primaryContrast),
+        margin: "auto",
+    });
+
+    const itemFlyout = style("itemFlyout", {
+        width: unit(vars.standard.width),
+        height: unit(vars.standard.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -507,5 +525,7 @@ export const iconClasses = useThemeCache(() => {
         hamburger,
         documentation,
         bookmark,
+        newPostMenuIcon,
+        itemFlyout,
     };
 });

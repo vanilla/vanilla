@@ -890,3 +890,135 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
         </svg>
     );
 }
+
+export function NewPostMenuIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    return (
+        <svg
+            className={classNames(iconClasses().newPostMenuIcon, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("New Post")}</title>
+            <path
+                d="M8,0A1,1,0,0,1,9,1V7h6a1,1,0,0,1,.993.883L16,8a1,1,0,0,1-1,1H9v6a1,1,0,0,1-.883.993L8,16a1,1,0,0,1-1-1V9H1a1,1,0,0,1-.993-.883L0,8A1,1,0,0,1,1,7H7V1A1,1,0,0,1,7.883.006Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function NewDiscussionIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+
+    return (
+        <svg
+            className={classNames(classes.itemFlyout)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("New Discussion Icon")}</title>
+            <path
+                fill="currentColor"
+                fillRule="evenodd"
+                d="M17.101 4l-.866 1.5H4c-.276 0-.5.224-.5.5v14c0 .276.224.5.5.5h7.324l-.002.044.059-.044H19c.276 0 .5-.224.5-.5v-8.154L21 9.248V20c0 1.105-.895 2-2 2H4c-1.105 0-2-.895-2-2V6c0-1.105.895-2 2-2h13.101zm-4.455 9.718l.243.245c.413.397.86.734 1.34 1.012.482.278.997.496 1.547.654l.334.089-3.689 2.757c-.088.066-.213.048-.28-.04-.03-.042-.044-.093-.038-.144l.543-4.573zM21.172.35l2.252 1.3c.335.193.45.621.256.956L16.358 15.29c-.677-.162-1.303-.41-1.88-.743-.482-.278-.929-.615-1.341-1.012l-.243-.245L20.216.606c.193-.335.621-.45.956-.256z"
+            />
+        </svg>
+    );
+}
+
+export function NewIdeaIcon(props: { className?: string; "area-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+
+    return (
+        <svg
+            className={classNames(classes.itemFlyout)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("New Idea Icon")}</title>
+            <path
+                d="M14.24,22.642a.536.536,0,0,1,0,1.042H9.76a.536.536,0,0,1,0-1.042Zm1.093-2.482a.521.521,0,1,1,0,1.042H8.667a.521.521,0,1,1,0-1.042ZM12,1.128a7.678,7.678,0,0,1,7.786,7.525,7.483,7.483,0,0,1-2.577,5.576l-.084.082c-1.232,1.19-1.092,3.735-1.092,3.762a.506.506,0,0,1-.14.352.472.472,0,0,1-.336.135H8.415a.527.527,0,0,1-.336-.135.439.439,0,0,1-.14-.352c.028-.027.14-2.571-1.092-3.762A7.483,7.483,0,0,1,4.214,8.653,7.678,7.678,0,0,1,12,1.128Zm-.028.893A6.713,6.713,0,0,0,5.139,8.626a6.5,6.5,0,0,0,2.352,4.98,6.156,6.156,0,0,1,1.4,4.007h6.19a6.179,6.179,0,0,1,1.316-3.9c0-.027.056-.081.084-.108a6.48,6.48,0,0,0,2.324-4.981A6.713,6.713,0,0,0,11.972,2.021ZM11.318,3.09a6.016,6.016,0,0,1,6.262,5.8.494.494,0,0,1-.985,0A5.094,5.094,0,0,0,11.318,4a.491.491,0,0,1-.493-.456.491.491,0,0,1,.493-.456Z"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="0.5px"
+            />
+            <path
+                d="M21.75,1.75l-1.5,1.5m3.856,4.659L22,8.167M.068,7.734l2.11.222m.05-6.123L3.877,3.167"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.5px"
+            />
+        </svg>
+    );
+}
+
+export function NewPollIcon(props: { className?: string; "area-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+
+    return (
+        <svg
+            className={classNames(classes.itemFlyout)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("New Poll Icon")}</title>
+            <rect
+                x="1"
+                y="14.238"
+                width="11"
+                height="5"
+                rx="1.6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2px"
+            />
+            <rect
+                x="1"
+                y="4.6"
+                width="7.333"
+                height="5"
+                rx="1.6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2px"
+            />
+            <path
+                d="M19.081,7.153H13.843"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8px"
+            />
+            <path
+                d="M11.538,7.153l2.514-2.5v5Z"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth="0.9px"
+                fillRule="evenodd"
+            />
+            <path
+                d="M15.62,16.532h5.238"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8px"
+            />
+            <path
+                d="M23.163,16.532l-2.514,2.5v-5Z"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth="0.9px"
+                fillRule="evenodd"
+            />
+        </svg>
+    );
+}

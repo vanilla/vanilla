@@ -30,7 +30,12 @@ export interface ITheme {
     version: string;
     insertUser?: IUserFragment;
     dateInserted?: string;
-    revisionID?: number;
+    revisionID: number | null;
+}
+
+export interface IThemeRevision extends ITheme {
+    active: boolean;
+    revisionID: number;
 }
 
 export interface IThemeAssets {
@@ -68,7 +73,7 @@ export type IThemeVariables = Record<string, any>;
 export interface IThemeState {
     assets: ILoadable<IThemeAssets>;
     forcedVariables: IThemeVariables | null;
-    themeRevisions: ILoadable<ITheme>;
+    themeRevisions: ILoadable<IThemeRevision[]>;
     upDateRevision: ILoadable<ITheme>;
 }
 
@@ -146,6 +151,19 @@ export const themeReducer = produce(
         .case(ThemeActions.patchTheme_ACs.done, (state, payload) => {
             state.upDateRevision.status = LoadStatus.SUCCESS;
             state.upDateRevision.data = payload.result;
+            const { revisionID, themeID } = payload.result;
+
+            // Go through any active revisions if we have them, and modify their active status.
+            if (state.themeRevisions.data) {
+                state.themeRevisions.data = state.themeRevisions.data.map(revision => {
+                    if (revision.themeID !== themeID) {
+                        return revision;
+                    }
+
+                    revision.active = revision.revisionID === revisionID;
+                    return revision;
+                });
+            }
             return state;
         }),
 );

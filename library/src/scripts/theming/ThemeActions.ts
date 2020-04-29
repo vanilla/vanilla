@@ -6,7 +6,7 @@
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
-import { ITheme, IThemeAssets } from "@library/theming/themeReducer";
+import { ITheme, IThemeAssets, IThemeRevision } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
@@ -96,7 +96,7 @@ export default class ThemeActions extends ReduxActions {
         "DELETE",
     );
 
-    public static getThemeRevisions_ACs = createAction.async<{ themeID: number }, IGetThemeResponse, IApiError>(
+    public static getThemeRevisions_ACs = createAction.async<{ themeID: number | string }, IThemeRevision[], IApiError>(
         "GET_THEME",
     );
 
@@ -143,7 +143,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public getThemeRevisions(themeID: number) {
+    public getThemeRevisions(themeID: number | string) {
         const thunk = bindThunkAction(ThemeActions.getThemeRevisions_ACs, async () => {
             const response = await this.api.get(`/themes/${themeID}/revisions`);
             return response.data;

@@ -10,7 +10,7 @@ namespace VanillaTests\APIv2;
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
 use Vanilla\UploadedFile;
-use VanillaTests\Fixtures\Uploader;
+use VanillaTests\Fixtures\TestUploader;
 
 /**
  * Test the /api/v2/media endpoints.
@@ -45,8 +45,8 @@ class MediaTest extends AbstractAPIv2Test {
      * @return array ['uploadedFile' => UploadedFile, 'responseBody' => $body]
      */
     public function testPost() {
-        Uploader::resetUploads();
-        $photo = Uploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        TestUploader::resetUploads();
+        $photo = TestUploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
 
         $row = [
             'file' => $photo,

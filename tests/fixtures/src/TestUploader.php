@@ -9,20 +9,23 @@ use Exception;
 use Vanilla\UploadedFile;
 use Gdn_Upload;
 
-class Uploader {
+/**
+ * Test utilities for uploads.
+ */
+class TestUploader {
 
-    protected static $uploadsPath = PATH_ROOT.'/tests/cache/uploads';
+    const TEST_UPLOAD_PATH = PATH_UPLOADS;
 
     /**
      * Verify the uploads directory exists. Attempt to create it, if not.
      *
-     * @throws Exception
+     * @throws Exception If the directory can't be created.
      */
     protected static function ensureDirectory() {
-        if (!file_exists(static::$uploadsPath)) {
-            $result = mkdir (static::$uploadsPath , 0777, true);
+        if (!file_exists(self::TEST_UPLOAD_PATH)) {
+            $result = mkdir(self::TEST_UPLOAD_PATH, 0777, true);
             if (!$result) {
-                throw new Exception('Unable to create uploads directory: '.self::$uploadsPath);
+                throw new Exception('Unable to create uploads directory: '.self::TEST_UPLOAD_PATH);
             }
         }
     }
@@ -35,7 +38,7 @@ class Uploader {
     protected static function generateFilename() {
         do {
             $name = randomString(12);
-            $path = static::$uploadsPath."/{$name}";
+            $path = self::TEST_UPLOAD_PATH."/{$name}";
         } while (file_exists($path));
         return $path;
     }
@@ -44,8 +47,8 @@ class Uploader {
      * Clear the uploads directory and reset the $_FILES global..
      */
     public static function resetUploads() {
-        if (file_exists(self::$uploadsPath)) {
-            $files = glob(self::$uploadsPath.'/*.*');
+        if (file_exists(self::TEST_UPLOAD_PATH)) {
+            $files = glob(self::TEST_UPLOAD_PATH.'/*.*');
             array_walk($files, 'unlink');
         }
 
@@ -57,9 +60,9 @@ class Uploader {
      *
      * @param string $name A field name associated with this file upload.
      * @param string $file Path to the file.
-     * @throws Exception if the file does not exist.
-     * @throws Exception if the file is not actually a file (i.e. is a directory).
-     * @throws Exception if the file is not readable.
+     * @throws Exception If the file does not exist.
+     * @throws Exception If the file is not actually a file (i.e. is a directory).
+     * @throws Exception If the file is not readable.
      * @return UploadedFile
      */
     public static function uploadFile($name, $file) {

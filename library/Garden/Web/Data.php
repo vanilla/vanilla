@@ -25,14 +25,19 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @param mixed $data The main response data.
      * @param array|int $meta Either an array of meta information or an integer HTTP response status.
+     * @param array $headers Headers to apply to the response.
      */
-    public function __construct($data = [], $meta = []) {
+    public function __construct($data = [], $meta = [], $headers = []) {
         $this->data = $data;
 
         if (is_int($meta)) {
             $this->meta = ['status' => $meta];
         } else {
             $this->meta = $meta;
+        }
+
+        foreach ($headers as $headerKey => $header) {
+            $this->setHeader($headerKey, $header);
         }
     }
 

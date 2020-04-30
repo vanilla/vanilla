@@ -576,7 +576,11 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $category = CategoryModel::categories($categoryID);
-        $permissionCategoryID = $category->PermissionCategoryID;
+        if ($category) {
+            $permissionCategoryID = $category['PermissionCategoryID'];
+        } else {
+            $permissionCategoryID = -1;
+        }
 
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $permissionCategoryID);
         $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);

@@ -1,1 +1,8 @@
-{}
+{
+    global: {
+        mainColors: {
+            // The main brand color of the site.
+            primary: "#476985",
+        },
+    },
+}

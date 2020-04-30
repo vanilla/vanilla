@@ -37,8 +37,8 @@
             "file": "styles.css"
         },
         "variables": {
-            "type": "json",
-            "file": "variables.json"
+            "type": "json5",
+            "file": "variables.json5"
         }
     }
 }

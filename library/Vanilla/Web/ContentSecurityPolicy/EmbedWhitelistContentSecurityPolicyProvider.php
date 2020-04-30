@@ -6,6 +6,8 @@
 
 namespace Vanilla\Web\ContentSecurityPolicy;
 
+use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
+
 /**
  * Embeds domains whitelist content security policy provider
  */
@@ -17,6 +19,7 @@ class EmbedWhitelistContentSecurityPolicyProvider implements ContentSecurityPoli
         'https://platform.twitter.com',
         'https://cdn.syndication.twimg.com',
         'https://www.instagram.com/embed.js',
+        PanoptoEmbed::JS_SCRIPT,
     ];
 
     /**

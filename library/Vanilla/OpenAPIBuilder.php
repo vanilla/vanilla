@@ -33,7 +33,7 @@ class OpenAPIBuilder {
     /**
      * @var callable[]
      */
-    private $filters;
+    private $filters = [];
 
     /**
      * OpenAPIBuilder constructor.

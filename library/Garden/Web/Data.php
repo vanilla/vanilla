@@ -341,4 +341,31 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
             throw new \InvalidArgumentException("Data:box() expects an instance of Data or an array.", 500);
         }
     }
+
+    /**
+     * Check if the provided response matches the provided response type.
+     *
+     * The {@link $class} is a string representation of the HTTP status code, with 'x' used as a wildcard.
+     *
+     * Class '2xx' = All 200-level responses
+     * Class '30x' = All 300-level responses up to 309
+     *
+     * @param string $class A string representation of the HTTP status code, with 'x' used as a wildcard.
+     * @return boolean Returns `true` if the response code matches the {@link $class}, `false` otherwise.
+     */
+    public function isResponseClass(string $class): bool {
+        $pattern = '`^'.str_ireplace('x', '\d', preg_quote($class, '`')).'$`';
+        $result = preg_match($pattern, $this->getStatus());
+
+        return $result === 1;
+    }
+
+    /**
+     * Determine if the response was successful.
+     *
+     * @return bool Returns `true` if the response was a successful 2xx code.
+     */
+    public function isSuccessful(): bool {
+        return $this->isResponseClass('2xx');
+    }
 }

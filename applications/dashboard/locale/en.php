@@ -124,6 +124,7 @@ $Definition['permissions.member'] = 'Member';
 $Definition['permissions.moderator'] = 'Moderator';
 $Definition['permissions.communityManager'] = 'Community Manager';
 $Definition['permissions.admin'] = 'Admin';
+$Definition['permissions.everyone'] = 'Everyone';
 $Definition['PluginHelp'] = "Plugins allow you to add functionality to your site.<br />Once a plugin has been added to your %s folder, you can enable or disable it here.";
 $Definition['ApplicationHelp'] = "Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.";
 $Definition['ThemeHelp'] = "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";

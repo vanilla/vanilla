@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Permissions;
 use Vanilla\Web\APIExpandMiddleware;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\Request;
@@ -17,7 +18,9 @@ use VanillaTests\Fixtures\Request;
  * Tests for the `APIExpandMiddlewareTest` class.
  */
 class APIExpandMiddlewareTest extends TestCase {
-    use BootstrapTrait;
+    use BootstrapTrait {
+        setUpBeforeClass as bootstrapSetUpBeforeClass;
+    }
 
     /**
      * @var APIExpandMiddleware
@@ -25,10 +28,44 @@ class APIExpandMiddlewareTest extends TestCase {
     protected $middleware;
 
     /**
+     * {@inheritDoc}
+     */
+    public static function setUpBeforeClass(): void {
+        parent::setUpBeforeClass();
+        self::bootstrapSetUpBeforeClass();
+
+        require_once __DIR__ . "/../../../../applications/dashboard/models/class.sessionmodel.php";
+        require_once __DIR__ . "/../../../../applications/dashboard/models/class.usermodel.php";
+    }
+
+    /**
      * Create a configured test middleware for each test.
      */
     public function setUp(): void {
-        $this->middleware = new TestAPIExpandMiddleware('/');
+        $userModel = $this->createStub(\UserModel::class);
+        $userModel
+            ->method("getDefaultSSOIDs")
+            ->willReturnCallback(function (array $userIDs): array {
+                $r = [];
+                foreach ($userIDs as $userID) {
+                    $r[$userID] = "sso-$userID";
+                }
+                return $r;
+            });
+
+        $permissions = new Permissions();
+        $permissions->set("Garden.Settings.Manage", true);
+        $session = $this->createStub(\Gdn_Session::class);
+        $session
+            ->method("getPermissions")
+            ->willReturn($permissions);
+
+        $this->middleware = new APIExpandMiddleware(
+            "/",
+            \Vanilla\Permissions::RANK_COMMUNITY_MANAGER,
+            $userModel,
+            $session
+        );
     }
 
     /**

@@ -6,11 +6,13 @@
 
 namespace Vanilla\Web;
 
-use Gdn_Session;
+use Garden\BasePathTrait;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
-use Garden\BasePathTrait;
+use Gdn_Session;
 use UserModel;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Permissions;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -77,8 +79,8 @@ class APIExpandMiddleware {
         $response = $next($request);
 
         if (!empty($expands) &&
-            (is_array($response) || ($response instanceof Data && $response->getMeta("status") === 200)) &&
-            $this->userIsAuthorized()) {
+            (is_array($response) || ($response instanceof Data && $response->isSuccessful()))) {
+            $this->verifyPermission();
             $response = $this->updateResponse($response, $expands);
         }
 
@@ -109,11 +111,13 @@ class APIExpandMiddleware {
     /**
      * Does the current user have permission to use this functionality?
      *
-     * @return bool
+     * @throws PermissionException If current user does not have the configured permission.
      */
-    protected function userIsAuthorized(): bool {
-        $result = $this->session->getPermissions()->hasRanked($this->permission);
-        return $result;
+    protected function verifyPermission(): void {
+        if ($this->session->getPermissions()->hasRanked($this->permission) !== true) {
+            $permission = Permissions::resolveRankedPermissionAlias($this->permission);
+            throw new PermissionException($permission);
+        }
     }
 
     /**

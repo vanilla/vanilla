@@ -296,7 +296,7 @@ class RoleController extends DashboardController {
     public function advanced() {
         $this->permission('Garden.Settings.Manage');
 
-        $aliases = Permissions::getRankedPermissionAliases();
+        $aliases = Permissions::getRankedPermissionAliases(true);
         foreach ($aliases as $key => &$alias) {
             $alias = t('permissions.'.$alias);
         }
@@ -313,9 +313,6 @@ class RoleController extends DashboardController {
                 'Description' => t('Garden.api.ssoIDPermission.description'),
                 'Control' => 'DropDown',
                 'Items' => $aliases,
-                'Options' => [
-                    'IncludeNull' => t('(All)'),
-                ],
                 'Default' => Permissions::RANK_COMMUNITY_MANAGER,
             ]
         ]);

@@ -12,6 +12,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
+use Vanilla\Permissions;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
@@ -280,7 +281,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Web\APIExpandMiddleware::class)
     ->setConstructorArgs([
         "/api/v2/",
-        ContainerUtils::config("Garden.api.ssoIDPermission", "communityManager")
+        ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
     ])
 
     ->rule(\Vanilla\OpenAPIBuilder::class)

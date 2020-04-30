@@ -59,10 +59,11 @@ class Permissions implements \JsonSerializable {
     const BAN_CSRF = '!csrf';
     const BAN_UNINSTALLED = '!uninstalled';
 
-    const RANK_MEMBER = 'member';
-    const RANK_MODERATOR = 'moderator';
-    const RANK_COMMUNITY_MANAGER = 'communityManager';
-    const RANK_ADMIN = 'admin';
+    public const RANK_EVERYONE = "everyone";
+    public const RANK_MEMBER = 'member';
+    public const RANK_MODERATOR = 'moderator';
+    public const RANK_COMMUNITY_MANAGER = 'communityManager';
+    public const RANK_ADMIN = 'admin';
 
     /**
      * Global permissions are stored as numerical indexes.
@@ -432,15 +433,26 @@ class Permissions implements \JsonSerializable {
     }
 
     /**
+     * Given a ranked permission alias, resolve it to a full permission.
+     *
+     * @param string $permission
+     * @return string
+     */
+    public static function resolveRankedPermissionAlias(string $permission): string {
+        if (isset(self::RANKED_PERMISSION_ALIASES[$permission])) {
+            $permission = self::RANKED_PERMISSION_ALIASES[$permission];
+        }
+        return $permission;
+    }
+
+    /**
      * Check the given permission, but also return true if the user has a higher permission.
      *
      * @param string $permission The permission to check.
      * @return boolean True on valid authorization, false on failure to authorize
      */
     public function hasRanked(string $permission): bool {
-        if (isset(self::RANKED_PERMISSION_ALIASES[$permission])) {
-            $permission = self::RANKED_PERMISSION_ALIASES[$permission];
-        }
+        $permission = self::resolveRankedPermissionAlias($permission);
 
         if (!isset(self::RANKED_PERMISSIONS[$permission])) {
             return $this->has($permission);
@@ -484,8 +496,11 @@ class Permissions implements \JsonSerializable {
      *
      * @return array
      */
-    public static function getRankedPermissionAliases(): array {
+    public static function getRankedPermissionAliases(bool $includeEveryone = false): array {
         $aliases = array_keys(self::RANKED_PERMISSION_ALIASES);
+        if ($includeEveryone) {
+            array_unshift($aliases, self::RANK_EVERYONE);
+        }
         $result = array_combine($aliases, $aliases);
         return $result;
     }
@@ -513,6 +528,10 @@ class Permissions implements \JsonSerializable {
      * @return bool|null Returns **true** if the user has the permission, **false** if they don't, or **null** if the permissions isn't applicable.
      */
     private function hasInternal($permission, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE) {
+        if ($permission === self::RANK_EVERYONE) {
+            return true;
+        }
+
         // Fix the mode of checking.
         if ($id !== null) {
             // We have a resource so we should check that.

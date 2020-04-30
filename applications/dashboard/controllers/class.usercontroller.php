@@ -553,7 +553,7 @@ class UserController extends DashboardController {
             }
 
             if ($this->Form->authenticatedPostBack(true) && $method != '') {
-                $userModel->deleteID($userID, ['DeleteMethod' => $method, 'DeleteModInfo' => $formValues['DeleteNotes']]);
+                $userModel->deleteID($userID, ['DeleteMethod' => $method, 'DeleteModerationInfo' => $formValues['DeleteNotes']]);
                 $this->View = 'deletecomplete';
             }
 

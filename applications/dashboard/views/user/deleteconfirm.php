@@ -16,7 +16,7 @@ echo $this->Form->errors();
         echo t("All of the user content will be replaced with a message stating the user has been deleted.");
     else
         echo t("The user content will be completely deleted."),
-        $this->Form->checkBox('DeleteModInfo', t('Delete moderation information'), ['value' => '1']);
+        $this->Form->checkBox('DeleteModerationInfo', t('Delete moderation information'), ['value' => '1']);
     ?>
 </div>
 <?php

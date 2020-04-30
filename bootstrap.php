@@ -278,12 +278,15 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
     ->rule(\Vanilla\Web\APIExpandMiddleware::class)
-    ->setConstructorArgs(["/api/v2/"])
+    ->setConstructorArgs([
+        "/api/v2/",
+        ContainerUtils::config("Garden.api.ssoIDPermission", "communityManager")
+    ])
 
     ->rule(\Vanilla\OpenAPIBuilder::class)
-    ->addCall('addFilter', ['filter' => new Reference('@ssoid-filter')])
+    ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
 
-    ->rule('@ssoid-filter')
+    ->rule('@apiexpand-filter')
     ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
 
     ->rule('@api-v2-route')

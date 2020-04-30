@@ -36,4 +36,11 @@ class TestAPIExpandMiddleware extends APIExpandMiddleware {
 
         return $r;
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function userIsAuthorized(): bool {
+        return true;
+    }
 }

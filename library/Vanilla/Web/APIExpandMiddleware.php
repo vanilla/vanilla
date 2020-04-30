@@ -6,6 +6,7 @@
 
 namespace Vanilla\Web;
 
+use Gdn_Session;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Garden\BasePathTrait;
@@ -39,6 +40,12 @@ class APIExpandMiddleware {
         "user.ssoID" => "userID",
     ];
 
+    /** @var string */
+    private $permission;
+
+    /** @var Gdn_Session */
+    private $session;
+
     /** @var UserModel */
     private $userModel;
 
@@ -46,11 +53,15 @@ class APIExpandMiddleware {
      * Setup the middleware.
      *
      * @param string $basePath
+     * @param string $permission
      * @param UserModel $userModel
+     * @param Gdn_Session $session
      */
-    public function __construct(string $basePath, UserModel $userModel) {
+    public function __construct(string $basePath, string $permission, UserModel $userModel, Gdn_Session $session) {
         $this->setBasePath($basePath);
+        $this->permission = $permission;
         $this->userModel = $userModel;
+        $this->session = $session;
     }
 
     /**
@@ -65,7 +76,9 @@ class APIExpandMiddleware {
 
         $response = $next($request);
 
-        if (!empty($expands)) {
+        if (!empty($expands) &&
+            (is_array($response) || ($response instanceof Data && $response->getMeta("status") === 200)) &&
+            $this->userIsAuthorized()) {
             $response = $this->updateResponse($response, $expands);
         }
 
@@ -90,6 +103,16 @@ class APIExpandMiddleware {
         }
 
         $this->scrubExpand($request, $result);
+        return $result;
+    }
+
+    /**
+     * Does the current user have permission to use this functionality?
+     *
+     * @return bool
+     */
+    protected function userIsAuthorized(): bool {
+        $result = $this->session->getPermissions()->hasRanked($this->permission);
         return $result;
     }
 

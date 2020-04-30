@@ -172,7 +172,7 @@ final class ArrayUtils {
             $currentKey = reset($keys);
             if (array_key_exists($currentKey, $array) && !self::isArray($array[$currentKey])) {
                 throw new \InvalidArgumentException(
-                    "Unexpected argument type. Expected an array or array-like object."
+                    "Unexpected type in path. Expected an array or array-like object."
                 );
             }
 

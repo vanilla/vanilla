@@ -58,6 +58,31 @@ class ArrayUtilsTest extends TestCase {
     }
 
     /**
+     * Verify escaping reserved characters in key.
+     *
+     * @param string $key
+     * @param string $expected
+     * @dataProvider provideEscapeKeyTests
+     */
+    public function testEscapeKey(string $key, string $expected): void {
+        $actual = ArrayUtils::escapeKey($key);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide data for testing the escapeKey method.
+     *
+     * @return array
+     */
+    public function provideEscapeKeyTests(): array {
+        $result = [
+            "basic" => ["foo.bar", "foo\\.bar"],
+        ];
+
+        return $result;
+    }
+
+    /**
      * Test getting an array element by its path.
      *
      * @param string $path
@@ -95,6 +120,11 @@ class ArrayUtilsTest extends TestCase {
                 "foo.bar",
                 ["foo" => "xyz"],
                 null
+            ],
+            "unknown key" => [
+                "foo.bar",
+                ["foo" => ["xyz" => "Hello world."]],
+                null,
             ],
             "escaped path" => [
                 "foo.b\.ar.baz",
@@ -190,6 +220,16 @@ class ArrayUtilsTest extends TestCase {
         return $result;
     }
 
+    /**
+     * Test setting a value by path where an existing segment is not an array.
+     */
+    public function testSetByPathInvalidElement(): void {
+        $array = ["foo" => ["bar" => "Hello world."]];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Unexpected type in path.");
+        ArrayUtils::setByPath("Bingo.", "foo.bar.baz", $array);
+    }
     /**
      * Calling `ArrayUtils::walkRecursiveArray()` without an array is an exception.
      */

@@ -4,7 +4,6 @@
  */
 
 import React, { useContext, useState, useEffect, useRef, useDebugValue } from "react";
-import { useHistory } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
 import { usePageChangeListener } from "@library/pageViews/pageViewTracking";
 
@@ -13,6 +12,8 @@ interface IContextValue {
     setBannerExists: (exists: boolean) => void;
     bannerRect: DOMRect | null;
     setBannerRect: (rect: DOMRect | null) => void;
+    overlayTitleBar: boolean;
+    setOverlayTitleBar: (exists: boolean) => void;
 }
 
 const context = React.createContext<IContextValue>({
@@ -20,6 +21,8 @@ const context = React.createContext<IContextValue>({
     setBannerExists: () => {},
     bannerRect: null,
     setBannerRect: () => {},
+    overlayTitleBar: false,
+    setOverlayTitleBar: () => {},
 });
 
 export function useBannerContext() {
@@ -49,10 +52,12 @@ export function useBannerContainerDivRef() {
 
 export function BannerContextProvider(props: { children: React.ReactNode }) {
     const [bannerExists, setBannerExists] = useState(false);
+    const [overlayTitleBar, setOverlayTitleBar] = useState(false);
     const [bannerRect, setBannerRect] = useState<DOMRect | null>(null);
     usePageChangeListener(() => {
         setBannerExists(false);
         setBannerRect(null);
+        setOverlayTitleBar(false);
     });
     return (
         <context.Provider
@@ -61,6 +66,8 @@ export function BannerContextProvider(props: { children: React.ReactNode }) {
                 setBannerExists,
                 bannerRect,
                 setBannerRect,
+                overlayTitleBar,
+                setOverlayTitleBar,
             }}
         >
             {props.children}
@@ -71,6 +78,7 @@ export function BannerContextProvider(props: { children: React.ReactNode }) {
 export function BannerContextProviderNoHistory(props: { children: React.ReactNode }) {
     const [bannerExists, setBannerExists] = useState(false);
     const [bannerRect, setBannerRect] = useState<DOMRect | null>(null);
+    const [overlayTitleBar, setOverlayTitleBar] = useState(false);
     return (
         <context.Provider
             value={{
@@ -78,6 +86,8 @@ export function BannerContextProviderNoHistory(props: { children: React.ReactNod
                 setBannerExists,
                 bannerRect,
                 setBannerRect,
+                overlayTitleBar,
+                setOverlayTitleBar,
             }}
         >
             {props.children}

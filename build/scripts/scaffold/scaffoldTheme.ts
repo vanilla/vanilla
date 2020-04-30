@@ -7,8 +7,8 @@ import path from "path";
 import fs from "fs";
 import fse from "fs-extra";
 import chalk from "chalk";
-import { printSection, print, printError } from "../utility/utils";
-import { VANILLA_ADDONS, VANILLA_THEMES, VANILLA_PLUGINS, VANILLA_APPS, VANILLA_THEMES_LEGACY } from "../env";
+import { printSection, print } from "../utility/utils";
+import { VANILLA_THEMES, VANILLA_PLUGINS, VANILLA_APPS, VANILLA_THEMES_LEGACY } from "../env";
 import { writeConfigTheme } from "../utility/configUtils";
 
 interface IThemeData {

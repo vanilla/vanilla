@@ -42,7 +42,7 @@ interface IProps {
 export default function Banner(props: IProps) {
     const device = useDevice();
     const bannerContextRef = useBannerContainerDivRef();
-    const { overlayTitleBar, setOverlayTitleBar } = useBannerContext();
+    const { setOverlayTitleBar } = useBannerContext();
 
     const { action, className, isContentBanner } = props;
 

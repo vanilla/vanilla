@@ -2,6 +2,9 @@
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+
         ?>
         <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
             <?php if ($showPhotos) :
@@ -16,8 +19,12 @@ if (!function_exists('WriteModuleDiscussion')):
    </span>
 
             <div class="Title"><?php
-                echo anchor(htmlspecialchars($discussion->Name), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
-                ?></div>
+                echo anchor(
+                    $htmlSanitizer->filter($discussion->Name), // Should already be encoded, but filter as an additional measure.
+                    discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''),
+                    'DiscussionLink'
+                );
+            ?></div>
             <div class="Meta DiscussionsModuleMeta">
                 <?php
                 $last = new stdClass();
@@ -93,7 +100,7 @@ if (!function_exists('WritePromotedContent')):
                 class="Title"><?php echo anchor(htmlspecialchars(sliceString($content['Name'], $sender->TitleLimit), false), $contentURL, 'DiscussionLink'); ?></div>
             <div class="Body">
                 <?php
-                $linkContent = Gdn_Format::excerpt($content['Body'], $content['Format']);
+                $linkContent = Gdn::formatService()->renderExcerpt($content['Body'], $content['Format']);
                 $trimmedLinkContent = sliceString($linkContent, $sender->BodyLimit);
 
                 echo anchor(htmlspecialchars($trimmedLinkContent), $contentURL, 'BodyLink');

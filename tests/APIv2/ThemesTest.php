@@ -16,6 +16,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Models\ThemeModel;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -32,31 +33,6 @@ class ThemesTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
-
-        $root = '/tests/fixtures';
-        $addonManager = new AddonManager(
-            [
-                Addon::TYPE_ADDON => [
-                    "$root/addons", "$root/applications", "$root/plugins"
-                ],
-                Addon::TYPE_THEME => "$root/themes",
-                Addon::TYPE_LOCALE => "$root/locales"
-            ],
-            PATH_ROOT.'/tests/cache/am/test-manager'
-        );
-
-        $request = self::container()->get(Gdn_Request::class);
-        $config = self::container()->get(Gdn_Configuration::class);
-
-        static::container()
-            ->rule(FsThemeProvider::class)
-            ->setConstructorArgs(
-                [
-                    $addonManager,
-                    $request,
-                    $config
-                ]
-            );
 
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
@@ -142,12 +118,13 @@ class ThemesTest extends AbstractAPIv2Test {
      * @depends testGetByName
      */
     public function testLogo() {
+        $cacheBuster = self::container()->get(DeploymentCacheBuster::class)->value();
         $logo = "logo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.Logo", $logo);
 
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo));
+        $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo) . "?v=$cacheBuster");
     }
 
     /**
@@ -156,12 +133,13 @@ class ThemesTest extends AbstractAPIv2Test {
      * @depends testGetByName
      */
     public function testMobileLogo() {
+        $cacheBuster = self::container()->get(DeploymentCacheBuster::class)->value();
         $mobileLogo = "mobileLogo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.MobileLogo", $mobileLogo);
 
         $response = $this->api()->get("themes/asset-test");
         $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo));
+        $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo) . "?v=$cacheBuster");
     }
 
     /**
@@ -173,9 +151,10 @@ class ThemesTest extends AbstractAPIv2Test {
      *
      */
     public function testIndex() {
+        $this->api()->setUserID(\UserModel::GUEST_USER_ID);
         $response = $this->api()->get("themes");
         $body = $response->getBody();
-        $this->assertEquals(3, count($body), 'The 2 unhidden files, and the current are returned');
+        $this->assertEquals(2, count($body), 'The 2 unhidden themes, keystone and foundation are returned.');
     }
 
     /**
@@ -184,16 +163,6 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
-        $this->assertEquals('keystone', $body['themeID']);
-    }
-
-    /**
-     * Test getThemeViewPath method of ThemeModel.
-     */
-    public function testGetThemeViewPath() {
-        /** @var ThemeModel $themeModel */
-        $themeModel = self::container()->get(ThemeModel::class);
-        $viewPath = $themeModel->getThemeViewPath('keystone');
-        $this->assertStringEndsWith('/themes/keystone/views/', $viewPath);
+        $this->assertEquals('theme-foundation', $body['themeID']);
     }
 }

@@ -14,9 +14,9 @@ $ModerationCount = 0;
 // Spam & Moderation Queue
 if ($Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false)) {
     $LogModel = new LogModel();
-    //$SpamCount = $LogModel->getOperationCount('spam');
+    $spamCount = $LogModel->getOperationCount('spam');
     $ModerationCount = $LogModel->getOperationCount('moderate,pending');
-    $DashboardCount += $ModerationCount;
+    $DashboardCount += $ModerationCount + $spamCount;
 }
 // Applicant Count
 if ($Session->checkPermission('Garden.Users.Approve')) {
@@ -92,6 +92,7 @@ if ($Session->isValid()):
     $applicantModifiers = $ApplicantCount > 0 ? ['badge' => $ApplicantCount] : [];
     $applicantModifiers['listItemCssClasses'] = ['link-applicants'];
     $modModifiers = $ModerationCount > 0 ? ['badge' => $ModerationCount] : [];
+    $spamModifiers = $spamCount > 0 ? ['badge' => $spamCount] : [];
     $modModifiers['listItemCssClasses'] = ['link-moderation'];
     $spamModifiers['listItemCssClasses'] = ['link-spam'];
     $dashboardModifiers['listItemCssClasses'] = ['link-dashboard'];

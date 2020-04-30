@@ -9,7 +9,7 @@ import { themeCardClasses } from "./themePreviewCardStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, emphasizeLightness } from "@library/styles/styleHelpersColors";
+import { colorOut, offsetLightness, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
@@ -19,8 +19,8 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { iconClasses } from "@library/icons/iconStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
@@ -37,12 +37,14 @@ interface IProps {
     globalPrimary?: string;
     titleBarBg?: string;
     titleBarFg?: string;
+    backgroundImage?: string;
     headerImg?: string;
     onApply?: VoidFunction;
     isApplyLoading?: boolean;
     onPreview?: VoidFunction;
     onCopy?: ClickHandlerOrUrl;
     onEdit?: ClickHandlerOrUrl;
+    onRevision?: ClickHandlerOrUrl;
     onDelete?: ClickHandlerOrUrl;
     isActiveTheme: boolean;
     noActions?: boolean;
@@ -51,6 +53,7 @@ interface IProps {
     canEdit?: boolean;
     canCopyCustom?: boolean;
     forceHover?: boolean;
+    revisions?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -93,11 +96,23 @@ export default function ThemePreviewCard(props: IProps) {
                                 <rect width="100%" height="100%" fill={vars.globalBg} />
                                 <g stroke="none" strokeWidth="1" fill={vars.globalBg} fillRule="evenodd">
                                     <g>
-                                        <polygon
-                                            fill={vars.splashBg}
-                                            fillRule="nonzero"
-                                            points="0 0 310 0 310 61 0 61"
-                                        ></polygon>
+                                        {props.backgroundImage ? (
+                                            <image
+                                                preserveAspectRatio="xMidYMid slice"
+                                                href={props.backgroundImage}
+                                                width="310px"
+                                                height="61px"
+                                                x={0}
+                                                y={0}
+                                            />
+                                        ) : (
+                                            <polygon
+                                                fill={vars.splashBg}
+                                                fillRule="nonzero"
+                                                points="0 0 310 0 310 61 0 61"
+                                            ></polygon>
+                                        )}
+
                                         <polygon
                                             fill={vars.titleBarBg}
                                             fillRule="nonzero"
@@ -328,6 +343,11 @@ export default function ThemePreviewCard(props: IProps) {
                                                 {t("Copy")}
                                             </LinkOrButton>
                                         )}
+                                        {props.revisions && props.onRevision && (
+                                            <LinkOrButton isDropdown onClick={props.onRevision}>
+                                                {t("Revision History")}
+                                            </LinkOrButton>
+                                        )}
                                         <DropDownItemSeparator />
                                         {props.canDelete && props.isActiveTheme ? (
                                             <DropDownItemButton onClick={props.onDelete} disabled={props.isActiveTheme}>
@@ -419,11 +439,11 @@ function calculateVars(props: IProps) {
     let globalFg = props.globalFg ? color(props.globalFg) : gVars.mainColors.fg;
     // Add a little opacity to the FG so it doesn't stick out so much.
     // Normal text isn't nearly so thick.
-    globalFg = emphasizeLightness(globalFg, 0.15) as ColorHelper;
+    globalFg = modifyColorBasedOnLightness(globalFg, 0.3) as ColorHelper;
 
     const globalPrimary = props.globalPrimary ? color(props.globalPrimary) : gVars.mainColors.primary;
     const titleBarBg = props.titleBarBg ? color(props.titleBarBg) : globalPrimary;
-    const splashBg = emphasizeLightness(globalPrimary, 0.2);
+    const splashBg = modifyColorBasedOnLightness(globalPrimary, 0.12, true);
     const titleBarFg = props.titleBarFg ?? titleVars.colors.fg;
     return {
         globalFg: colorOut(globalFg),

@@ -406,9 +406,10 @@ class PermissionModel extends Gdn_Model {
 
         // Select any that match $LimitToSuffix
         foreach ($permissionColumns as $columnName => $value) {
-            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) != $limitToSuffix) {
+            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) !== $limitToSuffix) {
                 continue; // permission not in $LimitToSuffix
-            }            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
+            }
+            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
 
         // Generic part of query
@@ -424,6 +425,7 @@ class PermissionModel extends Gdn_Model {
             if ($foreignKey && $foreignID) {
                 $this->SQL
                     ->join("$junctionTable j", "j.$junctionColumn = p.JunctionID")
+                    ->where("p.JunctionTable", $junctionTable)
                     ->where("j.$foreignKey", $foreignID);
             }
         } else {
@@ -512,36 +514,43 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Get user permissions.
      *
-     *
-     * @param null $userID
-     * @param null $roleID
-     * @return array|null
+     * @param ?int $userID
+     * @param ?int $roleID
+     * @return array
+     * @deprecated Use PermissionModel::getPermissionsByUser() or PermissionModel::getPermissionsByRole() instead.
      */
     public function cachePermissions($userID = null, $roleID = null) {
         if (!$userID) {
             $roleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+            $permissions = $this->getPermissionsByRole($roleID);
+            return $permissions;
         }
 
-        // Select all of the permission columns.
-        $permissionColumns = $this->permissionColumns();
-        foreach ($permissionColumns as $columnName => $value) {
-            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
+        if (empty($roleID)) {
+            $roleID = GDN::UserModel()->getRoleIDs($userID);
+        } else {
+            $roleID = (array)$roleID;
         }
+        $permissions = $this->getPermissionsByRole(...$roleID);
+        return $permissions;
+    }
 
-        $this->SQL->from('Permission p');
-
-        if (!is_null($roleID)) {
-            $this->SQL->where('p.RoleID', $roleID);
-        } elseif (!is_null($userID))
-            $this->SQL->join('UserRole ur', 'p.RoleID = ur.RoleID')->where('ur.UserID', $userID);
-
-        $this->SQL
-            ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
-            ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-
-        $result = $this->SQL->get()->resultArray();
-        return $result;
+    /**
+     * Get the permissions of a particular user.
+     *
+     * @param int $userID
+     * @return array Returns an array suitable for Permissions::setPermission().
+     */
+    public function getPermissionsByUser(int $userID): array {
+        if (!$userID) {
+            $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+        } else {
+            $roleIDs = GDN::UserModel()->getRoleIDs($userID);
+        }
+        $permissions = $this->getPermissionsByRole(...$roleIDs);
+        return $permissions;
     }
 
     /**
@@ -590,6 +599,7 @@ class PermissionModel extends Gdn_Model {
             $junctionColumn = $row['JunctionColumn'];
             unset($row['PermissionID'], $row['RoleID'], $row['JunctionTable'], $row['JunctionColumn'], $row['JunctionID']);
 
+            unset($juncIDs);
             // If the junction column is not the primary key then we must figure out and limit the permissions.
             if ($limitToDefault === false && $junctionColumn != $junctionTable.'ID') {
                 $juncIDs = $sQL
@@ -743,40 +753,73 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
-     * Get the permissions for one or more roles.
+     * Get the permissions for one or more roles from cache.
      *
-     * @param int $roleID The role to get the permissions for.
+     * @param array $roleID The role to get the permissions for.
      * @return array Returns a permission array suitable for use in a session.
      */
-    public function getPermissionsByRole($roleID) {
+    public function getPermissionsByRole(...$roleID) {
+        asort($roleID);
+        $roleIDKey = implode(',', $roleID);
         $inc = Gdn::userModel()->getPermissionsIncrement();
-        $key = "perms:$inc:role:$roleID";
+        $key = "perms:$inc:role:$roleIDKey";
+        $permissions = $this->getCachedRoles($key);
 
-        $permissions = Gdn::cache()->get($key);
-        if ($permissions === Gdn_Cache::CACHEOP_FAILURE) {
-            $sql = clone $this->SQL;
-            $sql->reset();
-
-            // Select all of the permission columns.
-            $permissionColumns = $this->permissionColumns();
-            foreach ($permissionColumns as $columnName => $value) {
-                $sql->select('p.`'.$columnName.'`', 'MAX');
-            }
-
-            $sql->from('Permission p')
-                ->where('p.RoleID', $roleID)
-                ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
-                ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-
-            $permissions = $sql->get()->resultArray();
+        if (!$permissions) {
+            $permissions = $this->getPermissionsByRoleDb(...$roleID);
             $permissions = UserModel::compilePermissions($permissions);
-            Gdn::cache()->store($key, $permissions);
+            $this->setCachedRoles($key, $permissions);
         }
-
         return $permissions;
     }
 
     /**
+     * Get role permission from the database.
+     *
+     * @param array $roleID
+     * @return array $permissions
+     */
+    protected function getPermissionsByRoleDb(...$roleID) {
+        $sql = clone $this->SQL;
+        $sql->reset();
+        // Select all of the permission columns.
+        $permissionColumns = $this->permissionColumns();
+        foreach ($permissionColumns as $columnName => $value) {
+            $sql->select('p.`' . $columnName . '`', 'MAX');
+        }
+
+        $sql->from('Permission p')
+            ->where('p.RoleID', $roleID)
+            ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
+            ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
+
+        $permissions = $sql->get()->resultArray();
+        return $permissions;
+    }
+
+    /**
+     * Get cached role permissions.
+     *
+     * @param string $key The cache key
+     * @return array|bool $permissions Role permissions
+     */
+    private function getCachedRoles($key) {
+        $permissions = Gdn::cache()->get($key);
+        return $permissions;
+    }
+
+    /**
+     * Save role permissions in the cache.
+     *
+     * @param string $key The cache key
+     * @param array $permissions Role permissions
+     */
+    private function setCachedRoles($key, $permissions) {
+        Gdn::cache()->store($key, $permissions);
+    }
+
+    /**
+     * Get permissions for edit.
      *
      * @param int $roleID
      * @param string $limitToSuffix

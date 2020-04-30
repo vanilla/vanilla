@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import {
     absolutePosition,
-    background,
+    backgroundHelper,
     borders,
     BorderType,
     colorOut,
@@ -16,15 +16,14 @@ import {
     EMPTY_SPACING,
     fonts,
     IBackground,
-    linkStyleFallbacks,
     paddings,
-    setAllLinkColors,
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",
@@ -63,7 +62,7 @@ export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWid
         "options",
         {
             ...options,
-            borderType: hasImage ? BorderType.SHADOW : BorderType.NONE,
+            borderType: hasImage ? BorderType.SHADOW : options.borderType,
         },
         optionOverrides,
     );
@@ -117,6 +116,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
 
     const borderStyling: NestedCSSProperties = (() => {
         switch (vars.options.borderType) {
+            case BorderType.SHADOW_AS_BORDER:
             case BorderType.NONE:
                 return {};
             case BorderType.BORDER:
@@ -143,27 +143,32 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         }
     })();
 
-    const linkStyles = setAllLinkColors();
+    const buttonStateStyles = clickableItemStates();
 
     const name = style("name", {
         color: colorOut(vars.options.fg),
         ...fonts(vars.name.font),
-        ...linkStyleFallbacks,
+        // ...linkStyleFallbacks,
         marginBottom: unit(globalVars.gutter.half),
     });
+
+    const nestedStyles = buttonStateStyles.$nest ?? undefined;
 
     const root = style(
         {
             height: percent(100),
             display: "block",
-            ...background(vars.options.background),
+            ...backgroundHelper(vars.options.background),
             color: colorOut(vars.options.fg),
             overflow: "hidden",
             minWidth: unit(vars.sizing.minWidth),
             $nest: {
-                [`&:active .${name}`]: linkStyles.nested["&&:active"],
-                [`&:focus .${name}`]: linkStyles.nested["&&:focus"],
-                [`&:hover .${name}`]: linkStyles.nested["&&:hover"],
+                [`&:hover .${name}`]: nestedStyles && nestedStyles["&&:hover"] ? nestedStyles["&&:hover"] : undefined,
+                [`&:focus .${name}`]: nestedStyles && nestedStyles["&&:focus"] ? nestedStyles["&&:focus"] : undefined,
+                [`&:focus-visible .${name}`]:
+                    nestedStyles && nestedStyles["&&:focus-visible"] ? nestedStyles["&&:focus-visible"] : undefined,
+                [`&:active .${name}`]:
+                    nestedStyles && nestedStyles["&&:active"] ? nestedStyles["&&:active"] : undefined,
             },
         },
         borderStyling,
@@ -187,5 +192,9 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         objectPosition: "center center",
     });
 
-    return { root, name, content, imageContainer, image };
+    const description = style("description", {
+        lineHeight: globalVars.lineHeights.base,
+    });
+
+    return { root, name, content, imageContainer, image, description };
 });

@@ -8,19 +8,28 @@ namespace Vanilla\Models;
 
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
-use Vanilla\AddonManager;
+use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\KludgedVariablesProviderInterface;
+use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeProviderCleanupInterface;
 use Vanilla\Theme\VariablesProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeProviderInterface;
 use Garden\Schema\ValidationField;
-use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Handle custom themes.
  */
 class ThemeModel {
+
+    const FOUNDATION_THEME_KEY = "theme-foundation";
+    const FALLBACK_THEME_KEY = self::FOUNDATION_THEME_KEY;
+    const ASSET_COMPAT_THEMES = [self::FOUNDATION_THEME_KEY];
+
     const HEADER = 'header';
     const FOOTER = 'footer';
     const VARIABLES = 'variables';
@@ -85,33 +94,54 @@ class ThemeModel {
     /** @var ConfigurationInterface $config */
     private $config;
 
-    /** @var AddonManager $addonManager */
+    /** @var \Gdn_Session */
+    private $session;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var AddonProviderInterface $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper $themeHelper */
     private $themeHelper;
 
+    /** @var ThemeSectionModel */
+    private $themeSections;
+
     /** @var string $themeManagePageUrl */
     private $themeManagePageUrl = '/dashboard/settings/themes';
+
+    /** @var FsThemeProvider */
+    private $fallbackThemeProvider;
 
     /**
      * ThemeModel constructor.
      *
      * @param ConfigurationInterface $config
      * @param \Gdn_Session $session
-     * @param AddonManager $addonManager
+     * @param AddonProviderInterface $addonManager
      * @param ThemeModelHelper $themeHelper
+     * @param ThemeSectionModel $themeSections
+     * @param SiteSectionModel $siteSectionModel
+     * @param FsThemeProvider $fallbackThemeProvider
      */
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
-        AddonManager $addonManager,
-        ThemeModelHelper $themeHelper
+        AddonProviderInterface $addonManager,
+        ThemeModelHelper $themeHelper,
+        ThemeSectionModel $themeSections,
+        SiteSectionModel $siteSectionModel,
+        FsThemeProvider $fallbackThemeProvider
     ) {
         $this->config = $config;
         $this->session = $session;
         $this->addonManager = $addonManager;
         $this->themeHelper = $themeHelper;
+        $this->themeSections = $themeSections;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->fallbackThemeProvider = $fallbackThemeProvider;
     }
 
     /**
@@ -121,6 +151,13 @@ class ThemeModel {
      */
     public function addVariableProvider(VariablesProviderInterface $provider) {
         $this->variableProviders[] = $provider;
+    }
+
+    /**
+     * Clear all variable providers.
+     */
+    public function clearVariableProviders() {
+        $this->variableProviders = [];
     }
 
     /**
@@ -145,11 +182,13 @@ class ThemeModel {
      * Get theme with all assets from provider detected
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $query Request query arguments
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $query = []): array {
         $provider = $this->getThemeProvider($themeKey);
-        $theme = $provider->getThemeWithAssets($themeKey);
+        $theme = $provider->getThemeWithAssets($themeKey, $query);
+        $theme = $this->normalizeTheme($theme);
         return $theme;
     }
 
@@ -163,7 +202,7 @@ class ThemeModel {
         foreach ($this->themeProviders as $themeProvider) {
             $themes = $themeProvider->getAllThemes();
             foreach ($themes as &$theme) {
-                $theme['preview'] = $this->generateThemePreview($theme) ?? null;
+                $theme = $this->normalizeTheme($theme);
                 $allThemes[] = $theme;
             }
         }
@@ -180,6 +219,7 @@ class ThemeModel {
     public function postTheme(array $body): array {
         $provider = $this->getThemeProvider('1');
         $theme = $provider->postTheme($body);
+        $theme = $this->normalizeTheme($theme);
         return $theme;
     }
 
@@ -194,6 +234,7 @@ class ThemeModel {
     public function patchTheme(int $themeID, array $body): array {
         $provider = $this->getThemeProvider($themeID);
         $theme = $provider->patchTheme($themeID, $body);
+        $theme = $this->normalizeTheme($theme);
         return $theme;
     }
 
@@ -214,24 +255,17 @@ class ThemeModel {
      * @return array
      */
     public function setCurrentTheme($themeID): array {
-        $provider = $this->getThemeProvider($themeID);
+        $previousTheme = $this->getCurrentTheme();
+        $previousProvider = $this->getThemeProvider($previousTheme['themeID']);
+        $newProvider = $this->getThemeProvider($themeID);
+        $newTheme = $newProvider->setCurrent($themeID);
 
-        if ($theme = $provider->setCurrent($themeID)) {
-            if ($provider->themeKeyType() === 0) {
-                try {
-                    $dbThemeProvider = $this->getThemeProvider(1);
-                    $dbThemeProvider->resetCurrent();
-                } catch (ClientException $e) {
-                    if ($e->getMessage() !== 'No custom theme provider found!') {
-                        throw $e;
-                    }
-                    //do nothing if db provider does not exist
-                }
-            }
+        if ($previousProvider !== $newProvider && $previousProvider instanceof ThemeProviderCleanupInterface) {
+            $previousProvider->afterCurrentProviderChange();
         }
 
-        $theme['preview'] = $this->generateThemePreview($theme) ?? null;
-        return $theme;
+        $newTheme = $this->normalizeTheme($newTheme);
+        return $newTheme;
     }
 
     /**
@@ -239,31 +273,19 @@ class ThemeModel {
      * (pseudo current theme for current session user only)
      *
      * @param int|string $themeID Theme ID to set current.
+     * @param int $revisionID Theme revision ID.
      * @return array
      */
-    public function setPreviewTheme($themeID): array {
+    public function setPreviewTheme($themeID, ?int $revisionID = null): array {
         if (empty($themeID)) {
             $theme = $this->getCurrentTheme();
             $this->themeHelper->cancelSessionPreviewTheme();
         } else {
             $provider = $this->getThemeProvider($themeID);
-            $theme = $provider->setPreviewTheme($themeID);
+            $theme = $provider->setPreviewTheme($themeID, $revisionID);
         }
+        $theme = $this->normalizeTheme($theme);
         return $theme;
-    }
-
-    /**
-     * Get view theme key
-     *
-     * @return string
-     */
-    public function getViewThemeKey(): string {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
-
-        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
-            $themeKey = $previewTheme;
-        }
-        return $themeKey;
     }
 
     /**
@@ -271,13 +293,14 @@ class ThemeModel {
      *
      * @return array
      */
-    public function getPreviewTheme(): array {
-        $previewTheme = [];
+    public function getPreviewTheme(): ?array {
+        $previewTheme = null;
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
             $previewTheme['themeID'] = $previewThemeKey;
             $provider = $this->getThemeProvider($previewThemeKey);
             $previewTheme['name'] = $provider->getName($previewThemeKey);
-            $previewTheme['redirect']= $this->getThemeManagePageUrl();
+            $previewTheme['redirect'] = $this->getThemeManagePageUrl();
+            $previewTheme['revisionID'] = $this->session->getPreference('PreviewThemeRevisionID');
         }
         return $previewTheme;
     }
@@ -301,76 +324,133 @@ class ThemeModel {
     }
 
     /**
-     * Get view theme addon
+     * Get master theme key.
      *
+     * @param int|string $themeKey
      * @return string
      */
-    public function getThemeAddon(): Addon {
-        $themeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+    public function getMasterThemeKey($themeKey): string {
         $provider = $this->getThemeProvider($themeKey);
-        $addonThemeKey = $provider->getMasterThemeKey($themeKey);
-        if ($previewTheme = $this->session->getPreference('PreviewThemeKey')) {
-            try {
-                $provider = $this->getThemeProvider($previewTheme);
-                $addonThemeKey = $provider->getMasterThemeKey($previewTheme);
-            } catch (NotFoundException $e) {
-                // if we store wrong preview key store in session, lets reset it
-                $this->themeHelper->cancelSessionPreviewTheme();
-            }
-        }
-        $addon = $this->addonManager->lookupTheme($addonThemeKey ?? $themeKey);
-        return $addon;
+        return $provider->getMasterThemeKey($themeKey);
+    }
+
+    /**
+     * Get view theme addon
+     *
+     * @return Addon
+     */
+    public function getCurrentThemeAddon(): Addon {
+        $currentTheme = $this->getCurrentTheme();
+        $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
+        return $this->getThemeAddon($masterKey);
+    }
+
+    /**
+     * Get view theme addon
+     *
+     * @param string $themeKey
+     * @return Addon
+     */
+    public function getThemeAddon(string $themeKey = ''): Addon {
+        return $this->addonManager->lookupTheme(
+            $this->getMasterThemeKey($themeKey)
+        );
+    }
+
+    /**
+     * Verify if ThemeKey or ID is valid.
+     *
+     * @param string|int $themeKey
+     * @return bool
+     */
+    public function verifyThemeIdentifierIsValid($themeKey) {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->themeExists($themeKey);
     }
 
     /**
      * Get current theme.
      *
-     * @return array|void If no currnt theme set returns null
+     * @return array The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(): ?array {
+    public function getCurrentTheme(): array {
         $current = null;
+
         try {
-            $provider = $this->getThemeProvider(1);
-            $current = $provider->getCurrent();
-        } catch (ClientException $e) {
-            if ($e->getMessage() !== 'No custom theme provider found!') {
-                throw $e;
+            // We absolutely cannot fail if a certain provider is not hooked up.
+            // As a result we will fall back to our default theme if there is some error.
+            $mobileKey = $this->config->get(ThemeModelHelper::CONFIG_MOBILE_THEME, null);
+            $desktopKey = $this->config->get(ThemeModelHelper::CONFIG_DESKTOP_THEME, null);
+            $currentKey = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
+
+            $baseKey = isMobile()
+                ? $mobileKey ?? $desktopKey
+                : $currentKey ?? $desktopKey;
+
+            // Try to get the base key.
+            $baseTheme = $this->getThemeProvider($baseKey)->getThemeWithAssets($baseKey);
+            if ($baseTheme !== null) {
+                $current = $baseTheme;
             }
-            //do nothing if db provider does not exist
-        }
 
-        if (is_null($current)) {
+            $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();
+            if ($sectionThemeID !== null) {
+                // Check if the theme actually exists.
+                $sectionTheme = $this->getThemeProvider($sectionThemeID)->getThemeWithAssets($sectionThemeID);
+                if ($sectionTheme !== null) {
+                    $current = $sectionTheme;
+                }
+            }
+
+            $previewThemeKey = $this->session->getPreference('PreviewThemeKey');
+            if ($previewThemeKey) { // May be stuck to empty string so falsy check is required.
+                $previewThemeRevisionID = $this->session->getPreference('PreviewThemeRevisionID');
+                $args = [];
+
+                if (!empty($previewThemeRevisionID)) {
+                    $args['revisionID'] = $previewThemeRevisionID;
+                }
+
+                $themeProvider = $this->getThemeProvider($previewThemeKey);
+                $previewTheme = $themeProvider->getThemeWithAssets($previewThemeKey, $args);
+                if ($previewTheme === null) {
+                    // if we stored wrong preview key store in session, lets reset it.
+                    $this->themeHelper->cancelSessionPreviewTheme();
+                } else {
+                    $current = $previewTheme;
+                }
+            }
+
+            if ($current === null) {
+                // If we're still null, fallback to our default.
+                $provider = $this->getThemeProvider("FILE");
+                $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
+            }
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            // If we had some exception during this, fallback to the default.
             $provider = $this->getThemeProvider("FILE");
-            $current = $provider->getCurrent();
+            $current = $provider->getThemeWithAssets(self::FALLBACK_THEME_KEY);
         }
-        $current['preview'] = $this->generateThemePreview($current) ?? null;
-        return $current;
-    }
 
-    /**
-     * Get theme view folder path
-     *
-     * @param string|int $themeKey Theme key or id
-     * @return string
-     */
-    public function getThemeViewPath($themeKey): string {
-        $provider = $this->getThemeProvider($themeKey);
-        $path = $provider->getThemeViewPath($themeKey);
-        return $path;
+        $current = $this->normalizeTheme($current);
+        return $current;
     }
 
     /**
      * Set theme asset (update existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.
+     * @param int $revisionID Theme revision ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      * @param string $data Data content for asset to set
      *
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
-        return $provider->setAsset($themeID, $assetKey, $data);
+        $asset = $provider->setAsset($themeID, $revisionID, $assetKey, $data);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -385,7 +465,8 @@ class ThemeModel {
      */
     public function sparseAsset(int $themeID, string $assetKey, string $data): array {
         $provider = $this->getThemeProvider($themeID);
-        return $provider->sparseAsset($themeID, $assetKey, $data);
+        $asset = $provider->sparseAsset($themeID, $assetKey, $data);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -398,23 +479,28 @@ class ThemeModel {
     private function getThemeProvider($themeKey): ThemeProviderInterface {
         $themeType = (is_int($themeKey) || ctype_digit($themeKey)) ? ThemeProviderInterface::TYPE_DB : ThemeProviderInterface::TYPE_FS;
         foreach ($this->themeProviders as $provider) {
-            $provider->setVariableProviders($this->getVariableProviders());
             if ($themeType === $provider->themeKeyType()) {
                 return $provider;
             }
         }
-        throw new ClientException('No custom theme provider found!', 501);
+
+        trigger_error('No custom theme provider found!', E_USER_WARNING);
+        // It is never acceptable to throw an exception in the theming system.
+        return $this->fallbackThemeProvider;
     }
 
     /**
      * Get the raw data of an asset.
      *
-     * @param string $themeKey
+     * @param string $themeID
      * @param string $assetKey
+     *
+     * @return string The asset contents.
      */
-    public function getAssetData(string $themeKey, string $assetKey): string {
-        $provider = $this->getThemeProvider($themeKey);
-        return $provider->getAssetData($themeKey, $assetKey);
+    public function getAssetData(string $themeID, string $assetKey): string {
+        $provider = $this->getThemeProvider($themeID);
+        $asset = $provider->getAssetData($themeID, $assetKey);
+        return $this->normalizeAsset($assetKey, $asset, $this->getThemeAddon($themeID));
     }
 
     /**
@@ -426,6 +512,21 @@ class ThemeModel {
     public function deleteAsset(string $themeKey, string $assetKey) {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * Get theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     */
+    public function getThemeRevisions(int $themeKey): array {
+        $provider = $this->getThemeProvider($themeKey);
+        $revisions = $provider->getThemeRevisions($themeKey);
+        foreach ($revisions as &$revision) {
+            $revision = $this->normalizeTheme($revision);
+        }
+        return $revisions;
     }
 
     /**
@@ -462,12 +563,91 @@ class ThemeModel {
     }
 
     /**
+     * Take in some some asset and normalize it.
+     *
+     * @param string $assetName
+     * @param mixed $assetContents
+     * @param Addon $themeAddon
+     *
+     * @return mixed The updated asset.
+     */
+    private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
+        // Mix in addon variables to the variables asset.
+        if (preg_match('/^variables/', $assetName) &&
+            $assetContents instanceof JsonAsset
+        ) {
+            $newJson = $this->mixAddonVariables($assetContents->getData(), $themeAddon);
+            return new JsonAsset($newJson);
+        } else {
+            return $assetContents;
+        }
+    }
+
+    /**
+     * Normalize theme data.
+     *
+     * @param array $theme The theme data.
+     * @return array Updated theme data.
+     */
+    private function normalizeTheme(array $theme): array {
+        $themeID = $theme['themeID'];
+        $addon = $this->getThemeAddon($themeID);
+        $features = new ThemeFeatures($this->config, $addon);
+        $theme['features'] = $features;
+
+        // Apply supported sections.
+        $supportedSections = $this->themeSections->getModernSections();
+        if ($features->useDataDrivenTheme()) {
+            $supportedSections = array_merge($supportedSections, $this->themeSections->getLegacySections());
+        }
+        $theme['supportedSections'] = $supportedSections;
+
+        // Normalize all assets.
+        foreach ($theme['assets'] as $assetName => $assetContents) {
+            $theme['assets'][$assetName] = $this->normalizeAsset($assetName, $assetContents, $addon);
+        }
+
+        // Generate a preview.
+        $theme['preview'] = $this->generateThemePreview($theme);
+        return $theme;
+    }
+
+    /**
+     * Add Addons variables to theme variables..
+     * Addon provided variables will override the theme variables.
+     *
+     * @param string $baseAssetContent Variables json theme asset string.
+     * @param Addon $themeAddon
+     * @return string The updated asset content.
+     */
+    private function mixAddonVariables(string $baseAssetContent, Addon $themeAddon): string {
+        $features = new ThemeFeatures($this->config, $themeAddon);
+        // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
+        $additionalVariables = [];
+        foreach ($this->variableProviders as $variableProvider) {
+            if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
+                continue;
+            }
+            $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
+        }
+
+        if ($additionalVariables) {
+            $variables = json_decode($baseAssetContent, true) ?? [];
+
+            $variables = array_replace_recursive($variables, $additionalVariables);
+            $baseAssetContent = json_encode($variables);
+        }
+        return $baseAssetContent;
+    }
+
+
+    /**
      * Generate a theme preview from the variables.
      *
      * @param array $theme
      * @return array
      */
-    public function generateThemePreview(array $theme): array {
+    private function generateThemePreview(array $theme): array {
         $preview = $theme['preview'] ?? [];
 
         if (!($theme["assets"]["variables"] instanceof JsonAsset)) {
@@ -476,12 +656,18 @@ class ThemeModel {
 
         $variables = $theme["assets"]["variables"]->getDataArray();
         if ($variables) {
-            $preview['global.mainColors.primary'] = $variables['global']['mainColors']['primary'] ?? null;
-            $preview['global.mainColors.bg'] = $variables['global']['mainColors']['bg'] ?? null;
-            $preview['global.mainColors.fg'] = $variables['global']['mainColors']['fg'] ?? null;
-            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? null;
+            $preset = $variables['global']['options']['preset'] ?? null;
+            $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
+            $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
+            $primary = $variables['global']['mainColors']['primary'] ?? null;
+            $preview['global.mainColors.primary'] = $primary;
+            $preview['global.mainColors.bg'] = $bg ?? null;
+            $preview['global.mainColors.fg'] = $fg ?? null;
+            $preview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
             $preview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
-            $preview['splash.outerBackground.image'] = $variables['splash']['outerBackground']['image'] ?? null;
+            $preview['banner.outerBackground.image'] = $variables['splash']['outerBackground']['image']
+                ?? $variables['banner']['outerBackground']['image']
+                ?? null;
         }
         return $preview;
     }

@@ -14,14 +14,14 @@ import {
     buttonStates,
     unit,
     userSelect,
-    negative,
     IStateSelectors,
     absolutePosition,
+    negativeUnit,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
+import { important, percent, rgba } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 
@@ -86,10 +86,7 @@ export const dropDownVariables = useThemeCache(() => {
     const contents = makeThemeVars("contents", {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
-        border: {
-            radius: globalVars.border.radius,
-            color: globalVars.border.color,
-        },
+        border: globalVars.borderType.dropDowns,
         padding: {
             vertical: 9,
             horizontal: 16,
@@ -119,47 +116,58 @@ export const dropDownClasses = useThemeCache(() => {
         listStyle: "none",
     });
 
-    const contents = style("contents", {
-        position: "absolute",
-        minWidth: unit(vars.sizing.widths.default),
-        backgroundColor: colorOut(vars.contents.bg),
-        color: colorOut(vars.contents.fg),
-        overflow: "auto",
-        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
-        ...borders(vars.contents.border),
-        $nest: {
-            "&&": {
-                zIndex: 3,
-            },
-            "&.isMedium": {
-                width: unit(vars.sizing.widths.medium),
-            },
-            "&.isParentWidth": {
-                minWidth: "initial",
-                left: 0,
-                right: 0,
-            },
-            "&.isOwnWidth": {
-                width: "initial",
-            },
-            "&.isRightAligned": {
-                right: 0,
-                top: 0,
-            },
-            "& .frame": {
-                boxShadow: "none",
-            },
-            "&.noMinWidth": {
-                minWidth: 0,
-            },
-            "&.hasVerticalPadding": {
-                ...paddings({
-                    vertical: 12,
-                    horizontal: important(0),
-                }),
+    const contents = style(
+        "contents",
+        {
+            position: "absolute",
+            minWidth: unit(vars.sizing.widths.default),
+            backgroundColor: colorOut(vars.contents.bg),
+            color: colorOut(vars.contents.fg),
+            overflow: "auto",
+            ...borders(vars.contents.border),
+            ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
+            $nest: {
+                "&&": {
+                    zIndex: 3,
+                    ...borders(vars.contents.border),
+                },
+                "&.isMedium": {
+                    width: unit(vars.sizing.widths.medium),
+                },
+                "&.isParentWidth": {
+                    minWidth: "initial",
+                    left: 0,
+                    right: 0,
+                },
+                "&.isOwnWidth": {
+                    width: "initial",
+                },
+                "&.isRightAligned": {
+                    right: 0,
+                    top: 0,
+                },
+                "& .frame": {
+                    boxShadow: "none",
+                },
+                "&.noMinWidth": {
+                    minWidth: 0,
+                },
+                "&.hasVerticalPadding": {
+                    ...paddings({
+                        vertical: 12,
+                        horizontal: important(0),
+                    }),
+                },
             },
         },
-    } as NestedCSSProperties);
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&.isOwnWidth": {
+                    width: percent(100),
+                },
+            },
+        }),
+    );
 
     const asModal = style("asModal", {
         $nest: {
@@ -172,16 +180,21 @@ export const dropDownClasses = useThemeCache(() => {
     const likeDropDownContent = style("likeDropDownContent", {
         ...shadows.dropDown(),
         backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...borders(),
+        ...borders(vars.contents.border),
     } as NestedCSSProperties);
 
-    const items = style("items", {
-        paddingTop: 3,
-        paddingBottom: 3,
-        paddingLeft: 0,
-        paddingRight: 0,
-        fontSize: unit(globalVars.fonts.size.medium),
-    });
+    const items = style(
+        "items",
+        {
+            padding: 0,
+            fontSize: unit(globalVars.fonts.size.medium),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                vertical: 9,
+            }),
+        }),
+    );
 
     const metaItems = style("metaItems", {
         $nest: {
@@ -295,19 +308,23 @@ export const dropDownClasses = useThemeCache(() => {
             "&.isNested": {},
         },
     });
-
-    const sectionHeading = style("sectionHeading", {
-        color: colorOut(globalVars.meta.text.color),
-        fontSize: unit(globalVars.fonts.size.small),
-        textTransform: "uppercase",
-        textAlign: "center",
-        fontWeight: globalVars.fonts.weights.semiBold,
-        ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
-    });
-
     const sectionContents = style("sectionContents", {
         display: "block",
         position: "relative",
+    });
+
+    const sectionHeading = style("sectionHeading", {
+        $nest: {
+            "&&": {
+                color: colorOut(globalVars.meta.text.color),
+                fontSize: unit(globalVars.fonts.size.small),
+                textTransform: "uppercase",
+                textAlign: "center",
+                fontWeight: globalVars.fonts.weights.semiBold,
+                ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
+            },
+            [`& + .${sectionContents} li:first-child`]: { paddingTop: unit(vars.spacer.margin.vertical) },
+        },
     });
 
     const arrow = style("arrow", {
@@ -398,7 +415,7 @@ export const dropDownClasses = useThemeCache(() => {
         transform: `translateX(${unit(flyoutOffset)})`,
     });
     const contentOffsetRight = style("contentOffsetRight", {
-        transform: `translateX(${negative(unit(flyoutOffset))})`,
+        transform: `translateX(${negativeUnit(flyoutOffset)})`,
     });
 
     return {
@@ -453,13 +470,13 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
         width: percent(100),
         textAlign: "left",
         minHeight: unit(vars.item.minHeight),
-        lineHeight: unit(globalVars.lineHeights.condensed),
+        lineHeight: globalVars.lineHeights.condensed,
         ...paddings({
             vertical: 4,
             horizontal: vars.item.padding.horizontal,
         }),
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
         color: colorOut(vars.item.colors.fg, true),
@@ -471,16 +488,28 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.color, true),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.hover.contrast, true)
+                        : undefined,
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.color, true),
+                    backgroundColor: colorOut(globalVars.states.focus.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.focus.contrast, true)
+                        : undefined,
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.active.color, true),
+                    backgroundColor: colorOut(globalVars.states.active.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.active.contrast, true)
+                        : undefined,
                 },
-                accessibleFocus: {
-                    borderColor: colorOut(globalVars.mainColors.primary, true),
+                keyboardFocus: {
+                    borderColor: colorOut(globalVars.states.focus.highlight, true),
+                    color: globalVars.states.hover.contrast
+                        ? colorOut(globalVars.states.focus.contrast, true)
+                        : undefined,
                 },
             },
             undefined,

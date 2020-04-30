@@ -4,8 +4,10 @@ var supportsAllFeatures =
     window.fetch &&
     window.Symbol &&
     window.CustomEvent &&
+    Array.prototype.includes &&
     Element.prototype.remove &&
     Element.prototype.closest &&
+    Element.prototype.attachShadow &&
     window.NodeList &&
     NodeList.prototype.forEach
 ;
@@ -22,7 +24,8 @@ if (!supportsAllFeatures) {
     // Which means we HAVE to set the element, even if it should be defaulted.
     #}
     script.async = false;
-    head.appendChild(script);
+    // document.write has to be used instead of append child for edge & old safari compatibility.
+    document.write(script.outerHTML);
 } else {
     {{ debugModeLiteral }} && console.log("Modern browser detected. No polyfills necessary");
 }

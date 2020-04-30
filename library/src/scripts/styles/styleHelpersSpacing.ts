@@ -6,6 +6,7 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { unit } from "@library/styles/styleHelpers";
+import { calc } from "csx";
 
 export interface ISpacing {
     top?: string | number;
@@ -18,26 +19,26 @@ export interface ISpacing {
 }
 
 export const EMPTY_SPACING = {
-    top: undefined,
-    right: undefined,
-    bottom: undefined,
-    left: undefined,
-    horizontal: undefined,
-    vertical: undefined,
-    all: undefined,
+    top: undefined as undefined | number | string,
+    right: undefined as undefined | number | string,
+    bottom: undefined as undefined | number | string,
+    left: undefined as undefined | number | string,
+    horizontal: undefined as undefined | number | string,
+    vertical: undefined as undefined | number | string,
+    all: undefined as undefined | number | string,
 };
 
 function spacings(property: "margin" | "padding", spacings?: ISpacing) {
+    if (!spacings) {
+        return {};
+    }
+
     const spacingVals: NestedCSSProperties = {};
 
     const propertyLeft = `${property}Left`;
     const propertyRight = `${property}Right`;
     const propertyTop = `${property}Top`;
     const propertyBottom = `${property}Bottom`;
-
-    if (!spacings) {
-        return spacingVals;
-    }
 
     if (spacings.all !== undefined) {
         spacingVals[propertyTop] = unit(spacings.all);
@@ -81,4 +82,19 @@ export function paddings(spacing: ISpacing) {
 
 export function margins(spacing: ISpacing) {
     return spacings("margin", spacing);
+}
+
+/**
+ * Extend an item container outward to compensate for item paddings.
+ * Usually used in a grid.
+ *
+ * If you use this function, make sure the parent is set to 100% width with over flow hidden.
+ *
+ * @param itemPaddingX A single unit of padding of a horizontal side of the item.
+ */
+export function extendItemContainer(itemPaddingX: number): NestedCSSProperties {
+    return {
+        width: calc(`100% + ${unit(itemPaddingX * 2)}`),
+        marginLeft: unit(-itemPaddingX),
+    };
 }

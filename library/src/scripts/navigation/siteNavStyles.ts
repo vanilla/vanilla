@@ -7,9 +7,10 @@
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { negative, unit, colorOut } from "@library/styles/styleHelpers";
+import { negative, unit, colorOut, allLinkStates } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -25,7 +26,6 @@ export const siteNavVariables = useThemeCache(() => {
             fg: globalVars.links.colors.default,
             fontWeight: globalVars.fonts.weights.bold,
         },
-        backgroundColor: "orange",
     });
 
     const title = makeThemeVars("title", {
@@ -85,6 +85,25 @@ export const siteNavNodeClasses = useThemeCache(() => {
 
     const style = styleFactory("siteNavNode");
 
+    const label = style(
+        "label",
+        {
+            position: "relative",
+            display: "block",
+            width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
+            marginLeft: unit(-vars.nodeToggle.width),
+            textAlign: "left",
+            border: `solid transparent ${unit(vars.node.borderWidth)}`,
+            paddingTop: unit(vars.node.padding + vars.node.borderWidth),
+            paddingRight: unit(vars.node.padding),
+            paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
+            paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
+        },
+        mediaQueries.oneColumnDown({
+            fontSize: unit(globalVars.fonts.size.large),
+        }),
+    );
+
     const root = style({
         position: "relative",
         display: "flex",
@@ -94,7 +113,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         fontSize: unit(vars.node.fontSize),
         color: vars.node.fg.toString(),
         $nest: {
-            "&.isCurrent": {
+            [`&.isCurrent .${label}`]: {
                 color: vars.node.active.fg.toString(),
             },
         },
@@ -114,54 +133,79 @@ export const siteNavNodeClasses = useThemeCache(() => {
         },
     });
 
-    const linkMixin: NestedCSSProperties = {
-        display: "block",
-        flexGrow: 1,
-        color: "inherit",
-        lineHeight: vars.node.lineHeight,
-        minHeight: px(30),
-        outline: 0,
-        padding: 0,
-        width: percent(100),
-        $nest: {
-            "&:active, &:focus": {
+    const linkMixin = (useTextColor?: boolean, selector?: string): NestedCSSProperties => {
+        const $nest = {
+            ...allLinkStates({
+                noState: {
+                    color: colorOut(useTextColor ? globalVars.mainColors.fg : globalVars.links.colors.default),
+                },
+                hover: {
+                    color: colorOut(globalVars.links.colors.hover),
+                },
+                focus: {
+                    color: colorOut(globalVars.links.colors.focus),
+                },
+                keyboardFocus: {
+                    color: colorOut(globalVars.links.colors.keyboardFocus),
+                },
+                active: {
+                    color: colorOut(globalVars.links.colors.active),
+                },
+            }).$nest,
+            "&:not(.focus-visible):active": {
                 outline: 0,
             },
-            "&:hover": {
-                color: colorOut(globalVars.links.colors.default.toString()),
+            "&:focus": {
+                outline: 0,
             },
             "&.hasChildren": {
-                fontWeight: globalVars.fonts.weights.semiBold,
-                color: "inherit",
                 $nest: {
+                    [`& .${label}`]: {
+                        fontWeight: globalVars.fonts.weights.bold,
+                    },
                     "&.isFirstLevel": {
                         fontSize: unit(globalVars.fonts.size.large),
-                        fontWeight: globalVars.fonts.weights.bold,
+                        fontWeight: globalVars.fonts.weights.normal,
                     },
                 },
             },
-        },
-    };
-    const link = style("link", linkMixin);
+        } as any;
 
-    const label = style(
-        "label",
-        {
-            position: "relative",
+        if (selector) {
+            const selectors = selector.split(",");
+            if (selectors.length && selectors.length > 0) {
+                selectors.map(s => {
+                    nestedWorkaround(trimTrailingCommas(s), $nest);
+                });
+            } else {
+                nestedWorkaround(trimTrailingCommas(selector), $nest);
+            }
+        }
+
+        const baseStyles = {
             display: "block",
-            width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
-            marginLeft: unit(-vars.nodeToggle.width),
-            textAlign: "left",
-            border: `solid transparent ${unit(vars.node.borderWidth)}`,
-            paddingTop: unit(vars.node.padding + vars.node.borderWidth),
-            paddingRight: unit(vars.node.padding),
-            paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
-            paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
-        },
-        mediaQueries.oneColumnDown({
-            fontSize: unit(globalVars.fonts.size.large),
-        }),
-    );
+            flexGrow: 1,
+            lineHeight: vars.node.lineHeight,
+            minHeight: px(30),
+            outline: 0,
+            padding: 0,
+            width: percent(100),
+        };
+
+        if (selector) {
+            if (useTextColor) {
+                baseStyles["color"] = colorOut(globalVars.mainColors.fg);
+            }
+            return baseStyles;
+        } else {
+            return {
+                ...baseStyles,
+                $nest: $nest,
+            };
+        }
+    };
+
+    const link = style("link", linkMixin(true));
 
     const spacer = style("spacer", {
         display: "block",
@@ -192,5 +236,21 @@ export const siteNavNodeClasses = useThemeCache(() => {
         transform: `translateY(-50%)`,
     });
 
-    return { root, children, contents, link, linkMixin, label, spacer, toggle, buttonOffset };
+    const activeLink = style("active", {
+        fontWeight: globalVars.fonts.weights.semiBold,
+        color: colorOut(globalVars.links.colors.active),
+    });
+
+    return {
+        root,
+        children,
+        contents,
+        link,
+        linkMixin,
+        label,
+        spacer,
+        toggle,
+        buttonOffset,
+        activeLink,
+    };
 });

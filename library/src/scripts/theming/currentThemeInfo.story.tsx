@@ -10,6 +10,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import CurrentThemeInfo from "./CurrentThemeInfo";
 import ThemePreviewCard from "./ThemePreviewCard";
 import { StoryTile } from "@library/storybook/StoryTile";
+import { ThemeType } from "@library/theming/themeReducer";
 
 const story = storiesOf("Theme", module);
 
@@ -30,14 +31,26 @@ story.add("Current Theme", () => {
                     />
                 </div>
                 <CurrentThemeInfo
-                    name={"Keystone"}
-                    info={{
-                        Description: {
-                            type: "string",
-                            info:
-                                "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+                    theme={{
+                        name: "Keystone",
+                        supportedSections: ["Forum", "Knowledge Base", "HomePage"],
+                        themeID: "keystone",
+                        revisionID: null,
+                        assets: {},
+                        features: {},
+                        preview: {
+                            info: {
+                                Description: {
+                                    type: "string",
+                                    info:
+                                        "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+                                },
+                                Authors: { type: "string", info: "Author1, Author2, Author3" },
+                            },
                         },
-                        Authors: { type: "string", info: "Author1, Author2, Author3" },
+                        type: ThemeType.FS,
+                        current: true,
+                        version: "4.0.0",
                     }}
                 />
             </div>

@@ -4,6 +4,7 @@
  */
 
 import { important, px } from "csx";
+import isNumeric from "validator/lib/isNumeric";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
 export * from "@library/styles/styleHelpersTypography";
@@ -46,9 +47,11 @@ export const ifExistsWithFallback = checkProp => {
 };
 
 export const unit = (val: string | number | undefined, unitFunction = px) => {
-    if (typeof val === "string") {
+    const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
+
+    if (typeof val === "string" && !valIsNumeric) {
         return val;
-    } else if (val !== undefined && val !== null && !isNaN(val)) {
+    } else if (val !== undefined && val !== null && valIsNumeric) {
         return unitFunction(val as number);
     } else {
         return val;
@@ -58,6 +61,15 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
 export const importantUnit = (val: string | number | undefined, unitFunction = px) => {
     const withUnit = unit(val);
     return withUnit ? important(withUnit.toString()) : withUnit;
+};
+
+export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
+    const withUnit = unit(val);
+    return withUnit ? important(negative(withUnit).toString()) : withUnit;
+};
+
+export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
+    return negative(unit(val));
 };
 
 export const negative = val => {
@@ -73,4 +85,8 @@ export const negative = val => {
     } else {
         return val;
     }
+};
+
+export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {
+    return val !== undefined ? unit(val) : undefined;
 };

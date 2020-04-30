@@ -8,6 +8,7 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
+use Gdn_Session;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
@@ -56,6 +57,15 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $activeThemeKey;
 
+    /** @var int $activeThemeRevisionID */
+    private $activeThemeRevisionID;
+
+    /** @var string */
+    private $mobileThemeKey;
+
+    /** @var string */
+    private $desktopThemeKey;
+
     /** @var string */
     private $activeThemeViewPath;
 
@@ -98,6 +108,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $dynamicPathFolder = '';
 
+    /** @var Gdn_Session */
+    private $session;
+
     /**
      * SiteMeta constructor.
      *
@@ -105,8 +118,9 @@ class SiteMeta implements \JsonSerializable {
      * @param Contracts\ConfigurationInterface $config The configuration object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
-     * @param ThemeFeatres $themeFeatures
+     * @param ThemeFeatures $themeFeatures
      * @param ThemeModel $themeModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         RequestInterface $request,
@@ -114,7 +128,8 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ThemeModel $themeModel
+        ThemeModel $themeModel,
+        Gdn_Session $session
     ) {
         $this->host = $request->getHost();
 
@@ -149,10 +164,20 @@ class SiteMeta implements \JsonSerializable {
         // DeploymentCacheBuster
         $this->cacheBuster = $deploymentCacheBuster->value();
 
+        $this->session = $session;
+
+        //Sign Out URL
+        $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
+
         // Theming
-        $themeKey = $themeModel->getViewThemeKey();
-        $this->activeThemeKey = $themeKey;
-        $this->activeThemeViewPath =  $themeModel->getThemeViewPath($themeKey);
+        $currentTheme = $themeModel->getCurrentTheme();
+        $currentThemeAddon = $themeModel->getCurrentThemeAddon();
+
+        $this->activeThemeKey = $currentTheme['themeID'];
+        $this->activeThemeRevisionID = $currentTheme['revisionID'] ?? null;
+        $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
+        $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
+        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeModel::FALLBACK_THEME_KEY);
         $this->themePreview =  $themeModel->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
@@ -199,6 +224,8 @@ class SiteMeta implements \JsonSerializable {
                 'orgName' => $this->orgName,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeThemeKey,
+                'mobileThemeKey' => $this->mobileThemeKey,
+                'desktopThemeKey' => $this->desktopThemeKey,
                 'logo' => $this->logo,
                 'favIcon' => $this->favIcon,
                 'shareImage' => $this->shareImage,
@@ -210,6 +237,7 @@ class SiteMeta implements \JsonSerializable {
                 'maxUploads' => $this->maxUploads,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
+            'signOutUrl' => $this->signOutUrl,
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
@@ -285,6 +313,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getActiveThemeKey(): string {
         return $this->activeThemeKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActiveThemeRevisionID(): ?int {
+        return $this->activeThemeRevisionID;
     }
 
     /**

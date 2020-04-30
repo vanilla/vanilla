@@ -20,6 +20,8 @@ export enum InputTextBlockBaseClass {
 
 export interface IInputProps {
     value?: string;
+    onFocus?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onBlur?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onKeyPress?: React.KeyboardEventHandler;
     inputClassNames?: string;
@@ -75,7 +77,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const classesInputBlock = inputBlockClasses();
 
         const { inputProps = {}, multiLineProps = {}, ...blockProps } = this.props;
-        const classes = classNames(classesInputBlock.inputText, "inputText", inputProps.inputClassNames, {
+        const classes = classNames(classesInputBlock.inputText, inputProps.inputClassNames, {
             InputBox: this.props.legacyMode,
             [classesInput.text]: !this.props.legacyMode,
         });
@@ -104,6 +106,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             aria-labelledby={labelID}
                             maxLength={inputProps.maxLength}
                             onChange={this.onChange}
+                            onFocus={this.onFocus}
+                            onBlur={this.onBlur}
                             ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
                             onKeyPress={inputProps.onKeyPress}
                             autoComplete={inputProps.autoComplete ? "on" : "off"}
@@ -129,6 +133,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             aria-labelledby={labelID}
                             maxLength={inputProps.maxLength}
                             onChange={this.onChange}
+                            onFocus={this.onFocus}
+                            onBlur={this.onBlur}
                             ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
                             onKeyPress={inputProps.onKeyPress}
                         />
@@ -176,6 +182,20 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         const { inputProps = {} } = this.props;
         if (inputProps.onChange) {
             inputProps.onChange(event);
+        }
+    };
+
+    private onBlur = event => {
+        const { inputProps = {} } = this.props;
+        if (inputProps.onBlur) {
+            inputProps.onBlur(event);
+        }
+    };
+
+    private onFocus = event => {
+        const { inputProps = {} } = this.props;
+        if (inputProps.onFocus) {
+            inputProps.onFocus(event);
         }
     };
 }

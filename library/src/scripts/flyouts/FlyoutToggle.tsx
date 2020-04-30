@@ -6,7 +6,7 @@
 
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
@@ -15,6 +15,7 @@ import classNames from "classnames";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { forceRenderStyles } from "typestyle";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -190,6 +191,7 @@ export default function FlyoutToggle(props: IProps) {
                 baseClass={props.buttonBaseClass}
                 buttonRef={buttonRef}
             >
+                <ScreenReaderContent>{props.name}</ScreenReaderContent>
                 {props.buttonContents}
             </Button>
 

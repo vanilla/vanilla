@@ -2,7 +2,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { getMeta, t } from "@library/utility/appUtils";
+import { getMeta, t, assetUrl, formatUrl } from "@library/utility/appUtils";
 import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
@@ -34,6 +34,10 @@ export const navigationVariables = useThemeCache(() => {
         [getCurrentLocale()]: undefined,
     });
 
+    const logo = makeVars("logo", {
+        url: "/",
+    });
+
     const currentLocale = getCurrentLocale();
 
     const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
@@ -44,5 +48,5 @@ export const navigationVariables = useThemeCache(() => {
         }
     };
 
-    return { navItems, getNavItemsForLocale };
+    return { navItems, logo, getNavItemsForLocale };
 });

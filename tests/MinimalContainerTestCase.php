@@ -20,6 +20,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Web\TwigEnhancer;
 use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
@@ -69,6 +71,9 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
             ->setClass(SingleSiteSectionProvider::class)
             ->setShared(true)
+
+            ->rule(TwigEnhancer::class)
+            ->setConstructorArgs(['bannerImageModel' => null])
 
             // Mocks of interfaces.
             // Addons
@@ -149,15 +154,35 @@ class MinimalContainerTestCase extends TestCase {
     }
 
     /**
+     * Set information about the current user in the session.
+     * @param array $info The user information to set.
+     */
+    public function setUserInfo(array $info) {
+        $session = new \Gdn_Session();
+
+        foreach ($info as $key => $value) {
+            if ($key === 'UserID') {
+                $session->UserID = $value;
+            }
+
+            if ($key === 'Admin' && $value > 0) {
+                $session->getPermissions()->setAdmin(true);
+            }
+
+            $session->User = new \stdClass();
+            $session->User->{$key} = $value;
+        }
+        self::container()->setInstance(\Gdn_Session::class, $session);
+    }
+
+    /**
      * Set some configuration key for the tests.
      *
      * @param string $key The config key.
      * @param mixed $value The value to set.
      */
     public static function setConfig(string $key, $value) {
-        /** @var MockConfig $config */
-        $config = self::container()->get(ConfigurationInterface::class);
-        $config->set($key, $value);
+        self::getConfig()->set($key, $value);
     }
 
     /**
@@ -166,9 +191,14 @@ class MinimalContainerTestCase extends TestCase {
      * @param array $configs An array of $configKey => $value
      */
     public static function setConfigs(array $configs) {
-        /** @var MockConfig $config */
-        $config = self::container()->get(MockConfig::class);
-        $config->loadData($configs);
+        self::getConfig()->loadData($configs);
+    }
+
+    /**
+     * Get the config object.
+     */
+    public static function getConfig(): ConfigurationInterface {
+        return self::container()->get(ConfigurationInterface::class);
     }
 
     /**

@@ -5,7 +5,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
 import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";

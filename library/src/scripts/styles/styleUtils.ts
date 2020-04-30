@@ -10,10 +10,13 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
+import { color, rgba, rgb, hsla, hsl, ColorHelper, list } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
+import isNumeric from "validator/lib/isNumeric";
+import { useEffect, useState } from "react";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
@@ -68,11 +71,32 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
-let themeUniqueness = hashString(Math.random().toString());
+// A unique identifier that represents the current state of the theme.
+let _themeCacheID = hashString(Math.random().toString());
 
-export function clearThemeCache() {
-    themeUniqueness = hashString(Math.random().toString());
-    return themeUniqueness;
+// Event name for resetting the theme cacheID.
+export const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
+
+export function resetThemeCache() {
+    _themeCacheID = hashString(Math.random().toString());
+    document.dispatchEvent(new CustomEvent(THEME_CACHE_EVENT, { detail: _themeCacheID }));
+    return _themeCacheID;
+}
+
+export function useThemeCacheID() {
+    const [cacheID, setCacheID] = useState(_themeCacheID);
+    useEffect(() => {
+        const listener = (e: CustomEvent) => {
+            setCacheID(e.detail);
+        };
+        document.addEventListener(THEME_CACHE_EVENT, listener);
+
+        return () => {
+            document.removeEventListener(THEME_CACHE_EVENT, listener);
+        };
+    });
+
+    return { cacheID, resetThemeCache };
 }
 
 /**
@@ -85,7 +109,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const storeState = getStore().getState();
         const themeKey = getMeta("ui.themeKey", "default");
         const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status + themeUniqueness;
+        const cacheKey = themeKey + status + _themeCacheID;
         const result = cacheKey + JSON.stringify(args);
         return result;
     };
@@ -101,6 +125,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  * - Merge in all subtrees. (theme variables override your defaults).
  *
  * @param componentName The base name of the component being styled.
+ * @param themeVars Optionally force a particular set of variables to be used.
  *
  * @example
  *
@@ -123,8 +148,17 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
  *      hover: mainColors.primary.darken(0.2), // They mixed variables will be automatically converted
  * }});
  */
-export function variableFactory(componentNames: string | string[]) {
-    const themeVars = getThemeVariables();
+export function variableFactory(
+    componentNames: string | string[],
+    themeVars?: IThemeVariables,
+    mergeWithGlobals = false,
+) {
+    if (!themeVars) {
+        themeVars = getThemeVariables();
+    } else if (mergeWithGlobals) {
+        themeVars = merge(getThemeVariables(), themeVars);
+    }
+
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames
@@ -141,14 +175,31 @@ export function variableFactory(componentNames: string | string[]) {
         }
 
         if (overrides != null) {
-            result = normalizeVariables(overrides, result);
+            result = normalizeVariables(stripUndefinedKeys(overrides), result);
         }
         return result;
     };
 }
 
-const rgbRegex = /rgba?\((\d+),\s?(\d+),\s?(\d+)[,\s]?(.+)\)/;
-const hslRegex = /hsla?\((\d+),\s?(\d+),\s?(\d+)[,\s](.+)?\)/;
+function stripUndefinedKeys(obj: any) {
+    if (typeof obj === "object") {
+        const newObj = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                newObj[key] = value;
+            }
+        }
+        return newObj;
+    }
+
+    return obj;
+}
+
+const rgbRegex = /^rgb\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)\)$/;
+const rgbaRegex = /^rgba\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d*(?:\.\d+)?)\)$/;
+const hslRegex = /^hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)$/;
+const hslaRegex = /^hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*(\d*(?:\.\d+)?)\)/;
+const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
  * Take some Object/Value from the variable factory and wrap it in it's proper wrapper.
@@ -164,6 +215,8 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
             return customVariable;
         } else if (defaultVariable instanceof ColorHelper) {
             if (customVariable instanceof ColorHelper) {
+                return customVariable;
+            } else if (typeof customVariable === "string" && customVariable.startsWith("linear-gradient")) {
                 return customVariable;
             } else {
                 const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
@@ -190,39 +243,131 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
 }
 
 /**
+ * Check if string is valid color in hex format
+ * @param colorString
+ */
+export function stringIsHexColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hexRegex);
+}
+
+/**
+ * Check if string is valid color in rgb format
+ * @param colorString
+ */
+export function stringIsRgbColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbRegex);
+}
+
+/**
+ * Check if string is valid color in rgba format
+ * @param colorString
+ */
+export function stringIsRgbaColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(rgbaRegex);
+}
+
+/**
+ * Check if string is valid color in hsl format
+ * @param colorString
+ */
+export function stringIsHslColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslRegex);
+}
+
+/**
+ * Check if string is valid color in hsla format
+ * @param colorString
+ */
+export function stringIsHslaColor(colorValue) {
+    return typeof colorValue === "string" && colorValue.match(hslaRegex);
+}
+
+/**
+ * Check if string is supported color format
+ * @param colorString
+ */
+export function stringIsValidColor(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        (stringIsRgbColor(colorValue) ||
+            stringIsHexColor(colorValue) ||
+            stringIsHslColor(colorValue) ||
+            stringIsHslaColor(colorValue) ||
+            stringIsRgbaColor(colorValue))
+    );
+}
+/**
+ * Check if string is linear gradient
+ * @param colorString
+ */
+export function stringIsLinearGradient(colorValue) {
+    return (
+        typeof colorValue === "string" &&
+        !stringIsValidColor(colorValue) &&
+        colorValue
+            .toString()
+            .trim()
+            .startsWith("linear-gradient(")
+    );
+}
+
+/**
+ * Check if string or ColorHelper is valid
+ * @param colorString
+ */
+export const isValidColor = colorValue => {
+    return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
+};
+
+/**
+ * Takes either a custome error message string or a boolean, true gives default message
+ * @param error
+ * @param defaultMessage
+ */
+export const getDefaultOrCustomErrorMessage = (error, defaultMessage: string) => {
+    return typeof error === "string" ? error : defaultMessage;
+};
+
+/**
  * Convert a color string into an instance.
  * @param colorString
  */
 export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
-    if (colorString.startsWith("#")) {
+    if (stringIsHexColor(colorString)) {
         // It's a colour.
         return color(colorString);
-    } else if (colorString.match(rgbRegex)) {
+    } else if (stringIsRgbColor(colorString)) {
         const result = rgbRegex.exec(colorString)!;
+
+        const r = parseInt(result[1], 10);
+        const g = parseInt(result[2], 10);
+        const b = parseInt(result[3], 10);
+        return rgb(r, g, b);
+    } else if (stringIsRgbaColor(colorString)) {
+        const result = rgbaRegex.exec(colorString)!;
 
         const r = parseInt(result[1], 10);
         const g = parseInt(result[2], 10);
         const b = parseInt(result[3], 10);
         const a = parseFloat(result[4]);
 
-        if (a !== null) {
-            return rgba(r, g, b, a);
-        } else {
-            return rgb(r, g, b);
-        }
-    } else if (colorString.match(hslRegex)) {
+        return rgba(r, g, b, a);
+    } else if (stringIsHslColor(colorString)) {
         const result = hslRegex.exec(colorString)!;
+
+        const h = parseInt(result[1], 10);
+        const s = parseInt(result[2], 10);
+        const l = parseInt(result[3], 10);
+        return hsl(h, s, l);
+    } else if (stringIsHslaColor(colorString)) {
+        const result = hslaRegex.exec(colorString)!;
 
         const h = parseInt(result[1], 10);
         const s = parseInt(result[2], 10);
         const l = parseInt(result[3], 10);
         const a = parseFloat(result[4]);
 
-        if (a !== null) {
-            return hsla(h, s, l, a);
-        } else {
-            return hsl(h, s, l);
-        }
+        return hsla(h, s, l, a);
     } else {
         if (throwOnFailure) {
             throw new Error(`Invalid color detected: ${colorString}`);

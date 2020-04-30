@@ -94,6 +94,15 @@ trait SearchRecordTypeTrait {
     public function getIndexName(): string {
         return $this->templateExists() ? self::SPHINX_INDEX : '';
     }
+    /**
+     * @inheritdoc
+     */
+    public function getIndexWeight(): int {
+        $oClass = new ReflectionClass(__CLASS__);
+        $constants = $oClass->getConstants();
+        $weight = $constants['SPHINX_INDEX_WEIGHT'] ?? 1;
+        return $weight;
+    }
 
     /**
      * Check if sphinx index template is enabled on infrastructure.

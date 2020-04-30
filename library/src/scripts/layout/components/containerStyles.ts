@@ -10,18 +10,33 @@ import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
-    const spacing = makeThemeVars("spacing", {
+    const smallPadding = panelWidgetVariables().spacing.padding;
+
+    let spacingInit = makeThemeVars("spacing", {
         padding: {
             horizontal: vars.gutter.size,
         },
-        paddingMobile: {
-            horizontal: 8,
+        mobile: {
+            padding: {
+                horizontal: smallPadding,
+            },
+        },
+    });
+
+    const spacing = makeThemeVars("spacing", {
+        ...spacingInit,
+        paddingFull: {
+            horizontal: vars.gutter.size + smallPadding,
+        },
+        paddingFullMobile: {
+            horizontal: smallPadding * 2,
         },
     });
 
@@ -41,7 +56,7 @@ export const containerVariables = useThemeCache(() => {
     };
 });
 
-export const containerMainStyles = () => {
+export const containerMainStyles = (): NestedCSSProperties => {
     const globalVars = globalVariables();
     const vars = containerVariables();
     return {
@@ -54,6 +69,11 @@ export const containerMainStyles = () => {
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),
+        $nest: {
+            "&.isNarrow": {
+                maxWidth: vars.sizing.narrowContentSize,
+            },
+        },
     };
 };
 
@@ -64,8 +84,17 @@ export const containerClasses = useThemeCache(() => {
     const root = style(
         containerMainStyles() as NestedCSSProperties,
         mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.paddingMobile),
+            ...paddings(vars.spacing.mobile.padding),
         }),
     );
-    return { root };
+
+    const fullGutter = style(
+        "fullGutter",
+        { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
+        mediaQueries.oneColumnDown({
+            ...paddings(vars.spacing.paddingFullMobile),
+        }),
+    );
+
+    return { root, fullGutter };
 });

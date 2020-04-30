@@ -86,4 +86,18 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return array
      */
     public function setApplication(string $app, bool $enable);
+
+    /**
+     * Get attributes assosciated with the site section.
+     *
+     * @return array
+     */
+    public function getAttributes(): array;
+
+    /**
+     * Get the themeID for this siteSection
+     *
+     * @return int|string|null
+     */
+    public function getSectionThemeID();
 }

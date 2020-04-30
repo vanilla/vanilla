@@ -56,14 +56,40 @@ class ThemesApiController extends AbstractApiController {
      * Get a theme assets.
      *
      * @param string $themeKey The unique theme key or theme ID.
+     * @param array $query
      * @return array
      */
-    public function get(string $themeKey): array {
+    public function get(string $themeKey, array $query = []): array {
         $this->permission();
         $out = $this->themeResultSchema('out');
+        $in = $this->schema([
+            'allowAddonVariables:b?',
+            'revisionID:i?'
+        ]);
+        $params = $in->validate($query);
 
-        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey);
+        if (!($params['allowAddonVariables'] ?? true)) {
+            $this->themeModel->clearVariableProviders();
+        }
+
+        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey, $query);
         $result = $out->validate($themeWithAssets);
+        return $result;
+    }
+
+    /**
+     * Get a theme revisions.
+     *
+     * @param int $themeID The unique theme key or theme ID.
+     * @return array
+     */
+    public function get_revisions(int $themeID): array {
+        $this->permission();
+        $in = $this->schema([], 'in');
+        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
+
+        $themeRevisions = $this->themeModel->getThemeRevisions($themeID);
+        $result = $out->validate($themeRevisions);
         return $result;
     }
 
@@ -166,7 +192,7 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 
-        $theme = $this->themeModel->setPreviewTheme($body['themeID']);
+        $theme = $this->themeModel->setPreviewTheme($body['themeID'], $body['revisionID'] ?? null);
         $theme = $out->validate($theme);
         return $theme;
     }
@@ -183,9 +209,14 @@ class ThemesApiController extends AbstractApiController {
 
         $previewThemeKey = $this->getSession()
             ->getPreference('PreviewThemeKey');
-
+        $previewThemeRevisionID = $this->getSession()
+            ->getPreference('PreviewThemeRevisionID');
         if (!empty($previewThemeKey)) {
-            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey);
+            $args = [];
+            if (!empty($previewThemeRevisionID)) {
+                $args['revisionID'] = $previewThemeRevisionID;
+            }
+            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey, $args);
         } else {
             $theme = $this->themeModel->getCurrentTheme();
         }

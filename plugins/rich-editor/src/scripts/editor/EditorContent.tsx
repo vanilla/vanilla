@@ -56,7 +56,7 @@ export default function EditorContent(props: IProps) {
  */
 export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extraOptions?: QuillOptionsStatic) {
     const ref = useRef<Quill>();
-    const { setQuillInstance } = useEditor();
+    const { setQuillInstance, onFocus } = useEditor();
 
     useEffect(() => {
         registerQuill();
@@ -72,6 +72,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
         };
         if (mountRef.current) {
             const quill = new Quill(mountRef.current, options);
+            quill.on("selection-change", () => {
+                onFocus?.(quill.hasFocus());
+            });
             quill.setContents(DEFAULT_CONTENT);
             setQuillInstance(quill);
             ref.current = quill;

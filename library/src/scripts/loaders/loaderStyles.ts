@@ -83,7 +83,7 @@ export const loaderClasses = useThemeCache(() => {
     });
 
     const loaderContainer = (size: TLength) => {
-        return style({
+        return style("loaderContainer", {
             position: "relative",
             display: "block",
             margin: "auto",

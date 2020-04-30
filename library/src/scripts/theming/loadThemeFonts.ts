@@ -5,6 +5,10 @@
 
 import getStore from "@library/redux/getStore";
 import WebFont from "webfontloader";
+import { getMeta, assetUrl, siteUrl, isAllowedUrl } from "@library/utility/appUtils";
+import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
+import { THEME_CACHE_EVENT } from "@library/styles/styleUtils";
+import { IThemeFont } from "@library/theming/themeReducer";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
@@ -14,6 +18,50 @@ const defaultFontConfig: WebFont.Config = {
 
 let loaded = false;
 
+document.addEventListener(THEME_CACHE_EVENT, () => {
+    loaded = false;
+});
+
+const getGoogleFontUrl = (
+    props: {
+        name: string;
+        weightNormal?: string | number;
+        weightSemiBold?: string | number;
+        weightBold?: string | number;
+    },
+    prefix?: boolean,
+) => {
+    const globalVars = globalVariables();
+    const {
+        name = defaultFontFamily,
+        weightNormal = globalVars.fonts.weights.normal,
+        weightSemiBold = globalVars.fonts.weights.semiBold,
+        weightBold = globalVars.fonts.weights.bold,
+    } = props;
+    return `${prefix ? "https://fonts.googleapis.com/css?family=" : ""}${encodeURI(
+        name,
+    )}:${weightNormal},${weightNormal}italic,${weightSemiBold},${weightSemiBold}`;
+};
+
+const validCustomFont = (customFont?: IThemeFont) => {
+    return customFont && customFont.url && customFont.url !== "" && customFont.name && customFont.name !== "";
+};
+
+const makeFontConfigFromFontVar = (fonts: IThemeFont[], isMonoSpace?: boolean) => {
+    const filteredFonts = fonts.filter(font => {
+        return validCustomFont(font);
+    });
+    const webFontConfig: WebFont.Config = {
+        custom: {
+            families: filteredFonts.map(font => font.name),
+            urls: filteredFonts.map(font => {
+                return assetUrl(`${font.url}?v=${getMeta("context.cacheBuster")}`);
+            }),
+        },
+    };
+    return webFontConfig;
+};
+
 export function loadThemeFonts() {
     if (loaded) {
         return;
@@ -21,16 +69,54 @@ export function loadThemeFonts() {
     loaded = true;
     const state = getStore().getState();
     const assets = state.theme.assets.data || {};
-    const { fonts } = assets;
+    const { fonts = { data: [] } } = assets;
 
-    if (fonts && fonts.data.length > 0) {
-        const webFontConfig: WebFont.Config = {
-            custom: {
-                families: fonts.data.map(font => font.name),
-                urls: fonts.data.map(font => font.url),
-            },
+    const globalVars = globalVariables();
+    const globalFontVars = globalVars.fonts;
+    const forceGoogleFont = globalFontVars.forceGoogleFont;
+    const customFont = globalFontVars.customFont;
+    const defaultFallback = globalVars.fonts.families[0];
+
+    if (globalVars.fonts.customFontUrl) {
+        // Legacy case, do not use globalVars.fonts.customFontUrl in the future
+        const [firstFamily, ...restFamilies] = globalVars.fonts.families.body;
+        WebFont.load(
+            makeFontConfigFromFontVar([
+                { name: firstFamily, url: globalVars.fonts.customFontUrl, fallbacks: restFamilies },
+            ]),
+        );
+    } else if (!forceGoogleFont && validCustomFont(customFont as IThemeFont)) {
+        const fontLoaderProps = [
+            customFont as IThemeFont,
+            ...[...customFont.fallbacks, defaultFontFamily].map(fontFamily => {
+                return {
+                    name: fontFamily,
+                    url: fontFamily === defaultFontFamily ? getGoogleFontUrl({ name: defaultFallback }, true) : "",
+                };
+            }),
+        ].filter(font => {
+            return font && customFont.name && customFont.name !== "";
+        });
+
+        const customConfig = {
+            families: fontLoaderProps.map(font => font.name),
+            urls: fontLoaderProps.map(font => {
+                return assetUrl(`${font.url}?v=${getMeta("context.cacheBuster")}`);
+            }),
         };
 
+        const mainFont = WebFont.load({
+            custom: customConfig,
+        });
+    } else if (forceGoogleFont) {
+        const webFontConfig: WebFont.Config = {
+            google: {
+                families: [getGoogleFontUrl({ name: defaultFallback })],
+            },
+        };
+        WebFont.load(webFontConfig);
+    } else if (fonts && fonts.data.length > 0) {
+        const webFontConfig = makeFontConfigFromFontVar(fonts.data);
         if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
             WebFont.load(webFontConfig);
         }

@@ -6,7 +6,7 @@
 
 import React from "react";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
@@ -22,6 +22,7 @@ export interface IDropDownItemButton {
     lang?: string;
     isActive?: boolean;
     buttonRef?: React.RefObject<HTMLButtonElement>;
+    role?: string;
 }
 
 /**
@@ -52,6 +53,7 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
                     disabled={this.props.disabled}
                     aria-current={this.props.current ? "true" : "false"}
                     lang={this.props.lang}
+                    role={this.props.role}
                 >
                     {buttonContent}
                 </Button>

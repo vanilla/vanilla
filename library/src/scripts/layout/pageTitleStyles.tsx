@@ -4,13 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { em, percent, px } from "csx";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, margins, unit } from "@library/styles/styleHelpers";
+import { margins, unit } from "@library/styles/styleHelpers";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 import { pageHeadingVariables } from "./pageHeadingStyles";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
+import { iconVariables } from "@library/icons/iconStyles";
 
 export const pageTitleClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -27,7 +28,21 @@ export const pageTitleClasses = useThemeCache(() => {
         $nest: lineHeightAdjustment(),
     } as NestedCSSProperties);
 
+    const iconSizing = iconVariables().chevronLeftCompact(true);
+
+    const smallBackLink = style("smallBackLink", {
+        $nest: {
+            [`& .${backLinkClasses().root}`]: {
+                height: unit(iconSizing.height),
+            },
+            [`& .${backLinkClasses().link}`]: {
+                height: unit(iconSizing.height),
+            },
+        },
+    });
+
     return {
         root,
+        smallBackLink,
     };
 });

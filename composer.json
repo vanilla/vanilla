@@ -30,10 +30,14 @@
         "php": ">=7.2.0",
         "ext-pdo": "*",
         "ext-json": "*",
+        "ext-curl": "*",
         "ext-fileinfo": "*",
+        "ext-dom": "*",
+        "ext-gd": "*",
+        "ext-libxml": "*",
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
-        "firebase/php-jwt": "~5.0",
+        "firebase/php-jwt": "^5.2",
         "michelf/php-markdown": "~1.9",
         "pclzip/pclzip": "~2.0",
         "phpmailer/phpmailer": "~5.2",
@@ -49,6 +53,7 @@
         "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
+        "vanilla/js-connect-php": "^3",
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
@@ -58,7 +63,8 @@
         "psr/event-dispatcher": "^1.0",
         "fig/event-dispatcher-util": "^1.1",
         "symfony/polyfill-php73": "^1.13",
-        "symfony/polyfill-php74": "^1.13"
+        "symfony/polyfill-php74": "^1.13",
+        "metasyntactical/composer-plugin-license-check": "^0.5.0"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -76,6 +82,7 @@
     "autoload": {
         "classmap": [
             "library/core/",
+            "library/deprecated/",
             "library/database/",
             "library/setup/"
         ],
@@ -84,7 +91,7 @@
             "library/core/functions.framework.php",
             "library/core/functions.general.php",
             "library/core/functions.compatibility.php",
-            "library/core/functions.deprecated.php"
+            "library/deprecated/functions.deprecated.php"
         ],
         "psr-4": {
             "Vanilla\\": "library/Vanilla",
@@ -103,6 +110,20 @@
             "VanillaTests\\Fixtures\\": "tests\\fixtures\\src",
             "GardenTests\\": "tests",
             "GardenTests\\Fixtures\\": "tests\\fixtures\\src"
+        }
+    },
+    "extra": {
+        "metasyntactical/composer-plugin-license-check": {
+            "whitelist": [
+                "MIT",
+                "BSD-2-Clause",
+                "BSD-3-Clause",
+                "LGPL-2.1",
+                "LGPL-3.0",
+                "GPL-2.0",
+                "GPL-2.0+",
+                "LGPL-3.0-only"
+            ]
         }
     }
 }

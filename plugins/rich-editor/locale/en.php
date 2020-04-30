@@ -75,6 +75,11 @@ $Definition['Embed'] = 'Embed';
 $Definition['▼'] = '▼';
 $Definition['Error'] = 'Error';
 $Definition['▲'] = '▲';
+$Definition['Upload Image'] = 'Upload Image';
+$Definition['Upload File'] = 'Upload File';
 
 // Quotes
 $Definition['Toggle Quote'] = 'Toggle Quote';
+
+// Accessibility
+$Definition['Accessibility'] = 'Accessibility';

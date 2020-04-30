@@ -10,13 +10,14 @@ import DayPickerInput from "react-day-picker/DayPickerInput";
 import { t } from "@library/utility/appUtils";
 import moment, { Moment } from "moment";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { guessOperatingSystem, OS } from "@vanilla/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
 import { formatDate, parseDate } from "react-day-picker/moment";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
+import RelativePortal from "react-relative-portal";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -178,9 +179,12 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
             isRightAligned: this.props.alignment === "right",
         });
         return (
-            <div className={classNames("dropDown", classes.root)} {...props}>
-                <div className={contentsClasses}>{children}</div>
-            </div>
+            // dayPickerClasses needs to be reapplied here, because it's rendered outside the root
+            <RelativePortal component="div" top={0} right={0} className={dayPickerClasses().root}>
+                <div className={classNames("dropDown", classes.root)} {...props}>
+                    <div className={contentsClasses}>{children}</div>
+                </div>
+            </RelativePortal>
         );
     };
 

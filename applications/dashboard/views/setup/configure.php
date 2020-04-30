@@ -4,7 +4,7 @@ echo $this->Form->open();
 ?>
     <div class="Title">
         <h1>
-            <?php echo img('applications/dashboard/design/images/vanilla_logo.png', ['alt' => 'Vanilla']); ?>
+            <?php echo img('applications/dashboard/styleguide/public/resources/images/vanilla-white.svg', ['alt' => 'Vanilla']); ?>
             <p><?php echo sprintf(t('Version %s Installer'), APPLICATION_VERSION); ?></p>
         </h1>
     </div>
@@ -79,14 +79,14 @@ echo $this->Form->open();
                 echo $this->Form->input('Password', 'password');
                 ?>
             </li>
-            <li class="Last">
+            <li>
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
                 echo $this->Form->input('PasswordMatch', 'password');
                 ?>
             </li>
         </ul>
-        <div class="Button">
+        <div>
             <?php echo $this->Form->button('Continue &rarr;'); ?>
         </div>
     </div>

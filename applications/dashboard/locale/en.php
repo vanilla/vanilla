@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+// phpcs:ignoreFile
 /**
  * Default user-facing text strings.
  *
@@ -59,6 +60,7 @@ $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
 $Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
 $Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
+$Definition['RolePersonalInfo'] = "This role is personal info. Only users with permission to view personal info will see it.";
 $Definition['ErrorBadInvitationCode'] = 'The invitation code you supplied is not valid.';
 $Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
 $Definition['User not found.'] = 'Sorry, no account could be found related to the %s you entered.';
@@ -158,15 +160,22 @@ $Definition['ConnectName'] = 'Username';
 //$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 //<p>{Excerpt}</p>
 //<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
+$Definition['Alert users if they click external link.'] =
+    'Alert users if they click a link in a post that will lead them away from the forum. Users will not be warned when following links that match a Trusted Domain';
 $Definition['Check out the new community forum I\'ve just set up.'] = 'Hi Pal!
 
 Check out the new community forum I\'ve just set up. It\'s a great place for us to chat with each other online.';
+$Definition['If you want to embed your forum, enable embedding.'] =
+    'If you want to embed your forum or use Vanilla\'s comments in your blog then you need to enable embedding. If you aren\'t using embedding then we recommend leaving this setting off.';
+$Definition['Invitation email failed to send: %s'] =
+    'Although the invitation was created successfully, the email failed to send. The server reported the following error: %s';
 $Definition['Large images will be scaled down.'] = 'Large images will be scaled down to a max width of %spx and a max height of %spx.';
 $Definition['Locales allow you to support other languages on your site.'] =
     'Locales allow you to support other languages on your site. Enable and disable locales you want to make available here.';
 $Definition['Test Email Message'] = '<p>This is a test email message.</p>'.
     '<p>You can configure the appearance of your forum\'s emails by navigating to the Email page in the dashboard.</p>';
+$Definition['This setting loads the page before executing Javascript.'] =
+    'This setting loads the page before executing Javascript which can improve your SEO.<br><strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ';
 $Definition['oauth2Instructions'] = '<p>Configure your forum to connect with an OAuth2 application by putting your unique Client ID, Client Secret, and required endpoints. You will probably need to provide your SSO application with an allowed callback URL, in part, to validate requests. The callback url for this forum is <code>%s</code></p>';
-
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

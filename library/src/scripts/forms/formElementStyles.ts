@@ -5,16 +5,17 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { color } from "csx";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const formElementsVariables = useThemeCache(() => {
-    const vars = globalVariables();
-    const varsLayouts = layoutVariables();
+export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const vars = globalVariables(forcedVars);
+    const varsLayouts = layoutVariables(forcedVars);
+    const makeThemeVars = variableFactory("formElements", forcedVars);
+
     const mixBgAndFg = vars.mixBgAndFg;
-    const makeThemeVars = variableFactory("formElements");
 
     const sizing = makeThemeVars("sizing", {
         height: 36,
@@ -24,16 +25,18 @@ export const formElementsVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         margin: 12,
-        horizontalPadding: 12,
         verticalPadding: 6,
+        horizontalPadding: 12,
+        fullBorderRadius: {
+            extraHorizontalPadding: 4, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
+        },
     });
 
     const border = makeThemeVars("border", {
-        width: 1,
-        fullWidth: 2,
-        color: vars.border.color,
-        style: "solid",
-        radius: vars.border.radius,
+        width: vars.borderType.formElements.default.width ?? vars.border.width,
+        color: vars.borderType.formElements.default.color ?? vars.border.color,
+        style: vars.borderType.formElements.default.style ?? vars.border.style,
+        radius: vars.borderType.formElements.default.radius ?? vars.border.radius,
     });
 
     const giantInput = makeThemeVars("giantInput", {
@@ -130,6 +133,7 @@ export const formErrorClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "space-between",
     });
+
     const actions = style("actions", {
         display: "flex",
         alignItems: "center",
@@ -138,6 +142,7 @@ export const formErrorClasses = useThemeCache(() => {
     const actionButton = style("button", {
         marginLeft: unit(12),
     });
+
     const activeButton = style("activeButton", {
         fontWeight: "bold",
     });

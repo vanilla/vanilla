@@ -41,6 +41,13 @@ interface SearchRecordTypeInterface {
     public function getIndexName(): string;
 
     /**
+     * Get sphinx index weight
+     *
+     * @return integer
+     */
+    public function getIndexWeight(): int;
+
+    /**
      * Get search record linked data model type
      *
      * @return mixed

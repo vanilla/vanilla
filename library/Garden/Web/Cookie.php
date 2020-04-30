@@ -48,7 +48,6 @@ class Cookie {
      */
     private $flushAll = false;
 
-
     /**
      * Construct a {@link Cookie} objects.
      *
@@ -70,7 +69,9 @@ class Cookie {
      * @return int
      */
     public function calculateExpiry($expire, $timestamp = null) {
-        if ($expire > self::EXPIRE_THRESHOLD) {
+        if ($expire === 0) {
+            return $expire;
+        } elseif ($expire > self::EXPIRE_THRESHOLD) {
             $result = $expire;
         } else {
             if ($timestamp === null || filter_var($timestamp, FILTER_VALIDATE_INT) === false) {
@@ -190,7 +191,7 @@ class Cookie {
         $expire = time() - 3600;
         $result = [];
         foreach ($deletes as $name => $_) {
-            $result[$name] = ['', $expire];
+            $result[$name] = ['', $expire, $this->path];
         }
         return $result;
     }

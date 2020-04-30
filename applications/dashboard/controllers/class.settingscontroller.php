@@ -525,11 +525,14 @@ class SettingsController extends DashboardController {
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
                 'Control' => 'imageupload',
-                'Size' => '16x16',
+                'Size' => '48x48',
                 'OutputType' => 'ico',
                 'Prefix' => 'favicon_',
                 'Crop' => true,
-                'Description' => t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
+                'Description' => t(
+                    'FaviconDescription',
+                    "Your site's favicon appears in your browser's title bar. It will be scaled down appropriately."
+                ),
                 'Options' => [
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
                 ]
@@ -568,9 +571,8 @@ class SettingsController extends DashboardController {
                 'LabelCode' => t('Defer Javascript Loading'),
                 'Control' => 'toggle',
                 'Default' => true,
-                'Description' => t('This setting loads the page before executing Javascript which can improve your SEO.<br>
-                    <strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ' .
-                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature')),
+                'Description' => t('This setting loads the page before executing Javascript.') . " " .
+                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature'),
                 'Options' => [
                     'UseRealBoolean' => true
                 ]

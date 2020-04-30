@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -24,7 +25,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
     use StaticInitializer;
 
@@ -781,8 +782,10 @@ class DiscussionModel extends Gdn_Model {
             $orderBy = [$orderFields => $orderDirection];
         }
 
+        $selects = [];
         $this->EventArguments['OrderBy'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$where;
+        $this->EventArguments['Selects'] = &$selects;
         $this->fireEvent('BeforeGet');
 
         // Verify permissions (restricting by category if necessary)
@@ -791,9 +794,8 @@ class DiscussionModel extends Gdn_Model {
         $sql = $this->SQL;
 
         // Build up the base query. Self-join for optimization.
-        $sql->select('d2.*')
+        $sql->select('d.DiscussionID')
             ->from('Discussion d')
-            ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($limit, $offset);
 
         foreach ($orderBy as $field => $direction) {
@@ -840,6 +842,12 @@ class DiscussionModel extends Gdn_Model {
             $safeWheres[$this->addFieldPrefix($key)] = $value;
         }
         $sql->where($safeWheres);
+        $subQuery = $sql->getSelect(true);
+
+        $sql->reset();
+        $sql->select('d2.*')
+            ->from('Discussion d2')
+            ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
 
         // Add the UserDiscussion query.
         if (($userID = Gdn::session()->UserID) > 0) {
@@ -851,7 +859,19 @@ class DiscussionModel extends Gdn_Model {
                 ->select('w.Participated');
         }
 
-        $data = $sql->get();
+        // Add select of addition fields to the SQL object.
+        foreach ($selects as $select) {
+            $sql->select($select);
+        }
+
+        $outerQuery = $sql->getSelect();
+        $finalQuery = str_replace(
+            '`'.$this->Database->DatabasePrefix.'_TBL_`',
+            '('.$subQuery.')',
+            $outerQuery
+        );
+
+        $data = $sql->query($finalQuery);
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -1131,10 +1151,17 @@ class DiscussionModel extends Gdn_Model {
             $discussion->Read = false;
             $discussion->CountUnreadComments = true;
         } else {
+            // If the category was marked explicitly read at some point, see if that applies here
             if ($category && !is_null($category['DateMarkedRead'])) {
-                // If the category was marked explicitly read at some point, see if that applies here
-                $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
+                // If the discussion hasn't been viewed or was created after the category was marked read,
+                // leave CountCountCommentWatch and DateLastViewed null. Otherwise, calculate the correct DateLastViewed.
+                if (!is_null($discussion->DateLastViewed) ||
+                    self::maxDate($category['DateMarkedRead'], $discussion->DateInserted) === $category['DateMarkedRead']) {
+                    // If it's not a newly created discussion, set DateLastViewed to whichever is most recent.
+                    $discussion->DateLastViewed = self::maxDate($discussion->DateLastViewed, $category['DateMarkedRead']);
+                }
             }
+
             list($read, $count) = $this->calculateCommentReadData(
                 $discussion->CountComments,
                 $discussion->DateLastComment,
@@ -1871,17 +1898,27 @@ class DiscussionModel extends Gdn_Model {
      */
     public function getID($discussionID, $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
         $session = Gdn::session();
+
+        $selects = [];
+        $this->EventArguments['Selects'] = &$selects;
         $this->fireEvent('BeforeGetID');
 
         $this->options($options);
 
-        $discussion = $this->SQL
+        $this->SQL
             ->select('d.*')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
-            ->select('d.LastCommentUserID', '', 'LastUserID')
+            ->select('d.LastCommentUserID', '', 'LastUserID');
+
+        // Add select of additional fields to the SQL object.
+        foreach ($selects as $select) {
+            $this->SQL->select($select);
+        }
+
+        $discussion = $this->SQL
             ->from('Discussion d')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
             ->where('d.DiscussionID', $discussionID)
@@ -2080,16 +2117,22 @@ class DiscussionModel extends Gdn_Model {
             $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
             $this->Validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
 
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'plainTextLength');
             }
 
-            // Add min length if body is required.
-            if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
-                $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+            if ($minCommentLength && is_numeric($minCommentLength)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
                 $this->Validation->applyRule('Body', 'MinTextLength');
+            } else {
+                // Add min length if body is required.
+                if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
+                    $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                    $this->Validation->applyRule('Body', 'MinTextLength');
+                }
             }
         }
 
@@ -2200,6 +2243,7 @@ class DiscussionModel extends Gdn_Model {
 
             // If the post is new and it validates, make sure the user isn't spamming
             if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
+                $forcedFormat = $formPostValues['forcedFormat'] ?? false;
                 // Get all fields on the form that relate to the schema
                 $fields = $this->Validation->schemaValidationFields();
 
@@ -2263,8 +2307,11 @@ class DiscussionModel extends Gdn_Model {
 
                 } else {
                     // Inserting.
-                    if (!val('Format', $fields) || c('Garden.ForceInputFormatter')) {
-                        $fields['Format'] = c('Garden.InputFormatter', '');
+                    $format = $fields['Format'] ?? null;
+                    if (!$format || c('Garden.ForceInputFormatter')) {
+                        $fields['Format'] = ($forcedFormat && $format)
+                            ? $format
+                            : c('Garden.InputFormatter', '');
                     }
 
                     // Check for approval
@@ -2963,7 +3010,7 @@ class DiscussionModel extends Gdn_Model {
      *
      * Events: DeleteDiscussion.
      *
-     * @param int $discussionID Unique ID of discussion to delete.
+     * @param int|array $discussionID Unique ID of discussion to delete or an array of discussion IDs.
      * @param array $options Additional options to control the delete behavior. Not used for discussions.
      * @return bool Always returns **true**.
      */
@@ -3040,11 +3087,12 @@ class DiscussionModel extends Gdn_Model {
             $this->setUserBookmarkCount($user->UserID);
         }
 
-        $dataObject = (object)$data;
-        $this->calculate($dataObject);
-        $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
-        $this->getEventManager()->dispatch($discussionEvent);
-
+        if ($data) {
+            $dataObject = (object)$data;
+            $this->calculate($dataObject);
+            $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($discussionEvent);
+        }
         return true;
     }
 
@@ -3623,9 +3671,9 @@ class DiscussionModel extends Gdn_Model {
             $row['DateLastComment'] = $row['DateInserted'];
         }
 
-        $scheme = new CamelCaseScheme;
+        $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
-        $result['type'] = isset($result['type']) ? lcfirst($result['type']) : null;
+        $result['type'] = !empty($result['type']) ? lcfirst($result['type']) : null;
 
         return $result;
     }

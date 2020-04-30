@@ -322,14 +322,14 @@ class ModerationController extends VanillaController {
         $this->setData('CountNotAllowed', $countNotAllowed);
 
         if ($this->Form->authenticatedPostBack()) {
-            // Delete the selected discussions (that the user has permission to delete).
-            foreach ($allowedDiscussions as $discussionID) {
-                $deleted = $discussionModel->deleteID($discussionID);
-                if ($deleted) {
-                    $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
-                }
+            $discussionArray = ['discussionID' => $allowedDiscussions];
+            // Queue deleting discussions.
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
+            foreach ($discussionArray['discussionID'] as $discussionID) {
+                $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
             }
-
             // Clear selections
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
             ModerationController::informCheckedDiscussions($this, true);
@@ -370,11 +370,17 @@ class ModerationController extends VanillaController {
 
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
-        $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
+        $DiscussionData = $DiscussionModel->SQL
+            ->select('DiscussionID, Name, Type, DateLastComment, CategoryID, CountComments')
+            ->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
 
         $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);
+            if (!array_key_exists('DiscussionType', $this->Data) && !is_null($Discussion['Type'])) {
+                $this->setData('DiscussionType', $Discussion['Type']);
+                $this->setData('CategoryID', $Category['CategoryID']);
+            }
             if ($Category && $Category['PermsDiscussionsEdit']) {
                 $AllowedDiscussions[] = $DiscussionID;
             }

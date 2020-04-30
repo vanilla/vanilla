@@ -25,6 +25,10 @@ class Operation {
     /** Type identifier for update operations. */
     const TYPE_UPDATE = 'UPDATE';
 
+    const MODE_DEFAULT = 'default';
+
+    const MODE_IMPORT = 'import';
+
     /** @var PipelineModel Reference to the object performing this operation. */
     private $caller;
 
@@ -39,6 +43,8 @@ class Operation {
 
     /** @var array Conditions to specify the scope of the operation. */
     private $where = [];
+
+    private $mode = self::MODE_DEFAULT;
 
     /**
      * Get the reference to the object performing this operation.
@@ -101,6 +107,24 @@ class Operation {
      */
     public function setOptions(array $options) {
         $this->options = $options;
+    }
+
+    /**
+     * Set the mode for the operation.
+     *
+     * @param string $mode
+     */
+    public function setMode(string $mode) {
+        $this->mode = $mode;
+    }
+
+    /**
+     * Get the mode for the operation.
+     *
+     * @return string
+     */
+    public function getMode(): string {
+        return $this->mode;
     }
 
     /**

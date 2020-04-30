@@ -5,69 +5,78 @@
  * @license GPL-2.0-only
  */
 
-import { cssRaw } from "typestyle";
-import {
-    borders,
-    colorOut,
-    negative,
-    pointerEvents,
-    setAllLinkColors,
-    textInputSizingFromFixedHeight,
-    unit,
-} from "@library/styles/styleHelpers";
-
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles/index";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
-    const formVars = formElementsVariables();
-    const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
-    // Various links
-    mixinTextLink(".Navigation-linkContainer a");
-    mixinTextLink(".Panel .PanelInThisDiscussion a");
-    mixinTextLink(".Panel .Leaderboard a");
-    mixinTextLink(".Panel .InThisConversation a");
-    mixinTextLink(".FilterMenu a", true);
-    mixinTextLink(".Breadcrumbs a", true);
-    mixinTextLink("div.Popup .Body a");
-    mixinTextLink(".selectBox-toggle");
-    mixinTextLink(".followButton");
-    mixinTextLink(".SelectWrapper::after");
-    mixinTextLink(".Back a");
-    mixinTextLink(".OptionsLink-Clipboard");
-    mixinTextLink("a.OptionsLink");
-    mixinTextLink(".MorePager a");
-    // Links that have FG color by default but regular state colors.
-    mixinTextLink(".ItemContent a", true);
-    mixinTextLink(".DataList .Item h3 a", true);
-    mixinTextLink(".DataList .Item a.Title", true);
-    mixinTextLink(".DataList .Item .Title a", true);
-    mixinTextLink("a.Tag", true);
-    mixinTextLink(".MenuItems a", true);
 
-    mixinTextLink(".DataTable h2 a", true);
-    mixinTextLink(".DataTable h3 a", true);
-    mixinTextLink(".DataTable .Title.Title a", true);
+    // Various links
+    mixinClickInput(".Navigation-linkContainer a");
+
+    mixinClickInput(".Panel .Leaderboard a");
+    mixinClickInput(".FieldInfo a");
+
+    mixinClickInput("div.Popup .Body a");
+    mixinClickInput(".selectBox-toggle");
+    mixinClickInput(".followButton");
+    mixinClickInput(".SelectWrapper::after");
+    mixinClickInput(".Back a");
+    mixinClickInput(".OptionsLink-Clipboard");
+    mixinClickInput("a.OptionsLink");
+    mixinClickInput("a.MoreWrap, .MoreWrap a, .MorePager a, .more.More, .MoreWrap a.more.More");
+    mixinClickInput(`body.Section-BestOf .Tile .Message a`);
+    mixinClickInput(
+        `
+        .DataList .IdeationTag,
+        .DataList .MItem.RoleTracker,
+        .MessageList .IdeationTag,
+        .MessageList .tag-tracker,
+        .DataTableWrap .IdeationTag,
+        .DataTableWrap .tag-tracker,
+        .DataTableWrap .MItem.RoleTracker
+        `,
+    );
+    mixinClickInput(`
+        .Container .userContent a,
+        .Container .UserContent a
+    `);
+    mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
+        default: globalVars.links.colors.default,
+    });
+    mixinClickInput(".DataList .Item .Title a");
+
+    // Links that have FG color by default but regular state colors.
+    mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
+
+    mixinTextLinkNoDefaultLinkAppearance(".MenuItems a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable h2 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable h3 a");
+    mixinTextLinkNoDefaultLinkAppearance(".DataTable .Title.Title a");
+    mixinTextLinkNoDefaultLinkAppearance(".Timebased.EndTime a");
+    mixinTextLinkNoDefaultLinkAppearance(".FilterMenu a");
+    mixinTextLinkNoDefaultLinkAppearance(`.DataList#search-results .Breadcrumbs a`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable.DiscussionsTable a.Title`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Panel .InThisConversation a`);
+    mixinTextLinkNoDefaultLinkAppearance(`.Panel .PanelInThisDiscussion a`);
+
+    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Aside`, {
+        paddingLeft: 0,
+        paddingRight: "1ex",
+        display: "inline",
+    });
+
+    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Username`, {
+        fontWeight: globalVars.fonts.weights.semiBold,
+    });
 };
 
-// Mixins replacement
-export const mixinTextLink = (selector: string, skipDefaultColor = false) => {
-    const linkColors = setAllLinkColors();
-    selector = trimTrailingCommas(selector);
-
-    if (!skipDefaultColor) {
-        cssOut(selector, {
-            color: linkColors.color,
-        });
-    }
-    nestedWorkaround(selector, linkColors.nested);
+export const mixinTextLinkNoDefaultLinkAppearance = selector => {
+    const globalVars = globalVariables();
+    mixinClickInput(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
 };

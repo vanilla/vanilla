@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { important, percent } from "csx";
+import { important, percent, px } from "csx";
 import { ColorValues, paddings, unit } from "@library/styles/styleHelpers";
 import {
     FontFamilyProperty,
@@ -22,7 +22,8 @@ import {
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { Col } from "@jest/types/build/Global";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 
 export const fontFallbacks = [
     "-apple-system",
@@ -39,9 +40,25 @@ export const fontFallbacks = [
     "Segoe UI Symbol",
 ];
 
-export function fontFamilyWithDefaults(fontFamilies: string[]): string {
+export const monoFallbacks = [
+    "Consolas",
+    "Andale Mono WT",
+    "Andale Mono",
+    "Lucida Console",
+    "Lucida Sans Typewriter",
+    "DejaVu Sans Mono",
+    "Bitstream Vera Sans Mono",
+    "Liberation Mono",
+    "Nimbus Mono L",
+    "Monaco",
+    "Courier New",
+    "Courier",
+    "monospace",
+];
+
+export function fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
     return fontFamilies
-        .concat(fontFallbacks)
+        .concat(options.isMonospaced ? monoFallbacks : fontFallbacks)
         .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
         .join(", ");
 }
@@ -72,17 +89,32 @@ export const getHorizontalPaddingForTextInput = (height: number, fontSize: numbe
     return getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth) * 2;
 };
 
-export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
+export const textInputSizingFromFixedHeight = (
+    height: number,
+    fontSize: number,
+    fullBorderWidth: number,
+    borderRadius?: number | string,
+) => {
     const paddingVertical = getVerticalPaddingForTextInput(height, fontSize, fullBorderWidth);
     const paddingHorizontal = getHorizontalPaddingForTextInput(height, fontSize, fullBorderWidth);
+
+    const formElementVars = formElementsVariables();
+
+    const paddingOffsets = paddingOffsetBasedOnBorderRadius({
+        radius: borderRadius ?? globalVariables().borderType.formElements.default.radius,
+        extraPadding: formElementVars.spacing.fullBorderRadius.extraHorizontalPadding,
+        height: height,
+    });
+
     return {
         fontSize: unit(fontSize),
         width: percent(100),
         lineHeight: 1.5,
-        minHeight: unit(formElementsVariables().sizing.height),
+        minHeight: unit(height),
         ...paddings({
-            vertical: unit(paddingVertical),
-            horizontal: unit(paddingHorizontal),
+            vertical: unit(px(paddingVertical)),
+            left: px(paddingHorizontal + paddingOffsets.left ?? 0),
+            right: px(paddingHorizontal + paddingOffsets.right ?? 0),
         }),
     };
 };
@@ -169,7 +201,7 @@ export const singleLineEllipsis = () => {
     return {
         whiteSpace: "nowrap" as WhiteSpaceProperty,
         textOverflow: "ellipsis" as TextOverflowProperty,
-        overflowX: "hidden" as OverflowXProperty,
+        overflow: "hidden" as OverflowXProperty,
         maxWidth: percent(100) as MaxWidthProperty<TLength>,
     };
 };

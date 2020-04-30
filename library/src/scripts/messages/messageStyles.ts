@@ -18,6 +18,7 @@ import {
     absolutePosition,
     negative,
     allLinkStates,
+    negativeUnit,
 } from "@library/styles/styleHelpers";
 import { percent, translate, translateX, translateY, viewWidth, em } from "csx";
 import { FontWeightProperty } from "csstype";
@@ -218,7 +219,7 @@ export const messagesClasses = useThemeCache(() => {
                     allStates: {
                         color: colorOut(vars.colors.states.fg),
                     },
-                    focusNotKeyboard: {
+                    clickFocus: {
                         outline: 0,
                     },
                 }),
@@ -238,7 +239,7 @@ export const messagesClasses = useThemeCache(() => {
         alignItems: "center",
         height: percent(100),
         maxHeight: em(2),
-        transform: translate(`${negative(unit(vars.spacing.padding.withIcon))}`),
+        transform: translate(negativeUnit(vars.spacing.padding.withIcon)),
         width: unit(vars.spacing.padding.withIcon),
     });
 

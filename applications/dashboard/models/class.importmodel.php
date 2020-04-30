@@ -460,7 +460,7 @@ class ImportModel extends Gdn_Model {
     public function deleteOverwriteTables() {
         $tables = ['Activity', 'Category', 'Comment', 'Conversation', 'ConversationMessage',
             'Discussion', 'Draft', 'Invitation', 'Media', 'Message', 'Photo', 'Permission', 'Rank', 'Poll', 'PollOption', 'PollVote', 'Role', 'UserAuthentication',
-            'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole'];
+            'UserComment', 'UserConversation', 'UserDiscussion', 'UserMeta', 'UserRole', 'Tag'];
 
         // Execute the SQL.
         $currentSubstep = val('CurrentSubstep', $this->Data, 0);

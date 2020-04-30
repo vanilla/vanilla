@@ -10,7 +10,7 @@ import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { SearchIcon } from "@library/icons/titleBar";
@@ -104,7 +104,7 @@ export function CompactSearch(props: ICompactSearchProps) {
             {!props.open && (
                 <Button
                     onClick={props.onSearchButtonClick}
-                    className={classNames(classesTitleBar.centeredButtonClass, props.buttonClass)}
+                    className={classNames(classesTitleBar.centeredButton, props.buttonClass)}
                     title={t("Search")}
                     aria-expanded={false}
                     aria-haspopup="true"

@@ -11,6 +11,7 @@ import classNames from "classnames";
 export interface IFrameBodyProps {
     className?: string;
     selfPadded?: boolean;
+    hasVerticalPadding?: boolean;
     children: React.ReactNode;
     scrollable?: boolean; // DON'T use at the same time as the Modal scrollable.
 }
@@ -26,10 +27,22 @@ export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
             <div
                 className={classNames("frameBody", this.props.className, classes.root, {
                     isSelfPadded: this.props.selfPadded,
+                    hasVerticalPadding: this.props.hasVerticalPadding,
                 })}
             >
                 {this.props.children}
             </div>
         );
     }
+}
+
+interface IContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+}
+/**
+ * Container to apply paddings inside of a frame body.
+ */
+export function FrameBodyContainer(props: IContainerProps) {
+    const classes = frameBodyClasses();
+    return <div {...props} className={classNames(props.className, classes.framePaddings)} />;
 }

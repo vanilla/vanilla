@@ -3,7 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { formElementsVariables } from "@library//forms/formElementStyles";
+
 import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -33,15 +33,15 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
         outline: 0,
         $nest: {
             "&:hover": {
-                backgroundColor: colorOut(globalVars.states.hover.color),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
                 zIndex: 1,
             },
             "&:active": {
-                backgroundColor: colorOut(globalVars.states.active.color),
+                backgroundColor: colorOut(globalVars.states.active.highlight),
                 zIndex: 1,
             },
             "&:focus": {
-                backgroundColor: colorOut(globalVars.states.focus.color),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
                 zIndex: 1,
             },
         },

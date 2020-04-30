@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-      }
+<?php
 /**
  * Dashboard database structure.
  *
@@ -10,6 +8,11 @@
  * @since 2.0
  */
 
+use Vanilla\Models\ThemeModelHelper;
+
+if (!defined('APPLICATION')) {
+    exit();
+}
 if (!isset($Drop)) {
     $Drop = false;
 }
@@ -271,7 +274,7 @@ $Construct->table('UserAuthenticationProvider')
 $Construct->table('UserAuthenticationNonce')
     ->column('Nonce', 'varchar(100)', false, 'primary')
     ->column('Token', 'varchar(128)', false)
-    ->column('Timestamp', 'timestamp', false, 'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationToken')
@@ -281,7 +284,7 @@ $Construct->table('UserAuthenticationToken')
     ->column('TokenSecret', 'varchar(64)', false)
     ->column('TokenType', ['request', 'access'], false)
     ->column('Authorized', 'tinyint(1)', false)
-    ->column('Timestamp', 'timestamp', false ,'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
@@ -836,6 +839,9 @@ $Construct
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)
+
+    // Lowercase to match new schemas.
+    ->column('foreignUrl', 'varchar(255)', true, 'unique')
     ->set(false, false);
 
 // Merge backup.
@@ -900,6 +906,7 @@ $Construct
     ->column("reactionValue", "int", false)
     ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
+    ->column('foreignID', 'varchar(32)', true, 'index')
     ->set($Explicit, $Drop);
 
 $Construct
@@ -1036,3 +1043,12 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
     Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
     Gdn::config()->remove("Sitemap.Robots.Rules");
 }
+
+
+// Save current theme value into the visible themes. This way existing sites will continue to see them even if they get hidden.
+
+/**
+ * @var ThemeModelHelper $themeHelper
+ */
+$themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+$themeHelper->saveCurrentThemeToVisible();

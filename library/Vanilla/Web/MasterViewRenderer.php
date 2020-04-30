@@ -23,6 +23,8 @@ class MasterViewRenderer {
 
     const HOME_LAYOUT_NAME = 'layout.home.twig';
 
+    const FALLBACK_LAYOUT_PATH = PATH_ADDONS_THEMES . '/theme-foundation/views/' . self::DEFAULT_LAYOUT_NAME;
+
     use TwigRenderTrait;
 
     /** @var ThemePreloadProvider */
@@ -76,17 +78,7 @@ class MasterViewRenderer {
     public function renderGdnController(\Gdn_Controller $controller): string {
         $data = array_merge(
             $controller->Data,
-            $this->getSharedData(),
-            [
-                'splashTitle' => $controller->data(
-                    'Category.Name',
-                    $this->siteMeta->getSiteTitle()
-                ),
-                'splashDescription' => $controller->data(
-                    'Category.Description',
-                    $controller->description()
-                ),
-            ]
+            $this->getSharedData()
         );
 
         $extraData = [
@@ -123,6 +115,8 @@ class MasterViewRenderer {
                 $template = $homeLayout;
             } elseif (file_exists($defaultLayout)) {
                 $template = $defaultLayout;
+            } else {
+                $template = self::FALLBACK_LAYOUT_PATH;
             }
         }
 

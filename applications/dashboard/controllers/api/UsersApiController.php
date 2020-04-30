@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use Vanilla\PermissionsTranslationTrait;
@@ -30,6 +31,8 @@ class UsersApiController extends AbstractApiController {
     use PermissionsTranslationTrait;
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
+    const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
+
 
     /** @var ActivityModel */
     private $activityModel;
@@ -134,43 +137,16 @@ class UsersApiController extends AbstractApiController {
 
         $this->userModel->removePicture($id);
     }
+
     /**
      * Get a schema instance comprised of all available user fields.
      *
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        $schema = Schema::parse([
-            'userID:i' => 'ID of the user.',
-            'name:s' => 'Name of the user.',
-            'password:s' => 'Password of the user.',
-            'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => [
-                'description' => 'Email address of the user.',
-                'minLength' => 0,
-            ],
-            'photo:s|n' => [
-                'minLength' => 0,
-                'description' => 'Raw photo field value from the user record.'
-            ],
-            'photoUrl:s|n' => [
-                'minLength' => 0,
-                'description' => 'URL to the user photo.'
-            ],
-            'points:i',
-            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
-            'showEmail:b' => 'Is the email address visible to other users?',
-            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
-            'banned:i' => 'Is the user banned?',
-            'dateInserted:dt' => 'When the user was created.',
-            'dateLastActive:dt|n' => 'Time the user was last active.',
-            'dateUpdated:dt|n' => 'When the user was last updated.',
-            'roles:a?' => $this->schema([
-                'roleID:i' => 'ID of the role.',
-                'name:s' => 'Name of the role.'
-            ], 'RoleFragment'),
-        ]);
-        return $schema;
+        $result = $this->userModel
+            ->schema();
+        return $result;
     }
 
     /**
@@ -308,10 +284,10 @@ class UsersApiController extends AbstractApiController {
         ], 'out');
 
         $query = $in->validate($query);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         if ($query['order'] == 'mention') {
-            list($sortField, $sortDirection) = $this->userModel->getMentionsSort();
+            [$sortField, $sortDirection] = $this->userModel->getMentionsSort();
         } else {
             $sortField = $query['order'];
             switch ($sortField) {
@@ -337,6 +313,55 @@ class UsersApiController extends AbstractApiController {
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Get a user's permissions.
+     *
+     * @param int $id The user's ID.
+     *
+     * @return Data
+     */
+    public function get_permissions(int $id): Data {
+        $requestedUserID = $id;
+        $this->permission();
+        $out = $this->schema([
+            "isAdmin:b",
+            'permissions:a' => new PermissionFragmentSchema(),
+        ]);
+
+        if (is_object($this->getSession()->User)) {
+            $sessionUser = (array)$this->getSession()->User;
+            $sessionUser = $this->normalizeOutput($sessionUser);
+        } else {
+            $sessionUser = $this->getGuestFragment();
+        }
+
+        // If it's not our own user, then we need to check for a stronger permissions.
+
+        if ($sessionUser['userID'] !== $requestedUserID) {
+            $this->permission([
+                'Garden.Users.Add',
+                'Garden.Users.Edit',
+                'Garden.Users.Delete'
+            ]);
+        }
+
+        $requestedUser = $requestedUserID === UserModel::GUEST_USER_ID
+            ? $this->getGuestFragment()
+            : $this->normalizeOutput($this->userByID($requestedUserID));
+
+        // Build the permissions
+        // This endpoint is heavily used (every page request), so we rely on caching in the model.
+        $permissions = $this->userModel->getPermissions($requestedUserID);
+
+        $result = ([
+            'isAdmin' => $requestedUser['isAdmin'],
+            'permissions' => $permissions->asPermissionFragments(),
+        ]);
+        $result = $out->validate($result);
+
+        return Data::box($result);
     }
 
     /**
@@ -474,7 +499,7 @@ class UsersApiController extends AbstractApiController {
         $query = $in->validate($query);
         $where = ApiUtils::queryToFilters($in, $query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
@@ -512,32 +537,8 @@ class UsersApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     protected function normalizeOutput(array $dbRecord) {
-        if (array_key_exists('UserID', $dbRecord)) {
-            $userID = $dbRecord['UserID'];
-            $roles = $this->userModel->getRoles($userID, false)->resultArray();
-            $dbRecord['roles'] = $roles;
-        }
-        if (array_key_exists('Photo', $dbRecord)) {
-            $photo = userPhotoUrl($dbRecord);
-            $dbRecord['Photo'] = $photo;
-            $dbRecord['PhotoUrl'] = $photo;
-        }
-        if (array_key_exists('Verified', $dbRecord)) {
-            $dbRecord['bypassSpam'] = $dbRecord['Verified'];
-            unset($dbRecord['Verified']);
-        }
-        if (array_key_exists('Confirmed', $dbRecord)) {
-            $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
-            unset($dbRecord['Confirmed']);
-        }
-        if (array_key_exists('Admin', $dbRecord)) {
-            // The site creator is 1, System is 2.
-            $dbRecord['isAdmin'] = in_array($dbRecord['Admin'], [1, 2]);
-            unset($dbRecord['Admin']);
-        }
-
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        $result = $this->userModel->normalizeRow($dbRecord, []);
+        return $result;
     }
 
     /**
@@ -728,11 +729,12 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @param array $body The request body.
-     * @throws NotFoundException if unable to find the user.
+     * @throws NotFoundException If unable to find the user.
+     * @throws \Garden\Web\Exception\ForbiddenException If the user doesn't have permission to ban the user.
      * @return array
      */
     public function put_ban($id, array $body) {
-        $this->permission('Garden.Users.Edit');
+        $this->permission(['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban']);
 
         $this->idParamSchema('in');
         $in = $this
@@ -742,8 +744,21 @@ class UsersApiController extends AbstractApiController {
 
         $row = $this->userByID($id);
         $body = $in->validate($body);
-        $banned = intval($body['banned']);
-        $this->userModel->setField($id, 'Banned', $banned);
+
+        // Check ranking permissions.
+        $userPermissions = $this->userModel->getPermissions($id);
+        $rankCompare = Gdn::session()->getPermissions()->compareRankTo($userPermissions);
+        if ($rankCompare < 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(t('You are not allowed to ban a user that has higher permissions than you.'));
+        } elseif ($rankCompare === 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(t('You are not allowed to ban a user with the same permission level as you.'));
+        }
+
+        if ($body['banned']) {
+            $this->userModel->ban($id, []);
+        } else {
+            $this->userModel->unBan($id, []);
+        }
 
         $result = $this->userByID($id);
         return $out->validate($result);
@@ -838,13 +853,13 @@ class UsersApiController extends AbstractApiController {
         // The image is going to be squared off. Go with the larger dimension.
         $size = $height >= $width ? $height : $width;
 
-        $destination = ProfileController::AVATAR_FOLDER.'/'.$this->generateUploadPath($ext, true);
+        $destination = $photo->generatePersistedUploadPath(ProfileController::AVATAR_FOLDER);
 
         // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
-        $this->savePhoto($photo, $destination, $size, 'p', true);
+        $this->savePhoto($photo, $size, 'p', true);
 
         // Resize and save the thumbnail.
-        $this->savePhoto($photo, $destination, $thumbSize, 'n');
+        $this->savePhoto($photo, $thumbSize, 'n');
 
         return $destination;
     }
@@ -853,22 +868,14 @@ class UsersApiController extends AbstractApiController {
      * Save a photo upload.
      *
      * @param UploadedFile $upload An instance of an uploaded file.
-     * @param string $destination The path, relative to the uploads directory, to save the images into.
      * @param int $size Maximum size, in pixels, for the photo.
      * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
      * @param bool $copy Should the upload be saved by copying, instead of moving?
-     * @throws Exception if there was an error encountered when saving the upload.
-     * @return array|bool
      */
-    private function savePhoto(UploadedFile $upload, $destination, $size, $prefix = '', $copy = false) {
-        $this->imageResizer->resize(
-            $upload->getFile(),
-            null,
+    private function savePhoto(UploadedFile $upload, $size, $prefix = '', $copy = false) {
+        $upload->setImageConstraints(
             ['crop' => true, 'height' => $size, 'width' => $size]
-        );
-
-        $result = $this->saveUpload($upload, $destination, "{$prefix}%s", $copy);
-        return $result;
+        )->persistUpload($copy, ProfileController::AVATAR_FOLDER, "{$prefix}%s");
     }
 
     /**
@@ -939,10 +946,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'points', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateLastActive', 'dateUpdated', 'roles?']);
-            $schema = $schema->add($this->fullSchema());
-            $this->userSchema = $this->schema($schema, 'User');
+            $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
     }

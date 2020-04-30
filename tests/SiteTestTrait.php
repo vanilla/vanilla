@@ -43,6 +43,21 @@ trait SiteTestTrait {
     private $sessionBak;
 
     /**
+     * @var int
+     */
+    protected $memberID;
+
+    /**
+     * @var int
+     */
+    protected $adminID;
+
+    /**
+     * @var int
+     */
+    protected $moderatorID;
+
+    /**
      * Get the names of addons to install.
      *
      * @return string[] Returns an array of addon names.
@@ -225,5 +240,49 @@ TEMPLATE;
         $fn->bindTo($session, \Gdn_Session::class);
         $fn($this->sessionBak['permissions']);
         $this->sessionBak = null;
+    }
+
+    /**
+     * Create a few test users and set them on the class.
+     *
+     * @param ?string $sx The suffix to use for the usernames and email addresses.
+     */
+    protected function createUserFixtures(?string $sx = null): void {
+        // Create some users to help.
+        if ($sx === null) {
+            $sx = (string)(time() . mt_rand(1000, 9999));
+        }
+
+        $this->adminID = $this->createUserFixture('Administrator', $sx);
+        $this->moderatorID = $this->createUserFixture('Moderator', $sx);
+        $this->memberID = $this->createUserFixture('Member', $sx);
+    }
+
+    /**
+     * Create a test user with a given role.
+     *
+     * @param string $role
+     * @param string $sx
+     * @return int
+     */
+    protected function createUserFixture(string $role, string $sx): int {
+        static $roleIDs;
+        if (!isset($roleIDs)) {
+            $roleIDs = array_column(
+                static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
+                'RoleID',
+                'Name'
+            );
+        }
+
+        $row = $this->api()->post('/users', [
+            'name' => "$role$sx",
+            'email' => "$role.$sx@example.com",
+            'password' => 'test',
+            'roleID' => [
+                $roleIDs[$role],
+            ],
+        ]);
+        return $row['userID'];
     }
 }

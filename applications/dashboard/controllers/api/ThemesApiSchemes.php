@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\TwigAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\FontsAsset;
@@ -34,9 +35,16 @@ trait ThemesApiSchemes {
                 'type:s',
                 'name:s?',
                 'version:s?',
+                'revisionID:i?',
+                'revisionName:s?',
+                'insertUser:o?',
+                'dateInserted:dt?',
+                'active:b?',
                 'current:b?',
                 'parentTheme:s?',
                 'assets?' => $this->assetsSchema(),
+                'supportedSections:a',
+                'features' => new InstanceValidatorSchema(ThemeFeatures::class),
                 'preview?' => [":a" => $this->assetsPreviewSchema()]
             ]),
             $type
@@ -137,6 +145,12 @@ trait ThemesApiSchemes {
                 'parentVersion:s?' => [
                     'description' => 'Parent theme template version/revision.',
                 ],
+                'revisionID:i?' => [
+                    'description' => 'Theme revision ID.',
+                ],
+                'revisionName:s?' => [
+                    'description' => 'Theme revision name.',
+                ],
                 'assets?' => Schema::parse([
                     "header?" => $this->assetsPutArraySchema(),
                     "footer?" => $this->assetsPutArraySchema(),
@@ -186,6 +200,9 @@ trait ThemesApiSchemes {
             Schema::parse([
                 'themeID:s?' => [
                     'description' => 'Theme ID or Theme Key',
+                ],
+                'revisionID:i?' => [
+                    'description' => 'Theme revision ID',
                 ],
             ]),
             $type

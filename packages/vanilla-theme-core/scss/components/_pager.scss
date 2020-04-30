@@ -188,12 +188,14 @@ a.MoreWrap,
         padding: 0;
         margin: 0 0 0 -1px;
         border: $pager_border;
-        background: $pager_bg;
+        @if ($staticVariables) {
+            background: $pager_bg;
 
-        &:focus,
-        &:hover {
-            background: $pager-hover_bg;
-            z-index: 1;
+            &:focus,
+            &:hover {
+                background: $pager-hover_bg;
+                z-index: 1;
+            }
         }
     }
 
@@ -235,16 +237,18 @@ a.MoreWrap,
         border-bottom-right-radius: $pager_borderRadius;
     }
 
-    .QuickSearchWrap .Button,
-    .QuickSearchButton {
-        @include Button(
-            $quickSearch_bg,
-            $quickSearch_fg,
-            $quickSearch_borderColor,
-            $quickSearch-hover_bg,
-            $quickSearch-hover_fg,
-            $quickSearch-hover_borderColor
-        );
+    @if($staticVariables) {
+        .QuickSearchWrap .Button,
+        .QuickSearchButton {
+            @include Button(
+                $quickSearch_bg,
+                $quickSearch_fg,
+                $quickSearch_borderColor,
+                $quickSearch-hover_bg,
+                $quickSearch-hover_fg,
+                $quickSearch-hover_borderColor
+            );
+        }
     }
 
     .QuickSearchButton {
@@ -275,6 +279,7 @@ a.MoreWrap,
         height: $formButton-height;
     }
 }
+
 
 .selectBox-toggle {
     color: $global-color_primary;

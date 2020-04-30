@@ -7,20 +7,21 @@
 
 namespace Vanilla\Theme;
 
-use Vanilla\Addon;
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeModel;
 
 /**
  * Class to hold information about a theme and it's configuration options.
  */
-class ThemeFeatures {
+class ThemeFeatures implements \JsonSerializable {
 
-    /** @var Addon */
+    /** @var AddonInterface */
     private $theme;
 
     /** @var ConfigurationInterface */
     private $config;
+
+    private $forcedFeatures = [];
 
     const FEATURE_DEFAULTS = [
         'NewFlyouts' => false,
@@ -34,12 +35,29 @@ class ThemeFeatures {
      * Constuctor.
      *
      * @param ConfigurationInterface $config
-     * @param ThemeModel $themeModel
+     * @param AddonInterface $theme
      */
-    public function __construct(ConfigurationInterface $config, ThemeModel $themeModel) {
+    public function __construct(ConfigurationInterface $config, AddonInterface $theme) {
         $this->config = $config;
-        $this->theme = $themeModel->getThemeAddon();
+        $this->theme = $theme;
     }
+
+    /**
+     * Force some theme features to be active.
+     *
+     * @param array $forcedFeatures An array of Feature => boolean.
+     */
+    public function forceFeatures(array $forcedFeatures) {
+        $this->forcedFeatures = $forcedFeatures;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize() {
+        return $this->allFeatures();
+    }
+
 
     /**
      * Get all of the current theme features.
@@ -60,7 +78,7 @@ class ThemeFeatures {
             $themeValues['NewFlyouts'] = true;
         }
 
-        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues);
+        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
     }
 
     /**

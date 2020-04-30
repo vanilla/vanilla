@@ -4,148 +4,202 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { Permission } from "@library/features/users/Permission";
-import { mount, shallow } from "enzyme";
-import UserActions from "@library/features/users/UserActions";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IMe } from "@library/@types/api/users";
-import sinon from "sinon";
+import { LoadStatus } from "@library/@types/api/core";
+import Permission, { PermissionMode } from "@library/features/users/Permission";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { assert } from "chai";
+import { mount, shallow } from "enzyme";
+import React from "react";
 
 // tslint:disable:jsx-use-translation-function
 
-const noop = () => {
-    return;
-};
-
 describe("<Permission />", () => {
-    let user: ILoadable<IMe>;
-    let actions: UserActions;
-
-    const makeMockUser = (withPermissions: string[] = [], isAdmin: boolean = false): IMe => {
-        return {
-            name: "test",
-            userID: 0,
-            permissions: withPermissions,
-            isAdmin,
-            photoUrl: "",
-            dateLastActive: "",
-            countUnreadNotifications: 1,
-        };
-    };
-
     describe("with no data loaded yet", () => {
-        beforeEach(() => {
-            user = {
-                status: LoadStatus.PENDING,
-            };
-        });
-
         it("returns nothing if the data isn't loaded yet.", () => {
             const result = shallow(
-                <Permission permission="test" currentUser={user} requestData={noop}>
-                    Test
-                </Permission>,
+                <TestReduxProvider
+                    state={{
+                        users: {
+                            permissions: {
+                                status: LoadStatus.PENDING,
+                            },
+                        },
+                    }}
+                >
+                    <Permission permission="test">Test</Permission>
+                </TestReduxProvider>,
             );
 
-            assert(result.isEmptyRender(), "Something was rendered");
+            assert(!result.contains("test"), "Something was rendered");
         });
 
         it("loads the fallback if nothing is rendered yet.", () => {
             const fallback = <div>{`fallback`}</div>;
-            const result = shallow(
-                <Permission permission="test" currentUser={user} requestData={noop} fallback={fallback}>
-                    Test
-                </Permission>,
+            const result = mount(
+                <TestReduxProvider
+                    state={{
+                        users: {
+                            permissions: {
+                                status: LoadStatus.PENDING,
+                            },
+                        },
+                    }}
+                >
+                    <Permission permission="test" fallback={fallback}>
+                        Test
+                    </Permission>
+                </TestReduxProvider>,
             );
 
-            assert(result.equals(fallback), "The fallback was not equivalent to the reuslt");
-        });
-
-        it("dispatches an action to get the data", () => {
-            const spy = sinon.spy();
-            assert(!spy.called, "The spy was called before the component even mounted.");
-            mount(
-                <Permission permission="test" currentUser={user} requestData={spy}>
-                    Test
-                </Permission>,
-            );
-
-            assert(spy.called, "The spy was not called by the component.");
+            assert(result.contains("fallback"), "The fallback was not equivalent to the reuslt");
         });
     });
 
     describe("with data", () => {
-        beforeEach(() => {
-            user = {
-                status: LoadStatus.SUCCESS,
-                data: makeMockUser(["perm1", "perm2", "perm3"]),
-            };
-            actions = new UserActions(sinon.fake(), sinon.fake() as any);
-        });
+        function Wrapper(props: any) {
+            return (
+                <TestReduxProvider
+                    state={{
+                        users: {
+                            permissions: {
+                                status: LoadStatus.SUCCESS,
+                                data: {
+                                    isAdmin: props.isAdmin ?? false,
+                                    permissions: [
+                                        {
+                                            type: "global",
+                                            id: null,
+                                            permissions: {
+                                                perm1: true,
+                                                perm2: true,
+                                                perm3: true,
+                                                "someResource.globalOnly": true,
+                                                "someResource.view": true,
+                                            },
+                                        },
+                                        {
+                                            type: "someResource",
+                                            id: 5,
+                                            permissions: {
+                                                "someResource.view": true,
+                                                "someResource.add": true,
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    }}
+                >
+                    {props.children}
+                </TestReduxProvider>
+            );
+        }
 
         it("renders children if the user has one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
-            let result = shallow(
-                <Permission permission="perm1" currentUser={user} requestData={noop}>
-                    {successComponent}
-                </Permission>,
+            let result = mount(
+                <Wrapper>
+                    <Permission permission="perm1">{successComponent}</Permission>
+                </Wrapper>,
+            );
+
+            assert(result.contains("Success"), "the success component did not render with 1 good permission passed");
+
+            result = mount(
+                <Wrapper>
+                    <Permission permission={["perm1", "asdfa"]}>{successComponent}</Permission>
+                </Wrapper>,
             );
 
             assert(
-                result.contains(successComponent),
-                "the success component did not render with 1 good permission passed",
-            );
-
-            result = shallow(
-                <Permission permission={["perm1", "asdfa"]} currentUser={user} requestData={noop}>
-                    {successComponent}
-                </Permission>,
-            );
-
-            assert(
-                result.contains(successComponent),
+                result.contains("Success"),
                 "the success component did not render with 1 good and 1 bad permission passed",
             );
         });
 
         it("renders children if the user does not have one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
-            let result = shallow(
-                <Permission permission="asd" currentUser={user} requestData={noop}>
-                    {successComponent}
-                </Permission>,
+            let result = mount(
+                <Wrapper>
+                    <Permission permission="asd">{successComponent}</Permission>
+                </Wrapper>,
             );
 
-            assert(!result.contains(successComponent), "the success component rendered with 1 bad permission passed");
+            assert(!result.contains("Success"), "the success component rendered with 1 bad permission passed");
 
-            result = shallow(
-                <Permission permission={["fds", "asdfa"]} currentUser={user} requestData={noop}>
-                    {successComponent}
-                </Permission>,
+            result = mount(
+                <Wrapper>
+                    <Permission permission={["fds", "asdfa"]}>{successComponent}</Permission>
+                </Wrapper>,
             );
 
-            assert(
-                !result.contains(successComponent),
-                "the success component did not render with 2 bad permissions passed",
+            assert(!result.contains("Success"), "the success component did not render with 2 bad permissions passed");
+        });
+
+        it("checks resource specific permission", () => {
+            const successComponent = <div>{`Success`}</div>;
+            let result = mount(
+                <Wrapper>
+                    <Permission resourceID={5} resourceType={"someResource"} permission="someResource.view">
+                        {successComponent}
+                    </Permission>
+                </Wrapper>,
             );
+
+            assert(result.contains("Success"), "the resource permission is checked");
+
+            result = mount(
+                <Wrapper>
+                    <Permission resourceID={5} resourceType={"someResource"} permission="someResource.globalOnly">
+                        {successComponent}
+                    </Permission>
+                </Wrapper>,
+            );
+
+            assert(!result.contains("Success"), "globalOnly permission should not appear when checking a resource");
+
+            result = mount(
+                <Wrapper>
+                    <Permission resourceID={5} resourceType={"someResource"} permission="someResource.add">
+                        {successComponent}
+                    </Permission>
+                </Wrapper>,
+            );
+
+            assert(result.contains("Success"), "A resource only permission must work");
+
+            result = mount(
+                <Wrapper>
+                    <Permission mode={PermissionMode.GLOBAL_OR_RESOURCE} permission="someResource.add">
+                        {successComponent}
+                    </Permission>
+                </Wrapper>,
+            );
+
+            assert(result.contains("Success"), "Resource permission must work in global or resource mode");
+
+            result = mount(
+                <Wrapper>
+                    <Permission mode={PermissionMode.GLOBAL} permission="someResource.add">
+                        {successComponent}
+                    </Permission>
+                </Wrapper>,
+            );
+
+            assert(!result.contains("Success"), "Resource permission must be ignored in in global mode");
         });
 
         it("renders children if the user has 'isAdmin' set", () => {
             const successComponent = <div>{`Success`}</div>;
-            user = {
-                status: LoadStatus.SUCCESS,
-                data: makeMockUser([], true),
-            };
             const result = shallow(
-                <Permission permission="asd" currentUser={user} requestData={noop}>
-                    {successComponent}
-                </Permission>,
+                <Wrapper isAdmin={true}>
+                    <Permission permission="asd">{successComponent}</Permission>
+                </Wrapper>,
             );
 
             assert(
-                result.contains(successComponent),
+                result.contains("Success"),
                 "the success component did not render with 1 bad permission passed and an isAdmin flag set to true",
             );
         });

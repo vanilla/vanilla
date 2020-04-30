@@ -140,6 +140,11 @@
 
 .title-block {
   display: flex;
+  align-items: center;
+
+  .backLink {
+      margin-left: 0;
+  }
 }
 
 // Header Block with Return Button
@@ -177,6 +182,11 @@
   &:hover {
     color: $brand-primary;
   }
+
+    .title-block & {
+        margin-left: -1em;
+        margin-right: 0;
+    }
 }
 
 // Header Menu

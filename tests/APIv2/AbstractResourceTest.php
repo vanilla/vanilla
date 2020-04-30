@@ -349,7 +349,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      */
     public function testIndex() {
         $indexUrl = $this->indexUrl();
-        $originalIndex = $this->api()->get($indexUrl);
+        $originalIndex = $this->api()->get($indexUrl, ['limit' => 100]);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
         $originalRows = $originalIndex->getBody();

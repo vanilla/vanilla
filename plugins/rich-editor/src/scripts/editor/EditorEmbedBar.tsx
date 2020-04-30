@@ -64,17 +64,43 @@ export function EditorEmbedBar(props: IProps) {
                         <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>
-
                 <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                     <EmbedFlyout disabled={isLoading} renderAbove={legacyMode} />
                 </li>
-
                 <Permission permission="uploads.add">
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                         <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>
+                {getExtraComponents().length > 0 && (
+                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="separator">
+                        <hr className={classesRichEditor.embedBarSeparator} />
+                    </li>
+                )}
+                {getExtraComponents().map((item, i) => (
+                    <React.Fragment key={i}>{item}</React.Fragment>
+                ))}
             </ul>
         </div>
     );
 }
+
+EditorEmbedBar.Item = function EditorEmbedBarItem(props: { children: React.ReactNode }) {
+    const { legacyMode } = useEditor();
+    const classesRichEditor = richEditorClasses(legacyMode);
+
+    return (
+        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
+            {props.children}
+        </li>
+    );
+};
+
+const extraComponents: React.ReactNode[] = [];
+function getExtraComponents() {
+    return extraComponents;
+}
+
+EditorEmbedBar.addExtraButton = (node: React.ReactNode) => {
+    extraComponents.push(node);
+};

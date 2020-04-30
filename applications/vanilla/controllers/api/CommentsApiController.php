@@ -142,17 +142,9 @@ class CommentsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        return Schema::parse([
-            'commentID:i' => 'The ID of the comment.',
-            'discussionID:i' => 'The ID of the discussion.',
-            'body:s' => 'The body of the comment.',
-            'dateInserted:dt' => 'When the comment was created.',
-            'dateUpdated:dt|n' => 'When the comment was last updated.',
-            'insertUserID:i' => 'The user that created the comment.',
-            'score:i|n' => 'Total points associated with this post.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'url:s?' => 'The full URL to the comment.'
-        ]);
+        $result = $this->commentModel
+            ->schema();
+        return $result;
     }
 
     /**
@@ -353,7 +345,7 @@ class CommentsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc', 'DateInserted')->resultArray();
         $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         // Expand associated rows.
@@ -388,17 +380,15 @@ class CommentsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
-        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
-        $dbRecord['Url'] = commentUrl($dbRecord);
-
-        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
-
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-
+        $normalizedRow = $this->commentModel->normalizeRow($dbRecord, []);
         // Allow addons to hook into the normalization process.
         $options = [];
-        $result = $this->getEventManager()->fireFilter('commentsApiController_normalizeOutput', $schemaRecord, $this, $options);
-
+        $result = $this->getEventManager()->fireFilter(
+            'commentsApiController_normalizeOutput',
+            $normalizedRow,
+            $this,
+            $options
+        );
         return $result;
     }
 

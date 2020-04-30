@@ -6,23 +6,35 @@
 import {
     colorOut,
     ColorValues,
-    emphasizeLightness,
+    offsetLightness,
     IBackground,
     IBorderRadiusOutput,
     modifyColorBasedOnLightness,
     radiusValue,
     EMPTY_BACKGROUND,
     getRatioBasedOnDarkness,
+    fontFallbacks,
+    monoFallbacks,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
-import { color, ColorHelper, percent } from "csx";
+import { color, ColorHelper, percent, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning, notEmpty } from "@vanilla/utils";
+import { ButtonPreset } from "@library/forms/buttonStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { isLightColor } from "@library/styles/styleHelpersColors";
 
-export const globalVariables = useThemeCache(() => {
+export enum GlobalPreset {
+    DARK = "dark",
+    LIGHT = "light",
+}
+
+export const defaultFontFamily = "Open Sans";
+
+export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#0291db");
-    const makeThemeVars = variableFactory("global");
+    const makeThemeVars = variableFactory("global", forcedVars);
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -31,32 +43,60 @@ export const globalVariables = useThemeCache(() => {
     };
 
     const constants = makeThemeVars("constants", {
-        linkStateColorEmphasis: 0.15,
+        stateColorEmphasis: 0.15,
         fullGutter: 48,
+        states: {
+            hover: {
+                stateEmphasis: 0.08,
+            },
+            selected: {
+                stateEmphasis: 0.5,
+            },
+            active: {
+                stateEmphasis: 0.2,
+            },
+            focus: {
+                stateEmphasis: 0.15,
+            },
+        },
     });
+
+    const options = makeThemeVars("options", { preset: GlobalPreset.LIGHT });
 
     const elementaryColors = {
         black: color("#000"),
+        almostBlack: color("#323639"),
+        greyText: color("#555a62"),
         white: color("#fff"),
-        transparent: "transparent" as ColorValues,
+        transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
-        fg: color("#555a62"),
-        bg: color("#fff"),
+        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.greyText : elementaryColors.white,
+        bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
         secondary: colorPrimary,
+        secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
     colorPrimary = initialMainColors.primary;
+    const colorSecondary = initialMainColors.secondary;
 
-    const primaryDarkness = colorPrimary.lightness();
-    const backgroundDarkness = initialMainColors.bg.lightness();
-    const goodContrast = Math.abs(primaryDarkness - backgroundDarkness) >= 0.4;
+    // Shorthand checking bg color for darkness
+    const getRatioBasedOnBackgroundDarkness = (
+        weight: number,
+        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+    ) => {
+        return getRatioBasedOnDarkness(weight, bgColor);
+    };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: emphasizeLightness(colorPrimary, 0.06, !goodContrast),
+        primaryContrast: isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
+        secondary: offsetLightness(colorPrimary, 0.05),
+        stateSecondary: undefined, // Calculated below, but you can overwrite it here.
+        secondaryContrast: isLightColor(colorSecondary) ? elementaryColors.almostBlack : elementaryColors.white,
     });
 
     const mainColors = {
@@ -64,13 +104,8 @@ export const globalVariables = useThemeCache(() => {
         ...generatedMainColors,
     };
 
-    // Shorthand checking bg color for darkness
-    const getRatioBasedOnBackgroundDarkness = (weight: number, bgColor: ColorHelper = mainColors.bg) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
-    };
-
     const mixBgAndFg = (weight: number) => {
-        return mainColors.fg.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
     const mixPrimaryAndFg = (weight: number) => {
@@ -98,18 +133,28 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const linkColorDefault = mainColors.secondary;
-    const linkColorState = emphasizeLightness(linkColorDefault, constants.linkStateColorEmphasis, true);
-
     const links = makeThemeVars("links", {
         colors: {
-            default: linkColorDefault,
-            hover: linkColorState,
-            focus: linkColorState,
-            accessibleFocus: linkColorState,
-            active: linkColorState,
+            default: mainColors.secondary,
+            hover: undefined,
+            focus: undefined,
+            keyboardFocus: undefined,
+            active: undefined,
             visited: undefined,
         },
+    });
+
+    // Generated derived colors from mainColors.
+    // You can set all of them by setting generatedMainColors.stateSecondary
+    // You can set individual states with links.colors["your state"]
+    // Will default to variation of links.colors.default (which is by default the secondary color)
+    Object.keys(links.colors).forEach(state => {
+        if (state !== "default" && state !== "visited") {
+            if (!links[state]) {
+                links.colors[state] =
+                    generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.008);
+            }
+        }
     });
 
     interface IBody {
@@ -128,7 +173,19 @@ export const globalVariables = useThemeCache(() => {
         colorHover: mixBgAndFg(0.2),
         width: 1,
         style: "solid",
-        radius: 6,
+        radius: 6, // Global default
+    });
+
+    const borderType = makeThemeVars("borderType", {
+        formElements: {
+            default: {
+                ...border,
+                color: mixBgAndFg(0.35).saturate(0.1),
+            },
+            buttons: border,
+        },
+        modals: border,
+        dropDowns: border,
     });
 
     const gutterSize = 16;
@@ -166,7 +223,7 @@ export const globalVariables = useThemeCache(() => {
         width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
     });
 
-    const fonts = makeThemeVars("fonts", {
+    const fontsInit0 = makeThemeVars("fonts", {
         size: {
             large: 16,
             medium: 14,
@@ -175,7 +232,6 @@ export const globalVariables = useThemeCache(() => {
             title: 22,
             subTitle: 18,
         },
-
         mobile: {
             size: {
                 title: 26,
@@ -186,16 +242,39 @@ export const globalVariables = useThemeCache(() => {
             semiBold: 600,
             bold: 700,
         },
-
-        families: {
-            body: ["Open Sans"],
+        googleFontFamily: defaultFontFamily as undefined | string,
+        forceGoogleFont: false,
+        customFontUrl: undefined as undefined | string, // legacy
+        customFont: {
+            name: undefined as undefined | string,
+            url: undefined as undefined | string,
+            fallbacks: [],
         },
+    });
+
+    const fontsInit1 = makeThemeVars("fonts", {
+        ...fontsInit0,
+        families: {
+            body: [
+                fontsInit0.customFont.name && !fontsInit0.forceGoogleFont
+                    ? fontsInit0.customFont.name
+                    : fontsInit0.googleFontFamily ?? defaultFontFamily,
+                ...fontFallbacks,
+            ],
+            monospace: monoFallbacks,
+        },
+    });
+
+    const isOpenSans = fontsInit1.families.body[0] === defaultFontFamily;
+
+    const fonts = makeThemeVars("fonts", {
+        ...fontsInit1,
         alignment: {
             headings: {
-                capitalLetterRatio: 0.73, // Calibrated for Open Sans
-                verticalOffset: 1, // Calibrated for Open Sans
-                horizontal: -0.03, // Calibrated for Open Sans
-                verticalOffsetForAdjacentElements: "-.13em", // Calibrated for Open Sans
+                capitalLetterRatio: isOpenSans ? 0.73 : 0.75, // Calibrated for Open Sans
+                verticalOffset: 1,
+                horizontalOffset: isOpenSans ? -0.03 : 0, // Calibrated for Open Sans
+                verticalOffsetForAdjacentElements: isOpenSans ? "-.13em" : "0em", // Calibrated for Open Sans
             },
         },
     });
@@ -215,7 +294,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const animation = makeThemeVars("animation", {
-        defaultTiming: ".15s",
+        defaultTiming: ".1s",
         defaultEasing: "ease-out",
     });
 
@@ -269,19 +348,23 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.08),
+            highlight: mixPrimaryAndBg(constants.states.hover.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         selected: {
-            color: mixPrimaryAndBg(0.5),
+            highlight: mixPrimaryAndBg(constants.states.selected.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.2),
+            highlight: mixPrimaryAndBg(constants.states.active.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.15),
+            highlight: mixPrimaryAndBg(constants.states.focus.stateEmphasis),
+            contrast: undefined,
             opacity: 1,
         },
     });
@@ -322,6 +405,13 @@ export const globalVariables = useThemeCache(() => {
     const buttonIcon = makeThemeVars("buttonIcon", {
         size: buttonIconSize,
         offset: (buttonIconSize - icon.sizes.default) / 2,
+    });
+
+    // Sets global "style" for buttons. Use "ButtonPreset" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
+    // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
+    // the style of them.
+    const buttonPreset = makeThemeVars("buttonPreset", {
+        style: undefined as ButtonPreset | undefined,
     });
 
     const separator = makeThemeVars("separator", {
@@ -376,11 +466,13 @@ export const globalVariables = useThemeCache(() => {
     };
 
     return {
+        options,
         utility,
         elementaryColors,
         mainColors,
         messageColors,
         body,
+        borderType,
         border,
         meta,
         gutter,
@@ -405,13 +497,14 @@ export const globalVariables = useThemeCache(() => {
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,
+        buttonPreset,
     };
 });
 
 export interface IGlobalBorderStyles extends IBorderRadiusOutput {
-    color: ColorValues;
-    width: BorderWidthProperty<TLength> | number;
-    style: BorderStyleProperty;
+    color?: ColorValues;
+    width?: BorderWidthProperty<TLength> | number;
+    style?: BorderStyleProperty;
     radius?: radiusValue;
 }
 

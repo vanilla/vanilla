@@ -39,7 +39,9 @@ import {
 } from "@library/icons/revision";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { ErrorIcon, WarningIcon, InformationIcon } from "@library/icons/common";
+import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconStyles";
+import { ColorHelper, color } from "csx";
 
 const story = storiesOf("Components", module);
 
@@ -139,6 +141,14 @@ story.add("Icons", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`InformationIcon`}>
                     <InformationIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`DocumentationIcon`}>
+                    <CommonIcons.DocumentationIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`BookmarkIcon`}>
+                    <a href="#" className={iconClasses().bookmark()}>
+                        <BookmarkIcon />
+                    </a>
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
@@ -296,7 +306,7 @@ story.add("Icons", () => {
                     </div>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`VanillaLogo`}>
-                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} />}
+                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} isMobile={true} />}
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Revisions</StoryHeading>
@@ -309,6 +319,21 @@ story.add("Icons", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`RevisionStatusPublishedIcon`}>
                     <RevisionStatusPublishedIcon />
+                </StoryTileAndTextCompact>
+            </StoryTiles>
+            <StoryHeading>New Post Menu</StoryHeading>
+            <StoryTiles>
+                <StoryTileAndTextCompact backgroundColor={color("#ccc")} text={`NewPostMenuIcon`}>
+                    <CommonIcons.NewPostMenuIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
+                    <CommonIcons.NewDiscussionIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewIdeaIcon`}>
+                    <CommonIcons.NewIdeaIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewPollIcon`}>
+                    <CommonIcons.NewPollIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

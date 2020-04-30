@@ -8,7 +8,7 @@ import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/cor
 import { useSiteNavContext } from "@library/navigation/SiteNavContext";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 import classNames from "classnames";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
@@ -93,7 +93,12 @@ export function PanelNavItems(props: IProps) {
                                     </DropDownItemButton>
                                 );
                             } else {
-                                return (
+                                return navItem.isLink ? (
+                                    <DropDownItemLink isActive={isActive} key={i} to={navItem.url}>
+                                        <span className={classes.text}>{navItem.name}</span>
+                                        <RightChevronIcon className={classes.arrow} />
+                                    </DropDownItemLink>
+                                ) : (
                                     <DropDownItemLink isActive={isActive} key={i} to={navItem.url}>
                                         {navItem.name}
                                     </DropDownItemLink>

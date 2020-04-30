@@ -5,7 +5,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
@@ -40,6 +40,12 @@ interface IProps {
 
     /** Whether or not to display the label visibly. */
     visibleLabel?: boolean;
+
+    /** Optional extra class for chevron **/
+    chevronClass?: string;
+
+    /** Check history and hide if there's no where to go **/
+    hideIfNoHistory?: boolean;
 }
 
 /**
@@ -60,9 +66,13 @@ export default function BackLink(props: IProps) {
     const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
     const title = props.title || t("Back");
 
+    if (!canGoBack && props.hideIfNoHistory && !props.fallbackUrl) {
+        return null;
+    }
+
     let content = (
         <>
-            <LeftChevronCompactIcon className={classes.icon} />
+            <LeftChevronCompactIcon className={classNames(classes.icon, props.chevronClass)} />
             {props.visibleLabel && <span className={classes.label}>{title}</span>}
         </>
     );
@@ -115,7 +125,7 @@ export default function BackLink(props: IProps) {
         );
     }
 
-    return <div className={classNames(classes.root, props.className)}>{content}</div>;
+    return <div className={classNames("backLink", classes.root, props.className)}>{content}</div>;
 }
 
 BackLink.defaultProps = {

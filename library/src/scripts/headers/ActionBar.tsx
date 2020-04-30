@@ -5,7 +5,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
@@ -23,9 +23,12 @@ import { actionBarClasses } from "@library/headers/ActionBarStyles";
 
 interface IProps {
     callToActionTitle?: string;
+    anotherCallToActionTitle?: string;
     isCallToActionDisabled?: boolean;
+    anotherCallToActionDisabled?: boolean;
     className?: string;
     isCallToActionLoading?: boolean;
+    anotherCallToActionLoading?: boolean;
     optionsMenu?: React.ReactNode;
     statusItem?: React.ReactNode;
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
@@ -34,6 +37,9 @@ interface IProps {
     selfPadded?: boolean;
     title?: React.ReactNode;
     fullWidth?: boolean;
+    backTitle?: string;
+    handleCancel?: (e: React.MouseEvent) => void;
+    handleAnotherSubmit?: (e: React.MouseEvent) => void;
 }
 
 /**
@@ -60,7 +66,12 @@ export function ActionBar(props: IProps) {
     const content = (
         <ul className={classNames(classes.items)}>
             <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                <BackLink title={t("Cancel")} visibleLabel={true} className={classes.backLink} />
+                <BackLink
+                    title={props.backTitle || t("Cancel")}
+                    visibleLabel={true}
+                    className={classes.backLink}
+                    onClick={props.handleCancel}
+                />
             </li>
             {props.statusItem}
             {showMobileDropDown ? (
@@ -71,7 +82,29 @@ export function ActionBar(props: IProps) {
                 </li>
             ) : null}
             {props.title}
-            <li ref={restoreRef} className={classNames(classes.item, "isPullRight")} style={minButtonSizeStyles}>
+            {props.anotherCallToActionTitle && (
+                <li
+                    ref={restoreRef}
+                    className={classNames(classes.item, "isPullRight", classes.anotherCallToAction)}
+                    style={minButtonSizeStyles}
+                >
+                    <Button
+                        submit={false}
+                        onClick={props.handleAnotherSubmit}
+                        title={props.anotherCallToActionTitle}
+                        disabled={props.anotherCallToActionDisabled}
+                        baseClass={ButtonTypes.TEXT_PRIMARY}
+                        className={classNames(classes.callToAction, classes.itemMarginLeft)}
+                    >
+                        {props.anotherCallToActionLoading ? <ButtonLoader /> : props.anotherCallToActionTitle}
+                    </Button>
+                </li>
+            )}
+            <li
+                ref={restoreRef}
+                className={classNames(classes.item, { isPullRight: !props.anotherCallToActionTitle })}
+                style={minButtonSizeStyles}
+            >
                 <Button
                     submit={true}
                     title={props.callToActionTitle}
@@ -82,6 +115,7 @@ export function ActionBar(props: IProps) {
                     {props.isCallToActionLoading ? <ButtonLoader /> : props.callToActionTitle}
                 </Button>
             </li>
+
             {props.optionsMenu && <li className={classes.itemMarginLeft}>{props.optionsMenu}</li>}
         </ul>
     );

@@ -12,8 +12,10 @@
 .MessageList {
     margin: 0 0 $utility-baseUnitTriple;
 
-    .Item {
-        @include listItem;
+    @if ($staticVariables) {
+        .Item {
+            @include listItem;
+        }
     }
 
     @if $component-item_spacing == 0 AND $component_lateralBorder == true {
@@ -57,7 +59,9 @@
                 background: transparent;
                 width: calc(100% - (#{$component_borderWidth} * 2));
                 position: absolute;
-                top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+                @if ($staticVariables) {
+                    top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+                }
             }
         }
     }
@@ -80,11 +84,11 @@
         }
 
 
-        a {
-            font-size: inherit;
-            font-weight: inherit;
-            display: inline;
-            @if ($staticVariables){
+        @if ($staticVariables){
+            a {
+                font-size: inherit;
+                font-weight: inherit;
+                display: inline;
                 color: inherit;
 
                 &:focus,
@@ -143,39 +147,41 @@
             font-weight: $component-meta_fontWeight;
             color: $component-meta_color;
         }
-    }
 
-    .Meta,
-    .AuthorWrap {
-        margin-left: -$utility-baseUnit;
-        margin-right: -$utility-baseUnit;
+        .Meta,
+        .AuthorWrap {
+            margin-left: -$utility-baseUnit;
+            margin-right: -$utility-baseUnit;
 
-        @include maxWidth {
-            margin-top: $utility-baseUnitDouble;
-            line-height: $component-meta_lineHeight;
+            @include maxWidth {
+                margin-top: $utility-baseUnitDouble;
+                line-height: $component-meta_lineHeight;
+            }
         }
-    }
 
-    .Author .Username,
-    .MItem,
-    .MItem.Category,
-    .ChildCategories {
-        font-size: inherit;
-        font-weight: inherit;
-        color: inherit;
-        display: inline-block;
 
-        a {
+
+        .Author .Username,
+        .MItem,
+        .MItem.Category,
+        .ChildCategories {
             font-size: inherit;
             font-weight: inherit;
-            line-height: inherit;
-            @if ($staticVariables) {
-                color: $component-meta-link_color;
+            color: inherit;
+            display: inline-block;
 
-                &:focus,
-                &:hover {
-                    text-decoration: $theme-link-hover_textDecoration;
-                    color: $component-meta-link-hover_color;
+            a {
+                font-size: inherit;
+                font-weight: inherit;
+                line-height: inherit;
+                @if ($staticVariables) {
+                    color: $component-meta-link_color;
+
+                    &:focus,
+                    &:hover {
+                        text-decoration: $theme-link-hover_textDecoration;
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
         }
@@ -277,11 +283,13 @@
 
     // overwrite ideation plugin styles
     .ItemIdea.ItemIdea.ItemIdea {
-        .PhotoWrap.IndexPhoto,
-        .idea-counter-module .idea-counter-box {
-            margin: 0 $utility-baseUnitDouble 0 0;
-            width: $theme-photo_size;
-            height: $theme-photo_size;
+        @if($staticVariables) {
+            .PhotoWrap.IndexPhoto,
+            .idea-counter-module .idea-counter-box {
+                margin: 0 $utility-baseUnitDouble 0 0;
+                width: $theme-photo_size;
+                height: $theme-photo_size;
+            }
         }
 
         .Meta {
@@ -296,14 +304,16 @@
         visibility: visible;
 
         .OptionsLink {
-            @include Button(
-                    $button-basic_bg,
-                    $button-basic_fg,
-                    $button-basic_border,
-                    $button-basic-hover_bg,
-                    $button-basic-hover_fg,
-                    $button-basic-hover_border
-            );
+            @if ($staticVariables) {
+                @include Button(
+                        $button-basic_bg,
+                        $button-basic_fg,
+                        $button-basic_border,
+                        $button-basic-hover_bg,
+                        $button-basic-hover_fg,
+                        $button-basic-hover_border
+                );
+            }
             margin-left: $utility-baseUnitHalf;
         }
 
@@ -493,7 +503,9 @@
                 padding: 0 $utility-baseUnitHalf;
 
                 a {
-                    color: inherit;
+                    @if ($staticVariables) {
+                        color: inherit;
+                    }
                     margin: 0;
 
                     &:hover,
@@ -518,17 +530,19 @@
                 }
             }
 
-            .InlineTags {
-                padding-left: 0;
+            @if ($staticVariables) {
+                .InlineTags {
+                    padding-left: 0;
 
-                a {
-                    font-size: inherit;
-                    color: $component-meta-link_color;
+                    a {
+                        font-size: inherit;
+                        color: $component-meta-link_color;
 
-                    &:hover,
-                    &:focus,
-                    &:active {
-                        color: $component-meta-link-hover_color;
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            color: $component-meta-link-hover_color;
+                        }
                     }
                 }
             }
@@ -541,13 +555,13 @@
                 }
             }
 
-        .MItem {
-            margin-bottom: 0;
+            .MItem {
+                margin-bottom: 0;
 
-            @include maxWidth {
-                margin-bottom: $utility-baseUnitHalf;
+                @include maxWidth {
+                    margin-bottom: $utility-baseUnitHalf;
+                }
             }
-        }
 
             .AuthorWrap {
                 max-width: calc(100% - 45px);
@@ -557,19 +571,21 @@
                 display: none;
             }
 
-            .MItem.RoleTitle,
-            .MItem.Rank {
-                @include Tag;
-                color: inherit;
-            }
+            @if ($staticVariables) {
+                .MItem.RoleTitle,
+                .MItem.Rank {
+                    @include Tag;
+                    color: inherit;
+                }
 
-            .Username {
-                color: $component-meta-link_color;
-                font-weight: $component-meta_fontWeight;
+                .Username {
+                    color: $component-meta-link_color;
+                    font-weight: $component-meta_fontWeight;
 
-                &:hover,
-                &:focus {
-                    color: $component-meta-link-hover_color;
+                    &:hover,
+                    &:focus {
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
 
@@ -702,16 +718,18 @@
         margin-right: 0;
     }
 
-    .MItem-Author a {
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: $component-meta-link_color;
+    @if($staticVariables) {
+        .MItem-Author a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            color: $component-meta-link_color;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
         }
     }
 }

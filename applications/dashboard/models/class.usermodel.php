@@ -9,10 +9,14 @@
  */
 
 use Garden\EventManager;
+use Garden\Schema\Schema;
+use Vanilla\Community\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Handles user data.
@@ -1821,15 +1825,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      */
     public function getRoles($userID, bool $includeInvalid = true) {
-        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
-        $rolesDataArray = Gdn::cache()->get($userRolesKey);
-
-        if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
-            $rolesDataArray = $this->SQL->getWhere('UserRole', ['UserID' => $userID])->resultArray();
-            $rolesDataArray = array_column($rolesDataArray, 'RoleID');
-            // Add result to cache
-            $this->userCacheRoles($userID, $rolesDataArray);
-        }
+        $rolesDataArray = $this->getRoleIDs($userID);
 
         $result = [];
         foreach ($rolesDataArray as $roleID) {
@@ -1843,7 +1839,26 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     }
 
     /**
+     * Get the roles for a user.
      *
+     * @param int $userID The user to get the roles for.
+     * @return array|bool $rolesDataArray User roles.
+     */
+    public function getRoleIDs($userID) {
+        $userRolesKey = formatString(self::USERROLES_KEY, ['UserID' => $userID]);
+        $rolesDataArray = Gdn::cache()->get($userRolesKey);
+
+        if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
+            $rolesDataArray = $this->SQL->getWhere('UserRole', ['UserID' => $userID])->resultArray();
+            $rolesDataArray = array_column($rolesDataArray, 'RoleID');
+            // Add result to cache
+            $this->userCacheRoles($userID, $rolesDataArray);
+        }
+        return $rolesDataArray;
+    }
+
+    /**
+     * Get Session.
      *
      * @param int $userID
      * @param bool $refresh
@@ -2335,7 +2350,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     }
                 }
             }
-
             $this->EventArguments['SaveRoles'] = &$saveRoles;
             $this->EventArguments['RoleIDs'] = &$roleIDs;
             $this->EventArguments['Fields'] = &$fields;
@@ -2504,8 +2518,133 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         } else {
             $userID = false;
         }
-
+        if ($userID) {
+            $user = $this->getID($userID);
+            $userEvent = $this->eventFromRow(
+                (array)$user,
+                $insert ? UserEvent::ACTION_INSERT : UserEvent::ACTION_UPDATE
+            );
+            $this->getEventManager()->dispatch($userEvent);
+        }
         return $userID;
+    }
+
+    /**
+     * Generate a user event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return UserEvent
+     */
+    private function eventFromRow(array $row, string $action): UserEvent {
+        $user = $this->normalizeRow($row, false);
+        $user = $this->readSchema()->validate($user);
+        $result = new UserEvent(
+            $action,
+            ["user" => $user]
+        );
+        return $result;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $expand
+     * @return array
+     */
+    public function normalizeRow(array $row, $expand = []): array {
+        if (array_key_exists('UserID', $row)) {
+            $userID = $row['UserID'];
+            $roles = $this->getRoles($userID, false)->resultArray();
+            $row['roles'] = $roles;
+        }
+        if (array_key_exists('Photo', $row)) {
+            $photo = userPhotoUrl($row);
+            $row['Photo'] = $photo;
+            $row['photoUrl'] = $photo;
+        }
+        if (array_key_exists('Verified', $row)) {
+            $row['bypassSpam'] = $row['Verified'];
+            unset($row['Verified']);
+        }
+        if (array_key_exists('Confirmed', $row)) {
+            $row['emailConfirmed'] = $row['Confirmed'];
+            unset($row['Confirmed']);
+        }
+        if (array_key_exists('Admin', $row)) {
+            // The site creator is 1, System is 2.
+            $row['isAdmin'] = in_array($row['Admin'], [1, 2]);
+            unset($row['Admin']);
+        }
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
+
+    /**
+     * Get a schema instance comprised of standard user fields.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        $result = Schema::parse([
+            'userID:i' => 'ID of the user.',
+            'name:s' => 'Name of the user.',
+            'password:s' => 'Password of the user.',
+            'hashMethod:s' => 'Hash method for the password.',
+            'email:s' => [
+                'description' => 'Email address of the user.',
+                'minLength' => 0,
+            ],
+            'photo:s|n' => [
+                'minLength' => 0,
+                'description' => 'Raw photo field value from the user record.'
+            ],
+            'photoUrl:s|n' => [
+                'minLength' => 0,
+                'description' => 'URL to the user photo.'
+            ],
+            'points:i',
+            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
+            'showEmail:b' => 'Is the email address visible to other users?',
+            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
+            'banned:i' => 'Is the user banned?',
+            'dateInserted:dt' => 'When the user was created.',
+            'dateLastActive:dt|n' => 'Time the user was last active.',
+            'dateUpdated:dt|n' => 'When the user was last updated.',
+            'roles:a?' => SchemaFactory::parse([
+                'roleID:i' => 'ID of the role.',
+                'name:s' => 'Name of the role.'
+            ], 'RoleFragment'),
+        ]);
+        return $result;
+    }
+
+    /**
+     * A schema representing fields relevant to reading and displaying user info (e.g. no password).
+     *
+     * @return Schema
+     */
+    public function readSchema() {
+            $result = Schema::parse([
+                "banned",
+                "bypassSpam",
+                "email",
+                "emailConfirmed",
+                "dateInserted",
+                "dateLastActive",
+                "dateUpdated",
+                "name",
+                "photoUrl",
+                "points",
+                "roles?",
+                "showEmail",
+                "userID",
+            ]);
+            $result->add($this->schema());
+
+            return $result;
     }
 
     /**
@@ -2813,12 +2952,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         // Check to see if the search exactly matches a role name.
         $roleID = false;
-        if (strtolower($keywords) == 'banned') {
-            $this->SQL->where('u.Banned >', 0);
-        } else {
-            $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
+        if ($keywords !== "") {
+            if (strtolower($keywords) == 'banned') {
+                $this->SQL->where('u.Banned >', 0);
+            } else {
+                $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
+            }
         }
-
         if (isset($where)) {
             $this->SQL->where($where, null, false);
         }
@@ -3786,7 +3926,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
 
         // Remove user's cache rows
         $this->clearCache($userID);
-
+        if ($userData) {
+            $userEvent = $this->eventFromRow((array)$userData, UserEvent::ACTION_DELETE);
+            $this->getEventManager()->dispatch($userEvent);
+        }
         return true;
     }
 
@@ -4417,6 +4560,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             ->setButton($url, t('Confirm My Email Address'));
 
         $email->setEmailTemplate($emailTemplate);
+
+        // Apply rate limiting
+        self::rateLimit($user);
 
         try {
             $email->send();
@@ -5123,8 +5269,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
             }
         }
 
-        $data = Gdn::permissionModel()->cachePermissions($userID);
-        $permissions->compileAndLoad($data);
+        $data = Gdn::permissionModel()->getPermissionsByUser($userID);
+        $permissions->setPermissions($data);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;

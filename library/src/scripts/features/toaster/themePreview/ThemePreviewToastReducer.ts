@@ -7,7 +7,7 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemesActions, { PreviewStatusType } from "@library/theming/ThemesActions";
+import ThemeActions, { PreviewStatusType } from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
@@ -31,25 +31,25 @@ const DEFAULT_PREVIEW_TOASTER_STATE: IPreviewToasterState = {
 
 export const themePreviewToastReducer = produce(
     reducerWithInitialState<IPreviewToasterState>(DEFAULT_PREVIEW_TOASTER_STATE)
-        .case(ThemesActions.putCurrentThemeACs.started, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.started, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.LOADING;
             nextState.applyStatus.data = {
                 themeID: payload.themeID,
             };
             return nextState;
         })
-        .case(ThemesActions.putCurrentThemeACs.done, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.done, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.SUCCESS;
             nextState.applyStatus.error = undefined;
 
             return nextState;
         })
-        .case(ThemesActions.putCurrentThemeACs.failed, (nextState, payload) => {
+        .case(ThemeActions.putCurrentThemeACs.failed, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.ERROR;
             nextState.applyStatus.error = payload.error;
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.started, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.started, (nextState, payload) => {
             if (payload.type === PreviewStatusType.CANCEL) {
                 nextState.cancelStatus.status = LoadStatus.LOADING;
             }
@@ -58,7 +58,7 @@ export const themePreviewToastReducer = produce(
             };
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.done, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.done, (nextState, payload) => {
             if (payload.params.type === PreviewStatusType.CANCEL) {
                 nextState.cancelStatus.status = LoadStatus.SUCCESS;
             }
@@ -66,7 +66,7 @@ export const themePreviewToastReducer = produce(
 
             return nextState;
         })
-        .case(ThemesActions.putPreviewThemeACs.failed, (nextState, payload) => {
+        .case(ThemeActions.putPreviewThemeACs.failed, (nextState, payload) => {
             nextState.cancelStatus.status = LoadStatus.ERROR;
             nextState.cancelStatus.error = payload.error;
             return nextState;

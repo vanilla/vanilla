@@ -1039,7 +1039,6 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
 }
 
 .Popup.hasRichEditor .Border {
-  width: 100%;
   box-sizing: border-box;
 }
 .Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
@@ -1048,6 +1047,11 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   display: none !important;
 }
 
+@media (max-width: 700px) {
+  .Popup.hasRichEditor .Border {
+    width: 100%;
+  }
+}
 @media (min-width: 700px) {
   .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm select,
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
@@ -1133,7 +1137,7 @@ body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
   }
   .Popup.hasRichEditor .Popup.hasRichEditor .Border,
 body.hasRichEditor .Popup.hasRichEditor .Border {
-    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
   }
   .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
@@ -1421,6 +1425,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   content: "";
   transition: 0.2s ease box-shadow;
+  pointer-events: none;
 }
 .richEditor .embedExternal-content:hover:after,
 .richEditor .embedLinkLoader-link:hover:after {
@@ -1566,7 +1571,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .Message img .embedImage-img,
 .embedImage-img {
-  display: block;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   position: relative;
   margin-left: auto;
   margin-right: auto;
@@ -1576,10 +1583,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .bbcode_left .embedImage-img {
   margin-left: 0;
+  display: inline-block;
 }
 
 .bbcode_right .embedImage-img {
   margin-right: 0;
+  display: inline-block;
 }
 
 .embedImage-link {
@@ -2113,6 +2122,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 .userContent li,
 .userContent.userContent ul li {
   margin: 5px 0;
+}
+
+svg {
+  pointer-events: none !important;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

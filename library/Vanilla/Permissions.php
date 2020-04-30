@@ -6,6 +6,7 @@
 
 namespace Vanilla;
 
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 
@@ -14,6 +15,31 @@ use Vanilla\Utility\DelimitedScheme;
  */
 class Permissions implements \JsonSerializable {
     use PermissionsTranslationTrait;
+
+    /** @var string Mode used when you want to know only if the user has the global permission, and not a resource specific one. */
+    const CHECK_MODE_GLOBAL_ONLY = "checkGlobalOnly";
+
+    /** @var string Standard mode for checking. If the use has the global or any resource specific permission, will return it. */
+    const CHECK_MODE_GLOBAL_OR_RESOURCE = "checkGlobalOrResource";
+
+    /** @var string Check only on the specific resource. */
+    const CHECK_MODE_RESOURCE_ONLY = "checkResource";
+
+    const PERMISSION_CHECK_MODES = [
+        self::CHECK_MODE_GLOBAL_ONLY,
+        self::CHECK_MODE_GLOBAL_OR_RESOURCE,
+        self::CHECK_MODE_RESOURCE_ONLY,
+    ];
+
+    /** Array of ranked permissions. */
+    private const RANKED_PERMISSIONS = [
+        'Garden.Admin.Allow' => 6, // virtual permission for isAdmin
+        'Garden.Settings.Manage' => 5,
+        'Garden.Community.Manage' => 4,
+        'Garden.Moderation.Manage' => 3,
+        'Garden.Curation.Manage' => 2,
+        'Garden.SignIn.Allow' => 1,
+    ];
 
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
@@ -216,10 +242,11 @@ class Permissions implements \JsonSerializable {
      *
      * @param string $permission Permission slug to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permission against (e.g. a category ID).
+     * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
      * @return bool
      */
-    public function has($permission, $id = null) {
-        return $this->hasAll((array)$permission, $id);
+    public function has($permission, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE) {
+        return $this->hasAll((array)$permission, $id, $checkMode);
     }
 
     /**
@@ -227,9 +254,10 @@ class Permissions implements \JsonSerializable {
      *
      * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID).
+     * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
      * @return bool
      */
-    public function hasAll(array $permissions, $id = null) {
+    public function hasAll(array $permissions, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE) {
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
             return false;
@@ -240,7 +268,7 @@ class Permissions implements \JsonSerializable {
         }
 
         foreach ($permissions as $permission) {
-            if ($this->hasInternal($permission, $id) === false) {
+            if ($this->hasInternal($permission, $id, $checkMode) === false) {
                 return false;
             }
         }
@@ -253,9 +281,10 @@ class Permissions implements \JsonSerializable {
      *
      * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID).
+     * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
      * @return bool
      */
-    public function hasAny(array $permissions, $id = null) {
+    public function hasAny(array $permissions, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE) {
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
             return false;
@@ -267,7 +296,7 @@ class Permissions implements \JsonSerializable {
 
         $nullCount = 0;
         foreach ($permissions as $permission) {
-            $has = $this->hasInternal($permission, $id);
+            $has = $this->hasInternal($permission, $id, $checkMode);
             if ($has === true) {
                 return true;
             } elseif ($has === null) {
@@ -322,7 +351,7 @@ class Permissions implements \JsonSerializable {
     /**
      * Remove a permission.
      *
-     * @param $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
+     * @param string $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View).
      * @param int|array $ids One or more IDs of foreign objects (e.g. category IDs).
      * @return $this;
      */
@@ -388,27 +417,173 @@ class Permissions implements \JsonSerializable {
     }
 
     /**
+     * Check the given permission, but also return true if the user has a higher permission.
+     *
+     * @param string $permission The permission to check.
+     * @return boolean True on valid authorization, false on failure to authorize
+     */
+    public function hasRanked(string $permission): bool {
+        if (!isset(self::RANKED_PERMISSIONS[$permission])) {
+            return $this->has($permission);
+        } else {
+            $minRank = self::RANKED_PERMISSIONS[$permission];
+
+            /**
+             * If the current permission is in our ranked list, iterate through the list, starting from the highest
+             * ranked permission down to our target permission, and determine if any are applicable to the current
+             * user.  This is done so that a user with a permission like Garden.Settings.Manage can still validate
+             * permissions against a Garden.Moderation.Manage permission check, without explicitly having it
+             * assigned to their role.
+             */
+            foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+                if ($rank < $minRank) {
+                    return false;
+                } elseif ($this->has($name)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Return the highest ranking permission the user has.
+     *
+     * @return string
+     */
+    public function getRankingPermission(): string {
+        foreach (self::RANKED_PERMISSIONS as $name => $rank) {
+            if ($this->has($name)) {
+                return $name;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Compare this permission set to another set to see which has the higher rank.
+     *
+     * @param Permissions $permissions The permissions to compare to.
+     * @return int Returns -1, 0, 1 for less than, equal, or greater than.
+     */
+    public function compareRankTo(Permissions $permissions): int {
+        $myRank = $this->getRankingPermission();
+        $otherRank = $permissions->getRankingPermission();
+
+        $r = (self::RANKED_PERMISSIONS[$myRank] ?? 0) <=> (self::RANKED_PERMISSIONS[$otherRank] ?? 0);
+        return $r;
+    }
+
+    /**
      * Check just the permissions array, ignoring overrides from admin/bans.
      *
      * @param string $permission The permission to check.
      * @param int|null $id The database ID of a non-global permission or **null** if this is a global check.
+     * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
      * @return bool|null Returns **true** if the user has the permission, **false** if they don't, or **null** if the permissions isn't applicable.
      */
-    private function hasInternal($permission, $id = null) {
+    private function hasInternal($permission, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE) {
+        // Fix the mode of checking.
+        if ($id !== null) {
+            // We have a resource so we should check that.
+            $checkMode = self::CHECK_MODE_RESOURCE_ONLY;
+        }
+
         if (strcasecmp($permission, 'admin') === 0) {
             return $this->isAdmin();
         } elseif (substr($permission, 0, 1) === '!') {
             // This is a ban so skip it.
             return null;
-        } elseif ($id === null) {
-            return !empty($this->permissions[$permission]) || (array_search($permission, $this->permissions) !== false);
         } else {
-            if (array_key_exists($permission, $this->permissions) && is_array($this->permissions[$permission])) {
-                return (array_search($id, $this->permissions[$permission]) !== false);
-            } else {
-                return false;
+            $hasGlobal = array_search($permission, $this->permissions) !== false;
+            $hasAnyResourceSpecific = !empty($this->permissions[$permission]);
+
+            switch ($checkMode) {
+                case self::CHECK_MODE_RESOURCE_ONLY:
+                    if (array_key_exists($permission, $this->permissions) && is_array($this->permissions[$permission])) {
+                        return (array_search($id, $this->permissions[$permission]) !== false);
+                    } else {
+                        return false;
+                    }
+                case self::CHECK_MODE_GLOBAL_ONLY:
+                    return $hasGlobal;
+                case self::CHECK_MODE_GLOBAL_OR_RESOURCE:
+                default:
+                    return $hasGlobal || $hasAnyResourceSpecific;
             }
         }
+    }
+
+    /**
+     * @return array[] An array of permission fragemnts. See PermissionFragmentSchema
+     */
+    public function asPermissionFragments(): array {
+        $resultsByTypeAndID = [
+            'global' => [
+                'type' => 'global',
+                'id' => null,
+                'permissions' => [],
+            ],
+        ];
+
+        /**
+         * Push an item into the permission array.
+         *
+         * @param string $permissionName
+         * @param int|null $resourceID
+         */
+        $pushItem = function (string $permissionName, ?int $resourceID = null) use (&$resultsByTypeAndID) {
+            // Map permission name to API style.
+            $permissionName = $this->renamePermission($permissionName);
+
+            // Handle root resourceIDs.
+            if ($resourceID === -1) {
+                $resourceID = null;
+            }
+
+            $junctionTable = $this->getJunctionTableForPermission($permissionName) ?? PermissionFragmentSchema::TYPE_GLOBAL;
+            $type = $junctionTable && $resourceID !== null ? $junctionTable : PermissionFragmentSchema::TYPE_GLOBAL;
+            $typeAndID = $type . $resourceID;
+
+            if (!empty($resultsByTypeAndID[$typeAndID])) {
+                $resultsByTypeAndID[$typeAndID]['permissions'][$permissionName] = true;
+            } else {
+                $resultsByTypeAndID[$typeAndID] = [
+                    'type' => $type,
+                    'id' => $resourceID,
+                    'permissions' => [$permissionName => true],
+                ];
+            }
+        };
+
+        // Push all of the permissions in.
+        foreach ($this->permissions as $key => $value) {
+            if (is_array($value)) {
+                // We have some resource specific information.
+                $permissionName = $key;
+                if ($this->isPermissionDeprecated($permissionName)) {
+                    continue;
+                }
+                foreach ($value as $resourceID) {
+                    $pushItem($permissionName, $resourceID);
+                }
+            } else {
+                // This is a global permission.
+                $permissionName = $value;
+                if ($this->isPermissionDeprecated($value)) {
+                    continue;
+                }
+                $pushItem($permissionName);
+            }
+        }
+
+        foreach ($resultsByTypeAndID as &$result) {
+            $permissions = $this->consolidatePermissions($result['permissions']);
+            ksort($permissions);
+            $result['permissions'] = $permissions;
+        }
+
+        return array_values($resultsByTypeAndID);
     }
 
     /**

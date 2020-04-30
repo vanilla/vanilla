@@ -11,6 +11,7 @@ import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { IFieldError } from "@library/@types/api/core";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -35,7 +36,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     labelNote?: string;
     labelID?: string;
     descriptionID?: string;
-    errors?: IFieldError[];
+    errors?: IError[];
     baseClass?: InputTextBlockBaseClass;
     legacyMode?: boolean;
     noMargin?: boolean;
@@ -101,7 +102,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                     {children}
                 </span>
                 <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
-                <ErrorMessages id={this.errorID} errors={this.props.errors} />
+                <ErrorMessages id={this.errorID} errors={this.props.errors} padded />
             </OuterTag>
         );
     }

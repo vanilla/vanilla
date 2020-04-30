@@ -10,6 +10,16 @@ interface IProps {
     uniqueKey: string | number; // A new analytics event is only fired when this changes.
 }
 
+let legacyAnalyticsTickEnabled = false;
+
+export function enableLegacyAnalyticsTick(newValue: boolean) {
+    legacyAnalyticsTickEnabled = newValue;
+}
+
+export function isLegacyAnalyticsTickEnabled() {
+    return legacyAnalyticsTickEnabled;
+}
+
 /**
  * A component to trigger an analytics event. The unique key must change between renders for a new event to fire.
  */

@@ -7,14 +7,18 @@
 import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
 import moment from "moment";
+import { getJSLocaleKey } from "@vanilla/i18n";
 
 interface IProps {
     /** The timestamp to format and display */
     timestamp: string;
+    /** Pass an explicit time zone to format in. */
+    timezone: string;
     /** An additional classname to apply to the root of the component */
     className?: string;
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
+    extended?: boolean;
 }
 
 /**
@@ -53,13 +57,14 @@ export default class DateTime extends Component<IProps> {
      */
     private get titleTime(): string {
         const date = new Date(this.props.timestamp);
-        return date.toLocaleString(undefined, {
+        return date.toLocaleString(getJSLocaleKey(), {
             year: "numeric",
             month: "long",
             day: "numeric",
             weekday: "long",
             hour: "numeric",
             minute: "numeric",
+            timeZone: this.props.timezone,
         });
     }
 
@@ -78,7 +83,22 @@ export default class DateTime extends Component<IProps> {
 
             return inputMoment.from(moment());
         } else {
-            return inputMoment.toDate().toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
+            const options = this.props.extended
+                ? {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                      timeZone: this.props.timezone,
+                  }
+                : {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      timeZone: this.props.timezone,
+                  };
+            return inputMoment.toDate().toLocaleString(getJSLocaleKey(), options);
         }
     }
 }

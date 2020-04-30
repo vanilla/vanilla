@@ -5,48 +5,97 @@
  * @license GPL-2.0-only
  */
 
-import {
-    borders,
-    colorOut,
-    getHorizontalPaddingForTextInput,
-    getVerticalPaddingForTextInput,
-    margins,
-    negative,
-    textInputSizingFromFixedHeight,
-    unit,
-} from "@library/styles/styleHelpers";
+import { colorOut, unit, userSelect, importantColorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important, percent, translateY } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { important } from "csx";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
-    const inputVars = inputVariables();
-    const formVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
+    const primaryContrast = colorOut(mainColors.primaryContrast);
 
-    cssOut(
+    mixinClickInput(
         `
-        .Pager span,
-        .Pager > a`,
+        .Pager > span,
+        .Pager > a,
+    `,
+        {},
         {
-            ...borders(),
-            backgroundColor: colorOut(globalVars.mainColors.bg),
-            color: colorOut(globalVars.mainColors.fg),
+            default: {
+                ...userSelect(),
+            },
+            allStates: {
+                ...userSelect(),
+                backgroundColor: colorOut(globalVars.mainColors.fg.fade(0.05)),
+            },
         },
     );
 
-    cssOut(`.Pager span`, {
-        $nest: {
-            [`&:hover, &:focus, &:active`]: {
-                color: primary,
+    mixinClickInput(
+        `
+        .Pager > a.Highlight
+    `,
+        {
+            default: primary,
+            allStates: primary,
+        },
+        {
+            default: {
+                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                cursor: "pointer",
+                ...userSelect(),
+            },
+            allStates: {
+                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                ...userSelect(),
             },
         },
+    );
+
+    cssOut(`.Pager .Next`, {
+        borderTopRightRadius: globalVars.border.radius,
+        borderBottomRightRadius: globalVars.border.radius,
+    });
+
+    cssOut(`.Pager .Previous`, {
+        borderBottomLeftRadius: globalVars.border.radius,
+        borderTopLeftRadius: globalVars.border.radius,
+    });
+
+    cssOut(`.Pager span`, {
+        cursor: important("default"),
+        backgroundColor: importantColorOut(globalVars.mainColors.bg),
+        color: importantColorOut(globalVars.links.colors.default),
+        opacity: 0.5,
+    });
+
+    cssOut(`.Content .PageControls`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexDirection: "row-reverse",
+        marginBottom: unit(16),
+    });
+
+    cssOut(`.MorePager`, {
+        textAlign: "right",
+        $nest: {
+            "& a": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    cssOut(`.PageControls-filters`, {
+        flex: 1,
+        display: "inline-flex",
+        alignItems: "baseline",
+    });
+
+    cssOut(`.PageControls.PageControls .selectBox`, {
+        height: "auto",
     });
 };

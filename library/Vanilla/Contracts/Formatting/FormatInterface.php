@@ -44,7 +44,15 @@ interface FormatInterface {
     public function renderPlainText(string $content): string;
 
     /**
-     * Render a version of the content suitable to be quoted in other content.
+     * Calculate the length of content with formatting and metadata removed.
+     *
+     * @param string $content
+     * @return int
+     */
+    public function getPlainTextLength(string $content): int;
+
+    /**
+     * Render a version of the content   suitable to be quoted in other content.
      *
      * @param string $content The raw content to render.
      *
@@ -97,4 +105,9 @@ interface FormatInterface {
      * @return string[] A list of usernames.
      */
     public function parseMentions(string $content): array;
+
+    /**
+     * @param bool $extendContent
+     */
+    public function setAllowExtendedContent(bool $extendContent): void;
 }

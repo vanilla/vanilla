@@ -223,7 +223,10 @@
     th,
     td {
         width: 100px;
-        padding: ($spacer / 2) ($spacer * .75);
+        padding: ($spacer / 2) $table-padding-x;
+
+        // 1px offset to account for previous border sizes.
+        padding-left: $table-padding-x - 1px;
 
         border-right: $table-border-width solid #eee;
         border-top: $table-border-width solid #ddd;
@@ -233,6 +236,10 @@
         font-weight: 600;
         font-size: $font-size-sm;
         line-height: $line-height-lg;
+
+        &:first-child {
+            padding-left: $table-padding-x;
+        }
 
         &:last-child {
             border-right: 0;
@@ -416,7 +423,7 @@
 
     tbody {
         td {
-            padding: ($spacer / 2) ($spacer * .75);
+            padding: ($spacer / 2) ($grid-gutter-width / 2);
             text-align: center;
         }
     }

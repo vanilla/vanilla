@@ -5,52 +5,58 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { style } from "typestyle";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { containerVariables } from "@library/layout/components/containerStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { calc, percent, translateX, viewWidth } from "csx";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("datePicker");
+    const makeThemeVars = variableFactory("datePicker");
 
-    const spacing = {
+    const spacing = makeThemeVars("spacing", {
         padding: 9,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         height: formElementVars.sizing.height,
-    };
+    });
 
-    const colors = {
+    const colors = makeThemeVars("colors", {
         today: globalVars.mainColors.primary,
         selected: {
-            color: globalVars.states.selected.color,
+            color: globalVars.states.selected.highlight,
         },
         hover: {
-            bg: globalVars.states.hover.color,
+            bg: globalVars.states.hover.highlight,
         },
-    };
+    });
 
-    const border = {
+    const border = makeThemeVars("border", {
         radius: globalVars.border.radius,
-    };
+    });
 
-    return { spacing, sizing, colors, border };
+    return {
+        spacing,
+        sizing,
+        colors,
+        border,
+    };
 });
 
 export const dayPickerClasses = useThemeCache(() => {
-    const debug = debugHelper("dayPicker");
+    const style = styleFactory("dayPicker");
     const vars = dayPickerVariables();
 
     // From third party, so we're targetting them this way
     const root = style({
-        ...debug.name(),
         $nest: {
             "& .DayPicker-wrapper": {
-                ...debug.name("AMIBHERE"),
                 padding: 0,
             },
             "& .DayPicker-Month": {
@@ -74,32 +80,34 @@ export const dayPickerClasses = useThemeCache(() => {
                     },
                 },
             },
-            "& .DayPicker-Day--today": {
-                color: vars.colors.today.toString(),
+            "& .DayPicker-Day.DayPicker-Day--today": {
+                color: colorOut(vars.colors.today),
             },
         },
     });
 
-    const header = style({
+    const header = style("header", {
         display: "flex",
         alignItems: "center",
         height: unit(vars.sizing.height),
         paddingLeft: unit(vars.spacing.padding),
         marginTop: unit(vars.spacing.padding),
-        ...debug.name("header"),
     });
 
-    const title = style({
+    const title = style("title", {
         flex: 1,
         padding: unit(vars.spacing.padding),
-        ...debug.name("title"),
     });
 
-    const navigation = style({
+    const navigation = style("navigation", {
         display: "flex",
         alignItems: "center",
-        ...debug.name("navigation"),
     });
 
-    return { root, header, title, navigation };
+    return {
+        root,
+        header,
+        title,
+        navigation,
+    };
 });

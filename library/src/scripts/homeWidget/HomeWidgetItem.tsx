@@ -47,7 +47,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                     HomeWidgetItemContentType.TITLE_DESCRIPTION,
                     HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
                 ].includes(options.contentType) && (
-                    <TruncatedText maxCharCount={160} tag={"div"}>
+                    <TruncatedText maxCharCount={160} tag={"div"} className={classes.description}>
                         {props.description}
                     </TruncatedText>
                 )}

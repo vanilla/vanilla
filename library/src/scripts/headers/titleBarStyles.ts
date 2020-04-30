@@ -5,39 +5,58 @@
  */
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    absolutePosition,
     allButtonStates,
     borders,
+    BorderType,
     colorOut,
-    emphasizeLightness,
     flexHelper,
     modifyColorBasedOnLightness,
-    unit,
-    userSelect,
-    absolutePosition,
+    offsetLightness,
     pointerEvents,
     singleBorder,
     sticky,
-    BorderType,
+    unit,
+    userSelect,
+    EMPTY_FONTS,
+    isLightColor,
+    negativeUnit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { ColorHelper, percent, px, quote, viewHeight, url, translate } from "csx";
+import {
+    calc,
+    ColorHelper,
+    important,
+    linearGradient,
+    percent,
+    px,
+    quote,
+    rgba,
+    translate,
+    translateX,
+    translateY,
+    viewHeight,
+} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { iconClasses } from "@library/icons/iconClasses";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonResetMixin, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { BackgroundProperty } from "csstype";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const titleBarVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const makeThemeVars = variableFactory("titleBar");
+export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const formElementVars = formElementsVariables(forcedVars);
+    const makeThemeVars = variableFactory("titleBar", forcedVars);
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
@@ -48,10 +67,52 @@ export const titleBarVariables = useThemeCache(() => {
         },
     });
 
-    const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.bg,
+    const spacing = makeThemeVars("spacing", {
+        padding: {
+            top: 0, // This is to add extra padding under the content of the title bar.
+            bottom: 0, // This is to add extra padding under the content of the title bar.
+        },
+    });
+
+    // Note that this overlay will go on top of the bg image, if you have one.
+    const overlay = makeThemeVars("overlay", {
+        background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
+    });
+
+    const colorsInit = makeThemeVars("colors", {
+        fg: globalVars.mainColors.primaryContrast,
         bg: globalVars.mainColors.primary,
         bgImage: null as string | null,
+    });
+
+    const colors = makeThemeVars("colors", {
+        ...colorsInit,
+        state: {
+            bg: isLightColor(colorsInit.bg) ? rgba(0, 0, 0, 0.1) : rgba(255, 255, 255, 0.1),
+            fg: colorsInit.fg,
+        },
+    });
+
+    const border = makeThemeVars("border", {
+        type: BorderType.NONE,
+        color: globalVars.border.color,
+        width: globalVars.border.width,
+    });
+
+    // sizing.height gives you the height of the contents of the titleBar.
+    // If spacing.paddingBottom is set, this value will be different than the height. To be used if you need to get the full height, not just the contents height.
+    const fullHeight =
+        sizing.height + spacing.padding.bottom + spacing.padding.top + border.type == BorderType.SHADOW_AS_BORDER
+            ? border.width
+            : 0;
+
+    const swoopInit = makeThemeVars("swoop", {
+        amount: 0,
+    });
+
+    const swoop = makeThemeVars("swoop", {
+        ...swoopInit,
+        swoopOffset: (16 * swoopInit.amount) / 50,
     });
 
     const fullBleed = makeThemeVars("fullBleed", {
@@ -68,10 +129,6 @@ export const titleBarVariables = useThemeCache(() => {
         spacer: 8,
     });
 
-    const border = makeThemeVars("border", {
-        type: BorderType.NONE,
-    });
-
     const buttonSize = globalVars.buttonIcon.size;
     const button = makeThemeVars("button", {
         borderRadius: globalVars.border.radius,
@@ -84,20 +141,22 @@ export const titleBarVariables = useThemeCache(() => {
             width: buttonSize,
         },
         state: {
-            bg: emphasizeLightness(colors.bg, 0.04),
+            bg: colors.state.bg,
         },
     });
 
-    const navAlignment = makeThemeVars("navAlignment", {
-        alignment: "left" as "left" | "center",
+    const generatedColors = makeThemeVars("generatedColors", {
+        state: offsetLightness(colors.bg, 0.04), // Default state color change
     });
 
     const linkButtonDefaults: IButtonType = {
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
-            bg: "transparent",
+            bg: rgba(0, 0, 0, 0),
+            fg: colors.fg,
         },
         fonts: {
+            ...EMPTY_FONTS,
             color: colors.fg,
         },
         sizing: {
@@ -105,30 +164,30 @@ export const titleBarVariables = useThemeCache(() => {
             minHeight: unit(globalVars.icon.sizes.large),
         },
         padding: {
-            side: 6,
+            horizontal: 6,
         },
         borders: {
             style: "none",
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         },
         hover: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focus: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         focusAccessible: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
         active: {
             colors: {
-                bg: button.state.bg,
+                bg: generatedColors.state,
             },
         },
     };
@@ -154,7 +213,8 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
-        maxWidth: 672,
+        bg: fullBleed.enabled ? colors.bg.fade(0.2) : globalVars.mainColors.secondary,
+        fg: colors.fg,
         mobile: {
             width: button.mobile.width,
         },
@@ -197,13 +257,38 @@ export const titleBarVariables = useThemeCache(() => {
         bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
     });
 
+    // Note that the logo defined here is the last fallback. If set through the dashboard, it will overwrite these values.
     const logo = makeThemeVars("logo", {
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
+        justifyContent: LogoAlignment.LEFT,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
+        desktop: {
+            url: undefined,
+        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        mobile: {
+            url: undefined,
+            maxWidth: undefined,
+            heightOffset: sizing.height / 3,
+        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
+        offsetVertical: {
+            amount: 0,
+            mobile: {
+                amount: 0,
+            },
+        },
     });
+
+    const navAlignment = makeThemeVars("navAlignment", {
+        alignment: "left" as "left" | "center",
+    });
+
+    if (logo.justifyContent === LogoAlignment.CENTER) {
+        // Forced to the left because they can't both be in the center.
+        navAlignment.alignment = "left";
+    }
 
     const mobileLogo = makeThemeVars("mobileLogo", {
         justifyContent: LogoAlignment.CENTER,
@@ -243,6 +328,7 @@ export const titleBarVariables = useThemeCache(() => {
         border,
         sizing,
         colors,
+        overlay,
         signIn,
         resister,
         guest,
@@ -261,6 +347,9 @@ export const titleBarVariables = useThemeCache(() => {
         breakpoints,
         navAlignment,
         mobileLogo,
+        spacing,
+        swoop,
+        fullHeight,
     };
 });
 
@@ -276,13 +365,20 @@ export const titleBarClasses = useThemeCache(() => {
         switch (vars.border.type) {
             case BorderType.BORDER:
                 return {
-                    borderBottom: singleBorder(),
+                    borderBottom: singleBorder({
+                        color: vars.border.color,
+                        width: vars.border.width,
+                    }),
                 };
             case BorderType.SHADOW:
                 return {
-                    boxShadow: shadowHelper().makeShadow(),
+                    boxShadow: shadowHelper().embed(globalVars.elementaryColors.black).boxShadow,
                 };
+            case BorderType.SHADOW_AS_BORDER:
+                // Note that this is empty because this option is set on the background elsewhere.
+                return {};
             case BorderType.NONE:
+                return {};
             default:
                 return {};
         }
@@ -322,22 +418,78 @@ export const titleBarClasses = useThemeCache(() => {
                     },
                 },
             },
+            [`& .${searchBarClasses().valueContainer}`]: {
+                backgroundColor: colorOut(vars.compactSearch.bg),
+            },
         },
-        ...mediaQueries.compact({
-            height: px(vars.sizing.mobile.height),
-        }).$nest,
+        ...(vars.swoop.amount
+            ? {
+                  $nest: {
+                      "& + *": {
+                          // Offset the next element to account for the swoop. (next element should go under the swoop slightly).
+                          marginTop: -vars.swoop.swoopOffset,
+                      },
+                  },
+              }
+            : {}),
     });
+
+    const swoopStyles = {
+        top: 0,
+        left: 0,
+        margin: `0 auto`,
+        position: `absolute`,
+        height: calc(`80% - ${unit(vars.border.width + 1)}`),
+        transform: translateX(`-10vw`),
+        width: `120vw`,
+        borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
+    };
+
+    const swoop = style("swoop", {});
+
+    const shadowAsBorder =
+        vars.border.type === BorderType.SHADOW_AS_BORDER
+            ? { boxShadow: `0 ${unit(vars.border.width)} 0 ${colorOut(vars.border.color)}` }
+            : {};
 
     const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: colorOut(vars.colors.bg),
+        // backgroundColor: colorOut(vars.colors.bg),
+        ...shadowAsBorder,
+        overflow: "hidden",
+        $nest: {
+            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        },
     });
 
     const bg2 = style("bg2", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
         backgroundColor: colorOut(vars.colors.bg),
+        ...shadowAsBorder,
+        overflow: "hidden",
+        $nest: {
+            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        },
+    });
+
+    const container = style("container", {
+        position: "relative",
+        height: percent(100),
+        width: percent(100),
+        paddingTop: unit(vars.spacing.padding.top),
+        paddingBottom: unit(vars.spacing.padding.bottom),
+    });
+
+    const bgContainer = style("bgContainer", {
+        ...absolutePosition.fullSizeOfParent(),
+        height: percent(100),
+        width: percent(100),
+        paddingTop: unit(vars.spacing.padding.top),
+        paddingBottom: unit(vars.spacing.padding.bottom),
+        boxSizing: "content-box",
+        overflow: "hidden",
     });
 
     const bgImage = style("bgImage", {
@@ -345,15 +497,23 @@ export const titleBarClasses = useThemeCache(() => {
         objectFit: "cover",
     });
 
+    const bannerPadding = style(
+        "bannerPadding",
+        {
+            paddingTop: px(vars.sizing.height / 2),
+        },
+        mediaQueries.compact({
+            paddingTop: px(vars.sizing.mobile.height / 2 + 20),
+        }),
+    );
+
     const negativeSpacer = style(
         "negativeSpacer",
         {
             marginTop: px(-vars.sizing.height),
-            paddingTop: px(vars.sizing.height / 2),
         },
         mediaQueries.compact({
             marginTop: px(-vars.sizing.mobile.height),
-            paddingTop: px(vars.sizing.mobile.height / 2),
         }),
     );
 
@@ -385,6 +545,18 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const logoOffsetDesktop = vars.logo.offsetVertical.amount
+        ? {
+              transform: translateY(`${unit(vars.logo.offsetVertical.amount)}`),
+          }
+        : {};
+
+    const logoOffsetMobile = vars.logo.offsetVertical.mobile.amount
+        ? {
+              transform: translateY(`${unit(vars.logo.offsetVertical.mobile.amount)}`),
+          }
+        : {};
+
     const logoContainer = style(
         "logoContainer",
         {
@@ -392,7 +564,8 @@ export const titleBarClasses = useThemeCache(() => {
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
             marginRight: unit(vars.logo.offsetRight),
-            justifyContent: vars.mobileLogo.justifyContent,
+            justifyContent: vars.logo.justifyContent,
+            ...logoOffsetDesktop,
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -411,6 +584,7 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
             marginRight: unit(0),
+            ...logoOffsetMobile,
         }),
     );
 
@@ -481,7 +655,6 @@ export const titleBarClasses = useThemeCache(() => {
             height: unit(vars.sizing.height),
             $nest: {
                 "&.isOpen": {
-                    width: unit(vars.compactSearch.maxWidth),
                     flex: 1,
                 },
             },
@@ -492,7 +665,6 @@ export const titleBarClasses = useThemeCache(() => {
     const compactSearchResults = style("compactSearchResults", {
         position: "absolute",
         top: unit(formElementVars.sizing.height),
-        maxWidth: px(vars.compactSearch.maxWidth),
         width: percent(100),
         $nest: {
             "&:empty": {
@@ -556,7 +728,7 @@ export const titleBarClasses = useThemeCache(() => {
                 "&&": {
                     ...allButtonStates(
                         {
-                            active: {
+                            allStates: {
                                 color: colorOut(vars.colors.fg),
                                 $nest: {
                                     "& .meBox-buttonContent": {
@@ -564,15 +736,7 @@ export const titleBarClasses = useThemeCache(() => {
                                     },
                                 },
                             },
-                            hover: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            accessibleFocus: {
+                            keyboardFocus: {
                                 outline: 0,
                                 color: colorOut(vars.colors.fg),
                                 $nest: {
@@ -587,7 +751,7 @@ export const titleBarClasses = useThemeCache(() => {
                             "& .meBox-buttonContent": {
                                 ...borders({
                                     width: 1,
-                                    color: "transparent",
+                                    color: rgba(0, 0, 0, 0),
                                 }),
                             },
                             "&.isOpen": {
@@ -622,7 +786,7 @@ export const titleBarClasses = useThemeCache(() => {
         transform: `translateX(6px)`,
     });
 
-    const centeredButtonClass = style("centeredButtonClass", {
+    const centeredButton = style("centeredButton", {
         ...flex.middle(),
     });
 
@@ -778,6 +942,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const hamburger = style("hamburger", {
         marginRight: unit(12),
+        marginLeft: negativeUnit(globalVars.buttonIcon.offset),
         $nest: {
             "&&": {
                 ...allButtonStates({
@@ -800,12 +965,30 @@ export const titleBarClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
+    const overlay = style("overlay", {
+        ...absolutePosition.fullSizeOfParent(),
+        background: vars.overlay.background,
+    });
+
+    const signInIconOffset = style("signInIconOffset", {
+        marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
+    });
+
+    const titleBarContainer = style("titleBarContainer", {
+        ...paddings({
+            horizontal: globalVars.gutter.half,
+        }),
+    });
+
     return {
         root,
         bg1,
         bg2,
+        container,
+        bgContainer,
         bgImage,
         negativeSpacer,
+        bannerPadding,
         spacer,
         bar,
         logoContainer,
@@ -830,7 +1013,7 @@ export const titleBarClasses = useThemeCache(() => {
         leftFlexBasis,
         signIn,
         register,
-        centeredButtonClass,
+        centeredButton,
         compactSearchResults,
         clearButtonClass,
         guestButton,
@@ -840,34 +1023,36 @@ export const titleBarClasses = useThemeCache(() => {
         hamburger,
         isSticky,
         logoAnimationWrap,
+        overlay,
+        swoop,
+        signInIconOffset,
+        titleBarContainer,
     };
 });
 
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
-    const logoHeight = px(vars.sizing.height - vars.logo.heightOffset);
 
     const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
 
     const logo = style("logo", {
         display: "block",
-        maxHeight: logoHeight,
+        maxHeight: px(vars.sizing.height - vars.logo.heightOffset),
         maxWidth: unit(vars.logo.maxWidth),
         width: "auto",
         $nest: {
             "&.isCentred": {
                 margin: "auto",
             },
-            [`.${iconClasses().vanillaLogo}`]: {
-                height: logoHeight,
-                width: "auto",
-            },
         },
     });
 
     const mobileLogo = style("mobileLogo", {
+        display: "flex",
         justifyContent: vars.mobileLogo.justifyContent,
+        maxHeight: px(vars.sizing.mobile.height - (vars.logo.mobile.heightOffset ?? vars.logo.heightOffset)),
+        maxWidth: unit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
     });
 
     const isCenter = style("isCenter", {
@@ -885,19 +1070,24 @@ export const titleBarLogoClasses = useThemeCache(() => {
 });
 
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
-    const gradient = (direction: "right" | "left") => {
-        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(
-            color.fade(0.3),
-        )} 20%, ${colorOut(color)} 90%)`;
-    };
     return {
         "&:after": {
             ...absolutePosition.topRight(),
-            background: gradient("right"),
+            background: linearGradient(
+                "right",
+                `${colorOut(color.fade(0))} 0%`,
+                `${colorOut(color.fade(0.3))} 20%`,
+                `${colorOut(color)} 90%`,
+            ),
         },
         "&:before": {
             ...absolutePosition.topLeft(),
-            background: gradient("left"),
+            background: linearGradient(
+                "left",
+                `${colorOut(color.fade(0))} 0%`,
+                `${colorOut(color.fade(0.3))} 20%`,
+                `${colorOut(color)} 90%`,
+            ),
         },
         "&:before, &:after": {
             ...pointerEvents(),

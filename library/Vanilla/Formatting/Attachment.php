@@ -44,7 +44,7 @@ class Attachment implements \JsonSerializable {
                 'mediaID:i',
                 'name:s',
                 'mediaID:i',
-                'dateInserted:dt',
+                'dateInserted:dt?',
                 'size:i',
                 'type:s',
                 'url:s',
@@ -66,7 +66,7 @@ class Attachment implements \JsonSerializable {
         $attachment = new Attachment();
         $attachment->mediaID = $validated['mediaID'];
         $attachment->url = $validated['url'];
-        $attachment->dateInserted = $validated['dateInserted'];
+        $attachment->dateInserted = $validated['dateInserted'] ?? null;
         $attachment->name = $validated['name'];
         $attachment->size = $validated['size'];
         $attachment->type = $validated['type'];

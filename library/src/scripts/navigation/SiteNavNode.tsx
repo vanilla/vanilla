@@ -9,13 +9,14 @@ import classNames from "classnames";
 import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { SiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
 import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
+import { colorOut } from "@library/styles/styleHelpersColors";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -44,7 +45,6 @@ export default class SiteNavNode extends React.Component<IProps> {
         const depthClass = `hasDepth-${this.props.depth + 1}`;
         const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
         const classes = siteNavNodeClasses();
-
         const { activeRecord } = this.props;
 
         let linkContents;
@@ -61,7 +61,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                     className={linkContentClasses}
                     onClick={this.handleClick as any}
                 >
-                    <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
+                    <span className={classNames(classes.label)}>{this.props.name}</span>
                 </Button>
             );
         } else {
@@ -78,7 +78,9 @@ export default class SiteNavNode extends React.Component<IProps> {
                             tabIndex={0}
                             to={this.props.url}
                         >
-                            <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
+                            <span className={classNames(classes.label, this.props.isLink && classes.activeLink)}>
+                                {this.props.name}
+                            </span>
                         </SmartLink>
                     )}
                 </Hoverable>
@@ -110,7 +112,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible ? (
+                {collapsible && this.props.children.length > 0 ? (
                     <div
                         className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,

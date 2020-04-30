@@ -5,7 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, paddings, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    debugHelper,
+    ISimpleBorderStyle,
+    paddings,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
@@ -50,6 +58,7 @@ export const tokensClasses = useThemeCache(() => {
                 paddingRight: px(12),
                 paddingBottom: 0,
                 paddingLeft: px(12),
+                ...borders(globalVars.borderType.formElements.default),
                 $nest: {
                     "&.tokens__value-container--has-value": {
                         ...paddings({
@@ -107,7 +116,10 @@ export const tokensClasses = useThemeCache(() => {
     const inputWrap = style("inputWrarp", {
         $nest: {
             "&.hasFocus .inputBlock-inputText": {
-                borderColor: colorOut(globalVars.mainColors.primary),
+                ...borders({
+                    ...globalVars.borderType.formElements.default,
+                    color: globalVars.mainColors.primary,
+                }),
             },
         },
     });

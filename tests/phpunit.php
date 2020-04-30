@@ -9,6 +9,8 @@ use VanillaTests\NullContainer;
 // Use consistent timezone for all tests.
 date_default_timezone_set("UTC");
 
+ini_set("default_charset", "UTF-8");
+
 error_reporting(E_ALL);
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
@@ -23,6 +25,8 @@ foreach ($classCompatibility as $class => $legacyClass) {
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
+define('PATH_UPLOADS', PATH_ROOT . '/tests/cache/uploads');
+
 define("PATH_FIXTURES", PATH_ROOT . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "fixtures");
 
 // Copy the cgi-bin files.
@@ -54,6 +58,10 @@ Gdn::setContainer(new NullContainer());
 
 // Clear the test cache.
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
+
+// Ensure our uploads directory exists.
+mkdir(PATH_ROOT.'/tests/cache', 0777);
+mkdir(PATH_UPLOADS, 0777);
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
 

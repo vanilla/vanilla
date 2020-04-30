@@ -87,7 +87,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\Site\ApplicationProvider::class)
     ->addCall('add', [new Reference(
         \Vanilla\Site\Application::class,
-        ['garden', ['api', 'entry', 'sso', 'utility']]
+        ['garden', ['api', 'entry', 'sso', 'utility', 'robots.txt', 'robots']]
     )])
     ->setShared(true)
 
@@ -130,8 +130,15 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     // File base theme api provider
     ->rule(\Vanilla\Models\ThemeModel::class)
+        ->setShared(true)
         ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
 
+    ->rule(\Vanilla\Models\ThemeSectionModel::class)
+    ->setShared(true)
+
+    ->rule(ThemeFeatures::class)
+    ->setShared(true)
+    ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // Logger
     ->rule(\Vanilla\Logger::class)
@@ -292,6 +299,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
 
+    ->rule(Gdn_Validation::class)
+    ->addCall('addRule', ['plainTextLength', new Reference(\Vanilla\PlainTextLengthValidator::class)])
+
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
@@ -371,6 +381,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerBuiltInFormats')
+    ->setInherit(true)
     ->setShared(true)
 
     ->rule(LegacyEmbedReplacer::class)

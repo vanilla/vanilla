@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
+import { useThemeCacheID } from "@library/styles/styleUtils";
 
 interface IProps {
     children: React.ReactNode;
@@ -23,13 +24,17 @@ interface IProps {
     errorComponent: React.ReactNode;
     variablesOnly?: boolean;
     disabled?: boolean;
+    revisionID?: number;
 }
 
+let hasMounted = false;
+
 export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
-    const { themeKey, disabled, variablesOnly } = props;
+    const { themeKey, disabled, variablesOnly, revisionID } = props;
     const { getAssets } = useReduxActions(ThemeActions);
     const { assets } = useSelector((state: ICoreStoreState) => state.theme);
     const { setTopOffset } = useScrollOffset();
+    const { cacheID } = useThemeCacheID();
 
     const [ownThemeKey, setThemeKey] = useState({});
     // Trigger a state re-render when the theme key changes
@@ -43,11 +48,12 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            void getAssets(themeKey);
+            void getAssets(themeKey, revisionID);
             return;
         }
 
-        if (assets.data) {
+        if (assets.data && !hasMounted) {
+            hasMounted = true;
             let themeHeader = document.getElementById("themeHeader");
             const themeFooter = document.getElementById("themeFooter");
 
@@ -62,13 +68,13 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
                 prepareShadowRoot(themeFooter, true);
             }
 
+            loadThemeFonts();
+
             if (variablesOnly) {
                 return;
             }
-
-            loadThemeFonts();
         }
-    }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey]);
+    }, [assets, disabled, setTopOffset, variablesOnly, getAssets, themeKey, cacheID]);
 
     if (props.disabled || props.variablesOnly) {
         return <>{props.children}</>;
@@ -78,7 +84,7 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         return (
             <>
                 <Backgrounds />
-                <Loader />
+                {!variablesOnly && <Loader />}
             </>
         );
     }

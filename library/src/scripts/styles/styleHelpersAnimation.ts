@@ -6,14 +6,17 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 
-export const defaultTransition = (...properties) => {
+export const defaultTransition = (...properties: string[]) => {
+    const vars = globalVariables();
+    return timedTransition(vars.animation.defaultTiming, ...properties);
+};
+
+export const timedTransition = (timing: string, ...properties: string[]) => {
     const vars = globalVariables();
     properties = properties.length === 0 ? ["all"] : properties;
     return {
         transition: `${properties.map((prop, index) => {
-            return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
-                index === properties.length ? ", " : ""
-            }`;
+            return `${prop} ${timing} ${vars.animation.defaultEasing}${index === properties.length ? ", " : ""}`;
         })}`,
     };
 };

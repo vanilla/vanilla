@@ -27,13 +27,16 @@ use Vanilla\Permissions;
  * any of its methods of constants.
  *
  */
-class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
+class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
     /** @var string token provided by authenticator  */
     protected $accessToken;
 
     /** @var array response to token request by authenticator  */
     protected $accessTokenResponse;
+
+    /** @var string AuthenticationSchemeAlias value */
+    protected $authenticationSchemeAlias = '';
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -90,6 +93,24 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
     }
 
     /**
+     * Gets the $authenticaitonSchemeAlias variable
+     *
+     * @return string
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return $this->authenticationSchemeAlias ?: $this->providerKey;
+    }
+
+    /**
+     * Sets the $authenticationSchemeAlias variable
+     *
+     * @param string $alias The AuthenticationSchemeAlias name.
+     */
+    protected function setAuthenticationSchemeAlias(string $alias): void {
+        $this->authenticationSchemeAlias = $alias;
+    }
+
+    /**
      * Add a query to a URL without checking if there is already a query attached.
      *
      * @param string $uri The URL with or without a query string already attached.
@@ -137,7 +158,8 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
                 'ProfileKeyPhoto' => 'picture',
                 'ProfileKeyName' => 'nickname',
                 'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'sub'
+                'ProfileKeyUniqueID' => 'sub',
+                'ProfileKeyRoles' => 'roles'
             ];
 
             $model->save($provider);
@@ -377,6 +399,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
             'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
             'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.'],
+            'ProfileKeyRoles' => ['LabelCode' => 'Roles', 'Description' => 'The Key in the JSON array to designate Roles.'],
             'Prompt' => ['LabelCode' => 'Prompt', 'Description' => 'Prompt Parameter to append to Authorize Url', 'Control' => 'DropDown', 'Items' => $promptOptions]
         ];
         return $formFields;
@@ -417,6 +440,7 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
         } else {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+            $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationSchemeAlias());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
@@ -788,13 +812,13 @@ class Gdn_OAuth2 extends Gdn_Plugin implements \Vanilla\InjectableInterface {
      */
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
-        $email = val('ProfileKeyEmail', $provider, 'email');
         $translatedKeys = [
-            val('ProfileKeyEmail', $provider, 'email') => 'Email',
-            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
-            val('ProfileKeyName', $provider, 'displayname') => 'Name',
-            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
-            val('ProfileKeyUniqueID', $provider, 'user_id') => 'UniqueID'
+            ($provider['ProfileKeyEmail'] ?? 'email') => 'Email',
+            ($provider['ProfileKeyPhoto'] ?? 'picture') => 'Photo',
+            ($provider['ProfileKeyName'] ?? 'displayname') => 'Name',
+            ($provider['ProfileKeyFullName'] ?? 'name') => 'FullName',
+            ($provider['ProfileKeyUniqueID'] ?? 'user_id') => 'UniqueID',
+            ($provider['ProfileKeyRoles'] ?? 'roles') => 'Roles'
         ];
 
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);

@@ -633,6 +633,12 @@ if (!function_exists('cssClass')) {
             }
         }
 
+        if (array_key_exists('imageSource', $row)) {
+            $cssClass .= " hasPhotoWrap";
+        } else {
+            $cssClass .= " noPhotoWrap";
+        }
+
         return trim($cssClass);
     }
 }
@@ -844,7 +850,6 @@ if (!function_exists('filtersDropDown')) {
             $default = t('All');
         }
         $output = '';
-
         if (c('Vanilla.EnableCategoryFollowing')) {
             $links = [];
             $active = null;
@@ -889,7 +894,15 @@ if (!function_exists('filtersDropDown')) {
             ]);
 
             // Generate the markup for the drop down menu.
-            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+            $output .= linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+        }
+
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            if (Gdn_Theme::inSection('DiscussionList')) {
+                include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+                $output .= adminCheck();
+            }
+            $output = "<div class='PageControls-filters'>$output</div>";
         }
 
         return $output;
@@ -1063,12 +1076,6 @@ if (!function_exists('hasViewProfile')) {
         }
 
         $result = checkPermission('Garden.Profiles.View');
-
-        $result = $result && (
-                c('Garden.Profile.Titles') ||
-                c('Garden.Profile.Locations', false) ||
-                c('Garden.Registration.Method') != 'Connect'
-            );
 
         return $result;
     }
@@ -1261,7 +1268,7 @@ if (!function_exists('plural')) {
      * @param $number
      * @param $singular
      * @param $plural
-     * @param bool $formattedNumber
+     * @param string|false $formattedNumber
      * @return string
      */
     function plural($number, $singular, $plural, $formattedNumber = false) {
@@ -1725,6 +1732,10 @@ if (!function_exists('signInUrl')) {
             if ($defaultProvider && !val('SignInUrl', $defaultProvider)) {
                 return '';
             }
+        }
+
+        if (strpos($target, 'entry/') === 0) {
+            $target = '';
         }
 
         return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');

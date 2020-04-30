@@ -32,6 +32,9 @@ function smarty_function_logo($params, &$smarty) {
     if (isset($params['width'])) {
         $options['width']  = $params['width'];
     }
+    if (isset($params['fallbackLogo'])) {
+        $options['fallbackLogo']  = $params['fallbackLogo'];
+    }
 
     $result = Gdn_Theme::logo($options);
 	return $result;

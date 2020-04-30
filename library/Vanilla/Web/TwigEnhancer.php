@@ -10,11 +10,13 @@ namespace Vanilla\Web;
 use Garden\EventManager;
 use \Gdn_Request;
 use Gdn;
+use PocketsPlugin;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\HtmlUtils;
 
@@ -41,6 +43,9 @@ class TwigEnhancer {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var BannerImageModel */
+    private $bannerImageModel;
+
     /** @var string|null The directory to cache compiled twig templates in. */
     private $compileCacheDirectory = null;
 
@@ -61,6 +66,7 @@ class TwigEnhancer {
      * @param ConfigurationInterface $config
      * @param LocaleInterface $locale
      * @param Gdn_Request $request
+     * @param BannerImageModel $bannerImageModel
      */
     public function __construct(
         AddonProviderInterface $addonProvider,
@@ -68,7 +74,8 @@ class TwigEnhancer {
         \Gdn_Session $session,
         ConfigurationInterface $config,
         LocaleInterface $locale,
-        Gdn_Request $request
+        Gdn_Request $request,
+        BannerImageModel $bannerImageModel = null
     ) {
         $this->addonProvider = $addonProvider;
         $this->eventManager = $eventManager;
@@ -76,6 +83,7 @@ class TwigEnhancer {
         $this->config = $config;
         $this->locale = $locale;
         $this->request = $request;
+        $this->bannerImageModel = $bannerImageModel;
     }
 
     /**
@@ -192,6 +200,23 @@ class TwigEnhancer {
     }
 
     /**
+     * Render a pocket if it exists.
+     *
+     * @param string $pocketName The name of the pocket.
+     * @param array $pocketArgs Arguments to pass to PocketsPlugin::pocketString().
+     *
+     * @return \Twig\Markup
+     */
+    public function renderPocket(string $pocketName, array $pocketArgs = []): \Twig\Markup {
+        if (!class_exists(PocketsPlugin::class)) {
+            return new \Twig\Markup('', 'utf-8');
+        }
+
+        $result = PocketsPlugin::pocketString($pocketName, $pocketArgs);
+        return new \Twig\Markup($result, 'utf-8');
+    }
+
+    /**
      * Get a config key. The result will then be cached for the instance of the twig enhancer.
      *
      * @param string $key Config key.
@@ -236,6 +261,15 @@ class TwigEnhancer {
     }
 
     /**
+     * Make an asset URL.
+     *
+     * @param string $url
+     */
+    public function assetUrl(string $url) {
+        return asset($url, true, true);
+    }
+
+    /**
      * Render out breadcrumbs from the controller.
      *
      * @param array $options
@@ -246,6 +280,13 @@ class TwigEnhancer {
         $breadcrumbs = Gdn::controller()->data('Breadcrumbs', []);
         $html = \Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $options, true), $options);
         return new \Twig\Markup($html, 'utf-8');
+    }
+
+    /**
+     * @return string
+     */
+    public function renderNoop(): string {
+        return '';
     }
 
     /**
@@ -260,7 +301,7 @@ class TwigEnhancer {
             't' => [$this, 'getTranslation'],
             'sprintf',
 
-            // Utility
+            // Utility`
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
 
@@ -268,6 +309,8 @@ class TwigEnhancer {
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
             'renderModule' => [$this, 'renderModule'],
             'renderBreadcrumbs' => [$this, 'renderBreadcrumbs'],
+            'renderPocket' => [$this, 'renderPocket'],
+            'renderBanner' => $this->bannerImageModel ? [$this->bannerImageModel, 'renderBanner'] : [$this, 'renderNoop'],
             'fireEchoEvent' => [$this, 'fireEchoEvent'],
             'firePluggableEchoEvent' => [$this, 'firePluggableEchoEvent'],
             'helpAsset',
@@ -277,7 +320,9 @@ class TwigEnhancer {
             'inSection' => [\Gdn_Theme::class, 'inSection'],
 
             // Routing.
+            'assetUrl' => [$this, 'assetUrl'],
             'url' => [$this->request, 'url'],
         ];
     }
+
 }

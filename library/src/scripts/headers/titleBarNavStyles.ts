@@ -4,27 +4,28 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px, calc, quote } from "csx";
+import { percent, px, calc, quote, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import {
     absolutePosition,
     colorOut,
     flexHelper,
-    margins,
     negative,
     paddings,
     unit,
     userSelect,
+    isLightColor,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { LogoAlignment } from "@library/headers/TitleBar";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
+    const titleBarVars = titleBarVariables();
 
     const border = makeThemeVars("border", {
         verticalWidth: 3,
@@ -39,10 +40,11 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     });
 
     const linkActive = makeThemeVars("linkActive", {
-        offset: 2,
+        offset: 0,
         height: 3,
-        bg: globalVars.mainColors.primary,
+        bg: titleBarVars.colors.fg,
         bottomSpace: 1,
+        maxWidth: 40,
     });
 
     const navLinks = makeThemeVars("navLinks", {
@@ -90,7 +92,7 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const navigation = style(
         "navigation",
-        titleBarVars.logo.doubleLogoStrategy === "hidden"
+        titleBarVars.logo.doubleLogoStrategy === "hidden" || titleBarVars.logo.justifyContent === LogoAlignment.CENTER
             ? {
                   marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
               }
@@ -130,19 +132,21 @@ const titleBarNavClasses = useThemeCache(() => {
         paddingRight: unit(vars.navLinks.padding.right),
         $nest: {
             "&.focus-visible": {
-                color: colorOut(titleBarVars.colors.fg),
-                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
+                color: colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: colorOut(titleBarVars.colors.state.bg),
             },
             "&:focus": {
-                color: colorOut(titleBarVars.colors.fg),
-                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
+                color: colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: colorOut(titleBarVars.colors.state.bg),
             },
             "&:hover": {
-                color: colorOut(titleBarVars.colors.fg),
-                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
+                color: colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: colorOut(titleBarVars.colors.state.bg),
             },
         },
     });
+
+    const offsetWidth = vars.linkActive.offset * 2;
 
     const linkActive = style("linkActive", {
         $nest: {
@@ -150,12 +154,14 @@ const titleBarNavClasses = useThemeCache(() => {
                 ...absolutePosition.topLeft(
                     `calc(50% - ${unit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
                 ),
+                maxWidth: unit(vars.linkActive.maxWidth),
                 content: quote(""),
                 height: unit(vars.linkActive.height),
+                left: percent(50),
                 marginLeft: unit(negative(vars.linkActive.offset)),
-                width: calc(`100% + ${unit(vars.linkActive.offset * 2)}`),
+                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${unit(offsetWidth)}`),
                 backgroundColor: colorOut(vars.linkActive.bg),
-                transform: `translateY(${unit(titleBarVars.sizing.height / 2)})`,
+                transform: `translate(-50%, ${unit(titleBarVars.sizing.height / 2)})`,
             },
         },
     });
@@ -164,10 +170,9 @@ const titleBarNavClasses = useThemeCache(() => {
         fontSize: unit(vars.navLinks.fontSize),
         fontWeight: globalVars.fonts.weights.normal,
         position: "relative",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        minHeight: unit(vars.item.size),
-        lineHeight: unit(vars.item.size),
+        alignSelf: "center",
         height: 0, // IE11 Fix.
     });
 

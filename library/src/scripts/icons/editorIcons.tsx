@@ -8,16 +8,18 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
+import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 
 const currentColorFill = {
     fill: "currentColor",
 };
 
-export function BoldIcon(props: { className?: string }) {
+export function BoldIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Bold")}</title>
@@ -29,11 +31,12 @@ export function BoldIcon(props: { className?: string }) {
     );
 }
 
-export function ItalicIcon(props: { className?: string }) {
+export function ItalicIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Italic")}</title>
@@ -45,11 +48,12 @@ export function ItalicIcon(props: { className?: string }) {
     );
 }
 
-export function StrikeIcon(props: { className?: string }) {
+export function StrikeIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Strikethrough")}</title>
@@ -61,11 +65,12 @@ export function StrikeIcon(props: { className?: string }) {
     );
 }
 
-export function CodeIcon(props: { className?: string }) {
+export function CodeIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Paragraph Code Block")}</title>
@@ -78,11 +83,12 @@ export function CodeIcon(props: { className?: string }) {
     );
 }
 
-export function LinkIcon(props: { className?: string }) {
+export function LinkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Link")}</title>
@@ -94,11 +100,12 @@ export function LinkIcon(props: { className?: string }) {
     );
 }
 
-export function EmojiIcon(props: { className?: string }) {
+export function EmojiIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Emoji")}</title>
@@ -110,13 +117,13 @@ export function EmojiIcon(props: { className?: string }) {
     );
 }
 
-export function EmbedErrorIcon(props: { className?: string }) {
+export function EmbedErrorIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
-            aria-hidden="true"
         >
             <title>{t("Warning")}</title>
             <path
@@ -127,11 +134,12 @@ export function EmbedErrorIcon(props: { className?: string }) {
     );
 }
 
-export function PilcrowIcon(props: { className?: string }) {
+export function PilcrowIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Paragraph")}</title>
@@ -144,11 +152,12 @@ export function PilcrowIcon(props: { className?: string }) {
     );
 }
 
-export function Heading2Icon(props: { className?: string }) {
+export function Heading2Icon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("H2")}</title>
@@ -160,11 +169,12 @@ export function Heading2Icon(props: { className?: string }) {
     );
 }
 
-export function Heading3Icon(props: { className?: string }) {
+export function Heading3Icon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("H3")}</title>
@@ -176,11 +186,12 @@ export function Heading3Icon(props: { className?: string }) {
     );
 }
 
-export function Heading4Icon(props: { className?: string }) {
+export function Heading4Icon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("H4")}</title>
@@ -194,11 +205,12 @@ export function Heading4Icon(props: { className?: string }) {
     );
 }
 
-export function Heading5Icon(props: { className?: string }) {
+export function Heading5Icon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("H5")}</title>
@@ -211,11 +223,12 @@ export function Heading5Icon(props: { className?: string }) {
     );
 }
 
-export function BlockquoteIcon(props: { className?: string }) {
+export function BlockquoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Quote")}</title>
@@ -227,11 +240,12 @@ export function BlockquoteIcon(props: { className?: string }) {
     );
 }
 
-export function CodeBlockIcon(props: { className?: string }) {
+export function CodeBlockIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Paragraph Code Block")}</title>
@@ -244,10 +258,14 @@ export function CodeBlockIcon(props: { className?: string }) {
     );
 }
 
-export function SpoilerIcon(props: { className?: string }) {
+export function SpoilerIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     // Exceptionally, this SVG needs a hard coded class, because it's also rendered through PHP and doesn't have access to JS classes
     return (
-        <svg className={classNames("spoiler-icon", props.className)} viewBox="0 0 24 24">
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames("spoiler-icon", props.className)}
+            viewBox="0 0 24 24"
+        >
             <title>{t("Spoiler")}</title>
             <path
                 fill="currentColor"
@@ -257,11 +275,12 @@ export function SpoilerIcon(props: { className?: string }) {
     );
 }
 
-export function EmbedIcon(props: { className?: string }) {
+export function EmbedIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Embed")}</title>
@@ -274,11 +293,12 @@ export function EmbedIcon(props: { className?: string }) {
     );
 }
 
-export function ImageIcon(props: { className?: string }) {
+export function ImageIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Image")}</title>
@@ -291,11 +311,12 @@ export function ImageIcon(props: { className?: string }) {
     );
 }
 
-export function AttachmentIcon(props: { className?: string }) {
+export function AttachmentIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Attachment")}</title>
@@ -308,11 +329,12 @@ export function AttachmentIcon(props: { className?: string }) {
     );
 }
 
-export function ListUnorderedIcon(props: { className?: string }) {
+export function ListUnorderedIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("List Unordered")}</title>
@@ -325,11 +347,12 @@ export function ListUnorderedIcon(props: { className?: string }) {
     );
 }
 
-export function ListOrderedIcon(props: { className?: string }) {
+export function ListOrderedIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("List Ordered")}</title>
@@ -341,11 +364,12 @@ export function ListOrderedIcon(props: { className?: string }) {
     );
 }
 
-export function IndentIcon(props: { className?: string }) {
+export function IndentIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Indent")}</title>
@@ -356,11 +380,12 @@ export function IndentIcon(props: { className?: string }) {
         </svg>
     );
 }
-export function OutdentIcon(props: { className?: string }) {
+export function OutdentIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >
             <title>{t("Outdent")}</title>

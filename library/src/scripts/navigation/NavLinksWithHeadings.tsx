@@ -12,16 +12,20 @@ import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
-import NavLinks from "@library/navigation/NavLinks";
+import NavLinks, { INavLinkNoItemComponent } from "@library/navigation/NavLinks";
+import Container from "@library/layout/components/Container";
+import { visibility } from "@library/styles/styleHelpers";
 
 interface IProps {
     title: string; // For accessibility, title of group
+    showTitle?: boolean;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     classNames?: string;
     data: ILinkListData;
     accessibleViewAllMessage?: string;
     ungroupedViewAllUrl?: string;
     ungroupedTitle?: string;
+    NoItemsComponent?: INavLinkNoItemComponent;
 }
 
 /**
@@ -35,19 +39,23 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const classes = navLinksClasses();
         const ungroupedTitle = this.props.ungroupedTitle || t("Overview");
 
-        if (ungrouped.length !== 0 || grouped.length !== 0) {
-            const ungroupedContent = (
-                <NavLinks
-                    title={ungroupedTitle}
-                    items={ungrouped}
-                    accessibleViewAllMessage={this.props.accessibleViewAllMessage}
-                    url={this.props.ungroupedViewAllUrl}
-                />
-            );
+        if (ungrouped.length > 0 || grouped.length > 0) {
+            const ungroupedContent =
+                ungrouped.length > 0 ? (
+                    <NavLinks
+                        title={ungroupedTitle}
+                        items={ungrouped}
+                        accessibleViewAllMessage={this.props.accessibleViewAllMessage}
+                        url={this.props.ungroupedViewAllUrl}
+                    />
+                ) : null;
             const groupedContent = grouped.map((group, i) => {
                 return (
                     <React.Fragment key={i}>
                         <NavLinks
+                            recordID={group.category.recordID}
+                            recordType={group.category.recordType}
+                            NoItemsComponent={this.props.NoItemsComponent}
                             items={group.items}
                             title={group.category.name}
                             url={group.category.url}
@@ -61,13 +69,23 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             });
 
             return (
-                <nav className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}>
-                    <ScreenReaderContent>
-                        <Heading title={this.props.title} depth={this.props.depth} />
-                    </ScreenReaderContent>
-                    {groupedContent}
-                    {ungroupedContent}
-                </nav>
+                <Container fullGutter narrow>
+                    <nav
+                        className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
+                    >
+                        <Heading
+                            title={this.props.title}
+                            depth={this.props.depth}
+                            className={classNames(
+                                classes.title,
+                                !this.props.showTitle && visibility().visuallyHidden,
+                                this.props.showTitle && classes.topTitle,
+                            )}
+                        />
+                        {groupedContent}
+                        {ungroupedContent}
+                    </nav>
+                </Container>
             );
         } else {
             return null;

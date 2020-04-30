@@ -4,18 +4,39 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, fonts, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    margins,
+    paddings,
+    unit,
+    EMPTY_BORDER,
+    singleBorder,
+    visibility,
+    srOnly,
+} from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { em, important, percent, px } from "csx";
+import { em, important, percent, px, border } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { media } from "typestyle";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const userContentVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("userContent");
-    const globalVars = globalVariables();
+export enum TableStyle {
+    HORIZONTAL_BORDER = "horizontalBorder",
+    HORIZONTAL_BORDER_STRIPED = "horizontalBorderStriped",
+    VERTICAL_BORDER = "verticalBorder",
+    VERTICAL_BORDER_STRIPED = "verticalBorderStriped",
+}
+
+export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeThemeVars = variableFactory("userContent", forcedVars);
+    const globalVars = globalVariables(forcedVars);
     const { mainColors } = globalVars;
 
     const fonts = makeThemeVars("fonts", {
@@ -27,6 +48,35 @@ export const userContentVariables = useThemeCache(() => {
             h4: "1em",
             h5: ".875em",
             h6: ".85em",
+        },
+    });
+
+    const tableInit = makeThemeVars("tables", {
+        style: TableStyle.HORIZONTAL_BORDER_STRIPED,
+        borders: {
+            ...EMPTY_BORDER,
+            ...globalVars.border,
+        },
+        cell: {
+            alignment: "left" as "center" | "left" | "right",
+        },
+        mobileBreakpoint: 600,
+    });
+
+    const tables = makeThemeVars("tables", {
+        ...tableInit,
+        striped: [TableStyle.HORIZONTAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER_STRIPED].includes(tableInit.style),
+        stripeColor: globalVars.mixBgAndFg(0.05),
+        outerBorderRadius: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style)
+            ? 4
+            : 0,
+        horizontalBorders: {
+            enabled: true, // All current variants have horizontal borders.
+            borders: tableInit.borders,
+        },
+        verticalBorders: {
+            enabled: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style),
+            borders: tableInit.borders,
         },
     });
 
@@ -90,6 +140,7 @@ export const userContentVariables = useThemeCache(() => {
         codeBlock,
         embeds,
         spacing,
+        tables,
     };
 });
 
@@ -231,21 +282,27 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkColors = setAllLinkColors();
+    const linkColors = clickableItemStates();
     const linkStyle = {
-        color: linkColors.color,
-        $nest: {
-            ...linkColors.nested,
-            "&:hover, &:focus": {
-                textDecoration: "underline",
-            },
+        "& a": {
+            color: colorOut(linkColors.color as string),
         },
-    };
-
-    const linkStyles: NestedCSSSelectors = {
-        a: linkStyle,
-        "p a": linkStyle,
-        "li a": linkStyle,
+        "& a:hover": {
+            color: colorOut(globalVars.links.colors.hover),
+            textDecoration: "underline",
+        },
+        "& a:focus": {
+            color: colorOut(globalVars.links.colors.focus),
+            textDecoration: "underline",
+        },
+        "& a.focus-visible": {
+            color: colorOut(globalVars.links.colors.keyboardFocus),
+            textDecoration: "underline",
+        },
+        "& a:active": {
+            color: colorOut(globalVars.links.colors.active),
+            textDecoration: "underline",
+        },
     };
 
     const codeStyles: NestedCSSSelectors = {
@@ -336,19 +393,6 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const legacy: NestedCSSSelectors = {
-        "& .bbcode_left": {
-            $nest: {
-                ".embedImage-img": {
-                    marginRight: "auto",
-                },
-            },
-        },
-        "& .bbcode_right .embedImage-img": {
-            marginLeft: "auto",
-        },
-    };
-
     const blockQuoteVars = blockQuoteVariables();
 
     const blockquotes: NestedCSSSelectors = {
@@ -357,29 +401,200 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const root = style({
-        // These CAN'T be flexed. That breaks margin collapsing.
-        display: important("block"),
-        position: "relative",
-        width: percent(100),
-        wordBreak: "break-word",
-        lineHeight: globalVars.lineHeights.base,
-        fontSize: vars.fonts.size,
-        $nest: {
-            // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
-            "&::before": {
-                marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
-            },
-            ...headings,
-            ...lists,
-            ...paragraphSpacing,
-            ...linkStyles,
-            ...codeStyles,
-            ...spoilersAndQuotes,
-            ...blockquotes,
-            ...legacy,
+    const tables: NestedCSSSelectors = {
+        "& .tableWrapper": {
+            overflowX: "auto",
+            width: percent(100),
         },
-    });
+        "& > .tableWrapper > table": {
+            width: percent(100),
+        },
+        // Rest of the table styles
+        "& > .tableWrapper th": {
+            whiteSpace: "nowrap",
+        },
+        "& > .tableWrapper td, & > .tableWrapper th": {
+            overflowWrap: "break-word",
+            minWidth: 80,
+            ...paddings({
+                vertical: 6,
+                horizontal: 12,
+            }),
+            border: "none",
+            textAlign: vars.tables.cell.alignment,
+            ...(vars.tables.horizontalBorders.enabled
+                ? {
+                      borderTop: singleBorder(vars.tables.horizontalBorders.borders),
+                      borderBottom: singleBorder(vars.tables.horizontalBorders.borders),
+                  }
+                : {}),
+            ...(vars.tables.verticalBorders.enabled
+                ? {
+                      borderLeft: singleBorder(vars.tables.verticalBorders.borders),
+                      borderRight: singleBorder(vars.tables.verticalBorders.borders),
+                  }
+                : {}),
+        },
+        "& > .tableWrapper tr:nth-child(even)": vars.tables.striped
+            ? {
+                  background: colorOut(vars.tables.stripeColor),
+              }
+            : {},
+        "& > .tableWrapper th, & > .tableWrapper thead td": {
+            fontWeight: globalVars.fonts.weights.bold,
+        },
+
+        // Mobile table styles.
+        "& .mobileTableHead": {
+            display: "none",
+        },
+    };
+
+    const outerBorderMixin = (): NestedCSSProperties => {
+        return {
+            borderRadius: vars.tables.outerBorderRadius,
+            borderTop: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderBottom: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderLeft: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+            borderRight: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+        };
+    };
+
+    // Apply outer border radii.
+    // border-collapse prevents our outer radius from applying.
+    const tableOuterRadiusQuery = media(
+        { minWidth: vars.tables.mobileBreakpoint + 1 },
+        {
+            $nest: {
+                "& .tableWrapper": outerBorderMixin(),
+                "& > .tableWrapper thead tr:first-child > *, & > .tableWrapper tbody:first-child tr:first-child > *": {
+                    // Get rid of the outer border radius.
+                    borderTop: "none",
+                },
+                "& > .tableWrapper :not(thead) tr:last-child > *": {
+                    // Get rid of the outer border radius.
+                    borderBottom: "none",
+                },
+                "& > .tableWrapper tr > *:last-child": {
+                    // Get rid of the outer border radius.
+                    borderRight: "none",
+                },
+                "& > .tableWrapper tr > *:first-child, & > .tableWrapper tr > .mobileTableHead:first-child + *": {
+                    // Get rid of the outer border radius.
+                    borderLeft: "none",
+                },
+            },
+        },
+    );
+
+    const tableMobileQuery = media(
+        { maxWidth: vars.tables.mobileBreakpoint },
+        {
+            $nest: {
+                "& .tableWrapper .tableHead": {
+                    ...srOnly(),
+                },
+                "& .tableWrapper tr": {
+                    display: "block",
+                    flexWrap: "wrap",
+                    width: percent(100),
+                    background: "none !important",
+                    marginBottom: vars.blocks.margin,
+                    ...outerBorderMixin(),
+                },
+                "& .tableWrapper tr .mobileStripe": vars.tables.striped
+                    ? {
+                          borderTop: "none",
+                          borderBottom: "none",
+                          background: colorOut(vars.tables.stripeColor),
+                      }
+                    : {
+                          borderTop: "none",
+                          borderBottom: "none",
+                      },
+                // First row.
+                "& .tableWrapper tr > *:first-child": {
+                    borderTop: "none",
+                },
+                // Last row.
+                "& .tableWrapper tr > *:last-child": {
+                    borderBottom: "none",
+                },
+                "& .tableWrapper .mobileTableHead": {
+                    borderBottom: "none",
+                },
+                "& .tableWrapper .mobileTableHead + *": {
+                    marginTop: -6,
+                    borderTop: "none",
+                },
+                "& .tableWrapper tr > *": {
+                    width: percent(100),
+                    wordWrap: "break-word",
+                    display: "block",
+                    borderLeft: "none",
+                    borderRight: "none",
+                },
+                "& .tableWrapper tr > :not(.mobileTableHead)": {
+                    borderRight: "none",
+                },
+            },
+        },
+    );
+
+    const root = style(
+        {
+            // These CAN'T be flexed. That breaks margin collapsing.
+            display: important("block"),
+            position: "relative",
+            width: percent(100),
+            wordBreak: "break-word",
+            lineHeight: globalVars.lineHeights.base,
+            fontSize: vars.fonts.size,
+            $nest: {
+                // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+                "&::before": {
+                    marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+                },
+                "& iframe": {
+                    width: percent(100),
+                },
+                ...tables,
+                ...headings,
+                ...lists,
+                ...paragraphSpacing,
+                ...codeStyles,
+                ...spoilersAndQuotes,
+                ...blockquotes,
+                ...linkStyle,
+            },
+        },
+        tableOuterRadiusQuery,
+        tableMobileQuery,
+    );
 
     return { root };
 });
+
+export const userContentCSS = () => {
+    const globalVars = globalVariables();
+    cssOut(
+        `
+        .Container .userContent h1,
+        .Container .userContent h2,
+        .Container.userContent h3,
+        .Container .userContent h4,
+        .Container .userContent h5,
+        .Container .userContent h6`,
+        {
+            color: colorOut(globalVars.mainColors.fg),
+        },
+    );
+};

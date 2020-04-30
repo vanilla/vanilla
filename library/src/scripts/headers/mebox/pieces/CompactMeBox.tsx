@@ -15,7 +15,7 @@ import { t } from "@library/utility/appUtils";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
 import { IInjectableUserState } from "@library/features/users/userModel";
@@ -58,7 +58,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
             <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
                     title={t("My Account")}
-                    className={classNames(classes.openButton, titleBarVars.centeredButtonClass, titleBarVars.button)}
+                    className={classNames(classes.openButton, titleBarVars.centeredButton, titleBarVars.button)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}

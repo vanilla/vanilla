@@ -14,6 +14,9 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { AttachmentIcon, ImageIcon } from "@library/icons/editorIcons";
 import { getMeta } from "@library/utility/appUtils";
+import { visibility } from "@library/styles/styleHelpersVisibility";
+import { t } from "@vanilla/i18n/src";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -22,11 +25,17 @@ interface IProps extends IWithEditorProps {
     legacyMode: boolean;
 }
 
-export class EditorUploadButton extends React.Component<IProps, {}> {
+export class EditorUploadButton extends React.Component<IProps, { uploadCount: number }> {
+    public state = {
+        uploadCount: 0,
+    };
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
+
+        const text = this.props.type === "image" ? t("Upload Image") : t("Upload File");
+
         return (
             <button
                 className={classNames(
@@ -36,12 +45,14 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                     classesRichEditor.button,
                 )}
                 type="button"
-                aria-pressed="false"
                 disabled={this.props.disabled}
                 onClick={this.onFakeButtonClick}
+                title={text}
             >
+                <ScreenReaderContent>{text}</ScreenReaderContent>
                 <IconForButtonWrap icon={this.icon} />
                 <input
+                    key={this.state.uploadCount}
                     ref={this.inputRef}
                     onChange={this.onInputChange}
                     className={classNames("richEditor-upload", classesRichEditor.upload)}
@@ -106,6 +117,8 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
         const maxUploads = getMeta("upload.maxUploads", 20);
 
         if (files && embedInsertion) {
+            // Increment the upload count to reset the input.
+            this.setState({ uploadCount: this.state.uploadCount + 1 });
             const filesArray = Array.from(files);
             if (filesArray.length >= maxUploads) {
                 const error = new Error(`Can't upload more than ${maxUploads} files at once.`);

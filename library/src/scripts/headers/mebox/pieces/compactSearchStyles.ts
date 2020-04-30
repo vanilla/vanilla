@@ -8,24 +8,27 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit, modifyColorBasedOnLightness, IButtonStates } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, important, percent, px } from "csx";
+import { ColorHelper, important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { SearchBarPresets } from "@library/banner/bannerStyles";
+import { ButtonPreset } from "@library/forms/buttonStyles";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export enum SearchBarButtonType {
-    TRANSPARENT = "transparent",
-    SOLID = "solid",
-    NONE = "none",
-}
+export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const globalVars = globalVariables(forcedVars);
+    const makeThemeVars = variableFactory("compactSearch", forcedVars);
+    const titleBarVars = titleBarVariables(forcedVars);
+    const formElVars = formElementsVariables(forcedVars);
 
-export const compactSearchVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("compactSearch");
-    const titleBarVars = titleBarVariables();
-    const formElVars = formElementsVariables();
-    const searchButtonOptions = makeThemeVars("searchButtonOptions", { type: SearchBarButtonType.SOLID });
-    const isTransparentButton = searchButtonOptions.type === SearchBarButtonType.TRANSPARENT;
+    const searchButtonOptions = makeThemeVars("searchButtonOptions", { preset: ButtonPreset.TRANSPARENT });
+    const searchInputOptions = makeThemeVars("searchInputOptions", { preset: SearchBarPresets.NO_BORDER });
+
+    const isUnifiedBorder = searchInputOptions.preset === SearchBarPresets.UNIFIED_BORDER;
+    const isTransparentButton = searchButtonOptions.preset === ButtonPreset.TRANSPARENT;
+    const isSolidButton = searchButtonOptions.preset === ButtonPreset.SOLID || isUnifiedBorder; // force solid button when using unified border
+
     let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
@@ -39,13 +42,13 @@ export const compactSearchVariables = useThemeCache(() => {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
         borderColor: globalVars.mainColors.fg.fade(0.4),
-        placeholder: titleBarVars.colors.fg.fade(0.8),
+        placeholder: globalVars.mainColors.fg.fade(0.8),
         active: {
             bg: baseColor,
         },
     });
 
-    const isContrastLight = colors.contrast instanceof ColorHelper && colors.contrast.lightness() >= 0.5;
+    const isContrastLight = colors.contrast.lightness() >= 0.5;
     const backgrounds = makeThemeVars("backgrounds", {
         useOverlay: false,
         overlayColor: isContrastLight
@@ -53,7 +56,7 @@ export const compactSearchVariables = useThemeCache(() => {
             : globalVars.elementaryColors.white.fade(0.3),
     });
 
-    const bgColor = isTransparentButton ? "transparent" : colors.primary;
+    const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.primary;
     const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
     const fgColor = isTransparentButton ? colors.contrast : colors.fg;
     const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
@@ -172,16 +175,16 @@ export const compactSearchClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             "& .searchBar__input": {
-                color: colorOut(vars.colors.fg),
+                color: colorOut(vars.searchBar.font.color),
                 width: percent(100),
+            },
+            "& .searchBar__input input": {
+                color: colorOut(vars.searchBar.font.color),
+                borderRadius: important(0),
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
-            },
-            ".hasFocus .searchBar-valueContainer": {
-                backgroundColor: colorOut(vars.colors.active.bg),
             },
             ".searchBar__placeholder": {
                 color: colorOut(vars.colors.placeholder),
@@ -195,7 +198,7 @@ export const compactSearchClasses = useThemeCache(() => {
             "&.isCentered": {
                 margin: "auto",
             },
-            ".suggestedTextInput-inputText": {
+            "& .suggestedTextInput-inputText": {
                 borderTopRightRadius: unit(globalVars.border.radius),
                 borderBottomRightRadius: unit(globalVars.border.radius),
             },

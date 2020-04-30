@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
- namespace Vanilla\Theme;
+namespace Vanilla\Theme;
 
- use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\NotFoundException;
 
  /**
   * Interface for providing variables on a theme.
@@ -18,7 +18,7 @@ interface ThemeProviderInterface {
     /**
      * Returns type of themeKey used for this provider
      *
-     * @return bool When theme key is numeric return TRUE if alphanumeric FALSE
+     * @return int One of TYPE_FS or TYPE_DB
      */
     public function themeKeyType(): int;
 
@@ -33,18 +33,20 @@ interface ThemeProviderInterface {
      * Returns type of theme with all assets
      *
      * @param string|int $themeKey Theme key or id
+     * @param array $args Arguments list.
      * @return array
      */
-    public function getThemeWithAssets($themeKey): array;
+    public function getThemeWithAssets($themeKey, array $args = []): array;
 
     /**
      * Get asset data
      *
      * @param string|int $themeKey Theme key or id
      * @param string $assetKey Asset key
+     * @param int $revisionID Theme revision id
      * @return string Asset data (content)
      */
-    public function getAssetData($themeKey, string $assetKey): string;
+    public function getAssetData($themeKey, string $assetKey, int $revisionID = null): string;
 
     /**
      * DELETE theme asset.
@@ -93,29 +95,21 @@ interface ThemeProviderInterface {
      * (pseudo current theme for current session user only)
      *
      * @param int|string $themeID Theme ID to set current.
+     * @param int $revisionID Theme revision ID.
      * @return array
      */
-    public function setPreviewTheme($themeID): array;
+    public function setPreviewTheme($themeID, int $revisionID = null): array;
 
     /**
      * Get "current" theme.
-     *
      * @return array
      */
     public function getCurrent(): ?array;
 
     /**
-     * Get theme view folder path
-     *
-     * @param strig|int $themeKey Theme key or id
-     * @return string
-     */
-    public function getThemeViewPath($themeKey): string;
-
-    /**
      * Get master (parent) theme key.
      *
-     * @param strig|int $themeKey Theme key or id
+     * @param string|int $themeKey Theme key or id
      * @throws NotFoundException Throws an exception when theme is not found.
      * @return string
      */
@@ -124,7 +118,7 @@ interface ThemeProviderInterface {
     /**
      * Get theme name.
      *
-     * @param strig|int $themeKey Theme key or id
+     * @param string|int $themeKey Theme key or id
      * @return string
      */
     public function getName($themeKey): string;
@@ -132,13 +126,14 @@ interface ThemeProviderInterface {
     /**
      * Set theme asset (replace existing or create new if asset does not exist).
      *
-     * @param int $themeID The unique theme ID.
+     * @param int $themeID Theme ID.
+     * @param int $revisionID Revision ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      * @param string $data Data content for asset.
      *
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array;
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array;
 
     /**
      * Sparse update/set theme asset (update existing or create new if asset does not exist).
@@ -151,13 +146,21 @@ interface ThemeProviderInterface {
      *
      * @return array
      */
-    public function sparseAsset(int $themeID, string $assetKey, string $data): array;
+    public function sparseAsset(int $themeID, int $revisionID, string $assetKey, string $data): array;
 
     /**
-     * Set variable providers
+     * Check if a theme exists.
      *
-     * @param array $variableProviders
-     * @return mixed
+     * @param string|int $themeKey
+     * @return bool
      */
-    public function setVariableProviders(array $variableProviders = []);
+    public function themeExists($themeKey): bool;
+
+    /**
+     * Get list of theme revisions
+     *
+     * @param int $themeKey
+     * @return array
+     */
+    public function getThemeRevisions(int $themeKey): array;
 }

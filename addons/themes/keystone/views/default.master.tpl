@@ -179,9 +179,9 @@
                 </div>
             {/if}
             <div class="Frame-body">
-
+                
                 <!---------- Hero Banner ---------->
-                {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
+                {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList", "CategoryDiscussionList"])}
                     <div class="Herobanner">
                         {if {banner_image_url}}
                             <div class="Herobanner-bgImage" style="background-image:url('{banner_image_url}')"></div>

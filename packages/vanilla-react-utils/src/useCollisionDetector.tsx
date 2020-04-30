@@ -20,44 +20,44 @@ function doRectsOverlap(rect1: DOMRectReadOnly, rect2: DOMRectReadOnly) {
     let hasHorizontalOverlap = false;
 
     //  [      { ]       }
-    if (rect1.left < rect2.left && rect1.right > rect2.left) {
+    if (rect1.left <= rect2.left && rect1.right >= rect2.left) {
         hasHorizontalOverlap = true;
     }
 
     //  {    [  }   ]
-    if (rect2.left < rect1.left && rect2.right > rect1.left) {
+    if (rect2.left <= rect1.left && rect2.right >= rect1.left) {
         hasHorizontalOverlap = true;
     }
 
     //  [   {} ]
-    if (rect1.left < rect2.left && rect1.right > rect2.right) {
+    if (rect1.left <= rect2.left && rect1.right >= rect2.right) {
         hasHorizontalOverlap = true;
     }
 
     //  {  []   }
-    if (rect2.left < rect1.left && rect2.right > rect1.right) {
+    if (rect2.left <= rect1.left && rect2.right >= rect1.right) {
         hasHorizontalOverlap = true;
     }
 
     let hasVerticalOverlap = false;
 
     // Verical version of  [      { ]       }
-    if (rect1.top < rect2.top && rect1.bottom > rect2.top) {
+    if (rect1.top <= rect2.top && rect1.bottom >= rect2.top) {
         hasVerticalOverlap = true;
     }
 
     // Verical version of  {    [  }   ]
-    if (rect2.top < rect1.top && rect2.bottom > rect1.top) {
+    if (rect2.top <= rect1.top && rect2.bottom >= rect1.top) {
         hasVerticalOverlap = true;
     }
 
     // Verical version of  [   {} ]
-    if (rect1.top < rect2.top && rect1.bottom > rect2.bottom) {
+    if (rect1.top <= rect2.top && rect1.bottom >= rect2.bottom) {
         hasVerticalOverlap = true;
     }
 
     // Verical version of  {  []   }
-    if (rect2.top < rect1.top && rect2.bottom > rect1.bottom) {
+    if (rect2.top <= rect1.top && rect2.bottom >= rect1.bottom) {
         hasVerticalOverlap = true;
     }
 

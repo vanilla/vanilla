@@ -5,13 +5,13 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
- * @package Core
- * @since 2.0
  */
+
 use Garden\Container\Container;
 use Garden\Web\Dispatcher;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -53,7 +53,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
 
-    /** @var stringThe method of the controller to be called. */
+    /** @var string The method of the controller to be called. */
     public $ControllerMethod;
 
     /**
@@ -173,26 +173,47 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     *
-     *
-     * @throws Exception
+     * Fire an event plugins can use to clean up the dispatcher.
      */
     public function cleanup() {
         $this->fireEvent('Cleanup');
     }
 
+    /**
+     * Get the currently dispatched application's folder name.
+     *
+     * @return string
+     */
     public function application() {
         return $this->applicationFolder;
     }
 
+    /**
+     * Get the name of the currently dispatched controller.
+     *
+     * @return string
+     */
     public function controller() {
         return $this->ControllerName;
     }
 
+    /**
+     * Get the name of the method on the currently dispatched controller.
+     *
+     * Note: This is not an HTTP method name. It's a class method name.
+     *
+     * @return string
+     */
     public function controllerMethod() {
         return $this->ControllerMethod;
     }
 
+    /**
+     * Get/set the arguments that are being passed to the currently dispatched controller method.
+     *
+     * @param array|null $value
+     * @return array|null
+     */
     public function controllerArguments($value = null) {
         if ($value !== null) {
             $this->controllerMethodArgs = $value;
@@ -200,6 +221,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         return $this->controllerMethodArgs;
     }
 
+    /**
+     * Start the dispatcher to make it ready to handle requests.
+     */
     public function start() {
         $this->fireEvent('AppStartup');
 
@@ -291,11 +315,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
     }
 
-    /*
+    /**
      * Dispatch a 404 with an event that can be handled.
      *
      * @param string $reason A developer-readable reason code to aid debugging.
-     * @param Gdn_Request|null The request object to rewrite to the 404.
+     * @param Gdn_Request|null $request The request object to rewrite to the 404.
+     * @return mixed|bool
      */
     private function dispatchNotFound($reason = 'notfound', $request = null) {
         if (!$request) {
@@ -346,6 +371,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * Places anything useful into this object's Controller properties.
      *
      * @param Gdn_Request $request The request to analyze.
+     * @return array|null Returns information about the request or `null` if there is no controller that matches the request.
      */
     private function analyzeRequest($request) {
         // Initialize the result of our request.
@@ -361,7 +387,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         ];
         $parts = explode('/', str_replace('\\', '/', $request->path()));
         // Decode path parts at the dispatcher level.
-        array_walk($parts, function(&$value) {
+        array_walk($parts, function (&$value) {
             $value = rawurldecode($value);
         });
 
@@ -406,7 +432,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     ->passData('Reason', 'controller_notfound')
                     ->analyzeRequest($request->withRoute('Default404'));
             }
-            return;
+            return null;
         }
 
         // A controller has been found. Find the addon that manages it.
@@ -426,9 +452,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * Get the folder names of the currently enabled applications.
      *
-     *
-     * @param string $enabledApplications
+     * @param string|array $enabledApplications
+     * @return array
      * @deprecated
      */
     public function enabledApplicationFolders($enabledApplications = '') {
@@ -558,7 +585,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Returns the name of the enabled application based on $ApplicationFolder.
      *
-     * @param string The application folder related to the application name you want to return.
+     * @param string $folder The application folder related to the application name you want to return.
+     * @return string|false
      */
     public function enabledApplication($folder = '') {
         if ($folder == '') {
@@ -589,6 +617,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param mixed $asset The string asset to be added. The asset can be one of two things.
      * - <b>string</b>: The string will be rendered to the page.
      * - <b>Gdn_IModule</b>: The Gdn_IModule::render() method will be called when the asset is rendered.
+     * @return $this
      */
     public function passAsset($assetName, $asset) {
         $this->controllerAssets[$assetName][] = $asset;
@@ -596,10 +625,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * Set some data that will be passed to the controller when it is dispatched.
      *
-     *
-     * @param $name
-     * @param $value
+     * @param string $name
+     * @param mixed $value
      * @return $this
      */
     public function passData($name, $value) {
@@ -612,6 +641,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param string $name The name of the property to assign the variable to.
      * @param mixed $mixed The variable to be passed as a property of the controller.
+     * @return $this
      */
     public function passProperty($name, $mixed) {
         $this->controllerProperties[$name] = $mixed;
@@ -684,6 +714,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * specifies a redirect.
      *
      * @param Gdn_Request $request The request to rewrite.
+     * @return Gdn_Request Returns the request with re-written values.
      */
     private function rewriteRequest($request) {
         $pathAndQuery = $request->pathAndQuery();
@@ -805,6 +836,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param Gdn_Request $request The request being dispatched.
      * @param array $routeArgs The result of {@link Gdn_Dispatcher::analyzeRequest()}.
+     * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
      */
     private function dispatchController($request, $routeArgs) {
         // Create the controller first.
@@ -849,15 +881,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $inputArgs = $pathArgs;
         }
         $method = is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
-        $args = reflectArgs($method, $inputArgs, $reflectionArguments);
+        $args = Dispatcher::reflectArgs($method, array_merge($inputArgs, $reflectionArguments), $this->container, false);
         $controller->ReflectArgs = $args;
 
-
         $canonicalUrl = url($this->makeCanonicalUrl($controller, $method, $args), true);
-        $canonicalUrlOld = $this->makeCanonicalUrlOld($controller);
-        if ($canonicalUrl !== $canonicalUrlOld) {
-            trigger_error("Canonical URL $canonicalUrl !== $canonicalUrlOld.", E_USER_NOTICE);
-        }
         $controller->canonicalUrl($canonicalUrl);
 
         // Now that we have everything its time to call the callback for the controller.
@@ -930,7 +957,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param object $controller The controller to use for the canonical URL.
      * @param ReflectionFunctionAbstract $method The method being dispatched.
-     * @param $array $args The reflected arguments.
+     * @param array $args The reflected arguments.
      * @return string Returns a URL.
      */
     protected function makeCanonicalUrl($controller, \ReflectionFunctionAbstract $method, $args): string {
@@ -970,8 +997,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Add args after known names to the querystring.
         $query = [];
         $split = false;
+        $hasSender = false;
         foreach ($args as $key => $value) {
             if (is_object($value)) {
+                $hasSender = true;
                 continue;
             } elseif (in_array($key, ['search', 'query']) || $split) {
                 if (!empty($value) && $value != ($defaults[$key] ?? '')) {
@@ -980,7 +1009,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 $split = true;
             } elseif (is_numeric($key)) {
                 break;
-            } else {
+            } elseif ($key === 'args' && is_array($value) && $hasSender) {
+                $parts = array_merge($parts, $value);
+            } elseif (is_scalar($value)) {
                 $parts[$key] = $value;
             }
         }
@@ -1026,8 +1057,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param string $controllerName The name of the controller to create.
      * @param Gdn_Request $request The current request.
-     * @param array &$routeArgs Arguments from a call to {@link Gdn_Dispatcher::analyzeRequest}.
-     * @return Gdn_Controller Returns a new {@link Gdn_Controller} object.
+     * @param array $routeArgs Arguments from a call to `Gdn_Dispatcher::analyzeRequest`.
+     * @return Gdn_Controller Returns a new `Gdn_Controller` object.
      */
     private function createController($controllerName, $request, &$routeArgs) {
         /* @var Gdn_Controller $controller */

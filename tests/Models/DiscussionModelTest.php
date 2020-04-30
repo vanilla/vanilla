@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use CategoryModel;
 use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
@@ -660,5 +661,108 @@ class DiscussionModelTest extends TestCase {
             $discussionSecondVisit->CountCommentWatch,
             "Updating comment watch status failed."
         );
+    }
+
+    /**
+     * Test calculate() with various category marked read discussion dates.
+     *
+     * @param string $discussionInserted
+     * @param string|null $discussionMarkedRead
+     * @param string|null $categoryMarkedRead
+     * @param string|null $expected
+     * @dataProvider provideMarkedRead
+     */
+    public function testDiscussionCategoryMarkedRead(
+        string $discussionInserted,
+        ?string $discussionMarkedRead,
+        ?string $categoryMarkedRead,
+        ?string $expected
+    ): void {
+        // Set up a CategoryModel instance to test.
+        CategoryModel::$Categories = [
+            100 => [
+                "Name" => "foo",
+                "UrlCode" => "foo",
+                "PermissionCategoryID" => 1,
+                "DateMarkedRead" => $categoryMarkedRead,
+            ]
+        ];
+
+        $discussion = (object)[
+            "DiscussionID" => 0,
+            "CategoryID" => 100,
+            "Name" => "test",
+            "Body" => "discuss",
+            "InsertUserID" => 123,
+            "DateInserted" => $discussionInserted,
+            "Url" => "bar",
+            "Attributes" => [],
+            "Tags" => [],
+            "LastCommentUserID" => 234,
+            "CountComments" => 5,
+            "DateLastComment" => "2020-01-01 16:22:42",
+            "DateLastViewed" => $discussionMarkedRead,
+            "CountCommentWatch" => $discussionMarkedRead ? 5 : null,
+        ];
+
+        $this->model->calculate($discussion);
+
+        $this->assertSame($expected, $discussion->DateLastViewed);
+
+        // Reset that static property.
+        CategoryModel::$Categories = null;
+    }
+
+    /**
+     * Provide data for testing date-marked-read calculations.
+     *
+     * @return array
+     */
+    public function provideMarkedRead(): array {
+        $result = [
+            "Discussion unread, category unread" => [
+                "2020-01-01 00:00:00", // Discussion.DateInserted
+                null, // Discussion.DateLastViewed
+                null, // Category.DateMarkedRead
+                null, // Expected value.
+            ],
+            "Discussion read, category unread." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
+                null,
+                "2020-01-08 00:00:00",
+            ],
+            "Discussion read, category read more recently." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
+                "2020-01-10 00:00:00",
+                "2020-01-10 00:00:00",
+            ],
+            "Discussion read, category read prior." => [
+                "2020-01-01 00:00:00",
+                "2020-01-22 00:00:00",
+                "2020-01-08 00:00:00",
+                "2020-01-22 00:00:00",
+            ],
+            "Discussion read, category read before discussion created." => [
+                "2020-01-01 00:00:00",
+                "2020-01-08 00:00:00",
+                "2019-12-25 00:00:00",
+                "2020-01-08 00:00:00",
+            ],
+            "Discussion unread, category read after discussion created." => [
+                "2020-01-01 00:00:00",
+                null,
+                "2020-01-15 00:00:00",
+                "2020-01-15 00:00:00",
+            ],
+            "Discussion unread, category read before discussion created." => [
+                "2020-01-22 00:00:00",
+                null,
+                "2020-01-15 00:00:00",
+                null,
+            ],
+        ];
+        return $result;
     }
 }

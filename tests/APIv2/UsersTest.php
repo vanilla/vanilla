@@ -7,9 +7,11 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
+use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\Fixtures\Uploader;
+use VanillaTests\Fixtures\TestUploader;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -32,6 +34,11 @@ class UsersTest extends AbstractResourceTest {
     private $configuration;
 
     /**
+     * @var \UserModel
+     */
+    private $userModel;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
@@ -48,14 +55,25 @@ class UsersTest extends AbstractResourceTest {
      * Disable email before running tests.
      */
     public function setUp(): void {
+        $this->backupSession();
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');
         $this->configuration->set('Garden.Email.Disabled', true);
 
+        $this->userModel = static::container()->get(\UserModel::class);
+
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
         $middleware->setIsPrivate(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->restoreSession();
     }
 
     /**
@@ -284,7 +302,78 @@ class UsersTest extends AbstractResourceTest {
         ];
         $actual = $response->getBody();
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test the users me endpoint with some custom roles.
+     */
+    public function testPermissions() {
+        $customCategory = $this->api()->post('/categories', [
+            'name' => 'Custom Perms',
+            'urlCode' => 'test-permissions-api',
+        ])->getBody();
+
+        $customRole = $this->api()->post('/roles', [
+            'name' => 'Custom Role',
+            'type' => 'member',
+            'permissions' => [
+                [
+                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
+                    'permissions' => [
+                        'community.manage' => true,
+                    ],
+                ],
+                // I would add some root category permissions here, but it's not possible to insert them through the API.
+                // https://github.com/vanilla/vanilla/issues/10184
+                [
+                    'type' => 'category',
+                    'id' => $customCategory['categoryID'],
+                    'permissions' => [
+                        "comments.add" => true,
+                        "comments.delete" => true,
+                        "comments.edit" => true,
+                        "discussions.add" => true,
+                        "discussions.manage" => false,
+                        "discussions.moderate" => false,
+                    ],
+                ],
+            ],
+        ])->getBody();
+
+        $user = $this->api()->post('/users', [
+            "email" => "testy@test.com",
+            "emailConfirmed" => true,
+            "name" => "TestTest",
+            "password" => "password",
+            "roleID" => [
+                $customRole['roleID'],
+            ],
+        ])->getBody();
+
+        $permissions = $this->api()->get('/users/' . $user['userID'] . '/permissions')->getBody();
+
+        $this->assertEquals([
+            'isAdmin' => false,
+            'permissions' => [
+                [
+                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
+                    'permissions' => [
+                        'community.manage' => true,
+                    ],
+                ],
+                [
+                    'type' => 'category',
+                    'id' => $customCategory['categoryID'],
+                    'permissions' => [
+                        "comments.add" => true,
+                        "comments.delete" => true,
+                        "comments.edit" => true,
+                        "discussions.add" => true,
+                    ],
+                ],
+            ]
+        ], $permissions);
     }
 
     /**
@@ -402,8 +491,8 @@ class UsersTest extends AbstractResourceTest {
     public function testPostPhoto() {
         $user = $this->testGet();
 
-        Uploader::resetUploads();
-        $photo = Uploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        TestUploader::resetUploads();
+        $photo = TestUploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
         $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/photo", ['photo' => $photo]);
 
         $this->assertEquals(201, $response->getStatusCode());
@@ -544,6 +633,40 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * A moderator should be able to ban a member.
+     */
+    public function testBanWithPermission() {
+        $this->createUserFixtures('testBanWithPermission');
+        $this->api()->setUserID($this->moderatorID);
+        $r = $this->api()->put("/users/{$this->memberID}/ban", ['banned' => true]);
+        $this->assertTrue($r['banned']);
+    }
+
+    /**
+     * A moderator should not be able to ban an administrator.
+     */
+    public function testBanWithoutPermission() {
+        $this->createUserFixtures('testBanWithoutPermission');
+        $this->api()->setUserID($this->moderatorID);
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You are not allowed to ban a user that has higher permissions than you.');
+        $r = $this->api()->put("/users/{$this->adminID}/ban", ['banned' => true]);
+    }
+
+    /**
+     * A moderator should not be able to ban another moderator.
+     */
+    public function testBanSamePermissionRank() {
+        $this->createUserFixtures('testBanSamePermissionRank');
+        $moderatorID = $this->moderatorID;
+        $this->createUserFixtures('testBanSamePermissionRank2');
+        $this->api()->setUserID($this->moderatorID);
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('You are not allowed to ban a user with the same permission level as you.');
+        $r = $this->api()->put("/users/{$moderatorID}/ban", ['banned' => true]);
+    }
+
+    /**
      * Perform a registration and verify the result.
      *
      * @param array $fields
@@ -559,5 +682,4 @@ class UsersTest extends AbstractResourceTest {
         ksort($registeredUser);
         $this->assertEquals($registration, $registeredUser);
     }
-
 }

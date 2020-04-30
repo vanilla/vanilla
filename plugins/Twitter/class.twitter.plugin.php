@@ -12,10 +12,13 @@ use Vanilla\Web\CurlWrapper;
 /**
  * Class TwitterPlugin
  */
-class TwitterPlugin extends Gdn_Plugin {
+class TwitterPlugin extends SSOAddon {
 
     /** Authentication provider key. */
     const PROVIDER_KEY = 'Twitter';
+
+    /** AuthenticationSchemeAlias */
+    private const AUTHENTICATION_SCHEME = 'twitter';
 
     /** @var string Twitter's URL. */
     public static $BaseApiUrl = 'https://api.twitter.com/1.1/';
@@ -25,6 +28,15 @@ class TwitterPlugin extends Gdn_Plugin {
 
     /** @var string */
     protected $_RedirectUri = null;
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
+    }
 
     /**
      * Gets/sets the current oauth access token.
@@ -894,7 +906,7 @@ class TwitterPlugin extends Gdn_Plugin {
         // Save the twitter provider type.
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
-            ['AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
+            ['AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME, 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
             ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );

@@ -48,6 +48,12 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var \Throwable */
     private $themeFetchError;
 
+    /** @var string|int */
+    private $forcedThemeKey;
+
+    /** @var string|null */
+    private $revisionID;
+
     /**
      * DI.
      *
@@ -72,6 +78,34 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     }
 
     /**
+     * @param int|string $forcedThemeKey
+     */
+    public function setForcedThemeKey($forcedThemeKey, $revisionID = null): void {
+        $this->forcedThemeKey = $forcedThemeKey;
+    }
+
+    /**
+     * @param int|null $revisionID
+     */
+    public function setForcedRevisionID(?int $revisionID = null): void {
+        $this->revisionID = $revisionID;
+    }
+
+    /**
+     * @return string|int
+     */
+    private function getThemeKeyToPreload() {
+        return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
+    }
+
+    /**
+     * @return int
+     */
+    private function getThemeRevisionID(): ?int {
+        return $this->revisionID ?? $this->siteMeta->getActiveThemeRevisionID();
+    }
+
+    /**
      * Get a script asset for the theme.
      * If the theme doesn't define a script asset, return null.
      *
@@ -85,7 +119,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
 
         return new ThemeScriptAsset(
             $this->request,
-            $this->siteMeta->getActiveThemeKey(),
+            $this->getThemeKeyToPreload(),
             // Use both the theme version and the deployment to make a more robust cache buster.
             // People often forget to increment their theme version in file based themes
             // so adding the deployment cache buster to the theme version handles this case.
@@ -100,9 +134,22 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     public function getThemeData(): ?array {
         if (!$this->themeData) {
-            $themeKey = $this->siteMeta->getActiveThemeKey();
+            $themeKey = $this->getThemeKeyToPreload();
+
+            // Forced theme keys disable addon variables.
+            $args = ['allowAddonVariables' => !$this->forcedThemeKey];
+            if (!empty($this->revisionID)) {
+                // when theme-settings/{id}/revisions preview
+                $args['revisionID'] = $this->revisionID;
+            } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+                $args['revisionID'] = $revisionID;
+            }
+
             try {
-                $this->themeData = $this->themesApi->get($themeKey);
+                $this->themeData = $this->themesApi->get(
+                    $themeKey,
+                    $args
+                );
             } catch (\Throwable $e) {
                 // Prevent infinite loops.
                 // Our error handling page uses the theme when possible.
@@ -152,7 +199,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             if (!$themeData) {
                 return '';
             }
-            $themeKey = $this->siteMeta->getActiveThemeKey();
+            $themeKey = $this->getThemeKeyToPreload();
             $styleSheet = $themeData['assets']['styles'] ?? null;
             if ($styleSheet) {
                 $style = $this->themesApi->get_assets($themeKey, 'styles.css');

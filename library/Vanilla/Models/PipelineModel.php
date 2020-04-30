@@ -41,6 +41,15 @@ class PipelineModel extends Model implements InjectableInterface {
     }
 
     /**
+     * Add a database operations processor to the pipeline.
+     *
+     * @param Processor $processor
+     */
+    public function addPipelinePostProcessor(Processor $processor) {
+        $this->pipeline->addPostProcessor($processor);
+    }
+
+    /**
      * Get resource rows from a database table.
      *
      * @param array $where Conditions for the select query.
@@ -90,14 +99,16 @@ class PipelineModel extends Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
+     * @param string $mode Operation mode (force || default).
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set) {
+    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_INSERT);
         $databaseOperation->setCaller($this);
         $databaseOperation->setSet($set);
+        $databaseOperation->setMode($mode);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::insert($databaseOperation->getSet());
         });
@@ -109,15 +120,17 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
+     * @param string $mode Operation mode (force || default).
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_UPDATE);
         $databaseOperation->setCaller($this);
         $databaseOperation->setSet($set);
         $databaseOperation->setWhere($where);
+        $databaseOperation->setMode($mode);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::update(
                 $databaseOperation->getSet(),

@@ -8,7 +8,7 @@ import React, { useRef } from "react";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -36,7 +36,7 @@ interface IOpenDirectionProps {
     renderLeft?: boolean; // @deprecated
 }
 
-export interface IProps extends IOpenDirectionProps {
+export interface IDropDownProps extends IOpenDirectionProps {
     name?: string;
     children: React.ReactNode;
     className?: string;
@@ -74,15 +74,13 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-export default function DropDown(props: IProps) {
+export default function DropDown(props: IDropDownProps) {
     const ownID = useUniqueID("dropDown");
     const id = props.id || ownID;
     const device = useDevice();
 
     const { title } = props;
     const mobileTitle = props.mobileTitle ?? title;
-    const classesDropDown = dropDownClasses();
-    const classesFrameHeader = frameHeaderClasses();
     const classes = dropDownClasses();
     const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
     const openAsModal = props.openAsModal || device === Devices.MOBILE || device === Devices.XS;
@@ -136,7 +134,13 @@ export default function DropDown(props: IProps) {
                                 {mobileTitle ?? title}
                             </FrameHeaderMinimal>
                         )}
-                        <ContentTag className={classNames("dropDownItems", classes.items)}>{props.children}</ContentTag>
+                        {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
+                            props.children
+                        ) : (
+                            <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                {props.children}
+                            </ContentTag>
+                        )}
                     </DropDownContents>
                 );
             }}

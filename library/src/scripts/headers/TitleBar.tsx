@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -7,7 +7,7 @@
 import { useBannerContext } from "@library/banner/BannerContext";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
@@ -20,7 +20,6 @@ import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { HashOffsetReporter, useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import BackLink from "@library/routing/links/BackLink";
@@ -33,9 +32,13 @@ import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
+import { useSelector } from "react-redux";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import WidgetContainer from "@library/layout/components/WidgetContainer";
+import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 
 interface IProps {
-    container?: HTMLElement; // Element containing header. Should be the default most if not all of the time.
+    container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
@@ -83,47 +86,90 @@ export default function TitleBar(_props: IProps) {
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
+    const isDesktopLogoCentered = vars.logo.justifyContent === LogoAlignment.CENTER;
+
+    // When previewing and updating the colors live, there can be flickering of some components.
+    // As a result we want to hide them on first render for these cases.
+    const isPreviewing = useSelector((state: ICoreStoreState) => state.theme.forcedVariables);
+    const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(!!isPreviewing);
+    useEffect(() => {
+        if (isPreviewFirstRender) {
+            setIsPreviewFirstRender(false);
+        }
+    }, [isPreviewFirstRender]);
 
     const headerContent = (
-        <HashOffsetReporter>
-            <animated.div {...bgProps} className={classes.bg1}></animated.div>
-            <animated.div {...bg2Props} className={classes.bg2}>
-                {/* Cannot be a background image there will be flickering. */}
-                {vars.colors.bgImage && (
-                    <img
-                        src={vars.colors.bgImage}
-                        className={classes.bgImage}
-                        alt={"titleBarImage"}
-                        aria-hidden={true}
-                    />
+        <HashOffsetReporter className={classes.container}>
+            <div className={classes.bgContainer}>
+                <animated.div
+                    {...bgProps}
+                    className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+                ></animated.div>
+                {!isPreviewFirstRender && (
+                    <animated.div
+                        {...bg2Props}
+                        className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
+                    >
+                        {/* Cannot be a background image there will be flickering. */}
+                        {vars.colors.bgImage && (
+                            <img
+                                src={vars.colors.bgImage}
+                                className={classes.bgImage}
+                                alt={"titleBarImage"}
+                                aria-hidden={true}
+                            />
+                        )}
+                        {vars.overlay && <div className={classes.overlay}></div>}
+                    </animated.div>
                 )}
-            </animated.div>
-            <Container>
-                <PanelWidgetHorizontalPadding>
+            </div>
+            <Container fullGutter>
+                <div className={classes.titleBarContainer}>
                     <div className={classNames(classes.bar, { isHome: showSubNav })}>
                         {isCompact &&
                             (props.useMobileBackButton ? (
-                                <BackLink className={classes.leftFlexBasis} linkClassName={classes.button} />
+                                <BackLink
+                                    hideIfNoHistory={true}
+                                    className={classes.leftFlexBasis}
+                                    linkClassName={classes.button}
+                                />
                             ) : (
                                 <FlexSpacer className="pageHeading-leftSpacer" />
                             ))}
-                        {!isCompact && (
-                            <animated.div className={classes.logoAnimationWrap} {...logoProps}>
-                                <HeaderLogo
-                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                    logoClassName="titleBar-logo"
-                                    logoType={LogoType.DESKTOP}
-                                />
+                        {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
+                            <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
+                                <span
+                                    className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
+                                    ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
+                                >
+                                    <HeaderLogo
+                                        className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                        logoClassName="titleBar-logo"
+                                        logoType={LogoType.DESKTOP}
+                                    />
+                                </span>
                             </animated.div>
                         )}
-                        {!isCompact && <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>}
+                        {!isCompact && !isDesktopLogoCentered && (
+                            <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
+                        )}
                         {!isSearchOpen && !isCompact && (
                             <TitleBarNav
                                 isCentered={vars.navAlignment.alignment === "center"}
-                                containerRef={vars.navAlignment.alignment === "center" ? collisionSourceRef : undefined}
+                                containerRef={
+                                    vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                        ? collisionSourceRef
+                                        : undefined
+                                }
                                 className={classes.nav}
                                 linkClassName={classes.topElement}
                                 linkContentClassName="titleBar-navLinkContent"
+                                afterNode={
+                                    !isCompact &&
+                                    isDesktopLogoCentered && (
+                                        <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
+                                    )
+                                }
                             />
                         )}
                         {isCompact && (
@@ -150,7 +196,9 @@ export default function TitleBar(_props: IProps) {
                                 )}
                             </>
                         )}
-                        {!isCompact && <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>}
+                        {!isCompact && !isDesktopLogoCentered && (
+                            <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
+                        )}
                         <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
                             {!isSearchOpen && (
                                 <div className={classes.extraMeBoxIcons}>
@@ -188,13 +236,13 @@ export default function TitleBar(_props: IProps) {
                             {meBox}
                         </ConditionalWrap>
                     </div>
-                </PanelWidgetHorizontalPadding>
+                </div>
             </Container>
         </HashOffsetReporter>
     );
 
     const { resetScrollOffset, setScrollOffset, offsetClass } = useScrollOffset();
-    const containerElement = props.container || document.getElementById("titleBar");
+    const containerElement = props.container !== null ? props.container || document.getElementById("titleBar") : null;
 
     const containerClasses = classNames(
         "titleBar",
@@ -346,14 +394,14 @@ function DesktopMeBox() {
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSPARENT}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
-                    to={`/entry/signin?target=${window.location.pathname}`}
+                    to={`/entry/signin?target=${window.location.href}`}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSLUCID}
                     linkClassName={classNames(classes.register, classes.guestButton)}
-                    to={`/entry/register?target=${window.location.pathname}`}
+                    to={`/entry/register?target=${window.location.href}`}
                 >
                     {t("Register")}
                 </TitleBarNavItem>
@@ -381,8 +429,8 @@ function MobileMeBox() {
     if (isGuest) {
         return (
             <SmartLink
-                className={classNames(classes.centeredButtonClass, classes.button)}
-                to={`/entry/signin?target=${window.location.pathname}`}
+                className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
+                to={`/entry/signin?target=${window.location.href}`}
             >
                 <SignInIcon className={"titleBar-signInIcon"} />
             </SmartLink>

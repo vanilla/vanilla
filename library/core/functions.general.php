@@ -288,40 +288,6 @@ if (!function_exists('arrayValueI')) {
     }
 }
 
-if (!function_exists('attribute')) {
-    /**
-     * Takes an attribute (or array of attributes) and formats them in attribute="value" format.
-     *
-     * @param string|array $name The attribute array or the name of the attribute.
-     * @param mixed $valueOrExclude The value of the attribute or a prefix of attribute names to exclude.
-     * @return string Returns a string in attribute="value" format.
-     */
-    function attribute($name, $valueOrExclude = '') {
-        $return = '';
-        if (!is_array($name)) {
-            $name = [$name => $valueOrExclude];
-            $exclude = '';
-        } else {
-            $exclude = $valueOrExclude;
-        }
-
-        foreach ($name as $attribute => $val) {
-            if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
-                continue;
-            }
-
-            if (is_array($val) && strpos($attribute, 'data-') === 0) {
-                $val = json_encode($val);
-            }
-
-            if ($val != '' && $attribute != 'Standard') {
-                $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
-            }
-        }
-        return $return;
-    }
-}
-
 if (!function_exists('calculateNumberOfPages')) {
     /**
      * Calculate the total number of pages based on the total items and items per page.
@@ -1513,6 +1479,11 @@ if (!function_exists('betterRandomString')) {
         } elseif (function_exists('mcrypt_create_iv')) {
             // @codeCoverageIgnoreStart
             $randomChars = unpack('C*', mcrypt_create_iv($length));
+            $cryptoStrong = true;
+            // @codeCoverageIgnoreEnd
+        } elseif (function_exists("random_bytes")) {
+            // @codeCoverageIgnoreStart
+            $randomChars = unpack("C*", random_bytes($length));
             $cryptoStrong = true;
             // @codeCoverageIgnoreEnd
         } else {

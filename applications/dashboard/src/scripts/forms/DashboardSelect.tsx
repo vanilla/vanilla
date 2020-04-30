@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
@@ -17,12 +17,12 @@ interface IProps extends IMenuPlacement {
     options: IComboBoxOption[];
     onChange: (newValue: IComboBoxOption | null) => void;
     value?: IComboBoxOption;
-    clas?: string;
     inputClassName?: string;
     disabled?: boolean;
     isClearable?: boolean;
     errors?: IFieldError[];
     selectRef?: React.RefObject<Select>;
+    isLoading?: boolean;
 }
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
@@ -42,6 +42,7 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 menuPlacement={props.menuPlacement}
                 isClearable={props.isClearable}
                 selectRef={props.selectRef}
+                isLoading={props.isLoading}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}
         </div>

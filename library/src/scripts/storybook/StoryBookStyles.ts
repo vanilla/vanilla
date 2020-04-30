@@ -18,8 +18,7 @@ import { border, calc, color, em, important, percent, scale, translateX } from "
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { InputTextBlockBaseClass } from "@library/forms/InputBlock";
-import { iconVariables } from "@library/icons/iconClasses";
+import { iconVariables } from "@library/icons/iconStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const storyBookVariables = useThemeCache(() => {
@@ -100,7 +99,7 @@ export const storyBookClasses = useThemeCache(() => {
             weight: globalVars.fonts.weights.bold,
             lineHeight: 1.25,
         }),
-        transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
+        transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
     });
 
     const headingH2 = style("headingH2", {
@@ -267,7 +266,7 @@ export const storyBookClasses = useThemeCache(() => {
                 fg = globalVars.mainColors.bg;
                 break;
             case "titleBar":
-                bg = titleBarVars.colors.bg;
+                bg = titleBarVars.colors.bg.mix(titleBarVars.colors.fg, 0.5);
                 fg = titleBarVars.colors.fg;
                 break;
         }

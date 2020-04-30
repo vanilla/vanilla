@@ -575,9 +575,16 @@ class DiscussionsApiController extends AbstractApiController {
             $categoryID = $discussionData['CategoryID'];
         }
 
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $category = CategoryModel::categories($categoryID);
+        if ($category) {
+            $permissionCategoryID = $category['PermissionCategoryID'];
+        } else {
+            $permissionCategoryID = -1;
+        }
+
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $permissionCategoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $permissionCategoryID);
 
         $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);

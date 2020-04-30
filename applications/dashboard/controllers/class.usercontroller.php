@@ -509,6 +509,9 @@ class UserController extends DashboardController {
     public function delete($userID = '', $method = '') {
         $this->permission('Garden.Users.Delete');
         $session = Gdn::session();
+
+        $formValues = $this->Form->formValues();
+
         if ($session->User->UserID == $userID) {
             trigger_error(errorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
         }
@@ -550,7 +553,7 @@ class UserController extends DashboardController {
             }
 
             if ($this->Form->authenticatedPostBack(true) && $method != '') {
-                $userModel->deleteID($userID, ['DeleteMethod' => $method]);
+                $userModel->deleteID($userID, ['DeleteMethod' => $method, 'DeleteNotes' => $formValues['DeleteNotes']]);
                 $this->View = 'deletecomplete';
             }
 

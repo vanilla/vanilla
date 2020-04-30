@@ -17,7 +17,7 @@ interface IThemeData {
     themeName: string;
 }
 
-const TEMPLATE_DIR = path.resolve(__dirname, "./theme-template");
+const TEMPLATE_DIR = path.resolve(VANILLA_THEMES, "./theme-foundation");
 
 export async function scaffoldTheme(themeData: IThemeData) {
     validateThemeData(themeData);
@@ -33,7 +33,10 @@ export async function scaffoldTheme(themeData: IThemeData) {
     const packageJson = fse.readJsonSync(path.resolve(newThemeDir, "package.json"));
     addonJson["name"] = themeName;
     addonJson["key"] = themeKey;
+    addonJson["license"] = "Proprietary";
+    delete addonJson["hidden"];
     packageJson["name"] = themeKey;
+    packageJson["license"] = "Proprietary";
 
     const options: fse.WriteOptions = {
         spaces: 4,

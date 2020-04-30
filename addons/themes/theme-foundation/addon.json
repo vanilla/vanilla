@@ -19,18 +19,18 @@
     "isResponsive": true,
     "license": "GPL-2.0-only",
     "sites": [],
-    "priority": 1000,
     "type": "theme",
     "Features": {
-        "ProfileHeader": true,
-        "SharedMasterView": true,
-        "NewFlyouts": true,
         "DataDrivenTheme": true
     },
     "assets": {
         "footer": {
             "type": "twig",
             "file": "footer.twig"
+        },
+        "header": {
+            "type": "twig",
+            "file": "header.twig"
         },
         "styles": {
             "type": "css",
@@ -39,10 +39,6 @@
         "variables": {
             "type": "json",
             "file": "variables.json"
-        },
-        "fonts": {
-            "type": "data",
-            "file": "fonts.json"
         }
     }
 }

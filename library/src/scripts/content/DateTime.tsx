@@ -9,7 +9,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import { getJSLocaleKey } from "@vanilla/i18n";
 
-interface IProps {
+export interface IDateTime {
     /** The timestamp to format and display */
     timestamp: string;
     /** Pass an explicit time zone to format in. */
@@ -24,8 +24,8 @@ interface IProps {
 /**
  * Component for displaying an accessible nicely formatted time string.
  */
-export default class DateTime extends Component<IProps> {
-    public static defaultProps: Partial<IProps> = {
+export default class DateTime extends Component<IDateTime> {
+    public static defaultProps: Partial<IDateTime> = {
         mode: "fixed",
     };
     private interval;

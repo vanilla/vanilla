@@ -22,6 +22,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     /** @var int */
     private $categoryID;
 
+    /** @var array|bool */
+    private $discussion;
+
     /**
      * Initial job setup.
      *
@@ -37,7 +40,11 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * @return Schema
      */
     private function messageSchema(): Schema {
-        $schema = Schema::parse(["categoryID" => ["type" => "integer"]]);
+        $schema = Schema::parse([
+            "categoryID" => ["type" => "integer"],
+            "discussion:a|b"
+            ]
+        );
         return $schema;
     }
 
@@ -45,10 +52,12 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Update category discussion count.
      */
     public function run(): JobExecutionStatus {
-        if (!is_int($this->categoryID)) {
+        $isValidDiscussion = is_array($this->discussion) || is_bool($this->discussion);
+        $isValidCategory = is_int($this->categoryID);
+        if (!$isValidDiscussion || !$isValidCategory) {
             return JobExecutionStatus::abandoned();
         }
-        $this->discussionModel->updateDiscussionCount($this->categoryID);
+        $this->discussionModel->scheduledUpdateCount($this->categoryID, $this->discussion);
         return JobExecutionStatus::complete();
     }
 
@@ -60,6 +69,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->categoryID = $message["categoryID"];
+        $this->discussion = $message["discussion"];
     }
 
     /**

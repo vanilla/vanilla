@@ -52,7 +52,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Update category discussion count.
      */
     public function run(): JobExecutionStatus {
-        $isValidDiscussion = is_array($this->discussion) || is_bool($this->discussion);
+        $isValidDiscussion = (is_array($this->discussion) || is_bool($this->discussion));
         $isValidCategory = is_int($this->categoryID);
         if (!$isValidDiscussion || !$isValidCategory) {
             return JobExecutionStatus::abandoned();

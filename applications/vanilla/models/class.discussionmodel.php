@@ -2642,7 +2642,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
     /**
      * Scheduled category discussion count update.
      *
-     * @param $categoryID
+     * @param int $categoryID Unique ID of category we are updating.
      * @param array|false $discussion The discussion to update the count for or **false** for all of them.
      */
     public function scheduledUpdateCount($categoryID, $discussion = false) {

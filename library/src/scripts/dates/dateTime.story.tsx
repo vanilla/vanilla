@@ -16,7 +16,7 @@ export default {
     parameters: {},
 };
 
-export function StoryDate(config) {
+export function StoryDateTime(config) {
     const testDates = [
         {
             timestamp: "2020-04-22T14:31:19Z",

@@ -15,7 +15,7 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             size: 36,
             bg: globalVars.mixBgAndFg(0.1),
             border: {
-                radius: 8,
+                radius: 10,
             },
         },
         month: {
@@ -27,7 +27,6 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         day: {
             font: {
                 size: 16,
-                weight: globalVars.fonts.weights.bold,
             },
         },
     });

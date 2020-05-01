@@ -31,13 +31,6 @@ class HtmlDocument {
     }
 
     /**
-     * Pre-encode certain characters that dom document has difficulty with.
-     */
-    private function preEncodeCharacters() {
-
-    }
-
-    /**
      * Query the DOM with some xpath.
      *
      * @param string $xpathQuery

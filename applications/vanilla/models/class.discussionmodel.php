@@ -2610,7 +2610,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      * @param array|false $discussion The discussion to update the count for or **false** for all of them.
      */
     public function updateDiscussionCount($categoryID, $discussion = false) {
-        $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
             $params = [];
             $where = '';
@@ -2634,7 +2633,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $this->Database->query($sql, $params, 'DiscussionModel_UpdateDiscussionCount');
 
         } elseif (is_numeric($categoryID)) {
-            $this->SQL
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID, 'discussion' => $discussion]);
+        }
+    }
+
+    /**
+     * Scheduled category discussion count update.
+     *
+     * @param $categoryID
+     * @param array|false $discussion The discussion to update the count for or **false** for all of them.
+     */
+    public function scheduledUpdateCount($categoryID, $discussion = false) {
+        $discussionID = val('DiscussionID', $discussion, false);
+        $this->SQL
                 ->select('d.DiscussionID', 'count', 'CountDiscussions')
                 ->select('d.CountComments', 'sum', 'CountComments')
                 ->from('Discussion d')
@@ -2660,7 +2673,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $categoryModel = new CategoryModel();
             $categoryModel->setField($categoryID, $cacheAmendment);
             $categoryModel->setRecentPost($categoryID);
-        }
     }
 
     /**
@@ -3066,9 +3078,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
 
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
-        /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-        $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-        $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID]);
+        $this->updateDiscussionCount($categoryID);
 
         // Update the last post info for the category and its parents.
         CategoryModel::instance()->refreshAggregateRecentPost($categoryID, true);

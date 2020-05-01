@@ -27,7 +27,6 @@ class TextFormat extends BaseFormat {
         $this->formatConfig = $formatConfig;
     }
 
-
     /**
      * @inheritdoc
      */

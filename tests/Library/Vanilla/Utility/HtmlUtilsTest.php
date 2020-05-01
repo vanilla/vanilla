@@ -8,12 +8,14 @@
 namespace VanillaTests\Library\Vanilla\Utility;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Utility\HtmlUtils;
 
 /**
  * Tests for the `HtmlUtils` class.
  */
 final class HtmlUtilsTest extends TestCase {
+
     /**
      * Tests for `HtmlUtils::classNames()`
      *
@@ -38,6 +40,95 @@ final class HtmlUtilsTest extends TestCase {
             [['foo', '', 'bar'], 'foo bar'],
         ];
         return $r;
+    }
+
+    /**
+     * Test get classes.
+     *
+     * @param \DOMElement $element
+     * @param array $expected
+     *
+     * @dataProvider provideGetClasses
+     */
+    public function testGetClasses(\DOMElement $element, array $expected) {
+        $this->assertEquals($expected, HtmlUtils::getClasses($element));
+    }
+
+    /**
+     * @return HtmlDocument
+     */
+    private function getTestHtmlDoc(): HtmlDocument {
+        $html = '<div id="1" class="class1 class2 class1"></div><div id="2" class="class1"></div>';
+        return new HtmlDocument($html);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideGetClasses(): array {
+        $doc = $this->getTestHtmlDoc();
+        return [
+            [ $doc->queryXPath('//*[@id="1"]')->item(0), ['class1', 'class2'] ],
+            [ $doc->queryXPath('//*[@id="2"]')->item(0), ['class1'] ]
+        ];
+    }
+
+    /**
+     * Test hasClass.
+     *
+     * @param \DOMElement $element
+     * @param string $class
+     * @param bool $expected
+     *
+     * @dataProvider provideHasClass
+     */
+    public function testHasClass(\DOMElement $element, string $class, bool $expected) {
+        $this->assertEquals($expected, HtmlUtils::hasClass($element, $class));
+    }
+
+    /**
+     * @return array
+     */
+    public function provideHasClass(): array {
+        $doc = $this->getTestHtmlDoc();
+        return [
+            [ $doc->queryXPath('//*[@id="1"]')->item(0), 'class1', true ],
+            [ $doc->queryXPath('//*[@id="1"]')->item(0), 'class2', true ],
+            [ $doc->queryXPath('//*[@id="1"]')->item(0), 'class3', false ],
+            [ $doc->queryXPath('//*[@id="1"]')->item(0), 'class', false ],
+        ];
+    }
+
+    /**
+     * Test appendClass.
+     *
+     * @param \DOMElement $element
+     * @param string $class
+     * @param array $expected
+     *
+     * @dataProvider provideAppendClass
+     */
+    public function testAppendClass(\DOMElement $element, string $class, array $expected) {
+        HtmlUtils::appendClass($element, $class);
+        $this->assertEquals($expected, HtmlUtils::getClasses($element));
+    }
+
+    /**
+     * @return array
+     */
+    public function provideAppendClass(): array {
+        return [
+            'add existing class' => [
+                $this->getTestHtmlDoc()->queryXPath('//*[@id="1"]')->item(0),
+                'class1',
+                ['class1', 'class2'],
+            ],
+            'add new class' => [
+                $this->getTestHtmlDoc()->queryXPath('//*[@id="1"]')->item(0),
+                'class3',
+                ['class1', 'class2', 'class3'],
+            ],
+        ];
     }
 
     /**

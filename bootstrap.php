@@ -12,6 +12,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
+use Vanilla\Permissions;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
@@ -251,6 +252,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     })])
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
@@ -275,6 +277,18 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
     ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
+
+    ->rule(\Vanilla\Web\APIExpandMiddleware::class)
+    ->setConstructorArgs([
+        "/api/v2/",
+        ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
+    ])
+
+    ->rule(\Vanilla\OpenAPIBuilder::class)
+    ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
+
+    ->rule('@apiexpand-filter')
+    ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

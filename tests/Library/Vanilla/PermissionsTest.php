@@ -128,6 +128,8 @@ class PermissionsTest extends SharedBootstrapTestCase {
         $this->assertTrue($permissions->has('Vanilla.Discussions.View', null));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Add', null, Permissions::CHECK_MODE_GLOBAL_ONLY));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Edit'));
+
+        $this->assertFalse($permissions->has(""));
     }
 
     public function testMerge() {

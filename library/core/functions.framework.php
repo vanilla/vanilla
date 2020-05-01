@@ -7,6 +7,7 @@
  */
 
 use Vanilla\Models\ThemeModel;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\CacheControlMiddleware;
 
 if (!function_exists('asset')) {
@@ -44,46 +45,10 @@ if (!function_exists('assetVersion')) {
      * @return string Returns a version string.
      */
     function assetVersion($destination, $version = null) {
-        static $gracePeriod = 90;
-
-        // Figure out which version to put after the asset.
-        if (is_null($version)) {
-            $version = APPLICATION_VERSION;
-            if (preg_match('`^/([^/]+)/([^/]+)/`', $destination, $matches)) {
-                $type = $matches[1];
-                $key = $matches[2];
-                static $themeVersion = null;
-
-                switch ($type) {
-                    case 'plugins':
-                    case 'applications':
-                        $addon = Gdn::addonManager()->lookupAddon($key);
-                        if ($addon) {
-                            $version = $addon->getVersion();
-                        }
-                        break;
-                    case 'themes':
-                        if ($themeVersion === null) {
-                            $theme = Gdn::addonManager()->lookupTheme(theme());
-                            if ($theme) {
-                                $themeVersion = $theme->getVersion();
-                            }
-                        }
-                        $version = $themeVersion;
-                        break;
-                }
-            }
-        }
-
-        // Add a timestamp component to the version if available.
-        if ($timestamp = c('Garden.Deployed')) {
-            $graced = $timestamp + $gracePeriod;
-            if (time() >= $graced) {
-                $timestamp = $graced;
-            }
-            $version .= '.'.dechex($timestamp);
-        }
-        return $version;
+        $result = $version ? $version .'-' : '';
+        $buster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
+        $result .= $buster->value();
+        return $result;
     }
 }
 

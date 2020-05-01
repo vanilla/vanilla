@@ -309,7 +309,7 @@ class RoleController extends DashboardController {
                 'Control' => 'toggle'
             ],
             'Garden.api.ssoIDPermission' => [
-                'LabelCode' => 'API SSO Expand Permission.',
+                'LabelCode' => 'API SSO Expand Permission',
                 'Description' => t('Garden.api.ssoIDPermission.description'),
                 'Control' => 'DropDown',
                 'Items' => $aliases,

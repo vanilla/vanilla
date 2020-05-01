@@ -8,17 +8,24 @@ import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
 import moment from "moment";
 import { getJSLocaleKey } from "@vanilla/i18n";
+import { dateTimeClasses } from "@library/content/dateTimeStyles";
+
+export enum DateFormats {
+    DEFAULT = "default",
+    EXTENDED = "extended",
+    COMPACT = "compact",
+}
 
 export interface IDateTime {
     /** The timestamp to format and display */
     timestamp: string;
     /** Pass an explicit time zone to format in. */
-    timezone: string;
+    timezone?: string;
     /** An additional classname to apply to the root of the component */
     className?: string;
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
-    extended?: boolean;
+    type?: DateFormats;
 }
 
 /**
@@ -27,6 +34,7 @@ export interface IDateTime {
 export default class DateTime extends Component<IDateTime> {
     public static defaultProps: Partial<IDateTime> = {
         mode: "fixed",
+        type: DateFormats.DEFAULT,
     };
     private interval;
 
@@ -68,10 +76,42 @@ export default class DateTime extends Component<IDateTime> {
         });
     }
 
+    private get options() {
+        switch (this.props.type) {
+            case DateFormats.COMPACT:
+                return {
+                    day: {
+                        day: "numeric",
+                        timeZone: this.props.timezone,
+                    },
+                    month: {
+                        month: "short",
+                        timeZone: this.props.timezone,
+                    },
+                };
+            case DateFormats.EXTENDED:
+                return {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    timeZone: this.props.timezone,
+                };
+            default:
+                return {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    timeZone: this.props.timezone,
+                };
+        }
+    }
+
     /**
      * Get a shorter human readable time for the time tag.
      */
-    private get humanTime(): string {
+    private get humanTime(): React.ReactNode {
         const inputMoment = moment(this.props.timestamp);
 
         if (this.props.mode === "relative") {
@@ -80,25 +120,23 @@ export default class DateTime extends Component<IDateTime> {
             if (seconds >= 0 && seconds <= 5) {
                 return t("just now");
             }
-
             return inputMoment.from(moment());
         } else {
-            const options = this.props.extended
-                ? {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "numeric",
-                      timeZone: this.props.timezone,
-                  }
-                : {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      timeZone: this.props.timezone,
-                  };
-            return inputMoment.toDate().toLocaleString(getJSLocaleKey(), options);
+            if (this.props.type !== DateFormats.COMPACT) {
+                return inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options as any);
+            } else {
+                const classes = dateTimeClasses();
+                return (
+                    <span className={classes.compactRoot}>
+                        <span className={classes.compactMonth} key={"month"}>
+                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options.month as any)}
+                        </span>
+                        <span className={classes.compactDay} key={"day"}>
+                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options.day as any)}
+                        </span>
+                    </span>
+                );
+            }
         }
     }
 }

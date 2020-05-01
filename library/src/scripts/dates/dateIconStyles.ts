@@ -12,7 +12,7 @@ export const dateIconVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     return {};
 });
 
-export const titleBarClasses = useThemeCache(() => {
+export const dateIconClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = dateIconVariables();
     const style = styleFactory("titleBar");

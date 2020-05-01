@@ -13,14 +13,14 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test the migration of the hero image plugin.
  */
-class HeroImageMigrateTest extends TestCase {
+class VanillaStructureTest extends TestCase {
 
     use SiteTestTrait;
 
     /**
      * Test that the old
      */
-    public function testMigration() {
+    public function testHeroImageMigration() {
         $structure = \Gdn::structure();
         $config = \Gdn::config();
 
@@ -51,7 +51,7 @@ class HeroImageMigrateTest extends TestCase {
         include_once PATH_LIBRARY.'/SmartyPlugins/function.hero_image_link.php';
         include_once PATH_LIBRARY.'/SmartyPlugins/function.banner_image_url.php';
 
-        $uploadBase = 'http://vanilla.test/heroimagemigratetest/uploads/';
+        $uploadBase = 'http://vanilla.test/vanillastructuretest/uploads/';
 
         // Test that we can still fetch our information using the old functions after the migrations.
         $this->assertEquals("category.png", @\HeroImagePlugin::getHeroImageSlug($categoryID));
@@ -65,5 +65,20 @@ class HeroImageMigrateTest extends TestCase {
         \Gdn::controller($ctrl);
 
         $this->assertEquals("${uploadBase}category.png", @\smarty_function_hero_image_link([], $smarty));
+    }
+
+    /**
+     * Test that we properly fix input formatters that were improperly named.
+     */
+    public function testInputFormatRename() {
+        $config = \Gdn::config();
+        $config->set('Garden.InputFormatter', 'rich');
+        $config->set('Garden.MobileInputFormatter', 'rich');
+
+        // Run the structure.
+        include PATH_APPLICATIONS.'/vanilla/settings/structure.php';
+
+        $this->assertSame('Rich', $config->get('Garden.InputFormatter'));
+        $this->assertSame('Rich', $config->get('Garden.MobileInputFormatter'));
     }
 }

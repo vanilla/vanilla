@@ -23,11 +23,18 @@ class HtmlDocument {
      * @param string $innerHtml HTML to construct the DOM with.
      */
     public function __construct(string $innerHtml) {
-        $this->dom = new \DOMDocument();
+        $this->dom = new \DOMDocument('1.0', 'UTF-8');
 
         // DomDocument will automatically add html, head and body wrapper if we don't.
         // We add our own to ensure consistency.
         @$this->dom->loadHTML($this->getDocumentPrefix() . $innerHtml . $this->getDocumentSuffix(), LIBXML_NOBLANKS);
+    }
+
+    /**
+     * Pre-encode certain characters that dom document has difficulty with.
+     */
+    private function preEncodeCharacters() {
+
     }
 
     /**

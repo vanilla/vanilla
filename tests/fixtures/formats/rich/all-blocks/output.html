@@ -11,14 +11,14 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
      * @param  Controller $sender The sending controller object.
      */
     public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {
-        // Bail out if we&#039;re in the dashboard
-        if (inSection(&#039;Dashboard&#039;)) {
+        // Bail out if we're in the dashboard
+        if (inSection('Dashboard')) {
             return;
         }
 
         // Fetch the currently enabled locale (en by default)
         $locale = Gdn::locale()-&gt;current();
-        $sender-&gt;setData(&#039;locale&#039;, $locale);
+        $sender-&gt;setData('locale', $locale);
     }
 }
 </pre>

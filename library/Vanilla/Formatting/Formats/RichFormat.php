@@ -66,7 +66,9 @@ class RichFormat extends BaseFormat {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
-            return $this->renderer->render($blotGroups);
+            $html = $this->renderer->render($blotGroups);
+            $html = $this->applyHtmlProcessors($html);
+            return $html;
         } catch (\Throwable $e) {
             $this->logBadInput($e);
             if ($throw) {

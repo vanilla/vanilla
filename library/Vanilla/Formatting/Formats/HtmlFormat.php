@@ -8,7 +8,6 @@
 namespace Vanilla\Formatting\Formats;
 
 use Exception;
-use Garden\StaticCacheTranslationTrait;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Html\HtmlDocument;
@@ -25,8 +24,6 @@ use Vanilla\InjectableInterface;
  * Format definition for HTML based formats.
  */
 class HtmlFormat extends BaseFormat implements InjectableInterface {
-
-    use StaticCacheTranslationTrait;
 
     const FORMAT_KEY = "html";
 

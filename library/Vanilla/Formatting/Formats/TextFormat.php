@@ -39,6 +39,8 @@ class TextFormat extends BaseFormat {
             $result = nl2br(trim($result));
         }
 
+        $result = $this->applyHtmlProcessors($result);
+
         return $result;
     }
 

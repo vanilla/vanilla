@@ -44,7 +44,6 @@ class TextExFormat extends TextFormat {
     public function renderHTML(string $content): string {
         $result = parent::renderHTML($content);
         $result = $this->htmlEnhancer->enhance($result);
-        $result = $this->applyHtmlProcessors($result);
         return $result;
     }
 

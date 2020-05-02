@@ -344,6 +344,36 @@ function setvalr($key, &$collection, $value = null) {
     }
 }
 
+if (!function_exists('str_ends_with')) {
+    /**
+     * A polyfill for PHP 8's `str_ends_with()` function.
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @return bool
+     * @see https://php.watch/versions/8.0/str_starts_with-str_ends_with
+     * @codeCoverageIgnore
+     */
+    function str_ends_with(string $haystack, string $needle): bool {
+        return $needle === '' || $needle === \substr($haystack, -\strlen($needle));
+    }
+}
+
+if (!function_exists('str_starts_with')) {
+    /**
+     * A polyfill for PHP 8's `str_ends_with()` function.
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @return bool
+     * @see https://php.watch/versions/8.0/str_starts_with-str_ends_with
+     * @codeCoverageIgnore
+     */
+    function str_starts_with(string $haystack, string $needle): bool {
+        return \strncmp($haystack, $needle, \strlen($needle)) === 0;
+    }
+}
+
 if (!function_exists('svalr')) {
     /**
      * Set a key to a value in a collection.

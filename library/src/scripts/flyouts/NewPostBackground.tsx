@@ -10,7 +10,7 @@ interface IProps {
     open: boolean;
     className?: string;
     children: React.ReactNode;
-    onClick: () => void;
+    onClick: (e) => void;
 }
 
 export default function NewPostBackground(props: IProps) {
@@ -24,9 +24,9 @@ export default function NewPostBackground(props: IProps) {
     });
 
     return createPortal(
-        <animated.div className={classNames(classes.container)} style={trans} onClick={props.onClick}>
+        <animated.aside className={classNames(classes.container)} style={trans} onClick={props.onClick}>
             {props.children}
-        </animated.div>,
+        </animated.aside>,
         document.body,
     );
 }

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useRef, useMemo } from "react";
 import classNames from "classnames";
 
 import { NewPostMenuIcon } from "@library/icons/common";
@@ -9,6 +9,7 @@ import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
 import { Trail } from "react-spring/renderprops";
 import { useSpring, animated, interpolate } from "react-spring";
 import NewPostBackground from "./NewPostBackground";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 export enum PostTypes {
     LINK = "link",
@@ -17,6 +18,7 @@ export enum PostTypes {
 
 export interface IAddPost {
     id: string;
+    aid?: string;
     action: (() => void) | string;
     type: PostTypes;
     className?: string;
@@ -64,16 +66,32 @@ function ActionItem({ item, style }: { item: IAddPost; style: ITransition }) {
 }
 
 export default function NewPostMenu(props: { items: IAddPost[] }) {
+    const classes = newPostMenuClasses();
+    const { items } = props;
+
     const [open, setOpen] = useState(false);
-    const toggle = () => setOpen(!open);
-    const onClickBackground = () => {
+    const bkgAnimationRef = useRef();
+
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
+    const buttonID = ID + "-button";
+    const menuID = ID + "-menu";
+    // const menuItemIDs = items.map(item => ID + `-${item.id}`);
+    const itemsWithAIDs = items.map(item => ({ ...item, aid: ID + `-${item.id}` }));
+
+    const toggle = () => {
+        if (!open && buttonRef.current) {
+            buttonRef.current.focus();
+        }
+        setOpen(!open);
+    };
+
+    const onClickBackground = e => {
+        e.stopPropagation();
         if (open) {
             setOpen(false);
         }
     };
-
-    const classes = newPostMenuClasses();
-    const { items } = props;
 
     // Animation parameters: o (opacity), d (degree), s (scale)
     const AnimatedButton = animated(Button);
@@ -88,18 +106,34 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     return (
         <NewPostBackground open={open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
+                {/* <ul id={menuID} role="menu" aria-labelledby={buttonID} tabIndex={-1} aria-activedescendant={buttonID}> */}
                 <Trail
                     reverse={open}
                     config={{ mass: 2, tension: 4000, friction: 100 }}
                     items={items}
                     keys={item => item.id}
                     from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
-                    to={{ opacity: open ? 1 : 0, transform: open ? "translate3d(0, 0, 0)" : "translate3d(0, 100%, 0)" }}
+                    to={{
+                        opacity: open ? 1 : 0,
+                        transform: open ? "translate3d(0, 0, 0)" : "translate3d(0, 100%, 0)",
+                    }}
                 >
-                    {item => props => <ActionItem key={item.id} item={item} style={props} />}
+                    {item => props => (
+                        // <li id={item.aid} role="menuitem">
+                        <ActionItem key={item.id} item={item} style={props} />
+                        // </li>
+                    )}
                 </Trail>
+                {/* </ul> */}
 
                 <AnimatedButton
+                    id={buttonID}
+                    aria-haspopup="true"
+                    aria-controls={menuID}
+                    aria-expanded={toggle}
+                    title={"New Post Menu"}
+                    aria-label={"New Post Menu"}
+                    buttonRef={buttonRef}
                     style={{
                         opacity: o
                             .interpolate({

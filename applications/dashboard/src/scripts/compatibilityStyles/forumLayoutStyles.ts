@@ -226,16 +226,6 @@ export const forumLayoutCSS = () => {
     );
 
     cssOut(`.Container`, containerMainStyles() as NestedCSSProperties);
-
-<<<<<<< HEAD
-=======
-    cssOut(`.Frame-contentWrap`, {
-        // ...paddings({
-        //     all: globalVars.gutter.half,
-        // }),
-    });
-
->>>>>>> 9dd6aecae... Refactor/clean up media queries for Foundation
     cssOut(`.Frame-row`, {
         display: "flex",
         flexWrap: "nowrap",

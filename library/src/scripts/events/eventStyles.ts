@@ -72,9 +72,9 @@ export const eventsClasses = useThemeCache(() => {
 
     const link = style("link", {
         color: colorOut(globalVars.mainColors.fg),
-        width: percent(100),
         display: "flex",
         flexWrap: "nowrap",
+        flexGrow: 1,
         justifyContent: "flex-start",
         alignItems: "flex-start",
         ...paddings(vars.spacing.padding),

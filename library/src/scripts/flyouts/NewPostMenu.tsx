@@ -143,7 +143,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         open
             ? [butAnimationRef, menuAnimationRef, itemsAnimationRef, bkgAnimationRef]
             : [butAnimationRef, itemsAnimationRef, menuAnimationRef, bkgAnimationRef],
-        [0.1, 0.1, 0.13, 0.14],
+        [0.1, 0.1, 0.13, 0.15],
     );
     // useChain([butAnimationRef, itemsAnimationRef]);
 

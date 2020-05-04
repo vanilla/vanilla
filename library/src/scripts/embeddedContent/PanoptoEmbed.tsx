@@ -24,7 +24,11 @@ const EMBED_LOADED_CLASS: string = "isLoaded";
  */
 export function PanoptoEmbed(props: IProps): JSX.Element {
     const throwError = useThrowError();
-    const playerId = 'player-' + Math.random().toString(36).substr(2, 9);
+    const playerId =
+        "player-" +
+        Math.random()
+            .toString(36)
+            .substr(2, 9);
 
     useLayoutEffect(() => {
         void convertPanoptoEmbeds().catch(throwError);
@@ -42,8 +46,7 @@ export function PanoptoEmbed(props: IProps): JSX.Element {
                         data-playerid={playerId}
                         data-sessionid={props.sessionId}
                         data-url={props.url}
-                    >
-                    </div>
+                    ></div>
                 </EmbedContent>
             </EmbedContainer>
         </>
@@ -98,8 +101,8 @@ async function renderPanoptoEmbed(element: HTMLElement) {
     element.classList.add(EMBED_LOADED_CLASS);
 
     // Add embedVideo-iframe class for proper dimensions.
-    let iframe: HTMLElement|undefined = element.getElementsByTagName('iframe')[0];
+    let iframe: HTMLElement | undefined = element.getElementsByTagName("iframe")[0];
     if (iframe != undefined) {
-        iframe.classList.add("embedVideo-iframe")
+        iframe.classList.add("embedVideo-iframe");
     }
 }

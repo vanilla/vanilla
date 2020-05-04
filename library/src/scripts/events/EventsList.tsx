@@ -27,7 +27,7 @@ export interface IEventList {
 export function EventsList(props: IEventList) {
     const classes = eventsClasses();
     if (!props.data || props.data.length === 0) {
-        const {hideIfEmpty = false, emptyMessage = t("This category does not have any events.") = props;
+        const { hideIfEmpty = false, emptyMessage = t("This category does not have any events.") } = props;
         return hideIfEmpty ? null : <p className={classes.empty}>{emptyMessage}</p>;
     }
 

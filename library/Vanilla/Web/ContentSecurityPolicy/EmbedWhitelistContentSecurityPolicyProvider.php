@@ -13,7 +13,7 @@ use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
  */
 class EmbedWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
     const EMBED_WHITELIST = [
-        PanoptoEmbed::JS_SCRIPT,
+        'https://developers.panopto.com',
         'https://embed-cdn.gettyimages.com',
         'https://s.imgur.com',
         'https://platform.instagram.com',

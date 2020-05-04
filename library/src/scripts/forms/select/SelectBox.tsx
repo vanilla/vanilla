@@ -87,7 +87,6 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                 buttonBaseClass={props.buttonBaseClass}
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
-                selfPadded={true}
                 renderLeft={renderLeft}
                 horizontalOffset={true}
             >

@@ -1,11 +1,12 @@
 import React from "react";
 import DateTime, { DateFormats, IDateTime } from "@library/content/DateTime";
 import SmartLink from "@library/routing/links/SmartLink";
-import { eventsClasses } from "@library/events/eventStyles";
+import { eventsClasses, eventsVariables } from "@library/events/eventStyles";
 import Paragraph from "@library/layout/Paragraph";
 import TruncatedText from "@library/content/TruncatedText";
 import EventAttendanceDropDown, { EventAttendance } from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
@@ -18,6 +19,8 @@ export interface IEvent {
     headingLevel?: 2 | 3;
     attendance: EventAttendance;
     className?: string;
+    longestCharCount?: number; // for dynamic width, based on language
+    attendanceOptions: ISelectBoxItem[];
 }
 
 /**
@@ -27,6 +30,8 @@ export function Event(props: IEvent) {
     const classes = eventsClasses();
 
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
+
+    const attendanceWidth = eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0);
 
     return (
         <li className={classNames(classes.item, props.className)}>
@@ -48,8 +53,14 @@ export function Event(props: IEvent) {
                         </div>
                     </div>
                 </SmartLink>
-                <div className={classes.attendance}>
-                    <EventAttendanceDropDown attendance={props.attendance} />
+                <div
+                    className={classes.attendance}
+                    style={{
+                        flexBasis: `${attendanceWidth}ex`,
+                        width: `${attendanceWidth}ex`,
+                    }}
+                >
+                    <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />
                 </div>
             </article>
         </li>

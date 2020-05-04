@@ -108,9 +108,7 @@ export function EventsStandard(props: { title?: string; headingLevel?: 2 | 3; da
     );
 }
 
-export const Empty = storyWithConfig({ useWrappers: false }, () => (
+export const Empty = storyWithConfig({}, () => (
     <EventsStandard title={"Empty Event List"} headingLevel={3} data={[]} />
 ));
-export const One = storyWithConfig({ useWrappers: false }, () => (
-    <EventsStandard title={"One Event"} data={dummyEventData.slice(0, 1)} />
-));
+export const One = storyWithConfig({}, () => <EventsStandard title={"One Event"} data={dummyEventData.slice(0, 1)} />);

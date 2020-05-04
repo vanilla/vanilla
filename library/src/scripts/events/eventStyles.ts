@@ -3,13 +3,12 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { borders, singleBorder } from "@library/styles/styleHelpersBorders";
 import { paddings } from "@library/styles/styleHelpersSpacing";
-import { colorOut, fonts, negativeUnit, unit, userSelect } from "@library/styles/styleHelpers";
-import { TextTransformProperty } from "csstype";
+import { colorOut, fonts, negativeUnit, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
 import { dateTimeVariables } from "@library/content/dateTimeStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -29,9 +28,10 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const spacing = makeVars("spacing", {
         contentSpacer: globalVars.gutter.half,
+        attendanceOffset: 5,
         padding: {
             vertical: 20,
-            horizontal: 10,
+            horizontal: 5,
         },
     });
 
@@ -47,31 +47,27 @@ export const eventsClasses = useThemeCache(() => {
         display: "block",
     });
 
-    const item = style("item", {
+    const empty = style("empty", {
         display: "block",
-        borderBottom: singleBorder(),
-        ...paddings({
-            horizontal: vars.spacing.padding.horizontal,
-        }),
     });
 
     const list = style("list", {
         display: "block",
         marginLeft: negativeUnit(vars.spacing.padding.horizontal * 2),
         width: calc(`100% + ${vars.spacing.padding.horizontal * 4}`),
+    });
+
+    const item = style("item", {
+        display: "block",
+        borderBottom: singleBorder(),
+        ...paddings({
+            horizontal: vars.spacing.padding.horizontal,
+        }),
         $nest: {
-            [`&.isFirst ${item}`]: {
+            [`&.isFirst`]: {
                 borderTop: singleBorder(),
             },
         },
-    });
-
-    const result = style("result", {
-        display: "flex",
-        flexWrap: "nowrap",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        width: percent(100),
     });
 
     const link = style("link", {
@@ -82,6 +78,14 @@ export const eventsClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         alignItems: "flex-start",
         ...paddings(vars.spacing.padding),
+    });
+
+    const result = style("result", {
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        width: percent(100),
     });
 
     const compactDateSize = unit(dateTimeVariables().compact.container.size);
@@ -122,6 +126,18 @@ export const eventsClasses = useThemeCache(() => {
 
     const attendance = style("attendance", {
         display: "block",
+        ...lineHeightAdjustment(),
+        ...paddings({
+            vertical: vars.spacing.padding.vertical,
+        }),
+    });
+
+    const dropDown = style("dropDown", {
+        $nest: {
+            [`& .${selectBoxClasses().toggle}`]: {
+                marginLeft: "auto",
+            },
+        },
     });
 
     return {
@@ -136,7 +152,9 @@ export const eventsClasses = useThemeCache(() => {
         excerpt,
         metas,
         meta,
+        empty,
         attendance,
         dateCompact,
+        dropDown,
     };
 });

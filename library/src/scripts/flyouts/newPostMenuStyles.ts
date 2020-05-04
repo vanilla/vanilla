@@ -1,7 +1,6 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
-import { iconClasses } from "@library/icons/iconStyles";
+import { unit, colorOut } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
@@ -18,6 +17,14 @@ export const newPostMenuVariables = useThemeCache(() => {
         position: {
             top: 16,
             right: 6,
+        },
+        opacity: {
+            open: 1,
+            close: 0,
+        },
+        transformY: {
+            open: 0,
+            close: 100,
         },
     });
 
@@ -36,11 +43,34 @@ export const newPostMenuVariables = useThemeCache(() => {
         position: {
             top: 24,
         },
+        opacity: {
+            open: 1,
+            close: 0,
+        },
+        degree: {
+            open: -135,
+            close: 0,
+        },
+        scale: {
+            open: 0.9,
+            close: 1,
+        },
     });
 
     const label = themeVars("label", {
         margin: {
             left: 10,
+        },
+    });
+
+    const menu = themeVars("menu", {
+        display: {
+            open: "block",
+            close: "none",
+        },
+        opacity: {
+            open: 1,
+            close: 0,
         },
     });
 
@@ -50,6 +80,7 @@ export const newPostMenuVariables = useThemeCache(() => {
         action,
         toggle,
         label,
+        menu,
     };
 });
 

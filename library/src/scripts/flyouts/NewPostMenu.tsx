@@ -5,14 +5,12 @@ import { NewPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { newPostMenuClasses } from "@library/flyouts/newPostMenuStyles";
-import { Trail } from "react-spring/renderprops";
+import { newPostMenuClasses, newPostMenuVariables } from "@library/flyouts/newPostMenuStyles";
 import { useSpring, animated, interpolate, useChain } from "react-spring";
 import NewPostBackground from "./NewPostBackground";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { newPostBackgroundClasses, newPostBackgroundVariables } from "./newPostBackgroundStyles";
+import { newPostBackgroundVariables } from "./newPostBackgroundStyles";
 import { colorOut } from "@library/styles/styleHelpers";
-import { useTransition } from "react-spring";
 import { useTrail } from "react-spring";
 
 export enum PostTypes {
@@ -22,7 +20,6 @@ export enum PostTypes {
 
 export interface IAddPost {
     id: string;
-    aid?: string;
     action: (() => void) | string;
     type: PostTypes;
     className?: string;
@@ -35,8 +32,8 @@ export interface ITransition {
     transform: string;
 }
 
-function ActionItem({ item, style }: { item: IAddPost; style?: ITransition }) {
-    const { action, className, type, label, icon, aid } = item;
+function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition; aid?: string }) {
+    const { action, className, type, label, icon } = item;
     const classes = newPostMenuClasses();
 
     const contents = (
@@ -47,7 +44,7 @@ function ActionItem({ item, style }: { item: IAddPost; style?: ITransition }) {
     );
 
     return (
-        <animated.li id={aid} style={style} className={classNames(classes.item)} role="menuitem">
+        <animated.li id={`${aid}-${item.id}`} role="menuitem" style={style} className={classNames(classes.item)}>
             {type === PostTypes.BUTTON ? (
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
@@ -71,16 +68,12 @@ function ActionItem({ item, style }: { item: IAddPost; style?: ITransition }) {
 
 export default function NewPostMenu(props: { items: IAddPost[] }) {
     const classes = newPostMenuClasses();
+    const vars = newPostMenuVariables();
+
     let { items } = props;
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     const [open, setOpen] = useState(false);
-
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
-    const buttonID = ID + "-button";
-    const menuID = ID + "-menu";
-    // const menuItemIDs = items.map(item => ID + `-${item.id}`);
-    items = items.map(item => ({ ...item, aid: ID + `-${item.id}` }));
 
     const toggle = () => {
         if (!open && buttonRef.current) {
@@ -96,94 +89,71 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         }
     };
 
-    const vars = newPostBackgroundVariables();
+    const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
+    const buttonID = ID + "-button";
+    const menuID = ID + "-menu";
 
+    const bkgVars = newPostBackgroundVariables();
     const bkgAnimationRef = useRef();
     const trans = useSpring({
         ref: bkgAnimationRef,
-        backgroundColor: open ? colorOut(vars.container.color.open) : colorOut(vars.container.color.close),
-        from: { backgroundColor: colorOut(vars.container.color.close) },
-        config: { duration: vars.container.duration },
+        backgroundColor: open ? colorOut(bkgVars.container.color.open) : colorOut(bkgVars.container.color.close),
+        from: { backgroundColor: colorOut(bkgVars.container.color.close) },
+        config: { duration: bkgVars.container.duration },
     });
 
-    // Animation parameters: o (opacity), d (degree), s (scale)
-    const butAnimationRef = useRef();
+    const buttonAnimationRef = useRef();
     const AnimatedButton = animated(Button);
     const { o, d, s } = useSpring({
-        ref: butAnimationRef,
+        ref: buttonAnimationRef,
         config: { duration: 150 },
-        o: open ? 1 : 0,
-        d: open ? -135 : 0,
-        s: open ? 0.9 : 1,
-        from: { o: 0, d: 0, s: 1 },
+        o: open ? vars.toggle.opacity.open : vars.toggle.opacity.close,
+        d: open ? vars.toggle.degree.open : vars.toggle.degree.close,
+        s: open ? vars.toggle.scale.open : vars.toggle.scale.close,
+        from: { o: vars.toggle.opacity.close, d: vars.toggle.degree.close, s: vars.toggle.scale.close },
     });
 
     const menuAnimationRef = useRef();
-    const ma = useSpring({
+    const menu = useSpring({
         ref: menuAnimationRef,
         config: { duration: 150 },
-        opacity: open ? 1 : 0,
-        display: open ? "block" : "none",
-        from: { opacity: 0, display: "none" },
+        opacity: open ? vars.menu.opacity.open : vars.menu.opacity.close,
+        display: open ? vars.menu.display.open : vars.menu.display.close,
+        from: { opacity: vars.menu.opacity.close, display: vars.menu.display.close },
     });
 
     const itemsAnimationRef = useRef();
     const trail = useTrail(items.length, {
         ref: itemsAnimationRef,
         config: { mass: 2, tension: 3500, friction: 100 },
-        opacity: toggle ? 1 : 0,
-        // x: toggle ? 0 : 20,
-        // height: toggle ? 80 : 0,
-        // from: { opacity: 0, x: 20, height: 0 },
-        transform: open ? "translate3d(0, 0, 0)" : "translate3d(0, 100%, 0)",
-        from: { opacity: 0, transform: "translate3d(0, 100%, 0)" },
+        opacity: toggle ? vars.item.opacity.open : vars.item.opacity.close,
+        transform: open
+            ? `translate3d(0, ${vars.item.transformY.open}, 0)`
+            : `translate3d(0, ${vars.item.transformY.close}%, 0)`,
+        from: { opacity: vars.item.opacity.close, transform: `translate3d(0, ${vars.item.transformY.close}%, 0)` },
     });
 
     useChain(
         open
-            ? [butAnimationRef, menuAnimationRef, itemsAnimationRef, bkgAnimationRef]
-            : [butAnimationRef, itemsAnimationRef, menuAnimationRef, bkgAnimationRef],
-        [0.1, 0.1, 0.13, 0.15],
+            ? [buttonAnimationRef, menuAnimationRef, itemsAnimationRef, bkgAnimationRef]
+            : [buttonAnimationRef, itemsAnimationRef, menuAnimationRef, bkgAnimationRef],
+        open ? [0.1, 0.2, 0.2, 0.15] : [0.1, 0.2, 0.25, 0.15],
     );
-    // useChain([butAnimationRef, itemsAnimationRef]);
 
     return (
         <NewPostBackground trans={trans} open={open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <animated.ul
-                    style={ma}
+                    style={menu}
                     id={menuID}
                     role="menu"
                     aria-labelledby={buttonID}
                     tabIndex={-1}
-                    aria-activedescendant={buttonID}
+                    aria-activedescendant={`ID-${items[0].id}`} // See id={`${aid}-${item.id}` in ActionItem
                 >
-                    {/* <Trail
-                        reverse={open}
-                        config={{ mass: 2, tension: 4000, friction: 100 }}
-                        items={items}
-                        keys={item => item.id}
-                        from={{ opacity: 0, transform: "translate3d(0, 100%, 0)" }}
-                        to={{
-                            opacity: open ? 1 : 0,
-                            transform: open ? "translate3d(0, 0, 0)" : "translate3d(0, 100%, 0)",
-                        }}
-                    >
-                        {item => props => <ActionItem key={item.id} item={item} style={props} />}
-                    </Trail> */}
-                    {/* {items.map(item => (
-                            <ActionItem key={item.id} item={item} />
-                        ))} */}
-                    {trail.map(({ opacity, transform, ...rest }, index) => {
-                        // console.log(transform);
-                        // console.log(index);
-                        return <ActionItem style={{ opacity, transform }} key={items[index].id} item={items[index]} />;
-                    })}
-
-                    {/* {itemTransitions.map(({ item }) => {
-                            // console.log(item);
-                            return <ActionItem key={item.id} item={item} />;
-                        })} */}
+                    {trail.map(({ opacity, transform, ...rest }, index) => (
+                        <ActionItem key={items[index].id} item={items[index]} style={{ opacity, transform }} aid={ID} />
+                    ))}
                 </animated.ul>
 
                 <AnimatedButton

@@ -12,21 +12,24 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const compact = makeVars("compact", {
         container: {
-            size: 36,
+            size: 38, // cheated to align with text
             bg: globalVars.mixBgAndFg(0.1),
             border: {
-                radius: 10,
+                radius: 8,
             },
         },
         month: {
             font: {
                 size: 10,
                 transform: "uppercase" as TextTransformProperty,
+                lineHeight: 1,
             },
         },
         day: {
             font: {
                 size: 16,
+                weight: globalVars.fonts.weights.bold,
+                lineHeight: 1,
             },
         },
     });

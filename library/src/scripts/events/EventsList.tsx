@@ -8,8 +8,11 @@ import React, { Component } from "react";
 
 import { IEvent } from "@library/events/Event";
 import { eventsClasses } from "@library/events/eventStyles";
+import { Event } from "@library/events/Event";
+import classNames from "classnames";
 
 export interface IEventList {
+    headingLevel?: 2 | 3;
     data: IEvent[];
 }
 
@@ -24,7 +27,14 @@ export function EventsList(props: IEventList) {
     return (
         <ul className={classes.list}>
             {props.data.map((event, i) => {
-                return <Event {...event} key={i} />;
+                return (
+                    <Event
+                        className={classNames({ isFirst: i === 0 })}
+                        headingLevel={props.headingLevel}
+                        {...event}
+                        key={i}
+                    />
+                );
             })}
         </ul>
     );

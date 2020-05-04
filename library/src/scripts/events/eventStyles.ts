@@ -1,69 +1,123 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
-import { borders } from "@library/styles/styleHelpersBorders";
+import { borders, singleBorder } from "@library/styles/styleHelpersBorders";
 import { paddings } from "@library/styles/styleHelpersSpacing";
-import { colorOut, fonts, unit, userSelect } from "@library/styles/styleHelpers";
+import { colorOut, fonts, negativeUnit, unit, userSelect } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
+import { calc, percent } from "csx";
+import { dateTimeVariables } from "@library/content/dateTimeStyles";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
     const globalVars = globalVariables();
 
-    const compact = makeVars("compact", {});
+    const compact = makeVars("compact", {
+        gutter: globalVars.gutter.size,
+    });
 
-    return { compact };
+    const title = makeVars("title", {
+        font: {
+            lineHeight: globalVars.lineHeights.condensed,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
+        },
+    });
+
+    const spacing = makeVars("spacing", {
+        contentSpacer: globalVars.gutter.half,
+        padding: {
+            vertical: 20,
+            horizontal: 10,
+        },
+    });
+
+    return { compact, title, spacing };
 });
 
 export const eventsClasses = useThemeCache(() => {
     const style = styleFactory("events");
     const vars = eventsVariables();
+    const globalVars = globalVariables();
 
     const root = style("root", {
         display: "block",
     });
 
     const item = style("item", {
-        display: "flex",
-        flexWrap: "nowrap",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
+        display: "block",
+        borderBottom: singleBorder(),
+        ...paddings({
+            horizontal: vars.spacing.padding.horizontal,
+        }),
     });
 
     const list = style("list", {
         display: "block",
+        marginLeft: negativeUnit(vars.spacing.padding.horizontal * 2),
+        width: calc(`100% + ${vars.spacing.padding.horizontal * 4}`),
+        $nest: {
+            [`&.isFirst ${item}`]: {
+                borderTop: singleBorder(),
+            },
+        },
+    });
+
+    const result = style("result", {
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        width: percent(100),
+    });
+
+    const link = style("link", {
+        color: colorOut(globalVars.mainColors.fg),
+        width: percent(100),
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        ...paddings(vars.spacing.padding),
+    });
+
+    const compactDateSize = unit(dateTimeVariables().compact.container.size);
+
+    const dateCompact = style("dateCompact", {
+        flexBasis: unit(compactDateSize),
+        flexShrink: 1,
     });
 
     const body = style("body", {
         display: "block",
     });
 
-    const result = style("result", {
-        display: "block",
-    });
-
-    const link = style("link", {
-        display: "block",
-    });
-
     const title = style("title", {
+        ...lineHeightAdjustment(),
         display: "block",
+        ...fonts(vars.title.font),
     });
 
     const main = style("main", {
         display: "block",
+        paddingLeft: unit(vars.compact.gutter),
     });
 
     const excerpt = style("excerpt", {
         display: "block",
+        marginTop: unit(vars.spacing.contentSpacer),
     });
 
     const metas = style("metas", {
-        display: "block",
+        ...metaContainerStyles(),
+        marginTop: unit(vars.spacing.contentSpacer),
     });
 
     const meta = style("meta", {
-        display: "block",
+        ...metaItemStyle(),
     });
 
     const attendance = style("attendance", {
@@ -83,5 +137,6 @@ export const eventsClasses = useThemeCache(() => {
         metas,
         meta,
         attendance,
+        dateCompact,
     };
 });

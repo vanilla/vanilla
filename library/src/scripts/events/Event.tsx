@@ -5,6 +5,7 @@ import { eventsClasses } from "@library/events/eventStyles";
 import Paragraph from "@library/layout/Paragraph";
 import TruncatedText from "@library/content/TruncatedText";
 import EventAttendanceDropDown, { EventAttendance } from "@library/events/EventAttendanceDropDown";
+import classNames from "classnames";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
@@ -14,8 +15,9 @@ export interface IEvent {
     excerpt?: string;
     location: string;
     url: string;
-    headingLevel: 2 | 3;
+    headingLevel?: 2 | 3;
     attendance: EventAttendance;
+    className?: string;
 }
 
 /**
@@ -27,10 +29,10 @@ export function Event(props: IEvent) {
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
 
     return (
-        <li className={classes.item}>
+        <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
                 <SmartLink to={props.url} className={classes.link} tabIndex={0}>
-                    <DateTime type={DateFormats.COMPACT} {...props.date} />
+                    <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
                     <div className={classes.main}>
                         <HeadingTag className={classes.title}>{props.name}</HeadingTag>
                         {props.excerpt && (

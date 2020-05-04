@@ -538,9 +538,9 @@ class DiscussionsApiController extends AbstractApiController {
         $whereCount = count($where);
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
         if ($whereCount === 0 || $isWhereOptimized) {
-            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), $_ENV['HTTP_HOST'] . '/api/v2/discussions', $query, $in);
         } else {
-            $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
+            $paging = ApiUtils::morePagerInfo($rows, $_ENV['HTTP_HOST'] . '/api/v2/discussions', $query, $in);
         }
 
         return new Data($result, ['paging' => $paging]);

@@ -19,10 +19,9 @@ import { calc, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { metaContainerStyles } from "@library/styles/metasStyles";
+import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
 
 export const groupVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("groups");
 
     const banner = makeThemeVars("banner", {
@@ -108,6 +107,17 @@ export const groupsCSS = () => {
         },
     });
 
+    cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
+        position: "relative",
+        top: "auto",
+        float: "none",
+        marginBottom: 0,
+    });
+
+    cssOut(`.Group-Header.NoBanner`, {
+        alignItems: "center",
+    });
+
     cssOut(`.Groups .DataTable .Item td, .DataTable .Item td`, {
         borderBottom: singleBorder(),
         ...paddings({
@@ -126,8 +136,8 @@ export const groupsCSS = () => {
 
     cssOut(`.PhotoWrap:hover a.ChangePicture`, {
         opacity: 0,
-        backgroundColor: importantColorOut(globalVars.mainColors.bg.fade(0.5)),
-        color: colorOut(globalVars.mainColors.fg),
+        backgroundColor: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
+        color: colorOut(globalVars.elementaryColors.white),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -196,6 +206,9 @@ export const groupsCSS = () => {
     });
 
     cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
+    cssOut(`body.Groups .Group-Content .Meta .MItem`, {
+        ...metaItemStyle(),
+    });
 
     cssOut(`body.Groups .Button.Handle .Sprite, body.Groups .NavButton.Handle .Sprite`, {
         marginRight: negativeUnit(2),
@@ -224,11 +237,15 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.Groups .DataList .ItemContent`, {
+        order: 11,
+    });
+
+    cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
         paddingLeft: unit(58),
     });
 
-    cssOut(`.Group-Box .Item .Options`, {
-        paddingLeft: unit(8),
+    cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
+        paddingLeft: unit(0),
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons`, {
@@ -239,5 +256,27 @@ export const groupsCSS = () => {
 
     cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
         marginRight: unit(4),
+    });
+
+    cssOut(`.DataList .Item.Event.event .DateTile`, {
+        order: 2,
+    });
+
+    cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
+        order: 1,
+        $nest: {
+            [`& .ToggleFlyout.OptionsMenu`]: {
+                display: "flex",
+                alignItems: "center",
+            },
+        },
+    });
+
+    cssOut(`.Group-Box .PageControls .Button-Controls`, {
+        ...absolutePosition.middleRightOfParent(),
+    });
+
+    cssOut(`.Group-Box`, {
+        marginBottom: unit(36),
     });
 };

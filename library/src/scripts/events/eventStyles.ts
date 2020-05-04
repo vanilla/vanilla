@@ -9,6 +9,7 @@ import { dateTimeVariables } from "@library/content/dateTimeStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -18,6 +19,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         gutter: globalVars.gutter.size,
     });
 
+    // Clone link state colors.
     const title = makeVars("title", {
         font: {
             lineHeight: globalVars.lineHeights.condensed,
@@ -70,6 +72,15 @@ export const eventsClasses = useThemeCache(() => {
         },
     });
 
+    const title = style("title", {
+        ...lineHeightAdjustment(),
+        display: "block",
+        ...fonts(vars.title.font),
+    });
+
+    const linkColors = clickableItemStates()["$nest"];
+    const toggleClass = selectBoxClasses().toggle;
+
     const link = style("link", {
         color: colorOut(globalVars.mainColors.fg),
         display: "flex",
@@ -78,6 +89,27 @@ export const eventsClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         alignItems: "flex-start",
         ...paddings(vars.spacing.padding),
+        $nest: {
+            [`& .${toggleClass}`]: {
+                marginLeft: "auto",
+                fontWeight: globalVars.fonts.weights.normal,
+            },
+            [`&:hover .${title}`]: {
+                ...linkColors!["&&:hover"],
+            },
+            [`&:focus .${title}`]: {
+                ...linkColors!["&&:focus"],
+            },
+            [`&.focus-visible .${title}`]: {
+                ...linkColors!["&&:focus-visible"],
+            },
+            [`&:active .${title}`]: {
+                ...linkColors!["&&:active"],
+            },
+            [`&:visited .${title}`]: {
+                ...linkColors!["&&:visited"],
+            },
+        },
     });
 
     const result = style("result", {
@@ -97,12 +129,6 @@ export const eventsClasses = useThemeCache(() => {
 
     const body = style("body", {
         display: "block",
-    });
-
-    const title = style("title", {
-        ...lineHeightAdjustment(),
-        display: "block",
-        ...fonts(vars.title.font),
     });
 
     const main = style("main", {

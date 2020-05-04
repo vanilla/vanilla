@@ -120,16 +120,6 @@ export const clickableItemStates = (
         visited: linkStyleFallbacks(overwriteColors.visited, overwriteColors.allStates, linkColors.visited),
     };
 
-    const specialStyles = {
-        default: overwritesSpecial ? overwritesSpecial.default : undefined,
-        hover: clickStyleFallback(overwritesSpecial.hover, overwritesSpecial.allStates),
-        focus: clickStyleFallback(overwritesSpecial.focus, overwritesSpecial.allStates),
-        clickFocus: clickStyleFallback(overwritesSpecial.clickFocus, overwritesSpecial.allStates),
-        keyboardFocus: clickStyleFallback(overwritesSpecial.keyboardFocus, overwritesSpecial.allStates),
-        active: clickStyleFallback(overwritesSpecial.active, overwritesSpecial.allStates),
-        visited: clickStyleFallback(overwritesSpecial.visited, overwritesSpecial.allStates),
-    };
-
     const styles = {
         default: {
             color: colorOut(mergedColors.default),

@@ -78,17 +78,6 @@ export default class DateTime extends Component<IDateTime> {
 
     private get options() {
         switch (this.props.type) {
-            case DateFormats.COMPACT:
-                return {
-                    day: {
-                        day: "numeric",
-                        timeZone: this.props.timezone,
-                    },
-                    month: {
-                        month: "short",
-                        timeZone: this.props.timezone,
-                    },
-                };
             case DateFormats.EXTENDED:
                 return {
                     year: "numeric",
@@ -123,16 +112,22 @@ export default class DateTime extends Component<IDateTime> {
             return inputMoment.from(moment());
         } else {
             if (this.props.type !== DateFormats.COMPACT) {
-                return inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options as any);
+                return inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options);
             } else {
                 const classes = dateTimeClasses();
                 return (
                     <span className={classes.compactRoot}>
                         <span className={classes.compactMonth} key={"month"}>
-                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options.month as any)}
+                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), {
+                                month: "short",
+                                timeZone: this.props.timezone,
+                            })}
                         </span>
                         <span className={classes.compactDay} key={"day"}>
-                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options.day as any)}
+                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), {
+                                day: "numeric",
+                                timeZone: this.props.timezone,
+                            })}
                         </span>
                     </span>
                 );

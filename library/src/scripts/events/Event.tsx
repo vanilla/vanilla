@@ -48,7 +48,7 @@ export function Event(props: IEvent) {
                         <div className={classes.metas}>
                             {props.location && <div className={classes.meta}>{props.location}</div>}
                             <div className={classes.meta}>
-                                <DateTime type={DateFormats.DEFAULT} />
+                                <DateTime type={DateFormats.DEFAULT} {...props.date} />
                             </div>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ import TruncatedText from "@library/content/TruncatedText";
 import EventAttendanceDropDown, { EventAttendance } from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { calc } from "csx";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
@@ -31,12 +32,17 @@ export function Event(props: IEvent) {
 
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
 
-    const attendanceWidth = eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0);
+    const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
 
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
-                <SmartLink to={props.url} className={classes.link} tabIndex={0}>
+                <SmartLink
+                    to={props.url}
+                    className={classes.link}
+                    tabIndex={0}
+                    style={{ maxWidth: calc(`100% - ${attendanceWidth}`) }}
+                >
                     <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
                     <div className={classes.main}>
                         <HeadingTag className={classes.title}>{props.name}</HeadingTag>
@@ -56,8 +62,8 @@ export function Event(props: IEvent) {
                 <div
                     className={classes.attendance}
                     style={{
-                        flexBasis: `${attendanceWidth}ex`,
-                        width: `${attendanceWidth}ex`,
+                        flexBasis: `${attendanceWidth}`,
+                        width: `${attendanceWidth}`,
                     }}
                 >
                     <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />

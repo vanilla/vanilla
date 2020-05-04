@@ -1508,7 +1508,21 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     }
 
     /**
+     * Get user authentication rows by user ID and provider.
      *
+     * @param int[] $userIDs
+     * @param string $provider
+     * @return array
+     */
+    private function getUserAuthentications(array $userIDs, string $provider): array {
+        return $this->SQL->getWhere(
+            'UserAuthentication',
+            ['UserID' => $userIDs, 'ProviderKey' => $provider]
+        )->resultArray();
+    }
+
+    /**
+     * Get a user count based on like comparisons.
      *
      * @param array|bool $like
      * @return int
@@ -5515,5 +5529,28 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
     public function setEmailUnique(bool $emailUnique) {
         $this->emailUnique = $emailUnique;
         return $this;
+    }
+
+    /**
+     * Given an array of user IDs
+     *
+     * @param array $userIDs
+     * @return array
+     */
+    public function getDefaultSSOIDs(array $userIDs): array {
+        $defaultProvider = Gdn_AuthenticationProviderModel::getDefault();
+        $result = array_combine($userIDs, array_pad([], count($userIDs), null));
+
+        if ($defaultProvider === false) {
+            return $result;
+        }
+
+        $connections = $this->getUserAuthentications($userIDs, $defaultProvider["AuthenticationKey"]);
+        $mapping = array_column($connections, "ForeignUserKey", "UserID");
+        foreach ($mapping as $userID => $ssoID) {
+            $result[$userID] = $ssoID;
+        }
+
+        return $result;
     }
 }

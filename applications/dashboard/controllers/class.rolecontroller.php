@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Permissions;
+
 /**
  * Handles /role endpoint.
  */
@@ -289,8 +291,39 @@ class RoleController extends DashboardController {
     }
 
     /**
+     * Advanced settings for roles & permissions.
+     */
+    public function advanced() {
+        $this->permission('Garden.Settings.Manage');
+
+        $aliases = Permissions::getRankedPermissionAliases(true);
+        foreach ($aliases as $key => &$alias) {
+            $alias = t('permissions.'.$alias);
+        }
+
+        $cf = new ConfigurationModule($this);
+        $cf->initialize([
+            'Garden.PrivateCommunity' => [
+                'LabelCode' => 'Enable Private Communities',
+                'Description' => t('Once enabled, only members will see inside your community.'),
+                'Control' => 'toggle'
+            ],
+            'Garden.api.ssoIDPermission' => [
+                'LabelCode' => 'API SSO Expand Permission',
+                'Description' => t('Garden.api.ssoIDPermission.description'),
+                'Control' => 'DropDown',
+                'Items' => $aliases,
+                'Default' => Permissions::RANK_COMMUNITY_MANAGER,
+            ]
+        ]);
+        $this->setData('Title', t('Advanced Settings'));
+        $cf->renderAll();
+    }
+
+    /**
      * Do permission check.
      *
+     * @param int $roleID
      * @since 2.0.0
      * @access protected
      */

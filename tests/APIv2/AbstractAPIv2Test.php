@@ -140,7 +140,13 @@ abstract class AbstractAPIv2Test extends TestCase {
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="first"/', $link) === 1);
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="next"/', $link, $matches) === 1);
 
-        $result = $this->api()->get(str_replace('/api/v2', '', $matches[1]));
+        // Ensure we are getting full url
+        $m = strpos($matches[1], 'http');
+        $this->assertTrue($m >= 0);
+        
+        $baseUrl = $this->api()->getBaseUrl();
+        $matches[1] = ltrim($matches[1], $baseUrl);
+        $result = $this->api()->get($resourcePath . $matches[1]);
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
     }

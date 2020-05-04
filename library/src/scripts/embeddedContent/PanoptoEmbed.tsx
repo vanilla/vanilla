@@ -13,8 +13,6 @@ import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
 interface IProps extends IBaseEmbedProps {
     sessionId: string;
     domain: string;
-    width: number;
-    height: number;
 }
 
 const PANOPTO_SCRIPT: string = "https://developers.panopto.com/scripts/embedapi.min.js";
@@ -26,24 +24,25 @@ const EMBED_LOADED_CLASS: string = "isLoaded";
  */
 export function PanoptoEmbed(props: IProps): JSX.Element {
     const throwError = useThrowError();
+    const playerId = 'player-' + Math.random().toString(36).substr(2, 9);
 
     useLayoutEffect(() => {
         void convertPanoptoEmbeds().catch(throwError);
     });
 
+    // Ratio is hardcoded at 16:9. Panopto is not returning the dimensions.
     return (
         <>
-            <EmbedContainer>
+            <EmbedContainer className="embedVideo">
                 <EmbedContent type={props.embedType}>
                     <div
-                        className="panoptoVideo"
-                        data-sessionid={props.sessionId}
+                        id={playerId}
+                        className="panoptoVideo embedVideo-ratio is16by9"
                         data-domain={props.domain}
+                        data-playerid={playerId}
+                        data-sessionid={props.sessionId}
                         data-url={props.url}
-                        data-height={props.height}
-                        data-width={props.width}
                     >
-                        <div id={"player-" + props.sessionId}></div>
                     </div>
                 </EmbedContent>
             </EmbedContainer>
@@ -77,21 +76,30 @@ async function renderPanoptoEmbed(element: HTMLElement) {
         throw new Error("Attempted to embed a Panopto video but the sessionId could not be found.");
     }
 
+    const playerId = element.getAttribute("data-playerid");
+    if (playerId == null) {
+        throw new Error("Attempted to embed a Panopto video but the playerId is missing.");
+    }
+
     const domain = element.getAttribute("data-domain");
     if (domain == null) {
         throw new Error("Attempted to embed a Panopto video but the domain could not be found.");
     }
 
-    const height = element.getAttribute("data-height");
-    const width = element.getAttribute("data-width");
+    if (window.EmbedApi === undefined) {
+        throw new Error("Attempted to embed a Panopto but an error has occurred.");
+    }
 
-    let embedApi = new window.EmbedApi("player-" + sessionId, {
-        width: width,
-        height: height,
+    new window.EmbedApi(playerId, {
         serverName: domain,
         sessionId: sessionId,
     });
 
-    embedApi.loadVideo();
     element.classList.add(EMBED_LOADED_CLASS);
+
+    // Add embedVideo-iframe class for proper dimensions.
+    let iframe: HTMLElement|undefined = element.getElementsByTagName('iframe')[0];
+    if (iframe != undefined) {
+        iframe.classList.add("embedVideo-iframe")
+    }
 }

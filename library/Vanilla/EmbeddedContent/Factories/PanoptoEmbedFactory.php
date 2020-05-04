@@ -15,12 +15,6 @@ use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
  */
 class PanoptoEmbedFactory extends AbstractEmbedFactory {
 
-    /** @var int DEFAULT_HEIGHT */
-    private const DEFAULT_HEIGHT = 360;
-
-    /** @var int DEFAULT_WIDTH */
-    private const DEFAULT_WIDTH = 640;
-
     /** @var array DOMAINS */
     private const DOMAINS = [
         'hosted.panopto.com',
@@ -41,8 +35,6 @@ class PanoptoEmbedFactory extends AbstractEmbedFactory {
             'embedType' => PanoptoEmbed::TYPE,
             'domain' => $path,
             'url' => $url,
-            'height' => self::DEFAULT_HEIGHT,
-            'width' => self::DEFAULT_WIDTH,
             'sessionId' => $this->sessionIDFromUrl($url),
         ]);
     }

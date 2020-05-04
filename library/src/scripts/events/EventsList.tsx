@@ -17,6 +17,8 @@ import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 export interface IEventList {
     headingLevel?: 2 | 3;
     data: IEvent[];
+    hideIfEmpty?: boolean;
+    emptyMessage?: string;
 }
 
 /**
@@ -25,7 +27,8 @@ export interface IEventList {
 export function EventsList(props: IEventList) {
     const classes = eventsClasses();
     if (!props.data || props.data.length === 0) {
-        return <p className={classes.empty}>{t("This category does not have any events.")}</p>;
+        const {hideIfEmpty = false, emptyMessage = t("This category does not have any events.") = props;
+        return hideIfEmpty ? null : <p className={classes.empty}>{emptyMessage}</p>;
     }
 
     const options = [

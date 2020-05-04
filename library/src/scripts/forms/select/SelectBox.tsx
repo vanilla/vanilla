@@ -70,7 +70,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
             aria-describedby={"describedBy" in props ? props.describedBy : undefined}
             className={classNames("selectBox", props.className)}
         >
-            {"label" in props && <span className=" sr-only">{props.label}</span>}
+            {"label" in props && props.label && <span className=" sr-only">{props.label}</span>}
             <DropDown
                 key={selectedOption ? selectedOption.value : undefined}
                 buttonRef={buttonRef}

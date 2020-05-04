@@ -136,6 +136,7 @@ export const eventsClasses = useThemeCache(() => {
         $nest: {
             [`& .${selectBoxClasses().toggle}`]: {
                 marginLeft: "auto",
+                fontWeight: globalVars.fonts.weights.normal,
             },
         },
     });

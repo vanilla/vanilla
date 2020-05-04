@@ -68,8 +68,6 @@ class PanoptoEmbedFactoryTest extends MinimalContainerTestCase {
             'embedType' => PanoptoEmbed::TYPE,
             'domain' => parse_url($urlToTest, PHP_URL_HOST),
             'url' => $urlToTest,
-            'height' => 360,
-            'width' => 640,
             'sessionId' => $parameters['id'] ?? null,
         ];
 

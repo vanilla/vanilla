@@ -52,16 +52,6 @@ class PanoptoEmbed extends AbstractEmbed {
         return Schema::parse([
             "sessionId:s",
             "domain:s",
-            "height:i",
-            "width:i",
         ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function normalizeData(array $data): array {
-        $data = EmbedUtils::ensureDimensions($data);
-        return $data;
     }
 }

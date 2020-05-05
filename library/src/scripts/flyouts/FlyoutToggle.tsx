@@ -191,7 +191,7 @@ export default function FlyoutToggle(props: IProps) {
                 baseClass={props.buttonBaseClass}
                 buttonRef={buttonRef}
             >
-                <ScreenReaderContent>{props.name}</ScreenReaderContent>
+                {props.name && <ScreenReaderContent>{props.name}</ScreenReaderContent>}
                 {props.buttonContents}
             </Button>
 

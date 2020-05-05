@@ -3,6 +3,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { unit, colorOut } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { color } from "csx";
 
 export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -123,6 +124,11 @@ export const newPostMenuClasses = useThemeCache(() => {
         height: unit(vars.toggle.size),
         width: unit(vars.toggle.size),
         backgroundColor: colorOut(globalVars.mainColors.primary),
+        $nest: {
+            "&:focus": {
+                border: `1px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
+            },
+        },
     });
 
     const label = style("label", {

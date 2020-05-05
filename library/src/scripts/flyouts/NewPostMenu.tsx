@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useRef, useMemo } from "react";
+import React, { ReactNode, useState, useRef, useMemo, useEffect, HtmlHTMLAttributes } from "react";
 import classNames from "classnames";
 
 import { NewPostMenuIcon } from "@library/icons/common";
@@ -12,6 +12,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { newPostBackgroundVariables } from "./newPostBackgroundStyles";
 import { colorOut } from "@library/styles/styleHelpers";
 import { useTrail } from "react-spring";
+import set from "lodash/set";
 
 export enum PostTypes {
     LINK = "link",
@@ -72,40 +73,58 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
     let { items } = props;
     const buttonRef = useRef<HTMLButtonElement>(null);
+    const backgroundRef = useRef();
+    const menuRef = useRef();
+    const itemsRef = useRef();
 
     const [open, setOpen] = useState(false);
+    const [bkgHit, setBkghit] = useState(false);
 
-    const toggle = () => {
-        if (!open && buttonRef.current) {
-            buttonRef.current.focus();
-        }
-        setOpen(!open);
-    };
+    const toggle = () => setOpen(!open);
 
     const onClickBackground = e => {
         e.stopPropagation();
         if (open) {
+            setBkghit(true);
             setOpen(false);
+        } else {
+            setBkghit(false);
         }
     };
+
+    const onKeyDown = e => {
+        if (e.keyCode === 27 && open) {
+            setBkghit(true);
+            setOpen(false);
+        } else if (e.keyCode === 27 && !open) {
+            setBkghit(false);
+        }
+    };
+
+    useEffect(() => {
+        if (open && buttonRef.current) {
+            buttonRef.current.focus();
+        }
+
+        if (!open && bkgHit && buttonRef.current) {
+            buttonRef.current.focus();
+        }
+    }, [open, buttonRef, bkgHit]);
 
     const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
     const buttonID = ID + "-button";
     const menuID = ID + "-menu";
 
     const bkgVars = newPostBackgroundVariables();
-    const bkgAnimationRef = useRef();
     const trans = useSpring({
-        ref: bkgAnimationRef,
+        ref: backgroundRef,
         backgroundColor: open ? colorOut(bkgVars.container.color.open) : colorOut(bkgVars.container.color.close),
         from: { backgroundColor: colorOut(bkgVars.container.color.close) },
         config: { duration: bkgVars.container.duration },
     });
 
-    const buttonAnimationRef = useRef();
     const AnimatedButton = animated(Button);
     const { o, d, s } = useSpring({
-        ref: buttonAnimationRef,
         config: { duration: 150 },
         o: open ? vars.toggle.opacity.open : vars.toggle.opacity.close,
         d: open ? vars.toggle.degree.open : vars.toggle.degree.close,
@@ -113,18 +132,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         from: { o: vars.toggle.opacity.close, d: vars.toggle.degree.close, s: vars.toggle.scale.close },
     });
 
-    const menuAnimationRef = useRef();
     const menu = useSpring({
-        ref: menuAnimationRef,
+        ref: menuRef,
         config: { duration: 150 },
         opacity: open ? vars.menu.opacity.open : vars.menu.opacity.close,
         display: open ? vars.menu.display.open : vars.menu.display.close,
         from: { opacity: vars.menu.opacity.close, display: vars.menu.display.close },
     });
 
-    const itemsAnimationRef = useRef();
     const trail = useTrail(items.length, {
-        ref: itemsAnimationRef,
+        ref: itemsRef,
         config: { mass: 2, tension: 3500, friction: 100 },
         opacity: toggle ? vars.item.opacity.open : vars.item.opacity.close,
         transform: open
@@ -134,14 +151,12 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     });
 
     useChain(
-        open
-            ? [buttonAnimationRef, menuAnimationRef, itemsAnimationRef, bkgAnimationRef]
-            : [buttonAnimationRef, itemsAnimationRef, menuAnimationRef, bkgAnimationRef],
-        open ? [0.1, 0.2, 0.2, 0.15] : [0.1, 0.2, 0.25, 0.15],
+        open ? [menuRef, itemsRef, backgroundRef] : [itemsRef, menuRef, backgroundRef],
+        open ? [0.2, 0.2, 0.15] : [0.2, 0.25, 0.15],
     );
 
     return (
-        <NewPostBackground trans={trans} open={open} onClick={onClickBackground}>
+        <NewPostBackground onKeyDown={onKeyDown} trans={trans} open={open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <animated.ul
                     style={menu}

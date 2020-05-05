@@ -173,7 +173,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @throws \Vanilla\Exception\PermissionException
      */
     public function get(string $type, string $id): array {
-        $this->permission('Garden.Setting.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $this->typeParamSchema();
         $this->idParamSchema();
@@ -197,7 +197,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @throws \Vanilla\Exception\PermissionException
      */
     public function index(): Data {
-        $this->permission('Garden.Setting.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $this->schema([], ['AuthenticatorIndex', 'in'])->setDescription('List authenticators.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
@@ -288,7 +288,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @throws \Vanilla\Exception\PermissionException
      */
     public function patch(string $authenticatorID, array $body): array {
-        $this->permission('Garden.Setting.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $this->idParamSchema();
         $in = $this->schema(

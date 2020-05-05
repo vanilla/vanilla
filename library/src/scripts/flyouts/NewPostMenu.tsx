@@ -100,16 +100,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
     const toggle = () => setOpen(!open);
 
-    const onClickBackground = e => {
-        e.stopPropagation();
+    const onClickBackground = (event: React.MouseEvent) => {
+        event.stopPropagation();
         if (open) {
             setButtonFocus(true);
             setOpen(false);
         }
     };
 
-    const onKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Escape" && open) {
+    const onKeyDown = (event: React.KeyboardEvent<any>) => {
+        if (event.key === "Escape" && open) {
             setButtonFocus(true);
             setOpen(false);
         }

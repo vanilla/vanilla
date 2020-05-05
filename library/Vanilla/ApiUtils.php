@@ -157,7 +157,7 @@ class ApiUtils {
         if (!empty($argsStr)) {
             $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
-        $url = \Gdn::request()->url($url, true);
+        $url = \Gdn::request()->getSimpleUrl($url);
         return $url;
     }
 

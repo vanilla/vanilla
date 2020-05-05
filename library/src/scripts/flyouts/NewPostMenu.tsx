@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useRef, useMemo, useEffect, HtmlHTMLAttributes } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import classNames from "classnames";
 
 import { NewPostMenuIcon } from "@library/icons/common";
@@ -12,7 +12,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { newPostBackgroundVariables } from "./newPostBackgroundStyles";
 import { colorOut } from "@library/styles/styleHelpers";
 import { useTrail } from "react-spring";
-import set from "lodash/set";
+import { t } from "@vanilla/i18n";
 
 export enum PostTypes {
     LINK = "link",
@@ -33,7 +33,17 @@ export interface ITransition {
     transform: string;
 }
 
-function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition; aid?: string }) {
+function ActionItem({
+    item,
+    style,
+    aid,
+    onFocus,
+}: {
+    item: IAddPost;
+    style?: ITransition;
+    aid?: string;
+    onFocus: (string) => void;
+}) {
     const { action, className, type, label, icon } = item;
     const classes = newPostMenuClasses();
 
@@ -44,8 +54,15 @@ function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition;
         </>
     );
 
+    const id = `${aid}-${item.id}`;
     return (
-        <animated.li id={`${aid}-${item.id}`} role="menuitem" style={style} className={classNames(classes.item)}>
+        <animated.li
+            id={id}
+            onFocus={() => onFocus(id)}
+            role="menuitem"
+            style={style}
+            className={classNames(classes.item)}
+        >
             {type === PostTypes.BUTTON ? (
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
@@ -78,49 +95,48 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const itemsRef = useRef();
 
     const [open, setOpen] = useState(false);
-    const [bkgHit, setBkghit] = useState(false);
+    const [buttonFocus, setButtonFocus] = useState(false);
+    const [activeItem, setActiveItem] = useState("");
 
     const toggle = () => setOpen(!open);
 
     const onClickBackground = e => {
         e.stopPropagation();
         if (open) {
-            setBkghit(true);
+            setButtonFocus(true);
             setOpen(false);
-        } else {
-            setBkghit(false);
         }
     };
 
-    const onKeyDown = e => {
-        if (e.keyCode === 27 && open) {
-            setBkghit(true);
+    const onKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Escape" && open) {
+            setButtonFocus(true);
             setOpen(false);
-        } else if (e.keyCode === 27 && !open) {
-            setBkghit(false);
         }
     };
+
+    const onFocus = (id: string) => setActiveItem(id);
 
     useEffect(() => {
         if (open && buttonRef.current) {
             buttonRef.current.focus();
         }
 
-        if (!open && bkgHit && buttonRef.current) {
+        if (!open && buttonFocus && buttonRef.current) {
             buttonRef.current.focus();
         }
-    }, [open, buttonRef, bkgHit]);
+    }, [open, buttonRef, buttonFocus]);
 
     const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
     const buttonID = ID + "-button";
     const menuID = ID + "-menu";
 
-    const bkgVars = newPostBackgroundVariables();
+    const bgVars = newPostBackgroundVariables();
     const trans = useSpring({
         ref: backgroundRef,
-        backgroundColor: open ? colorOut(bkgVars.container.color.open) : colorOut(bkgVars.container.color.close),
-        from: { backgroundColor: colorOut(bkgVars.container.color.close) },
-        config: { duration: bkgVars.container.duration },
+        backgroundColor: open ? colorOut(bgVars.container.color.open) : colorOut(bgVars.container.color.close),
+        from: { backgroundColor: colorOut(bgVars.container.color.close) },
+        config: { duration: bgVars.container.duration },
     });
 
     const AnimatedButton = animated(Button);
@@ -164,10 +180,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     role="menu"
                     aria-labelledby={buttonID}
                     tabIndex={-1}
-                    aria-activedescendant={`ID-${items[0].id}`} // See id={`${aid}-${item.id}` in ActionItem
+                    aria-activedescendant={activeItem}
                 >
                     {trail.map(({ opacity, transform, ...rest }, index) => (
-                        <ActionItem key={items[index].id} item={items[index]} style={{ opacity, transform }} aid={ID} />
+                        <ActionItem
+                            onFocus={onFocus}
+                            key={items[index].id}
+                            item={items[index]}
+                            style={{ opacity, transform }}
+                            aid={ID}
+                        />
                     ))}
                 </animated.ul>
 
@@ -176,8 +198,8 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     aria-haspopup="true"
                     aria-controls={menuID}
                     aria-expanded={toggle}
-                    title={"New Post Menu"}
-                    aria-label={"New Post Menu"}
+                    title={t("New Post Menu")}
+                    aria-label={t("New Post Menu")}
                     buttonRef={buttonRef}
                     style={{
                         opacity: o

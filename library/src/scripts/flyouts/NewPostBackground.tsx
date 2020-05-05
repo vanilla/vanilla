@@ -10,7 +10,7 @@ interface IProps {
     className?: string;
     children: React.ReactNode;
     onClick: (e) => void;
-    onKeyDown: (e) => void;
+    onKeyDown?: (e) => void;
     trans: any;
 }
 

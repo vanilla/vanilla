@@ -19,45 +19,61 @@ export interface IEventList {
     data: IEvent[];
     hideIfEmpty?: boolean;
     emptyMessage?: string;
+    compact?: boolean;
 }
 
 /**
  * Component for displaying an accessible nicely formatted time string.
  */
 export function EventsList(props: IEventList) {
-    const classes = eventsClasses();
+    const classes = eventsClasses({
+        compact: props.compact,
+    });
     if (!props.data || props.data.length === 0) {
         const { hideIfEmpty = false, emptyMessage = t("This category does not have any events.") } = props;
         return hideIfEmpty ? null : <p className={classes.empty}>{emptyMessage}</p>;
     }
+    const going = t("Going");
+    const maybe = t("Maybe");
 
     const options = [
-        { name: t("Going"), value: EventAttendance.GOING },
-        { name: t("Maybe"), value: EventAttendance.MAYBE },
+        { name: going, value: EventAttendance.GOING },
+        { name: maybe, value: EventAttendance.MAYBE },
         { name: t("Not going"), value: EventAttendance.NOT_GOING },
     ] as ISelectBoxItem[];
 
     let longestCharCount = 0;
-    options.forEach(o => {
-        if (o.name && o.name.length > longestCharCount) {
-            longestCharCount = o.name.length;
+    if (props.compact) {
+        if (going.length > maybe.length) {
+            longestCharCount = going.length;
+        } else {
+            longestCharCount = maybe.length;
         }
-    });
+    } else {
+        options.forEach(o => {
+            if (o.name && o.name.length > longestCharCount) {
+                longestCharCount = o.name.length;
+            }
+        });
+    }
 
     return (
-        <ul className={classes.list}>
-            {props.data.map((event, i) => {
-                return (
-                    <Event
-                        className={classNames({ isFirst: i === 0 })}
-                        headingLevel={props.headingLevel}
-                        {...event}
-                        key={i}
-                        longestCharCount={longestCharCount}
-                        attendanceOptions={options}
-                    />
-                );
-            })}
-        </ul>
+        <>
+            <ul className={classes.list}>
+                {props.data.map((event, i) => {
+                    return (
+                        <Event
+                            className={classNames({ isFirst: i === 0 })}
+                            headingLevel={props.headingLevel}
+                            {...event}
+                            key={i}
+                            longestCharCount={longestCharCount}
+                            attendanceOptions={options}
+                            compact={props.compact}
+                        />
+                    );
+                })}
+            </ul>
+        </>
     );
 }

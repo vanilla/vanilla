@@ -220,7 +220,7 @@ export const groupsCSS = () => {
     });
 
     // Group Box
-    cssOut(`.Group-Box .Item`, {
+    cssOut(`.Group-Box .Item:not(tr)`, {
         display: "flex",
         flexDirection: "row-reverse",
         width: percent(100),

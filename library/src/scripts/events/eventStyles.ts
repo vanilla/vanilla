@@ -78,7 +78,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const style = styleFactory("events");
     const vars = eventsVariables();
     const globalVars = globalVariables();
-    const compactDateWidth = dateTimeVariables().compact.container.size;
+    const compactDateSize = dateTimeVariables().compact.container.size;
 
     const root = style("root", {
         display: "block",
@@ -157,7 +157,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         flexWrap: "nowrap",
         alignItems: "center",
         justifyContent: "flex-start",
-        minHeight: unit(compactDateWidth),
+        minHeight: unit(compactDateSize),
         flexGrow: 1,
         overflow: "hidden",
     });
@@ -169,8 +169,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         alignItems: "flex-start",
         width: percent(100),
     });
-
-    const compactDateSize = unit(compactDateWidth);
 
     const dateCompact = style("dateCompact", {
         flexBasis: unit(compactDateSize),
@@ -187,7 +185,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         display: "block",
         paddingLeft: unit(vars.compact.gutter),
         transform: translateY(`${unit(vars.alignment.verticalCheat)}`), // text alignment cheat
-        maxWidth: calc(`100% - ${unit(compactDateWidth)}`),
+        maxWidth: calc(`100% - ${unit(compactDateSize)}`),
     });
 
     const excerpt = style("excerpt", {
@@ -211,12 +209,18 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
     });
 
+    const attendanceVerticallyCentered = style("attendanceVerticallyCentered", {});
     const attendanceAlignment = style("attendanceAlignment", {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
         justifyContent: "flex-start",
         minHeight: unit(vars.title.font.size),
+        $nest: {
+            [`&.${attendanceVerticallyCentered}`]: {
+                minHeight: unit(compactDateSize),
+            },
+        },
     });
 
     const dropDown = style("dropDown", {
@@ -273,6 +277,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         dateCompact,
         dropDown,
         attendanceAlignment,
+        attendanceVerticallyCentered,
         attendanceClass,
         attendanceStamp,
     };

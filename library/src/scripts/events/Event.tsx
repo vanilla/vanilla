@@ -37,6 +37,7 @@ export function Event(props: IEvent) {
 
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
     const showAttendance = props.compact && props.attendance !== EventAttendance.NOT_GOING;
+    const showMetas = props.location || !props.compact;
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
@@ -69,7 +70,7 @@ export function Event(props: IEvent) {
                                     <TruncatedText maxCharCount={160}>{props.excerpt}</TruncatedText>
                                 </Paragraph>
                             )}
-                            {(props.location || !props.compact) && (
+                            {showMetas && (
                                 <div className={classes.metas}>
                                     {props.location && <div className={classes.meta}>{props.location}</div>}
                                     {!props.compact && (
@@ -91,7 +92,11 @@ export function Event(props: IEvent) {
                         }}
                     >
                         {showAttendance && (
-                            <div className={classes.attendanceAlignment}>
+                            <div
+                                className={classNames(classes.attendanceAlignment, {
+                                    [classes.attendanceVerticallyCentered]: !showMetas,
+                                })}
+                            >
                                 <AttendanceStamp attendance={props.attendance} />
                             </div>
                         )}

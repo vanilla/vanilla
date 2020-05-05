@@ -13,6 +13,7 @@ import { newPostBackgroundVariables } from "./newPostBackgroundStyles";
 import { colorOut } from "@library/styles/styleHelpers";
 import { useTrail } from "react-spring";
 import { t } from "@vanilla/i18n";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export enum PostTypes {
     LINK = "link",
@@ -91,8 +92,10 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     let { items } = props;
     const buttonRef = useRef<HTMLButtonElement>(null);
     const backgroundRef = useRef();
-    const menuRef = useRef();
-    const itemsRef = useRef();
+    const menuRef = useRef<HTMLUListElement>(null);
+    const itemsRef = useRef<HTMLLIElement>(null);
+
+    const accessMenuRef = useRef<HTMLUListElement>(null);
 
     const [open, setOpen] = useState(false);
     const [buttonFocus, setButtonFocus] = useState(false);
@@ -112,6 +115,10 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         if (event.key === "Escape" && open) {
             setButtonFocus(true);
             setOpen(false);
+        }
+        if (accessMenuRef.current) {
+            const tabHandler = new TabHandler(accessMenuRef.current);
+            // console.log(tabHandler.tabbableElements.length);
         }
     };
 
@@ -175,6 +182,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         <NewPostBackground onKeyDown={onKeyDown} trans={trans} open={open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <animated.ul
+                    ref={accessMenuRef}
                     style={menu}
                     id={menuID}
                     role="menu"

@@ -2646,7 +2646,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      * @param array|false $discussion The discussion to update the count for or **false** for all of them.
      */
     public function scheduledUpdateCount($categoryID, $discussion = false) {
-        $discussionID = val('DiscussionID', $discussion, false);
+        $discussionID = $discussion['DiscussionID'] ?: false;
         $this->SQL
                 ->select('d.DiscussionID', 'count', 'CountDiscussions')
                 ->select('d.CountComments', 'sum', 'CountComments')

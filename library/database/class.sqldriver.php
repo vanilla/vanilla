@@ -2127,7 +2127,7 @@ abstract class Gdn_SQLDriver {
             return $this;
         }
 
-        $fieldExpr = $this->_parseExpr($field);
+        $fieldExpr = $this->escapeFieldReference($field);
 
         // Build up the in clause.
         $in = [];

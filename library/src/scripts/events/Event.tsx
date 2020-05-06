@@ -28,7 +28,7 @@ export interface IEvent {
 }
 
 /**
- * Component for displaying an accessible nicely formatted time string.
+ * Component for displaying an event in a list
  */
 export function Event(props: IEvent) {
     const classes = eventsClasses();

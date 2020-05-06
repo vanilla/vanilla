@@ -9,6 +9,9 @@ export enum EventAttendance {
     NOT_GOING = "not going",
 }
 
+/**
+ * Component for displaying/selecting attendance to an event
+ */
 export default function EventAttendanceDropDown(props: { attendance: EventAttendance; options: ISelectBoxItem[] }) {
     if (props.options.length === 0) {
         return null;

@@ -23,7 +23,7 @@ export interface IEventList {
 }
 
 /**
- * Component for displaying an accessible nicely formatted time string.
+ * Component for displaying the list of events
  */
 export function EventsList(props: IEventList) {
     const classes = eventsClasses({

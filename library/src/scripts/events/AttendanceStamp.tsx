@@ -3,6 +3,9 @@ import { eventsClasses } from "@library/events/eventStyles";
 import { EventAttendance } from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
 
+/**
+ * Component for displaying your attendance to an event
+ */
 export function AttendanceStamp(props: { attendance: EventAttendance }) {
     const classes = eventsClasses();
     return (

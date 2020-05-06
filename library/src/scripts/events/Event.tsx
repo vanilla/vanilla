@@ -4,12 +4,13 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { eventsClasses, eventsVariables } from "@library/events/eventStyles";
 import Paragraph from "@library/layout/Paragraph";
 import TruncatedText from "@library/content/TruncatedText";
-import EventAttendanceDropDown, { EventAttendance } from "@library/events/EventAttendanceDropDown";
+import EventAttendanceDropDown from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { calc, percent } from "csx";
+import { calc } from "csx";
 import { AttendanceStamp } from "@library/events/AttendanceStamp";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { EventAttendance } from "@library/events/eventOptions";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
@@ -19,7 +20,7 @@ export interface IEvent {
     excerpt?: string;
     location: string;
     url: string;
-    headingLevel?: 2 | 3;
+    headingLevel?: 2 | 3 | 4;
     attendance: EventAttendance;
     className?: string;
     compact?: boolean;

@@ -11,11 +11,10 @@ import { eventsClasses } from "@library/events/eventStyles";
 import { Event } from "@library/events/Event";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
-import { EventAttendance } from "@library/events/EventAttendanceDropDown";
-import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { eventAttendanceOptions } from "@library/events/eventOptions";
 
 export interface IEventList {
-    headingLevel?: 2 | 3;
+    headingLevel?: 2 | 3 | 4;
     data: IEvent[];
     hideIfEmpty?: boolean;
     emptyMessage?: string;
@@ -37,12 +36,6 @@ export function EventsList(props: IEventList) {
     const going = t("Going");
     const maybe = t("Maybe");
 
-    const options = [
-        { name: going, value: EventAttendance.GOING },
-        { name: maybe, value: EventAttendance.MAYBE },
-        { name: t("Not going"), value: EventAttendance.NOT_GOING },
-    ] as ISelectBoxItem[];
-
     let longestCharCount = 0;
     if (props.compact) {
         if (going.length > maybe.length) {
@@ -51,7 +44,7 @@ export function EventsList(props: IEventList) {
             longestCharCount = maybe.length;
         }
     } else {
-        options.forEach(o => {
+        eventAttendanceOptions.forEach(o => {
             if (o.name && o.name.length > longestCharCount) {
                 longestCharCount = o.name.length;
             }
@@ -69,7 +62,7 @@ export function EventsList(props: IEventList) {
                             {...event}
                             key={i}
                             longestCharCount={longestCharCount}
-                            attendanceOptions={options}
+                            attendanceOptions={eventAttendanceOptions}
                             compact={props.compact}
                         />
                     );

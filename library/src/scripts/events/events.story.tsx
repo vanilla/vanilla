@@ -9,8 +9,8 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { EventsList } from "@library/events/EventsList";
 import { IEvent } from "@library/events/Event";
-import { EventAttendance } from "@library/events/EventAttendanceDropDown";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { EventAttendance } from "@library/events/eventOptions";
 
 export default {
     title: "Events",
@@ -60,7 +60,6 @@ const dummyEventData = [
             timestamp: "2020-04-22T14:31:19Z",
         },
         url: "http://google.ca",
-        attendance: EventAttendance.GOING,
     },
     {
         name: "Watercolor for beginners",
@@ -122,11 +121,10 @@ const dummyEventData = [
             timestamp: "2020-04-22T14:31:19Z",
         },
         url: "http://google.ca",
-        attendance: EventAttendance.GOING,
     },
 ] as IEvent[];
 
-export function EventList(props: { title?: string; headingLevel?: 2 | 3; data?: IEvent[]; compact?: boolean }) {
+export function EventList(props: { title?: string; headingLevel?: 2 | 3 | 4; data?: IEvent[]; compact?: boolean }) {
     const { title = "Event List", headingLevel = 2, data = dummyEventData, compact = false } = props;
     return (
         <>

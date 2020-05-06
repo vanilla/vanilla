@@ -25,7 +25,7 @@ import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles"
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
-import { EventAttendance } from "@library/events/EventAttendanceDropDown";
+import { EventAttendance } from "@library/events/eventOptions";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -265,6 +265,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         },
     });
 
+    const viewMore = style("viewMore", {
+        marginLeft: "auto",
+    });
+
+    const filter = style("filter", {});
+    const filterLabel = style("filterLabel", {});
+
     return {
         root,
         item,
@@ -286,5 +293,8 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendanceVerticallyCentered,
         attendanceClass,
         attendanceStamp,
+        viewMore,
+        filter,
+        filterLabel,
     };
 });

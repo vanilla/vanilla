@@ -6,8 +6,8 @@
 
 import React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
-import { EventAttendance } from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
+import { EventAttendance } from "@library/events/eventOptions";
 
 /**
  * Component for displaying your attendance to an event

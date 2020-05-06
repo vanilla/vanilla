@@ -2536,12 +2536,12 @@ class CategoryModel extends Gdn_Model {
         if (!is_array($category) && !is_object($category)) {
             $category = self::categories($category);
         }
-        
+
         $permissionCategory = self::categories(val('PermissionCategoryID', $category));
         if (empty($permissionCategory)) {
             return self::categories(-1);
         }
-        
+
         // Ensure all of our values are processed properly.
         self::calculate($permissionCategory);
         return $permissionCategory;
@@ -3559,6 +3559,41 @@ SQL;
         // Make sure we're dealing with a positive offset.
         $offset = abs($offset);
         self::adjustAggregateCounts($categoryID, $type, $offset, $cache);
+    }
+
+    /**
+     * Update category discussion and comment count.
+     *
+     * @param int $categoryID Unique ID of category we are updating.
+     * @param array|false $discussion Discussion to update category "last discussion" field.
+     */
+    public function updateDiscussionCount(int $categoryID, $discussion = null) {
+        $discussionID = $discussion['DiscussionID'] ?: null;
+        $this->SQL
+            ->select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->select('d.CountComments', 'sum', 'CountComments')
+            ->from('Discussion d')
+            ->where('d.CategoryID', $categoryID);
+
+        $data = $this->SQL->get()->firstRow(DATASET_TYPE_ARRAY);
+        $countDiscussions = (int)$data['CountDiscussions'] ?: 0;
+        $countComments = (int)$data['CountComments'] ?: 0;
+
+        $cacheAmendment = [
+            'CountDiscussions' => $countDiscussions,
+            'CountComments' => $countComments
+        ];
+
+        if ($discussionID) {
+            $cacheAmendment = array_merge($cacheAmendment, [
+                'LastDiscussionID' => $discussionID,
+                'LastCommentID' => null,
+                'LastDateInserted' => val('DateInserted', $discussion)
+            ]);
+        }
+
+        $this->setField($categoryID, $cacheAmendment);
+        $this->setRecentPost($categoryID);
     }
 
     /**

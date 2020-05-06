@@ -2640,42 +2640,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
     }
 
     /**
-     * Scheduled category discussion count update.
-     *
-     * @param int $categoryID Unique ID of category we are updating.
-     * @param array|false $discussion The discussion to update the count for or **false** for all of them.
-     */
-    public function scheduledUpdateCount($categoryID, $discussion = false) {
-        $discussionID = $discussion['DiscussionID'] ?: false;
-        $this->SQL
-                ->select('d.DiscussionID', 'count', 'CountDiscussions')
-                ->select('d.CountComments', 'sum', 'CountComments')
-                ->from('Discussion d')
-                ->where('d.CategoryID', $categoryID);
-
-            $data = $this->SQL->get()->firstRow();
-            $countDiscussions = (int)getValue('CountDiscussions', $data, 0);
-            $countComments = (int)getValue('CountComments', $data, 0);
-
-            $cacheAmendment = [
-                'CountDiscussions' => $countDiscussions,
-                'CountComments' => $countComments
-            ];
-
-            if ($discussionID) {
-                $cacheAmendment = array_merge($cacheAmendment, [
-                    'LastDiscussionID' => $discussionID,
-                    'LastCommentID' => null,
-                    'LastDateInserted' => val('DateInserted', $discussion)
-                ]);
-            }
-
-            $categoryModel = new CategoryModel();
-            $categoryModel->setField($categoryID, $cacheAmendment);
-            $categoryModel->setRecentPost($categoryID);
-    }
-
-    /**
      * @param int|array|stdClass $discussion The discussion ID or discussion.
      * @throws Exception
      * @deprecated

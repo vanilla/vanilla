@@ -1,20 +1,18 @@
-import classNames from "classnames";
-import Heading from "@library/layout/Heading";
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { t } from "@library/utility/appUtils";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import * as React from "react";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { eventsClasses } from "@library/events/eventStyles";
-import { FlyoutType } from "@library/flyouts/DropDown";
-import { StoryExampleDropDown } from "@library/flyouts/StoryExampleDropDown";
+import { EventAttendance } from "@library/events/eventOptions";
 
-export enum EventAttendance {
-    GOING = "going",
-    MAYBE = "maybe",
-    NOT_GOING = "not going",
-}
-
+/**
+ * Component for displaying/selecting attendance to an event
+ */
 export default function EventAttendanceDropDown(props: { attendance: EventAttendance; options: ISelectBoxItem[] }) {
     if (props.options.length === 0) {
         return null;
@@ -29,7 +27,12 @@ export default function EventAttendanceDropDown(props: { attendance: EventAttend
                 widthOfParent={false}
                 options={props.options}
                 label={t("Will you be attending?")}
-                value={activeOption}
+                value={
+                    activeOption ?? {
+                        name: t("RSVP"),
+                        value: EventAttendance.RSVP,
+                    }
+                }
                 renderLeft={true}
                 offsetPadding={true}
             />

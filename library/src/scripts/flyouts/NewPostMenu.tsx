@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect, useReducer } from "react";
+import React, { useRef, useMemo, useEffect, useReducer } from "react";
 import classNames from "classnames";
 
 import { NewPostMenuIcon } from "@library/icons/common";
@@ -59,7 +59,7 @@ function ActionItem({
     return (
         <animated.li
             id={id}
-            onFocus={() => onFocus(id)}
+            // onFocus={() => onFocus(id)}
             role="menuitem"
             style={style}
             className={classNames(classes.item)}
@@ -145,8 +145,16 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             case "ArrowDown":
+            case "Enter":
+            case " ":
                 if (state.buttonFocus) {
                     dispatch({ type: "set_focused_item", item: 0 });
+                    dispatch({ type: "set_open", open: true });
+                }
+                break;
+            case "ArrowUp":
+                if (state.buttonFocus) {
+                    dispatch({ type: "set_focused_item", item: -1 });
                     dispatch({ type: "set_open", open: true });
                 }
                 break;
@@ -188,25 +196,31 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
         console.log(state);
 
-        if (accessMenuRef.current) {
-            const tabHandler = new TabHandler(accessMenuRef.current);
-            console.log(tabHandler.getAll()?.length);
-            const first = tabHandler.getInitial();
-            if (first) {
-                // console.log("here");
-                first.focus();
-            }
-        }
-
         // if (accessMenuRef.current) {
         //     const tabHandler = new TabHandler(accessMenuRef.current);
-        //     if (state.focusedItem === 0) {
-        //         const first = tabHandler.getInitial();
-        //         if (first) {
-        //             first.focus();
-        //         }
+        //     console.log(tabHandler.getAll()?.length);
+        //     const first = tabHandler.getInitial();
+        //     if (first) {
+        //         // console.log("here");
+        //         first.focus();
         //     }
         // }
+
+        if (accessMenuRef.current) {
+            const tabHandler = new TabHandler(accessMenuRef.current);
+            if (state.focusedItem === 0) {
+                const first = tabHandler.getInitial();
+                if (first) {
+                    first.focus();
+                }
+            }
+            if (state.focusedItem === -1) {
+                const last = tabHandler.getLast();
+                if (last) {
+                    last.focus();
+                }
+            }
+        }
 
         // if (accessMenuRef.current) {
         //     const tabHandler = new TabHandler(accessMenuRef.current);
@@ -241,7 +255,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         opacity: state.open ? vars.menu.opacity.open : vars.menu.opacity.close,
         display: state.open ? vars.menu.display.open : vars.menu.display.close,
         from: { opacity: vars.menu.opacity.close, display: vars.menu.display.close },
-        // onRest: handleAccessibility,
+        onRest: handleAccessibility,
     });
 
     const trail = useTrail(items.length, {
@@ -252,7 +266,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             ? `translate3d(0, ${vars.item.transformY.open}, 0)`
             : `translate3d(0, ${vars.item.transformY.close}%, 0)`,
         from: { opacity: vars.item.opacity.close, transform: `translate3d(0, ${vars.item.transformY.close}%, 0)` },
-        onRest: handleAccessibility,
+        // onRest: handleAccessibility,
     });
 
     useChain(

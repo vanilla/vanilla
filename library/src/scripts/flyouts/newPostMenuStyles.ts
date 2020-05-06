@@ -100,6 +100,11 @@ export const newPostMenuClasses = useThemeCache(() => {
     const item = style("item", {
         marginTop: unit(vars.item.position.top),
         marginRight: unit(vars.item.position.right),
+        $nest: {
+            "&:focus": {
+                outline: `px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
+            },
+        },
     });
 
     const action = style("action", {

@@ -2634,6 +2634,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
         } elseif (is_numeric($categoryID)) {
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $discussion = $discussion ?: null;
             $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
             $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID, 'discussion' => $discussion]);
         }

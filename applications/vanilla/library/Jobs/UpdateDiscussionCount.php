@@ -42,9 +42,8 @@ class UpdateDiscussionCount implements LocalJobInterface {
     private function messageSchema(): Schema {
         $schema = Schema::parse([
             "categoryID" => ["type" => "integer"],
-            "discussion:a|b"
-            ]
-        );
+            "discussion:a|n?"
+            ]);
         return $schema;
     }
 

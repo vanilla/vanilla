@@ -8,6 +8,7 @@ import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { EventAttendance } from "@library/events/eventOptions";
+import { EventDetails, IEventExtended } from "@library/events/EventDetails";
 
 export default {
     title: "Event Details",
@@ -18,8 +19,8 @@ export default {
     },
 };
 
-const dummyEventData = [
-    {
+const dummyEventDetailsData = {
+    event: {
         name: "Watercolor for beginners",
         excerpt: "Zoom meeting with Bob Ross explaing the basic fundamentals of Watercolor",
         date: {
@@ -29,10 +30,10 @@ const dummyEventData = [
         url: "http://google.ca",
         attendance: EventAttendance.MAYBE,
     },
-] as IEventExtended;
+} as IEventExtended;
 
 export function StoryEventDetails(props: { data: IEventExtended; title: string }) {
-    const { data = dummyEventData, title = "Event Details" } = props;
+    const { data = dummyEventDetailsData, title = "Event Details" } = props;
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>

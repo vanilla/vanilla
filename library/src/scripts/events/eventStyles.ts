@@ -265,6 +265,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const filter = style("filter", {});
     const filterLabel = style("filterLabel", {});
+    const details = style("details", {});
 
     return {
         root,
@@ -288,5 +289,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         viewMore,
         filter,
         filterLabel,
+        details,
     };
 });

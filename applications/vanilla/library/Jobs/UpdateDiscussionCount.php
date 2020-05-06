@@ -12,12 +12,12 @@ use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
- * Update category discussion count.
+ * Update category discussion and comment count.
  */
 class UpdateDiscussionCount implements LocalJobInterface {
 
-    /** @var \DiscussionModel */
-    private $discussionModel;
+    /** @var \CategoryModel */
+    private $categoryModel;
 
     /** @var int */
     private $categoryID;
@@ -28,10 +28,10 @@ class UpdateDiscussionCount implements LocalJobInterface {
     /**
      * Initial job setup.
      *
-     * @param \DiscussionModel $discussionModel
+     * @param \CategoryModel $categoryModel
      */
-    public function __construct(\DiscussionModel $discussionModel) {
-        $this->discussionModel = $discussionModel;
+    public function __construct(\CategoryModel $categoryModel) {
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -43,7 +43,8 @@ class UpdateDiscussionCount implements LocalJobInterface {
         $schema = Schema::parse([
             "categoryID" => ["type" => "integer"],
             "discussion:a|b"
-            ]);
+            ]
+        );
         return $schema;
     }
 
@@ -51,12 +52,10 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Update category discussion count.
      */
     public function run(): JobExecutionStatus {
-        $isValidDiscussion = (is_array($this->discussion) || is_bool($this->discussion));
-        $isValidCategory = is_int($this->categoryID);
-        if (!$isValidDiscussion || !$isValidCategory) {
+        if (!$this->categoryID) {
             return JobExecutionStatus::abandoned();
         }
-        $this->discussionModel->scheduledUpdateCount($this->categoryID, $this->discussion);
+        $this->categoryModel->updateDiscussionCount($this->categoryID, $this->discussion);
         return JobExecutionStatus::complete();
     }
 
@@ -68,7 +67,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->categoryID = $message["categoryID"];
-        $this->discussion = $message["discussion"];
+        $this->discussion = $message["discussion"] ?: null;
     }
 
     /**

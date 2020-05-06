@@ -3568,7 +3568,7 @@ SQL;
      * @param array|false $discussion Discussion to update category "last discussion" field.
      */
     public function updateDiscussionCount(int $categoryID, $discussion = null) {
-        $discussionID = $discussion['DiscussionID'] ?: null;
+        $discussionID = $discussion['DiscussionID'] ?? null;
         $this->SQL
             ->select('d.DiscussionID', 'count', 'CountDiscussions')
             ->select('d.CountComments', 'sum', 'CountComments')
@@ -3588,7 +3588,7 @@ SQL;
             $cacheAmendment = array_merge($cacheAmendment, [
                 'LastDiscussionID' => $discussionID,
                 'LastCommentID' => null,
-                'LastDateInserted' => val('DateInserted', $discussion)
+                'LastDateInserted' => $discussion['DateInserted'] ?? null
             ]);
         }
 

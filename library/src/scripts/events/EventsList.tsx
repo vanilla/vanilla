@@ -1,10 +1,10 @@
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { Component } from "react";
+import React from "react";
 
 import { IEvent } from "@library/events/Event";
 import { eventsClasses } from "@library/events/eventStyles";
@@ -29,6 +29,7 @@ export function EventsList(props: IEventList) {
     const classes = eventsClasses({
         compact: props.compact,
     });
+
     if (!props.data || props.data.length === 0) {
         const { hideIfEmpty = false, emptyMessage = t("This category does not have any events.") } = props;
         return hideIfEmpty ? null : <p className={classes.empty}>{emptyMessage}</p>;

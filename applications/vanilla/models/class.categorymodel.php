@@ -3565,7 +3565,7 @@ SQL;
      * Update category discussion and comment count.
      *
      * @param int $categoryID Unique ID of category we are updating.
-     * @param array|false $discussion Discussion to update category "last discussion" field.
+     * @param array|null $discussion Discussion to update category "last discussion" field.
      */
     public function updateDiscussionCount(int $categoryID, $discussion = null) {
         $discussionID = $discussion['DiscussionID'] ?? null;

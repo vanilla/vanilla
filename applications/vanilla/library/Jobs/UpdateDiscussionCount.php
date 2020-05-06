@@ -22,7 +22,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
     /** @var int */
     private $categoryID;
 
-    /** @var array|bool */
+    /** @var array|null */
     private $discussion;
 
     /**
@@ -48,12 +48,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     }
 
     /**
-     * Update category discussion count.
+     * Update category discussion and comment count.
      */
     public function run(): JobExecutionStatus {
-        if (!$this->categoryID) {
-            return JobExecutionStatus::abandoned();
-        }
         $this->categoryModel->updateDiscussionCount($this->categoryID, $this->discussion);
         return JobExecutionStatus::complete();
     }
@@ -66,7 +63,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->categoryID = $message["categoryID"];
-        $this->discussion = $message["discussion"] ?: null;
+        $this->discussion = $message["discussion"];
     }
 
     /**

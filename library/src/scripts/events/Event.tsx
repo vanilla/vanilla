@@ -38,7 +38,7 @@ export function Event(props: IEvent) {
 
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
     const showAttendance = props.compact && props.attendance !== EventAttendance.NOT_GOING;
-    const showMetas = props.location || !props.compact;
+    const showMetas = props.location || !props.compact || showAttendance;
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
@@ -49,7 +49,7 @@ export function Event(props: IEvent) {
                     style={
                         showAttendance
                             ? {
-                                  maxWidth: calc(`100% - ${attendanceWidth}`),
+                                  maxWidth: !props.compact ? calc(`100% - ${attendanceWidth}`) : undefined,
                                   fontSize: props.compact
                                       ? eventsVariables().attendanceStamp.font.size
                                       : globalVariables().fonts.size.medium, // Needed for correct ex calculation
@@ -60,10 +60,7 @@ export function Event(props: IEvent) {
                     <div className={classes.linkAlignment}>
                         <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
                         <div className={classes.main}>
-                            <HeadingTag
-                                title={props.name}
-                                className={classNames(classes.title, { isSingleLine: props.compact })}
-                            >
+                            <HeadingTag title={props.name} className={classes.title}>
                                 {props.name}
                             </HeadingTag>
                             {props.excerpt && !props.compact && (
@@ -73,6 +70,9 @@ export function Event(props: IEvent) {
                             )}
                             {showMetas && (
                                 <div className={classes.metas}>
+                                    {showAttendance && (
+                                        <AttendanceStamp attendance={props.attendance} className={classes.meta} />
+                                    )}
                                     {props.location && <div className={classes.meta}>{props.location}</div>}
                                     {!props.compact && (
                                         <div className={classes.meta}>
@@ -84,7 +84,7 @@ export function Event(props: IEvent) {
                         </div>
                     </div>
                 </SmartLink>
-                {(showAttendance || !props.compact) && (
+                {!props.compact && (
                     <div
                         className={classes.attendance}
                         style={{
@@ -92,18 +92,7 @@ export function Event(props: IEvent) {
                             width: `${attendanceWidth}`,
                         }}
                     >
-                        {showAttendance && (
-                            <div
-                                className={classNames(classes.attendanceAlignment, {
-                                    [classes.attendanceVerticallyCentered]: !showMetas,
-                                })}
-                            >
-                                <AttendanceStamp attendance={props.attendance} />
-                            </div>
-                        )}
-                        {!props.compact && (
-                            <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />
-                        )}
+                        <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />
                     </div>
                 )}
             </article>

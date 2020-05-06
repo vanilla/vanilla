@@ -12,10 +12,15 @@ import { EventAttendance } from "@library/events/eventOptions";
 /**
  * Component for displaying your attendance to an event
  */
-export function AttendanceStamp(props: { attendance: EventAttendance }) {
+export function AttendanceStamp(props: { attendance?: EventAttendance; className?: string }) {
     const classes = eventsClasses();
+    if (!props.attendance) {
+        return null;
+    }
     return (
-        <div className={classNames(classes.attendanceStamp, classes.attendanceClass(props.attendance))}>
+        <div
+            className={classNames(classes.attendanceStamp, classes.attendanceClass(props.attendance), props.className)}
+        >
             {props.attendance}
         </div>
     );

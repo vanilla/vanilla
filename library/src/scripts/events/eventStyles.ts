@@ -116,11 +116,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const title = style("title", {
         display: "block",
         ...fonts(vars.title.font),
-        $nest: {
-            "&.isSingleLine": {
-                ...singleLineEllipsis(),
-            },
-        },
     });
 
     const linkColors = clickableItemStates()["$nest"];
@@ -200,12 +195,20 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const metas = style("metas", {
-        ...metaContainerStyles(),
+        // ...metaContainerStyles(),
         marginTop: unit(vars.spacing.contentSpacer),
     });
 
     const meta = style("meta", {
-        ...metaItemStyle(),
+        display: "inline",
+        ...fonts({
+            size: globalVars.meta.text.fontSize,
+            color: globalVars.meta.colors.fg,
+            lineHeight: globalVars.lineHeights.meta,
+        }),
+        ...margins({
+            right: globalVars.meta.spacing.default * 2,
+        }),
     });
 
     const attendance = style("attendance", {
@@ -213,20 +216,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...paddings({
             vertical: vars.spacing.padding.vertical,
         }),
-    });
-
-    const attendanceVerticallyCentered = style("attendanceVerticallyCentered", {});
-    const attendanceAlignment = style("attendanceAlignment", {
-        display: "flex",
-        flexWrap: "nowrap",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        minHeight: unit(vars.title.font.size),
-        $nest: {
-            [`&.${attendanceVerticallyCentered}`]: {
-                minHeight: unit(compactDateSize),
-            },
-        },
     });
 
     const dropDown = style("dropDown", {
@@ -245,22 +234,27 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const attendanceVars = vars.attendanceStamp;
     const attendanceStamp = style("attendanceStamp", {
-        display: "inline-flex",
-        ...margins({
-            left: "auto",
-        }),
-        ...fonts(attendanceVars.font),
-        ...borders({
-            ...attendanceVars.border,
-            color: attendanceVars.border.color ?? attendanceVars.font.color, // default to font color. Darkenned because border is very thin and get anti-aliased
-        }),
-        ...paddings(attendanceVars.padding),
-        whiteSpace: "nowrap",
-        lineHeight: 1,
         $nest: {
+            [`&&`]: {
+                display: "inline-flex",
+                ...margins({
+                    left: "auto",
+                }),
+                ...fonts(attendanceVars.font),
+                ...borders({
+                    ...attendanceVars.border,
+                    color: attendanceVars.border.color ?? attendanceVars.font.color, // default to font color. Darkenned because border is very thin and get anti-aliased
+                }),
+                ...paddings(attendanceVars.padding),
+                whiteSpace: "nowrap",
+                lineHeight: 1,
+            },
             [`&.${attendanceClass(EventAttendance.GOING)}`]: {
                 color: colorOut(attendanceVars.going.fg),
                 borderColor: colorOut(attendanceVars.going.fg),
+            },
+            [`&.${meta}`]: {
+                marginRight: globalVars.meta.spacing.default * 2,
             },
         },
     });
@@ -289,8 +283,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendance,
         dateCompact,
         dropDown,
-        attendanceAlignment,
-        attendanceVerticallyCentered,
         attendanceClass,
         attendanceStamp,
         viewMore,

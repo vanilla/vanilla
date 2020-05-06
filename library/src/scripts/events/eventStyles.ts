@@ -97,7 +97,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const list = style("list", {
         display: "block",
         marginLeft: negativeUnit(vars.spacing.padding.horizontal * 2),
-        width: calc(`100% + ${vars.spacing.padding.horizontal * 4}`),
+        width: calc(`100% + ${unit(vars.spacing.padding.horizontal * 4)}`),
     });
 
     const item = style("item", {

@@ -7,13 +7,13 @@
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { EventsList } from "@library/events/EventsList";
 import { IEvent } from "@library/events/Event";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { EventAttendance } from "@library/events/eventOptions";
+import { EventList as EventListComponent } from "@library/events/EventList";
 
 export default {
-    title: "Events",
+    title: "Event Lists",
     parameters: {
         chromatic: {
             viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
@@ -129,21 +129,23 @@ export function EventList(props: { title?: string; headingLevel?: 2 | 3 | 4; dat
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
-            <EventsList data={data} headingLevel={headingLevel} compact={compact} />
+            <EventListComponent data={data} headingLevel={headingLevel} compact={compact} />
         </>
     );
 }
 
-export const Empty = storyWithConfig({}, () => <EventList title={"Empty Event List"} headingLevel={3} data={[]} />);
-export const One = storyWithConfig({}, () => <EventList title={"One Event"} data={dummyEventData.slice(0, 1)} />);
+export const EmptyList = storyWithConfig({}, () => <EventList title={"Empty Event List"} headingLevel={3} data={[]} />);
+export const OneItemInList = storyWithConfig({}, () => (
+    <EventList title={"One Event"} data={dummyEventData.slice(0, 1)} />
+));
 
 // Panel
 export const PanelEventList = storyWithConfig({}, () => (
     <EventList title={"Panel - Event List"} compact={true} headingLevel={3} data={dummyEventData} />
 ));
-export const PanelEmpty = storyWithConfig({}, () => (
+export const EmptyPanelList = storyWithConfig({}, () => (
     <EventList title={"Panel - Empty Event List"} compact={true} headingLevel={3} data={[]} />
 ));
-export const PanelOne = storyWithConfig({}, () => (
+export const OneItemInPanelList = storyWithConfig({}, () => (
     <EventList title={"Panel - One Event"} compact={true} data={dummyEventData.slice(0, 1)} />
 ));

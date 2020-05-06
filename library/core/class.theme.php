@@ -95,6 +95,7 @@ class Gdn_Theme {
         $dataCount = 0;
         $homeLinkFound = false;
         $position = 1;
+        $displayStructuredData = false;
 
         foreach ($data as $row) {
             $dataCount++;
@@ -109,6 +110,7 @@ class Gdn_Theme {
             if ($count > 0) {
                 $result .= '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">';
                 $result .= '<meta itemprop="position" content="'.$position++.'" />';
+                $displayStructuredData = true;
             }
 
             $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
@@ -123,7 +125,8 @@ class Gdn_Theme {
             $count++;
         }
 
-        $result = '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.$result.'</span>';
+        // Display as BreadcrumbList if there is structured data.
+        $result = '<span class="Breadcrumbs" '.(($displayStructuredData) ? 'itemscope itemtype="http://schema.org/BreadcrumbList"' : '').'>'.$result.'</span>';
         return $result;
     }
 

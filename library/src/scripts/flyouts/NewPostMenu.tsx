@@ -91,7 +91,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
 
     let { items } = props;
     const buttonRef = useRef<HTMLButtonElement>(null);
-    const backgroundRef = useRef();
+    const backgroundRef = useRef<HTMLElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
     const itemsRef = useRef<HTMLLIElement>(null);
 
@@ -112,17 +112,67 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     };
 
     const onKeyDown = (event: React.KeyboardEvent<any>) => {
-        if (event.key === "Escape" && open) {
-            setButtonFocus(true);
-            setOpen(false);
-        }
+        event.preventDefault();
+        event.stopPropagation();
+        let tabHandler;
+
         if (accessMenuRef.current) {
-            const tabHandler = new TabHandler(accessMenuRef.current);
-            // console.log(tabHandler.tabbableElements.length);
+            tabHandler = new TabHandler(accessMenuRef.current);
+            // if (tabHandler) {
+            //     console.log(tabHandler.tabbableElements.length);
+            // }
         }
+        if (!open) {
+            switch (event.key) {
+                case "ArrowDown":
+                    setOpen(true);
+                    console.log(tabHandler.tabbableElements.length);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // if (open) {
+        //     switch (event.key) {
+        //         case "Escape":
+        //             setOpen(false);
+        //             setButtonFocus(true);
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // } else {
+        //     switch (event.key) {
+        //         case "ArrowDown":
+        //             setOpen(true);
+        //             if (tabHandler) {
+        //                 const initial = tabHandler.getInitial();
+        //                 if (initial) {
+        //                     // console.log("here");
+        //                     initial.focus();
+        //                 }
+        //             }
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // }
+
+        // if (event.key === "Escape" && open) {
+        //     setButtonFocus(true);
+        //     setOpen(false);
+        // }
+        // if (accessMenuRef.current) {
+        //     const tabHandler = new TabHandler(accessMenuRef.current);
+        //     // console.log(tabHandler.tabbableElements.length);
+        // }
     };
 
-    const onFocus = (id: string) => setActiveItem(id);
+    const onFocus = (id: string) => {
+        console.log(id);
+        setActiveItem(id);
+    };
 
     useEffect(() => {
         if (open && buttonRef.current) {

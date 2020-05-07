@@ -9,6 +9,13 @@ namespace VanillaTests\Library\Core;
 
 use VanillaTests\SharedBootstrapTestCase;
 
+/**
+ * Provide tests to ensure the validity of breadcrumbs. This class will ensure
+ * that all the breadcrumbs created by the core theme hooks contain valid data structure.
+ *
+ * Class BreadcrumbStructureTest
+ * @package VanillaTests\Library\Core
+ */
 class BreadcrumbStructureTest extends SharedBootstrapTestCase {
     /**
      * Provide a test for {@link \Gdn_Theme::breadcrumbs()}
@@ -37,7 +44,11 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                    ],
                     true,
                     [],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.
+                    '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">'.
+                    '<meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
                 [
                     [
@@ -45,7 +56,10 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     [],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.
+                    '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
                 [
                     [
@@ -54,7 +68,12 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     [],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel "><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="2" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.
+                    '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel "><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="2" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
                 [
                     [
@@ -63,7 +82,10 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     false,
                     [],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel "><a href="http://vanilla.test/categories/one"><span>Categories</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.
+                    '<span class="CrumbLabel "><a href="http://vanilla.test/categories/one"><span>Categories</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
                 [
                     [
@@ -79,7 +101,9 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     ['HomeUrl' => 'http://vanilla.test/en'],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/en"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/en"><span>Home</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
                 [
                     [
@@ -88,7 +112,9 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     ['HideLast' => true],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
+                    '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
+                    '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
                 ]
             ];
         return $r;

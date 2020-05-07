@@ -101,7 +101,8 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     ['HomeUrl' => 'http://vanilla.test/en'],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/en"><span>Home</span></a></span>'.
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb">'.
+                    '<a href="http://vanilla.test/en"><span>Home</span></a></span>'.
                     '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
                     '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
                 ],
@@ -112,7 +113,8 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
                     ],
                     true,
                     ['HideLast' => true],
-                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
+                    '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb">'.
+                    '<a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>'.
                     '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> '.
                     '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>'
                 ]
@@ -120,4 +122,3 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase {
         return $r;
     }
 }
-

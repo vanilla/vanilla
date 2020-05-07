@@ -9,6 +9,7 @@ namespace Vanilla;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Psr\Log\LogLevel;
 
 /**
  * A logger that can contain many loggers.
@@ -19,29 +20,39 @@ use Psr\Log\LoggerTrait;
 class Logger implements LoggerInterface {
     use LoggerTrait;
 
-    /** Log type. */
-    const EMERGENCY = 'emergency';
+    public const FIELD_EVENT = 'event';
+    public const FIELD_LOG_TYPE = 'logType';
+
+    public const TYPE_ADMIN = 'admin';
+    public const TYPE_APPLICATION = 'application';
+    public const TYPE_MODERATION = 'moderation';
+    public const TYPE_SECURITY = 'security';
+    public const TYPE_SYSTEM = 'system';
+    public const TYPE_DEFAULT = self::TYPE_APPLICATION;
 
     /** Log type. */
-    const ALERT = 'alert';
+    public const EMERGENCY = LogLevel::EMERGENCY;
 
     /** Log type. */
-    const CRITICAL = 'critical';
+    public const ALERT = LogLevel::ALERT;
 
     /** Log type. */
-    const ERROR = 'error';
+    public const CRITICAL = LogLevel::CRITICAL;
 
     /** Log type. */
-    const WARNING = 'warning';
+    public const ERROR = LogLevel::ERROR;
 
     /** Log type. */
-    const NOTICE = 'notice';
+    public const WARNING = LogLevel::WARNING;
 
     /** Log type. */
-    const INFO = 'info';
+    public const NOTICE = LogLevel::NOTICE;
 
     /** Log type. */
-    const DEBUG = 'debug';
+    public const INFO = LogLevel::INFO;
+
+    /** Log type. */
+    public const DEBUG = LogLevel::DEBUG;
 
     /**
      * @var array An array of loggers and levels.

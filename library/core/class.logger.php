@@ -212,7 +212,7 @@ class Logger {
      * @param array $context The message data.
      */
     public static function event($event, $level, $message, $context = []) {
-        $context['event'] = $event;
+        $context[\Vanilla\Logger::FIELD_EVENT] = $event;
         static::log($level, $message, $context);
     }
 

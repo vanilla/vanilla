@@ -24,14 +24,14 @@ interface IProps extends ITabProps, ITabBase {}
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-class RadioTab extends React.Component<ITabProps> {
+class RadioTab extends React.Component<IProps> {
     public render() {
         const classes = this.props.classes ?? radioTabClasses();
         return (
             <label
                 className={classNames(
                     "radioButtonsAsTabs-tab",
-                    this.props.childClass,
+                    { [this.props.childClass]: this.props.childClass },
                     this.props.className,
                     classes.tab,
                 )}

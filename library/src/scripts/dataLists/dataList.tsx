@@ -9,8 +9,8 @@ import { dataListClasses } from "@library/dataLists/dataListStyles";
 import { t } from "@vanilla/i18n/src";
 
 export interface IData {
-    key: string;
-    value: string;
+    key: React.ReactNode;
+    value: React.ReactNode;
 }
 
 export interface IDataList {
@@ -19,7 +19,7 @@ export interface IDataList {
 
 /**
  * Component for displaying data lists
- * Because of cccessibility concerns, the markup is a table not a data list.
+ * Because of accessibility concerns, the markup is a table not a data list.
  */
 export function DataList(props: IDataList) {
     const classes = dataListClasses();
@@ -28,7 +28,7 @@ export function DataList(props: IDataList) {
     }
     return (
         <table className={classes.root}>
-            <desc>{t("Event Details")}</desc>
+            <caption>{t("Event Details")}</caption>
             {props.data.map((d, i) => {
                 return (
                     <tr className={classes.row} key={i}>

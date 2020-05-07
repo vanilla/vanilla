@@ -266,7 +266,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const filter = style("filter", {});
     const filterLabel = style("filterLabel", {});
     const details = style("details", {});
+    const separator = style("details", {});
     const attendanceAsRadio = style("attendanceAsRadio", {});
+    const attendee = style("attendee", {});
+    const attendeeList = style("attendeeList", {});
+    const attendeePhoto = style("attendeePhoto", {});
+    const attendeePlus = style("attendeePlus", {});
+    const noAttendees = style("noAttendees", {});
 
     return {
         root,
@@ -292,5 +298,11 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         filterLabel,
         details,
         attendanceAsRadio,
+        separator,
+        attendee,
+        attendeeList,
+        attendeePhoto,
+        attendeePlus,
+        noAttendees,
     };
 });

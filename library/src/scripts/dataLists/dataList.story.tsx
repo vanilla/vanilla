@@ -4,46 +4,50 @@
  */
 
 import React from "react";
-import DateTime, { DateFormats, IDateTime } from "@library/content/DateTime";
-import { StoryTiles } from "@library/storybook/StoryTiles";
-import { StoryTile } from "@library/storybook/StoryTile";
+import DateTime, { DateFormats } from "@library/content/DateTime";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
+import { DataList, IData } from "@library/dataLists/dataList";
+import { t } from "@vanilla/i18n/src";
+import { dummyEventDetailsData } from "./dummyEventData";
+import { renderToString } from "react-dom/server";
 
 export default {
-    title: "Date Formats",
+    title: "Data List",
     parameters: {},
 };
 
-export function StoryDateTime(config) {
-    const testDates = [
-        {
-            timestamp: "2020-04-22T14:31:19Z",
-            type: DateFormats.DEFAULT,
-        },
-        {
-            timestamp: "2020-04-22T14:31:19Z",
-            type: DateFormats.EXTENDED,
-        },
-        {
-            timestamp: "2020-04-22T14:31:19Z",
-            type: DateFormats.COMPACT,
-        },
-    ] as IDateTime[];
+export function Standard(props: { data: [] }) {
+    const startDate = <DateTime {...dummyEventDetailsData.dateStart} type={DateFormats.EXTENDED} />;
+    const endDate = <DateTime {...dummyEventDetailsData.dateEnd} type={DateFormats.EXTENDED} />;
 
-    const content = testDates.map((date, i) => {
-        return (
-            <StoryTileAndTextCompact key={i}>
-                <DateTime {...date} />
-            </StoryTileAndTextCompact>
-        );
-    });
+    const dummyData = [
+        {
+            key: t("When"),
+            value: (
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: `${renderToString(startDate)}${
+                            dummyEventDetailsData.dateEnd ? ` - ${renderToString(endDate)}` : ""
+                        }`,
+                    }}
+                />
+            ),
+        },
+        {
+            key: t("Where"),
+            value: dummyEventDetailsData.location,
+        },
+        {
+            key: t("Organizer"),
+            value: dummyEventDetailsData.organizer,
+        },
+    ] as IData[];
 
     return (
         <StoryContent>
-            <StoryHeading depth={1}>Date Formats</StoryHeading>
-            {content}
+            <StoryHeading depth={1}>Data List</StoryHeading>
+            <DataList data={dummyData} />
         </StoryContent>
     );
 }

@@ -5,9 +5,8 @@
 
 import React from "react";
 
-import {dataListClasses} from "@library/dataLists/dataListStyles";
-import {t} from "@vanilla/i18n/src";
-
+import { dataListClasses } from "@library/dataLists/dataListStyles";
+import { t } from "@vanilla/i18n/src";
 
 export interface IData {
     key: string;
@@ -15,7 +14,7 @@ export interface IData {
 }
 
 export interface IDataList {
-    data: IData[],
+    data: IData[];
 }
 
 /**
@@ -27,13 +26,19 @@ export function DataList(props: IDataList) {
     if (props.data.length === 0) {
         return null;
     }
-    return <table className={classes.root}>
-        <desc>{t("Event Details")}</desc>
-        {props.data.map((d, i) => {
-            return (<tr className={classes.row} key={i}>
-                <th scope="row" className={classes.key}>{d.key}</th>
-                <td className={classes.value}>{d.value}</td>
-            </tr>);
-        }}
-    </table>;
+    return (
+        <table className={classes.root}>
+            <desc>{t("Event Details")}</desc>
+            {props.data.map((d, i) => {
+                return (
+                    <tr className={classes.row} key={i}>
+                        <th scope="row" className={classes.key}>
+                            {d.key}
+                        </th>
+                        <td className={classes.value}>{d.value}</td>
+                    </tr>
+                );
+            })}
+        </table>
+    );
 }

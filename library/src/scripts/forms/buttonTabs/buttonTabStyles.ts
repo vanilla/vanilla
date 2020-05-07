@@ -23,9 +23,9 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 
-export const radioTabsVariables = useThemeCache(() => {
+export const buttonTabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const makeVars = variableFactory("radioTabs");
+    const makeVars = variableFactory("buttonTabs");
 
     const colors = makeVars("colors", {
         bg: globalVars.mainColors.bg,
@@ -94,9 +94,9 @@ export const radioTabsVariables = useThemeCache(() => {
     };
 });
 
-export const radioTabClasses = useThemeCache(() => {
-    const vars = radioTabsVariables();
-    const style = styleFactory("radioTab");
+export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) => {
+    const vars = buttonTabsVariables();
+    const style = styleFactory("buttonTabs");
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
 
@@ -187,5 +187,5 @@ export const radioTabClasses = useThemeCache(() => {
         input,
         leftTab,
         rightTab,
-    } as IRadioTabClasses;
+    };
 });

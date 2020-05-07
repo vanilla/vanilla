@@ -15,7 +15,8 @@ import { EventAttendance } from "@library/events/eventOptions";
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
 export interface IEvent {
-    date: IEventDate;
+    dateStart: IEventDate;
+    dateEnd?: IEventDate;
     name: string;
     excerpt?: string;
     location: string;
@@ -58,7 +59,7 @@ export function Event(props: IEvent) {
                     }
                 >
                     <div className={classes.linkAlignment}>
-                        <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
+                        <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.dateStart} />
                         <div className={classes.main}>
                             <HeadingTag title={props.name} className={classes.title}>
                                 {props.name}
@@ -76,7 +77,7 @@ export function Event(props: IEvent) {
                                     {props.location && <div className={classes.meta}>{props.location}</div>}
                                     {!props.compact && (
                                         <div className={classes.meta}>
-                                            <DateTime type={DateFormats.DEFAULT} {...props.date} />
+                                            <DateTime type={DateFormats.DEFAULT} {...props.dateStart} />
                                         </div>
                                     )}
                                 </div>

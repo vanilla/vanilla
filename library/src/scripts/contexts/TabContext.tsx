@@ -7,14 +7,14 @@
 import * as React from "react";
 import { Optionalize } from "@library/@types/utils";
 
-export interface ITabProps {
+export interface ITabBase {
     setData: (data: any) => void;
     groupID: string;
     activeTab: string | number;
     childClass: string;
 }
 
-const TabContext = React.createContext<ITabProps>({} as any);
+const TabContext = React.createContext<ITabBase>({} as any);
 export default TabContext;
 
 /**
@@ -22,9 +22,9 @@ export default TabContext;
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withTabs<T extends ITabProps = ITabProps>(WrappedComponent: React.ComponentType<T>) {
+export function withTabs<T extends ITabBase = ITabBase>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithTabs extends React.Component<Optionalize<T, ITabProps>> {
+    class ComponentWithTabs extends React.Component<Optionalize<T, ITabBase>> {
         public static displayName = `withTabs(${displayName})`;
         public render() {
             return (

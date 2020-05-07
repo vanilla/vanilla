@@ -6,23 +6,27 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ITabProps, withTabs } from "@library/contexts/TabContext";
+import { ITabBase, withTabs } from "@library/contexts/TabContext";
 import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
+import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 
-interface IProps extends ITabProps {
+export interface ITabProps {
     label: string;
-    className?: string;
     data: string | number;
-    activeTab: string | number;
+    className?: string;
     position?: "left" | "right";
+    detached?: boolean;
+    classes?: IRadioTabClasses;
 }
+
+interface IProps extends ITabProps, ITabBase {}
 
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-class RadioTab extends React.Component<IProps> {
+class RadioTab extends React.Component<ITabProps> {
     public render() {
-        const classes = radioTabClasses();
+        const classes = this.props.classes ?? radioTabClasses();
         return (
             <label
                 className={classNames(
@@ -44,7 +48,7 @@ class RadioTab extends React.Component<IProps> {
                 />
                 <span
                     className={classNames(
-                        "radioButtonsAsTabs-label",
+                        { "radioButtonsAsTabs-label": !this.props.detached },
                         classes.label,
                         this.props.position === "left" ? classes.leftTab : undefined,
                         this.props.position === "right" ? classes.rightTab : undefined,

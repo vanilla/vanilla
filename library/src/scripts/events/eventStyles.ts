@@ -266,6 +266,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const filter = style("filter", {});
     const filterLabel = style("filterLabel", {});
     const details = style("details", {});
+    const attendanceAsRadio = style("attendanceAsRadio", {});
 
     return {
         root,
@@ -290,5 +291,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         filter,
         filterLabel,
         details,
+        attendanceAsRadio,
     };
 });

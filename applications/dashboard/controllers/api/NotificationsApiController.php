@@ -237,12 +237,11 @@ class NotificationsApiController extends AbstractApiController {
         $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema();
-        $in = $this->schema(Schema::parse([
+        $in = $this->schema([
             "read?" => [
-                "description" => "Mark the notification read/unread.",
                 "enum" => [true]
             ]
-        ])->add($this->notificationSchema()), "in")->setDescription("Update a notification.");
+        ], "in")->setDescription("Update a notification.");
         $out = $this->schema($this->notificationSchema(), "out");
 
         $body = $in->validate($body);
@@ -273,12 +272,11 @@ class NotificationsApiController extends AbstractApiController {
     public function patch_index(array $body): Data {
         $this->permission("Garden.SignIn.Allow");
 
-        $in = $this->schema(Schema::parse([
+        $in = $this->schema([
             "read?" => [
-                "description" => "Mark the notification read/unread.",
                 "enum" => [true]
             ]
-        ])->add($this->notificationSchema()), "in")->setDescription("Update all notifications.");
+        ], "in")->setDescription("Update all notifications.");
         $out = $this->schema([], "out");
 
         $body = $in->validate($body);

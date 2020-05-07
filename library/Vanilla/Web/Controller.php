@@ -200,51 +200,6 @@ abstract class Controller implements InjectableInterface {
     }
 
     /**
-     * Generate a valid upload path, relative to the uploads directory.
-     *
-     * @param string $ext The file's extension.
-     * @param bool $chunk Include an additional random subdirectory?
-     * @return string
-     */
-    public function generateUploadPath($ext, $chunk = false) {
-        $path = $this->upload->generateTargetName(PATH_UPLOADS, $ext, $chunk);
-        $result = stringBeginsWith($path, PATH_UPLOADS.'/', false, true);
-        return $result;
-    }
-
-    /**
-     * @param UploadedFile $upload
-     * @param string $destination
-     * @param string $nameFormat
-     * @param bool $copy
-     * @throws \Exception if failed to save the upload.
-     * @returns array|bool
-     */
-    public function saveUpload(UploadedFile $upload, $destination, $nameFormat = '%s', $copy = false) {
-        $destination = $result = stringBeginsWith($destination, PATH_UPLOADS.'/', false, true);
-        $ext = pathinfo($destination, PATHINFO_EXTENSION);
-        $baseName = basename($destination, ".{$ext}");
-        $dirName = dirname($destination);
-
-        $target = sprintf($nameFormat, $baseName);
-        if (!empty($ext)) {
-            $target .= ".{$ext}";
-        }
-        if (!empty($dirName)) {
-            $target = "{$dirName}/{$target}";
-        }
-        $target = PATH_UPLOADS."/{$target}";
-
-        $result = $this->upload->saveAs(
-            $upload->getFile(),
-            $target,
-            ["OriginalFilename" => $upload->getClientFilename()],
-            $copy
-        );
-        return $result;
-    }
-
-    /**
      * Given a model, analyze its validation property and return failures.
      *
      * @param object $model The model to analyze the Validation property of.

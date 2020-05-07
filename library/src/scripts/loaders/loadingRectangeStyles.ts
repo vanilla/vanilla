@@ -54,3 +54,14 @@ export const loadingSpacerClass = useThemeCache((height: string | number) => {
         width: percent(100),
     });
 });
+
+export const loadingCircleClass = useThemeCache((height: string | number) => {
+    const vars = loadingRectangeVariables();
+    return style({
+        height: unit(50),
+        width: unit(50),
+        background: colorOut(vars.colors.bg),
+        margin: 20,
+        borderRadius: 50,
+    });
+});

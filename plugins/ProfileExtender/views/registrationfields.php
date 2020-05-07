@@ -12,6 +12,10 @@ if (is_array($Sender->RegistrationFields)) {
             $Options = array_combine($values, $labels);
         }
 
+        if ($Field['FormType'] == 'TextBox' && !empty($Field['Options'])) {
+            $Options = $Field['Options'];
+        }
+
         if ($Field['FormType'] == 'CheckBox') {
             echo wrap($Sender->Form->{$Field['FormType']}($Name, $Field['Label']), 'li');
         } else {

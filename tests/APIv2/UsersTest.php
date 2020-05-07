@@ -11,7 +11,7 @@ use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\Fixtures\Uploader;
+use VanillaTests\Fixtures\TestUploader;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -491,8 +491,8 @@ class UsersTest extends AbstractResourceTest {
     public function testPostPhoto() {
         $user = $this->testGet();
 
-        Uploader::resetUploads();
-        $photo = Uploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        TestUploader::resetUploads();
+        $photo = TestUploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
         $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/photo", ['photo' => $photo]);
 
         $this->assertEquals(201, $response->getStatusCode());

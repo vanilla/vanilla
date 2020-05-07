@@ -27,14 +27,18 @@ paths:
       - Notifications
       summary: List notifications for the current user.
     patch:
-      responses:
-        '204':
-          description: Success
+      summary: Mark all notifications read.
       tags:
       - Notifications
       requestBody:
-        $ref: '#/components/requestBodies/NotificationSchema'
-      summary: Update all notifications.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPatchSchema'
+        required: true
+      responses:
+        '204':
+          description: Success
   '/notifications/{id}':
     get:
       parameters:
@@ -56,12 +60,21 @@ paths:
       - Notifications
       summary: Get a single notification.
     patch:
+      summary: Mark a notification read.
+      tags:
+        - Notifications
       parameters:
       - in: path
         name: id
         required: true
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPatchSchema'
+        required: true
       responses:
         '200':
           content:
@@ -69,15 +82,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotificationSchema'
           description: Success
-      tags:
-      - Notifications
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationSchema'
-        required: true
-      summary: Update a notification.
 components:
   requestBodies:
     NotificationSchema:
@@ -127,3 +131,11 @@ components:
       - dateUpdated
       - read
       type: object
+    NotificationPatchSchema:
+      description: Fields for patching a notification.
+      type: object
+      properties:
+        read:
+          type: boolean
+          enum:
+            - true

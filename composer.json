@@ -30,8 +30,10 @@
         "php": ">=7.2.0",
         "ext-pdo": "*",
         "ext-json": "*",
+        "ext-curl": "*",
         "ext-fileinfo": "*",
         "ext-dom": "*",
+        "ext-gd": "*",
         "ext-libxml": "*",
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
@@ -62,7 +64,8 @@
         "fig/event-dispatcher-util": "^1.1",
         "symfony/polyfill-php73": "^1.13",
         "symfony/polyfill-php74": "^1.13",
-        "metasyntactical/composer-plugin-license-check": "^0.5.0"
+        "metasyntactical/composer-plugin-license-check": "^0.5.0",
+        "colinodell/json5": "^2.1"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",

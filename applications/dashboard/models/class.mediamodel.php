@@ -4,16 +4,26 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Contracts\Web\FileUploadHandler;
+use Vanilla\Models\VanillaMediaSchema;
+use Vanilla\UploadedFile;
+use Vanilla\Utility\ModelUtils;
+
 /**
  * Class MediaModel
  */
-class MediaModel extends Gdn_Model {
+class MediaModel extends Gdn_Model implements FileUploadHandler {
+
+    /** @var Gdn_Upload */
+    private $upload;
 
     /**
      * MediaModel constructor.
      */
     public function __construct() {
         parent::__construct('Media');
+        $this->upload = \Gdn::getContainer()->get(Gdn_Upload::class);
     }
 
     /**
@@ -174,5 +184,129 @@ class MediaModel extends Gdn_Model {
             // Explicitly set the deleteFile option
             $this->delete($media['MediaID'], ['deleteFile' => true]);
         }
+    }
+
+    /**
+     * Normalize and validate a row.
+     *
+     * @param array $row
+     *
+     * @return array
+     */
+    private function normalizeAndValidate(array $row): array {
+        $schema = new VanillaMediaSchema(true);
+        $result = VanillaMediaSchema::normalizeFromDbRecord($row);
+        $result = $schema->validate($result);
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array {
+        // Casen extra args for the DB.
+        if (isset($extraArgs['foreignID'])) {
+            $extraArgs['ForeignID'] = $extraArgs['foreignID'];
+        }
+        if (isset($extraArgs['foreignType'])) {
+            $extraArgs['ForeignTable'] = $extraArgs['foreignType'];
+        }
+
+        $media = array_merge($extraArgs, [
+            'Name' => $file->getClientFilename(),
+            'Type' => $file->getClientMediaType(),
+            'Size' => $file->getSize(),
+        ]);
+
+        if ($file->getForeignUrl() !== null) {
+            $media['foreignUrl'] = $file->getForeignUrl();
+        }
+
+        // Persist the actual file an get it's final URL.
+        // We might have already persisted the upload.
+        $persistedPath = $file->getPersistedPath();
+        if ($persistedPath === null) {
+            $persistedPath = $file->persistUpload()->getPersistedPath();
+        }
+        $media['Path'] = $persistedPath;
+        if ($file->getClientWidth() !== null) {
+            $media['ImageWidth'] = $file->getClientWidth();
+        }
+        if ($file->getClientHeight() !== null) {
+            $media['ImageHeight'] = $file->getClientHeight();
+        }
+
+        $id = $this->save($media);
+        ModelUtils::validationResultToValidationException($this, \Gdn::locale(), true);
+
+        $result = $this->findUploadedMediaByID($id);
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findUploadedMediaByID(int $id): array {
+        $row = $this->getID($id, DATASET_TYPE_ARRAY);
+        if (!$row) {
+            throw new NotFoundException('Media');
+        }
+        return $this->normalizeAndValidate($row);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findUploadedMediaByUrl(string $url): array {
+        $uploadPaths = $this->upload->getUploadWebPaths();
+
+        $testPaths = [];
+        foreach ($uploadPaths as $type => $urlPrefix) {
+            if (stringBeginsWith($url, $urlPrefix)) {
+                $path = trim(stringBeginsWith($url, $urlPrefix, true, true), '\\/');
+                if (!empty($type)) {
+                    $path = "$type/$path";
+                }
+                $testPaths[] = $path;
+            }
+        }
+
+        if (empty($testPaths)) {
+            throw new NotFoundException('Media');
+        }
+
+        // Any matches?.
+        $row = $this->getWhere(
+            ['Path' => $testPaths],
+            '',
+            'asc',
+            1
+        )->firstRow(DATASET_TYPE_ARRAY);
+
+        // Couldn't find a match.
+        if (empty($row)) {
+            throw new NotFoundException('Media');
+        }
+
+        return $this->normalizeAndValidate($row);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findUploadedMediaByForeignUrl(string $foreignUrl): array {
+        $row = $this->getWhere(
+            ['ForeignUrl' => $foreignUrl],
+            '',
+            'asc',
+            1
+        )->firstRow(DATASET_TYPE_ARRAY);
+
+        // Couldn't find a match.
+        if (empty($row)) {
+            throw new NotFoundException('Media');
+        }
+
+        return $this->normalizeAndValidate($row);
     }
 }

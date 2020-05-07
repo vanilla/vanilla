@@ -35,16 +35,27 @@ $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 $CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
 $CountAllCommentsExists = $Construct->columnExists('CountAllComments');
 
+$config = Gdn::config();
 // Rename the remnants of the Hero Image plugin.
 if ($HeroImageExists) {
-    Gdn::config()->remove('EnabledPlugins.heroimage');
+    $config->remove('EnabledPlugins.heroimage');
     $Construct->table('Category');
     $Construct->renameColumn('HeroImage', 'BannerImage');
 }
 
 if ($configBannerImage = Gdn::config('Garden.HeroImage')) {
-    Gdn::config()->set('Garden.BannerImage', $configBannerImage);
-    Gdn::config()->remove('Garden.HeroImage');
+    $config->set('Garden.BannerImage', $configBannerImage);
+    $config->remove('Garden.HeroImage');
+}
+
+// Fix the casening of the Rich post format.
+// For a short period, lowercase rich format values were being saved into the config.
+if ($config->get('Garden.InputFormatter') === 'rich') {
+    $config->set('Garden.InputFormatter', 'Rich');
+}
+
+if ($config->get('Garden.MobileInputFormatter') === 'rich') {
+    $config->set('Garden.MobileInputFormatter', 'Rich');
 }
 
 $Construct->primaryKey('CategoryID')

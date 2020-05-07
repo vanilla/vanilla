@@ -134,6 +134,19 @@ if ($SystemUserID) {
         $SystemUserID = false;
         removeFromConfig('Garden.SystemUserID');
     }
+
+    // Make sure our profile image respects SSL settings.
+    $profileUrl = $SysUser->Photo ?? '';
+    $ownSiteHttp = 'http://'.\Gdn::request()->getHostAndPort();
+    if ($profileUrl && strpos($profileUrl, $ownSiteHttp) === 0 && \Gdn::config('Garden.AllowSSL')) {
+        \Gdn::sql()->update(
+            'User',
+            [
+                'Photo' => preg_replace("/^http/", "https", $profileUrl),
+            ],
+            [ 'UserID' => $SystemUserID]
+        )->put();
+    }
 }
 
 if (!$SystemUserID) {
@@ -826,6 +839,9 @@ $Construct
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)
+
+    // Lowercase to match new schemas.
+    ->column('foreignUrl', 'varchar(255)', true, 'unique')
     ->set(false, false);
 
 // Merge backup.

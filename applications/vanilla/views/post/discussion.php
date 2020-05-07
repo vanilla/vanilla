@@ -28,6 +28,10 @@ if (!$CancelUrl) {
         if ($discussionType) {
             $options['DiscussionType'] = $discussionType;
         }
+        if (property_exists($this, 'Draft') && is_object($this->Draft)) {
+            $options['DraftID'] = $this->Draft->DraftID;
+        }
+
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';

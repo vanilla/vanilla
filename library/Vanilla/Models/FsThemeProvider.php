@@ -214,7 +214,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         // Check theme for default.
         if (!$foundLogo) {
             if (valr("assets.variables", $res)) {
-                $themeVars = json_decode($res['assets']['variables']->getData(), true);
+                $themeVars = json5_decode($res['assets']['variables']->getData(), true);
                 $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
                 $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
                 $noDesktopLogo = empty($desktopLogo);
@@ -282,6 +282,7 @@ class FsThemeProvider implements ThemeProviderInterface {
             case "twig":
                 return new TwigAsset($data);
             case "json":
+            case "json5":
                 return new JsonAsset($data);
             default:
                 throw new ServerException("Unrecognized type: {$type}");
@@ -299,9 +300,9 @@ class FsThemeProvider implements ThemeProviderInterface {
         $key = strtolower($key);
         switch ($key) {
             case "fonts":
-                return new FontsAsset(json_decode($content, true));
+                return new FontsAsset(json5_decode($content, true));
             case "scripts":
-                return new ScriptsAsset(json_decode($content, true));
+                return new ScriptsAsset(json5_decode($content, true));
             default:
                 throw new ServerException("Unrecognized data asset: {$key}");
         }
@@ -417,7 +418,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function setPreviewTheme($themeKey): array {
+    public function setPreviewTheme($themeKey, int $revisionID = null): array {
         if (!empty($themeKey)) {
             $theme = $this->getThemeWithAssets($themeKey);
         } else {

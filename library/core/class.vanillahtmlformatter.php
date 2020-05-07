@@ -166,7 +166,13 @@ class VanillaHtmlFormatter {
      * @return string Returns the filtered HTML.
      */
     public function format($html, $options = []) {
-        $attributes = self::c('Garden.Html.BlockedAttributes', 'on*, target, download');
+        $allowExtended = $options['allowedExtendedContent'] ?? false;
+
+        $defaultBlockedAttrs = 'on*, target';
+        if (!$allowExtended) {
+            $defaultBlockedAttrs .= ', download';
+        }
+        $attributes = self::c('Garden.Html.BlockedAttributes', $defaultBlockedAttrs);
         $schemes = implode(', ', self::c('Garden.Html.AllowedUrlSchemes', []));
 
         $specOverrides = val('spec', $options, []);
@@ -189,7 +195,7 @@ class VanillaHtmlFormatter {
             'valid_xhtml' => 0
         ];
 
-        if ($options['allowedExtendedContent'] ?? false) {
+        if ($allowExtended) {
             $elements = $config['elements'] ?? null;
             $config['elements'] = str_replace('-iframe', '', $elements);
         }

@@ -51,6 +51,9 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var string|int */
     private $forcedThemeKey;
 
+    /** @var string|null */
+    private $revisionID;
+
     /**
      * DI.
      *
@@ -77,8 +80,15 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @param int|string $forcedThemeKey
      */
-    public function setForcedThemeKey($forcedThemeKey): void {
+    public function setForcedThemeKey($forcedThemeKey, $revisionID = null): void {
         $this->forcedThemeKey = $forcedThemeKey;
+    }
+
+    /**
+     * @param int|null $revisionID
+     */
+    public function setForcedRevisionID(?int $revisionID = null): void {
+        $this->revisionID = $revisionID;
     }
 
     /**
@@ -86,6 +96,13 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     private function getThemeKeyToPreload() {
         return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
+    }
+
+    /**
+     * @return int
+     */
+    private function getThemeRevisionID(): ?int {
+        return $this->revisionID ?? $this->siteMeta->getActiveThemeRevisionID();
     }
 
     /**
@@ -118,13 +135,20 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     public function getThemeData(): ?array {
         if (!$this->themeData) {
             $themeKey = $this->getThemeKeyToPreload();
+
+            // Forced theme keys disable addon variables.
+            $args = ['allowAddonVariables' => !$this->forcedThemeKey];
+            if (!empty($this->revisionID)) {
+                // when theme-settings/{id}/revisions preview
+                $args['revisionID'] = $this->revisionID;
+            } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+                $args['revisionID'] = $revisionID;
+            }
+
             try {
                 $this->themeData = $this->themesApi->get(
                     $themeKey,
-                    [
-                        // Forced theme keys disable addon variables.
-                        'allowAddonVariables' => !$this->forcedThemeKey,
-                    ]
+                    $args
                 );
             } catch (\Throwable $e) {
                 // Prevent infinite loops.

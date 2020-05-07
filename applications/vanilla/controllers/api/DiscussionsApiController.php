@@ -575,9 +575,11 @@ class DiscussionsApiController extends AbstractApiController {
             $categoryID = $discussionData['CategoryID'];
         }
 
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $permissionCategoryID = self::getPermissionID($categoryID);
+
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $permissionCategoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $permissionCategoryID);
 
         $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
@@ -585,6 +587,21 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $this->discussionByID($id);
         $result = $this->normalizeOutput($result);
         return $out->validate($result);
+    }
+
+    /**
+     * Get the category permission ID.
+     *
+     * @param int $categoryID The category ID.
+     * @return int Returns the associated permission ID.
+     */
+    public static function getPermissionID(int $categoryID): int {
+        $category = CategoryModel::categories($categoryID);
+        if ($category) {
+            return $category['PermissionCategoryID'];
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -602,10 +619,11 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
+        $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryPermissionID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryPermissionID);
 
         $discussionData = ApiUtils::convertInputKeys($body);
         $id = $this->discussionModel->save($discussionData);

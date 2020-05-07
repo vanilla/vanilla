@@ -396,3 +396,31 @@ export const componentThemeVariables = (componentName: string) => {
         subComponentStyles,
     };
 };
+
+/**
+ * Print a set of variables for debugging.
+ */
+export function printDebugVars(vars: any) {
+    logDebug(JSON.stringify(getDebugVars(vars)));
+}
+
+function getDebugVars(vars: any): any {
+    let result = {} as any;
+
+    for (const [key, value] of Object.entries(vars)) {
+        if (value instanceof ColorHelper) {
+            result[key] =
+                value.opacity() < 1
+                    ? `rgba(${value
+                          .toRGBA()
+                          .red()}, ${value.toRGBA().green()}, ${value.toRGBA().blue()}, ${value.toRGBA().alpha()})`
+                    : value.toHexString();
+        } else if (typeof value === "object" && value) {
+            result[key] = getDebugVars(value);
+        } else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}

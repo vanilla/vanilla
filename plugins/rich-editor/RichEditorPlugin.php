@@ -85,7 +85,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @return string[] Additional post formats.
      */
     public function getPostFormats_handler(array $postFormats): array {
-        $postFormats[] = RichFormat::FORMAT_KEY;
+        $postFormats[] = 'Rich'; // The config values have always been uppercase. (including in default configs).
         return $postFormats;
     }
 

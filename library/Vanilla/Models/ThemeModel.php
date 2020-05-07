@@ -273,15 +273,16 @@ class ThemeModel {
      * (pseudo current theme for current session user only)
      *
      * @param int|string $themeID Theme ID to set current.
+     * @param int $revisionID Theme revision ID.
      * @return array
      */
-    public function setPreviewTheme($themeID): array {
+    public function setPreviewTheme($themeID, ?int $revisionID = null): array {
         if (empty($themeID)) {
             $theme = $this->getCurrentTheme();
             $this->themeHelper->cancelSessionPreviewTheme();
         } else {
             $provider = $this->getThemeProvider($themeID);
-            $theme = $provider->setPreviewTheme($themeID);
+            $theme = $provider->setPreviewTheme($themeID, $revisionID);
         }
         $theme = $this->normalizeTheme($theme);
         return $theme;
@@ -299,6 +300,7 @@ class ThemeModel {
             $provider = $this->getThemeProvider($previewThemeKey);
             $previewTheme['name'] = $provider->getName($previewThemeKey);
             $previewTheme['redirect'] = $this->getThemeManagePageUrl();
+            $previewTheme['revisionID'] = $this->session->getPreference('PreviewThemeRevisionID');
         }
         return $previewTheme;
     }
@@ -402,7 +404,15 @@ class ThemeModel {
 
             $previewThemeKey = $this->session->getPreference('PreviewThemeKey');
             if ($previewThemeKey) { // May be stuck to empty string so falsy check is required.
-                $previewTheme = $this->getThemeProvider($previewThemeKey)->getThemeWithAssets($previewThemeKey);
+                $previewThemeRevisionID = $this->session->getPreference('PreviewThemeRevisionID');
+                $args = [];
+
+                if (!empty($previewThemeRevisionID)) {
+                    $args['revisionID'] = $previewThemeRevisionID;
+                }
+
+                $themeProvider = $this->getThemeProvider($previewThemeKey);
+                $previewTheme = $themeProvider->getThemeWithAssets($previewThemeKey, $args);
                 if ($previewTheme === null) {
                     // if we stored wrong preview key store in session, lets reset it.
                     $this->themeHelper->cancelSessionPreviewTheme();
@@ -599,19 +609,6 @@ class ThemeModel {
 
         // Generate a preview.
         $theme['preview'] = $this->generateThemePreview($theme);
-
-        // A little fixup to ensure current variables are always applied to asset compat themes.
-        $currentID = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
-        $currentID = $this->verifyThemeIdentifierIsValid($currentID) ? $currentID : ThemeModel::FALLBACK_THEME_KEY;
-
-        if (in_array($themeID, self::ASSET_COMPAT_THEMES, true) &&
-            $currentID !== null &&
-            !in_array($currentID, self::ASSET_COMPAT_THEMES, true) // To prevent infinite loops.
-        ) {
-            // Apply the current themes assets over foundation.
-            $currentTheme = $this->getThemeWithAssets($currentID);
-            $theme['assets'] = $currentTheme['assets'];
-        }
         return $theme;
     }
 

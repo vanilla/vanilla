@@ -169,7 +169,7 @@ if (!function_exists('writeListItem')):
                 Gdn::controller()->EventArguments['Category'] = &$category;
                 Gdn::controller()->fireEvent('BeforeCategoryItem');
                 $headingClass = "CategoryNameHeading";
-                if (empty($row['Description'])) {
+                if (empty($category['Description'])) {
                     $headingClass .= " isEmptyDescription";
                 }
                 ?>

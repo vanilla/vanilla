@@ -9,9 +9,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Contracts\ConfigurationInterface;
 use \Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
+use Vanilla\Models\VanillaMediaSchema;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use \Vanilla\EmbeddedContent\AbstractEmbed;
@@ -20,7 +22,15 @@ use \Vanilla\EmbeddedContent\AbstractEmbed;
  * API Controller for `/media`.
  */
 class MediaApiController extends AbstractApiController {
+
+    /**
+     * @deprecated
+     */
     const TYPE_IMAGE = 'image';
+
+    /**
+     * @deprecated
+     */
     const TYPE_FILE = 'file';
 
     /** @var Schema */
@@ -35,16 +45,14 @@ class MediaApiController extends AbstractApiController {
     /** @var ImageResizer */
     private $imageResizer;
 
-    /** @var Config */
+    /** @var ConfigurationInterface */
     private $config;
 
     /**
-     * MediaApiController constructor.
-     *
-     * @param MediaModel $mediaModel
-     * @param EmbedService $embedService
+     * DI.
+     * @inheritdoc
      */
-    public function __construct(MediaModel $mediaModel, EmbedService $embedService, ImageResizer $imageResizer, Gdn_Configuration $config) {
+    public function __construct(MediaModel $mediaModel, EmbedService $embedService, ImageResizer $imageResizer, ConfigurationInterface $config) {
         $this->mediaModel = $mediaModel;
         $this->embedService = $embedService;
         $this->imageResizer = $imageResizer;
@@ -54,15 +62,14 @@ class MediaApiController extends AbstractApiController {
     /**
      * Delete a media item by ID.
      *
-     * @param $id The media item's numeric ID.
+     * @param int $id The media item's numeric ID.
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Delete a media item.');
-        $out = $this->schema($this->fullSchema(), 'out');
-        $row = $this->mediaByID($id);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+        $row = $this->mediaModel->findUploadedMediaByID($id);
+        if ($row['insertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Community.Manage');
         }
 
@@ -82,48 +89,12 @@ class MediaApiController extends AbstractApiController {
 
         $in->validate($query);
 
-        $row = $this->mediaByUrl($query['url']);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+        $row = $this->mediaModel->findUploadedMediaByUrl($query['url']);
+        if ($row['insertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Community.Manage');
         }
 
-        $this->mediaModel->deleteID($row['MediaID']);
-    }
-
-    /**
-     * Process a user upload and insert into the media table.
-     *
-     * @param UploadedFile $upload An object representing an uploaded file.
-     * @param string $type The upload type (e.g. "image").
-     * @throws Exception if there was an error encountered when saving the upload.
-     * @return array
-     */
-    private function doUpload(UploadedFile $upload, $type) {
-        $file = $upload->getFile();
-
-        $media = [
-            'Name' => $upload->getClientFilename(),
-            'Type' => $upload->getClientMediaType(),
-            'Size' => $upload->getSize(),
-            'ForeignID' => $this->getSession()->UserID,
-            'ForeignTable' => 'embed'
-        ];
-
-        switch ($type) {
-            case self::TYPE_IMAGE:
-                [$media['ImageWidth'], $media['ImageHeight']] = $this->preprocessImage($upload);
-        }
-
-        $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
-        $destination = $this->generateUploadPath($ext, true);
-        $uploadResult = $this->saveUpload($upload, $destination);
-        $media['Path'] = $uploadResult['SaveName'];
-
-        $id = $this->mediaModel->save($media);
-        $this->validateModel($this->mediaModel);
-
-        $result = $this->mediaByID($id);
-        return $result;
+        $this->mediaModel->deleteID($row['mediaID']);
     }
 
     /**
@@ -132,7 +103,7 @@ class MediaApiController extends AbstractApiController {
      * @param array $row
      */
     private function editPermission(array $row) {
-        $insertUserID = $row["InsertUserID"] ?? null;
+        $insertUserID = $row["insertUserID"] ?? null;
         if ($this->getSession()->UserID === $insertUserID) {
             // Make sure we can still perform uploads.
             $this->permission("Garden.Uploads.Add");
@@ -155,48 +126,37 @@ class MediaApiController extends AbstractApiController {
      *
      * @param int $id The media item's numeric ID.
      * @return array
-     * @throws NotFoundException if the media item could not be found.
+     * @throws NotFoundException If the media item could not be found.
      */
-    public function get($id) {
+    public function get(int $id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Get a media item.');
-        $out = $this->schema($this->fullSchema(), 'out');
-
-        $row = $this->mediaByID($id);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+        $row = $this->mediaModel->findUploadedMediaByID($id);
+        if ($row['insertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Community.Manage');
         }
-
-        $row = $this->normalizeOutput($row);
-
-        $result = $out->validate($row);
-        return $result;
+        return $row;
     }
 
     /**
      * Get a media item's information by its URL.
      *
-     * @param $query The request query.
+     * @param array $query The request query.
      * @return array
-     * @throws NotFoundException if the media item could not be found.
+     * @throws NotFoundException If the media item could not be found.
      */
     public function get_byUrl(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema(['url:s' => 'Full URL to the item.'], 'in')->setDescription('Get a media item, using its URL.');
-        $out = $this->schema($this->fullSchema(), 'out');
 
         $query = $in->validate($query);
 
-        $row = $this->mediaByUrl($query['url']);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+        $row = $this->mediaModel->findUploadedMediaByUrl($query['url']);
+        if ($row['insertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Community.Manage');
         }
-
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
+        return $row;
     }
 
     /**
@@ -213,89 +173,6 @@ class MediaApiController extends AbstractApiController {
             );
         }
         return $this->schema($this->idParamSchema, $type);
-    }
-
-    /**
-     * Get a media row by its numeric ID.
-     *
-     * @param int $id The media ID.
-     * @throws NotFoundException if the media item could not be found.
-     * @return array
-     */
-    public function mediaByID($id) {
-        $row = $this->mediaModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row) {
-            throw new NotFoundException('Media');
-        }
-        return $row;
-    }
-
-    /**
-     * Get a media row by its full URL.
-     *
-     * @param string $url The full media URL.
-     * @throws NotFoundException if the media item could not be found.
-     * @return array
-     */
-    public function mediaByUrl($url) {
-        $uploadPaths = Gdn_Upload::urls();
-
-        $testPaths = [];
-        foreach ($uploadPaths as $type => $urlPrefix) {
-            if (stringBeginsWith($url, $urlPrefix)) {
-                $path = trim(stringBeginsWith($url, $urlPrefix, true, true), '\\/');
-                if (!empty($type)) {
-                    $path = "$type/$path";
-                }
-                $testPaths[] = $path;
-            }
-        }
-
-        if (empty($testPaths)) {
-            throw new NotFoundException('Media');
-        }
-
-        // Any matches?.
-        $row = $this->mediaModel->getWhere(
-            ['Path' => $testPaths],
-            '',
-            'asc',
-            1
-        )->firstRow(DATASET_TYPE_ARRAY);
-
-        // Couldn't find a match.
-        if (empty($row)) {
-            throw new NotFoundException('Media');
-        }
-
-        return $row;
-    }
-
-    /**
-     * Normalize a database record to match the Schema definition.
-     *
-     * @param array $row Database record.
-     * @return array Return a record, normalized for output.
-     */
-    public function normalizeOutput(array $row) {
-        $row['foreignID'] = $row['ForeignID'] ?? null;
-        $row['foreignType'] = $row['ForeignTable'] ?? null;
-
-        if (array_key_exists('Path', $row)) {
-            $parsed = Gdn_Upload::parse($row['Path']);
-            $row['url'] = $parsed['Url'];
-
-            $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
-            if (in_array($ext, array_keys(ImageResizer::getExtType()))) {
-                $row['height'] = $row['ImageHeight'] ?? null;
-                $row['width'] = $row['ImageWidth'] ?? null;
-            }
-        } else {
-            $row['url'] = null;
-        }
-
-        $schemaRecord = ApiUtils::convertOutputKeys($row);
-        return $schemaRecord;
     }
 
     /**
@@ -323,11 +200,10 @@ class MediaApiController extends AbstractApiController {
                 "type" => "integer",
             ],
         ], ["articlesPatchAttachment", "in"])->setDescription("Update a media item's attachment to another record.");
-        $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
 
-        $original = $this->mediaByID($id);
+        $original = $this->mediaModel->findUploadedMediaByID($id);
         $this->editPermission($original);
 
         $canAttach = $this->getEventManager()->fireFilter(
@@ -347,10 +223,8 @@ class MediaApiController extends AbstractApiController {
             ],
             ["MediaID" => $id]
         );
-        $row = $this->mediaByID($id);
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
+        $row = $this->mediaModel->findUploadedMediaByID($id);
+        return $row;
     }
 
     /**
@@ -374,21 +248,13 @@ class MediaApiController extends AbstractApiController {
         $in = $this->schema([
             'file' => $uploadSchema,
         ], 'in')->setDescription('Add a media item.');
-        $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-
-        $imageExtensions = array_keys(ImageResizer::getExtType());
-        /** @var UploadedFile $file */
-        $file = $body['file'];
-        $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION) ?? '';
-        $type = in_array($extension, $imageExtensions) ? self::TYPE_IMAGE : self::TYPE_FILE;
-
-        $row = $this->doUpload($body['file'], $type);
-
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
+        $row = $this->mediaModel->saveUploadedFile(
+            $body['file'],
+            ['foreignType' => 'embed', 'foreignID' => $this->getSession()->UserID ]
+        );
+        return $row;
     }
 
     /**
@@ -396,10 +262,6 @@ class MediaApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @return array
-     * @throws Exception
-     * @throws \Garden\Schema\ValidationException
-     * @throws \Garden\Web\Exception\HttpException
-     * @throws \Vanilla\Exception\PermissionException
      */
     public function post_scrape(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -425,44 +287,6 @@ class MediaApiController extends AbstractApiController {
         }
 
         $result = $out->validate($pageInfo);
-        return $result;
-    }
-
-    /**
-     * Prepare an image to be saved. This includes optional resizing and re-orienting, based on EXIF data.
-     *
-     * @param UploadedFile $upload
-     * @return array
-     */
-    private function preprocessImage(UploadedFile $upload): array {
-        $file = $upload->getFile();
-        $size = getimagesize($file);
-
-        if (empty($size)) {
-            throw new ClientException("File is not a valid image.");
-        }
-
-        [$width, $height] = $size;
-        $options = [
-            "crop" => false,
-            "height" => $height ?? 0,
-            "width" => $width ?? 0,
-        ];
-
-        if ($this->config->get("ImageUpload.Limits.Enabled")) {
-            if ($newWidth = filter_var($this->config->get("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
-                $options["width"] = $newWidth;
-            }
-            if ($newHeight = filter_var($this->config->get("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT)) {
-                $options["height"] = $newHeight;
-            }
-        }
-
-        // Resize and re-orient the image as necessary.
-        $this->imageResizer->resize($file, null, $options);
-
-        // Get the new details, after resizing and re-orienting the image.
-        $result = getimagesize($file);
         return $result;
     }
 }

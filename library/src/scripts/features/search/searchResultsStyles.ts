@@ -19,6 +19,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -26,9 +27,6 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.primary,
-        hover: {
-            fg: globalVars.links.colors.hover,
-        },
     });
 
     const title = makeThemeVars("title", {
@@ -158,6 +156,7 @@ export const searchResultClasses = useThemeCache(() => {
         paddingRight: unit(24),
     });
 
+    const linkColors = clickableItemStates()["$nest"];
     const root = style(
         {
             display: "flex",
@@ -172,13 +171,19 @@ export const searchResultClasses = useThemeCache(() => {
             }) as any,
             $nest: {
                 [`&:hover .${title}`]: {
-                    color: colorOut(vars.colors.hover.fg),
+                    ...linkColors!["&&:hover"],
                 },
                 [`&:focus .${title}`]: {
-                    color: colorOut(vars.colors.hover.fg),
+                    ...linkColors!["&&:focus"],
+                },
+                [`&.focus-visible .${title}`]: {
+                    ...linkColors!["&&:focus-visible"],
                 },
                 [`&:active .${title}`]: {
-                    color: colorOut(vars.colors.hover.fg),
+                    ...linkColors!["&&:active"],
+                },
+                [`&:visited .${title}`]: {
+                    ...linkColors!["&&:visited"],
                 },
                 "&:not(.focus-visible)": {
                     outline: 0,

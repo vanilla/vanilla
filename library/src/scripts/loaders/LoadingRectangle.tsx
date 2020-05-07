@@ -4,7 +4,7 @@
  */
 
 import React, { DetailedHTMLProps } from "react";
-import { loadingRectangeClass, loadingSpacerClass } from "@library/loaders/loadingRectangeStyles";
+import { loadingCircleClass, loadingRectangeClass, loadingSpacerClass } from "@library/loaders/loadingRectangeStyles";
 import classNames from "classnames";
 
 interface IProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -20,4 +20,8 @@ export function LoadingRectange(props: IProps) {
 
 export function LoadingSpacer(props: IProps) {
     return <div {...props} className={classNames(loadingSpacerClass(props.height), props.className)}></div>;
+}
+
+export function LoadingCircle(props: IProps) {
+    return <div {...props} className={classNames(loadingCircleClass(props.height), props.className)}></div>;
 }

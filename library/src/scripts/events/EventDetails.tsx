@@ -76,7 +76,7 @@ export function EventDetails(props: IEventExtended) {
 
             <EventAttendees data={dummyEventDetailsData.going!} title={t("Going")} extra={552} separator={true} />
             <EventAttendees data={dummyEventDetailsData.maybe!} title={t("Maybe")} extra={1201} separator={true} />
-            <EventAttendees data={dummyEventDetailsData.notGoing!} title={t("No going")} separator={true} />
+            <EventAttendees data={dummyEventDetailsData.notGoing!} title={t("Not going")} separator={true} />
         </div>
     );
 }

@@ -132,7 +132,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 break;
             case "End":
                 if (state.open) {
-                    dispatch({ type: "set_focused_item", item: -1 });
+                    dispatch({ type: "set_focused_item", item: items.length - 1 });
                 }
                 break;
             case "ArrowUp":
@@ -196,7 +196,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 break;
             case "ArrowUp":
                 if (state.buttonFocus) {
-                    dispatch({ type: "set_focused_item", item: -1 });
+                    dispatch({ type: "set_focused_item", item: items.length - 1 });
                     dispatch({ type: "set_open", open: true });
                 }
                 break;
@@ -220,9 +220,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             if (state.focusedItem === 0) {
                 const first = tabHandler.getInitial();
                 first?.focus();
-            } else if (state.focusedItem === -1) {
-                const last = tabHandler.getLast();
-                last?.focus();
             } else if (state.focusedItem === items.length - 1) {
                 const last = tabHandler.getLast();
                 last?.focus();
@@ -230,8 +227,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 let item = tabHandler.getInitial();
                 item?.focus();
                 if (item) {
-                    const itemNumber = state.focusedItem < -1 ? state.focusedItem + items.length : state.focusedItem;
-                    for (let i = 0; i < itemNumber; i++) {
+                    for (let i = 0; i < state.focusedItem; i++) {
                         item = tabHandler.getNext();
                         item?.focus();
                     }

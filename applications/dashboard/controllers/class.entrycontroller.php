@@ -870,6 +870,14 @@ class EntryController extends Gdn_Controller {
                             } catch (Gdn_UserException $ex) {
                                 $this->Form->addError($ex);
                             }
+                        } else {
+                            // If we have a user match & there is no password.
+                            $this->Form->addError(
+                                t(
+                                    'You are trying to connect with a username that is already assigned to a user. '.
+                                    'If this is you, please enter the password you used when you created this account on this forum.'
+                                )
+                            );
                         }
                     }
                 }

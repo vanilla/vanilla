@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 /**
  * A logger that can contain many loggers.
@@ -16,6 +17,8 @@ use Psr\Log\LoggerInterface;
  * @package Vanilla
  */
 class Logger implements LoggerInterface {
+    use LoggerTrait;
+
     /** Log type. */
     const EMERGENCY = 'emergency';
 
@@ -126,16 +129,6 @@ class Logger implements LoggerInterface {
     }
 
     /**
-     * System is unusable.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     */
-    public function emergency($message, array $context = []) {
-        $this->log(self::EMERGENCY, $message, $context);
-    }
-
-    /**
      * Log with an arbitrary level.
      *
      * @param mixed $level One of the **Logger::*** constants.
@@ -171,92 +164,4 @@ class Logger implements LoggerInterface {
 
         $inCall = false;
     }
-
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function alert($message, array $context = []) {
-        $this->log(self::ALERT, $message, $context);
-    }
-
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function critical($message, array $context = []) {
-        $this->log(self::CRITICAL, $message, $context);
-    }
-
-    /**
-     * Runtime errors that do not require immediate action but should typically be logged and monitored.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function error($message, array $context = []) {
-        $this->log(self::ERROR, $message, $context);
-    }
-
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function warning($message, array $context = []) {
-        $this->log(self::WARNING, $message, $context);
-    }
-
-    /**
-     * Normal but significant events.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function notice($message, array $context = []) {
-        $this->log(self::NOTICE, $message, $context);
-    }
-
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function info($message, array $context = []) {
-        $this->log(self::INFO, $message, $context);
-    }
-
-    /**
-     * Detailed debug information.
-     *
-     * @param string $message The message to log. Put fields in {braces} to replace with context values.
-     * @param array $context The context to format the message with.
-     * @return null
-     */
-    public function debug($message, array $context = []) {
-        $this->log(self::DEBUG, $message, $context);
-    }
-
 }

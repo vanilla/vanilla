@@ -206,4 +206,18 @@ EOT;
         $r = $this->sql->delete('testDelete', ['name' => $id]);
         $this->assertEquals(2, $r);
     }
+
+    /**
+     * Test a basic where in clause.
+     */
+    public function testWhereInField() {
+        $actual = $this->sql->select()->from('foo')->where('bar', [1, 2, 'three'])->getSelect();
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where `bar` in ('1', '2', 'three')
+EOT;
+
+        $this->assertSame($expected, $actual);
+    }
 }

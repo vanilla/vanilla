@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect, useReducer } from "react";
+import React, { useRef, useMemo, useReducer } from "react";
 import classNames from "classnames";
 
 import { NewPostMenuIcon } from "@library/icons/common";
@@ -34,17 +34,7 @@ export interface ITransition {
     transform: string;
 }
 
-function ActionItem({
-    item,
-    style,
-    aid,
-    onFocus,
-}: {
-    item: IAddPost;
-    style?: ITransition;
-    aid?: string;
-    onFocus: (string) => void;
-}) {
+function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition; aid?: string }) {
     const { action, className, type, label, icon } = item;
     const classes = newPostMenuClasses();
 
@@ -55,15 +45,8 @@ function ActionItem({
         </>
     );
 
-    const id = `${aid}-${item.id}`;
     return (
-        <animated.li
-            id={id}
-            // onFocus={() => onFocus(id)}
-            role="menuitem"
-            style={style}
-            className={classNames(classes.item)}
-        >
+        <animated.li id={aid} role="menuitem" style={style} className={classNames(classes.item)}>
             {type === PostTypes.BUTTON ? (
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
@@ -88,7 +71,6 @@ function ActionItem({
 const initialState = {
     open: false,
     buttonFocus: false,
-    activeItem: "", // for aria-activedescendant
     focusedItem: undefined,
 };
 
@@ -98,8 +80,6 @@ const reducer = (state, action) => {
             return { ...state, open: !state.open };
         case "set_open":
             return { ...state, open: action.open };
-        case "set_active_item":
-            return { ...state, activeItem: action.item };
         case "set_button_focus":
             return { ...state, buttonFocus: action.focus };
         case "set_focused_item":
@@ -114,6 +94,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const vars = newPostMenuVariables();
 
     let { items } = props;
+
     const buttonRef = useRef<HTMLButtonElement>(null);
     const backgroundRef = useRef<HTMLElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
@@ -132,7 +113,68 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         }
     };
 
-    const onKeyDown = (event: React.KeyboardEvent<any>) => {
+    const onBgKeyDown = (event: React.KeyboardEvent<any>) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        switch (event.key) {
+            case "Escape":
+                if (state.open) {
+                    dispatch({ type: "set_open", open: false });
+                    dispatch({ type: "set_button_focus", focus: true });
+                    dispatch({ type: "set_focused_item", item: undefined });
+                }
+                break;
+            case "Home":
+                if (state.open) {
+                    dispatch({ type: "set_focused_item", item: 0 });
+                }
+                break;
+            case "End":
+                if (state.open) {
+                    dispatch({ type: "set_focused_item", item: -1 });
+                }
+                break;
+            case "ArrowUp":
+                if (state.open && typeof state.focusedItem != "undefined") {
+                    dispatch({ type: "set_focused_item", item: (state.focusedItem + 1) % items.length });
+                }
+                break;
+            case "ArrowDown":
+                if (state.open && typeof state.focusedItem != "undefined") {
+                    dispatch({ type: "set_focused_item", item: (state.focusedItem - 1 + items.length) % items.length });
+                }
+                break;
+            case "Enter":
+                if (typeof state.focusedItem !== "undefined") {
+                    const item = items[state.focusedItem === -1 ? items.length - 1 : state.focusedItem];
+                    switch (item.type) {
+                        case PostTypes.LINK:
+                            window.location.href = item.action as string;
+                            dispatch({ type: "set_open", open: false });
+                            dispatch({ type: "set_button_focus", focus: true });
+                            dispatch({ type: "set_focused_item", item: undefined });
+                            break;
+                        case PostTypes.BUTTON:
+                            (item.action as () => void)();
+                            dispatch({ type: "set_open", open: false });
+                            dispatch({ type: "set_button_focus", focus: true });
+                            dispatch({ type: "set_focused_item", item: undefined });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                break;
+            default:
+                if (state.buttonFocus) {
+                    dispatch({ type: "set_button_focus", focus: true });
+                }
+                break;
+        }
+    };
+
+    const onMenuButtonKeyDown = (event: React.KeyboardEvent<any>) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -159,73 +201,44 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
-                // We don't want to lose focus if the user presses other keys
                 if (state.buttonFocus) {
-                    console.log("here");
                     dispatch({ type: "set_button_focus", focus: true });
                 }
                 break;
         }
     };
 
-    const onFocus = (id: string) => {
-        dispatch({ type: "set_active_item", item: id });
-    };
+    const handleAccessibility = items => {
+        console.log(state);
 
-    // useEffect(() => {
-    //     // if (accessMenuRef.current) {
-    //     //     const tabHandler = new TabHandler(accessMenuRef.current);
-    //     //     console.log(tabHandler.getAll()?.length);
-    //     // }
-    //     if (state.buttonFocus && buttonRef.current) {
-    //         buttonRef.current.focus();
-    //     }
-    //     if (state.open && buttonRef.current) {
-    //         buttonRef.current.focus();
-    //     }
-
-    //     if (!state.open && state.buttonFocus && buttonRef.current) {
-    //         buttonRef.current.focus();
-    //     }
-    // }, [state.open, buttonRef, state.buttonFocus, state.focusedItem, accessMenuRef, state]);
-
-    const handleAccessibility = () => {
         if ((state.open || state.buttonFocus) && buttonRef.current) {
             buttonRef.current.focus();
         }
-
-        console.log(state);
-
-        // if (accessMenuRef.current) {
-        //     const tabHandler = new TabHandler(accessMenuRef.current);
-        //     console.log(tabHandler.getAll()?.length);
-        //     const first = tabHandler.getInitial();
-        //     if (first) {
-        //         // console.log("here");
-        //         first.focus();
-        //     }
-        // }
 
         if (accessMenuRef.current) {
             const tabHandler = new TabHandler(accessMenuRef.current);
             if (state.focusedItem === 0) {
                 const first = tabHandler.getInitial();
-                if (first) {
-                    first.focus();
-                }
-            }
-            if (state.focusedItem === -1) {
+                first?.focus();
+            } else if (state.focusedItem === -1) {
                 const last = tabHandler.getLast();
-                if (last) {
-                    last.focus();
+                last?.focus();
+            } else if (state.focusedItem === items.length - 1) {
+                const last = tabHandler.getLast();
+                last?.focus();
+            } else if (typeof state.focusedItem !== "undefined") {
+                let item = tabHandler.getInitial();
+                item?.focus();
+                if (item) {
+                    const itemNumber = state.focusedItem < -1 ? state.focusedItem + items.length : state.focusedItem;
+                    for (let i = 0; i < itemNumber; i++) {
+                        item = tabHandler.getNext();
+                        item?.focus();
+                    }
+                    item?.focus();
                 }
             }
         }
-
-        // if (accessMenuRef.current) {
-        //     const tabHandler = new TabHandler(accessMenuRef.current);
-        //     console.log(tabHandler.getAll()?.length);
-        // }
     };
 
     const ID = useMemo(() => uniqueIDFromPrefix("newpost"), []);
@@ -255,7 +268,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         opacity: state.open ? vars.menu.opacity.open : vars.menu.opacity.close,
         display: state.open ? vars.menu.display.open : vars.menu.display.close,
         from: { opacity: vars.menu.opacity.close, display: vars.menu.display.close },
-        onRest: handleAccessibility,
+        onRest: () => handleAccessibility(items),
     });
 
     const trail = useTrail(items.length, {
@@ -266,7 +279,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             ? `translate3d(0, ${vars.item.transformY.open}, 0)`
             : `translate3d(0, ${vars.item.transformY.close}%, 0)`,
         from: { opacity: vars.item.opacity.close, transform: `translate3d(0, ${vars.item.transformY.close}%, 0)` },
-        // onRest: handleAccessibility,
     });
 
     useChain(
@@ -275,7 +287,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     );
 
     return (
-        <NewPostBackground onKeyDown={onKeyDown} trans={trans} open={state.open} onClick={onClickBackground}>
+        <NewPostBackground onKeyDown={onBgKeyDown} trans={trans} open={state.open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <animated.ul
                     style={menu}
@@ -284,20 +296,20 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     role="menu"
                     aria-labelledby={buttonID}
                     tabIndex={-1}
-                    aria-activedescendant={state.activeItem}
+                    aria-activedescendant={state.focusedItem}
                 >
                     {trail.map(({ opacity, transform, ...rest }, index) => (
                         <ActionItem
-                            onFocus={onFocus}
+                            aid={`ID-${index}`} // accessibility id
                             key={items[index].id}
                             item={items[index]}
                             style={{ opacity, transform }}
-                            aid={ID}
                         />
                     ))}
                 </animated.ul>
 
                 <AnimatedButton
+                    onKeyDown={onMenuButtonKeyDown}
                     id={buttonID}
                     aria-haspopup="true"
                     aria-controls={menuID}

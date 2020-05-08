@@ -14,6 +14,8 @@ use Garden\Web\Exception\HttpException;
 
 class InternalClient extends HttpClient {
 
+    const DEFAULT_USER_ID = 2;
+
     /**
      * @var Container The container used to construct request objects.
      */
@@ -22,7 +24,7 @@ class InternalClient extends HttpClient {
     /**
      * @var int
      */
-    private $userID;
+    private $userID = self::DEFAULT_USER_ID;
 
     /**
      * @var string

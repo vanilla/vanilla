@@ -145,9 +145,63 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     dispatch({ type: "set_focused_item", item: (state.focusedItem - 1 + items.length) % items.length });
                 }
                 break;
+            case "A":
+            case "B":
+            case "C":
+            case "D":
+            case "E":
+            case "F":
+            case "G":
+            case "H":
+            case "I":
+            case "J":
+            case "K":
+            case "L":
+            case "M":
+            case "N":
+            case "O":
+            case "P":
+            case "Q":
+            case "R":
+            case "S":
+            case "T":
+            case "U":
+            case "V":
+            case "W":
+            case "X":
+            case "Y":
+            case "Z":
+            case "a":
+            case "b":
+            case "c":
+            case "d":
+            case "e":
+            case "f":
+            case "g":
+            case "h":
+            case "i":
+            case "j":
+            case "k":
+            case "l":
+            case "m":
+            case "n":
+            case "o":
+            case "p":
+            case "q":
+            case "r":
+            case "s":
+            case "t":
+            case "u":
+            case "v":
+            case "w":
+            case "x":
+            case "y":
+            case "z":
+                // Add some handling
+                break;
             case "Enter":
                 if (typeof state.focusedItem !== "undefined") {
-                    const item = items[state.focusedItem === -1 ? items.length - 1 : state.focusedItem];
+                    const item = items[state.focusedItem];
                     switch (item.type) {
                         case PostTypes.LINK:
                             window.location.href = item.action as string;
@@ -218,20 +272,13 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         if (accessMenuRef.current) {
             const tabHandler = new TabHandler(accessMenuRef.current);
             if (state.focusedItem === 0) {
-                const first = tabHandler.getInitial();
-                first?.focus();
+                tabHandler.getInitial()?.focus();
             } else if (state.focusedItem === items.length - 1) {
-                const last = tabHandler.getLast();
-                last?.focus();
+                tabHandler.getLast()?.focus();
             } else if (typeof state.focusedItem !== "undefined") {
-                let item = tabHandler.getInitial();
-                item?.focus();
-                if (item) {
-                    for (let i = 0; i < state.focusedItem; i++) {
-                        item = tabHandler.getNext();
-                        item?.focus();
-                    }
-                    item?.focus();
+                tabHandler.getInitial()?.focus();
+                for (let i = 0; i < state.focusedItem; i++) {
+                    tabHandler.getNext()?.focus();
                 }
             }
         }

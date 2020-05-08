@@ -68,7 +68,13 @@ function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition;
     );
 }
 
-const initialState = {
+interface IState {
+    open: boolean;
+    buttonFocus: boolean;
+    focusedItem?: number;
+}
+
+const initialState: IState = {
     open: false,
     buttonFocus: false,
     focusedItem: undefined,
@@ -99,7 +105,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const backgroundRef = useRef<HTMLElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
     const itemsRef = useRef<HTMLLIElement>(null);
-
     const accessMenuRef = useRef<HTMLUListElement>(null);
 
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -126,6 +131,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
+                // We don't want to lose focus in case we already have
                 if (state.buttonFocus) {
                     dispatch({ type: "set_button_focus", focus: true });
                 }
@@ -249,6 +255,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
+                // We don't want to lose focus in case we already have
                 if (state.buttonFocus) {
                     dispatch({ type: "set_button_focus", focus: true });
                 }
@@ -283,6 +290,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
+                // We don't want to lose focus in case we already have
                 if (state.buttonFocus) {
                     dispatch({ type: "set_button_focus", focus: true });
                 }
@@ -291,8 +299,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     };
 
     const handleAccessibility = items => {
-        console.log(state);
-
         if ((state.open || state.buttonFocus) && buttonRef.current) {
             buttonRef.current.focus();
         }
@@ -317,7 +323,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const menuID = ID + "-menu";
 
     const bgVars = newPostBackgroundVariables();
-    const trans = useSpring({
+    const bgTransition = useSpring({
         ref: backgroundRef,
         backgroundColor: state.open ? colorOut(bgVars.container.color.open) : colorOut(bgVars.container.color.close),
         from: { backgroundColor: colorOut(bgVars.container.color.close) },
@@ -358,7 +364,12 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     );
 
     return (
-        <NewPostBackground onKeyDown={onBgKeyDown} trans={trans} open={state.open} onClick={onClickBackground}>
+        <NewPostBackground
+            onKeyDown={onBgKeyDown}
+            bgTransition={bgTransition}
+            open={state.open}
+            onClick={onClickBackground}
+        >
             <div className={classNames(classes.root)}>
                 <animated.ul
                     onKeyDown={onKeyDown}

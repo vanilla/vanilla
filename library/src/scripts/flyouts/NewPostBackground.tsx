@@ -11,7 +11,7 @@ interface IProps {
     children: React.ReactNode;
     onClick: (e) => void;
     onKeyDown?: (e) => void;
-    trans: any;
+    bgTransition: any;
 }
 
 export default function NewPostBackground(props: IProps) {
@@ -20,7 +20,7 @@ export default function NewPostBackground(props: IProps) {
     return createPortal(
         <animated.aside
             className={classNames(classes.container)}
-            style={props.trans}
+            style={props.bgTransition}
             onClick={props.onClick}
             onKeyDown={props.onKeyDown}
         >

@@ -62,7 +62,7 @@ export function EventDetails(props: IEventExtended) {
     return (
         <div className={classes.details}>
             <DataList data={eventMetaData} className={classes.section} />
-            <ButtonTabs accessibleTitle={t("Are you going?")} setData={({}) => {}}>
+            <ButtonTabs activeTab={EventAttendance.GOING} accessibleTitle={t("Are you going?")} setData={() => {}}>
                 <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
                 <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
                 <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} />

@@ -80,7 +80,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const separator = makeVars("separator", {
-        fg: globalVars.mixBgAndFg(0.5),
+        fg: globalVars.mixBgAndFg(0.2),
     });
 
     const section = makeVars("section", {
@@ -405,7 +405,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         filter,
         filterLabel,
         details,
-        // attendanceAsRadio,
         separator,
         attendee,
         attendeeList,

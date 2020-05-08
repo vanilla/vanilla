@@ -26,6 +26,7 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const key = makeThemeVars("key", {
         textAlignment: "left" as TextAlignProperty,
         padding: {
+            vertical: spacing.padding.vertical,
             right: globalVars.spacer.size,
         },
         font: {
@@ -38,6 +39,9 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const value = makeThemeVars("value", {
         textAlignment: "left" as TextAlignProperty,
+        padding: {
+            vertical: spacing.padding.vertical,
+        },
     });
 
     return {
@@ -59,49 +63,28 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         "table",
         {},
         mediaQueries.xs({
-            display: "block",
+            $nest: {
+                "&&": {
+                    display: "block",
+                },
+            },
         }),
     );
 
-    const row = style(
-        "row",
-        {},
-        mediaQueries.xs({
-            display: "block",
-        }),
-    );
+    const key = style("key", {
+        textAlign: vars.key.textAlignment,
+        verticalAlign: "top",
+        whiteSpace: "nowrap",
+        ...paddings(vars.key.padding),
+    });
 
-    const key = style(
-        "key",
-        {
-            textAlign: vars.key.textAlignment,
-            ...paddings({
-                ...vars.spacing.padding,
-                ...vars.key.padding,
-            }),
-        },
-        mediaQueries.xs({
-            display: "block",
-            ...paddings({
-                horizontal: 0,
-                bottom: 0,
-            }),
-        }),
-    );
+    const value = style("value", {
+        textAlign: vars.key.textAlignment,
+        verticalAlign: "top",
+        ...paddings(vars.value.padding),
+    });
 
-    const value = style(
-        "value",
-        {
-            textAlign: vars.key.textAlignment,
-        },
-        mediaQueries.xs({
-            display: "block",
-            ...paddings({
-                horizontal: 0,
-                top: 2,
-            }),
-        }),
-    );
+    const row = style("row", {});
 
     return {
         root,

@@ -3567,7 +3567,7 @@ SQL;
      * @param int $categoryID Unique ID of category we are updating.
      * @param array|null $discussion Discussion to update category "last discussion" field.
      */
-    public function updateDiscussionCount(int $categoryID, $discussion = null) {
+    public function updateDiscussionCount(int $categoryID, ?array $discussion = null) {
         $discussionID = $discussion['DiscussionID'] ?? null;
         $this->SQL
             ->select('d.DiscussionID', 'count', 'CountDiscussions')

@@ -125,6 +125,26 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     dispatch({ type: "set_focused_item", item: undefined });
                 }
                 break;
+            default:
+                if (state.buttonFocus) {
+                    dispatch({ type: "set_button_focus", focus: true });
+                }
+                break;
+        }
+    };
+
+    const onKeyDown = (event: React.KeyboardEvent<any>) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        switch (event.key) {
+            case "Escape":
+                if (state.open) {
+                    dispatch({ type: "set_open", open: false });
+                    dispatch({ type: "set_button_focus", focus: true });
+                    dispatch({ type: "set_focused_item", item: undefined });
+                }
+                break;
             case "Home":
                 if (state.open) {
                     dispatch({ type: "set_focused_item", item: 0 });
@@ -341,6 +361,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         <NewPostBackground onKeyDown={onBgKeyDown} trans={trans} open={state.open} onClick={onClickBackground}>
             <div className={classNames(classes.root)}>
                 <animated.ul
+                    onKeyDown={onKeyDown}
                     style={menu}
                     ref={accessMenuRef}
                     id={menuID}

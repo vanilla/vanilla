@@ -15,7 +15,6 @@ const items: IAddPost[] = [
         id: "1",
         type: PostTypes.BUTTON,
         action: () => {
-            console.log("New Poll");
             logDebug("Some Action");
         },
         icon: <NewPollIcon />,
@@ -25,7 +24,6 @@ const items: IAddPost[] = [
         id: "2",
         type: PostTypes.BUTTON,
         action: () => {
-            console.log("New Idea");
             logDebug("Some Action");
         },
         icon: <NewIdeaIcon />,
@@ -35,7 +33,6 @@ const items: IAddPost[] = [
         id: "3",
         type: PostTypes.BUTTON,
         action: () => {
-            console.log("New Discussion");
             logDebug("Some Action");
         },
         icon: <NewDiscussionIcon />,

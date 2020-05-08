@@ -47,7 +47,7 @@ trait UsersAndRolesApiTestTrait {
             'password' => 'testpassword',
             'photo' => null,
             'roleID' => [
-                \RoleModel::DEFAULT_MEMBER_ID,
+                \RoleModel::MEMBER_ID,
             ]
         ];
 

@@ -7,6 +7,7 @@ import React from "react";
 
 import { dataListClasses } from "@library/dataLists/dataListStyles";
 import { t } from "@vanilla/i18n/src";
+import classNames from "classnames";
 
 export interface IData {
     key: React.ReactNode;
@@ -14,6 +15,7 @@ export interface IData {
 }
 
 export interface IDataList {
+    className?: string;
     data: IData[];
 }
 
@@ -27,18 +29,23 @@ export function DataList(props: IDataList) {
         return null;
     }
     return (
-        <table className={classes.root}>
-            <caption>{t("Event Details")}</caption>
-            {props.data.map((d, i) => {
-                return (
-                    <tr className={classes.row} key={i}>
-                        <th scope="row" className={classes.key}>
-                            {d.key}
-                        </th>
-                        <td className={classes.value}>{d.value}</td>
-                    </tr>
-                );
-            })}
-        </table>
+        <div className={classNames(classes.root, props.className)}>
+            <table className={classes.table}>
+                <caption>{t("Event Details")}</caption>
+                {props.data.map((d, i) => {
+                    return (
+                        <tr
+                            className={classNames(classes.row, { isFirst: i === 0, isLast: i === props.data.length })}
+                            key={i}
+                        >
+                            <th scope="row" className={classes.key}>
+                                {d.key}
+                            </th>
+                            <td className={classes.value}>{d.value}</td>
+                        </tr>
+                    );
+                })}
+            </table>
+        </div>
     );
 }

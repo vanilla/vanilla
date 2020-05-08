@@ -26,6 +26,7 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { EventAttendance } from "@library/events/eventOptions";
+import { userPhotoClasses, userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -41,6 +42,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
         },
+        margin: 12,
     });
 
     const alignment = makeVars("alignment", {
@@ -77,7 +79,53 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    return { compact, title, spacing, attendanceStamp, alignment };
+    const separator = makeVars("separator", {
+        fg: globalVars.mixBgAndFg(0.5),
+    });
+
+    const section = makeVars("section", {
+        title: {
+            font: {
+                ...EMPTY_FONTS,
+                size: globalVars.fonts.size.medium,
+                weight: globalVars.fonts.weights.bold,
+            } as IFont,
+        },
+        spacing: {
+            vertical: 20,
+        },
+    });
+
+    const description = makeVars("description", {
+        font: {
+            ...EMPTY_FONTS,
+            size: globalVars.fonts.size.medium,
+        },
+    });
+
+    const attendees = makeVars("attendees", {
+        offset: 15,
+        plus: {
+            font: {
+                lineHeight: globalVars.lineHeights.condensed,
+                size: globalVars.fonts.size.medium,
+                weight: globalVars.fonts.weights.bold,
+            },
+            margin: 5,
+        },
+    });
+
+    return {
+        compact,
+        title,
+        spacing,
+        attendanceStamp,
+        alignment,
+        separator,
+        section,
+        description,
+        attendees,
+    };
 });
 
 export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) => {
@@ -266,13 +314,73 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const filter = style("filter", {});
     const filterLabel = style("filterLabel", {});
     const details = style("details", {});
-    const separator = style("details", {});
-    const attendanceAsRadio = style("attendanceAsRadio", {});
-    const attendee = style("attendee", {});
-    const attendeeList = style("attendeeList", {});
-    const attendeePhoto = style("attendeePhoto", {});
-    const attendeePlus = style("attendeePlus", {});
+    const separator = style("details", {
+        display: "block",
+        width: percent(100),
+        // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
+        borderBottom: singleBorder({
+            color: vars.separator.fg,
+        }),
+        ...margins({
+            bottom: vars.section.spacing.vertical,
+        }),
+    });
+    // const attendanceAsRadio = style("attendanceAsRadio", {});
+
+    const attendee = style("attendee", {
+        width: unit(userPhotoVariables().sizing.medium - vars.attendees.offset),
+        $nest: {
+            "&.isLast": {
+                width: "auto",
+                marginRight: unit(vars.attendees.plus.margin),
+            },
+        },
+    });
+
+    const attendeeList = style("attendeeList", {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        paddingRight: unit(vars.attendees.offset), // prevents photos from overflowing
+    });
+
+    const attendeePhoto = style("attendeePhoto", {
+        // Intentionally not using borders() here to not mess up border radius;
+        borderColor: colorOut(globalVars.mainColors.bg),
+        borderWidth: unit(globalVars.border.width),
+        borderStyle: "solid",
+        backgroundColor: colorOut(globalVars.mainColors.bg),
+        $nest: {
+            [`& .${userPhotoClasses().photo}`]: {
+                width: percent(100),
+                height: percent(100),
+            },
+        },
+    });
+
+    const attendeePlus = style("attendeePlus", {
+        ...fonts(vars.attendees.plus.font),
+        lineHeight: unit(userPhotoVariables().sizing.medium),
+    });
+
     const noAttendees = style("noAttendees", {});
+
+    const section = style("section", {
+        ...margins(vars.section.spacing),
+    });
+
+    const sectionTitle = style("sectionTitle", {
+        ...fonts(vars.section.title.font),
+        marginBottom: unit(vars.title.margin),
+    });
+
+    const description = style("description", {
+        $nest: {
+            "&&": {
+                ...fonts(vars.description.font),
+            },
+        },
+    });
 
     return {
         root,
@@ -297,12 +405,15 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         filter,
         filterLabel,
         details,
-        attendanceAsRadio,
+        // attendanceAsRadio,
         separator,
         attendee,
         attendeeList,
         attendeePhoto,
         attendeePlus,
         noAttendees,
+        section,
+        sectionTitle,
+        description,
     };
 });

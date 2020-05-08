@@ -17,6 +17,7 @@ import { ButtonTab } from "@library/forms/buttonTabs/ButtonTab";
 import { EventAttendance } from "@library/events/eventOptions";
 import UserContent from "@library/content/UserContent";
 import { EventAttendees } from "@library/events/Attendees";
+import Heading from "@library/layout/Heading";
 
 export interface IEventExtended extends IEvent {
     organizer: string;
@@ -35,7 +36,7 @@ export function EventDetails(props: IEventExtended) {
     const startDate = <DateTime {...dummyEventDetailsData.dateStart} type={DateFormats.EXTENDED} />;
     const endDate = <DateTime {...dummyEventDetailsData.dateEnd} type={DateFormats.EXTENDED} />;
 
-    const dummyData = [
+    const eventMetaData = [
         {
             key: t("When"),
             value: (
@@ -60,23 +61,43 @@ export function EventDetails(props: IEventExtended) {
 
     return (
         <div className={classes.details}>
-            <DataList data={dummyData} />
+            <DataList data={eventMetaData} className={classes.section} />
             <ButtonTabs accessibleTitle={t("Are you going?")} setData={({}) => {}}>
                 <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
                 <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
                 <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} />
             </ButtonTabs>
 
-            {props.excerpt && (
-                <>
+            {props.about && (
+                <div className={classes.section}>
                     <hr className={classes.separator} />
-                    <UserContent content={props.excerpt} />
-                </>
+                    <Heading depth={2} className={classes.sectionTitle} renderAsDepth={"custom"}>
+                        {t("About the event")}
+                    </Heading>
+                    <UserContent className={classes.description} content={props.about} />
+                </div>
             )}
 
-            <EventAttendees data={dummyEventDetailsData.going!} title={t("Going")} extra={552} separator={true} />
-            <EventAttendees data={dummyEventDetailsData.maybe!} title={t("Maybe")} extra={1201} separator={true} />
-            <EventAttendees data={dummyEventDetailsData.notGoing!} title={t("Not going")} separator={true} />
+            <EventAttendees
+                data={dummyEventDetailsData.going!}
+                title={t("Going")}
+                emptyMessage={t("Nobody has confirmed their attendance yet.")}
+                extra={552}
+                separator={true}
+            />
+            <EventAttendees
+                emptyMessage={t("Nobody is on the fence right now.")}
+                data={dummyEventDetailsData.maybe!}
+                title={t("Maybe")}
+                extra={1201}
+                separator={true}
+            />
+            <EventAttendees
+                emptyMessage={t("Nobody has declined the invitation so far.")}
+                data={dummyEventDetailsData.notGoing!}
+                title={t("Not going")}
+                separator={true}
+            />
         </div>
     );
 }

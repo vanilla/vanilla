@@ -11,7 +11,7 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 export interface ICommonHeadingProps {
     id?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
-    renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
+    renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6 | "custom";
     className?: string;
     title?: React.ReactNode;
 }
@@ -31,6 +31,7 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
 
     const Tag = `h${finalDepth}` as "h1";
     const classes = typographyClasses();
+    const customStyles = renderAsDepth !== "custom";
 
     return (
         <Tag
@@ -40,12 +41,11 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
                 "heading",
                 `heading-${finalRenderDepth}`,
                 {
-                    [classes.pageTitle]: finalRenderDepth === 1,
-                    [classes.largeTitle]: isLarge,
-                    [classes.subTitle]: finalRenderDepth === 2,
-                    [classes.componentSubTitle]: finalRenderDepth >= 3,
+                    [classes.pageTitle]: finalRenderDepth === 1 && !customStyles,
+                    [classes.largeTitle]: isLarge && !customStyles,
+                    [classes.subTitle]: finalRenderDepth === 2 && !customStyles,
+                    [classes.componentSubTitle]: finalRenderDepth >= 3 && !customStyles,
                 },
-
                 className,
             )}
         >

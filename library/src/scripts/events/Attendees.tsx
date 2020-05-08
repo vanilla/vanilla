@@ -6,12 +6,13 @@
 import React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
 import { IUserFragment } from "@library/@types/api/users";
-import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Heading from "@library/layout/Heading";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { renderToString } from "react-dom/server";
 import Paragraph from "@library/layout/Paragraph";
 import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
+import classNames from "classnames";
 
 export interface IEventAttendees {
     data: IUserFragment[];
@@ -21,6 +22,7 @@ export interface IEventAttendees {
     depth?: 2 | 3;
     maxCount?: number;
     emptyMessage?: string;
+    className?: string;
 }
 
 /**
@@ -29,27 +31,37 @@ export interface IEventAttendees {
 export function EventAttendees(props: IEventAttendees) {
     const { data, maxCount = 10, extra, separator = false, depth = 2, title, emptyMessage } = props;
     const empty = data.length === 0;
-
     const classes = eventsClasses();
 
     return (
-        <section className={classes.details}>
+        <section className={classNames(classes.section, props.className)}>
             {separator && <hr className={classes.separator} />}
-            <Heading depth={depth}>{title}</Heading>
+            <Heading depth={depth} className={classes.sectionTitle} renderAsDepth={"custom"}>
+                {title}
+            </Heading>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}
             {!empty && (
                 <ul className={classes.attendeeList}>
                     {data.map((user, i) => {
                         return (
-                            <li className={classes.attendee} key={i}>
-                                <UserPhoto className={classes.attendeePhoto} userInfo={user} />
+                            <li
+                                className={classNames(classes.attendee, {
+                                    isLast: i === data.length - 1,
+                                })}
+                                key={i}
+                            >
+                                <UserPhoto
+                                    size={UserPhotoSize.MEDIUM}
+                                    className={classes.attendeePhoto}
+                                    userInfo={user}
+                                />
                             </li>
                         );
                     })}
                     {extra && (
                         <li
                             className={classes.attendeePlus}
-                            key={data.length + 1}
+                            key={data.length}
                             dangerouslySetInnerHTML={{
                                 __html: `+${renderToString(<NumberFormatted value={extra} />)}`,
                             }}

@@ -102,7 +102,7 @@ export const newPostMenuClasses = useThemeCache(() => {
         marginRight: unit(vars.item.position.right),
         $nest: {
             "&:focus": {
-                outline: `px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
+                outline: `1px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
             },
         },
     });

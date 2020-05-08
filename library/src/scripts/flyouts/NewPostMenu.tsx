@@ -197,7 +197,15 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             case "x":
             case "y":
             case "z":
-                // Add some handling
+                const itemList = items
+                    .map((item, index) => ({ ...item, index }))
+                    .filter(item => item.label.startsWith(event.key));
+                if (typeof state.focusedItem !== "undefined") {
+                    const next = itemList.find(item => item.index > state.focusedItem);
+                    if (next) {
+                        dispatch({ type: "set_focused_item", item: next.index });
+                    }
+                }
                 break;
             case "Enter":
                 if (typeof state.focusedItem !== "undefined") {

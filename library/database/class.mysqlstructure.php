@@ -732,7 +732,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'blob',
             'mediumblob',
             'longblob',
-            'bit'
+            'bit',
+            'json',
         ];
 
         $column->Type = strtolower($column->Type);

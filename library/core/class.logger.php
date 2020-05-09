@@ -18,6 +18,17 @@ use Psr\Log\LoggerInterface;
  * @see BaseLogger
  */
 class Logger {
+    public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
+    public const FIELD_LOG_TYPE = \Vanilla\Logger::FIELD_LOG_TYPE;
+
+    public const TYPE_ADMIN = \Vanilla\Logger::TYPE_ADMIN;
+    public const TYPE_APPLICATION = \Vanilla\Logger::TYPE_APPLICATION;
+    public const TYPE_MODERATION = \Vanilla\Logger::TYPE_MODERATION;
+    public const TYPE_SECURITY = \Vanilla\Logger::TYPE_SECURITY;
+    public const TYPE_SYSTEM = \Vanilla\Logger::TYPE_SYSTEM;
+    public const TYPE_DEFAULT = \Vanilla\Logger::TYPE_DEFAULT;
+
+
 
     /** Log type. */
     const EMERGENCY = 'emergency';

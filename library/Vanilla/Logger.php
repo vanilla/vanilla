@@ -30,6 +30,14 @@ class Logger implements LoggerInterface {
     public const TYPE_SYSTEM = 'system';
     public const TYPE_DEFAULT = self::TYPE_APPLICATION;
 
+    public const TYPES = [
+        self::TYPE_ADMIN,
+        self::TYPE_APPLICATION,
+        self::TYPE_MODERATION,
+        self::TYPE_SECURITY,
+        self::TYPE_SYSTEM,
+    ];
+
     /** Log type. */
     public const EMERGENCY = LogLevel::EMERGENCY;
 

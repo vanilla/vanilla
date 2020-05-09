@@ -18,7 +18,7 @@ use Vanilla\InjectableInterface;
 class Model implements InjectableInterface {
 
     /** @var \Gdn_Database */
-    private $database;
+    protected $database;
 
     /** @var Schema */
     protected $readSchema;

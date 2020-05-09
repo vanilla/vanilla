@@ -208,7 +208,7 @@ class ProxyRequest {
      *     'Debug'                => FALSE,      // Debug output
      *     'Simulate'             => FALSE       // Don't actually request, just set up
      *
-     * @param array /string $options URL, or array options
+     * @param array|string|null $options URL, or array options
      * @param array $queryParams GET/POST parameters
      * @param array $files List of files to upload
      * @param array $extraHeaders Any additional headers to tack on
@@ -384,7 +384,7 @@ class ProxyRequest {
         $logContext = [
             'requestUrl' => $url,
             'requestMethod' => $requestMethod
-        ];
+        ] + ($options['LogContext'] ?? []) + ['logType' => \Vanilla\Logger::TYPE_SYSTEM];
 
         /*
          * ProxyRequest can masquerade as the current user, so collect and encode
@@ -532,7 +532,7 @@ class ProxyRequest {
                 if (!is_array($postData) && !is_object($postData)) {
                     $sendExtraHeaders['Content-Length'] = strlen($postData);
                 } else {
-                    $tempPostData = http_build_str($postData);
+                    $tempPostData = http_build_query($postData);
                     $sendExtraHeaders['Content-Length'] = strlen($tempPostData);
                 }
 

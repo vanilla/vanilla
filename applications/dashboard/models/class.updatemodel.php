@@ -698,9 +698,13 @@ class UpdateModel extends Gdn_Model {
             if ($structure = $addon->getSpecial('structure')) {
                 Logger::event(
                     'addon_structure',
-                    Logger::INFO,
+                    Logger::DEBUG,
                     "Executing structure for {addonKey}.",
-                    ['addonKey' => $addon->getKey(), 'structureType' => 'file']
+                    [
+                        'addonKey' => $addon->getKey(),
+                        'structureType' => 'file',
+                        \Vanilla\Logger::FIELD_LOG_TYPE => \Vanilla\Logger::TYPE_SYSTEM,
+                    ]
                 );
 
                 try {
@@ -729,9 +733,13 @@ class UpdateModel extends Gdn_Model {
                 if (is_object($plugin) && method_exists($plugin, 'structure')) {
                     Logger::event(
                         'addon_structure',
-                        Logger::INFO,
+                        Logger::DEBUG,
                         "Executing structure for {addonKey}.",
-                        ['addonKey' => $addon->getKey(), 'structureType' => 'method']
+                        [
+                            'addonKey' => $addon->getKey(),
+                            'structureType' => 'method',
+                            \Vanilla\Logger::FIELD_LOG_TYPE => \Vanilla\Logger::TYPE_SYSTEM
+                        ]
                     );
 
                     try {

@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Core;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Tests for explodeTrim().
@@ -25,6 +26,28 @@ class ExplodeTrimTest extends TestCase {
      */
     public function testExplodeTrim(string $testDelimiter, string $testString, bool $testImplode, $expected) {
         $actual = explodeTrim($testDelimiter, $testString, $testImplode);
+        if (is_array($actual)) {
+            $this->assertEqualsCanonicalizing($expected, $actual);
+        } else {
+            $this->assertSame($expected, $actual);
+        }
+    }
+
+    /**
+     * Test {@link ArrayUtils::explodeTrim()} against several scenarios.
+     *
+     * @param string $delimiter The boundary string.
+     * @param string $string The input string to be trimmed.
+     * @param bool $implode Whether to implode exploded input string before returning.
+     * @param string|array $expected Expected result.
+     * @dataProvider provideExplodeTrimArrays
+     */
+    public function testExplodeTrimMethod(string $delimiter, string $string, bool $implode, $expected) {
+        $actual = ArrayUtils::explodeTrim($delimiter, $string);
+        if ($implode) {
+            $actual = implode($delimiter, $actual);
+        }
+
         if (is_array($actual)) {
             $this->assertEqualsCanonicalizing($expected, $actual);
         } else {

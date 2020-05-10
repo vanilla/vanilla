@@ -693,27 +693,6 @@ if (!function_exists('deprecated')) {
     }
 }
 
-if (!function_exists('explodeTrim')) {
-    /**
-     * Split a string by a string and do some trimming to clean up faulty user input.
-     *
-     * @param string $delimiter The boundary string.
-     * @param string $string The input string.
-     * @param bool $implode Whether or not to re-implode the string before returning.
-     * @return array|string Returns the exploded string as an array or a string if {@link $implode} is true.
-     */
-    function explodeTrim($delimiter, $string, $implode = false) {
-        $arr = explode($delimiter, $string);
-        $arr = array_map('trim', $arr);
-        $arr = array_filter($arr);
-        if ($implode) {
-            return implode($delimiter, $arr);
-        } else {
-            return $arr;
-        }
-    }
-}
-
 if (!function_exists('domGetContent')) {
     /**
      * Search a DOM for a selector and return the contents.

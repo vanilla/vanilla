@@ -60,6 +60,20 @@ final class ArrayUtils {
     }
 
     /**
+     * Split a string by a string and do some trimming to clean up faulty user input.
+     *
+     * @param string $delimiter The boundary string.
+     * @param string $string The input string.
+     * @return array Returns the exploded string as an array.
+     */
+    public static function explodeTrim(string $delimiter, string $string): array {
+        $arr = explode($delimiter, $string);
+        $arr = array_map('trim', $arr);
+        $arr = array_filter($arr);
+        return $arr;
+    }
+
+    /**
      * Lookup a value in an associative array by its full key path.
      *
      * @param string $path

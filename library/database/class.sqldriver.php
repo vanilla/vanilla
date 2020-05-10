@@ -1449,9 +1449,13 @@ abstract class Gdn_SQLDriver {
         $fields = explode(',', "$fields $direction");
 
         foreach ($fields as $parts) {
-            if (preg_match('`^([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
-                $field = $m[1];
-                $direction = $m[2] ?? 'asc';
+            if (preg_match('`^(-)?([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
+                $field = $m[2];
+                if (!empty($m[1])) {
+                    $direction = 'desc';
+                } else {
+                    $direction = $m[3] ?? 'asc';
+                }
 
                 $this->_OrderBys[] = $this->escapeFieldReference($field).' '.$direction;
             } else {

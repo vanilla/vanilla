@@ -11,7 +11,6 @@ import Heading from "@library/layout/Heading";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { renderToString } from "react-dom/server";
 import Paragraph from "@library/layout/Paragraph";
-import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
 import classNames from "classnames";
 
 export interface IEventAttendees {

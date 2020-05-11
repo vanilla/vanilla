@@ -10,10 +10,15 @@ import { EventAttendance } from "@library/events/eventOptions";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export default {
     title: "Radio Buttons as Buttons",
-    parameters: {},
+    parameters: {
+        chromatic: {
+            viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
+        },
+    },
 };
 
 export function RadioButtonsAsButtons(props: { title?: string; accessibleTitle?: string }) {

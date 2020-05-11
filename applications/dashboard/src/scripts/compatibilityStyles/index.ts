@@ -352,6 +352,8 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
+    cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(vars.mainColors.primary) });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

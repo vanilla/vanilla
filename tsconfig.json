@@ -11,7 +11,8 @@
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
-            "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"]
+            "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
+            "@groups/*": ["./applications/groups/src/scripts/*"]
         },
         "typeRoots": ["@types", "./node_modules/@types"]
     },

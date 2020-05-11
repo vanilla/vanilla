@@ -94,7 +94,6 @@ export function EventDetails(props: IEventExtended) {
                 emptyMessage={t("Nobody is on the fence right now.")}
                 data={dummyEventDetailsData.maybe!}
                 title={t("Maybe")}
-                extra={1201}
                 separator={true}
             />
             <EventAttendees

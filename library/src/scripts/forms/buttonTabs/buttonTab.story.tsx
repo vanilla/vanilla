@@ -12,7 +12,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { EventAttendance } from "@library/events/eventOptions";
 import { EventList as EventListComponent } from "@library/events/EventList";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
-import { ButtonTab } from "@library/forms/buttonTabs/ButtonTab";
+import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";
 
 export default {

@@ -21,7 +21,7 @@ class JsonFieldProcessor implements Processor {
      *
      * @param array $fields
      */
-    public function __construct(array $fields) {
+    public function __construct(array $fields = []) {
         $this->setFields($fields);
     }
 

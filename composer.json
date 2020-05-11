@@ -64,6 +64,7 @@
         "fig/event-dispatcher-util": "^1.1",
         "symfony/polyfill-php73": "^1.13",
         "symfony/polyfill-php74": "^1.13",
+        "symfony/polyfill-php80": "^1.16",
         "metasyntactical/composer-plugin-license-check": "^0.5.0",
         "colinodell/json5": "^2.1"
     },

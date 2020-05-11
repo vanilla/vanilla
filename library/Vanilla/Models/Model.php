@@ -11,11 +11,16 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\InjectableInterface;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Basic model class.
  */
 class Model implements InjectableInterface {
+    const OPT_LIMIT = "limit";
+    const OPT_OFFSET = "offset";
+    const OPT_SELECT = "select";
+    const OPT_ORDER = 'order';
 
     /** @var \Gdn_Database */
     protected $database;
@@ -25,6 +30,11 @@ class Model implements InjectableInterface {
 
     /** @var string */
     private $table;
+
+    /**
+     * @var string[]
+     */
+    private $primaryKey;
 
     /** @var Schema */
     protected $writeSchema;
@@ -36,6 +46,7 @@ class Model implements InjectableInterface {
      */
     public function __construct(string $table) {
         $this->table = $table;
+        $this->setPrimaryKey($table.'ID');
     }
 
     /**
@@ -72,7 +83,7 @@ class Model implements InjectableInterface {
     public function delete(array $where, array $options = []): bool {
         // Lazy load schemas.
         $this->ensureSchemas();
-        $limit = $options["limit"] ?? false;
+        $limit = $options[self::OPT_LIMIT] ?? false;
 
         $this->sql()->delete($this->table, $where, $limit);
         // If fully executed without an exception bubbling up, consider this a success.
@@ -111,15 +122,20 @@ class Model implements InjectableInterface {
         // Lazy load schemas.
         $this->ensureSchemas();
 
-        $orderFields = $options["orderFields"] ?? "";
+        $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
         $orderDirection = $options["orderDirection"] ?? "asc";
-        $limit = $options["limit"] ?? false;
-        $offset = $options["offset"] ?? 0;
-        $selects =  $options["select"] ?? [];
+        $limit = $options[self::OPT_LIMIT] ?? false;
+        $offset = $options[self::OPT_OFFSET] ?? 0;
+        $selects =  $options[self::OPT_SELECT] ?? [];
 
         $sqlDriver = $this->sql();
 
         if (!empty($selects)) {
+            if (is_string($selects)) {
+                $selects = ArrayUtils::explodeTrim(',', $selects);
+            }
+            $selects = $this->translateSelects($selects);
+
             $sqlDriver->select($selects);
         }
         $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
@@ -140,8 +156,42 @@ class Model implements InjectableInterface {
      *
      * @return string
      */
-    protected function getTable(): string {
+    public function getTable(): string {
         return $this->table;
+    }
+
+    /**
+     * Get the primary key columns.
+     *
+     * @return array
+     */
+    public function getPrimaryKey(): array {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Set the primary key columns.
+     *
+     * @param string $columns
+     */
+    protected function setPrimaryKey(string ...$columns): void {
+        $this->primaryKey = $columns;
+    }
+
+    /**
+     * Return an array suitable for a where clause for a primary key.
+     *
+     * @param mixed $id
+     * @param mixed $ids
+     * @return array
+     */
+    public function primaryWhere($id, ...$ids): array {
+        $values = array_merge([$id], $ids);
+        $where = [];
+        foreach ($this->getPrimaryKey() as $i => $column) {
+            $where[$column] = $values[$i] ?? null;
+        }
+        return $where;
     }
 
     /**
@@ -158,7 +208,7 @@ class Model implements InjectableInterface {
      * @throws NoResultsException If no rows could be found.
      */
     public function selectSingle(array $where = [], array $options = []): array {
-        $options["limit"] = 1;
+        $options[self::OPT_LIMIT] = 1;
         $rows = $this->get($where, $options);
         if (empty($rows)) {
             throw new NoResultsException("No rows matched the provided criteria.");
@@ -171,7 +221,7 @@ class Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
-     * @return mixed ID of the inserted row.
+     * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
     public function insert(array $set) {
@@ -182,6 +232,10 @@ class Model implements InjectableInterface {
         $result = $this->sql()->insert($this->table, $set);
         if ($result === false) {
             throw new Exception("An unknown error was encountered while inserting the row.");
+        }
+        // This is a bit of a kludge, but we want a true integer because we are otherwise string with schemas.
+        if (is_numeric($result)) {
+            $result = (int)$result;
         }
         return $result;
     }
@@ -220,5 +274,26 @@ class Model implements InjectableInterface {
         $this->sql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.
         return true;
+    }
+
+    /**
+     * Translate selects with some additional support.
+     *
+     * @param array $selects
+     * @return array
+     */
+    private function translateSelects(array $selects): array {
+        $negatives = [];
+        foreach ($selects as $select) {
+            if ($select[0] === '-') {
+                $negatives[] = substr($select, 1);
+            }
+        }
+
+        if (!empty($negatives)) {
+            $columns = array_keys($this->readSchema->getField('properties'));
+            $selects = array_values(array_diff($columns, $negatives));
+        }
+        return $selects;
     }
 }

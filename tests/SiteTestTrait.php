@@ -70,6 +70,13 @@ trait SiteTestTrait {
      * Install the site.
      */
     public static function setupBeforeClass(): void {
+        self::setupSiteTest();
+    }
+
+    /**
+     * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
+     */
+    private static function setupSiteTest(): void {
         self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 

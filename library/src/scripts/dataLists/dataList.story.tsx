@@ -7,7 +7,7 @@ import React from "react";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { DataList, IData } from "@library/dataLists/dataList";
+import { DataList, IData } from "@library/dataLists/DataList";
 import { t } from "@vanilla/i18n/src";
 import { dummyEventDetailsData } from "./dummyEventData";
 import { renderToString } from "react-dom/server";

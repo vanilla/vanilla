@@ -6,7 +6,7 @@
 import React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
 import { IEvent } from "@library/events/Event";
-import { DataList, IData } from "@library/dataLists/dataList";
+import { DataList, IData } from "@library/dataLists/DataList";
 import { IUserFragment } from "@library/@types/api/users";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { t } from "@vanilla/i18n/src";

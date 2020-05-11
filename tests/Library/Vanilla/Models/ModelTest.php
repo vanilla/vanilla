@@ -62,6 +62,9 @@ class ModelTest extends TestCase {
         $this->assertSame($id, $row['modelID']);
     }
 
+    /**
+     * You can select all but some columns by prefixng with a "-".
+     */
     public function testAllButSelect(): void {
         $id = $this->model->insert(['name' => 'foo']);
 

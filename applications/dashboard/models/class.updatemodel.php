@@ -761,7 +761,11 @@ class UpdateModel extends Gdn_Model {
                     'addon_permissions',
                     Logger::INFO,
                     "Defining permissions for {addonKey}.",
-                    ['addonKey' => $addon->getKey(), 'permissions' => $permissions]
+                    [
+                        'addonKey' => $addon->getKey(),
+                        'permissions' => $permissions,
+                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                    ]
                 );
                 Gdn::permissionModel()->define($permissions);
             }

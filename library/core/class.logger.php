@@ -277,6 +277,7 @@ class Logger {
             $path = Gdn::request()->path();
             $key = "log:$event:$userID:$path";
             if (Gdn::cache()->get($key) === false) {
+                $context += [self::FIELD_LOG_TYPE => self::TYPE_SECURITY];
                 self::event($event, $level, $message, $context);
                 Gdn::cache()->store($key, time(), [Gdn_Cache::FEATURE_EXPIRY => 300]);
             }

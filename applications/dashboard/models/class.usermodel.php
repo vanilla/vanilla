@@ -2791,8 +2791,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                 Logger::event(
                     'role_remove',
                     Logger::INFO,
-                    "{username} removed {toUsername} from the {role} role.",
-                    ['touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName]
+                    "{toUsername} removed from the {role} role.",
+                    [
+                        'touserid' => $User->UserID,
+                        'toUsername' => $User->Name,
+                        'role' => $RoleName,
+                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                    ]
                 );
             }
 
@@ -2800,8 +2805,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                 Logger::event(
                     'role_add',
                     Logger::INFO,
-                    "{username} added {toUsername} to the {role} role.",
-                    ['touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName]
+                    "{toUsername} added to the {role} role.",
+                    [
+                        'touserid' => $User->UserID,
+                        'toUsername' => $User->Name,
+                        'role' => $RoleName,
+                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY
+                    ]
                 );
             }
         }
@@ -4874,7 +4884,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input]
+                    ['input' => $input, Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
                 );
             }
             return false;
@@ -4908,7 +4918,12 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         'password_reset_request',
                         Logger::INFO,
                         '{email} has been sent a password reset email.',
-                        ['input' => $input, 'email' => $user->Email, 'forUserID' => $user->UserID]
+                        [
+                            'input' => $input,
+                            'email' => $user->Email,
+                            'forUserID' => $user->UserID,
+                            Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                        ]
                     );
                 }
             } catch (Exception $ex) {
@@ -4918,14 +4933,22 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                             'password_reset_skipped',
                             Logger::INFO,
                             $ex->getMessage(),
-                            ['input' => $input, 'email' => $user->Email]
+                            [
+                                'input' => $input,
+                                'email' => $user->Email,
+                                Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                            ]
                         );
                     } else {
                         Logger::event(
                             'password_reset_failure',
                             Logger::ERROR,
                             'The password reset email to {email} failed to send.',
-                            ['input' => $input, 'email' => $user->Email]
+                            [
+                                'input' => $input,
+                                'email' => $user->Email,
+                                Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                            ]
                         );
                     }
                 }
@@ -4944,7 +4967,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input]
+                    ['input' => $input, Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
                 );
             }
             return false;

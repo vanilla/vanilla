@@ -34,7 +34,14 @@ export interface ITransition {
     transform: string;
 }
 
-function ActionItem({ item, style, aid }: { item: IAddPost; style?: ITransition; aid?: string }) {
+interface IProps {
+    item: IAddPost;
+    style?: ITransition;
+    aid?: string; // accessibility id
+}
+
+function ActionItem(props: IProps) {
+    const { item, style, aid } = props;
     const { action, className, type, label, icon } = item;
     const classes = newPostMenuClasses();
 
@@ -171,68 +178,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     dispatch({ type: "set_focused_item", item: (state.focusedItem - 1 + items.length) % items.length });
                 }
                 break;
-            case "A":
-            case "B":
-            case "C":
-            case "D":
-            case "E":
-            case "F":
-            case "G":
-            case "H":
-            case "I":
-            case "J":
-            case "K":
-            case "L":
-            case "M":
-            case "N":
-            case "O":
-            case "P":
-            case "Q":
-            case "R":
-            case "S":
-            case "T":
-            case "U":
-            case "V":
-            case "W":
-            case "X":
-            case "Y":
-            case "Z":
-            case "a":
-            case "b":
-            case "c":
-            case "d":
-            case "e":
-            case "f":
-            case "g":
-            case "h":
-            case "i":
-            case "j":
-            case "k":
-            case "l":
-            case "m":
-            case "n":
-            case "o":
-            case "p":
-            case "q":
-            case "r":
-            case "s":
-            case "t":
-            case "u":
-            case "v":
-            case "w":
-            case "x":
-            case "y":
-            case "z":
-                const itemList = items
-                    .map((item, index) => ({ ...item, index }))
-                    .filter(item => item.label.startsWith(event.key));
-                if (typeof state.focusedItem !== "undefined") {
-                    const next = itemList.find(item => item.index > state.focusedItem);
-                    if (next) {
-                        dispatch({ type: "set_focused_item", item: next.index });
-                    }
-                }
-                break;
             case "Enter":
                 if (typeof state.focusedItem !== "undefined") {
                     const item = items[state.focusedItem];
@@ -255,9 +200,14 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
-                // We don't want to lose focus in case we already have
-                if (state.buttonFocus) {
-                    dispatch({ type: "set_button_focus", focus: true });
+                const itemList = items
+                    .map((item, index) => ({ ...item, index }))
+                    .filter(item => item.label.startsWith(event.key));
+                if (typeof state.focusedItem !== "undefined") {
+                    const next = itemList.find(item => item.index > state.focusedItem);
+                    if (next) {
+                        dispatch({ type: "set_focused_item", item: next.index });
+                    }
                 }
                 break;
         }

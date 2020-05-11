@@ -141,7 +141,7 @@ class CategoryModel extends Gdn_Model {
      * Load all of the categories from the cache or the database.
      */
     private static function loadAllCategories() {
-        Logger::log(Logger::DEBUG, "CategoryModel::loadAllCategories");
+        Logger::log(Logger::DEBUG, "CategoryModel::loadAllCategories", [Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM]);
 
         // Try and get the categories from the cache.
         $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);

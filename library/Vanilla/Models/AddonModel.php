@@ -205,7 +205,12 @@ class AddonModel implements LoggerAwareInterface {
         if (!$wasEnabled) {
             $this->logger->info(
                 'The {addonKey} {addonType} was enabled.',
-                ['event' => 'addon_enabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
+                [
+                    'event' => 'addon_enabled',
+                    'addonKey' => $addon->getKey(),
+                    'addonType' => $addon->getType(),
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                ]
             );
         }
     }
@@ -241,7 +246,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_structure',
                     'addonKey' => $addon->getKey(),
                     'structureType' => 'file',
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
                 ]
             );
 
@@ -265,7 +270,13 @@ class AddonModel implements LoggerAwareInterface {
 
             $this->logger->info(
                 "Calling {addonMethod} on {addonClass} for {addonKey}.",
-                ['event' => 'addon_method', 'addonMethod' => $method, 'addonClass' => $pluginClass, 'addonKey' => $addon->getKey()]
+                [
+                    'event' => 'addon_method',
+                    'addonMethod' => $method,
+                    'addonClass' => $pluginClass,
+                    'addonKey' => $addon->getKey(),
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                ]
             );
 
             $this->container->call([$plugin, $method]);
@@ -305,7 +316,12 @@ class AddonModel implements LoggerAwareInterface {
         if ($permissions = $addon->getInfoValue('registerPermissions')) {
             $this->logger->info(
                 "Defining permissions for {addonKey}.",
-                ['event' => 'addon_permissions', 'addonKey' => $addon->getKey(), 'permissions' => $permissions]
+                [
+                    'event' => 'addon_permissions',
+                    'addonKey' => $addon->getKey(),
+                    'permissions' => $permissions,
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                ]
             );
             $permissionModel = $this->container->get(PermissionModel::class);
             $permissionModel->define($permissions);
@@ -391,7 +407,12 @@ class AddonModel implements LoggerAwareInterface {
         if ($wasEnabled) {
             $this->logger->info(
                 'The {addonKey} {addonType} was disabled.',
-                ['event' => 'addon_disabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
+                [
+                    'event' => 'addon_disabled',
+                    'addonKey' => $addon->getKey(),
+                    'addonType' => $addon->getType(),
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                ]
             );
         }
 
@@ -414,7 +435,8 @@ class AddonModel implements LoggerAwareInterface {
                 [
                     'event' => 'addon_structure',
                     'addonKey' => $addon->getKey(),
-                    'structureType' => 'file', Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM
+                    'structureType' => 'file',
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
                 ]
             );
 

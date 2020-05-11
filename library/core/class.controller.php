@@ -1263,6 +1263,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 '{username} was denied access to {path}.',
                 [
                     'permission' => $permission,
+                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
                 ]
             );
 
@@ -1275,7 +1276,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         } else {
             $required = array_intersect((array)$permission, ['Garden.Settings.Manage', 'Garden.Moderation.Manage']);
             if (!empty($required)) {
-                Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
+                Logger::logAccess(
+                    'security_access',
+                    Logger::INFO,
+                    "{username} accessed {path}.",
+                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                );
             }
         }
     }
@@ -2106,6 +2112,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->ApplicationFolder.'_'.$controllerName.'_'.
                     Gdn_Format::alphaNumeric(strtolower($this->RequestMethod))
                 );
+                $this->BodyIdentifier = $bodyIdentifier;
                 include $masterViewPath;
             } else {
                 $viewHandler->render($masterViewPath, $this);

@@ -130,7 +130,7 @@ class Gdn_Session {
         }
 
         if ($this->UserID) {
-            Logger::event('session_end', Logger::INFO, 'Session ended for {username}.');
+            Logger::event('session_end', Logger::INFO, 'Session ended for {username}.', [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]);
         }
 
         $authenticator->authenticateWith()->deauthenticate();
@@ -433,7 +433,12 @@ class Gdn_Session {
                 if ($this->permissions->has('Garden.SignIn.Allow')) {
                     if ($setIdentity) {
                         Gdn::authenticator()->setIdentity($this->UserID, $persist);
-                        Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+                        Logger::event(
+                            'session_start',
+                            Logger::INFO,
+                            'Session started for {username}.',
+                            [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        );
                         Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                     }
 
@@ -686,13 +691,15 @@ class Gdn_Session {
                     [
                         "User TK" => $foreignKey,
                         "Site TK" => $this->_TransientKey,
+                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
                     ]
                 );
             } else {
                 Logger::event(
                     'csrf_failure',
                     Logger::ERROR,
-                    'Invalid transient key.'
+                    'Invalid transient key.',
+                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
                 );
             }
         }

@@ -13,7 +13,7 @@ import { t } from "@vanilla/i18n/src";
 import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
 import { renderToString } from "react-dom/server";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
-import { ButtonTab } from "@library/forms/buttonTabs/ButtonTab";
+import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { EventAttendance } from "@library/events/eventOptions";
 import UserContent from "@library/content/UserContent";
 import { EventAttendees } from "@library/events/Attendees";
@@ -62,10 +62,15 @@ export function EventDetails(props: IEventExtended) {
     return (
         <div className={classes.details}>
             <DataList data={eventMetaData} className={classes.section} />
-            <ButtonTabs activeTab={EventAttendance.GOING} accessibleTitle={t("Are you going?")} setData={() => {}}>
+            <ButtonTabs
+                activeTab={EventAttendance.GOING}
+                accessibleTitle={t("Are you going?")}
+                setData={(data: EventAttendance) => {}}
+                className={classes.attendanceSelector}
+            >
                 <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
                 <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
-                <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} />
+                <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} className={"isLast"} />
             </ButtonTabs>
 
             {props.about && (

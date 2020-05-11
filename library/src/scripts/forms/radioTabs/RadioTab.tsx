@@ -6,27 +6,29 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ITabBase, withTabs } from "@library/contexts/TabContext";
+import { ITabContext, withTabs } from "@library/contexts/TabContext";
 import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 
-export interface ITabProps {
+export interface IBaseTabProps {
     label: string;
     data: string | number;
     className?: string;
     position?: "left" | "right";
-    detached?: boolean;
     classes?: IRadioTabClasses;
+    customTabActiveClass?: string;
+    customTabInactiveClass?: string;
 }
 
-interface IProps extends ITabProps, ITabBase {}
+export interface ITabProps extends IBaseTabProps, ITabContext {}
 
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-class RadioTab extends React.Component<IProps> {
+class RadioTab extends React.Component<ITabProps> {
     public render() {
         const classes = this.props.classes ?? radioTabClasses();
+        const active = this.props.activeTab === this.props.data;
         return (
             <label
                 className={classNames(
@@ -42,14 +44,19 @@ class RadioTab extends React.Component<IProps> {
                     onClick={this.onClick}
                     onKeyDown={this.onKeyDown}
                     onChange={this.handleOnChange}
-                    checked={this.props.activeTab === this.props.data}
+                    checked={active}
                     name={this.props.groupID}
                     value={this.props.label}
                 />
                 <span
                     className={classNames(
-                        { "radioButtonsAsTabs-label": !this.props.detached },
                         classes.label,
+                        {
+                            "radioButtonsAsTabs-label":
+                                !this.props.customTabActiveClass && !this.props.customTabInactiveClass,
+                            [`${this.props.customTabActiveClass}`]: this.props.customTabActiveClass && active,
+                            [`${this.props.customTabInactiveClass}`]: this.props.customTabInactiveClass && !active,
+                        },
                         this.props.position === "left" ? classes.leftTab : undefined,
                         this.props.position === "right" ? classes.rightTab : undefined,
                     )}
@@ -79,4 +86,4 @@ class RadioTab extends React.Component<IProps> {
     };
 }
 
-export default withTabs<IProps>(RadioTab);
+export default withTabs<ITabProps>(RadioTab);

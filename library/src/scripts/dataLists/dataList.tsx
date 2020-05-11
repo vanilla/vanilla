@@ -32,19 +32,24 @@ export function DataList(props: IDataList) {
         <div className={classNames(classes.root, props.className)}>
             <table className={classes.table}>
                 <caption>{t("Event Details")}</caption>
-                {props.data.map((d, i) => {
-                    return (
-                        <tr
-                            className={classNames(classes.row, { isFirst: i === 0, isLast: i === props.data.length })}
-                            key={i}
-                        >
-                            <th scope="row" className={classes.key}>
-                                {d.key}
-                            </th>
-                            <td className={classes.value}>{d.value}</td>
-                        </tr>
-                    );
-                })}
+                <tbody>
+                    {props.data.map((d, i) => {
+                        return (
+                            <tr
+                                className={classNames(classes.row, {
+                                    isFirst: i === 0,
+                                    isLast: i === props.data.length,
+                                })}
+                                key={i}
+                            >
+                                <th scope="row" className={classes.key}>
+                                    {d.key}
+                                </th>
+                                <td className={classes.value}>{d.value}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
             </table>
         </div>
     );

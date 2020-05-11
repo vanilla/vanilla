@@ -266,6 +266,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
     });
 
+    const attendanceSelector = style("attendanceSelector", {
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexWrap: "nowrap",
+    });
+
     const dropDown = style("dropDown", {
         ...lineHeightAdjustment(),
         $nest: {
@@ -401,6 +408,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         dropDown,
         attendanceClass,
         attendanceStamp,
+        attendanceSelector,
         viewMore,
         filter,
         filterLabel,

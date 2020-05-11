@@ -225,7 +225,7 @@ EOT;
      * Adding "-" before an order field orders it in descending order.
      */
     public function testNegativeOrderBy() {
-        $actual = $this->sql->select()->from('foo')->orderBy('-foo, bar')->getSelect();
+        $actual = $this->sql->select()->from('foo')->orderBy('-foo, bar', 'asc')->getSelect();
         $expected = <<<EOT
 select *
 from `GDN_foo` `foo`

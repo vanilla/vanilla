@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\Model;
 use VanillaTests\SiteTestTrait;
 
@@ -53,20 +54,23 @@ class ModelTest extends TestCase {
 
     /**
      * Test a basic insert get path.
+     *
+     * @return int
      */
-    public function testInsertGet(): void {
-        $id = $this->model->insert(['name' => 'foo']);
+    public function testInsertGet(): int {
+        $id = $this->insertOne();
         $row = $this->model->selectSingle($this->model->primaryWhere($id));
 
         $this->assertSame('foo', $row['name']);
         $this->assertSame($id, $row['modelID']);
+        return $id;
     }
 
     /**
      * You can select all but some columns by prefixng with a "-".
      */
     public function testAllButSelect(): void {
-        $id = $this->model->insert(['name' => 'foo']);
+        $id = $this->insertOne();
 
         $row = $this->model->selectSingle(
             $this->model->primaryWhere($id),
@@ -74,5 +78,43 @@ class ModelTest extends TestCase {
         );
         $this->assertSame('foo', $row['name']);
         $this->assertArrayNotHasKey('modelID', $row);
+    }
+
+    /**
+     * Test a basic delete.
+     *
+     * @depends testInsertGet
+     */
+    public function testDelete(): void {
+        $id = $this->insertOne();
+        $this->model->delete($this->model->primaryWhere($id));
+
+        $this->expectException(NoResultsException::class);
+        $row = $this->model->selectSingle($this->model->primaryWhere($id));
+    }
+
+    /**
+     * Test a basic record update.
+     *
+     * @depends testInsertGet
+     */
+    public function testUpdate(): void {
+        $id = $this->insertOne();
+        $r = $this->model->update(['name' => 'bar'], $this->model->primaryWhere($id));
+
+
+        $row = $this->model->selectSingle($this->model->primaryWhere($id));
+        $this->assertSame('bar', $row['name']);
+    }
+
+    /**
+     * Insert a basic test row.
+     *
+     * @param string $name
+     * @return int
+     */
+    private function insertOne(string $name = 'foo'): int {
+        $id = $this->model->insert(['name' => $name]);
+        return $id;
     }
 }

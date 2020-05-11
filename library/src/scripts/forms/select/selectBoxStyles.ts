@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { unit, colorOut } from "@library/styles/styleHelpers";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -91,6 +91,10 @@ export const selectBoxClasses = useThemeCache(() => {
         paddingBottom: unit(0),
     });
 
+    const checkedIcon = style("checkedIcon", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
     return {
         toggle,
         buttonItem,
@@ -101,5 +105,6 @@ export const selectBoxClasses = useThemeCache(() => {
         spacer,
         itemLabel,
         offsetPadding,
+        checkedIcon,
     };
 });

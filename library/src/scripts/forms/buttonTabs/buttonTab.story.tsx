@@ -6,11 +6,7 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storyWithConfig } from "@library/storybook/StoryContext";
-import { IEvent } from "@library/events/Event";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { EventAttendance } from "@library/events/eventOptions";
-import { EventList as EventListComponent } from "@library/events/EventList";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";
@@ -25,7 +21,7 @@ export function RadioButtonsAsButtons(props: { title?: string; accessibleTitle?:
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
-            <ButtonTabs accessibleTitle={accessibleTitle} setData={({}) => {}}>
+            <ButtonTabs accessibleTitle={accessibleTitle} setData={selectedTab => {}}>
                 <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
                 <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
                 <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} />

@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { EventAttendance } from "@library/events/eventOptions";
-import { IEventExtended } from "@library/events/EventDetails";
+import { EventAttendance } from "@groups/events/events/eventOptions";
+import { IEventExtended } from "@groups/events/events/EventDetails";
 import { IUserFragment } from "@library/@types/api/users";
 
 export const dummyEventDetailsData = {

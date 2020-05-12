@@ -5,13 +5,11 @@
  */
 
 import React from "react";
-import DateTime, { DateFormats, IDateTime } from "@library/content/DateTime";
-
-export interface IFromToDate extends Omit<IDateTime, "type"> {}
+import DateTime, { DateFormats } from "@library/content/DateTime";
 
 export interface IProps {
-    dateStart: IFromToDate;
-    dateEnd?: IFromToDate;
+    dateStarts: string;
+    dateEnds: string;
 }
 
 /**
@@ -19,8 +17,8 @@ export interface IProps {
  */
 export function FromToDateTime(props: IProps) {
     // Note that we plan to have more advanced checks here to not repeat duplicate date/time information in the end time in a future iteration.
-    const startDate = <DateTime {...props.dateStart} type={DateFormats.EXTENDED} />;
-    const endDate = <DateTime {...props.dateEnd} type={DateFormats.EXTENDED} />;
+    const startDate = <DateTime timestamp={props.dateStarts} type={DateFormats.EXTENDED} />;
+    const endDate = <DateTime timestamp={props.dateEnds} type={DateFormats.EXTENDED} />;
     return (
         <>
             {startDate}

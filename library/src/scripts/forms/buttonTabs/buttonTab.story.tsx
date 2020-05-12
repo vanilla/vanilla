@@ -6,7 +6,7 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { EventAttendance } from "@library/events/eventOptions";
+import { EventAttendance } from "@groups/events/events/eventOptions";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";

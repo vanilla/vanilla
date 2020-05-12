@@ -126,29 +126,33 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     };
 
     const onBgKeyDown = (event: React.KeyboardEvent<any>) => {
-        event.preventDefault();
-        event.stopPropagation();
-
         switch (event.key) {
             case "Escape":
                 if (state.open) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     dispatch({ type: "set_open", open: false });
                     dispatch({ type: "set_button_focus", focus: true });
                     dispatch({ type: "set_focused_item", item: undefined });
                 }
                 break;
             default:
-                // We don't want to lose focus in case we already have
-                if (state.buttonFocus) {
-                    dispatch({ type: "set_button_focus", focus: true });
-                }
                 break;
         }
     };
 
-    const onKeyDown = (event: React.KeyboardEvent<any>) => {
-        event.preventDefault();
-        event.stopPropagation();
+    const onMenuItemKeyDown = (event: React.KeyboardEvent<any>) => {
+        const keys = ["Escape", "Home", "End", "ArrowUp", "ArrowDown", "Enter"];
+
+        // Only handling keys in these situations so preventDefault and stopPropagation in these
+        if (
+            keys.includes(event.key) ||
+            (typeof state.focusedItem !== "undefined" &&
+                items.find(item => item.label.toLocaleUpperCase().startsWith(event.key.toLocaleUpperCase())))
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
         switch (event.key) {
             case "Escape":
@@ -170,12 +174,12 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 break;
             case "ArrowUp":
                 if (state.open && typeof state.focusedItem != "undefined") {
-                    dispatch({ type: "set_focused_item", item: (state.focusedItem + 1) % items.length });
+                    dispatch({ type: "set_focused_item", item: (state.focusedItem - 1 + items.length) % items.length });
                 }
                 break;
             case "ArrowDown":
                 if (state.open && typeof state.focusedItem != "undefined") {
-                    dispatch({ type: "set_focused_item", item: (state.focusedItem - 1 + items.length) % items.length });
+                    dispatch({ type: "set_focused_item", item: (state.focusedItem + 1) % items.length });
                 }
                 break;
             case "Enter":
@@ -202,7 +206,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             default:
                 const itemList = items
                     .map((item, index) => ({ ...item, index }))
-                    .filter(item => item.label.startsWith(event.key));
+                    .filter(item => item.label.toLocaleUpperCase().startsWith(event.key.toLocaleUpperCase()));
                 if (typeof state.focusedItem !== "undefined") {
                     const next = itemList.find(item => item.index > state.focusedItem);
                     if (next) {
@@ -214,8 +218,11 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     };
 
     const onMenuButtonKeyDown = (event: React.KeyboardEvent<any>) => {
-        event.preventDefault();
-        event.stopPropagation();
+        const keys = ["Escape", "ArrowDown", "Enter", " ", "ArrowUp"];
+        if (keys.includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
         switch (event.key) {
             case "Escape":
@@ -240,11 +247,6 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
-                // We don't want to lose focus in case we already have
-                if (state.buttonFocus) {
-                    dispatch({ type: "set_button_focus", focus: true });
-                }
-                break;
         }
     };
 
@@ -322,18 +324,19 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         >
             <div className={classNames(classes.root)}>
                 <animated.ul
-                    onKeyDown={onKeyDown}
+                    onKeyDown={onMenuItemKeyDown}
                     style={menu}
                     ref={accessMenuRef}
                     id={menuID}
                     role="menu"
                     aria-labelledby={buttonID}
                     tabIndex={-1}
-                    aria-activedescendant={state.focusedItem}
+                    // focusedItem is also the index of an item (see aid below)
+                    aria-activedescendant={`${ID}-${state.focusedItem}`}
                 >
                     {trail.map(({ opacity, transform, ...rest }, index) => (
                         <ActionItem
-                            aid={`ID-${index}`} // accessibility id
+                            aid={`${ID}-${index}`} // accessibility id
                             key={items[index].id}
                             item={items[index]}
                             style={{ opacity, transform }}

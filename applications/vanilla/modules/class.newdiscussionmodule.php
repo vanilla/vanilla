@@ -82,7 +82,7 @@ class NewDiscussionModule extends Gdn_Module {
     public function toString() {
         // Set CategoryID if we have one.
         if (c('Vanilla.Categories.Use', true) && $this->CategoryID === null) {
-            $this->CategoryID = Gdn::controller()->data('Category.CategoryID', false);
+            $this->CategoryID = Gdn::controller()->data('Category.CategoryID', Gdn::controller()->data('ContextualCategoryID', false));
         }
 
         // Allow plugins and themes to modify parameters.

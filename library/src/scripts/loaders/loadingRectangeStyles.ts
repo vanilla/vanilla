@@ -38,6 +38,7 @@ export const loadingRectangeClass = useThemeCache((height: string | number, widt
     const vars = loadingRectangeVariables();
     return style({
         display: "block",
+        borderRadius: 2,
         background: colorOut(vars.colors.bg),
         height: unit(height),
         width: unit(width),

@@ -9,9 +9,9 @@ import { t } from "@vanilla/i18n/src";
 
 export enum EventAttendance {
     RSVP = "rsvp", // only for default value in EventAttendanceDropDown
-    GOING = "going",
+    GOING = "yes",
     MAYBE = "maybe",
-    NOT_GOING = "not going",
+    NOT_GOING = "not",
 }
 
 export const eventAttendanceOptions = [

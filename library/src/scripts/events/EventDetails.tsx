@@ -35,17 +35,15 @@ export function EventDetails(props: IEventExtended) {
     const eventMetaData = [
         {
             key: t("When"),
-            value: (
-                <FromToDateTime dateStart={dummyEventDetailsData.dateStart} dateEnd={dummyEventDetailsData.dateEnd} />
-            ),
+            value: <FromToDateTime dateStart={props.dateStart} dateEnd={props.dateEnd} />,
         },
         {
             key: t("Where"),
-            value: dummyEventDetailsData.location,
+            value: props.location,
         },
         {
             key: t("Organizer"),
-            value: dummyEventDetailsData.organizer,
+            value: props.organizer,
         },
     ];
 
@@ -53,7 +51,7 @@ export function EventDetails(props: IEventExtended) {
         <div className={classes.details}>
             <DataList data={eventMetaData} className={classes.section} caption={t("Event Details")} />
             <ButtonTabs
-                activeTab={EventAttendance.GOING}
+                activeTab={props.attendance}
                 accessibleTitle={t("Are you going?")}
                 setData={(data: EventAttendance) => {}}
                 className={classes.attendanceSelector}
@@ -72,22 +70,24 @@ export function EventDetails(props: IEventExtended) {
             )}
 
             <EventAttendees
-                data={dummyEventDetailsData.going!}
+                data={props.going!}
                 title={t("Going")}
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
-                extra={552}
+                extra={props.going?.length}
                 separator={true}
             />
             <EventAttendees
                 emptyMessage={t("Nobody is on the fence right now.")}
-                data={dummyEventDetailsData.maybe!}
+                data={props.maybe!}
                 title={t("Maybe")}
+                extra={props.maybe?.length}
                 separator={true}
             />
             <EventAttendees
                 emptyMessage={t("Nobody has declined the invitation so far.")}
-                data={dummyEventDetailsData.notGoing!}
+                data={props.notGoing!}
                 title={t("Not going")}
+                extra={props.notGoing?.length}
                 separator={true}
             />
         </div>

@@ -4,13 +4,12 @@
  */
 
 import React from "react";
-import DateTime, { DateFormats } from "@library/content/DateTime";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { DataList } from "@library/dataLists/dataList";
 import { t } from "@vanilla/i18n/src";
 import { dummyEventDetailsData } from "./dummyEventData";
 import { FromToDateTime } from "@library/content/FromToDateTime";
+import { DataList } from "@library/dataLists/DataList";
 
 export default {
     title: "Data List",

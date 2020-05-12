@@ -6,7 +6,6 @@
 import React from "react";
 
 import { dataListClasses } from "@library/dataLists/dataListStyles";
-import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 
 export interface IDataListNode {

@@ -6,17 +6,17 @@
 import React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
 import { IEvent } from "@library/events/Event";
-import { DataList } from "@library/dataLists/dataList";
 import { IUserFragment } from "@library/@types/api/users";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { t } from "@vanilla/i18n/src";
-import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { EventAttendance } from "@library/events/eventOptions";
 import UserContent from "@library/content/UserContent";
 import { EventAttendees } from "@library/events/Attendees";
 import { FromToDateTime } from "@library/content/FromToDateTime";
+import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
+import { DataList } from "@library/dataLists/DataList";
 
 export interface IEventExtended extends IEvent {
     organizer: string;
@@ -31,9 +31,6 @@ export interface IEventExtended extends IEvent {
  */
 export function EventDetails(props: IEventExtended) {
     const classes = eventsClasses();
-
-    const startDate = <DateTime {...dummyEventDetailsData.dateStart} type={DateFormats.EXTENDED} />;
-    const endDate = <DateTime {...dummyEventDetailsData.dateEnd} type={DateFormats.EXTENDED} />;
 
     const eventMetaData = [
         {

@@ -31,13 +31,12 @@ export function EventAttendees(props: IEventAttendees) {
     const { data, maxCount = 10, extra, separator = false, depth = 2, title, emptyMessage } = props;
     const empty = data.length === 0;
     const classes = eventsClasses();
+    const HeadingTag = `h${depth}` as "h1";
 
     return (
         <section className={classNames(classes.section, props.className)}>
             {separator && <hr className={classes.separator} />}
-            <Heading depth={depth} className={classes.sectionTitle} renderAsDepth={"custom"}>
-                {title}
-            </Heading>
+            <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}
             {!empty && (
                 <ul className={classes.attendeeList}>
@@ -58,13 +57,9 @@ export function EventAttendees(props: IEventAttendees) {
                         );
                     })}
                     {extra && (
-                        <li
-                            className={classes.attendeePlus}
-                            key={data.length}
-                            dangerouslySetInnerHTML={{
-                                __html: `+${renderToString(<NumberFormatted value={extra} />)}`,
-                            }}
-                        />
+                        <li className={classes.attendeePlus} key={data.length}>
+                            +<NumberFormatted value={extra} />
+                        </li>
                     )}
                 </ul>
             )}

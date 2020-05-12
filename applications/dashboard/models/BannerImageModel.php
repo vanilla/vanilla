@@ -10,6 +10,7 @@ namespace Vanilla\Dashboard\Models;
 use Gdn;
 use Vanilla\AliasLoader;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Models\SiteMeta;
 
 /**
@@ -24,13 +25,17 @@ class BannerImageModel {
     /** @var SiteMeta */
     private $siteMeta;
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * BannerImageModel constructor.
      *
      * @param SiteMeta $siteMeta
      */
-    public function __construct(SiteMeta $siteMeta) {
+    public function __construct(SiteMeta $siteMeta, FormatService $formatService) {
         $this->siteMeta = $siteMeta;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -52,11 +57,11 @@ class BannerImageModel {
         $title = $controller->data('Category.Name');
 
         if ($title) {
-              $defaultProps['title'] = Gdn::formatService()->renderPlainText($title, HtmlFormat::FORMAT_KEY);
+              $defaultProps['title'] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
         }
 
         //filter description before passing on to the component
-        $defaultProps['description'] = Gdn::formatService()->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
+        $defaultProps['description'] = $this->formatService->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
 
         $props = array_merge($defaultProps, $props);
         $html = "";

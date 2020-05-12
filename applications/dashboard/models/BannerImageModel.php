@@ -7,7 +7,9 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use Gdn;
 use Vanilla\AliasLoader;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Models\SiteMeta;
 
 /**
@@ -50,8 +52,11 @@ class BannerImageModel {
         $title = $controller->data('Category.Name');
 
         if ($title) {
-              $defaultProps['title'] = $title;
+              $defaultProps['title'] = Gdn::formatService()->renderPlainText($title, HtmlFormat::FORMAT_KEY);
         }
+
+        //filter description before passing on to the component
+        $defaultProps['description'] = Gdn::formatService()->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
 
         $props = array_merge($defaultProps, $props);
         $html = "";

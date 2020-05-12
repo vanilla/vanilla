@@ -11,11 +11,13 @@ import { calc } from "csx";
 import { AttendanceStamp } from "@library/events/AttendanceStamp";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { EventAttendance } from "@library/events/eventOptions";
+import { IFromToDate } from "@library/content/FromToDateTime";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
 export interface IEvent {
-    date: IEventDate;
+    dateStart: IEventDate | IFromToDate;
+    dateEnd?: IEventDate | IFromToDate;
     name: string;
     excerpt?: string;
     location: string;
@@ -58,7 +60,7 @@ export function Event(props: IEvent) {
                     }
                 >
                     <div className={classes.linkAlignment}>
-                        <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
+                        <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.dateStart} />
                         <div className={classes.main}>
                             <HeadingTag title={props.name} className={classes.title}>
                                 {props.name}
@@ -76,7 +78,7 @@ export function Event(props: IEvent) {
                                     {props.location && <div className={classes.meta}>{props.location}</div>}
                                     {!props.compact && (
                                         <div className={classes.meta}>
-                                            <DateTime type={DateFormats.DEFAULT} {...props.date} />
+                                            <DateTime type={DateFormats.DEFAULT} {...props.dateStart} />
                                         </div>
                                     )}
                                 </div>

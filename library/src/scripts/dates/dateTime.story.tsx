@@ -12,7 +12,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 
 export default {
-    title: "Date Formats",
+    title: "Date/Time Formats",
     parameters: {},
 };
 

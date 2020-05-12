@@ -17,7 +17,7 @@ import {
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { important, percent, px, rgba } from "csx";
+import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";

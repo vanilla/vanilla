@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\InstanceValidatorSchema;
@@ -143,6 +144,8 @@ class CategoriesApiController extends AbstractApiController {
                 'enum' => ['categories', 'discussions', 'flat', 'heading'],
                 'default' => 'discussions'
             ],
+            'iconUrl:s|n?',
+            'bannerUrl:s|n?',
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
@@ -540,6 +543,8 @@ class CategoriesApiController extends AbstractApiController {
         $dbRecord['isArchived'] = $dbRecord['Archived'];
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($dbRecord['CategoryID']));
+        $schemaRecord['iconUrl'] = $dbRecord['Photo'] ? Gdn_UploadImage::url($dbRecord['Photo']) : null;
+        $schemaRecord['bannerUrl'] = BannerImageModel::getBannerImageSlug($dbRecord['CategoryID']) ?: null;
         return $schemaRecord;
     }
 

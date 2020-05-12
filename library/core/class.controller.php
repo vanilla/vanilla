@@ -9,6 +9,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
@@ -225,6 +227,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Gdn_Controller constructor.
      */
     public function __construct() {
+        $this->htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
         $this->useDeferredLegacyScripts = \Vanilla\FeatureFlagHelper::featureEnabled('DeferredLegacyScripts');
         $this->Application = '';
         $this->ApplicationFolder = '';
@@ -748,10 +751,9 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @return mixed
      */
     public function description($value = false, $plainText = false) {
-        if ($value != false) {
-            if ($plainText) {
-                $value = Gdn_Format::plainText($value);
-            }
+        if ($value) {
+            $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+            $value = $plainText ? Gdn::formatService()->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $htmlSanitizer->filter($value);
             $this->setData('_Description', $value);
         }
         return $this->data('_Description');
@@ -2458,11 +2460,11 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function title($title = null, $subtitle = null) {
         if (!is_null($title)) {
-            $this->setData('Title', $title);
+            $this->setData('Title', Gdn::formatService()->renderPlainText($title, HtmlFormat::FORMAT_KEY));
         }
 
         if (!is_null($subtitle)) {
-            $this->setData('_Subtitle', $subtitle);
+            $this->setData('_Subtitle', Gdn::formatService()->renderPlainText($subtitle, HtmlFormat::FORMAT_KEY));
         }
 
         return $this->data('Title');

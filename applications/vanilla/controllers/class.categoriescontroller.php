@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -101,7 +102,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section(val('CssClass', $category));
         Gdn_Theme::section('DiscussionList');
 
-        $this->title(htmlspecialchars(val('Name', $category, '')));
+        $this->title(val('Name', $category, ''));
         $this->description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
         $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
@@ -327,7 +328,7 @@ class CategoriesController extends VanillaController {
 
             $this->setData('Category', $category, true);
 
-            $this->title(htmlspecialchars(val('Name', $category, '')));
+            $this->title(val('Name', $category, ''));
             $this->description(val('Description', $category), true);
 
             switch ($category->DisplayAs) {
@@ -522,7 +523,7 @@ class CategoriesController extends VanillaController {
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($Title) {
                 $this->title($Title, '');
             } else {

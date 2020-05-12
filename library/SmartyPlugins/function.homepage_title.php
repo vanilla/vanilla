@@ -1,4 +1,7 @@
 <?php
+
+use Vanilla\Formatting\Formats\HtmlFormat;
+
 /**
  * Returns Homepage Title from config
  *
@@ -9,5 +12,5 @@
  * @return string
  */
 function smarty_function_homepage_title() {
-    return c('Garden.HomepageTitle', '');
+    return Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
 }

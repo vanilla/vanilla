@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
+
 /**
  * Handles displaying discussions in most contexts via /discussions endpoint.
  *

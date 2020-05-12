@@ -18,6 +18,7 @@ export interface IBaseTabProps {
     classes?: IRadioTabClasses;
     customTabActiveClass?: string;
     customTabInactiveClass?: string;
+    disabled?: boolean;
 }
 
 export interface ITabProps extends IBaseTabProps, ITabContext {}
@@ -47,9 +48,11 @@ class RadioTab extends React.Component<ITabProps> {
                     checked={active}
                     name={this.props.groupID}
                     value={this.props.label}
+                    disabled={this.props.disabled}
                 />
                 <span
                     className={classNames(
+                        { isDisabled: this.props.disabled },
                         classes.label,
                         {
                             "radioButtonsAsTabs-label":

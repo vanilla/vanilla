@@ -7,9 +7,9 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
-import { dummyEventDetailsData } from "./dummyEventData";
 import { FromToDateTime } from "@library/content/FromToDateTime";
 import { DataList } from "@library/dataLists/DataList";
+import { dummyEventDetailsData } from "@groups/events/dummyEventData";
 
 export default {
     title: "Data List",
@@ -21,7 +21,7 @@ export function Standard(props: { data: [] }) {
         {
             key: t("When"),
             value: (
-                <FromToDateTime dateStart={dummyEventDetailsData.dateStart!} dateEnd={dummyEventDetailsData.dateEnd} />
+                <FromToDateTime dateStarts={dummyEventDetailsData.dateStart} dateEnds={dummyEventDetailsData.dateEnd} />
             ),
         },
         {

@@ -5,6 +5,8 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -30,15 +32,21 @@ class CategoriesApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * CategoriesApiController constructor.
      *
      * @param CategoryModel $categoryModel
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->categoryModel = $categoryModel;
+        $this->breadcrumbModel = $breadcrumbModel;
     }
 
     /**
@@ -152,7 +160,7 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if unable to find the category.
      * @return array
      */
-    public function get($id) {
+    public function get(int $id) {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->idParamSchema()->setDescription('Get a category.');
@@ -216,7 +224,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
             $this->isExpandField('parent', $query['expand']),
@@ -266,28 +274,24 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'parentCategoryID:i?' => 'Parent category ID.',
-            'parentCategoryCode:s?' => 'Parent category URL code.',
+            'parentCategoryID:i?',
+            'parentCategoryCode:s?',
             'followed:b' => [
                 'default' => false,
-                'description' => 'Only list categories followed by the current user.',
             ],
             'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2,
             ],
             'archived:b|n' => [
-                'description' => 'Filter by archived status of a category. True for archived only. False for no archived categories. Not compatible with followed filter.',
                 'default' => false
             ],
             'page:i?' => [
-                'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages(),
             ],
             'limit:i?' => [
-                'description' => 'Desired number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100,
@@ -308,7 +312,7 @@ class CategoriesApiController extends AbstractApiController {
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         if ($query['followed']) {
             $categories = $this->categoryModel
@@ -517,6 +521,11 @@ class CategoriesApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
+        if ($dbRecord['CategoryID'] === -1) {
+            $dbRecord['Url'] = url('/categories');
+            $dbRecord['DisplayAs'] = 'Discussions';
+        }
+
         if ($dbRecord['ParentCategoryID'] <= 0) {
             $dbRecord['ParentCategoryID'] = null;
         }
@@ -529,8 +538,8 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $dbRecord['isArchived'] = $dbRecord['Archived'];
-
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($dbRecord['CategoryID']));
         return $schemaRecord;
     }
 

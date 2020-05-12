@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { ITabContext, withTabs } from "@library/contexts/TabContext";
 import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
 export interface IBaseTabProps {
     label: string;
@@ -19,6 +20,7 @@ export interface IBaseTabProps {
     customTabActiveClass?: string;
     customTabInactiveClass?: string;
     disabled?: boolean;
+    isLoading?: boolean;
 }
 
 export interface ITabProps extends IBaseTabProps, ITabContext {}
@@ -64,7 +66,7 @@ class RadioTab extends React.Component<ITabProps> {
                         this.props.position === "right" ? classes.rightTab : undefined,
                     )}
                 >
-                    {this.props.label}
+                    {this.props.isLoading ? <ButtonLoader /> : this.props.label}
                 </span>
             </label>
         );

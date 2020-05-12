@@ -229,6 +229,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 }
                 break;
             default:
+                break;
         }
     };
 

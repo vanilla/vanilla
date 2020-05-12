@@ -10,10 +10,15 @@ import * as React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
 import { EventAttendance } from "@library/events/eventOptions";
 
+export interface IEventAttendance {
+    attendance: EventAttendance;
+    options: ISelectBoxItem[];
+}
+
 /**
  * Component for displaying/selecting attendance to an event
  */
-export default function EventAttendanceDropDown(props: { attendance: EventAttendance; options: ISelectBoxItem[] }) {
+export default function EventAttendanceDropDown(props: IEventAttendance) {
     if (props.options.length === 0) {
         return null;
     }

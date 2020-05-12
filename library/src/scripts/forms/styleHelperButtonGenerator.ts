@@ -23,7 +23,11 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
 
-export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+export const generateButtonStyleProperties = (
+    buttonTypeVars: IButtonType,
+    setZIndexOnState = false,
+    stateSuffix?: string,
+) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
@@ -157,68 +161,64 @@ export const generateButtonStyleProperties = (buttonTypeVars: IButtonType, setZI
         touchAction: "manipulation",
         cursor: "pointer",
         $nest: {
-            "&:not([disabled])": {
-                $nest: {
-                    "&:not(.focus-visible)": {
-                        outline: 0,
-                    },
-                    "&:hover": {
-                        zIndex,
-                        color: colorOut(
-                            buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.fg
-                                ? buttonTypeVars.hover.colors.fg
-                                : undefined,
-                        ),
-                        backgroundColor: colorOut(
-                            buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
-                                ? buttonTypeVars.hover.colors.bg
-                                : undefined,
-                        ),
-                        ...hoverBorder,
-                    },
-                    "&:focus": {
-                        zIndex,
-                        color: colorOut(
-                            buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.fg
-                                ? buttonTypeVars.focus!.colors.fg
-                                : undefined,
-                        ),
-                        backgroundColor: colorOut(
-                            buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
-                                ? buttonTypeVars.focus!.colors.bg
-                                : undefined,
-                        ),
-                        ...focusBorder,
-                    },
-                    "&:active": {
-                        zIndex,
-                        color: colorOut(
-                            buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.fg
-                                ? buttonTypeVars.active!.colors.fg
-                                : undefined,
-                        ),
-                        backgroundColor: colorOut(
-                            buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
-                                ? buttonTypeVars.active!.colors.bg
-                                : undefined,
-                        ),
-                        ...activeBorder,
-                    },
-                    "&.focus-visible": {
-                        zIndex,
-                        color: colorOut(
-                            buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.fg
-                                ? buttonTypeVars.focusAccessible!.colors.fg
-                                : undefined,
-                        ),
-                        backgroundColor: colorOut(
-                            buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
-                                ? buttonTypeVars.focusAccessible!.colors.bg
-                                : undefined,
-                        ),
-                        ...focusAccessibleBorder,
-                    },
-                },
+            [`&:not([disabled]):not(.focus-visible)`]: {
+                outline: 0,
+            },
+            [`&:not([disabled]):hover${stateSuffix ?? ""}`]: {
+                zIndex,
+                color: colorOut(
+                    buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.fg
+                        ? buttonTypeVars.hover.colors.fg
+                        : undefined,
+                ),
+                backgroundColor: colorOut(
+                    buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
+                        ? buttonTypeVars.hover.colors.bg
+                        : undefined,
+                ),
+                ...hoverBorder,
+            },
+            [`&:not([disabled]):focus${stateSuffix ?? ""}`]: {
+                zIndex,
+                color: colorOut(
+                    buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.fg
+                        ? buttonTypeVars.focus!.colors.fg
+                        : undefined,
+                ),
+                backgroundColor: colorOut(
+                    buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
+                        ? buttonTypeVars.focus!.colors.bg
+                        : undefined,
+                ),
+                ...focusBorder,
+            },
+            [`&:not([disabled]):active${stateSuffix ?? ""}`]: {
+                zIndex,
+                color: colorOut(
+                    buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.fg
+                        ? buttonTypeVars.active!.colors.fg
+                        : undefined,
+                ),
+                backgroundColor: colorOut(
+                    buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
+                        ? buttonTypeVars.active!.colors.bg
+                        : undefined,
+                ),
+                ...activeBorder,
+            },
+            [`&:not([disabled]):focus-visible${stateSuffix ?? ""}`]: {
+                zIndex,
+                color: colorOut(
+                    buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.fg
+                        ? buttonTypeVars.focusAccessible!.colors.fg
+                        : undefined,
+                ),
+                backgroundColor: colorOut(
+                    buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
+                        ? buttonTypeVars.focusAccessible!.colors.bg
+                        : undefined,
+                ),
+                ...focusAccessibleBorder,
             },
             "&[disabled]": {
                 opacity: formElVars.disabled.opacity,

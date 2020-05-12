@@ -9,21 +9,22 @@ import { dataListClasses } from "@library/dataLists/dataListStyles";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
 
-export interface IData {
+export interface IDataListNode {
     key: React.ReactNode;
     value: React.ReactNode;
 }
 
-export interface IDataList {
+export interface IProps {
     className?: string;
-    data: IData[];
+    caption: string; // Required for accessibility. Should give you a short summary of the contents.
+    data: IDataListNode[];
 }
 
 /**
  * Component for displaying data lists
  * Because of accessibility concerns, the markup is a table not a data list.
  */
-export function DataList(props: IDataList) {
+export function DataList(props: IProps) {
     const classes = dataListClasses();
     if (props.data.length === 0) {
         return null;
@@ -31,7 +32,7 @@ export function DataList(props: IDataList) {
     return (
         <div className={classNames(classes.root, props.className)}>
             <table className={classes.table}>
-                <caption>{t("Event Details")}</caption>
+                <caption>{props.caption}</caption>
                 <tbody>
                     {props.data.map((d, i) => {
                         return (

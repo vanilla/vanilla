@@ -6,18 +6,17 @@
 import React from "react";
 import { eventsClasses } from "@library/events/eventStyles";
 import { IEvent } from "@library/events/Event";
-import { DataList, IData } from "@library/dataLists/DataList";
+import { DataList } from "@library/dataLists/dataList";
 import { IUserFragment } from "@library/@types/api/users";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { t } from "@vanilla/i18n/src";
 import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
-import { renderToString } from "react-dom/server";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { EventAttendance } from "@library/events/eventOptions";
 import UserContent from "@library/content/UserContent";
 import { EventAttendees } from "@library/events/Attendees";
-import Heading from "@library/layout/Heading";
+import { FromToDateTime } from "@library/content/FromToDateTime";
 
 export interface IEventExtended extends IEvent {
     organizer: string;
@@ -40,13 +39,7 @@ export function EventDetails(props: IEventExtended) {
         {
             key: t("When"),
             value: (
-                <span
-                    dangerouslySetInnerHTML={{
-                        __html: `${renderToString(startDate)}${
-                            dummyEventDetailsData.dateEnd ? ` - ${renderToString(endDate)}` : ""
-                        }`,
-                    }}
-                />
+                <FromToDateTime dateStart={dummyEventDetailsData.dateStart} dateEnd={dummyEventDetailsData.dateEnd} />
             ),
         },
         {
@@ -57,11 +50,11 @@ export function EventDetails(props: IEventExtended) {
             key: t("Organizer"),
             value: dummyEventDetailsData.organizer,
         },
-    ] as IData[];
+    ];
 
     return (
         <div className={classes.details}>
-            <DataList data={eventMetaData} className={classes.section} />
+            <DataList data={eventMetaData} className={classes.section} caption={t("Event Details")} />
             <ButtonTabs
                 activeTab={EventAttendance.GOING}
                 accessibleTitle={t("Are you going?")}
@@ -76,9 +69,7 @@ export function EventDetails(props: IEventExtended) {
             {props.about && (
                 <div className={classes.section}>
                     <hr className={classes.separator} />
-                    <Heading depth={2} className={classes.sectionTitle} renderAsDepth={"custom"}>
-                        {t("About the event")}
-                    </Heading>
+                    <h2 className={classes.sectionTitle}>{t("About the event")}</h2>
                     <UserContent className={classes.description} content={props.about} />
                 </div>
             )}

@@ -11,12 +11,13 @@ import { calc } from "csx";
 import { AttendanceStamp } from "@library/events/AttendanceStamp";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { EventAttendance } from "@library/events/eventOptions";
+import { IFromToDate } from "@library/content/FromToDateTime";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
 export interface IEvent {
-    dateStart: IEventDate;
-    dateEnd?: IEventDate;
+    dateStart: IEventDate | IFromToDate;
+    dateEnd?: IEventDate | IFromToDate;
     name: string;
     excerpt?: string;
     location: string;

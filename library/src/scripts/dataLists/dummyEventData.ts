@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { EventAttendance } from "@library/events/eventOptions";
 import { IEventExtended } from "@library/events/EventDetails";
 import { IUserFragment } from "@library/@types/api/users";

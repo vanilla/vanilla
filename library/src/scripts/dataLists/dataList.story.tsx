@@ -7,10 +7,10 @@ import React from "react";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { DataList, IData } from "@library/dataLists/DataList";
+import { DataList } from "@library/dataLists/dataList";
 import { t } from "@vanilla/i18n/src";
 import { dummyEventDetailsData } from "./dummyEventData";
-import { renderToString } from "react-dom/server";
+import { FromToDateTime } from "@library/content/FromToDateTime";
 
 export default {
     title: "Data List",
@@ -18,20 +18,11 @@ export default {
 };
 
 export function Standard(props: { data: [] }) {
-    const startDate = <DateTime {...dummyEventDetailsData.dateStart} type={DateFormats.EXTENDED} />;
-    const endDate = <DateTime {...dummyEventDetailsData.dateEnd} type={DateFormats.EXTENDED} />;
-
     const dummyData = [
         {
             key: t("When"),
             value: (
-                <span
-                    dangerouslySetInnerHTML={{
-                        __html: `${renderToString(startDate)}${
-                            dummyEventDetailsData.dateEnd ? ` - ${renderToString(endDate)}` : ""
-                        }`,
-                    }}
-                />
+                <FromToDateTime dateStart={dummyEventDetailsData.dateStart!} dateEnd={dummyEventDetailsData.dateEnd} />
             ),
         },
         {
@@ -42,12 +33,12 @@ export function Standard(props: { data: [] }) {
             key: t("Organizer"),
             value: dummyEventDetailsData.organizer,
         },
-    ] as IData[];
+    ];
 
     return (
         <StoryContent>
             <StoryHeading depth={1}>Data List</StoryHeading>
-            <DataList data={dummyData} />
+            <DataList data={dummyData} caption={t("Event Details")} />
         </StoryContent>
     );
 }

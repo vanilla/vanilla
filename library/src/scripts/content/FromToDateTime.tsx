@@ -24,7 +24,8 @@ export function FromToDateTime(props: IProps) {
     return (
         <>
             {startDate}
-            {endDate ? ` - ${endDate}` : ""}
+            {endDate && " - "}
+            {endDate}
         </>
     );
 }

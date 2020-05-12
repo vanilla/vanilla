@@ -9,3 +9,7 @@ em {
 body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {
     outline: none;
 }
+
+caption {
+    @include sr-only;
+}

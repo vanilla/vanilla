@@ -16,10 +16,12 @@ import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts
 import { important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
     const layoutVars = forumLayoutVariables();
+    const formElementVars = formElementsVariables();
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {
         top: unit(layoutVars.cell.paddings.vertical),
@@ -231,5 +233,18 @@ export const searchPageCSS = () => {
 
     cssOut(`.Item-Search .Summary`, {
         marginTop: unit(searchResultsVars.excerpt.margin),
+    });
+
+    const buttonWidth = 46;
+
+    cssOut(`body.Section-SearchResults .AdvancedSearch .InputAndButton .Handle.Handle `, {
+        right: unit(buttonWidth),
+    });
+    cssOut(`body.Section-SearchResults .AdvancedSearch .InputAndButton .bwrap.bwrap`, {
+        minWidth: unit(buttonWidth),
+    });
+
+    cssOut(`body.Section-SearchResults .AdvancedSearch .KeywordsWrap.InputAndButton .InputBox.InputBox`, {
+        paddingRight: unit(buttonWidth * 2 - 10),
     });
 };

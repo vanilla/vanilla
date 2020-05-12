@@ -41,7 +41,7 @@ export default function EventFilter(props: { filter: EventFilterTypes }) {
     return (
         <div className={classes.filter}>
             <span id={id} className={classes.filterLabel}>
-                {t("View:")}
+                {t("View")}
             </span>
             <SelectBox
                 className={eventsClasses().dropDown}

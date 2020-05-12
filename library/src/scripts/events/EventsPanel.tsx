@@ -1,10 +1,9 @@
 import React from "react";
-import { EventList } from "@library/events/events.story";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n/src";
 import { eventsClasses } from "@library/events/eventStyles";
 import Heading from "@library/layout/Heading";
-import { IEventList } from "@library/events/EventsList";
+import { EventList, IEventList } from "@library/events/EventList";
 
 export interface IProps {
     events: Omit<IEventList, "compact" | "headingLevel">;

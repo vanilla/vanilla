@@ -2610,7 +2610,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      * @param array|false $discussion The discussion to update the count for or **false** for all of them.
      */
     public function updateDiscussionCount($categoryID, $discussion = false) {
-        $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
             $params = [];
             $where = '';
@@ -2634,32 +2633,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $this->Database->query($sql, $params, 'DiscussionModel_UpdateDiscussionCount');
 
         } elseif (is_numeric($categoryID)) {
-            $this->SQL
-                ->select('d.DiscussionID', 'count', 'CountDiscussions')
-                ->select('d.CountComments', 'sum', 'CountComments')
-                ->from('Discussion d')
-                ->where('d.CategoryID', $categoryID);
-
-            $data = $this->SQL->get()->firstRow();
-            $countDiscussions = (int)getValue('CountDiscussions', $data, 0);
-            $countComments = (int)getValue('CountComments', $data, 0);
-
-            $cacheAmendment = [
-                'CountDiscussions' => $countDiscussions,
-                'CountComments' => $countComments
-            ];
-
-            if ($discussionID) {
-                $cacheAmendment = array_merge($cacheAmendment, [
-                    'LastDiscussionID' => $discussionID,
-                    'LastCommentID' => null,
-                    'LastDateInserted' => val('DateInserted', $discussion)
-                ]);
-            }
-
-            $categoryModel = new CategoryModel();
-            $categoryModel->setField($categoryID, $cacheAmendment);
-            $categoryModel->setRecentPost($categoryID);
+            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+            $discussion = (array)$discussion ?: null;
+            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+            $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID, 'discussion' => $discussion]);
         }
     }
 

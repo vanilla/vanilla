@@ -14,6 +14,23 @@ use Vanilla\Models\PipelineModel;
  * Class for basic PipelineModel testing.
  */
 class BasicPipelineModel extends PipelineModel {
+    /**
+     * BasicPipelineModel constructor.
+     *
+     * @param string $table
+     */
+    public function __construct(string $table) {
+        parent::__construct($table);
+
+        $this->readSchema = $this->writeSchema = Schema::parse([
+            "UniqueID" => ["type" => "integer"],
+            "InsertUserID" => ["type" => "integer"],
+            "DateInserted" => ["type" => "datetime"],
+            "UpdateUserID" => ["type" => "integer"],
+            "DateUpdated" => ["type" => "datetime"],
+        ]);
+    }
+
 
     /**
      * Perform a dummy database operation using the configured pipeline.
@@ -40,18 +57,5 @@ class BasicPipelineModel extends PipelineModel {
             return $dummyResult;
         });
         return $result;
-    }
-
-    /**
-     * Make sure we have configured schemas available to the instance.
-     */
-    protected function ensureSchemas() {
-        $this->readSchema = $this->writeSchema = Schema::parse([
-            "UniqueID" => ["type" => "integer"],
-            "InsertUserID" => ["type" => "integer"],
-            "DateInserted" => ["type" => "datetime"],
-            "UpdateUserID" => ["type" => "integer"],
-            "DateUpdated" => ["type" => "datetime"],
-        ]);
     }
 }

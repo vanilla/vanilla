@@ -23,7 +23,7 @@ class Model implements InjectableInterface {
     const OPT_ORDER = 'order';
 
     /** @var \Gdn_Database */
-    protected $database;
+    private $database;
 
     /** @var Schema */
     protected $readSchema;
@@ -38,6 +38,11 @@ class Model implements InjectableInterface {
 
     /** @var Schema */
     protected $writeSchema;
+
+    /**
+     * @var Schema
+     */
+    private $databaseSchema;
 
     /**
      * Basic model constructor.
@@ -61,6 +66,34 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Get the schema used to validate selects.
+     *
+     * @return Schema
+     */
+    public function getReadSchema(): Schema {
+        if ($this->readSchema === null) {
+            $schema = $this->getDatabaseSchema();
+            $this->configureReadSchema($schema);
+            $this->readSchema = $schema;
+        }
+        return $this->readSchema;
+    }
+
+    /**
+     * Get the schema used to validate inserts and updates.
+     *
+     * @return Schema
+     */
+    public function getWriteSchema(): Schema {
+        if ($this->writeSchema === null) {
+            $schema = $this->getDatabaseSchema();
+            $this->configureWriteSchema($schema);
+            $this->writeSchema = $schema;
+        }
+        return $this->writeSchema;
+    }
+
+    /**
      * Configure a Garden Schema instance for write operations by the model.
      *
      * @param Schema $schema Schema representing the resource's database table.
@@ -81,29 +114,22 @@ class Model implements InjectableInterface {
      * @return bool True.
      */
     public function delete(array $where, array $options = []): bool {
-        // Lazy load schemas.
-        $this->ensureSchemas();
         $limit = $options[self::OPT_LIMIT] ?? false;
 
-        $this->sql()->delete($this->table, $where, $limit);
+        $this->createSql()->delete($this->table, $where, $limit);
         // If fully executed without an exception bubbling up, consider this a success.
         return true;
     }
 
     /**
      * Make sure we have configured schemas available to the instance.
+     *
+     * @deprecated Use `getReadSchema()` and `getWriteSchema()` instead.
+     * @codeCoverageIgnore
      */
     protected function ensureSchemas() {
-        if ($this->readSchema === null || $this->writeSchema === null) {
-            $schema = $this->database->simpleSchema($this->table);
-
-            if (!($this->readSchema instanceof Schema)) {
-                $this->readSchema = $this->configureReadSchema(clone $schema);
-            }
-            if (!($this->writeSchema instanceof Schema)) {
-                $this->writeSchema = $this->configureWriteSchema(clone $schema);
-            }
-        }
+        $this->getReadSchema();
+        $this->getWriteSchema();
     }
 
     /**
@@ -118,17 +144,14 @@ class Model implements InjectableInterface {
      * @return array Rows matching the conditions and within the parameters specified in the options.
      * @throws ValidationException If a row fails to validate against the schema.
      */
-    public function get(array $where = [], array $options = []): array {
-        // Lazy load schemas.
-        $this->ensureSchemas();
-
+    public function select(array $where = [], array $options = []): array {
         $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
         $offset = $options[self::OPT_OFFSET] ?? 0;
         $selects =  $options[self::OPT_SELECT] ?? [];
 
-        $sqlDriver = $this->sql();
+        $sqlDriver = $this->createSql();
 
         if (!empty($selects)) {
             if (is_string($selects)) {
@@ -142,13 +165,26 @@ class Model implements InjectableInterface {
             ->resultArray();
 
         if (empty($selects)) {
-            $schema = Schema::parse([":a" => $this->readSchema]);
+            $schema = Schema::parse([":a" => $this->getReadSchema()]);
         } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
+            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->getReadSchema())]);
         }
+        // What if a processor goes here?
+
         $result = $schema->validate($result);
 
         return $result;
+    }
+
+    /**
+     * An alias of `select()`.
+     *
+     * @param array $where
+     * @param array $options
+     * @return array
+     */
+    public function get(array $where = [], array $options = []): array {
+        return $this->select($where, $options);
     }
 
     /**
@@ -225,13 +261,12 @@ class Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      */
     public function insert(array $set) {
-        // Lazy load schemas.
-        $this->ensureSchemas();
-
-        $set = $this->writeSchema->validate($set);
-        $result = $this->sql()->insert($this->table, $set);
+        $set = $this->getWriteSchema()->validate($set);
+        $result = $this->createSql()->insert($this->table, $set);
         if ($result === false) {
+            // @codeCoverageIgnoreStart
             throw new Exception("An unknown error was encountered while inserting the row.");
+            // @codeCoverageIgnoreEnd
         }
         // This is a bit of a kludge, but we want a true integer because we are otherwise string with schemas.
         if (is_numeric($result)) {
@@ -252,10 +287,21 @@ class Model implements InjectableInterface {
      *
      * @return \Gdn_SQLDriver
      */
-    protected function sql(): \Gdn_SQLDriver {
+    protected function createSql(): \Gdn_SQLDriver {
         $sql = clone $this->database->sql();
         $sql->reset();
         return $sql;
+    }
+
+    /**
+     * Alias of `createSql()`.
+     *
+     * @return \Gdn_SQLDriver
+     * @deprecated
+     * @codeCoverageIgnore
+     */
+    protected function sql(): \Gdn_SQLDriver {
+        return $this->createSql();
     }
 
     /**
@@ -267,11 +313,8 @@ class Model implements InjectableInterface {
      * @return bool True.
      */
     public function update(array $set, array $where): bool {
-        // Lazy load schemas.
-        $this->ensureSchemas();
-
-        $set = $this->writeSchema->validate($set, true);
-        $this->sql()->put($this->table, $set, $where);
+        $set = $this->getWriteSchema()->validate($set, true);
+        $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.
         return true;
     }
@@ -291,9 +334,21 @@ class Model implements InjectableInterface {
         }
 
         if (!empty($negatives)) {
-            $columns = array_keys($this->readSchema->getField('properties'));
+            $columns = array_keys($this->getReadSchema()->getField('properties'));
             $selects = array_values(array_diff($columns, $negatives));
         }
         return $selects;
+    }
+
+    /**
+     * Get or generate the schema returned by the database.
+     *
+     * @return Schema
+     */
+    private function getDatabaseSchema(): Schema {
+        if ($this->databaseSchema === null) {
+            $this->databaseSchema = $this->database->simpleSchema($this->getTable());
+        }
+        return $this->databaseSchema;
     }
 }

@@ -52,7 +52,7 @@ class DraftModel extends PipelineModel {
      */
     public function draftsCount(int $userID): int {
 
-        $countRecord = $this->sql()
+        $countRecord = $this->createSql()
             ->from($this->getTable())
             ->select('*', 'COUNT', 'draftCount')
             ->where('insertUserID', $userID)

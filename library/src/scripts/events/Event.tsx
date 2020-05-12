@@ -4,28 +4,34 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { eventsClasses, eventsVariables } from "@library/events/eventStyles";
 import Paragraph from "@library/layout/Paragraph";
 import TruncatedText from "@library/content/TruncatedText";
-import EventAttendanceDropDown, { EventAttendance } from "@library/events/EventAttendanceDropDown";
+import EventAttendanceDropDown from "@library/events/EventAttendanceDropDown";
 import classNames from "classnames";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { calc } from "csx";
+import { AttendanceStamp } from "@library/events/AttendanceStamp";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { EventAttendance } from "@library/events/eventOptions";
+import { IFromToDate } from "@library/content/FromToDateTime";
 
 interface IEventDate extends Omit<IDateTime, "mode" | "type"> {}
 
 export interface IEvent {
-    date: IEventDate;
+    dateStart: IEventDate | IFromToDate;
+    dateEnd?: IEventDate | IFromToDate;
     name: string;
     excerpt?: string;
     location: string;
     url: string;
-    headingLevel?: 2 | 3;
+    headingLevel?: 2 | 3 | 4;
     attendance: EventAttendance;
     className?: string;
+    compact?: boolean;
     longestCharCount?: number; // for dynamic width, based on language
     attendanceOptions: ISelectBoxItem[];
 }
 
 /**
- * Component for displaying an accessible nicely formatted time string.
+ * Component for displaying an event in a list
  */
 export function Event(props: IEvent) {
     const classes = eventsClasses();
@@ -33,7 +39,8 @@ export function Event(props: IEvent) {
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
 
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
-
+    const showAttendance = props.compact && props.attendance !== EventAttendance.NOT_GOING;
+    const showMetas = props.location || !props.compact || showAttendance;
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
@@ -41,33 +48,55 @@ export function Event(props: IEvent) {
                     to={props.url}
                     className={classes.link}
                     tabIndex={0}
-                    style={{ maxWidth: calc(`100% - ${attendanceWidth}`) }}
+                    style={
+                        showAttendance
+                            ? {
+                                  maxWidth: !props.compact ? calc(`100% - ${attendanceWidth}`) : undefined,
+                                  fontSize: props.compact
+                                      ? eventsVariables().attendanceStamp.font.size
+                                      : globalVariables().fonts.size.medium, // Needed for correct ex calculation
+                              }
+                            : {}
+                    }
                 >
-                    <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.date} />
-                    <div className={classes.main}>
-                        <HeadingTag className={classes.title}>{props.name}</HeadingTag>
-                        {props.excerpt && (
-                            <Paragraph className={classes.excerpt}>
-                                <TruncatedText maxCharCount={160}>{props.excerpt}</TruncatedText>
-                            </Paragraph>
-                        )}
-                        <div className={classes.metas}>
-                            {props.location && <div className={classes.meta}>{props.location}</div>}
-                            <div className={classes.meta}>
-                                <DateTime type={DateFormats.DEFAULT} {...props.date} />
-                            </div>
+                    <div className={classes.linkAlignment}>
+                        <DateTime className={classes.dateCompact} type={DateFormats.COMPACT} {...props.dateStart} />
+                        <div className={classes.main}>
+                            <HeadingTag title={props.name} className={classes.title}>
+                                {props.name}
+                            </HeadingTag>
+                            {props.excerpt && !props.compact && (
+                                <Paragraph className={classes.excerpt}>
+                                    <TruncatedText maxCharCount={160}>{props.excerpt}</TruncatedText>
+                                </Paragraph>
+                            )}
+                            {showMetas && (
+                                <div className={classes.metas}>
+                                    {showAttendance && (
+                                        <AttendanceStamp attendance={props.attendance} className={classes.meta} />
+                                    )}
+                                    {props.location && <div className={classes.meta}>{props.location}</div>}
+                                    {!props.compact && (
+                                        <div className={classes.meta}>
+                                            <DateTime type={DateFormats.DEFAULT} {...props.dateStart} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </SmartLink>
-                <div
-                    className={classes.attendance}
-                    style={{
-                        flexBasis: `${attendanceWidth}`,
-                        width: `${attendanceWidth}`,
-                    }}
-                >
-                    <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />
-                </div>
+                {!props.compact && (
+                    <div
+                        className={classes.attendance}
+                        style={{
+                            flexBasis: `${attendanceWidth}`,
+                            width: `${attendanceWidth}`,
+                        }}
+                    >
+                        <EventAttendanceDropDown attendance={props.attendance} options={props.attendanceOptions} />
+                    </div>
+                )}
             </article>
         </li>
     );

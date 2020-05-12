@@ -21,6 +21,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
+import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 
 export const radioTabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -186,5 +187,5 @@ export const radioTabClasses = useThemeCache(() => {
         input,
         leftTab,
         rightTab,
-    };
+    } as IRadioTabClasses;
 });

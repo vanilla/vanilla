@@ -105,7 +105,7 @@ story.add("Elements", () => {
             </StoryParagraph>
             <RadioTabs
                 accessibleTitle={t("Search in:")}
-                prefix="advancedSearchDomain"
+                groupName="advancedSearchDomain"
                 setData={doNothing}
                 activeTab={activeTab}
                 childClass="advancedSearchDomain-tab"

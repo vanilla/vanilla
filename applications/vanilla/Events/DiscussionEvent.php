@@ -7,9 +7,12 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
+use Vanilla\Logging\LoggableEventInterface;
+use Vanilla\Logging\LoggableEventTrait;
 
 /**
  * Represent a discussion resource event.
  */
-class DiscussionEvent extends ResourceEvent {
+class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
+    use LoggableEventTrait;
 }

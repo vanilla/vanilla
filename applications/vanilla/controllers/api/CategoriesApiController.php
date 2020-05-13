@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -164,7 +165,9 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id) {
-        $this->permission('Garden.Settings.Manage');
+        if (!$this->categoryModel::checkPermission($id, 'Vanilla.Discussions.View')) {
+            throw new ForbiddenException('Category');
+        }
 
         $in = $this->idParamSchema()->setDescription('Get a category.');
         $out = $this->schema($this->schemaWithParent(), 'out');

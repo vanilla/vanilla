@@ -155,6 +155,18 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      */
     public function log($level, $message, array $context = []) {
+        // Add default fields to the context if they don't exist.
+        $defaults = [
+            'userid' => \Gdn::session()->UserID,
+            'username' => \Gdn::session()->User->Name ?? 'anonymous',
+            'ip' => \Gdn::request()->ipAddress(),
+            'timestamp' => time(),
+            'method' => \Gdn::request()->requestMethod(),
+            'domain' => rtrim(url('/', true), '/'),
+            'path' => \Gdn::request()->path()
+        ];
+        $context = $context + $defaults;
+
         $levelPriority = self::levelPriority($level);
         if ($levelPriority > LOG_DEBUG) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level: $level.");

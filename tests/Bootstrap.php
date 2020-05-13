@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
+use Nette\Loaders\RobotLoader;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;

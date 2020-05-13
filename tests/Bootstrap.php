@@ -325,6 +325,9 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
 
+            ->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(ForumBreadcrumbProvider::class)])
+
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')
             ->setShared(true)

@@ -234,7 +234,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->Assets = [];
         $this->CssClass = '';
         $this->Data = [];
-        $this->formatService = Gdn::getContainer()->get(FormatService::class);
         $this->Head = Gdn::factory('Dummy');
         $this->internalMethods = [
             'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
@@ -753,8 +752,8 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function description($value = false, $plainText = false) {
         if ($value) {
-            $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
-            $value = $plainText ? $this->formatService->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $htmlSanitizer->filter($value);
+
+            $value = $plainText ? Gdn::formatService()->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $this->htmlSanitizer->filter($value);
             $this->setData('_Description', $value);
         }
         return $this->data('_Description');
@@ -2461,11 +2460,11 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function title($title = null, $subtitle = null) {
         if (!is_null($title)) {
-            $this->setData('Title', $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY));
+            $this->setData('Title', Gdn::formatService()->renderPlainText($title, HtmlFormat::FORMAT_KEY));
         }
 
         if (!is_null($subtitle)) {
-            $this->setData('_Subtitle', $this->formatService->renderPlainText($subtitle, HtmlFormat::FORMAT_KEY));
+            $this->setData('_Subtitle', Gdn::formatService()->renderPlainText($subtitle, HtmlFormat::FORMAT_KEY));
         }
 
         return $this->data('Title');

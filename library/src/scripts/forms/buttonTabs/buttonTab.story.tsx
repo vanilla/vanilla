@@ -10,9 +10,7 @@ import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { BannerAlignment } from "@library/banner/bannerStyles";
 
 export default {
     title: "Radio Buttons as Buttons",
@@ -29,13 +27,9 @@ export function RadioButtonsAsButtons(props: { title?: string; accessibleTitle?:
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
             <ButtonTabs accessibleTitle={accessibleTitle} setData={selectedTab => {}}>
-                <ButtonTab disabled={props.disabled} label={t("Going")} data={EventAttendance.GOING.toString()} />
-                <ButtonTab disabled={props.disabled} label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
-                <ButtonTab
-                    disabled={props.disabled}
-                    label={t("Not going")}
-                    data={EventAttendance.NOT_GOING.toString()}
-                />
+                <ButtonTab disabled={props.disabled} label={t("Going")} data={"going"} />
+                <ButtonTab disabled={props.disabled} label={t("Maybe")} data={"maybe"} />
+                <ButtonTab disabled={props.disabled} label={t("Not going")} data={"Not Going"} />
             </ButtonTabs>
         </>
     );

@@ -9,7 +9,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
 import { FromToDateTime } from "@library/content/FromToDateTime";
 import { DataList } from "@library/dataLists/DataList";
-import { dummyEventDetailsData } from "@groups/events/dummyEventData";
+import { STORY_DATE } from "@library/storybook/storyData";
 
 export default {
     title: "Data List",
@@ -20,17 +20,15 @@ export function Standard(props: { data: [] }) {
     const dummyData = [
         {
             key: t("When"),
-            value: (
-                <FromToDateTime dateStarts={dummyEventDetailsData.dateStart} dateEnds={dummyEventDetailsData.dateEnd} />
-            ),
+            value: <FromToDateTime dateStarts={STORY_DATE} dateEnds={STORY_DATE} />,
         },
         {
             key: t("Where"),
-            value: dummyEventDetailsData.location,
+            value: "A beautiful sunny beach",
         },
         {
             key: t("Organizer"),
-            value: dummyEventDetailsData.organizer,
+            value: "Adam Charron",
         },
     ];
 

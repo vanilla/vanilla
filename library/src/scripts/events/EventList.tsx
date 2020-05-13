@@ -24,7 +24,7 @@ export interface IEventList {
 /**
  * Component for displaying the list of events
  */
-export function EventsList(props: IEventList) {
+export function EventList(props: IEventList) {
     const classes = eventsClasses({
         compact: props.compact,
     });

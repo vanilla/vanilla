@@ -5,18 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    debugHelper,
-    ISimpleBorderStyle,
-    paddings,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, paddings, unit, userSelect } from "@library/styles/styleHelpers";
 import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, px } from "csx";
+import { important, percent, px } from "csx";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -75,6 +67,11 @@ export const tokensClasses = useThemeCache(() => {
                     },
                     ".tokens__input": {
                         flexGrow: 1,
+                        display: important("inline-flex"),
+                        alignItems: "center",
+                        justifyContent: "stretch",
+                        margin: unit((formElVars.sizing.height - vars.token.minHeight) / 2 - formElVars.border.width),
+                        minHeight: unit(vars.token.minHeight),
                     },
                     input: {
                         width: percent(100),

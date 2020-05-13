@@ -369,7 +369,6 @@ compatibilityStyles = useThemeCache(() => {
     ideaCSS();
     tableCSS();
     discussionCSS();
-
     searchPageCSS();
     groupsCSS();
     profilePageCSS();

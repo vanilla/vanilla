@@ -752,7 +752,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function description($value = false, $plainText = false) {
         if ($value) {
-
             $value = $plainText ? Gdn::formatService()->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $this->htmlSanitizer->filter($value);
             $this->setData('_Description', $value);
         }

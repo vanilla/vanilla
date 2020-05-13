@@ -547,4 +547,28 @@ class Bootstrap {
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
     }
+
+    /**
+     * Register an autoloader that loads all classes.
+     */
+    public static function registerAutoloader(): void {
+        $loader = new RobotLoader();
+        $loader->addDirectory(PATH_APPLICATIONS, PATH_PLUGINS);
+
+        $excluded = [
+            'Mustache',
+            'sitehub',
+            'lithecompiler',
+            'lithestyleguide',
+            'Warnings',
+        ];
+        foreach ($excluded as $subdir) {
+            $loader->excludeDirectory(PATH_PLUGINS.'/'.$subdir);
+        }
+
+        // And set caching to the 'temp' directory
+        $loader->setTempDirectory(PATH_ROOT.'/tests/cache/autoloader');
+        $loader->register();
+    }
 }
+

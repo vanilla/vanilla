@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface;
 class Logger {
     public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
     public const FIELD_LOG_TYPE = \Vanilla\Logger::FIELD_LOG_TYPE;
+    public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
+    public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
 
     public const TYPE_ADMIN = \Vanilla\Logger::TYPE_ADMIN;
     public const TYPE_APPLICATION = \Vanilla\Logger::TYPE_APPLICATION;
@@ -27,8 +29,6 @@ class Logger {
     public const TYPE_SECURITY = \Vanilla\Logger::TYPE_SECURITY;
     public const TYPE_SYSTEM = \Vanilla\Logger::TYPE_SYSTEM;
     public const TYPE_DEFAULT = \Vanilla\Logger::TYPE_DEFAULT;
-
-
 
     /** Log type. */
     const EMERGENCY = 'emergency';

@@ -22,6 +22,8 @@ class Logger implements LoggerInterface {
 
     public const FIELD_EVENT = 'event';
     public const FIELD_LOG_TYPE = 'logType';
+    public const FIELD_TARGET_USERID = 'targetUserID';
+    public const FIELD_TARGET_USERNAME = 'targetName';
 
     public const TYPE_ADMIN = 'admin';
     public const TYPE_APPLICATION = 'application';

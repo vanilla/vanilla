@@ -10,7 +10,7 @@
  */
 
 use Vanilla\Formatting\Formats\HtmlFormat;
-use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
@@ -227,7 +227,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Gdn_Controller constructor.
      */
     public function __construct() {
-        $this->htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
         $this->useDeferredLegacyScripts = \Vanilla\FeatureFlagHelper::featureEnabled('DeferredLegacyScripts');
         $this->Application = '';
         $this->ApplicationFolder = '';
@@ -752,7 +751,9 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function description($value = false, $plainText = false) {
         if ($value) {
-            $value = $plainText ? Gdn::formatService()->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $this->htmlSanitizer->filter($value);
+            /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+            $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+            $value = $plainText ? Gdn::formatService()->renderPlainText($value, HtmlFormat::FORMAT_KEY) : $htmlSanitizer->filter($value);
             $this->setData('_Description', $value);
         }
         return $this->data('_Description');

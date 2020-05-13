@@ -42,6 +42,7 @@ import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import { logDebugConditionnal } from "@vanilla/utils";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -412,7 +413,7 @@ export const camelCaseToDash = (str: string) => {
     return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 };
 
-export const nestedWorkaround = (selector: string, nestedObject) => {
+export const nestedWorkaround = (selector: string, nestedObject, debug?: boolean) => {
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
 
@@ -446,6 +447,7 @@ export const nestedWorkaround = (selector: string, nestedObject) => {
                 }
             }
         });
+        logDebugConditionnal(debug, rawStyles);
         cssRaw(rawStyles);
     }
 };

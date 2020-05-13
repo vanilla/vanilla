@@ -39,7 +39,13 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
             new Breadcrumb(self::t('Community'), \Gdn::request()->url('/')),
         ];
         foreach ($ancestors as $ancestor) {
-            $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor));
+            if ($ancestor['CategoryID'] === -1) {
+                // If we actually get the root category, we don't want to see the "synthetic" root.
+                // We actually just want the categories page.
+                $crumbs[] = new Breadcrumb(t('Categories'), url('/categories'));
+            } else {
+                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor));
+            }
         }
         return $crumbs;
     }

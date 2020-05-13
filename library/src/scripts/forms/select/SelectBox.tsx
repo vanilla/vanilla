@@ -143,16 +143,17 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
 function SelectBoxContents(props: { item: ISelectBoxItem; isSelected: boolean }) {
     const { item, isSelected } = props;
     const classes = selectBoxClasses();
+    console.log("bala");
 
     return (
         <>
             <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
             <span className={classNames("sc-only", classes.checkContainer)}>
-                {isSelected && <CheckCompactIcon className={"selectBox-isSelectedIcon"} />}
+                {isSelected && (
+                    <CheckCompactIcon className={classNames("selectBox-isSelectedIcon", classes.checkedIcon)} />
+                )}
                 {!isSelected && (
-                    <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
-                        {` `}
-                    </span>
+                    <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}></span>
                 )}
                 {item.icon}
             </span>

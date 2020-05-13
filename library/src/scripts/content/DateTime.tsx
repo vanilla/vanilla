@@ -16,7 +16,7 @@ export enum DateFormats {
     COMPACT = "compact",
 }
 
-export interface IDateTime {
+interface IDateTimeProps {
     /** The timestamp to format and display */
     timestamp: string;
     /** Pass an explicit time zone to format in. */
@@ -31,8 +31,8 @@ export interface IDateTime {
 /**
  * Component for displaying an accessible nicely formatted time string.
  */
-export default class DateTime extends Component<IDateTime> {
-    public static defaultProps: Partial<IDateTime> = {
+export default class DateTime extends Component<IDateTimeProps> {
+    public static defaultProps: Partial<IDateTimeProps> = {
         mode: "fixed",
         type: DateFormats.DEFAULT,
     };

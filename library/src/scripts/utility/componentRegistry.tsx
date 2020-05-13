@@ -45,6 +45,8 @@ const _components: {
     [key: string]: IRegisteredComponent;
 } = {};
 
+let _pageComponent: React.ComponentType<any> | null = null;
+
 /**
  * Register a component in the Components registry.
  *
@@ -56,6 +58,16 @@ export function addComponent(name: string, Component: React.ComponentType<any>, 
         Component,
         mountOptions,
     };
+}
+
+/**
+ * Register a component in the Components registry.
+ *
+ * @param name The name of the component.
+ * @param component The component to register.
+ */
+export function addPageComponent(Component: React.ComponentType<any>) {
+    _pageComponent = Component;
 }
 
 /**
@@ -86,6 +98,11 @@ export function getComponent(name: string): IRegisteredComponent | undefined {
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export function _mountComponents(parent: Element) {
+    const parentPage = parent.querySelector("#app");
+    if (parentPage instanceof HTMLElement && _pageComponent !== null) {
+        mountReact(<_pageComponent />, parentPage);
+    }
+
     parent.querySelectorAll("[data-react]").forEach(node => {
         if (!(node instanceof HTMLElement)) {
             logWarning("Attempting to mount a data-react component on an invalid element", node);

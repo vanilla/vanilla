@@ -75,6 +75,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
         whiteSpace: "nowrap",
+        fontWeight: globalVars.fonts.weights.bold,
         ...paddings(vars.key.padding),
     });
 

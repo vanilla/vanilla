@@ -1,6 +1,5 @@
 import React, { useRef, useMemo, useReducer } from "react";
 import classNames from "classnames";
-
 import { NewPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
@@ -47,6 +46,7 @@ function ActionItem(props: IProps) {
 
     const contents = (
         <>
+            <div className={classes.itemFocus} aria-hidden={true} />
             {icon}
             <span className={classes.label}>{label}</span>
         </>
@@ -326,9 +326,12 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                         />
                     ))}
                 </animated.ul>
+
                 <animated.div
-                    className={classes.toggleShadow}
-                    style={{ transform: interpolate(s => `scale(${s}deg)`) }}
+                    className={classes.toggleWrap}
+                    style={{
+                        transform: interpolate([s], s => `scale(${s})`),
+                    }}
                 >
                     <AnimatedButton
                         onKeyDown={onMenuButtonKeyDown}
@@ -345,13 +348,14 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                                     range: [0, 0.25, 0.45, 0.75, 1],
                                     output: [1, 0.97, 0.7, 0.9, 1],
                                 })
-                                .interpolate(x => `${o}`),
-                            transform: interpolate(d => `rotate(${d})`),
+                                .interpolate(o => `${o}`),
+                            transform: interpolate([d], d => `rotate(${d}deg)`),
                         }}
                         baseClass={ButtonTypes.CUSTOM}
                         onClick={() => dispatch({ type: "toggle_open" })}
                         className={classNames(classes.toggle)}
                     >
+                        <div className={classes.toggleFocus} aria-hidden={true} />
                         <NewPostMenuIcon />
                     </AnimatedButton>
                 </animated.div>

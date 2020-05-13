@@ -325,9 +325,6 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
 
-            ->rule(BreadcrumbModel::class)
-            ->addCall('addProvider', [new Reference(ForumBreadcrumbProvider::class)])
-
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')
             ->setShared(true)
@@ -413,7 +410,7 @@ class Bootstrap {
                 /* @var Addon $addon */
                 if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
                     $bootstrapPath = $addon->path($bootstrapPath);
-                    include_once $bootstrapPath;
+                    include $bootstrapPath;
                 }
             }
 

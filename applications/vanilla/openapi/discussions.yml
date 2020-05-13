@@ -152,6 +152,7 @@ paths:
             - lastPost
             - lastPost.body
             - lastPost.insertUser
+            - reactions
             - all
             type: string
           type: array

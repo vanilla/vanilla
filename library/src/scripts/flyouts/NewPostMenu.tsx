@@ -326,31 +326,35 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                         />
                     ))}
                 </animated.ul>
-
-                <AnimatedButton
-                    onKeyDown={onMenuButtonKeyDown}
-                    id={buttonID}
-                    aria-haspopup="true"
-                    aria-controls={menuID}
-                    aria-expanded={state.open}
-                    title={t("New Post Menu")}
-                    aria-label={t("New Post Menu")}
-                    buttonRef={buttonRef}
-                    style={{
-                        opacity: o
-                            .interpolate({
-                                range: [0, 0.25, 0.45, 0.75, 1],
-                                output: [1, 0.97, 0.7, 0.9, 1],
-                            })
-                            .interpolate(x => `${o}`),
-                        transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
-                    }}
-                    baseClass={ButtonTypes.CUSTOM}
-                    onClick={() => dispatch({ type: "toggle_open" })}
-                    className={classNames(classes.toggle)}
+                <animated.div
+                    className={classes.toggleShadow}
+                    style={{ transform: interpolate(s => `scale(${s}deg)`) }}
                 >
-                    <NewPostMenuIcon />
-                </AnimatedButton>
+                    <AnimatedButton
+                        onKeyDown={onMenuButtonKeyDown}
+                        id={buttonID}
+                        aria-haspopup="true"
+                        aria-controls={menuID}
+                        aria-expanded={state.open}
+                        title={t("New Post Menu")}
+                        aria-label={t("New Post Menu")}
+                        buttonRef={buttonRef}
+                        style={{
+                            opacity: o
+                                .interpolate({
+                                    range: [0, 0.25, 0.45, 0.75, 1],
+                                    output: [1, 0.97, 0.7, 0.9, 1],
+                                })
+                                .interpolate(x => `${o}`),
+                            transform: interpolate(d => `rotate(${d})`),
+                        }}
+                        baseClass={ButtonTypes.CUSTOM}
+                        onClick={() => dispatch({ type: "toggle_open" })}
+                        className={classNames(classes.toggle)}
+                    >
+                        <NewPostMenuIcon />
+                    </AnimatedButton>
+                </animated.div>
             </div>
         </NewPostBackground>
     );

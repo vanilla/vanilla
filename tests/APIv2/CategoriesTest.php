@@ -51,8 +51,6 @@ class CategoriesTest extends AbstractResourceTest {
      */
     public static function setUpBeforeClass(): void {
         parent::setupBeforeClass();
-        self::container()->rule(BreadcrumbModel::class)
-            ->addCall('addProvider', [new \Garden\Container\Reference(ForumBreadcrumbProvider::class)]);
         self::$categoryModel = self::container()->get(CategoryModel::class);
     }
 

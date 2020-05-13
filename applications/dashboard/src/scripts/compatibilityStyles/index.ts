@@ -41,6 +41,7 @@ import { searchResultsVariables } from "@vanilla/library/src/scripts/features/se
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -352,7 +353,7 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
-    cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(vars.mainColors.primary) });
+    cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(dropDownVariables().item.colors.fg) });
 
     buttonCSS();
     flyoutCSS();

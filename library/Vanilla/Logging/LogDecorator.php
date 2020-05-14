@@ -32,6 +32,11 @@ class LogDecorator implements LoggerInterface {
     private $logger;
 
     /**
+     * @var array
+     */
+    private $staticContextDefaults = [];
+
+    /**
      * LogDecorator constructor.
      *
      * @param \Gdn_Session $session
@@ -48,7 +53,7 @@ class LogDecorator implements LoggerInterface {
      * {@inheritdoc}
      */
     public function log($level, $message, array $context = array()) {
-        $defaults = [
+        $defaults = $this->staticContextDefaults + [
             'userid' => $this->session->UserID,
             'username' => $this->session->User->Name ?? 'anonymous',
             'ip' => $this->request->ipAddress(),
@@ -59,5 +64,32 @@ class LogDecorator implements LoggerInterface {
         ];
 
         $this->logger->log($level, $message, $context + $defaults);
+    }
+
+    /**
+     * Add log context defaults.
+     *
+     * @param array $defaults
+     */
+    public function addStaticContextDefaults(array $defaults) {
+        $this->staticContextDefaults = array_replace($this->staticContextDefaults, $defaults);
+    }
+
+    /**
+     * Get the context defaults that will be added to every log entry.
+     *
+     * @return array
+     */
+    public function getStaticContextDefaults(): array {
+        return $this->staticContextDefaults;
+    }
+
+    /**
+     * Set the context defaults that will be added to every log entry.
+     *
+     * @param array $staticContextDefaults
+     */
+    public function setStaticContextDefaults(array $staticContextDefaults): void {
+        $this->staticContextDefaults = $staticContextDefaults;
     }
 }

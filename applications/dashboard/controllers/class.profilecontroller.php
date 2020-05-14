@@ -365,9 +365,13 @@ class ProfileController extends Gdn_Controller {
     public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
 
+        $this->Head->addScript('js/library/jquery.js');
+
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);
         $settings = [];
+
+        $this->buildProfile();
 
         // Set up form
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);

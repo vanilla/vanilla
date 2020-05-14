@@ -158,14 +158,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
     ->addAlias(\Psr\EventDispatcher\EventDispatcherInterface::class)
     ->addAlias(\Psr\EventDispatcher\ListenerProviderInterface::class)
-    ->addCall("addListenerMethod", [\Vanilla\Logging\EventLogger::class, "logResourceEvent"])
+    ->addCall("addListenerMethod", [\Vanilla\Logging\ResourceEventLogger::class, "logResourceEvent"])
     ->setShared(true)
 
-    ->rule(\Vanilla\Logging\EventLogger::class)
-    ->addCall("overrideEventAction", [
+    ->rule(\Vanilla\Logging\ResourceEventLogger::class)
+    ->addCall("includeAction", [
         \Vanilla\Community\Events\UserEvent::class,
         '*',
-        true,
     ])
     ->setShared(true)
 

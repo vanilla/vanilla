@@ -26,6 +26,9 @@ abstract class ResourceEvent {
     /** @var array */
     protected $payload;
 
+    /** @var array */
+    protected $sender;
+
     /** @var string */
     protected $type;
 
@@ -34,10 +37,12 @@ abstract class ResourceEvent {
      *
      * @param string $action
      * @param array $payload
+     * @param array $sender
      */
-    public function __construct(string $action, array $payload) {
+    public function __construct(string $action, array $payload, ?array $sender = null) {
         $this->action = $action;
         $this->payload = $payload;
+        $this->sender = $sender;
         $this->type = $this->typeFromClass();
     }
 
@@ -57,6 +62,15 @@ abstract class ResourceEvent {
      */
     public function getPayload(): ?array {
         return $this->payload;
+    }
+
+    /**
+     * Get the entity responsible for triggering the event, if available.
+     *
+     * @return array|null
+     */
+    public function getSender(): ?array {
+        return $this->sender;
     }
 
     /**

@@ -142,9 +142,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // Logger
+    ->rule(\Vanilla\Logging\LogDecorator::class)
+    ->setShared(true)
+    ->setConstructorArgs(['logger' => new Reference(\Vanilla\Logger::class)])
+    ->addAlias(\Psr\Log\LoggerInterface::class)
+
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
-    ->addAlias(\Psr\Log\LoggerInterface::class)
 
     ->rule(\Psr\Log\LoggerAwareInterface::class)
     ->addCall('setLogger')
@@ -160,7 +164,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Logging\EventLogger::class)
     ->addCall("overrideEventAction", [
         \Vanilla\Community\Events\UserEvent::class,
-        \Garden\Events\ResourceEvent::ACTION_INSERT,
+        '*',
         true,
     ])
     ->setShared(true)

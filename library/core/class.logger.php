@@ -61,6 +61,11 @@ class Logger {
     private static $logLevel;
 
     /**
+     * @var LoggerInterface
+     */
+    private static $realLogger;
+
+    /**
      * Add a new logger to observe messages.
      *
      * @param LoggerInterface $logger The logger to add.
@@ -109,6 +114,18 @@ class Logger {
             self::$instance = Gdn::getContainer()->get(\Vanilla\Logger::class);
         }
         return self::$instance;
+    }
+
+    /**
+     * Get the logger used to do the actual logging.
+     *
+     * @return LoggerInterface
+     */
+    private static function getRealLogger(): LoggerInterface {
+        if (!self::$realLogger) {
+            self::$realLogger = Gdn::getContainer()->get(LoggerInterface::class);
+        }
+        return self::$realLogger;
     }
 
     /**
@@ -306,7 +323,7 @@ class Logger {
             'path' => Gdn::request()->path()
         ];
         $context = $context + $defaults;
-        static::getLogger()->log($level, $message, $context);
+        static::getRealLogger()->log($level, $message, $context);
     }
 
     /**

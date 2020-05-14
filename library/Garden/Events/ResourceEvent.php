@@ -69,6 +69,15 @@ abstract class ResourceEvent {
     }
 
     /**
+     * Get the full name of the event.
+     *
+     * @return string
+     */
+    public function getFullEventName(): string {
+        return $this->getType().'_'.$this->getAction();
+    }
+
+    /**
      * Derive the event type from the current class name.
      *
      * @return string

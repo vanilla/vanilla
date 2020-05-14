@@ -12,47 +12,52 @@ import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
-interface IProps {
-    prefix: string;
+export interface IRadioTabsProps {
     accessibleTitle: string; // Describe what these buttons represent. Hidden from view, for screen readers
-    className?: string;
     setData: (data: any) => void;
+    activeTab?: string | number;
     children: React.ReactNode;
-    activeTab: string | number;
+    groupName?: string;
+    className?: string;
     childClass?: string;
+    classes?: IRadioTabClasses;
+}
+
+export interface IRadioTabClasses {
+    root?: string;
+    tabs?: string;
+    tab?: string;
+    label?: string;
+    input?: string;
+    leftTab?: string;
+    rightTab?: string;
 }
 
 /**
- * Implement what looks like tabs, but what is semantically radio buttons.
+ * Implement what looks like tabs (or other inputs with the classes prop), but what is semantically radio buttons.
  */
-export default class RadioTabs extends React.Component<IProps> {
+export default class RadioTabs extends React.Component<IRadioTabsProps> {
     private groupID;
 
     public constructor(props) {
         super(props);
-        this.groupID = uniqueIDFromPrefix(this.props.prefix);
+        this.groupID = uniqueIDFromPrefix(this.props.groupName || "radioTabsGroup");
     }
 
     public render() {
-        const classes = radioTabClasses();
+        const classes = this.props.classes ?? radioTabClasses();
+
         const classesInputBlock = inputBlockClasses();
         return (
             <TabContext.Provider
                 value={{
                     groupID: this.groupID,
                     setData: this.props.setData,
-                    activeTab: this.props.activeTab,
+                    activeTab: this.props.activeTab || 0,
                     childClass: this.props.childClass || "",
                 }}
             >
-                <fieldset
-                    className={classNames(
-                        "_searchBarAdvanced-searchIn",
-                        classesInputBlock.root,
-                        classes.root,
-                        this.props.className,
-                    )}
-                >
+                <fieldset className={classNames(classesInputBlock.root, classes.root, this.props.className)}>
                     <ScreenReaderContent tag="legend">{this.props.accessibleTitle}</ScreenReaderContent>
                     <div className={classes.tabs}>{this.props.children}</div>
                 </fieldset>

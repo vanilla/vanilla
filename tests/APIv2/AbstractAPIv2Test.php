@@ -62,6 +62,24 @@ abstract class AbstractAPIv2Test extends TestCase {
 
         $this->logger = new TestLogger();
         \Logger::addLogger($this->logger);
+        $this->setUpTestTraits();
+    }
+
+    /**
+     * Setup test traits.
+     *
+     * Any trait that defines a method `setUpNameOfTrait` will be called.
+     */
+    public function setUpTestTraits() {
+        $uses = array_flip(class_uses(static::class));
+        foreach ($uses as $traitName) {
+            $shortName = (new \ReflectionClass($traitName))->getShortName();
+            $methodName = 'setUp'.$shortName;
+
+            if (method_exists($this, $methodName)) {
+                call_user_func([$this, $methodName]);
+            }
+        }
     }
 
     /**

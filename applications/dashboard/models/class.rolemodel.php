@@ -13,6 +13,13 @@
  */
 class RoleModel extends Gdn_Model {
 
+    const GUEST_ID = 2;
+    const UNCONFIRMED_ID = 3;
+    const APPLICANT_ID = 4;
+    const MEMBER_ID = 8;
+    const ADMIN_ID = 16;
+    const MOD_ID = 32;
+
     /** Slug for Guest role type. */
     const TYPE_GUEST = 'guest';
 

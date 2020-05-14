@@ -184,4 +184,4 @@ $Configuration['Routes']['DefaultPermission'] = ['dashboard/home/unauthorized', 
 $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
 
 // Themes
-$Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList"];
+$Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList", "NewEventList"];

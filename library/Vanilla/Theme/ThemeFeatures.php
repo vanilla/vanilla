@@ -29,6 +29,7 @@ class ThemeFeatures implements \JsonSerializable {
         'ProfileHeader' => false,
         'DataDrivenTheme' => false,
         'DisableKludgedVars' => false,
+        'NewEventsPage' => false,
     ];
 
     /**
@@ -76,6 +77,7 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['ProfileHeader'] = true;
             $themeValues['SharedMasterView'] = true;
             $themeValues['NewFlyouts'] = true;
+            $themeValues['NewEventsPage'] = true;
         }
 
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);

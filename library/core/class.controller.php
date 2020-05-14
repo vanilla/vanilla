@@ -221,6 +221,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var string|null  */
     protected $_PageName = null;
 
+    /** @var bool */
+    protected $isReactView = false;
+
     /**
      * Gdn_Controller constructor.
      */
@@ -738,6 +741,22 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->_DeliveryMethod;
+    }
+
+    /**
+     * Tell the controller to render as a full react view, instead of custom theme views.
+     *
+     * @param bool $isReactView
+     */
+    public function setIsReactView(bool $isReactView) {
+        $this->isReactView = $isReactView;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsReactView(): bool {
+        return $this->isReactView;
     }
 
     /**

@@ -81,10 +81,12 @@ class MasterViewRenderer {
             $this->getSharedData()
         );
 
+        $data['title'] = $data['Title'] ?? $this->siteMeta->getSiteTitle();
+
+        $bodyHtmlKey = $controller->getIsReactView() ? 'seoContent' : 'bodyContent';
+
         $extraData = [
-            'bodyContent' =>
-                $this->renderThemeContentView($data)
-                ?? $controller->renderAssetForTwig('Content'),
+            $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig('Content'),
             'cssClasses' => $controller->data('CssClass') . ' isLoading',
             'pageHead' => $controller->renderAssetForTwig('Head'),
         ];

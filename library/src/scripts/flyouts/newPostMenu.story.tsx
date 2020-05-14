@@ -43,7 +43,7 @@ const items: IAddPost[] = [
         type: PostTypes.LINK,
         action: "http://google.ca",
         icon: <NewDiscussionIcon />,
-        label: "Some Link",
+        label: "to Google",
     },
 ];
 

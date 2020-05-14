@@ -4,15 +4,13 @@
  */
 
 import React from "react";
-import DateTime, { DateFormats, IDateTime } from "@library/content/DateTime";
-import { StoryTiles } from "@library/storybook/StoryTiles";
-import { StoryTile } from "@library/storybook/StoryTile";
+import DateTime, { DateFormats } from "@library/content/DateTime";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 
 export default {
-    title: "Date Formats",
+    title: "Date/Time Formats",
     parameters: {},
 };
 
@@ -30,7 +28,7 @@ export function StoryDateTime(config) {
             timestamp: "2020-04-22T14:31:19Z",
             type: DateFormats.COMPACT,
         },
-    ] as IDateTime[];
+    ];
 
     const content = testDates.map((date, i) => {
         return (

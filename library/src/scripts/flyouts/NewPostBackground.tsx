@@ -2,31 +2,30 @@ import React from "react";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 
-import { useSpring, animated } from "react-spring";
-import { newPostBackgroundClasses, newPostBackgroundVariables } from "./newPostBackgroundStyles";
-import { colorOut } from "@library/styles/styleHelpers";
+import { animated } from "react-spring";
+import { newPostBackgroundClasses } from "./newPostBackgroundStyles";
 
 interface IProps {
     open: boolean;
     className?: string;
     children: React.ReactNode;
-    onClick: () => void;
+    onClick: (e) => void;
+    onKeyDown?: (e) => void;
+    bgTransition: any;
 }
 
 export default function NewPostBackground(props: IProps) {
     const classes = newPostBackgroundClasses();
-    const vars = newPostBackgroundVariables();
-
-    const trans = useSpring({
-        backgroundColor: props.open ? colorOut(vars.container.color.open) : colorOut(vars.container.color.close),
-        from: { backgroundColor: colorOut(vars.container.color.close) },
-        config: { duration: vars.container.duration },
-    });
 
     return createPortal(
-        <animated.div className={classNames(classes.container)} style={trans} onClick={props.onClick}>
+        <animated.aside
+            className={classNames(classes.container)}
+            style={props.bgTransition}
+            onClick={props.onClick}
+            onKeyDown={props.onKeyDown}
+        >
             {props.children}
-        </animated.div>,
+        </animated.aside>,
         document.body,
     );
 }

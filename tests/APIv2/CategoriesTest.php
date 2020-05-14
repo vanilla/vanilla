@@ -8,6 +8,8 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
+use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Test the /api/v2/categories endpoints.
@@ -43,6 +45,14 @@ class CategoriesTest extends AbstractResourceTest {
 
     /** {@inheritdoc} */
     protected $testPagingOnIndex = false;
+
+    /**
+     * Fix some container setup issues of the breadcrumb model.
+     */
+    public static function setUpBeforeClass(): void {
+        parent::setupBeforeClass();
+        self::$categoryModel = self::container()->get(CategoryModel::class);
+    }
 
     /**
      * {@inheritdoc}
@@ -86,14 +96,6 @@ class CategoriesTest extends AbstractResourceTest {
         ];
         static::$recordCounter++;
         return $record;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function setupBeforeClass(): void {
-        parent::setupBeforeClass();
-        self::$categoryModel = self::container()->get(CategoryModel::class);
     }
 
     /**

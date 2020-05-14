@@ -37,7 +37,7 @@ class BreadcrumbModel {
      */
     public function getForRecord(RecordInterface $record, string $locale = null): array {
         /** @var BreadcrumbProviderInterface|null $provider */
-        $provider = $this->providers[$record->getRecordType()];
+        $provider = $this->providers[$record->getRecordType()] ?? null;
         if (!$provider) {
             throw new BreadcrumbProviderNotFoundException($record->getRecordType() . " could not be found");
         }

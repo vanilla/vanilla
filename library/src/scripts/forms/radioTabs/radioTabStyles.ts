@@ -5,18 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { cssRule } from "typestyle";
-import {
-    colorOut,
-    unit,
-    fonts,
-    paddings,
-    borders,
-    negative,
-    srOnly,
-    IFont,
-    borderRadii,
-} from "@library/styles/styleHelpers";
+import { colorOut, unit, fonts, paddings, negative, srOnly, IFont, borderRadii } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -175,6 +164,9 @@ export const radioTabClasses = useThemeCache(() => {
                         color: colorOut(vars.colors.state.fg),
                     },
                 },
+            },
+            "&[disabled] + .radioButtonsAsTabs-label": {
+                opacity: formElementVariables.disabled.opacity,
             },
         },
     });

@@ -25,9 +25,11 @@ use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\UASniffer;
@@ -323,6 +325,9 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
 
+            ->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(ForumBreadcrumbProvider::class)])
+
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')
             ->setShared(true)
@@ -408,7 +413,7 @@ class Bootstrap {
                 /* @var Addon $addon */
                 if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
                     $bootstrapPath = $addon->path($bootstrapPath);
-                    include_once $bootstrapPath;
+                    include $bootstrapPath;
                 }
             }
 

@@ -162,6 +162,15 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             );
         };
 
+        const aboveOneColumn = (styles: NestedCSSProperties) => {
+            return media(
+                {
+                    minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
+                },
+                styles,
+            );
+        };
+
         const xs = (styles: NestedCSSProperties) => {
             return media(
                 {
@@ -178,6 +187,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             twoColumnsDown,
             oneColumn,
             oneColumnDown,
+            aboveOneColumn,
             xs,
         };
     };

@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { unit, srOnly, negativeUnit, margins } from "@library/styles/styleHelpers";
+import { unit, srOnly, negativeUnit, margins, pointerEvents } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, important, percent } from "csx";
@@ -69,7 +69,14 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
 
     const label = style(
         "label",
-        {},
+        {
+            $nest: {
+                "&.isDisabled": {
+                    ...pointerEvents("none"),
+                    opacity: formElementVariables.disabled.opacity,
+                },
+            },
+        },
         mediaQueries.xs({
             minWidth: important(0),
         }),

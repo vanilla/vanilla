@@ -312,17 +312,6 @@ class Logger {
      * @param array $context The message data.
      */
     public static function log($level, $message, $context = []) {
-        // Add default fields to the context if they don't exist.
-        $defaults = [
-            'userid' => Gdn::session()->UserID,
-            'username' => val("Name", Gdn::session()->User, 'anonymous'),
-            'ip' => Gdn::request()->ipAddress(),
-            'timestamp' => time(),
-            'method' => Gdn::request()->requestMethod(),
-            'domain' => rtrim(url('/', true), '/'),
-            'path' => Gdn::request()->path()
-        ];
-        $context = $context + $defaults;
         static::getRealLogger()->log($level, $message, $context);
     }
 

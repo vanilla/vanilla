@@ -10,11 +10,14 @@ namespace VanillaTests\Library\Vanilla;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
+use VanillaTests\BootstrapTrait;
 
 /**
  * Test of basic logging.
  */
 class LoggerTest extends LoggerInterfaceTest {
+    use BootstrapTrait;
+
     /**
      * @var TestLogger $logger;
      */
@@ -62,7 +65,9 @@ class LoggerTest extends LoggerInterfaceTest {
         list($lastLevel, $lastMessage, $lastContext) = $logger->last;
         $this->assertSame($level, $lastLevel);
         $this->assertSame($message, $lastMessage);
-        $this->assertSame($context, $lastContext);
+
+        $common = array_intersect_key($lastContext, $context);
+        $this->assertSame($context, $common);
     }
 
     protected function assertNotLog(TestLogger $logger, $level, $message, $context) {

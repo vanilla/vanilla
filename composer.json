@@ -29,6 +29,7 @@
     "require": {
         "php": ">=7.2.0",
         "ext-pdo": "*",
+        "ext-intl": "*",
         "ext-json": "*",
         "ext-curl": "*",
         "ext-fileinfo": "*",

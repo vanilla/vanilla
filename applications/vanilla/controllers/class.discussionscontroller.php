@@ -103,7 +103,7 @@ class DiscussionsController extends VanillaController {
 
         // Setup head.
         if (!$this->data('Title')) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             $DefaultControllerRoute = val('Destination', Gdn::router()->getRoute('DefaultController'));
             if ($Title && ($DefaultControllerRoute == 'discussions')) {
                 $this->title($Title, '');
@@ -112,7 +112,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->description()) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
         if ($this->Head) {
             $this->Head->addRss(url('/discussions/feed.rss', true), $this->Head->title());
@@ -268,7 +268,7 @@ class DiscussionsController extends VanillaController {
 
         // Setup head.
         if (!$this->data('Title')) {
-            $title = c('Garden.HomepageTitle');
+            $title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($title) {
                 $this->title($title, '');
             } else {
@@ -276,7 +276,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->description()) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
         if ($this->Head) {
             $this->Head->addRss(url('/discussions/unread/feed.rss', true), $this->Head->title());

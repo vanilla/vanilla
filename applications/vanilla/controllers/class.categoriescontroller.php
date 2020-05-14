@@ -10,6 +10,7 @@
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -102,7 +103,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section(val('CssClass', $category));
         Gdn_Theme::section('DiscussionList');
 
-        $this->title(val('Name', $category, ''));
+        $this->title(Gdn::formatService()->renderPlainText(val('Name', $category, ''), HtmlFormat::FORMAT_KEY));
         $this->description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
         $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
@@ -328,7 +329,7 @@ class CategoriesController extends VanillaController {
 
             $this->setData('Category', $category, true);
 
-            $this->title(val('Name', $category, ''));
+            $this->title(Gdn::formatService()->renderPlainText(val('Name', $category, ''), HtmlFormat::FORMAT_KEY));
             $this->description(val('Description', $category), true);
 
             switch ($category->DisplayAs) {
@@ -533,7 +534,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section('CategoryList');
 
         if (!$Category) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
 
         $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
@@ -617,7 +618,7 @@ class CategoriesController extends VanillaController {
         $this->Menu->highlightRoute('/discussions');
 
         if (!$this->title()) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($Title) {
                 $this->title($Title, '');
             } else {
@@ -626,7 +627,7 @@ class CategoriesController extends VanillaController {
         }
 
         if (!$Category) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
 
         Gdn_Theme::section('CategoryDiscussionList');

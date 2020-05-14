@@ -9,27 +9,21 @@ namespace VanillaTests\Library\Vanilla\Logging;
 use Garden\Events\ResourceEvent;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\CommentEvent;
-use Vanilla\Logging\EventLogger;
+use Vanilla\Logging\ResourceEventLogger;
 use Psr\Log\LoggerInterface;
 use Vanilla\Logger;
 use VanillaTests\Library\Vanilla\TestLogger;
 
 /**
- * Test for the EventLogger.
+ * Test for the ResourceEventLogger.
  */
-class EventLoggerTest extends TestCase {
+class ResourceEventLoggerTest extends TestCase {
 
-    /** @var EventLogger */
+    /** @var ResourceEventLogger */
     private $eventLogger;
 
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var \Gdn_Request|\PHPUnit\Framework\MockObject\Stub */
-    private $request;
-
-    /** @var \Gdn_Session */
-    private $session;
 
     /**
      * @inheritDoc
@@ -47,32 +41,20 @@ class EventLoggerTest extends TestCase {
         $parentLogger = new Logger();
         $this->logger = new TestLogger($parentLogger);
 
-        $this->session = new \Gdn_Session();
-        $this->session->User = (object)[
-            "UserID" => 1,
-            "Name" => "Vanilla",
-        ];
-
-        $this->request = $this->createStub(\Gdn_Request::class);
-        $this->request->method("getIP")->willReturn("127.0.0.1");
-        $this->request->method("getPath")->willReturn("/vanilla/path/to/endpoint");
-        $this->request->method("getMethod")->willReturn("POST");
-        $this->request->method("urlDomain")->willReturn("https://dev.vanilla.localhost");
-
-        $this->eventLogger = new EventLogger($this->logger, $this->session, $this->request);
+        $this->eventLogger = new ResourceEventLogger($this->logger);
     }
 
     /**
      * Verify adding a generic action event.
      */
-    public function testAddAction(): void {
+    public function testIncludeAction(): void {
         $newAction = md5(rand());
         $event = new CommentEvent($newAction, []);
 
         $this->eventLogger->logResourceEvent($event);
         $this->assertSame([null, null, null], $this->logger->last);
 
-        $this->eventLogger->addAction($newAction);
+        $this->eventLogger->includeAction("*", $newAction);
         $this->eventLogger->logResourceEvent($event);
         $this->assertNotNull($this->logger->last[0]);
     }
@@ -80,11 +62,11 @@ class EventLoggerTest extends TestCase {
     /**
      * Verify adding a generic action event.
      */
-    public function testAddActionReturn(): void {
+    public function testIncludeActionReturn(): void {
         $action = md5(rand());
-        $newResult = $this->eventLogger->addAction($action);
+        $newResult = $this->eventLogger->includeAction("*", $action);
         $this->assertTrue($newResult);
-        $existingResult = $this->eventLogger->addAction($action);
+        $existingResult = $this->eventLogger->includeAction("*", $action);
         $this->assertFalse($existingResult);
     }
 
@@ -92,13 +74,12 @@ class EventLoggerTest extends TestCase {
      * Verify adding an event-specific action rule.
      */
     public function testOverrideEventAction(): void {
-        $this->eventLogger->removeAction(ResourceEvent::ACTION_UPDATE);
-        $this->eventLogger->overrideEventAction(CommentEvent::class, ResourceEvent::ACTION_UPDATE, true);
+        $this->eventLogger->includeAction("*", ResourceEvent::ACTION_UPDATE);
+        $this->eventLogger->excludeAction(CommentEvent::class, ResourceEvent::ACTION_UPDATE);
 
         $event = new CommentEvent(ResourceEvent::ACTION_UPDATE, []);
         $this->eventLogger->logResourceEvent($event);
-        [$level, $message, $context] = $this->logger->last;
-        $this->assertSame("comment_update", $context[Logger::FIELD_EVENT]);
+        $this->assertSame([null, null, null], $this->logger->last);
     }
 
     /**
@@ -117,12 +98,6 @@ class EventLoggerTest extends TestCase {
                 "payload" => $payload,
                 "resourceAction" => $event->getAction(),
                 "resourceType" => $event->getType(),
-                "domain" => $this->request->urlDomain(),
-                "ip" => $this->request->getIP(),
-                "method" => $this->request->getMethod(),
-                "path" => $this->request->getPath(),
-                "userID" => $this->session->User->UserID,
-                "username" => $this->session->User->Name,
             ]
         ];
 
@@ -133,16 +108,16 @@ class EventLoggerTest extends TestCase {
     /**
      * Verify removing a generic action event.
      */
-    public function testRemoveAction(): void {
+    public function testExcludeAction(): void {
         $newAction = md5(rand());
         $event = new CommentEvent($newAction, []);
 
-        $this->eventLogger->addAction($newAction);
+        $this->eventLogger->includeAction("*", $newAction);
         $this->eventLogger->logResourceEvent($event);
         $this->assertNotNull($this->logger->last[0]);
 
         $this->logger->last = [null, null, null];
-        $this->eventLogger->removeAction($newAction);
+        $this->eventLogger->excludeAction(CommentEvent::class, $newAction);
         $this->eventLogger->logResourceEvent($event);
         $this->assertSame([null, null, null], $this->logger->last);
     }
@@ -150,12 +125,12 @@ class EventLoggerTest extends TestCase {
     /**
      * Verify adding a generic action event.
      */
-    public function testRemoveActionReturn(): void {
+    public function testExcludeActionReturn(): void {
         $action = md5(rand());
-        $this->eventLogger->addAction($action);
-        $existingResult = $this->eventLogger->removeAction($action);
+        $this->eventLogger->includeAction("*", $action);
+        $existingResult = $this->eventLogger->excludeAction("*", $action);
         $this->assertTrue($existingResult);
-        $newResult = $this->eventLogger->removeAction($action);
+        $newResult = $this->eventLogger->excludeAction("*", $action);
         $this->assertFalse($newResult);
     }
 

@@ -27,7 +27,7 @@ class ModelTest extends TestCase {
      * Install the site and set up a test table.
      */
     public static function setupBeforeClass(): void {
-        static::setupSiteTest();
+        static::setupBeforeClassSiteTestTrait();
 
         static::container()->call(function (
             \Gdn_DatabaseStructure $st

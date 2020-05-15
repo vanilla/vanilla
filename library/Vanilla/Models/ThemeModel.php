@@ -341,7 +341,7 @@ class ThemeModel {
      * @return AddonInterface
      */
     public function getCurrentThemeAddon(): AddonInterface {
-        $currentTheme = $this->getCurrentTheme();
+        $currentTheme = $this->getCurrentTheme(true);
         $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
         return $this->getThemeAddon($masterKey);
     }
@@ -372,9 +372,14 @@ class ThemeModel {
     /**
      * Get current theme.
      *
+     * @param bool $prioritizeAddon We have to decide if we want an accurate addon or not.
+     *
+     * If false (default) - The Garden.CurrentTheme will take priority on mobile.
+     * If true - The Garden.MobileTheme will take priority on mobile.
+     *
      * @return array The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(): array {
+    public function getCurrentTheme(bool $prioritizeAddon = false): array {
         $current = null;
 
         try {
@@ -384,14 +389,21 @@ class ThemeModel {
             $desktopKey = $this->config->get(ThemeModelHelper::CONFIG_DESKTOP_THEME, null);
             $currentKey = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
 
-            $baseKey = isMobile()
-                ? $mobileKey ?? $desktopKey
-                : $currentKey ?? $desktopKey;
+            $needsMobileOverlay = false;
+            $baseKey = $currentKey ?? $desktopKey;
+
+            if (isMobile() && $mobileKey !== null && $prioritizeAddon) {
+                $baseKey = $mobileKey;
+                $needsMobileOverlay = true;
+            }
 
             // Try to get the base key.
             $baseTheme = $this->getThemeProvider($baseKey)->getThemeWithAssets($baseKey);
-            if ($baseTheme !== null) {
-                $current = $baseTheme;
+            $current = $baseTheme;
+
+            if ($needsMobileOverlay && $currentKey !== null) {
+                $assetOverlayTheme = $this->getThemeProvider($currentKey)->getThemeWithAssets($currentKey);
+                $current['assets'] = $assetOverlayTheme['assets'];
             }
 
             $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();

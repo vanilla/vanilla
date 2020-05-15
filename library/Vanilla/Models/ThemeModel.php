@@ -6,12 +6,9 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
-use Vanilla\Contracts\AddonInterface;
-use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\KludgedVariablesProviderInterface;
@@ -101,7 +98,7 @@ class ThemeModel {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
-    /** @var AddonProviderInterface $addonManager */
+    /** @var AddonManager $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper $themeHelper */
@@ -121,7 +118,7 @@ class ThemeModel {
      *
      * @param ConfigurationInterface $config
      * @param \Gdn_Session $session
-     * @param AddonProviderInterface $addonManager
+     * @param AddonManager $addonManager
      * @param ThemeModelHelper $themeHelper
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
@@ -130,7 +127,7 @@ class ThemeModel {
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
-        AddonProviderInterface $addonManager,
+        AddonManager $addonManager,
         ThemeModelHelper $themeHelper,
         ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel,
@@ -338,9 +335,9 @@ class ThemeModel {
     /**
      * Get view theme addon
      *
-     * @return AddonInterface
+     * @return Addon
      */
-    public function getCurrentThemeAddon(): AddonInterface {
+    public function getCurrentThemeAddon(): Addon {
         $currentTheme = $this->getCurrentTheme(true);
         $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
         return $this->getThemeAddon($masterKey);
@@ -350,9 +347,9 @@ class ThemeModel {
      * Get view theme addon
      *
      * @param string $themeKey
-     * @return AddonInterface
+     * @return Addon
      */
-    public function getThemeAddon(string $themeKey = ''): AddonInterface {
+    public function getThemeAddon(string $themeKey = ''): Addon {
         return $this->addonManager->lookupTheme(
             $this->getMasterThemeKey($themeKey)
         );
@@ -580,11 +577,11 @@ class ThemeModel {
      *
      * @param string $assetName
      * @param mixed $assetContents
-     * @param AddonInterface $themeAddon
+     * @param Addon $themeAddon
      *
      * @return mixed The updated asset.
      */
-    private function normalizeAsset(string $assetName, $assetContents, AddonInterface $themeAddon) {
+    private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
         // Mix in addon variables to the variables asset.
         if (preg_match('/^variables/', $assetName) &&
             $assetContents instanceof JsonAsset
@@ -630,10 +627,10 @@ class ThemeModel {
      * Addon provided variables will override the theme variables.
      *
      * @param string $baseAssetContent Variables json theme asset string.
-     * @param AddonInterface $themeAddon
+     * @param Addon $themeAddon
      * @return string The updated asset content.
      */
-    private function mixAddonVariables(string $baseAssetContent, AddonInterface $themeAddon): string {
+    private function mixAddonVariables(string $baseAssetContent, Addon $themeAddon): string {
         $features = new ThemeFeatures($this->config, $themeAddon);
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];

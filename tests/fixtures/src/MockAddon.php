@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Fixtures;
 
-use Vanilla\Contracts;
+use Vanilla\Addon;
 
 /**
  * Mock addon class. Assumes key and subdirectory are the same.
  */
-class MockAddon implements Contracts\AddonInterface {
+class MockAddon extends Addon {
 
     /** @var string */
     private $key;

@@ -20,7 +20,7 @@ use Vanilla\Contracts;
  * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
-class AddonManager implements Contracts\AddonProviderInterface {
+class AddonManager {
 
     /// Constants ///
 

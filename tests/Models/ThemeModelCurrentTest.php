@@ -7,14 +7,13 @@
 
 namespace VanillaTests\Models;
 
-use Garden\Container\Reference;
-use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\AddonManager;
 use Vanilla\Models\ThemeModel;
 use Vanilla\Models\ThemeModelHelper;
 use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
-use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockThemeProvider;
 use VanillaTests\MinimalContainerTestCase;
 
@@ -33,15 +32,15 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
     /** @var MockThemeProvider */
     private $mockThemeProvider;
 
-    /** @var MockAddonProvider */
-    private $mockAddonProvider;
+    /** @var MockAddonManager */
+    private $addonManager;
 
     /**
      * Prepare the container.
      */
     public function setUp(): void {
         parent::setUp();
-        $this->mockAddonProvider = self::container()->get(MockAddonProvider::class);
+        $this->addonManager = self::container()->get(MockAddonManager::class);
         $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
 
         // Fresh container.
@@ -50,7 +49,7 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
         self::container()
             ->rule(ThemeModel::class)
             ->addCall('addThemeProvider', [$this->mockThemeProvider])
-            ->setInstance(AddonProviderInterface::class, $this->mockAddonProvider);
+            ->setInstance(AddonManager::class, $this->addonManager);
     }
 
     /**
@@ -72,12 +71,12 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
      * Test the we get consistent results when all themes are set to the same.
      */
     public function testGetCurrentAllSame() {
-        $this->mockAddonProvider->pushAddon(new MockAddon(self::ADDON_THEME, [
+        $this->addonManager->pushAddon(new MockAddon(self::ADDON_THEME, [
             'Features' => [
                 'SharedMasterView' => true,
             ]
         ]));
-        $this->mockAddonProvider->pushAddon(new MockAddon(self::MOBILE_ADDON_THEME));
+        $this->addonManager->pushAddon(new MockAddon(self::MOBILE_ADDON_THEME));
 
         $addonTheme = $this->mockThemeProvider->postTheme([
             'themeID' => self::ADDON_THEME,

@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
-use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
@@ -29,7 +28,7 @@ use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
-use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
@@ -78,9 +77,8 @@ class MinimalContainerTestCase extends TestCase {
 
             // Mocks of interfaces.
             // Addons
-            ->rule(AddonProviderInterface::class)
-            ->setClass(MockAddonProvider::class)
-            ->addAlias(AddonManager::class)
+            ->rule(AddonManager::class)
+            ->setClass(MockAddonManager::class)
             ->addAlias(\Gdn::AliasAddonManager)
             ->setShared(true)
 

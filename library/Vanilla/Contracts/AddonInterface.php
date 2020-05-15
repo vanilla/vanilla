@@ -40,4 +40,13 @@ interface AddonInterface {
      * @return mixed Returns the info value or {@link $default}.
      */
     public function getInfoValue(string $key, $default = null);
+
+    /**
+     * Make a full path from an addon-relative path.
+     *
+     * @param string $subpath The subpath to base the path on, starting with a "/".
+     * @param string $relative One of the **Addon::PATH_*** constants.
+     * @return string Returns a full path.
+     */
+    public function path($subpath = '', $relative = '');
 }

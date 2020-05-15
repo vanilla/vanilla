@@ -8,6 +8,7 @@ namespace Vanilla\Models;
 
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
+use Vanilla\Contracts\AddonInterface;
 use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
@@ -337,9 +338,9 @@ class ThemeModel {
     /**
      * Get view theme addon
      *
-     * @return Addon
+     * @return AddonInterface
      */
-    public function getCurrentThemeAddon(): Addon {
+    public function getCurrentThemeAddon(): AddonInterface {
         $currentTheme = $this->getCurrentTheme();
         $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
         return $this->getThemeAddon($masterKey);
@@ -349,9 +350,9 @@ class ThemeModel {
      * Get view theme addon
      *
      * @param string $themeKey
-     * @return Addon
+     * @return AddonInterface
      */
-    public function getThemeAddon(string $themeKey = ''): Addon {
+    public function getThemeAddon(string $themeKey = ''): AddonInterface {
         return $this->addonManager->lookupTheme(
             $this->getMasterThemeKey($themeKey)
         );
@@ -567,11 +568,11 @@ class ThemeModel {
      *
      * @param string $assetName
      * @param mixed $assetContents
-     * @param Addon $themeAddon
+     * @param AddonInterface $themeAddon
      *
      * @return mixed The updated asset.
      */
-    private function normalizeAsset(string $assetName, $assetContents, Addon $themeAddon) {
+    private function normalizeAsset(string $assetName, $assetContents, AddonInterface $themeAddon) {
         // Mix in addon variables to the variables asset.
         if (preg_match('/^variables/', $assetName) &&
             $assetContents instanceof JsonAsset
@@ -617,10 +618,10 @@ class ThemeModel {
      * Addon provided variables will override the theme variables.
      *
      * @param string $baseAssetContent Variables json theme asset string.
-     * @param Addon $themeAddon
+     * @param AddonInterface $themeAddon
      * @return string The updated asset content.
      */
-    private function mixAddonVariables(string $baseAssetContent, Addon $themeAddon): string {
+    private function mixAddonVariables(string $baseAssetContent, AddonInterface $themeAddon): string {
         $features = new ThemeFeatures($this->config, $themeAddon);
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];

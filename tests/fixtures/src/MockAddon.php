@@ -58,4 +58,11 @@ class MockAddon implements Contracts\AddonInterface {
     public function getInfoValue(string $key, $default = null) {
         return isset($this->info[$key]) ? $this->info[$key] : $default;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function path($subpath = '', $relative = '') {
+        return '/mock-addon/'.$this->getKey().'/'.$subpath;
+    }
 }

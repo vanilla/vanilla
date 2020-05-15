@@ -21,6 +21,7 @@ use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\TwigEnhancer;
 use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
@@ -56,7 +57,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Setup the container.
      */
-    private function configureContainer() {
+    protected function configureContainer() {
         \Gdn::setContainer(new Container());
 
         self::container()
@@ -145,6 +146,9 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(UserProviderInterface::class)
             ->setClass(MockUserProvider::class)
             ->setShared(true)
+
+            ->rule(ThemeFeatures::class)
+            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
             ->rule(\Gdn_PluginManager::class)
             ->addAlias(\Gdn::AliasPluginManager)

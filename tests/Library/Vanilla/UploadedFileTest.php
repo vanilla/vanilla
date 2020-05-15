@@ -73,6 +73,33 @@ class UploadedFileTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test that we can safely persist files with spaces in their name.
+     *
+     * @param string $name
+     *
+     * @dataProvider provideImagesWithSpaces
+     */
+    public function testPersistFileWithSpaces(string $name) {
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl($name);
+
+        // Save the upload.
+        $file->persistUpload();
+        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
+        $this->assertStringContainsString('image-with-spaces.jpg', $file->getPersistedPath());
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provideImagesWithSpaces(): array {
+        return [
+            'no url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image with spaces.jpg'],
+            'with url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image%20with%20spaces.jpg'],
+        ];
+    }
+
+    /**
      * Test that custom paths can be persisted.
      */
     public function testCustomPersistedPath() {

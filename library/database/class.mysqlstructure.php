@@ -579,7 +579,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                                         'maxVarcharLength' => $charLength['MaxLength'],
                                         'newLength' => $column->Length,
                                         'oldLength' => $existingColumn->Length,
-                                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                                     ]
                                 );
 

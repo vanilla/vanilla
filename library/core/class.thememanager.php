@@ -399,7 +399,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     'themeType' => 'desktop',
                     'oldTheme' => $oldTheme,
                     'newTheme' => $newTheme,
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
         }
@@ -600,7 +600,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     'themeType' => $isMobile ? 'mobile' : 'desktop',
                     'oldTheme' => $oldTheme,
                     'newTheme' => $themeName,
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
         }

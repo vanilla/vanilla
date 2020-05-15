@@ -384,7 +384,7 @@ class ProxyRequest {
         $logContext = [
             'requestUrl' => $url,
             'requestMethod' => $requestMethod
-        ] + ($options['LogContext'] ?? []) + [Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM];
+        ] + ($options['LogContext'] ?? []) + [Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM];
 
         /*
          * ProxyRequest can masquerade as the current user, so collect and encode

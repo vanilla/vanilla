@@ -770,14 +770,14 @@ class ProfileController extends Gdn_Controller {
                     'password_change',
                     Logger::INFO,
                     '{InsertName} changed password.',
-                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             } else {
                 Logger::event(
                     'password_change_failure',
                     Logger::INFO,
                     '{InsertName} failed to change password.',
-                    ['Error' => $this->Form->errorString(), Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    ['Error' => $this->Form->errorString(), Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }

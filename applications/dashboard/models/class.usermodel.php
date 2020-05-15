@@ -2796,7 +2796,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         'touserid' => $User->UserID,
                         'toUsername' => $User->Name,
                         'role' => $RoleName,
-                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                     ]
                 );
             }
@@ -2810,7 +2810,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         'touserid' => $User->UserID,
                         'toUsername' => $User->Name,
                         'role' => $RoleName,
-                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
                     ]
                 );
             }
@@ -4884,7 +4884,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input, Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    ['input' => $input, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
             return false;
@@ -4921,8 +4921,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                         [
                             'input' => $input,
                             'email' => $user->Email,
-                            'forUserID' => $user->UserID,
-                            Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                            Logger::FIELD_TARGET_USERID => $user->UserID,
+                            Logger::FIELD_TARGET_USERNAME => $user->Name,
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                         ]
                     );
                 }
@@ -4936,7 +4937,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                             [
                                 'input' => $input,
                                 'email' => $user->Email,
-                                Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                             ]
                         );
                     } else {
@@ -4947,7 +4948,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                             [
                                 'input' => $input,
                                 'email' => $user->Email,
-                                Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                             ]
                         );
                     }
@@ -4967,7 +4968,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input, Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    ['input' => $input, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
             return false;

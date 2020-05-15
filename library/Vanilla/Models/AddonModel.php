@@ -209,7 +209,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_enabled',
                     'addonKey' => $addon->getKey(),
                     'addonType' => $addon->getType(),
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
         }
@@ -246,7 +246,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_structure',
                     'addonKey' => $addon->getKey(),
                     'structureType' => 'file',
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                 ]
             );
 
@@ -275,7 +275,7 @@ class AddonModel implements LoggerAwareInterface {
                     'addonMethod' => $method,
                     'addonClass' => $pluginClass,
                     'addonKey' => $addon->getKey(),
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                 ]
             );
 
@@ -320,7 +320,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_permissions',
                     'addonKey' => $addon->getKey(),
                     'permissions' => $permissions,
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                 ]
             );
             $permissionModel = $this->container->get(PermissionModel::class);
@@ -411,7 +411,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_disabled',
                     'addonKey' => $addon->getKey(),
                     'addonType' => $addon->getType(),
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_ADMIN,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
         }
@@ -436,7 +436,7 @@ class AddonModel implements LoggerAwareInterface {
                     'event' => 'addon_structure',
                     'addonKey' => $addon->getKey(),
                     'structureType' => 'file',
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                 ]
             );
 

@@ -19,16 +19,16 @@ use Psr\Log\LoggerInterface;
  */
 class Logger {
     public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
-    public const FIELD_LOG_TYPE = \Vanilla\Logger::FIELD_LOG_TYPE;
+    public const FIELD_CHANNEL = \Vanilla\Logger::FIELD_CHANNEL;
     public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
     public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
 
-    public const TYPE_ADMIN = \Vanilla\Logger::TYPE_ADMIN;
-    public const TYPE_APPLICATION = \Vanilla\Logger::TYPE_APPLICATION;
-    public const TYPE_MODERATION = \Vanilla\Logger::TYPE_MODERATION;
-    public const TYPE_SECURITY = \Vanilla\Logger::TYPE_SECURITY;
-    public const TYPE_SYSTEM = \Vanilla\Logger::TYPE_SYSTEM;
-    public const TYPE_DEFAULT = \Vanilla\Logger::TYPE_DEFAULT;
+    public const CHANNEL_ADMIN = \Vanilla\Logger::CHANNEL_ADMIN;
+    public const CHANNEL_APPLICATION = \Vanilla\Logger::CHANNEL_APPLICATION;
+    public const CHANNEL_MODERATION = \Vanilla\Logger::CHANNEL_MODERATION;
+    public const CHANNEL_SECURITY = \Vanilla\Logger::CHANNEL_SECURITY;
+    public const CHANNEL_SYSTEM = \Vanilla\Logger::CHANNEL_SYSTEM;
+    public const CHANNEL_DEFAULT = \Vanilla\Logger::CHANNEL_DEFAULT;
 
     /** Log type. */
     const EMERGENCY = 'emergency';
@@ -294,7 +294,7 @@ class Logger {
             $path = Gdn::request()->path();
             $key = "log:$event:$userID:$path";
             if (Gdn::cache()->get($key) === false) {
-                $context += [self::FIELD_LOG_TYPE => self::TYPE_SECURITY];
+                $context += [self::FIELD_CHANNEL => self::CHANNEL_SECURITY];
                 self::event($event, $level, $message, $context);
                 Gdn::cache()->store($key, time(), [Gdn_Cache::FEATURE_EXPIRY => 300]);
             }

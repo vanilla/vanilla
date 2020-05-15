@@ -1282,7 +1282,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 '{username} was denied access to {path}.',
                 [
                     'permission' => $permission,
-                    Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                 ]
             );
 
@@ -1299,7 +1299,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     'security_access',
                     Logger::INFO,
                     "{username} accessed {path}.",
-                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }

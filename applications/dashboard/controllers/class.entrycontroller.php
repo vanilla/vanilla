@@ -161,7 +161,7 @@ class EntryController extends Gdn_Controller {
                         'signin_failure',
                         Logger::WARNING,
                         '{username} failed to sign in. Some or all credentials were missing.',
-                        [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
                 break;
@@ -190,7 +190,7 @@ class EntryController extends Gdn_Controller {
                                     'signin_failure',
                                     Logger::WARNING,
                                     '{username} failed to sign in. Permission denied.',
-                                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $reaction = $authenticator->failedResponse();
                                 break;
@@ -201,7 +201,7 @@ class EntryController extends Gdn_Controller {
                                     'signin_failure',
                                     Logger::WARNING,
                                     '{username} failed to sign in. Authentication denied.',
-                                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $reaction = $authenticator->failedResponse();
                                 break;
@@ -212,7 +212,7 @@ class EntryController extends Gdn_Controller {
                                     'signin_failure',
                                     Logger::WARNING,
                                     '{username} failed to sign in. More information needed from user.',
-                                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $this->addCredentialErrorToForm('ErrorInsufficient');
 
@@ -1076,7 +1076,7 @@ class EntryController extends Gdn_Controller {
                         'Signed in using the legacy embed method',
                         [
                             'login' => $this->Form->getFormValue('Email'),
-                            Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                         ]
                     );
                 } else {
@@ -1101,7 +1101,7 @@ class EntryController extends Gdn_Controller {
                         'Failed to sign in. User not found: {signin}',
                         [
                             'signin' => $email,
-                            Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                         ]
                     );
                     $this->fireEvent('BadSignIn', [
@@ -1153,7 +1153,7 @@ class EntryController extends Gdn_Controller {
                                 'signin_failure',
                                 Logger::WARNING,
                                 '{username} failed to sign in.  Invalid password.',
-                                ['InsertName' => $user->Name, Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                                ['InsertName' => $user->Name, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                             );
                             $this->fireEvent('BadSignIn', [
                                 'Email' => $email,
@@ -1358,7 +1358,7 @@ class EntryController extends Gdn_Controller {
                         'signin_failure',
                         Logger::WARNING,
                         '{username} failed to sign in. Invalid credentials.',
-                        [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
 
@@ -1864,7 +1864,7 @@ class EntryController extends Gdn_Controller {
                 'password_reset_failure',
                 Logger::NOTICE,
                 '{username} failed to authenticate password reset request.',
-                [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
             );
             $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $userID,
@@ -1878,7 +1878,7 @@ class EntryController extends Gdn_Controller {
                 'password_reset_failure',
                 Logger::NOTICE,
                 '{username} has an expired reset token.',
-                [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
             );
             $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $userID,
@@ -1913,14 +1913,14 @@ class EntryController extends Gdn_Controller {
                         'password_reset_failure',
                         Logger::NOTICE,
                         'Failed to reset the password for {username}. Password is invalid.',
-                        [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 } elseif ($password != $passwordMatch) {
                     Logger::event(
                         'password_reset_failure',
                         Logger::NOTICE,
                         'Failed to reset the password for {username}. Passwords did not match.',
-                        [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
 
@@ -1930,7 +1930,7 @@ class EntryController extends Gdn_Controller {
                         'password_reset',
                         Logger::NOTICE,
                         '{username} has reset their password.',
-                        [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                     Gdn::session()->start($user->UserID, true);
                     $this->setRedirectTo('/', false);

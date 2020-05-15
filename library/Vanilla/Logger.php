@@ -21,23 +21,23 @@ class Logger implements LoggerInterface {
     use LoggerTrait;
 
     public const FIELD_EVENT = 'event';
-    public const FIELD_LOG_TYPE = 'logType';
+    public const FIELD_CHANNEL = 'channel';
     public const FIELD_TARGET_USERID = 'targetUserID';
     public const FIELD_TARGET_USERNAME = 'targetName';
 
-    public const TYPE_ADMIN = 'admin';
-    public const TYPE_APPLICATION = 'application';
-    public const TYPE_MODERATION = 'moderation';
-    public const TYPE_SECURITY = 'security';
-    public const TYPE_SYSTEM = 'system';
-    public const TYPE_DEFAULT = self::TYPE_APPLICATION;
+    public const CHANNEL_ADMIN = 'admin';
+    public const CHANNEL_APPLICATION = 'application';
+    public const CHANNEL_MODERATION = 'moderation';
+    public const CHANNEL_SECURITY = 'security';
+    public const CHANNEL_SYSTEM = 'system';
+    public const CHANNEL_DEFAULT = self::CHANNEL_APPLICATION;
 
-    public const TYPES = [
-        self::TYPE_ADMIN,
-        self::TYPE_APPLICATION,
-        self::TYPE_MODERATION,
-        self::TYPE_SECURITY,
-        self::TYPE_SYSTEM,
+    public const CHANNELS = [
+        self::CHANNEL_ADMIN,
+        self::CHANNEL_APPLICATION,
+        self::CHANNEL_MODERATION,
+        self::CHANNEL_SECURITY,
+        self::CHANNEL_SYSTEM,
     ];
 
     /** Log type. */

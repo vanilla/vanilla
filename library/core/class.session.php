@@ -130,7 +130,7 @@ class Gdn_Session {
         }
 
         if ($this->UserID) {
-            Logger::event('session_end', Logger::INFO, 'Session ended for {username}.', [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]);
+            Logger::event('session_end', Logger::INFO, 'Session ended for {username}.', [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]);
         }
 
         $authenticator->authenticateWith()->deauthenticate();
@@ -437,7 +437,7 @@ class Gdn_Session {
                             'session_start',
                             Logger::INFO,
                             'Session started for {username}.',
-                            [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                            [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                         );
                         Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                     }
@@ -691,7 +691,7 @@ class Gdn_Session {
                     [
                         "User TK" => $foreignKey,
                         "Site TK" => $this->_TransientKey,
-                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                     ]
                 );
             } else {
@@ -699,7 +699,7 @@ class Gdn_Session {
                     'csrf_failure',
                     Logger::ERROR,
                     'Invalid transient key.',
-                    [Logger::FIELD_LOG_TYPE => Logger::TYPE_SECURITY]
+                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }

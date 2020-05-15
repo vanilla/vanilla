@@ -703,7 +703,7 @@ class UpdateModel extends Gdn_Model {
                     [
                         'addonKey' => $addon->getKey(),
                         'structureType' => 'file',
-                        \Vanilla\Logger::FIELD_LOG_TYPE => \Vanilla\Logger::TYPE_SYSTEM,
+                        \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
                     ]
                 );
 
@@ -738,7 +738,7 @@ class UpdateModel extends Gdn_Model {
                         [
                             'addonKey' => $addon->getKey(),
                             'structureType' => 'method',
-                            \Vanilla\Logger::FIELD_LOG_TYPE => \Vanilla\Logger::TYPE_SYSTEM
+                            \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM
                         ]
                     );
 
@@ -764,7 +764,7 @@ class UpdateModel extends Gdn_Model {
                     [
                         'addonKey' => $addon->getKey(),
                         'permissions' => $permissions,
-                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                     ]
                 );
                 Gdn::permissionModel()->define($permissions);

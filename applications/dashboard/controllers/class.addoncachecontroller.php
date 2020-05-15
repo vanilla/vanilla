@@ -101,7 +101,7 @@ class AddonCacheController extends DashboardController {
                         'invalid' => $invalid,
                         'current' => array_keys($current),
                         'cached' => array_keys($cached),
-                        Logger::FIELD_LOG_TYPE => Logger::TYPE_SYSTEM,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                     ]
                 );
             }

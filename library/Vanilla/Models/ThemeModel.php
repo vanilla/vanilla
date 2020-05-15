@@ -24,6 +24,16 @@ use Garden\Schema\ValidationField;
  */
 class ThemeModel {
 
+    /**
+     * When fetching the current theme, accurate assets will be prioritized. CurrentTheme > MobileTheme
+     */
+    const GET_THEME_MODE_PRIORITIZE_ASSETS = 'prioritizeAssets';
+
+    /**
+     * When fetching the current theme, an accurate addon will be prioritized. MobileTheme > CurrentTheme
+     */
+    const GET_THEME_MODE_PRIORITIZE_ADDON = 'prioritizeAddon';
+
     const FOUNDATION_THEME_KEY = "theme-foundation";
     const FALLBACK_THEME_KEY = self::FOUNDATION_THEME_KEY;
     const ASSET_COMPAT_THEMES = [self::FOUNDATION_THEME_KEY];
@@ -338,7 +348,7 @@ class ThemeModel {
      * @return Addon
      */
     public function getCurrentThemeAddon(): Addon {
-        $currentTheme = $this->getCurrentTheme(true);
+        $currentTheme = $this->getCurrentTheme(self::GET_THEME_MODE_PRIORITIZE_ADDON);
         $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
         return $this->getThemeAddon($masterKey);
     }
@@ -369,14 +379,11 @@ class ThemeModel {
     /**
      * Get current theme.
      *
-     * @param bool $prioritizeAddon We have to decide if we want an accurate addon or not.
-     *
-     * If false (default) - The Garden.CurrentTheme will take priority on mobile.
-     * If true - The Garden.MobileTheme will take priority on mobile.
+     * @param string $mode One of the GET_THEME_MODES.
      *
      * @return array The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(bool $prioritizeAddon = false): array {
+    public function getCurrentTheme(string $mode = self::GET_THEME_MODE_PRIORITIZE_ASSETS): array {
         $current = null;
 
         try {
@@ -389,7 +396,7 @@ class ThemeModel {
             $needsMobileOverlay = false;
             $baseKey = $currentKey ?? $desktopKey;
 
-            if (isMobile() && $mobileKey !== null && $prioritizeAddon) {
+            if (isMobile() && $mobileKey !== null && $mode === self::GET_THEME_MODE_PRIORITIZE_ADDON) {
                 $baseKey = $mobileKey;
                 $needsMobileOverlay = true;
             }

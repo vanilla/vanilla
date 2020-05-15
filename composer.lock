@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad9c3c414e58bfb89a836987642048f0",
+    "content-hash": "9c1d7dcbdaca4655da6b67674332adcc",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -48,70 +48,6 @@
                 "ico"
             ],
             "time": "2016-09-27T22:00:56+00:00"
-        },
-        {
-            "name": "colinodell/json5",
-            "version": "v2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/colinodell/json5.git",
-                "reference": "86136a74726d48ec60285d5b8585d62e0645b56c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/colinodell/json5/zipball/86136a74726d48ec60285d5b8585d62e0645b56c",
-                "reference": "86136a74726d48ec60285d5b8585d62e0645b56c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": "^5.6|^7.0"
-            },
-            "require-dev": {
-                "mikehaertl/php-shellcommand": "^1.2.5",
-                "phpunit/phpunit": "^4.8.36|^7.3",
-                "squizlabs/php_codesniffer": "^2.3",
-                "symfony/finder": "^2.8|^3.4|^4.1"
-            },
-            "bin": [
-                "bin/json5"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "ColinODell\\Json5\\": "src"
-                },
-                "files": [
-                    "src/global.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Colin O'Dell",
-                    "email": "colinodell@gmail.com",
-                    "homepage": "https://www.colinodell.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "UTF-8 compatible JSON5 parser for PHP",
-            "homepage": "https://github.com/colinodell/json5",
-            "keywords": [
-                "JSON5",
-                "json",
-                "json5_decode",
-                "json_decode"
-            ],
-            "time": "2019-03-28T18:28:32+00:00"
         },
         {
             "name": "container-interop/container-interop",
@@ -332,6 +268,68 @@
                 "markdown"
             ],
             "time": "2019-12-02T02:32:27+00:00"
+        },
+        {
+            "name": "nette/neon",
+            "version": "v3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nette/neon.git",
+                "reference": "3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nette/neon/zipball/3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e",
+                "reference": "3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "ext-json": "*",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "nette/tester": "^2.0",
+                "phpstan/phpstan": "^0.12",
+                "tracy/tracy": "^2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause",
+                "GPL-2.0-only",
+                "GPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "David Grudl",
+                    "homepage": "https://davidgrudl.com"
+                },
+                {
+                    "name": "Nette Community",
+                    "homepage": "https://nette.org/contributors"
+                }
+            ],
+            "description": "🍸 Nette NEON: encodes and decodes NEON file format.",
+            "homepage": "https://ne-on.org",
+            "keywords": [
+                "export",
+                "import",
+                "neon",
+                "nette",
+                "yaml"
+            ],
+            "time": "2020-03-04T11:47:04+00:00"
         },
         {
             "name": "paragonie/random_compat",

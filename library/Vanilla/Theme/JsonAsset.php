@@ -12,7 +12,7 @@
 class JsonAsset extends Asset {
 
     /** @var string JSON content of this asset. */
-    private $data;
+    protected $data;
 
     /** @var string Type of asset. */
     protected $type = "json";
@@ -23,7 +23,7 @@ class JsonAsset extends Asset {
      * @param string $data
      */
     public function __construct($data) {
-        $this->data = json5_decode($data);
+        $this->data = json_decode($data);
     }
 
     /**

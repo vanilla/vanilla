@@ -8,7 +8,7 @@ The following instructions assume that you have already installed Node.js on you
 $ brew install node
 ```
 
-> __Notice__: It is important that you install Node in a way that does not require you to `sudo`.
+> **Notice**: It is important that you install Node in a way that does not require you to `sudo`.
 
 Once you have Node.js up and running, you will need to install the local dependencies using [npm](npmjs.org):
 
@@ -19,9 +19,9 @@ $ npm install
 ### Tasks
 
 #### Build - `npm run build`
+
 Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/custom.css`](design/custom.css) and Javascripts will be concatenated and output to [`js/custom.js`](js/custom.js).
 
-**Bower doesn't have any dependencies here, so you need to manually create the folder "bower_components" so npm doesn't crash.**
-
 #### Watch - `npm run watch`
+
 Watches the assets for changes and runs the appropriate Grunt tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically.

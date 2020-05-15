@@ -10,7 +10,6 @@
     "devDependencies": {
         "@vanilla/library": "^3.0.1",
         "@vanilla/utils": "^3.0.1",
-        "bower": "1.8.8",
         "fibers": "4.0.1",
         "grunt": "1.0.4",
         "grunt-autoprefixer": "3.0.x",
@@ -28,7 +27,6 @@
         "time-grunt": "2.0.0"
     },
     "scripts": {
-        "install": "bower install --allow-root",
         "build": "grunt",
         "watch": "grunt watch"
     }

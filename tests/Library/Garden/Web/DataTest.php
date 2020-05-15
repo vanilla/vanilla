@@ -262,7 +262,8 @@ class DataTest extends TestCase {
      */
     public function testRenderNoHeaders() {
         $expected = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $actual = $this->getActualOutput($this->data->render());
+
+        $actual = $this->getRenderedData();
         $this->assertSame($expected, $actual);
     }
 
@@ -272,7 +273,7 @@ class DataTest extends TestCase {
     public function testRenderOneHeader() {
         $this->data->setHeader('xxx', 'xxx');
         $expected = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $actual = $this->getActualOutput($this->data->render());
+        $actual = $this->getRenderedData();
         $this->assertSame($expected, $actual);
     }
 
@@ -441,5 +442,17 @@ class DataTest extends TestCase {
     public function testIntStatusConstructor() {
         $data = new Data([], 200);
         $this->assertSame(200, $data->getStatus());
+    }
+
+    /**
+     * Get the rendered data from the data class.
+     *
+     * @return false|string
+     */
+    private function getRenderedData() {
+        ob_start();
+        $this->data->render();
+        $actual = ob_get_clean();
+        return $actual;
     }
 }

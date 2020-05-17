@@ -44,7 +44,7 @@ final class RangeExpression {
         '<', '<=', '=', '>=', '>'
     ];
 
-    const REGEX_SINGL_VALUE = <<<EOT
+    private const REGEX_SINGL_VALUE = <<<EOT
 `
 ^(>=|<=|=|<|>)  # Operator
 \s*             # Eat whitespace
@@ -53,7 +53,7 @@ final class RangeExpression {
 mx
 EOT;
 
-    const REGEX_RANGE = <<<EOT
+    private const REGEX_RANGE = <<<EOT
 `
 ^([[(])?        # Left bracket
 ([^.,]+)?       # From
@@ -120,7 +120,7 @@ EOT;
             !in_array(substr($expr, -1), [')', ']'], true) &&
             strpos($expr, ',') !== false) {
             // This is a CSV list.
-            $values = ArrayUtils::explodeTrim(',', $expr);
+            $values = array_map('trim', explode(',', $expr));
             if ($valueSchema !== null) {
                 foreach ($values as $i => &$value) {
                     $value = self::validateValue($value, $valueSchema, $validation, "value[$i]");

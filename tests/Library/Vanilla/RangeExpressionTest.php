@@ -190,4 +190,53 @@ class RangeExpressionTest extends TestCase {
         $this->expectExceptionMessage("not a valid range expression");
         $valid = RangeExpression::createSchema()->validate(new \DateTimeImmutable());
     }
+
+    /**
+     * Test a parsed string's `__toString()` preservation.
+     *
+     * @param string $expr
+     * @dataProvider provideParsedStrings
+     */
+    public function testParsedToString(string $expr) {
+        $actual = RangeExpression::parse($expr, null, true)->__toString();
+        $this->assertSame($expr, $actual);
+    }
+
+    /**
+     * Test a parsed string's `__toString()` canonicalization..
+     *
+     * @param string $expr
+     * @param string $expected
+     * @dataProvider provideParsedStrings
+     */
+    public function testCanonicalToString(string $expr, string $expected) {
+        $actual = RangeExpression::parse($expr)->__toString();
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide some expressions and canonicalizations.
+     *
+     * @return array
+     */
+    public function provideParsedStrings() {
+        $r = [
+            ['a, b', 'a,b'],
+            ['[a,b]', 'a..b'],
+            ['a..b)', '[a,b)'],
+            ['=a', 'a'],
+            ['a..', '>=a'],
+            ['..a', '<=a'],
+        ];
+
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test an empty from part of the range.
+     */
+    public function testEmptyFrom(): void {
+        $actual = RangeExpression::parse('..a')->__toString();
+        $this->assertSame('<=a', $actual);
+    }
 }

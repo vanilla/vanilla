@@ -44,7 +44,14 @@ final class RangeExpression {
         '<', '<=', '=', '>=', '>'
     ];
 
-    private const REGEX_SINGL_VALUE = <<<EOT
+    private const BRACKETS = [
+        '>=' => '[',
+        '>' => '(',
+        '<' => ')',
+        '<=' => ']',
+    ];
+
+    private const REGEX_SINGLE_VALUE = <<<EOT
 `
 ^(>=|<=|=|<|>)  # Operator
 \s*             # Eat whitespace
@@ -70,6 +77,11 @@ EOT;
     private $values;
 
     /**
+     * @var string
+     */
+    private $originalString;
+
+    /**
      * RangeFilter constructor.
      *
      * @param string $op Filter operator.
@@ -89,9 +101,10 @@ EOT;
      *
      * @param mixed $expr The expression to parse. This is generally an array of values or a stringable.
      * @param Schema|null $valueSchema A schema to validate individual values.
+     * @param bool $keepExpr
      * @return RangeExpression
      */
-    public static function parse($expr, Schema $valueSchema = null): RangeExpression {
+    public static function parse($expr, Schema $valueSchema = null, bool $keepExpr = false): RangeExpression {
         $validation = new Validation();
 
         if (!is_scalar($expr) && !is_array($expr)) {
@@ -107,14 +120,14 @@ EOT;
             if ($validation->isValid()) {
                 return new RangeExpression('=', array_values($expr));
             }
-        } elseif (preg_match(self::REGEX_SINGL_VALUE, $expr, $m)) {
+        } elseif (preg_match(self::REGEX_SINGLE_VALUE, $expr, $m)) {
             // This is a single value expression (ex. '>=10', '<1000')
             [$_, $op, $value] = $m;
 
             $value = self::validateValue($value, $valueSchema, $validation, 'value');
 
             if ($validation->isValid()) {
-                return new RangeExpression($op, $value);
+                return self::creatRangeExpression($keepExpr ? $expr : '', $op, $value);
             }
         } elseif (!in_array(substr($expr, 0, 1), ['(', '['], true) &&
             !in_array(substr($expr, -1), [')', ']'], true) &&
@@ -127,28 +140,38 @@ EOT;
                 }
             }
             if ($validation->isValid()) {
-                return new RangeExpression('=', $values);
+                return self::creatRangeExpression($keepExpr ? $expr : '', '=', $values);
             }
         } elseif (preg_match(self::REGEX_RANGE, $expr, $m)) {
             // This is a range expression (ex. '1..10', '(1,5]', '2020-05-01..2020-05-14)')
             [$_, $left, $from, $to, $right] = $m + array_fill(0, 5, '');
 
-            $from = self::validateValue($from, $valueSchema, $validation, 'from');
+            if (empty($from) && empty($to)) {
+                throw self::createValidationException('At least one value in the range is required.');
+            }
+
+            $args = [];
+            if (!empty($from)) {
+                $from = self::validateValue($from, $valueSchema, $validation, 'from');
+                $args[] = $left ?: '>=';
+                $args[] = $from;
+            }
+
             if (!empty($to)) {
                 $to = self::validateValue($to, $valueSchema, $validation, 'to');
-            } else {
-                $to = null;
+                $args[] = $right ?: '<=';
+                $args[] = $to;
             }
 
             if ($validation->isValid()) {
-                return new RangeExpression($left ?: '>=', $from, $right ?: '<=', $to);
+                return self::creatRangeExpression($keepExpr ? $expr : '', ...$args);
             }
         } else {
             // This is just a single value so consider it an equality match.
             $expr = self::validateValue($expr, $valueSchema, $validation, 'value');
 
             if ($validation->isValid()) {
-                return new RangeExpression('=', $expr);
+                return self::creatRangeExpression($keepExpr ? $expr : '', '=', $expr);
             }
         }
         throw new ValidationException($validation);
@@ -268,5 +291,52 @@ EOT;
      */
     public function getValues(): array {
         return $this->values;
+    }
+
+    /**
+     * Create a range expression and set its original expression.
+     *
+     * @param string $expr
+     * @param mixed $params
+     * @return RangeExpression
+     */
+    private static function creatRangeExpression(string $expr, ...$params): RangeExpression {
+        $r = new RangeExpression(...$params);
+        if ($expr) {
+            $r->originalString = $expr;
+        }
+        return $r;
+    }
+
+    /**
+     * Convert this object to a string.
+     *
+     * @return string
+     */
+    public function __toString() {
+        if (!empty($this->originalString)) {
+            return $this->originalString;
+        }
+
+        if (count($this->values) === 1) {
+            if (isset($this->values['='])) {
+                return is_array($this->values['=']) ? implode(',', $this->values['=']) : (string)$this->values['='];
+            } else {
+                return key($this->values).current($this->values);
+            }
+        } elseif (count($this->values) >= 2) {
+            if (isset($this->values['>=']) && isset($this->values['<='])) {
+                return $this->values['>='].'..'.$this->values['<='];
+            } else {
+                $left = isset($this->values['>']) ? '>' : '>=';
+                $right = isset($this->values['<']) ? '<' : '<=';
+
+                return self::BRACKETS[$left].$this->values[$left].','.$this->values[$right].self::BRACKETS[$right];
+            }
+        } else {
+            // @codeCoverageIgnoreStart
+            return '';
+            // @codeCoverageIgnoreStop
+        }
     }
 }

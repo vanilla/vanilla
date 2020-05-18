@@ -330,8 +330,16 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.HasNew`, {
-        backgroundColor: colorOut(vars.mainColors.primary),
-        color: colorOut(vars.mainColors.primaryContrast),
+        backgroundColor: colorOut(vars.mainColors.primaryContrast),
+        color: colorOut(vars.mainColors.primary),
+        ...borders({
+            radius: 2,
+            color: vars.mainColors.primary,
+        }),
+        ...paddings({
+            vertical: 3,
+            horizontal: 6,
+        }),
     });
 
     cssOut(`.Item.Read`, {

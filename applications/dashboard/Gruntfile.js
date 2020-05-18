@@ -13,8 +13,6 @@ module.exports = function(grunt) {
     // Time how long tasks take. Can help when optimizing build times
     require("time-grunt")(grunt);
 
-    grunt.file.mkdir("bower_components");
-
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
 
@@ -51,73 +49,6 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            main: {
-                files: [
-                    {
-                        expand: true,
-                        flatten: true,
-                        cwd: "bower_components",
-                        src: [
-                            "bootstrap/js/dist/collapse.js",
-                            "bootstrap/js/dist/collapse.js.map",
-                            "bootstrap/js/dist/dropdown.js",
-                            "bootstrap/js/dist/dropdown.js.map",
-                            "bootstrap/js/dist/modal.js",
-                            "bootstrap/js/dist/modal.js.map",
-                            "bootstrap/js/dist/tooltip.js",
-                            "bootstrap/js/dist/tooltip.js.map",
-                            "bootstrap/js/dist/util.js",
-                            "bootstrap/js/dist/util.js.map",
-                        ],
-                        dest: "js/vendors/bootstrap",
-                    },
-                    {
-                        expand: true,
-                        flatten: true,
-                        cwd: "bower_components",
-                        src: [
-                            "clipboard/dist/clipboard.min.js",
-                            "bootstrap-daterangepicker/daterangepicker.js",
-                            "jquery-icheck/icheck.min.js",
-                            "moment/min/moment.min.js",
-                            "tether/dist/js/tether.min.js",
-                            "tether-drop/dist/js/drop.min.js",
-                            "jquery-checkall/dist/jquery.checkall.min.js",
-                        ],
-                        dest: "js/vendors",
-                    },
-                    {
-                        expand: true,
-                        flatten: true,
-                        cwd: "bower_components",
-                        src: [
-                            "ace-builds/src-min/ace.js",
-                            "ace-builds/src-min/mode-html.js",
-                            "ace-builds/src-min/mode-css.js",
-                            "ace-builds/src-min/ext-searchbox.js",
-                            "ace-builds/src-min/theme-clouds.js",
-                        ],
-                        dest: "js/vendors/ace",
-                    },
-                    {
-                        expand: true,
-                        flatten: true,
-                        cwd: "bower_components",
-                        src: ["google-code-prettify/src/prettify.js"],
-                        dest: "js/vendors/prettify",
-                    },
-                    {
-                        expand: true,
-                        flatten: true,
-                        cwd: "bower_components",
-                        src: [
-                            "google-code-prettify/src/prettify.css",
-                            "color-themes-for-google-code-prettify/dist/themes/tomorrow.css",
-                        ],
-                        dest: "design/vendors",
-                    }
-                ],
-            },
             styleguide: {
                 files: [
                     {
@@ -238,8 +169,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask("styleguide", ["concat:styleguide", "copy:styleguide", "kss"]);
-
-    grunt.registerTask("wiredep", ["copy:main"]);
 
     grunt.registerTask("default", ["sass_globbing", "sass", "autoprefixer", "concat:dist"]);
 };

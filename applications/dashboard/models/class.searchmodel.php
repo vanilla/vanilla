@@ -219,7 +219,7 @@ class SearchModel extends Gdn_Model {
      * @return string
      * @deprecated
      */
-    private function condense($html) {
+    private static function condense($html) {
         $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
         $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
         return $html;

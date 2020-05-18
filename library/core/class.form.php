@@ -333,9 +333,11 @@ class Gdn_Form extends Gdn_Pluggable {
         $return .= $this->_attributesToString($attributes);
 
         if ($elem === 'button') {
-            $return .= ' value="'.val('value', $attributes, $buttonCode).'">'.htmlspecialchars(t($buttonCode, val('value', $attributes))).'</button>';
+            $return .= ' value="'.htmlspecialchars(val('value', $attributes, $buttonCode)).'">'.
+                htmlspecialchars(t($buttonCode, val('value', $attributes))).
+                '</button>';
         } else {
-            $return .= ' value="'.t($buttonCode, val('value', $attributes)).'"';
+            $return .= ' value="'.htmlspecialchars(t($buttonCode, val('value', $attributes))).'"';
             $return .= " />\n";
         }
         return $return;
@@ -347,6 +349,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $code The text of the anchor.
      * @param string $destination The URL path of the anchor.
      * @param array $attributes Additional attributes for the anchor.
+     * @return string
      * @see anchor()
      */
     public function linkButton($code, $destination = '', $attributes = []) {
@@ -626,8 +629,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 $getValue = $this->getValue(substr($fieldName, 0, -2));
                 if (is_array($getValue) && in_array($value, $getValue)) {
                     $attributes['checked'] = 'checked';
-                } elseif ($getValue == $value)
+                } elseif ($getValue == $value) {
                     $attributes['checked'] = 'checked';
+                }
             }
         } else {
             if ($this->getValue($fieldName) == $value) {
@@ -757,7 +761,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $upload = '
             <label class="file-upload">
-              <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
+              <input type="file" name="'.htmlspecialchars($fieldName).'" id="'.$id.'" '.$attributes.'>
               <span class="file-upload-choose" data-placeholder="'.t('Choose').'">'.t('Choose').'</span>
               <span class="file-upload-browse">'.t('Browse').'</span>
             </label>';
@@ -1391,7 +1395,7 @@ class Gdn_Form extends Gdn_Pluggable {
             }
         }
 
-        $return .= '<input type="hidden" name="DateFields[]" value="'.$fieldName.'" />';
+        $return .= '<input type="hidden" name="DateFields[]" value="'.htmlspecialchars($fieldName).'" />';
 
         // Append validation error message
         if ($showErrors) {
@@ -1622,6 +1626,11 @@ class Gdn_Form extends Gdn_Pluggable {
         return $return;
     }
 
+    /**
+     * Return the form's validation errors as a single string.
+     *
+     * @return string
+     */
     public function errorString() {
         $return = '';
         if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
@@ -1643,6 +1652,8 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Escape a string.
+     *
      * @see Gdn_Form::escapeFieldName()
      * @deprecated
      *
@@ -1674,6 +1685,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * represents the final part of the permission name, as in the "Edit" part
      * of "Garden.Roles.Edit".
      * ie. Row1 = array('Add', 'Edit', 'Delete');
+     * @return string
      */
     public function getCheckBoxGridGroup($groupName, $group, $rows, $cols) {
         $return = '';
@@ -1726,7 +1738,9 @@ class Gdn_Form extends Gdn_Pluggable {
             $headings = '';
             $cells = '';
         }
-        return $return == '' ? '' : '<div class="table-wrap"><table class="table-data js-tj js-checkbox-grid table-checkbox-grid">'.$return.'</tbody></table></div>';
+        return $return == '' ?
+            '' :
+            '<div class="table-wrap"><table class="table-data js-tj js-checkbox-grid table-checkbox-grid">'.$return.'</tbody></table></div>';
     }
 
     /**
@@ -1740,10 +1754,6 @@ class Gdn_Form extends Gdn_Pluggable {
             foreach ($this->HiddenInputs as $name => $value) {
                 $return .= $this->hidden($name, ['value' => $value]);
             }
-            // Clean out the array
-            // mosullivan - removed cleanout so that entry forms can all have the same hidden inputs added once on the entry/index view.
-            // TODO - WATCH FOR BUGS BECAUSE OF THIS CHANGE.
-            // $this->HiddenInputs = array();
         }
         return $return;
     }
@@ -1887,7 +1897,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 unset($attributes['nohidden']);
             } else {
                 $return .= '<input type="hidden" name="Checkboxes[]" value="'.
-                    (substr($fieldName, -2) === '[]' ? substr($fieldName, 0, -2) : $fieldName).
+                    htmlspecialchars(substr($fieldName, -2) === '[]' ? substr($fieldName, 0, -2) : $fieldName).
                     '" />';
             }
         }
@@ -1939,11 +1949,19 @@ PASSWORDMETER;
     }
 
 
+    /**
+     * Wrap an input in a div.
+     *
+     * @param string $fieldName
+     * @param string $type
+     * @param array $attributes
+     * @return string
+     */
     public function inputWrap($fieldName, $type = 'text', $attributes = []) {
         return '<div class="input-wrap">'.$this->input($fieldName, $type, $attributes).'</div>';
     }
 
-        /**
+    /**
      * Returns XHTML for a label element.
      *
      * @param string $translationCode Code to be translated and presented within the label tag.
@@ -1963,12 +1981,21 @@ PASSWORDMETER;
         return $return;
     }
 
+    /**
+     * Wrap a label in a div.
+     *
+     * @param string $translationCode
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
     public function labelWrap($translationCode, $fieldName = '', $attributes = []) {
         return '<div class="label-wrap">'.$this->label($translationCode, $fieldName, $attributes).'</div>';
     }
 
     /**
      * Generate a friendly looking label translation code from a camel case variable name
+     *
      * @param string|array $item The item to generate the label from.
      *  - string: Generate the label directly from the item.
      *  - array: Generate the label from the item as if it is a schema row passed to Gdn_Form::simple().
@@ -1990,10 +2017,11 @@ PASSWORDMETER;
             $labelCode = trim(strrchr($labelCode, '.'), '.');
         }
 
-        // Split camel case labels into seperate words.
+        // Split camel case labels into separate words.
         $labelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $labelCode);
         $labelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $labelCode);
-        $labelCode = trim($labelCode);
+        $labelCode = preg_replace('`\s+`', ' ', $labelCode);
+        $labelCode = ucfirst(trim($labelCode));
 
         return $labelCode;
     }
@@ -2532,7 +2560,7 @@ PASSWORDMETER;
     }
 
     /**
-     *
+     * Get the form values as a data set style array.
      *
      * @return array
      */
@@ -2565,6 +2593,7 @@ PASSWORDMETER;
      *
      * Note: these values are typically used by the model and it's validation object.
      *
+     * @param array|null $newValue New form values to set.
      * @return array
      */
     public function formValues($newValue = null) {
@@ -2823,7 +2852,8 @@ PASSWORDMETER;
     /**
      * Save an image from a field.
      *
-     * @param string $field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
+     * @param string $field The name of the field. The image will be uploaded with the _New extension while the current
+     * image will be just the field name.
      * @param array $options
      *  - CurrentImage: Current image to clean if the save is successful
      * @return bool
@@ -2860,9 +2890,9 @@ PASSWORDMETER;
         // The file is valid so let's come up with its new name.
         if (isset($options['Name'])) {
             $name = $options['Name'];
-        } elseif (isset($options['Prefix']))
-            $name = $options['Prefix'].md5(microtime()).'.'.$ext;
-        else {
+        } elseif (isset($options['Prefix'])) {
+            $name = $options['Prefix'] . md5(microtime()) . '.' . $ext;
+        } else {
             $name = md5(microtime()).'.'.$ext;
         }
 
@@ -2966,7 +2996,7 @@ PASSWORDMETER;
      * @param Gdn_Model $model The Model that will enforce data rules on $this->_DataArray. This value
      *  is passed by reference so any changes made to the model outside this
      *  object apply when it is referenced here.
-     * @param Ressource $dataSet A result resource containing data to be filled in the form.
+     * @param mixed $dataSet A result resource containing data to be filled in the form.
      */
     public function setModel($model, $dataSet = false) {
         $this->_Model = $model;
@@ -2977,9 +3007,9 @@ PASSWORDMETER;
     }
 
     /**
+     * Set the validation results on the form.
      *
-     *
-     * @param $validationResults
+     * @param array $validationResults
      */
     public function setValidationResults($validationResults) {
         if (!is_array($this->_ValidationResults)) {
@@ -3010,7 +3040,7 @@ PASSWORDMETER;
      * It sets the value in $this->_DataArray rather than in $this->_FormValues.
      *
      * @param string $fieldName
-     * @param mixed $Default
+     * @param mixed $value
      */
     public function setValue($fieldName, $value) {
         if (!is_array($this->_DataArray)) {
@@ -3037,9 +3067,10 @@ PASSWORDMETER;
      *  - Description: An optional description for the field.
      *  - Items: If the control is a list control then its items are specified here.
      *  - Options: Additional options to be passed into the control.
-     * @param type $options Additional options to pass into the form.
+     * @param array $options Additional options to pass into the form.
      *  - Wrap: A two item array specifying the text to wrap the form in.
      *  - ItemWrap: A two item array specifying the text to wrap each form item in.
+     * @return string
      */
     public function simple($schema, $options = []) {
         $result = valr('Wrap.0', $options, '<ul>');
@@ -3299,5 +3330,12 @@ PASSWORDMETER;
     protected function _valueAttribute($fieldName, $attributes) {
         // Value from $Attributes overrides the datasource and the postback.
         return ' value="'.Gdn_Format::form(arrayValueI('value', $attributes, $this->getValue($fieldName))).'"';
+    }
+
+    /**
+     * Reset the form ID counters.
+     */
+    public static function resetIDs(): void {
+        self::$idCounters = [];
     }
 }

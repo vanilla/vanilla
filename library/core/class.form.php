@@ -898,8 +898,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 $getValue = $this->getValue(substr($fieldName, 0, -2));
                 if (is_array($getValue) && in_array($value, $getValue)) {
                     $attributes['checked'] = 'checked';
-                } elseif ($getValue == $value)
+                } elseif ($getValue == $value) {
                     $attributes['checked'] = 'checked';
+                }
             }
         } else {
             if ($this->getValue($fieldName) == $value) {
@@ -933,7 +934,11 @@ class Gdn_Form extends Gdn_Pluggable {
             } elseif ($display === 'before') {
                 $input = $labelElement.t($label).'</label> '.$input;
             } elseif ($display === 'toggle') {
-                $input = '<div class="label-wrap"><label>'.t($label).'</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.$input.$labelElement.'</label></div></div> ';
+                $input = '<div class="label-wrap"><label>'.
+                    t($label).
+                    '</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.
+                    $input.$labelElement.
+                    '</label></div></div> ';
             } else {
                 $input = $input.' '.$labelElement.t($label).'</label>';
             }
@@ -1157,10 +1162,10 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Generate a list of grouped checkbox grids.
      *
-     *
-     * @param $data
-     * @param $fieldName
+     * @param array $data
+     * @param string $fieldName
      * @return string
      */
     public function checkBoxGridGroups($data, $fieldName) {
@@ -1172,11 +1177,11 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Generate a checkbox grid group.
      *
-     *
-     * @param $groupName
-     * @param $data
-     * @param $fieldName
+     * @param string $groupName
+     * @param array $data
+     * @param string $fieldName
      * @return string
      */
     public function checkBoxGridGroup($groupName, $data, $fieldName) {
@@ -1255,6 +1260,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @param string $buttonCode
      * @param string $xhtml
+     * @param array $attributes
      * @return string
      */
     public function close($buttonCode = '', $xhtml = '', $attributes = []) {
@@ -1478,8 +1484,9 @@ class Gdn_Form extends Gdn_Pluggable {
         $includeNull = arrayValueI('IncludeNull', $attributes, false);
         if ($includeNull === true) {
             $return .= "<option value=\"\"></option>\n";
-        } elseif ($includeNull)
+        } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
+        }
 
         if (is_object($dataSet)) {
             $fieldsExist = false;
@@ -1492,7 +1499,7 @@ class Gdn_Form extends Gdn_Pluggable {
             )
             ) {
                 foreach ($dataSet->result() as $data) {
-                    $return .= '<option value="'.$data->$valueField.
+                    $return .= '<option value="'.htmlspecialchars($data->$valueField).
                         '"';
                     if (in_array($data->$valueField, $value) && $hasValue) {
                         $return .= ' selected="selected"';
@@ -1502,7 +1509,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
             }
         } elseif (is_array($dataSet)) {
-            foreach ($dataSet as $iD => $text) {
+            foreach ($dataSet as $id => $text) {
                 if (is_array($text)) {
                     $attribs = $text;
                     $text = val('Text', $attribs, '');
@@ -1510,8 +1517,8 @@ class Gdn_Form extends Gdn_Pluggable {
                 } else {
                     $attribs = [];
                 }
-                $return .= '<option value="'.$iD.'"';
-                if (in_array($iD, $value) && $hasValue) {
+                $return .= '<option value="'.htmlspecialchars($id).'"';
+                if (in_array($id, $value) && $hasValue) {
                     $return .= ' selected="selected"';
                 }
 
@@ -1534,6 +1541,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
     /**
      * Returns the xhtml for a dropdown list with option groups.
+     *
      * @param string $fieldName
      * @param array $data
      * @param string $groupField
@@ -1559,8 +1567,9 @@ class Gdn_Form extends Gdn_Pluggable {
         $includeNull = arrayValueI('IncludeNull', $attributes, false);
         if ($includeNull === true) {
             $return .= "<option value=\"\"></option>\n";
-        } elseif ($includeNull)
+        } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
+        }
 
         $lastGroup = null;
 
@@ -2163,7 +2172,9 @@ PASSWORDMETER;
 
         // Wrap with label.
         if ($label != '') {
-            $labelElement = '<label for="'.arrayValueI('id', $attributes, $this->escapeID($fieldName, false)).'" class="'.val('class', $attributes, 'RadioLabel').'">';
+            $labelElement = '<label for="'.
+                arrayValueI('id', $attributes, $this->escapeID($fieldName, false)).
+                '" class="'.val('class', $attributes, 'RadioLabel').'">';
             if ($display === 'wrap') {
                 $labelElement = '<label'.attribute('class', $class).'>';
                 $input = $labelElement.$input.' '.t($label).'</label>';
@@ -2333,21 +2344,27 @@ PASSWORDMETER;
         return $return;
     }
 
+    /**
+     * Generate a wrapped text box.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
     public function textBoxWrap($fieldName, $attributes = []) {
         return '<div class="input-wrap">'.$this->textBox($fieldName, $attributes).'</div>';
     }
 
-
-        /// =========================================================================
+    /// =========================================================================
     /// Methods for interfacing with the model & db.
     /// =========================================================================
 
     /**
-     * Adds an error to the errors collection and optionally relates it to the
-     * specified FieldName. Errors added with this method can be rendered with
-     * $this->errors().
+     * Adds an error to the errors collection and optionally relates it to the specified FieldName.
      *
-     * @param mixed $errorCode
+     * Errors added with this method can be rendered with $this->errors().
+     *
+     * @param mixed $error
      *  - <b>string</b>: The translation code that represents the error to display.
      *  - <b>Exception</b>: The exception to display the message for.
      * @param string $fieldName The name of the field to relate the error to.

@@ -391,4 +391,187 @@ EOT;
 
         return $r;
     }
+
+    /**
+     * Test the default `Gdn_Form::checkbox()`.
+     */
+    public function testDefaultCheckbox(): void {
+        $actual = $this->form->checkBox('fo>"');
+        $expected = <<<EOT
+<div class="checkbox">
+    <input type="hidden" name="Checkboxes[]" value="fo&gt;&quot;" />
+    <input type="checkbox" id="Form_fo" name="fo&gt;&quot;" value="1" class="" />
+</div>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test the default `Gdn_Form::radio()`.
+     */
+    public function testDefaultRadio(): void {
+        $actual = $this->form->radio('fo>"', 'bar', ['value' => '2']);
+        $expected = <<<EOT
+<label>
+    <input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar
+</label>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test the default `Gdn_Form::checkBoxList()`.
+     */
+    public function testDefaultCheckboxList(): void {
+        $actual = $this->form->checkBoxList('foo', ['a' => 'b', 'c' => 'd']);
+        $expected = <<<EOT
+<ul class="CheckBoxList">
+    <li><div class="checkbox">
+        <label for="foo1">
+            <input type="hidden" name="Checkboxes[]" value="foo" />
+            <input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a
+        </label>
+    </div></li>
+    <li><div class="checkbox">
+        <label for="foo2">
+            <input type="hidden" name="Checkboxes[]" value="foo" />
+            <input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c
+        </label>
+    </div></li>
+</ul>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test the default `Gdn_Form::radioList()`.
+     */
+    public function testDefaultRadioList(): void {
+        $actual = $this->form->radioList('foo', ['a' => 'b', 'c' => 'd']);
+        $expected = <<<EOT
+<div class="radio">
+    <label>
+        <input type="radio" id="Form_foo" name="foo" value="a" class="" /> b
+    </label>
+</div>
+<div class="radio">
+    <label>
+        <input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d
+    </label>
+</div>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test the default `Gdn_Form::dropDown()`.
+     */
+    public function testDefaultDropdown(): void {
+        $actual = $this->form->dropDown('foo', ['>' => 'b', '"' => 'd']);
+        $expected = <<<EOT
+<select id="Form_foo" name="foo" class="form-control">
+<option value="&gt;">b</option>
+<option value="&quot;">d</option>
+</select>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test the default `Gdn_Form::open()`.
+     */
+    public function testDefaultOpen(): void {
+        $actual = $this->form->open(['action' => 'https://example.com']).
+            $this->form->close();
+        $expected = <<<EOT
+<form method="post" action="https://example.com" autocomplete="off" >
+    <div>
+        <input type="hidden" id="Form_TransientKey" name="TransientKey" value="" />
+    </div>
+</form>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test a form with a GET method and a query string.
+     */
+    public function testOpenWithGetQuery(): void {
+        $actual = $this->form->open([
+            'action' => 'http://example.com?foo=bar',
+            'method' => 'GET',
+        ]).$this->form->close();
+
+        $expected = <<<EOT
+<form method="GET" action="http://example.com" autocomplete="off" >
+    <div>
+        <input type="hidden" name="foo" value="bar" />
+        <input type="hidden" id="Form_TransientKey" name="TransientKey" value="" />
+    </div>
+</form>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    public function testDefaultDate(): void {
+        $actual = $this->form->date('fo>"', ['YearRange' => '2019-2020']);
+        $expected = <<<EOT
+<select id="Form_fo_Month" name="fo&gt;&quot;_Month" class="Month">
+    <option value="0">Month</option>
+    <option value="1">Jan</option>
+    <option value="2">Feb</option>
+    <option value="3">Mar</option>
+    <option value="4">Apr</option>
+    <option value="5">May</option>
+    <option value="6">Jun</option>
+    <option value="7">Jul</option>
+    <option value="8">Aug</option>
+    <option value="9">Sep</option>
+    <option value="10">Oct</option>
+    <option value="11">Nov</option>
+    <option value="12">Dec</option>
+</select>
+<select id="Form_fo_Day" name="fo&gt;&quot;_Day" class="Day">
+    <option value="0">Day</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+    <option value="16">16</option>
+    <option value="17">17</option>
+    <option value="18">18</option>
+    <option value="19">19</option>
+    <option value="20">20</option>
+    <option value="21">21</option>
+    <option value="22">22</option>
+    <option value="23">23</option>
+    <option value="24">24</option>
+    <option value="25">25</option>
+    <option value="26">26</option>
+    <option value="27">27</option>
+    <option value="28">28</option>
+    <option value="29">29</option>
+    <option value="30">30</option>
+    <option value="31">31</option>
+</select>
+<select id="Form_fo_Year" name="fo&gt;&quot;_Year" class="Year">
+    <option value="0">Year</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+</select>
+<input type="hidden" name="DateFields[]" value="fo&gt;&quot;" />
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
 }

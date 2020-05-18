@@ -12,6 +12,7 @@ use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\NeonAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
@@ -214,7 +215,7 @@ class FsThemeProvider implements ThemeProviderInterface {
         // Check theme for default.
         if (!$foundLogo) {
             if (valr("assets.variables", $res)) {
-                $themeVars = json5_decode($res['assets']['variables']->getData(), true);
+                $themeVars = json_decode($res['assets']['variables']->getData(), true);
                 $desktopLogo = valr("titleBar.logo.desktop.url", $themeVars);
                 $mobileLogo = valr("titleBar.logo.mobile.url", $themeVars);
                 $noDesktopLogo = empty($desktopLogo);
@@ -282,8 +283,9 @@ class FsThemeProvider implements ThemeProviderInterface {
             case "twig":
                 return new TwigAsset($data);
             case "json":
-            case "json5":
                 return new JsonAsset($data);
+            case "neon":
+                return new NeonAsset($data);
             default:
                 throw new ServerException("Unrecognized type: {$type}");
         }
@@ -300,9 +302,9 @@ class FsThemeProvider implements ThemeProviderInterface {
         $key = strtolower($key);
         switch ($key) {
             case "fonts":
-                return new FontsAsset(json5_decode($content, true));
+                return new FontsAsset(json_decode($content, true));
             case "scripts":
-                return new ScriptsAsset(json5_decode($content, true));
+                return new ScriptsAsset(json_decode($content, true));
             default:
                 throw new ServerException("Unrecognized data asset: {$key}");
         }

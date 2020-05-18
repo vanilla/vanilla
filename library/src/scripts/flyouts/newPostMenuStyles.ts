@@ -1,9 +1,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut } from "@library/styles/styleHelpers";
+import { unit, colorOut, borders, margins, absolutePosition } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { color } from "csx";
+import { calc, color } from "csx";
 
 export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -41,7 +41,7 @@ export const newPostMenuVariables = useThemeCache(() => {
 
     const toggle = themeVars("toggle", {
         size: 56,
-        position: {
+        margin: {
             top: 24,
         },
         opacity: {
@@ -86,9 +86,9 @@ export const newPostMenuVariables = useThemeCache(() => {
 });
 
 export const newPostMenuClasses = useThemeCache(() => {
-    const style = styleFactory("newPostMenu");
     const vars = newPostMenuVariables();
     const globalVars = globalVariables();
+    const style = styleFactory("newPostMenu");
 
     const root = style("root", {
         position: "fixed",
@@ -100,16 +100,20 @@ export const newPostMenuClasses = useThemeCache(() => {
     const item = style("item", {
         marginTop: unit(vars.item.position.top),
         marginRight: unit(vars.item.position.right),
-        $nest: {
-            "&:focus": {
-                outline: `1px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
-            },
-        },
+    });
+
+    const itemFocus = style("itemFocus", {
+        ...absolutePosition.fullSizeOfParent(),
+        margin: unit(1),
+        maxWidth: calc(`100% - 2px`),
+        maxHeight: calc(`100% - 2px`),
+        borderRadius: unit(vars.action.borderRadius),
     });
 
     const action = style("action", {
+        position: "relative",
         borderRadius: unit(vars.action.borderRadius),
-        ...shadowHelper().dropDown(),
+        ...shadowHelper().floatingButton(),
         minHeight: unit(vars.action.size.height),
         backgroundColor: colorOut(globalVars.mainColors.bg),
         paddingLeft: unit(vars.action.padding.horizontal),
@@ -117,21 +121,38 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         ...clickableItemStates({ default: globalVars.mainColors.fg }),
+        $nest: {
+            "&.focus-visible": {
+                outline: 0,
+            },
+            [`&.focus-visible .${itemFocus}`]: {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+            },
+        },
+    });
+
+    const toggleFocus = style("toggleFocus", {
+        ...absolutePosition.fullSizeOfParent(),
+        margin: unit(1),
+        maxWidth: calc(`100% - 2px`),
+        maxHeight: calc(`100% - 2px`),
+        borderRadius: "50%",
     });
 
     const toggle = style("toggle", {
         display: "inline-flex",
         alignItems: "center",
         justifyItems: "center",
-        borderRadius: "50%",
-        ...shadowHelper().dropDown(),
-        marginTop: unit(vars.toggle.position.top),
         height: unit(vars.toggle.size),
         width: unit(vars.toggle.size),
         backgroundColor: colorOut(globalVars.mainColors.primary),
+        borderRadius: "50%",
         $nest: {
-            "&:focus": {
-                border: `1px solid ${colorOut(globalVars.mainColors.primaryContrast)}`,
+            [`&.focus-visible`]: {
+                outline: 0,
+            },
+            [`&.focus-visible .${toggleFocus}`]: {
+                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primaryContrast)} inset`,
             },
         },
     });
@@ -141,11 +162,23 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-block",
     });
 
+    const toggleWrap = style("toggleShadow", {
+        display: "inline-flex",
+        borderRadius: "50%",
+        ...shadowHelper().floatingButton(),
+        height: unit(vars.toggle.size),
+        width: unit(vars.toggle.size),
+        ...margins(vars.toggle.margin),
+    });
+
     return {
         root,
         item,
+        itemFocus,
         action,
         toggle,
         label,
+        toggleWrap,
+        toggleFocus,
     };
 });

@@ -16,7 +16,6 @@
         "time-grunt": "2.0.0"
     },
     "scripts": {
-        "install": "bower install --allow-root",
         "build": "grunt",
         "watch": "grunt watch"
     }

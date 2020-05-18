@@ -10,12 +10,14 @@ namespace VanillaTests\Library\Vanilla\Web;
 use Garden\EventManager;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Web\TwigEnhancer;
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for our twig enhancement utilties.
  */
-class TwigEnhancerTest extends SharedBootstrapTestCase {
+class TwigEnhancerTest extends TestCase {
+
+    use BootstrapTrait;
 
     /**
      * Test rendering controller assets.

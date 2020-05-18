@@ -513,6 +513,9 @@ EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 
+    /**
+     * Test the default `Gdn_Form::date()`.
+     */
     public function testDefaultDate(): void {
         $actual = $this->form->date('fo>"', ['YearRange' => '2019-2020']);
         $expected = <<<EOT

@@ -491,20 +491,6 @@ if (!function_exists('categoryUrl')) {
     }
 }
 
-if (!function_exists('condense')) {
-    /**
-     *
-     *
-     * @param string $html
-     * @return mixed
-     */
-    function condense($html) {
-        $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
-        $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
-        return $html;
-    }
-}
-
 if (!function_exists('countString')) {
     /**
      *
@@ -906,24 +892,6 @@ if (!function_exists('filtersDropDown')) {
         }
 
         return $output;
-    }
-}
-
-if (!function_exists('fixnl2br')) {
-    /**
-     * Removes the break above and below tags that have a natural margin.
-     *
-     * @param string $text The text to fix.
-     * @return string
-     * @since 2.1
-     *
-     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
-     */
-    function fixnl2br($text) {
-        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
-        /** @var Formats\HtmlFormat $htmlFormat */
-        $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
-        return $htmlFormat->cleanupLineBreaks((string) $text);
     }
 }
 
@@ -1661,32 +1629,6 @@ if (!function_exists('wrapIf')) {
         } else {
             return wrap($string, $tag, $attributes);
         }
-    }
-}
-
-if (!function_exists('discussionLink')) {
-    /**
-     * Build URL for discussion.
-     *
-     * @deprecated discussionUrl()
-     * @param $discussion
-     * @param bool $extended
-     * @return string
-     */
-    function discussionLink($discussion, $extended = true) {
-        deprecated('discussionLink', 'discussionUrl');
-
-        $discussionID = val('DiscussionID', $discussion);
-        $discussionName = val('Name', $discussion);
-        $parts = [
-            'discussion',
-            $discussionID,
-            Gdn_Format::url($discussionName)
-        ];
-        if ($extended) {
-            $parts[] = ($discussion->CountCommentWatch > 0) ? '#Item_'.$discussion->CountCommentWatch : '';
-        }
-        return url(implode('/', $parts), true);
     }
 }
 

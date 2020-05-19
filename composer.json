@@ -77,7 +77,8 @@
         "voku/simple_html_dom": "4.1.7",
         "mikey179/vfsstream": "~1.6",
         "phing/phing": "2.*",
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-master",
+        "nette/robot-loader": "^3.2"
     },
     "provide": {
         "ext-gd": "*"

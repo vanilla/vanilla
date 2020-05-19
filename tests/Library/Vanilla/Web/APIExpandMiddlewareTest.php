@@ -33,9 +33,6 @@ class APIExpandMiddlewareTest extends TestCase {
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::bootstrapSetUpBeforeClass();
-
-        require_once __DIR__ . "/../../../../applications/dashboard/models/class.sessionmodel.php";
-        require_once __DIR__ . "/../../../../applications/dashboard/models/class.usermodel.php";
     }
 
     /**

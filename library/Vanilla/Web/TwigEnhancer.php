@@ -13,7 +13,7 @@ use Gdn;
 use PocketsPlugin;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
-use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
@@ -25,8 +25,8 @@ use Vanilla\Utility\HtmlUtils;
  */
 class TwigEnhancer {
 
-    /** @var AddonProviderInterface */
-    private $addonProvider;
+    /** @var AddonManager */
+    private $addonManager;
 
     /** @var EventManager */
     private $eventManager;
@@ -60,7 +60,7 @@ class TwigEnhancer {
     /**
      * DI.
      *
-     * @param AddonProviderInterface $addonProvider
+     * @param AddonManager $addonManager
      * @param EventManager $eventManager
      * @param \Gdn_Session $session
      * @param ConfigurationInterface $config
@@ -69,7 +69,7 @@ class TwigEnhancer {
      * @param BannerImageModel $bannerImageModel
      */
     public function __construct(
-        AddonProviderInterface $addonProvider,
+        AddonManager $addonManager,
         EventManager $eventManager,
         \Gdn_Session $session,
         ConfigurationInterface $config,
@@ -77,7 +77,7 @@ class TwigEnhancer {
         Gdn_Request $request,
         BannerImageModel $bannerImageModel = null
     ) {
-        $this->addonProvider = $addonProvider;
+        $this->addonManager = $addonManager;
         $this->eventManager = $eventManager;
         $this->session = $session;
         $this->config = $config;
@@ -126,7 +126,7 @@ class TwigEnhancer {
      * @param FilesystemLoader $loader
      */
     public function enhanceFileSystem(FilesystemLoader $loader) {
-        $addons = $this->addonProvider->getEnabled();
+        $addons = $this->addonManager->getEnabled();
         $loader->addPath(PATH_ROOT . '/resources/views', 'resources');
 
         foreach ($addons as $addon) {

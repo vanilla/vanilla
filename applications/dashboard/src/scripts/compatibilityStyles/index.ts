@@ -300,7 +300,7 @@ compatibilityStyles = useThemeCache(() => {
     );
 
     cssOut(".Panel > * + *", {
-        marginTop: unit(vars.gutter.size),
+        marginTop: unit(24),
     });
 
     cssOut(`.Panel > .PhotoWrapLarge`, {

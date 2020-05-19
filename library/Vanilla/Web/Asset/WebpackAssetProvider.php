@@ -9,11 +9,11 @@ namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\ThemeModel;
-use Vanilla\Contracts\AddonInterface;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -25,8 +25,8 @@ class WebpackAssetProvider {
     /** @var RequestInterface */
     private $request;
 
-    /** @var Contracts\AddonProviderInterface */
-    private $addonProvider;
+    /** @var AddonManager */
+    private $addonManager;
 
     /** @var \Gdn_Session */
     private $session;
@@ -56,18 +56,20 @@ class WebpackAssetProvider {
      * WebpackAssetProvider constructor.
      *
      * @param RequestInterface $request
-     * @param Contracts\AddonProviderInterface $addonProvider
+     * @param AddonManager $addonManager
      * @param \Gdn_Session $session
+     * @param ConfigurationInterface $config
+     * @param ThemeModel $themeModel
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\AddonProviderInterface $addonProvider,
+        AddonManager $addonManager,
         \Gdn_Session $session,
         ConfigurationInterface $config,
         ThemeModel $themeModel
     ) {
         $this->request = $request;
-        $this->addonProvider = $addonProvider;
+        $this->addonManager = $addonManager;
         $this->session = $session;
         $this->config = $config;
         $this->themeModel = $themeModel;
@@ -156,7 +158,7 @@ class WebpackAssetProvider {
         }
 
         // Grab all of the addon based assets.
-        foreach ($this->addonProvider->getEnabled() as $addon) {
+        foreach ($this->addonManager->getEnabled() as $addon) {
             $addon = $this->checkReplacePreview($addon);
             // See if we have a common bundle
             $commonAsset = new WebpackAddonAsset(
@@ -199,13 +201,13 @@ class WebpackAssetProvider {
      * @param Addon $addon
      * @return Addon
      */
-    private function checkReplacePreview(AddonInterface $addon): AddonInterface {
+    private function checkReplacePreview(Addon $addon): Addon {
         $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
         $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
             if ($addon->getKey() === $currentThemeKey) {
                 $addonKey = $this->themeModel->getMasterThemeKey($previewThemeKey);
-                if ($previewTheme = $this->addonProvider->lookupTheme($addonKey)) {
+                if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
                     $addon = $previewTheme;
                 }
             }
@@ -253,7 +255,7 @@ class WebpackAssetProvider {
         }
 
         // Grab all of the addon based assets.
-        foreach ($this->addonProvider->getEnabled() as $addon) {
+        foreach ($this->addonManager->getEnabled() as $addon) {
             $addon = $this->checkReplacePreview($addon);
             $asset = new WebpackAddonAsset(
                 $this->request,

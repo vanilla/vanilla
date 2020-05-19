@@ -15,12 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
-use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\TwigEnhancer;
 use VanillaTests\Fixtures\MockUASniffer;
 use Vanilla\Formatting\FormatService;
@@ -28,7 +28,7 @@ use Vanilla\Formatting\Quill\Parser;
 use Vanilla\InjectableInterface;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
-use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
@@ -56,7 +56,7 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Setup the container.
      */
-    private function configureContainer() {
+    protected function configureContainer() {
         \Gdn::setContainer(new Container());
 
         self::container()
@@ -77,9 +77,8 @@ class MinimalContainerTestCase extends TestCase {
 
             // Mocks of interfaces.
             // Addons
-            ->rule(AddonProviderInterface::class)
-            ->setClass(MockAddonProvider::class)
-            ->addAlias(AddonManager::class)
+            ->rule(AddonManager::class)
+            ->setClass(MockAddonManager::class)
             ->addAlias(\Gdn::AliasAddonManager)
             ->setShared(true)
 
@@ -145,6 +144,9 @@ class MinimalContainerTestCase extends TestCase {
             ->rule(UserProviderInterface::class)
             ->setClass(MockUserProvider::class)
             ->setShared(true)
+
+            ->rule(ThemeFeatures::class)
+            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
             ->rule(\Gdn_PluginManager::class)
             ->addAlias(\Gdn::AliasPluginManager)

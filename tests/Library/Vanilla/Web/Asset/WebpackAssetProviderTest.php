@@ -17,7 +17,7 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
-use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Fixtures\Request;
@@ -44,7 +44,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
      */
     private function getWebpackAssetProvider(array $addons = []) {
         $session = new \Gdn_Session();
-        $addonManager = new MockAddonProvider($addons);
+        $addonManager = new MockAddonManager($addons);
         $config = new MockConfig(['Garden.CurrentTheme'=>'default']);
         $themeHelper = new ThemeModelHelper(
             $addonManager,

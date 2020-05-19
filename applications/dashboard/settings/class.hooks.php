@@ -295,8 +295,8 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if ($mobileTheme) {
-            $isDistinctMobileTheme = $mobileTheme !== $desktopTheme;
-            $hasMobileThemeOptions = $isDistinctMobileTheme && count($mobileTheme->getInfoValue('options', [])) > 0;
+            $isDistinctMobileTheme = $mobileTheme !== $desktopTheme && $mobileTheme->getInfoValue('isMobile');
+            $hasMobileThemeOptions = $isDistinctMobileTheme && (count($mobileTheme->getInfoValue('options', [])) > 0);
         }
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.

@@ -8,7 +8,7 @@
 namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Contracts;
+use Vanilla\Addon;
 
 /**
  * An webpack asset that it specific to an addon.
@@ -21,7 +21,7 @@ class WebpackAddonAsset extends WebpackAsset {
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
-     * @param Contracts\AddonInterface $addon The addon to get an asset for.
+     * @param Addon $addon The addon to get an asset for.
      * @param string $cacheBustingKey A string for busting the cache.
      * @param bool $isCommonChunk Whether to check append common to the path.
      */
@@ -29,7 +29,7 @@ class WebpackAddonAsset extends WebpackAsset {
         RequestInterface $request,
         string $extension,
         string $section,
-        Contracts\AddonInterface $addon,
+        Addon $addon,
         $cacheBustingKey = "",
         bool $isCommonChunk = false
     ) {

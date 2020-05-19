@@ -236,6 +236,14 @@ class PocketsPlugin extends Gdn_Plugin {
                 ];
             }
 
+            if ($roles) {
+                $rolesDesc = t('Only visible to users with roles with permission.');
+                $meta['roles'] = [
+                    'label' => t('Roles'),
+                    'value' => $rolesDesc
+                ];
+            }
+
             $pocketRow['Meta'] = $meta;
         }
 
@@ -369,8 +377,13 @@ class PocketsPlugin extends Gdn_Plugin {
                 // The 'TestMode' property will already be set to true in the UI, we'll let save() set it.
             }
 
+            // Roles
+            $roles = $form->getFormValue('Roles');
+            $form->setFormValue('Roles', $roles);
+
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
+
 
             $saved = $form->save();
             if ($saved) {
@@ -394,6 +407,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 $pocket['EveryBegin'] = $repeatFrequency[1];
                 $pocket['Indexes'] = implode(',', $repeatFrequency);
                 $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
+                $pocket['Roles'] = $pocket->Roles;
                 $pocket['TestMode'] = Pocket::inTestMode($pocket);
 
                 // The frontend displays an enable/disable toggle, so we need this value to be turned around.
@@ -685,6 +699,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('ShowInDashboard', 'tinyint', '0')
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
+            ->column('Roles', "varchar(225)", null)
             ->set();
 
         $PermissionModel = Gdn::permissionModel();

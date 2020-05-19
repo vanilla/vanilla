@@ -67,6 +67,9 @@ class Pocket {
     /** @var array */
     public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
 
+    /** @var array */
+    public $Roles = [];
+
     /**
      * Pocket constructor.
      *
@@ -163,6 +166,10 @@ class Pocket {
             }
         }
 
+        if($this->hasRoles()){
+            $break = "here";
+        }
+
         // If we've passed all of the tests then the pocket can be processed.
         return true;
     }
@@ -185,6 +192,7 @@ class Pocket {
         $this->EmbeddedNever = val('EmbeddedNever', $data);
         $this->ShowInDashboard = val('ShowInDashboard', $data);
         $this->TestMode = val('TestMode', $data);
+        $this->Roles = val('Roles', $data);
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -198,6 +206,15 @@ class Pocket {
      */
     public function isAd() {
         return $this->Type == Pocket::TYPE_AD;
+    }
+
+    /**
+     * Determine whether the pocket is dependent on conditions
+     *
+     * @return bool
+     */
+    public function hasRoles() {
+        return !empty($this->Roles);
     }
 
     /**
@@ -330,7 +347,8 @@ class Pocket {
                 'MobileNever' => 0,
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
-                'Type' => 'default'
+                'Type' => 'default',
+                'Roles' => null
                 ];
             $model->save($pocket);
         }

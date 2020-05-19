@@ -104,19 +104,13 @@ echo $Form->errors();
             ?>
         </div>
     </li>
-    <li data-react="pocket-multi-role-input" tag="div" style="display: none!important;" data-unhide="true"/>
 
-
-
-<!--    <li class="form-group">-->
-<!--        --><?php
-//        echo $Form->labelWrap('By Role', ''); ?>
-<!--        <div class="input-wrap">-->
-<!--            --><?php
-//
-//            ?>
-<!--        </div>-->
-<!--    </li>-->
+    <?php
+        $ROLES_ID = "js-pocketRoles";
+        $roleProps = ["tag" => "div", "id" => $ROLES_ID];
+    ?>
+    <li data-react="pocket-multi-role-input" data-props="<?php echo htmlspecialchars(json_encode($roleProps)); ?>" style="display: none!important;" data-unhide="true">
+    </li>
 
 
     <li class="form-group">
@@ -129,5 +123,7 @@ echo $Form->errors();
         </div>
     </li>
 </ul>
+<?php //echo $Form->textBox("Roles", ["id" => $ROLES_ID]); ?>
+<?php echo $Form->hidden("Roles", ["id" => $ROLES_ID]); ?>
 <?php echo $Form->close('Save');
 

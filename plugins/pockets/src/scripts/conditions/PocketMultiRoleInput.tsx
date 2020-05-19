@@ -3,29 +3,39 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 
-export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements }) {
-    const form = { viewRoleIDs: [] };
+export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements; id?: string }) {
+    const { id = "js-pocketRole" } = props;
+    const [roles, setRoles] = useState([] as number[]);
 
-    console.log("PocketMultiRoleInput");
+    const formField = useMemo(() => {
+        return document.getElementById(id);
+    }, []) as HTMLInputElement;
 
-    const updateForm = viewRoleIDs => {
-        console.log("viewRoleIDs: ", viewRoleIDs);
-        return;
-    };
+    useEffect(() => {
+        if (formField) {
+            formField.value = JSON.stringify(roles);
+        }
+    }, [roles]);
+
+    // initial loading of values
+    useEffect(() => {
+        console.log("formField.value: ", formField.value);
+        setRoles(JSON.parse(formField.value));
+    }, [formField]);
 
     return (
         <DashboardFormGroup label={t("Roles")} tag={props.tag}>
             <div className="input-wrap">
                 <MultiRoleInput
                     label={""}
-                    value={form.viewRoleIDs ?? []}
+                    value={roles ?? []}
                     onChange={viewRoleIDs => {
-                        updateForm({ viewRoleIDs });
+                        setRoles(viewRoleIDs ?? []);
                     }}
                 />
             </div>

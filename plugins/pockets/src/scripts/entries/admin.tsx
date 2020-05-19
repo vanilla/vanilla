@@ -7,6 +7,4 @@ import React from "react";
 import { addComponent, addPageComponent } from "@library/utility/componentRegistry";
 import { PocketMultiRoleInput } from "../conditions/PocketMultiRoleInput";
 
-addPageComponent(() => <PocketMultiRoleInput />);
-
 addComponent("pocket-multi-role-input", PocketMultiRoleInput);

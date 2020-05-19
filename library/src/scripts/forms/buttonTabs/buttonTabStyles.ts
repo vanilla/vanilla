@@ -30,14 +30,14 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
             position: "relative",
             alignItems: "center",
             justifyContent: "flex-start",
+            ...margins({
+                horizontal: negativeUnit(globalVars.gutter.half),
+                vertical: negativeUnit(globalVars.gutter.half),
+            }),
         },
         mediaQueries.xs({
             flexWrap: "wrap",
-            marginLeft: negativeUnit(globalVars.gutter.half),
-            ...margins({
-                horizontal: negativeUnit(globalVars.gutter.quarter),
-                vertical: negativeUnit(globalVars.gutter.quarter),
-            }),
+            justifyContent: "stretch",
             width: calc(`100% + ${unit(globalVars.gutter.size)}`),
         }),
     );
@@ -45,22 +45,16 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
     const tab = style(
         "tab",
         {
-            marginRight: unit(globalVars.gutter.size),
-            $nest: {
-                "&.isLast": {
-                    flexGrow: 1,
-                    marginRight: 0,
-                },
-            },
+            ...margins({
+                all: globalVars.gutter.half,
+            }),
         },
         mediaQueries.xs({
             display: "flex",
             position: "relative",
             alignItems: "center",
             justifyContent: "stretch",
-            ...margins({
-                all: globalVars.gutter.quarter,
-            }),
+            flexGrow: 1,
         }),
     );
 
@@ -79,6 +73,7 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
         },
         mediaQueries.xs({
             minWidth: important(0),
+            flexGrow: 1,
         }),
     );
     const labelStateStyles = generateButtonStyleProperties(buttonVariables().primary);

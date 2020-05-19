@@ -202,7 +202,7 @@ class Bootstrap {
 
             ->rule(\Vanilla\Logging\ResourceEventLogger::class)
             ->addCall("includeAction", [
-                \Vanilla\Community\Events\UserEvent::class,
+                \Vanilla\Dashboard\Events\UserEvent::class,
                 '*',
             ])
             ->setShared(true)

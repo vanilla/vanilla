@@ -162,7 +162,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(\Vanilla\Logging\ResourceEventLogger::class)
     ->addCall("includeAction", [
-        \Vanilla\Community\Events\UserEvent::class,
+        \Vanilla\Dashboard\Events\UserEvent::class,
         '*',
     ])
     ->setShared(true)

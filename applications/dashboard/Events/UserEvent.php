@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Community\Events;
+namespace Vanilla\Dashboard\Events;
 
 use Garden\Events\ResourceEvent;
+use Vanilla\AliasLoader;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 
@@ -28,3 +29,5 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface {
         return $payload;
     }
 }
+
+AliasLoader::createAliases(UserEvent::class);

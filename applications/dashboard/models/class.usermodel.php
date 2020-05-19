@@ -12,7 +12,7 @@ use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
-use Vanilla\Community\Events\UserEvent;
+use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;

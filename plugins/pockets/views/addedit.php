@@ -104,6 +104,21 @@ echo $Form->errors();
             ?>
         </div>
     </li>
+    <li data-react="pocket-multi-role-input" tag="div" style="display: none!important;" data-unhide="true"/>
+
+
+
+<!--    <li class="form-group">-->
+<!--        --><?php
+//        echo $Form->labelWrap('By Role', ''); ?>
+<!--        <div class="input-wrap">-->
+<!--            --><?php
+//
+//            ?>
+<!--        </div>-->
+<!--    </li>-->
+
+
     <li class="form-group">
         <div class="label-wrap-wide">
             <?php echo $Form->label('Test Mode', 'Testing'); ?>

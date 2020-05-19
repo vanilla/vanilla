@@ -70,6 +70,8 @@ trait SiteTestTrait {
      * Install the site.
      */
     public static function setupBeforeClass(): void {
+        require_once __DIR__ . '/../applications/vanilla/Events/UserEvent.php';
+
         self::setupBeforeClassSiteTestTrait();
     }
 

@@ -7,7 +7,6 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
-use Garden\Schema\Schema;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 
@@ -20,19 +19,17 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
     /**
      * @inheritDoc
      */
-    private function getLogPayloadSchema(): ?Schema {
-        $result = Schema::parse([
-            "discussion:o" => [
-                "discussionID",
-                "dateInserted",
-                "dateUpdated",
-                "updateUserID",
-                "insertUserID",
-                "url",
-                "name",
-            ]
+    private function getLogPayload(): array {
+        $payload = $this->getPayload();
+        $payload["discussion"] = array_intersect_key($payload["discussion"] ?? [], [
+            "discussionID" => true,
+            "dateInserted" => true,
+            "dateUpdated" => true,
+            "updateUserID" => true,
+            "insertUserID" => true,
+            "url" => true,
+            "name" => true,
         ]);
-
-        return $result;
+        return $payload;
     }
 }

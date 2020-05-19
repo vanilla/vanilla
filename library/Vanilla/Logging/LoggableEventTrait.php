@@ -7,8 +7,6 @@
 namespace Vanilla\Logging;
 
 use Garden\Events\ResourceEvent;
-use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
 use Psr\Log\LogLevel;
 use Vanilla\Logger;
 

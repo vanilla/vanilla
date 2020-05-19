@@ -2813,10 +2813,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 Logger::event(
                     'role_remove',
                     Logger::INFO,
-                    "{toUsername} removed from the {role} role.",
+                    "{".Logger::FIELD_TARGET_USERNAME."} removed from the {role} role.",
                     [
-                        'touserid' => $User->UserID,
-                        'toUsername' => $User->Name,
+                        Logger::FIELD_TARGET_USERID => $User->UserID,
+                        Logger::FIELD_TARGET_USERNAME => $User->Name,
                         'role' => $RoleName,
                         Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                     ]
@@ -2827,10 +2827,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 Logger::event(
                     'role_add',
                     Logger::INFO,
-                    "{toUsername} added to the {role} role.",
+                    "{".Logger::FIELD_TARGET_USERNAME."} added to the {role} role.",
                     [
-                        'touserid' => $User->UserID,
-                        'toUsername' => $User->Name,
+                        Logger::FIELD_TARGET_USERID => $User->UserID,
+                        Logger::FIELD_TARGET_USERNAME => $User->Name,
                         'role' => $RoleName,
                         Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
                     ]

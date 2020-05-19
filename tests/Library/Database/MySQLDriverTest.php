@@ -220,4 +220,17 @@ EOT;
 
         $this->assertSame($expected, $actual);
     }
+
+    /**
+     * Adding "-" before an order field orders it in descending order.
+     */
+    public function testNegativeOrderBy() {
+        $actual = $this->sql->select()->from('foo')->orderBy('-foo, bar', 'asc')->getSelect();
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+order by `foo` desc, `bar` asc
+EOT;
+        $this->assertSame($expected, $actual);
+    }
 }

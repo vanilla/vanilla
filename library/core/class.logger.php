@@ -18,6 +18,17 @@ use Psr\Log\LoggerInterface;
  * @see BaseLogger
  */
 class Logger {
+    public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
+    public const FIELD_CHANNEL = \Vanilla\Logger::FIELD_CHANNEL;
+    public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
+    public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
+
+    public const CHANNEL_ADMIN = \Vanilla\Logger::CHANNEL_ADMIN;
+    public const CHANNEL_APPLICATION = \Vanilla\Logger::CHANNEL_APPLICATION;
+    public const CHANNEL_MODERATION = \Vanilla\Logger::CHANNEL_MODERATION;
+    public const CHANNEL_SECURITY = \Vanilla\Logger::CHANNEL_SECURITY;
+    public const CHANNEL_SYSTEM = \Vanilla\Logger::CHANNEL_SYSTEM;
+    public const CHANNEL_DEFAULT = \Vanilla\Logger::CHANNEL_DEFAULT;
 
     /** Log type. */
     const EMERGENCY = 'emergency';
@@ -48,6 +59,11 @@ class Logger {
 
     /** @var string The global level at which events are committed to the log. */
     private static $logLevel;
+
+    /**
+     * @var LoggerInterface
+     */
+    private static $realLogger;
 
     /**
      * Add a new logger to observe messages.
@@ -98,6 +114,18 @@ class Logger {
             self::$instance = Gdn::getContainer()->get(\Vanilla\Logger::class);
         }
         return self::$instance;
+    }
+
+    /**
+     * Get the logger used to do the actual logging.
+     *
+     * @return LoggerInterface
+     */
+    private static function getRealLogger(): LoggerInterface {
+        if (!self::$realLogger) {
+            self::$realLogger = Gdn::getContainer()->get(LoggerInterface::class);
+        }
+        return self::$realLogger;
     }
 
     /**
@@ -212,7 +240,7 @@ class Logger {
      * @param array $context The message data.
      */
     public static function event($event, $level, $message, $context = []) {
-        $context['event'] = $event;
+        $context[\Vanilla\Logger::FIELD_EVENT] = $event;
         static::log($level, $message, $context);
     }
 
@@ -266,6 +294,7 @@ class Logger {
             $path = Gdn::request()->path();
             $key = "log:$event:$userID:$path";
             if (Gdn::cache()->get($key) === false) {
+                $context += [self::FIELD_CHANNEL => self::CHANNEL_SECURITY];
                 self::event($event, $level, $message, $context);
                 Gdn::cache()->store($key, time(), [Gdn_Cache::FEATURE_EXPIRY => 300]);
             }
@@ -283,18 +312,7 @@ class Logger {
      * @param array $context The message data.
      */
     public static function log($level, $message, $context = []) {
-        // Add default fields to the context if they don't exist.
-        $defaults = [
-            'userid' => Gdn::session()->UserID,
-            'username' => val("Name", Gdn::session()->User, 'anonymous'),
-            'ip' => Gdn::request()->ipAddress(),
-            'timestamp' => time(),
-            'method' => Gdn::request()->requestMethod(),
-            'domain' => rtrim(url('/', true), '/'),
-            'path' => Gdn::request()->path()
-        ];
-        $context = $context + $defaults;
-        static::getLogger()->log($level, $message, $context);
+        static::getRealLogger()->log($level, $message, $context);
     }
 
     /**

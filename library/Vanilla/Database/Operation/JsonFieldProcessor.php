@@ -17,6 +17,15 @@ class JsonFieldProcessor implements Processor {
     private $fields = [];
 
     /**
+     * JsonFieldProcessor constructor.
+     *
+     * @param array $fields
+     */
+    public function __construct(array $fields = []) {
+        $this->setFields($fields);
+    }
+
+    /**
      * Get the list of fields to be packed and unpacked.
      *
      * @return array

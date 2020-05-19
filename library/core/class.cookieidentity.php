@@ -503,7 +503,7 @@ class Gdn_CookieIdentity {
                     'cookie_jwt_error',
                     Logger::ERROR,
                     $e->getMessage(),
-                    ['jwt' => $jwt]
+                    ['jwt' => $jwt, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }

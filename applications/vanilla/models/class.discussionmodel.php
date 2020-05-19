@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\Events\ResourceEvent;
+use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
@@ -25,7 +27,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
 
     use StaticInitializer;
 
@@ -126,6 +128,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      */
     private $archiveDate;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -135,6 +140,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         parent::__construct('Discussion', $validation);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
 
+        $this->userModel = Gdn::getContainer()->get(UserModel::class);
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
@@ -597,7 +603,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        $this->userModel->joinUsers($data, ['FirstUserID', 'LastUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -883,7 +889,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
         // Join in users and categories.
         if ($expand) {
-            Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+            $this->userModel->joinUsers($data, ['FirstUserID', 'LastUserID']);
             CategoryModel::joinCategories($data);
         }
 
@@ -1007,7 +1013,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        $this->userModel->joinUsers($data, ['FirstUserID', 'LastUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1407,7 +1413,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             $this->addDenormalizedViews($data);
         }
 
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        $this->userModel->joinUsers($data, ['FirstUserID', 'LastUserID']);
         CategoryModel::joinCategories($data);
 
         // Prep and fire event
@@ -1552,7 +1558,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        $this->userModel->joinUsers($data, ['FirstUserID', 'LastUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1933,7 +1939,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
         // Join in the users.
         $discussion = [$discussion];
-        Gdn::userModel()->joinUsers($discussion, ['LastUserID', 'InsertUserID']);
+        $this->userModel->joinUsers($discussion, ['LastUserID', 'InsertUserID']);
         $discussion = $discussion[0];
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -2350,7 +2356,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                     }
 
                     // Update the user's discussion count.
-                    $insertUser = Gdn::userModel()->getID($fields['InsertUserID']);
+                    $insertUser = $this->userModel->getID($fields['InsertUserID']);
                     $this->updateUserDiscussionCount($fields['InsertUserID'], val('CountDiscussions', $insertUser, 0) > 100);
 
                     // Mark the user as participated and update DateLastViewed.
@@ -2384,7 +2390,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
 
                 $discussionEvent = $this->eventFromRow(
                     (array)$discussion,
-                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
+                    $this->userModel->currentFragment()
                 );
                 $this->getEventManager()->dispatch($discussionEvent);
 
@@ -2404,18 +2411,23 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      *
      * @param array $row
      * @param string $action
+     * @param array $sender
      * @return DiscussionEvent
      */
-    private function eventFromRow(array $row, string $action): DiscussionEvent {
-        /** @var UserModel */
-        $userModel = Gdn::getContainer()->get(UserModel::class);
-
-        $userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
+    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+        $this->userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
         $discussion = $this->normalizeRow($row, true);
         $discussion = $this->schema()->validate($discussion);
+
+        if ($sender) {
+            $senderSchema = new UserFragmentSchema();
+            $sender = $senderSchema->validate($sender);
+        }
+
         $result = new DiscussionEvent(
             $action,
-            ["discussion" => $discussion]
+            ["discussion" => $discussion],
+            $sender
         );
         return $result;
     }
@@ -2489,7 +2501,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         if (is_string($body) && is_string($format)) {
             $mentions = Gdn::formatService()->parseMentions($body, $format);
             /** @var UserModel $userModel */
-            $userModel = Gdn::getContainer()->get(UserModel::class);
+            $userModel = $this->userModel;
 
             foreach ($mentions as $mentionName) {
                 $mentionUser = $userModel->getByUsername($mentionName);
@@ -2659,7 +2671,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      */
     public function updateUserDiscussionCount($userID, $inc = false) {
         if ($inc) {
-            $user = Gdn::userModel()->getID($userID);
+            $user = $this->userModel->getID($userID);
 
             $countDiscussions = val('CountDiscussions', $user);
             // Increment if 100 or greater; Recalculate on 120, 140 etc.
@@ -2669,7 +2681,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
                     ->where('UserID', $userID)
                     ->put();
 
-                Gdn::userModel()->updateUserCache($userID, 'CountDiscussions', $countDiscussions + 1);
+                $this->userModel->updateUserCache($userID, 'CountDiscussions', $countDiscussions + 1);
                 return;
             }
         }
@@ -2681,7 +2693,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             ->get()->value('CountDiscussions', 0);
 
         // Save the count to the user table
-        Gdn::userModel()->setField($userID, 'CountDiscussions', $countDiscussions);
+        $this->userModel->setField($userID, 'CountDiscussions', $countDiscussions);
     }
 
     /**
@@ -2692,7 +2704,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
      */
     public function setUserBookmarkCount($userID) {
         $count = $this->userBookmarkCount($userID);
-        Gdn::userModel()->setField($userID, 'CountBookmarks', $count);
+        $this->userModel->setField($userID, 'CountBookmarks', $count);
 
         return $count;
     }
@@ -3067,7 +3079,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         if ($data) {
             $dataObject = (object)$data;
             $this->calculate($dataObject);
-            $discussionEvent = $this->eventFromRow((array)$dataObject, DiscussionEvent::ACTION_DELETE);
+
+            $discussionEvent = $this->eventFromRow(
+                (array)$dataObject,
+                DiscussionEvent::ACTION_DELETE,
+                $this->userModel->currentFragment()
+            );
             $this->getEventManager()->dispatch($discussionEvent);
         }
         return true;
@@ -3173,7 +3190,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         if (is_numeric($discussion)) {
             $discussion = $this->getID($discussion);
         }
-        $userModel = Gdn::userModel();
+        $userModel = $this->userModel;
         // Get category permission.
         $categoryID = val('CategoryID', $discussion);
         if ($userID && Gdn::session()->UserID === $userID) {
@@ -3530,7 +3547,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
         ];
 
         if (array_key_exists('InsertUserID', $discussion) && $discussion['InsertUserID']) {
-            $user = Gdn::userModel()->getID($discussion['InsertUserID'], DATASET_TYPE_ARRAY);
+            $user = $this->userModel->getID($discussion['InsertUserID'], DATASET_TYPE_ARRAY);
             if ($user) {
                 $result["author"] = [
                     "@context" => "https://schema.org",
@@ -3714,6 +3731,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
+            'updateUserID:i|n',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',

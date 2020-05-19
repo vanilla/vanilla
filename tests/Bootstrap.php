@@ -197,6 +197,14 @@ class Bootstrap {
             ->addAlias(EventListenerConfigInterface::class)
             ->addAlias(EventDispatcherInterface::class)
             ->addAlias(ListenerProviderInterface::class)
+            ->addCall("addListenerMethod", [\Vanilla\Logging\ResourceEventLogger::class, "logResourceEvent"])
+            ->setShared(true)
+
+            ->rule(\Vanilla\Logging\ResourceEventLogger::class)
+            ->addCall("includeAction", [
+                \Vanilla\Dashboard\Events\UserEvent::class,
+                '*',
+            ])
             ->setShared(true)
 
             ->rule(InjectableInterface::class)

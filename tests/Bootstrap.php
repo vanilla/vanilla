@@ -162,7 +162,6 @@ class Bootstrap {
                 ],
                 PATH_ROOT.'/tests/cache/bootstrap'
             ])
-            ->addAlias(AddonManager::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 

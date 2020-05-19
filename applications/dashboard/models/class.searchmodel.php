@@ -177,7 +177,7 @@ class SearchModel extends Gdn_Model {
 
         foreach ($result as $key => $value) {
             if (isset($value['Summary'])) {
-                $value['Summary'] = condense(Gdn_Format::to($value['Summary'], $value['Format']));
+                $value['Summary'] = self::condense(Gdn_Format::to($value['Summary'], $value['Format']));
                 // We just converted it to HTML. Make sure everything downstream knows it.
                 // Taking this HTML and feeding it into the Rich Format for example, would be invalid.
                 $value['Format'] = 'Html';
@@ -210,5 +210,18 @@ class SearchModel extends Gdn_Model {
             $this->_SearchMode = $value;
         }
         return $this->_SearchMode;
+    }
+
+    /**
+     * Reduce whitespace in some HTML.
+     *
+     * @param string $html
+     * @return string
+     * @deprecated
+     */
+    private static function condense($html) {
+        $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
+        $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
+        return $html;
     }
 }

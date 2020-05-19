@@ -1,6 +1,5 @@
 import React, { useRef, useMemo, useReducer } from "react";
 import classNames from "classnames";
-
 import { NewPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Button from "@library/forms/Button";
@@ -47,6 +46,7 @@ function ActionItem(props: IProps) {
 
     const contents = (
         <>
+            <div className={classes.itemFocus} aria-hidden={true} />
             {icon}
             <span className={classes.label}>{label}</span>
         </>
@@ -327,30 +327,38 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                     ))}
                 </animated.ul>
 
-                <AnimatedButton
-                    onKeyDown={onMenuButtonKeyDown}
-                    id={buttonID}
-                    aria-haspopup="true"
-                    aria-controls={menuID}
-                    aria-expanded={state.open}
-                    title={t("New Post Menu")}
-                    aria-label={t("New Post Menu")}
-                    buttonRef={buttonRef}
+                <animated.div
+                    className={classes.toggleWrap}
                     style={{
-                        opacity: o
-                            .interpolate({
-                                range: [0, 0.25, 0.45, 0.75, 1],
-                                output: [1, 0.97, 0.7, 0.9, 1],
-                            })
-                            .interpolate(x => `${o}`),
-                        transform: interpolate([d, s], (d, s) => `rotate(${d}deg) scale(${s})`),
+                        transform: interpolate([s], s => `scale(${s})`),
                     }}
-                    baseClass={ButtonTypes.CUSTOM}
-                    onClick={() => dispatch({ type: "toggle_open" })}
-                    className={classNames(classes.toggle)}
                 >
-                    <NewPostMenuIcon />
-                </AnimatedButton>
+                    <AnimatedButton
+                        onKeyDown={onMenuButtonKeyDown}
+                        id={buttonID}
+                        aria-haspopup="true"
+                        aria-controls={menuID}
+                        aria-expanded={state.open}
+                        title={t("New Post Menu")}
+                        aria-label={t("New Post Menu")}
+                        buttonRef={buttonRef}
+                        style={{
+                            opacity: o
+                                .interpolate({
+                                    range: [0, 0.25, 0.45, 0.75, 1],
+                                    output: [1, 0.97, 0.7, 0.9, 1],
+                                })
+                                .interpolate(o => `${o}`),
+                            transform: interpolate([d], d => `rotate(${d}deg)`),
+                        }}
+                        baseClass={ButtonTypes.CUSTOM}
+                        onClick={() => dispatch({ type: "toggle_open" })}
+                        className={classNames(classes.toggle)}
+                    >
+                        <div className={classes.toggleFocus} aria-hidden={true} />
+                        <NewPostMenuIcon />
+                    </AnimatedButton>
+                </animated.div>
             </div>
         </NewPostBackground>
     );

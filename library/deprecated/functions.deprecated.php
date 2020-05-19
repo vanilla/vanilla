@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -221,6 +222,20 @@ if (!function_exists('compareHashDigest')) {
     }
 }
 
+if (!function_exists('condense')) {
+    /**
+     *
+     *
+     * @param string $html
+     * @return mixed
+     */
+    function condense($html) {
+        $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
+        $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
+        return $html;
+    }
+}
+
 if (!function_exists('ConsolidateArrayValuesByKey')) {
     /**
      * Return the values from a single column in the input array.
@@ -286,6 +301,32 @@ if (!function_exists('cTo')) {
     }
 }
 
+if (!function_exists('discussionLink')) {
+    /**
+     * Build URL for discussion.
+     *
+     * @deprecated discussionUrl()
+     * @param $discussion
+     * @param bool $extended
+     * @return string
+     */
+    function discussionLink($discussion, $extended = true) {
+        deprecated('discussionLink', 'discussionUrl');
+
+        $discussionID = val('DiscussionID', $discussion);
+        $discussionName = val('Name', $discussion);
+        $parts = [
+            'discussion',
+            $discussionID,
+            Gdn_Format::url($discussionName)
+        ];
+        if ($extended) {
+            $parts[] = ($discussion->CountCommentWatch > 0) ? '#Item_'.$discussion->CountCommentWatch : '';
+        }
+        return url(implode('/', $parts), true);
+    }
+}
+
 if (!function_exists('explodeTrim')) {
     /**
      * Split a string by a string and do some trimming to clean up faulty user input.
@@ -305,6 +346,24 @@ if (!function_exists('explodeTrim')) {
         } else {
             return $arr;
         }
+    }
+}
+
+if (!function_exists('fixnl2br')) {
+    /**
+     * Removes the break above and below tags that have a natural margin.
+     *
+     * @param string $text The text to fix.
+     * @return string
+     * @since 2.1
+     *
+     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
+     */
+    function fixnl2br($text) {
+        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
+        /** @var Formats\HtmlFormat $htmlFormat */
+        $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
+        return $htmlFormat->cleanupLineBreaks((string) $text);
     }
 }
 
@@ -1006,5 +1065,344 @@ if (!function_exists('attribute')) {
             }
         }
         return $return;
+    }
+}
+
+if (!function_exists('proxyHead')) {
+    /**
+     * Make a cURL HEAD request to a URL.
+     *
+     * @param string $url The URL to request.
+     * @param array|null $headers An optional array of additional headers to send with the request.
+     * @param int|false $timeout The request timeout in seconds.
+     * @param bool $followRedirects Whether or not to follow redirects.
+     * @return array Returns an array of response headers.
+     * @throws Exception Throws an exception when there is an unrecoverable error making the request.
+     * @deprecated
+     */
+    function proxyHead($url, $headers = null, $timeout = false, $followRedirects = false) {
+        deprecated('proxyHead()', 'class ProxyRequest');
+
+        if (is_null($headers)) {
+            $headers = [];
+        }
+
+        $originalHeaders = $headers;
+        $originalTimeout = $timeout;
+        if (!$timeout) {
+            $timeout = c('Garden.SocketTimeout', 1.0);
+        }
+
+        $urlParts = parse_url($url);
+        $scheme = val('scheme', $urlParts, 'http');
+        $host = val('host', $urlParts, '');
+        $port = val('port', $urlParts, '80');
+        $path = val('path', $urlParts, '');
+        $query = val('query', $urlParts, '');
+
+        // Get the cookie.
+        $cookie = '';
+        $encodeCookies = c('Garden.Cookie.Urlencode', true);
+
+        foreach ($_COOKIE as $key => $value) {
+            if (strncasecmp($key, 'XDEBUG', 6) == 0) {
+                continue;
+            }
+
+            if (strlen($cookie) > 0) {
+                $cookie .= '; ';
+            }
+
+            $eValue = ($encodeCookies) ? urlencode($value) : $value;
+            $cookie .= "{$key}={$eValue}";
+        }
+        $cookie = ['Cookie' => $cookie];
+
+        $response = '';
+        if (function_exists('curl_init')) {
+            //$Url = $Scheme.'://'.$Host.$Path;
+            $handler = curl_init();
+            curl_setopt($handler, CURLOPT_TIMEOUT, $timeout);
+            curl_setopt($handler, CURLOPT_URL, $url);
+            curl_setopt($handler, CURLOPT_PORT, $port);
+            curl_setopt($handler, CURLOPT_HEADER, 1);
+            curl_setopt($handler, CURLOPT_NOBODY, 1);
+            curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($handler, CURLOPT_HTTPHEADER, $headers);
+
+            if (strlen($cookie['Cookie'])) {
+                curl_setopt($handler, CURLOPT_COOKIE, $cookie['Cookie']);
+            }
+
+            $response = curl_exec($handler);
+            if ($response == false) {
+                $response = curl_error($handler);
+            }
+
+            curl_close($handler);
+        } elseif (function_exists('fsockopen')) {
+            $referer = Gdn::request()->webRoot();
+
+            // Make the request
+            $pointer = @fsockopen($host, $port, $errorNumber, $error, $timeout);
+            if (!$pointer) {
+                throw new Exception(
+                    sprintf(
+                        t('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'),
+                        $url,
+                        $errorNumber,
+                        $error
+                    )
+                );
+            }
+
+            $request = "HEAD $path?$query HTTP/1.1\r\n";
+
+            $hostHeader = $host.($port != 80) ? ":{$port}" : '';
+            $header = [
+                'Host' => $hostHeader,
+                'User-Agent' => val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
+                'Accept' => '*/*',
+                'Accept-Charset' => 'utf-8',
+                'Referer' => $referer,
+                'Connection' => 'close'
+            ];
+
+            if (strlen($cookie['Cookie'])) {
+                $header = array_merge($header, $cookie);
+            }
+
+            $header = array_merge($header, $headers);
+
+            $headerString = "";
+            foreach ($header as $headerName => $headerValue) {
+                $headerString .= "{$headerName}: {$headerValue}\r\n";
+            }
+            $headerString .= "\r\n";
+
+            // Send the headers and get the response
+            fputs($pointer, $request);
+            fputs($pointer, $headerString);
+            while ($line = fread($pointer, 4096)) {
+                $response .= $line;
+            }
+            @fclose($pointer);
+            $response = trim($response);
+        } else {
+            throw new Exception(t('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+        }
+
+        $responseLines = explode("\n", trim($response));
+        $status = array_shift($responseLines);
+        $response = [];
+        $response['HTTP'] = trim($status);
+
+        /* get the numeric status code.
+       * - trim off excess edge whitespace,
+       * - split on spaces,
+       * - get the 2nd element (as a single element array),
+       * - pop the first (only) element off it...
+       * - return that.
+       */
+        $response['StatusCode'] = array_pop(array_slice(explode(' ', trim($status)), 1, 1));
+        foreach ($responseLines as $line) {
+            $line = explode(':', trim($line));
+            $key = trim(array_shift($line));
+            $value = trim(implode(':', $line));
+            $response[$key] = $value;
+        }
+
+        if ($followRedirects) {
+            $code = getValue('StatusCode', $response, 200);
+            if (in_array($code, [301, 302])) {
+                if (array_key_exists('Location', $response)) {
+                    $location = getValue('Location', $response);
+                    return proxyHead($location, $originalHeaders, $originalTimeout, $followRedirects);
+                }
+            }
+        }
+
+        return $response;
+    }
+
+}
+
+if (!function_exists('proxyRequest')) {
+    /**
+     * Use curl or fsock to make a request to a remote server.
+     *
+     * @param string $url The full url to the page being requested (including http://).
+     * @param integer $timeout How long to allow for this request.
+     * Default Garden.SocketTimeout or 1, 0 to never timeout.
+     * @param boolean $followRedirects Whether or not to follow 301 and 302 redirects. Defaults false.
+     * @return string Returns the response body.
+     * @deprecated
+     */
+    function proxyRequest($url, $timeout = false, $followRedirects = false) {
+        deprecated('proxyRequest()', 'class ProxyRequest');
+
+        $originalTimeout = $timeout;
+        if ($timeout === false) {
+            $timeout = c('Garden.SocketTimeout', 1.0);
+        }
+
+        $urlParts = parse_url($url);
+        $scheme = getValue('scheme', $urlParts, 'http');
+        $host = getValue('host', $urlParts, '');
+        $port = getValue('port', $urlParts, $scheme == 'https' ? '443' : '80');
+        $path = getValue('path', $urlParts, '');
+        $query = getValue('query', $urlParts, '');
+        // Get the cookie.
+        $cookie = '';
+        $encodeCookies = c('Garden.Cookie.Urlencode', true);
+
+        foreach ($_COOKIE as $key => $value) {
+            if (strncasecmp($key, 'XDEBUG', 6) == 0) {
+                continue;
+            }
+
+            if (strlen($cookie) > 0) {
+                $cookie .= '; ';
+            }
+
+            $eValue = ($encodeCookies) ? urlencode($value) : $value;
+            $cookie .= "{$key}={$eValue}";
+        }
+        $response = '';
+        if (function_exists('curl_init')) {
+            //$Url = $Scheme.'://'.$Host.$Path;
+            $handler = curl_init();
+            curl_setopt($handler, CURLOPT_URL, $url);
+            curl_setopt($handler, CURLOPT_PORT, $port);
+            curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($handler, CURLOPT_HEADER, 1);
+            curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+
+            if ($cookie != '') {
+                curl_setopt($handler, CURLOPT_COOKIE, $cookie);
+            }
+
+            if ($timeout > 0) {
+                curl_setopt($handler, CURLOPT_TIMEOUT, $timeout);
+            }
+
+            // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST.
+            //Same for the $Url above
+            //
+            //if ($Query != '') {
+            //   curl_setopt($Handler, CURLOPT_POST, 1);
+            //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+            //}
+            $response = curl_exec($handler);
+            $success = true;
+            if ($response == false) {
+                $success = false;
+                $response = '';
+                throw new Exception(curl_error($handler));
+            }
+
+            curl_close($handler);
+        } elseif (function_exists('fsockopen')) {
+            $referer = Gdn_Url::webRoot(true);
+
+            // Make the request
+            $pointer = @fsockopen($host, $port, $errorNumber, $error, $timeout);
+            if (!$pointer) {
+                throw new Exception(
+                    sprintf(
+                        t('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'),
+                        $url,
+                        $errorNumber,
+                        $error
+                    )
+                );
+            }
+
+            stream_set_timeout($pointer, $timeout);
+            if (strlen($cookie) > 0) {
+                $cookie = "Cookie: $cookie\r\n";
+            }
+
+            $hostHeader = $host.(($port != 80) ? ":{$port}" : '');
+            $header = "GET $path?$query HTTP/1.1\r\n"
+                ."Host: {$hostHeader}\r\n"
+                // If you've got basic authentication enabled for the app, you're going to need to explicitly define
+                // the user/pass for this fsock call.
+                // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
+                ."User-Agent: ".val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
+                ."Accept: */*\r\n"
+                ."Accept-Charset: utf-8;\r\n"
+                ."Referer: {$referer}\r\n"
+                ."Connection: close\r\n";
+
+            if ($cookie != '') {
+                $header .= $cookie;
+            }
+
+            $header .= "\r\n";
+
+            // Send the headers and get the response
+            fputs($pointer, $header);
+            while ($line = fread($pointer, 4096)) {
+                $response .= $line;
+            }
+            @fclose($pointer);
+            $bytes = strlen($response);
+            $response = trim($response);
+            $success = true;
+
+            $streamInfo = stream_get_meta_data($pointer);
+            if (getValue('timed_out', $streamInfo, false) === true) {
+                $success = false;
+                $response = "Operation timed out after {$timeout} seconds with {$bytes} bytes received.";
+            }
+        } else {
+            throw new Exception(t('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+        }
+
+        if (!$success) {
+            return $response;
+        }
+
+        $responseHeaderData = trim(substr($response, 0, strpos($response, "\r\n\r\n")));
+        $response = trim(substr($response, strpos($response, "\r\n\r\n") + 4));
+
+        $responseHeaderLines = explode("\n", trim($responseHeaderData));
+        $status = array_shift($responseHeaderLines);
+        $responseHeaders = [];
+        $responseHeaders['HTTP'] = trim($status);
+
+        /* get the numeric status code.
+       * - trim off excess edge whitespace,
+       * - split on spaces,
+       * - get the 2nd element (as a single element array),
+       * - pop the first (only) element off it...
+       * - return that.
+       */
+        $status = trim($status);
+        $status = explode(' ', $status);
+        $status = array_slice($status, 1, 1);
+        $status = array_pop($status);
+        $responseHeaders['StatusCode'] = $status;
+        foreach ($responseHeaderLines as $line) {
+            $line = explode(':', trim($line));
+            $key = trim(array_shift($line));
+            $value = trim(implode(':', $line));
+            $responseHeaders[$key] = $value;
+        }
+
+        if ($followRedirects) {
+            $code = getValue('StatusCode', $responseHeaders, 200);
+            if (in_array($code, [301, 302])) {
+                if (array_key_exists('Location', $responseHeaders)) {
+                    $location = absoluteSource(getValue('Location', $responseHeaders), $url);
+                    return proxyRequest($location, $originalTimeout, $followRedirects);
+                }
+            }
+        }
+
+        return $response;
     }
 }

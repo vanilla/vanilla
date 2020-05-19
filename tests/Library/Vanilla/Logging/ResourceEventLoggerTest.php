@@ -87,7 +87,7 @@ class ResourceEventLoggerTest extends TestCase {
      */
     public function testBasicLog(): void {
         $action = ResourceEvent::ACTION_UPDATE;
-        $payload = ["foo" => "bar"];
+        $payload = ["comment" => []];
         $event = new CommentEvent($action, $payload);
 
         $expected = [

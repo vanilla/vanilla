@@ -24,7 +24,6 @@ class AbstractApiControllerTest extends TestCase {
      */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
-        require_once __DIR__.'/../../applications/dashboard/controllers/api/AbstractApiController.php';
     }
 
     /**

@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
+use Nette\Loaders\RobotLoader;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -162,7 +163,6 @@ class Bootstrap {
                 ],
                 PATH_ROOT.'/tests/cache/bootstrap'
             ])
-            ->addAlias(AddonManager::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -197,6 +197,14 @@ class Bootstrap {
             ->addAlias(EventListenerConfigInterface::class)
             ->addAlias(EventDispatcherInterface::class)
             ->addAlias(ListenerProviderInterface::class)
+            ->addCall("addListenerMethod", [\Vanilla\Logging\ResourceEventLogger::class, "logResourceEvent"])
+            ->setShared(true)
+
+            ->rule(\Vanilla\Logging\ResourceEventLogger::class)
+            ->addCall("includeAction", [
+                \Vanilla\Dashboard\Events\UserEvent::class,
+                '*',
+            ])
             ->setShared(true)
 
             ->rule(InjectableInterface::class)
@@ -548,4 +556,28 @@ class Bootstrap {
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
     }
+
+    /**
+     * Register an autoloader that loads all classes.
+     */
+    public static function registerAutoloader(): void {
+        $loader = new RobotLoader();
+        $loader->addDirectory(PATH_APPLICATIONS, PATH_PLUGINS);
+
+        $excluded = [
+            'Mustache',
+            'sitehub',
+            'lithecompiler',
+            'lithestyleguide',
+            'Warnings',
+        ];
+        foreach ($excluded as $subdir) {
+            $loader->excludeDirectory(PATH_PLUGINS.'/'.$subdir);
+        }
+
+        // And set caching to the 'temp' directory
+        $loader->setTempDirectory(PATH_ROOT.'/tests/cache/autoloader');
+        $loader->register();
+    }
 }
+

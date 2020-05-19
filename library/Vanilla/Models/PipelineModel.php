@@ -76,26 +76,6 @@ class PipelineModel extends Model implements InjectableInterface {
     }
 
     /**
-     * Get the model's read schema.
-     *
-     * @return Schema
-     */
-    public function getReadSchema(): Schema {
-        $this->ensureSchemas();
-        return $this->readSchema;
-    }
-
-    /**
-     * Get the model's write schema.
-     *
-     * @return Schema
-     */
-    public function getWriteSchema(): Schema {
-        $this->ensureSchemas();
-        return $this->writeSchema;
-    }
-
-    /**
      * Add a resource row.
      *
      * @param array $set Field values to set.

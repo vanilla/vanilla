@@ -477,12 +477,18 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * {@inheritDoc}
      */
     public function getListenersForEvent(object $event): iterable {
+        // Get handlers for the class and its inherited classes.
         $class = new \ReflectionClass($event);
-
         do {
             $handlers = $this->getHandlers($class->getName());
             yield from $handlers;
         } while ($class = $class->getParentClass());
+
+        // Get handlers for all interfaces implemented on the class.
+        $class = new \ReflectionClass($event);
+        foreach ($class->getInterfaceNames() as $interface) {
+            yield from $this->getHandlers($interface);
+        }
     }
 
     /**

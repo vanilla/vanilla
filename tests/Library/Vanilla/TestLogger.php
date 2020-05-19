@@ -62,4 +62,31 @@ class TestLogger implements LoggerInterface {
         $this->logs[] = "$level $msg";
         $this->last = [$level, $message, $context];
     }
+
+    /**
+     * Get the level of the last log entry.
+     *
+     * @return string
+     */
+    public function getLastLevel(): string {
+        return $this->last[0];
+    }
+
+    /**
+     * Get the message of the last log entry.
+     *
+     * @return string
+     */
+    public function getLastMessage(): string {
+        return $this->last[1];
+    }
+
+    /**
+     * Get the context of the last log entry.
+     *
+     * @return array
+     */
+    public function getLastContext(): array {
+        return $this->last[2];
+    }
 }

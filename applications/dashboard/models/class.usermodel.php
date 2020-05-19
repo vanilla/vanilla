@@ -1066,6 +1066,17 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         $userID = $this->SQL->insert($this->Name, $fields);
+
+        if ($userID) {
+            $user = $this->getID($userID);
+            $userEvent = $this->eventFromRow(
+                (array)$user,
+                UserEvent::ACTION_INSERT,
+                $this->currentFragment()
+            );
+            $this->getEventManager()->dispatch($userEvent);
+        }
+
         if (is_array($roles)) {
             $this->saveRoles($userID, $roles, false);
         }
@@ -2542,15 +2553,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
         if ($userID) {
             $user = $this->getID($userID);
-            if ($this->session->UserID) {
-                $sender = $this->getFragmentByID($this->session->UserID, true);
-            } else {
-                $sender = $this->getGeneratedFragment(static::GENERATED_FRAGMENT_KEY_GUEST);
-            }
             $userEvent = $this->eventFromRow(
                 (array)$user,
                 $insert ? UserEvent::ACTION_INSERT : UserEvent::ACTION_UPDATE,
-                $sender
+                $this->currentFragment()
             );
             $this->getEventManager()->dispatch($userEvent);
         }
@@ -3973,15 +3979,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         // Remove user's cache rows
         $this->clearCache($userID);
         if ($userData) {
-            if ($this->session->UserID) {
-                $sender = $this->getFragmentByID($this->session->UserID, true);
-            } else {
-                $sender = $this->getGeneratedFragment(static::GENERATED_FRAGMENT_KEY_GUEST);
-            }
             $userEvent = $this->eventFromRow(
                 (array)$userData,
                 UserEvent::ACTION_DELETE,
-                $sender
+                $this->currentFragment()
             );
             $this->getEventManager()->dispatch($userEvent);
         }

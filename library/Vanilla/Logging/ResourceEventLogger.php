@@ -38,21 +38,25 @@ class ResourceEventLogger {
     /**
      * Log resource events that are loggable.
      *
-     * @param ResourceEvent $event
+     * @param LoggableEventInterface $event
      * @return ResourceEvent
      */
     public function logResourceEvent(LoggableEventInterface $event): ResourceEvent {
-        $entry = $event->getLogEntry();
+        try {
+            $entry = $event->getLogEntry();
 
-        if ($event instanceof ResourceEvent && $this->shouldLogEvent($event)) {
-            $this->logger->log(
-                $entry->getLevel(),
-                $entry->getMessage(),
-                $entry->getContext()
-            );
+            if ($event instanceof ResourceEvent && $this->shouldLogEvent($event)) {
+                $this->logger->log(
+                    $entry->getLevel(),
+                    $entry->getMessage(),
+                    $entry->getContext()
+                );
+            }
+
+            return $event;
+        } catch (\Exception $ex) {
+            trigger_error($ex->getMessage(), E_USER_WARNING);
         }
-
-        return $event;
     }
 
     /**

@@ -99,6 +99,9 @@ export const tokensClasses = useThemeCache(() => {
                 fontWeight: globalVars.fonts.weights.normal,
                 fontSize: globalVars.fonts.size.small,
             },
+            "& .tokens--is-disabled": {
+                opacity: formElVars.disabled.opacity,
+            },
             "& .tokens-clear": {
                 height: unit(globalVars.icon.sizes.default),
                 width: unit(globalVars.icon.sizes.default),

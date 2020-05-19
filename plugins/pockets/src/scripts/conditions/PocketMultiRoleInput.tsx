@@ -8,25 +8,18 @@ import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 
-export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements; id?: string }) {
+export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements; id?: string; initialValue?: string }) {
     const { id = "js-pocketRole" } = props;
-    const [roles, setRoles] = useState([] as number[]);
+    const [roles, setRoles] = useState(props.initialValue ? JSON.parse(props.initialValue) : "[]");
+    const [disabled, setDisabled] = useState(true);
 
     const formField = useMemo(() => {
         return document.getElementById(id);
     }, []) as HTMLInputElement;
 
     useEffect(() => {
-        if (formField) {
-            formField.value = JSON.stringify(roles);
-        }
+        setRoles(JSON.parse(formField.value ?? []));
     }, [roles]);
-
-    // initial loading of values
-    useEffect(() => {
-        console.log("formField.value: ", formField.value);
-        setRoles(JSON.parse(formField.value));
-    }, [formField]);
 
     return (
         <DashboardFormGroup label={t("Roles")} tag={props.tag}>
@@ -34,6 +27,10 @@ export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements;
                 <MultiRoleInput
                     label={""}
                     value={roles ?? []}
+                    disabled={disabled}
+                    loadedCallback={() => {
+                        console.log("finito");
+                    }}
                     onChange={viewRoleIDs => {
                         setRoles(viewRoleIDs ?? []);
                     }}

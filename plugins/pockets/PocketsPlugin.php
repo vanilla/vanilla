@@ -236,14 +236,6 @@ class PocketsPlugin extends Gdn_Plugin {
                 ];
             }
 
-            if ($roles) {
-                $rolesDesc = t('Only visible to users with roles with permission.');
-                $meta['roles'] = [
-                    'label' => t('Roles'),
-                    'value' => $rolesDesc
-                ];
-            }
-
             $pocketRow['Meta'] = $meta;
         }
 
@@ -407,7 +399,6 @@ class PocketsPlugin extends Gdn_Plugin {
                 $pocket['EveryBegin'] = $repeatFrequency[1];
                 $pocket['Indexes'] = implode(',', $repeatFrequency);
                 $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
-                $pocket['Roles'] = $pocket->Roles;
                 $pocket['TestMode'] = Pocket::inTestMode($pocket);
 
                 // The frontend displays an enable/disable toggle, so we need this value to be turned around.

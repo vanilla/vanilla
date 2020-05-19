@@ -40,6 +40,6 @@ export function MultiRoleInput(props: IProps) {
             }}
             options={roleOptions.data ?? []}
             isLoading={[LoadStatus.PENDING, LoadStatus.LOADING].includes(roleOptions.status)}
-        ></Tokens>
+        />
     );
 }

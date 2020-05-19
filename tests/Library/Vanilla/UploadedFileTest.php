@@ -112,7 +112,7 @@ class UploadedFileTest extends SharedBootstrapTestCase {
         // Save the upload.
         $file->persistUpload(false, 'subdir', 'prefix-%s');
         $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertStringMatchesFormat('subdir/%d/prefix-logo.svg', $file->getPersistedPath());
+        $this->assertStringMatchesFormat('subdir/%s/prefix-logo.svg', $file->getPersistedPath());
     }
 
     /**

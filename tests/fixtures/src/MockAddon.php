@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Fixtures;
 
-use Vanilla\Contracts;
+use Vanilla\Addon;
 
 /**
  * Mock addon class. Assumes key and subdirectory are the same.
  */
-class MockAddon implements Contracts\AddonInterface {
+class MockAddon extends Addon {
 
     /** @var string */
     private $key;
@@ -57,5 +57,12 @@ class MockAddon implements Contracts\AddonInterface {
      */
     public function getInfoValue(string $key, $default = null) {
         return isset($this->info[$key]) ? $this->info[$key] : $default;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function path($subpath = '', $relative = '') {
+        return '/mock-addon/'.$this->getKey().'/'.$subpath;
     }
 }

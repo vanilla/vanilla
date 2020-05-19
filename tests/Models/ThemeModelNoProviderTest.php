@@ -13,7 +13,7 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Core tests for the theme model.
  */
-class ThemeModelTest extends SharedBootstrapTestCase {
+class ThemeModelNoProviderTest extends SharedBootstrapTestCase {
 
     /**
      * @return ThemeModel

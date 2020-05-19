@@ -6,11 +6,9 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
-use Vanilla\Contracts\AddonProviderInterface;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\KludgedVariablesProviderInterface;
@@ -25,6 +23,16 @@ use Garden\Schema\ValidationField;
  * Handle custom themes.
  */
 class ThemeModel {
+
+    /**
+     * When fetching the current theme, accurate assets will be prioritized. CurrentTheme > MobileTheme
+     */
+    const GET_THEME_MODE_PRIORITIZE_ASSETS = 'prioritizeAssets';
+
+    /**
+     * When fetching the current theme, an accurate addon will be prioritized. MobileTheme > CurrentTheme
+     */
+    const GET_THEME_MODE_PRIORITIZE_ADDON = 'prioritizeAddon';
 
     const FOUNDATION_THEME_KEY = "theme-foundation";
     const FALLBACK_THEME_KEY = self::FOUNDATION_THEME_KEY;
@@ -100,7 +108,7 @@ class ThemeModel {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
-    /** @var AddonProviderInterface $addonManager */
+    /** @var AddonManager $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper $themeHelper */
@@ -120,7 +128,7 @@ class ThemeModel {
      *
      * @param ConfigurationInterface $config
      * @param \Gdn_Session $session
-     * @param AddonProviderInterface $addonManager
+     * @param AddonManager $addonManager
      * @param ThemeModelHelper $themeHelper
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
@@ -129,7 +137,7 @@ class ThemeModel {
     public function __construct(
         ConfigurationInterface $config,
         \Gdn_Session $session,
-        AddonProviderInterface $addonManager,
+        AddonManager $addonManager,
         ThemeModelHelper $themeHelper,
         ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel,
@@ -340,7 +348,7 @@ class ThemeModel {
      * @return Addon
      */
     public function getCurrentThemeAddon(): Addon {
-        $currentTheme = $this->getCurrentTheme();
+        $currentTheme = $this->getCurrentTheme(self::GET_THEME_MODE_PRIORITIZE_ADDON);
         $masterKey = $this->getMasterThemeKey($currentTheme['themeID']);
         return $this->getThemeAddon($masterKey);
     }
@@ -371,9 +379,11 @@ class ThemeModel {
     /**
      * Get current theme.
      *
+     * @param string $mode One of the GET_THEME_MODES.
+     *
      * @return array The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(): array {
+    public function getCurrentTheme(string $mode = self::GET_THEME_MODE_PRIORITIZE_ASSETS): array {
         $current = null;
 
         try {
@@ -383,14 +393,21 @@ class ThemeModel {
             $desktopKey = $this->config->get(ThemeModelHelper::CONFIG_DESKTOP_THEME, null);
             $currentKey = $this->config->get(ThemeModelHelper::CONFIG_CURRENT_THEME, null);
 
-            $baseKey = isMobile()
-                ? $mobileKey ?? $desktopKey
-                : $currentKey ?? $desktopKey;
+            $needsMobileOverlay = false;
+            $baseKey = $currentKey ?? $desktopKey;
+
+            if (isMobile() && $mobileKey !== null && $mode === self::GET_THEME_MODE_PRIORITIZE_ADDON) {
+                $baseKey = $mobileKey;
+                $needsMobileOverlay = true;
+            }
 
             // Try to get the base key.
             $baseTheme = $this->getThemeProvider($baseKey)->getThemeWithAssets($baseKey);
-            if ($baseTheme !== null) {
-                $current = $baseTheme;
+            $current = $baseTheme;
+
+            if ($needsMobileOverlay && $currentKey !== null) {
+                $assetOverlayTheme = $this->getThemeProvider($currentKey)->getThemeWithAssets($currentKey);
+                $current['assets'] = $assetOverlayTheme['assets'];
             }
 
             $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();

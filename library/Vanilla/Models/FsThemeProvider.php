@@ -7,7 +7,7 @@
 namespace Vanilla\Models;
 
 use Vanilla\Addon;
-use Vanilla\Contracts\AddonInterface;
+use Vanilla\AddonManager;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -16,7 +16,6 @@ use Vanilla\Theme\NeonAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -31,7 +30,7 @@ class FsThemeProvider implements ThemeProviderInterface {
 
     use FsThemeMissingTrait;
 
-    /** @var AddonProviderInterface $addonManager */
+    /** @var AddonManager $addonManager */
     private $addonManager;
 
     /** @var ThemeModelHelper */
@@ -49,13 +48,13 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * FsThemeProvider constructor.
      *
-     * @param AddonProviderInterface $addonManager
+     * @param AddonManager $addonManager
      * @param RequestInterface $request
      * @param ConfigurationInterface $config
      * @param ThemeModelHelper $themeHelper
      */
     public function __construct(
-        AddonProviderInterface $addonManager,
+        AddonManager $addonManager,
         RequestInterface $request,
         ConfigurationInterface $config,
         ThemeModelHelper $themeHelper
@@ -121,11 +120,11 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @return Addon
      */
-    public function getThemeAddon($themeKey): AddonInterface {
+    public function getThemeAddon($themeKey): Addon {
         $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof AddonInterface)) {
+        if (!$theme) {
             $theme = $this->addonManager->lookupTheme(ThemeModel::FALLBACK_THEME_KEY);
-            if (!($theme instanceof AddonInterface)) {
+            if (!$theme) {
                 // Uh-oh, even the default theme doesn't exist.
                 throw new NotFoundException("Theme");
             }
@@ -143,7 +142,7 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function themeExists($themeKey): bool {
         $themeExists = false;
         $theme = $this->addonManager->lookupTheme($themeKey);
-        if ($theme instanceof AddonInterface) {
+        if ($theme instanceof Addon) {
             $themeExists = true;
         }
 

@@ -104,7 +104,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
-    ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager

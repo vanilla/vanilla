@@ -7,21 +7,21 @@
 
 namespace VanillaTests\Fixtures;
 
-use Vanilla\Contracts;
-use Vanilla\Contracts\AddonInterface;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 
 /**
  * Mock addon provider. All addons given to it are "enabled".
  *
  * @see MockAddon
  */
-class MockAddonProvider implements Contracts\AddonProviderInterface {
+class MockAddonManager extends AddonManager {
 
     /** @var array MockAddon[] */
     private $addons = [];
 
     /**
-     * MockAddonProvider Constructor.
+     * MockAddonManager Constructor.
      *
      * @param array $addons Addons to initialize with.
      */
@@ -52,7 +52,7 @@ class MockAddonProvider implements Contracts\AddonProviderInterface {
      * Get theme addon by key
      *
      * @param int|string $themeKey Theme key or ID
-     * @return AddonInterface|null Get theme addon.
+     * @return Addon|null Get theme addon.
      */
     public function lookupTheme($themeKey) {
         $addon = null;

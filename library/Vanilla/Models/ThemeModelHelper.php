@@ -6,10 +6,9 @@
 
 namespace Vanilla\Models;
 
-use Vanilla\Contracts\AddonInterface;
-use Vanilla\Contracts\AddonProviderInterface;
 use Gdn_Session as SessionInterface;
 use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\ThemeProviderInterface;
 
@@ -34,7 +33,7 @@ class ThemeModelHelper {
     /** @var SessionInterface $session */
     private $session;
 
-    /** @var AddonProviderInterface $addonManager */
+    /** @var AddonManager $addonManager */
     private $addonManager;
 
     /** @var ConfigurationInterface $config */
@@ -43,12 +42,12 @@ class ThemeModelHelper {
     /**
      * ThemeModelHelper constructor.
      *
-     * @param AddonProviderInterface $addonManager
+     * @param AddonManager $addonManager
      * @param SessionInterface $session
      * @param ConfigurationInterface $config
      */
     public function __construct(
-        AddonProviderInterface $addonManager,
+        AddonManager $addonManager,
         SessionInterface $session,
         ConfigurationInterface $config
     ) {
@@ -60,12 +59,12 @@ class ThemeModelHelper {
     /**
      * Filter themes based on their addon.json.
      *
-     * @param AddonInterface $theme A themes data from it's addon.json.
+     * @param Addon $theme A themes data from it's addon.json.
      * @param string $siteName The vanilla domain of the site.
      *
      * @return bool
      */
-    public function isThemeVisible(AddonInterface $theme, ?string $siteName = null): bool {
+    public function isThemeVisible(Addon $theme, ?string $siteName = null): bool {
         if ($siteName === null && defined('CLIENT_NAME')) {
             $siteName = CLIENT_NAME;
         }

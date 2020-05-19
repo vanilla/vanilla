@@ -204,22 +204,9 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get_current(): ?array {
         $this->permission();
-        $in = $this->schema([], 'in');
         $out = $this->themeResultSchema('out');
 
-        $previewThemeKey = $this->getSession()
-            ->getPreference('PreviewThemeKey');
-        $previewThemeRevisionID = $this->getSession()
-            ->getPreference('PreviewThemeRevisionID');
-        if (!empty($previewThemeKey)) {
-            $args = [];
-            if (!empty($previewThemeRevisionID)) {
-                $args['revisionID'] = $previewThemeRevisionID;
-            }
-            $theme = $this->themeModel->getThemeWithAssets($previewThemeKey, $args);
-        } else {
-            $theme = $this->themeModel->getCurrentTheme();
-        }
+        $theme = $this->themeModel->getCurrentTheme();
         return $out->validate($theme);
     }
 

@@ -13,7 +13,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Contains the information for a single addon.
  */
-class Addon implements Contracts\AddonInterface {
+class Addon {
 
     const TYPE_ADDON = 'addon';
     const TYPE_LOCALE = 'locale';
@@ -199,11 +199,7 @@ class Addon implements Contracts\AddonInterface {
     }
 
     /**
-     * Make a full path from an addon-relative path.
-     *
-     * @param string $subpath The subpath to base the path on, starting with a "/".
-     * @param string $relative One of the **Addon::PATH_*** constants.
-     * @return string Returns a full path.
+     * @inheritdoc
      */
     public function path($subpath = '', $relative = self::PATH_FULL) {
         $subpath = $subpath ? '/'.ltrim($subpath, '\\/') : '';

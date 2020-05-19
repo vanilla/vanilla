@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\OpenAPIBuilder;
-use VanillaTests\Fixtures\MockAddonProvider;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\Request;
 
 /**

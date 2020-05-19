@@ -18,16 +18,11 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface {
     use LoggableEventTrait;
 
     /**
-     * @inheritDoc
+     * Get an optionally customized version of the payload for a log entry..
+     *
+     * @return array
      */
-    private function getLogPayloadSchema(): ?Schema {
-        $result = Schema::parse([
-            "user:o" => [
-                "userID",
-                "name",
-            ]
-        ]);
-
-        return $result;
+    private function getLogPayload(): array {
+        return array_intersect_key($this->getPayload(), ['userID' => 1, 'name' => 1]);
     }
 }

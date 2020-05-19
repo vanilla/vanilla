@@ -88,29 +88,6 @@ trait LoggableEventTrait {
      * @return array
      */
     private function getLogPayload(): array {
-        $payload = $this->getPayload();
-        $schema = $this->getLogPayloadSchema();
-
-        if ($schema === null) {
-            return $payload;
-        }
-
-        try {
-            $payload = ["comment" => []];
-            $payload = $schema->validate($payload);
-        } catch (ValidationException $e) {
-            $payload = ["@error" => $e->getMessage()];
-        }
-
-        return $payload;
-    }
-
-    /**
-     * Get a schema to clean and validate the log payload, if available.
-     *
-     * @return Schema|null
-     */
-    private function getLogPayloadSchema(): ?Schema {
-        return null;
+        return $this->getPayload();
     }
 }

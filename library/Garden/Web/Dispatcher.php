@@ -174,7 +174,7 @@ class Dispatcher {
                 continue;
             } catch (\Throwable $dispatchEx) {
                 $response = null;
-                if ($action instanceof Action) {
+                if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;
                     if ($obj instanceof CustomExceptionHandler) {
                         if ($obj->hasExceptionHandler($dispatchEx)) {

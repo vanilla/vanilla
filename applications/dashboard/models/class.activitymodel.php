@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\Events\EventFromRowInterface;
+use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -25,7 +27,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Activity data management.
  */
-class ActivityModel extends Gdn_Model implements FormatFieldInterface {
+class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
 
     use \Vanilla\FloodControlTrait;
 
@@ -90,6 +92,9 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
     /** @var FormatService */
     private $formatService;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * Defines the related database table name.
      *
@@ -105,17 +110,20 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
         ?EventDispatcherInterface $eventDispatcher = null
     ) {
         parent::__construct('Activity', $validation);
+
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
+
         $this->formatService = $formatService instanceof FormatService ?
             $formatService : Gdn::getContainer()->get(FormatService::class);
         $this->logger = $logger instanceof LoggerInterface ?
             $logger : Gdn::getContainer()->get(LoggerInterface::class);
         $this->eventDispatcher = $eventDispatcher instanceof EventDispatcherInterface ?
             $eventDispatcher : Gdn::getContainer()->get(EventDispatcherInterface::class);
+        $this->userModel = Gdn::getContainer()->get(UserModel::class);
     }
 
     /**
@@ -214,7 +222,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
                 $row['Photo'] = $row['ActivityPhoto'];
                 $row['PhotoUrl'] = userUrl($row, 'Activity');
             } else {
-                $user = Gdn::userModel()->getID($row['ActivityUserID'], DATASET_TYPE_ARRAY);
+                $user = $this->userModel->getID($row['ActivityUserID'], DATASET_TYPE_ARRAY);
                 if ($user) {
                     $photo = $user['Photo'];
                     $row['PhotoUrl'] = userUrl($user);
@@ -389,7 +397,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             ->get();
 
         self::getUsers($result->resultArray());
-        Gdn::userModel()->joinUsers(
+        $this->userModel->joinUsers(
             $result->resultArray(),
             ['ActivityUserID', 'RegardingUserID'],
             ['Join' => ['Name', 'Email', 'Gender', 'Photo']]
@@ -471,7 +479,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             ->limit($limit, $offset)
             ->get();
 
-        Gdn::userModel()->joinUsers($result, ['ActivityUserID', 'RegardingUserID'], ['Join' => ['Name', 'Photo', 'Email', 'Gender']]);
+        $this->userModel->joinUsers($result, ['ActivityUserID', 'RegardingUserID'], ['Join' => ['Name', 'Photo', 'Email', 'Gender']]);
 
         $this->EventArguments['Data'] =& $result;
         $this->fireEvent('AfterGet');
@@ -675,7 +683,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
         $result->datasetType(DATASET_TYPE_ARRAY);
 
         self::getUsers($result->resultArray());
-        Gdn::userModel()->joinUsers(
+        $this->userModel->joinUsers(
             $result->resultArray(),
             ['ActivityUserID', 'RegardingUserID'],
             ['Join' => ['Name', 'Photo', 'Email', 'Gender']]
@@ -762,7 +770,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
     public function getComment($iD) {
         $activity = $this->SQL->getWhere('ActivityComment', ['ActivityCommentID' => $iD])->resultArray();
         if ($activity) {
-            Gdn::userModel()->joinUsers($activity, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
+            $this->userModel->joinUsers($activity, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
             return array_shift($activity);
         }
         return false;
@@ -783,7 +791,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             ->whereIn('c.ActivityID', $activityIDs)
             ->orderBy('c.ActivityID, c.DateInserted')
             ->get()->resultArray();
-        Gdn::userModel()->joinUsers($result, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
+        $this->userModel->joinUsers($result, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
         return $result;
     }
 
@@ -943,7 +951,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
         }
 
-        $User = Gdn::userModel()->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
+        $User = $this->userModel->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
         if ($User) {
             if ($Force) {
@@ -1065,7 +1073,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
 
         $activity = (array)$activity;
 
-        $user = Gdn::userModel()->getID($activity['NotifyUserID'], DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($activity['NotifyUserID'], DATASET_TYPE_ARRAY);
         if (!$user) {
             return false;
         }
@@ -1298,7 +1306,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
 
                     try {
                         // Only send if the user is not banned
-                        $user = Gdn::userModel()->getID($userID);
+                        $user = $this->userModel->getID($userID);
                         if (!val('Banned', $user)) {
                             $email->send();
                             $emailed = self::SENT_OK;
@@ -1426,7 +1434,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             $activity->RegardingUserID = $commentActivity->RegardingUserID;
             $activity->Route = '/activity/item/'.$activity->CommentActivityID;
         }
-        $user = Gdn::userModel()->getID($activity->RegardingUserID, DATASET_TYPE_OBJECT);
+        $user = $this->userModel->getID($activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
         if ($user) {
             if ($force) {
@@ -1724,10 +1732,15 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
                 $activityID = $this->SQL->insert('Activity', $activity);
                 $activity['ActivityID'] = $activityID;
 
-                if ($activity["Notified"] === self::SENT_PENDING) {
-                    $event = $this->eventFromRow($activity);
+                if ($activity["Notified"] === self::SENT_PENDING || $activity['Emailed'] == self::SENT_PENDING) {
+                    $event = $this->eventFromRow(
+                        $activity,
+                        NotificationEvent::ACTION_INSERT,
+                        $this->userModel->currentFragment()
+                    );
                     $this->eventDispatcher->dispatch($event);
                 }
+
                 if ($activity['Emailed'] == self::SENT_PENDING) {
                     $this->queueEmail($emailFields + $activity, $options);
                 }
@@ -1758,8 +1771,8 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
         }
 
         if ($notificationInc > 0) {
-            $countNotifications = Gdn::userModel()->getID($activity['NotifyUserID'])->CountNotifications + $notificationInc;
-            Gdn::userModel()->setField($activity['NotifyUserID'], 'CountNotifications', $countNotifications);
+            $countNotifications = $this->userModel->getID($activity['NotifyUserID'])->CountNotifications + $notificationInc;
+            $this->userModel->setField($activity['NotifyUserID'], 'CountNotifications', $countNotifications);
         }
 
         // If this is a wall post then we need to notify on that.
@@ -1796,9 +1809,9 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             ['NotifyUserID' => $userID, 'Notified' => self::SENT_PENDING]
         );
 
-        $user = Gdn::userModel()->getID($userID);
+        $user = $this->userModel->getID($userID);
         if (val('CountNotifications', $user) != 0) {
-            Gdn::userModel()->setField($userID, 'CountNotifications', 0);
+            $this->userModel->setField($userID, 'CountNotifications', 0);
         }
     }
 
@@ -1875,7 +1888,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
      * @param $wallPost
      */
     protected function notifyWallComment($comment, $wallPost) {
-        $notifyUser = Gdn::userModel()->getID($wallPost['ActivityUserID']);
+        $notifyUser = $this->userModel->getID($wallPost['ActivityUserID']);
 
         $activity = [
             'ActivityType' => 'WallComment',
@@ -1899,7 +1912,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
      * @param $wallPost
      */
     protected function notifyWallPost($wallPost) {
-        $notifyUser = Gdn::userModel()->getID($wallPost['ActivityUserID']);
+        $notifyUser = $this->userModel->getID($wallPost['ActivityUserID']);
 
         $activity = [
             'ActivityType' => 'WallPost',
@@ -2037,7 +2050,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
             return;
         }
 
-        $user = Gdn::userModel()->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
         if (!is_array($user) || !array_key_exists("Email", $user)) {
             return;
         }
@@ -2196,13 +2209,14 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
      * Generate a notification event object, based on a database row.
      *
      * @param array $row
+     * @param string $action
+     * @param array|null $sender
      * @return NotificationEvent
      */
-    private function eventFromRow(array $row): NotificationEvent {
+    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
         /** @var UserModel */
-        $userModel = Gdn::getContainer()->get(UserModel::class);
-        $userModel->expandUsers($row, ["ActivityUserID", "NotifyUserID", "RegardingUserID"]);
-        $notification = $this->normalizeRow($row, true);
+        $this->userModel->expandUsers($row, ["ActivityUserID", "NotifyUserID", "RegardingUserID"]);
+        $notification = $this->normalizeRow($row);
         $notification = $this->schema()->validate($notification);
         $result = new NotificationEvent(
             NotificationEvent::ACTION_INSERT,
@@ -2220,7 +2234,7 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface {
     public function normalizeRow(array $row): array {
         $row["Url"] = !empty($row["Route"]) ? url($row["Route"], true) : null;
 
-        $notifyUser = Gdn::userModel()->getID($row["NotifyUserID"], DATASET_TYPE_ARRAY);
+        $notifyUser = $this->userModel->getID($row["NotifyUserID"], DATASET_TYPE_ARRAY);
         $row["headline"] = $this->getActivityHeadline($row, $notifyUser);
 
         $story = $row["Story"] ?? null;

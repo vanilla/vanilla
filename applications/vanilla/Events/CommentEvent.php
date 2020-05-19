@@ -7,7 +7,6 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
-use Garden\Schema\Schema;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 
@@ -20,20 +19,18 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface {
     /**
      * @inheritDoc
      */
-    private function getLogPayloadSchema(): ?Schema {
-        $result = Schema::parse([
-            "comment:o" => [
-                "commentID",
-                "discussionID",
-                "dateInserted",
-                "dateUpdated",
-                "updateUserID",
-                "insertUserID",
-                "url",
-                "name?",
-            ]
+    private function getLogPayload(): array {
+        $payload = $this->getPayload();
+        $payload["comment"] = array_intersect_key($payload["comment"] ?? [], [
+            "commentID" => true,
+            "discussionID" => true,
+            "dateInserted" => true,
+            "dateUpdated" => true,
+            "updateUserID" => true,
+            "insertUserID" => true,
+            "url" => true,
+            "name?" => true,
         ]);
-
-        return $result;
+        return $payload;
     }
 }

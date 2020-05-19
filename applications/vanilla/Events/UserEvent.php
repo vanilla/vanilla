@@ -7,7 +7,6 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
-use Garden\Schema\Schema;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 
@@ -18,11 +17,14 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface {
     use LoggableEventTrait;
 
     /**
-     * Get an optionally customized version of the payload for a log entry..
-     *
-     * @return array
+     * @inheritDoc
      */
     private function getLogPayload(): array {
-        return array_intersect_key($this->getPayload(), ['userID' => 1, 'name' => 1]);
+        $payload = $this->getPayload();
+        $payload["user"] = array_intersect_key($payload["user"] ?? [], [
+            "userID" => true,
+            "name" => true,
+        ]);
+        return $payload;
     }
 }

@@ -165,6 +165,7 @@ class UploadedFile {
         $keys = parse_url($url); // parse the url
         $path = explode("/", $keys['path'] ?? randomString(12)); // splitting the path
         $last = end($path) ?: null; // get the value of the last element
+        $last = urldecode($last);
         return $last;
     }
 
@@ -195,6 +196,7 @@ class UploadedFile {
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
         $baseName = basename($this->getClientFilename(), ".${ext}");
         $baseName = sprintf($nameFormat, $baseName);
+        $baseName = \Gdn_Format::url($baseName);
         $uploadPath = FileUtils::generateUniqueUploadPath($ext, true, $baseName, $persistDirectory);
         return $uploadPath;
     }

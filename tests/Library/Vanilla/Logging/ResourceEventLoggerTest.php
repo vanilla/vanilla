@@ -28,15 +28,6 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass(): void {
-        parent::setUpBeforeClass();
-        require_once __DIR__ . "/../../../../library/Vanilla/Logger.php";
-        require_once __DIR__ . "/../../../../applications/vanilla/Events/CommentEvent.php";
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function setUp(): void {
         $parentLogger = new Logger();
         $this->logger = new TestLogger($parentLogger);

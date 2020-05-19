@@ -77,9 +77,6 @@ trait SiteTestTrait {
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
     private static function setupBeforeClassSiteTestTrait(): void {
-        // Remove this when we get better auto-loading for tests.
-        require_once __DIR__ . '/../applications/vanilla/Events/UserEvent.php';
-
         self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 

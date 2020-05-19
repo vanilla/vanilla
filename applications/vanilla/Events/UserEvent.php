@@ -7,6 +7,7 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
+use Garden\Schema\Schema;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 
@@ -15,4 +16,18 @@ use Vanilla\Logging\LoggableEventTrait;
  */
 class UserEvent extends ResourceEvent implements LoggableEventInterface {
     use LoggableEventTrait;
+
+    /**
+     * @inheritDoc
+     */
+    private function getLogPayloadSchema(): ?Schema {
+        $result = Schema::parse([
+            "user:o" => [
+                "userID",
+                "name",
+            ]
+        ]);
+
+        return $result;
+    }
 }

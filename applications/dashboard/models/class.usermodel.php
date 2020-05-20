@@ -1591,7 +1591,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
      *
      * @param int $iD The ID of the user.
      * @param string|false $datasetType Whether to return an array or object.
-     * @param array $options Additional options to affect fetching. Currently unused.
+     * @param array $options Additional options to affect fetching. "skipCache" will always fetch from the db.
      * @return array|object|false Returns the user or **false** if the user wasn't found.
      */
     public function getID($iD, $datasetType = false, $options = []) {
@@ -1603,7 +1603,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface {
         // Check page cache, then memcached
         $user = $this->getUserFromCache($iD, 'userid');
         // If not, query DB
-        if ($user === Gdn_Cache::CACHEOP_FAILURE) {
+        if ($user === Gdn_Cache::CACHEOP_FAILURE || $options['skipCache'] === true) {
             $user = parent::getID($iD, DATASET_TYPE_ARRAY);
 
             // We want to cache a non-existent user no-matter what.

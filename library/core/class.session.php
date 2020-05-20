@@ -265,15 +265,17 @@ class Gdn_Session {
      * @return bool
      */
     public function isNewVisit() {
-        if ($this->User) {
+        //avoid getting user from cache so we can get an accurate DateLastActive
+        $user = Gdn::userModel()->getID($this->UserID, false, ['skipCache' => true]);
+        if ($user) {
             $cookie = $this->getCookie('-Vv', false);
-            $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
+            $userVisitExpiry = Gdn_Format::toTimeStamp($user->DateLastActive) + self::VISIT_LENGTH;
 
             if ($cookie) {
                 $result = false; // User has cookie, not a new visit.
-            } elseif ($userVisitExpiry > time())
+            } elseif ($userVisitExpiry > time()) {
                 $result = false; // User was last active less than 20 minutes ago, not a new visit.
-            else {
+            } else {
                 $result = true; // No cookie and not active in the last 20 minutes? New visit.
             }
         } else {

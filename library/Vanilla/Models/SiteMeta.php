@@ -111,6 +111,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var string */
+    private $reCaptchaKey = '';
+
     /**
      * SiteMeta constructor.
      *
@@ -195,6 +198,8 @@ class SiteMeta implements \JsonSerializable {
         $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
+
+        $this->reCaptchaKey = $config->get("Recaptcha.PublicKey", '');
     }
 
     /**
@@ -242,6 +247,7 @@ class SiteMeta implements \JsonSerializable {
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
             'themePreview' => $this->themePreview,
+            'reCaptchaKey' => $this->reCaptchaKey,
         ];
     }
 

@@ -1,8 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
  */
+if (!defined('APPLICATION')) exit();
 
 if (!isset($Drop)) {
     $Drop = false;

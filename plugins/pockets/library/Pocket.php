@@ -98,6 +98,9 @@ class Pocket {
      * @return bool
      */
     public function canRender($data) {
+        $testMode = self::inTestMode($this);
+        $isAdmin = Gdn::session()->CheckPermission('Garden.Settings.Manage');
+
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
         }
@@ -119,7 +122,7 @@ class Pocket {
             return false;
         }
 
-        if (self::inTestMode($this) && !checkPermission('Plugins.Pockets.Manage')) {
+        if ($testMode && !checkPermission('Plugins.Pockets.Manage')) {
             return false;
         }
 
@@ -166,11 +169,12 @@ class Pocket {
             }
         }
 
-        $isAdmin = Gdn::session()->CheckPermission('Garden.Settings.Manage');
-        if($this->hasRoles() && !$isAdmin){
+        // Check roles
+        if($this->hasRoles() && !($testMode && $isAdmin)){
             $roleModel = new RoleModel();
-            $userRoles = $roleModel->getByUserID(Gdn::session()->UserID);
-            $intersections = array_intersect(array_keys($userRoles), json_decode($this->Roles));
+            $userID = Gdn::session()->UserID;
+            $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
+            $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);
             if (count($intersections) === 0) {
                 return false;
             }
@@ -194,11 +198,11 @@ class Pocket {
         $this->Page = $data['Page'];
         $this->MobileOnly = $data['MobileOnly'];
         $this->MobileNever = $data['MobileNever'];
-        $this->Type = val('Type', $data, Pocket::TYPE_DEFAULT);
-        $this->EmbeddedNever = val('EmbeddedNever', $data);
-        $this->ShowInDashboard = val('ShowInDashboard', $data);
-        $this->TestMode = val('TestMode', $data);
-        $this->Roles = val('Roles', $data);
+        $this->Type = $data['Type'] ?? Pocket::TYPE_DEFAULT;
+        $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
+        $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
+        $this->TestMode = $data['TestMode'] ?? null;
+        $this->Roles = $data['Roles'] ?? null;
 
         // parse the frequency.
         $repeat = $data['Repeat'];

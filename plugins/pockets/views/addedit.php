@@ -104,6 +104,16 @@ echo $Form->errors();
             ?>
         </div>
     </li>
+
+    <?php echo $Form->react(
+        "Roles", "pocket-multi-role-input",
+        [
+            "tag" => "li",
+            "value" => $Form->getValue("Roles") ?? ""
+        ]
+    );
+    ?>
+
     <li class="form-group">
         <div class="label-wrap-wide">
             <?php echo $Form->label('Test Mode', 'Testing'); ?>
@@ -114,5 +124,6 @@ echo $Form->errors();
         </div>
     </li>
 </ul>
+
 <?php echo $Form->close('Save');
 

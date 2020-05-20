@@ -369,8 +369,13 @@ class PocketsPlugin extends Gdn_Plugin {
                 // The 'TestMode' property will already be set to true in the UI, we'll let save() set it.
             }
 
+            // Roles
+            $roles = $form->getFormValue('Roles');
+            $form->setFormValue('Roles', $roles);
+
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
+
 
             $saved = $form->save();
             if ($saved) {
@@ -685,6 +690,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('ShowInDashboard', 'tinyint', '0')
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
+            ->column('Roles', "varchar(225)", null)
             ->set();
 
         $PermissionModel = Gdn::permissionModel();

@@ -67,6 +67,9 @@ class Pocket {
     /** @var array */
     public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
 
+    /** @var array */
+    public $Roles = [];
+
     /**
      * Pocket constructor.
      *
@@ -95,6 +98,9 @@ class Pocket {
      * @return bool
      */
     public function canRender($data) {
+        $testMode = self::inTestMode($this);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
         }
@@ -116,7 +122,7 @@ class Pocket {
             return false;
         }
 
-        if (self::inTestMode($this) && !checkPermission('Plugins.Pockets.Manage')) {
+        if ($testMode && !$pocketAdmin) {
             return false;
         }
 
@@ -163,6 +169,17 @@ class Pocket {
             }
         }
 
+        // Check roles
+        if ($this->hasRoles() && !$testMode && !$pocketAdmin) {
+            $roleModel = Gdn::getContainer()->get(RoleModel::class);
+            $userID = Gdn::session()->UserID;
+            $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
+            $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);
+            if (count($intersections) === 0) {
+                return false;
+            }
+        }
+
         // If we've passed all of the tests then the pocket can be processed.
         return true;
     }
@@ -181,10 +198,11 @@ class Pocket {
         $this->Page = $data['Page'];
         $this->MobileOnly = $data['MobileOnly'];
         $this->MobileNever = $data['MobileNever'];
-        $this->Type = val('Type', $data, Pocket::TYPE_DEFAULT);
-        $this->EmbeddedNever = val('EmbeddedNever', $data);
-        $this->ShowInDashboard = val('ShowInDashboard', $data);
-        $this->TestMode = val('TestMode', $data);
+        $this->Type = $data['Type'] ?? Pocket::TYPE_DEFAULT;
+        $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
+        $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
+        $this->TestMode = $data['TestMode'] ?? null;
+        $this->Roles = $data['Roles'] ?? null;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -198,6 +216,15 @@ class Pocket {
      */
     public function isAd() {
         return $this->Type == Pocket::TYPE_AD;
+    }
+
+    /**
+     * Determine whether the pocket is dependent on conditions
+     *
+     * @return bool
+     */
+    public function hasRoles() {
+        return !empty($this->Roles);
     }
 
     /**
@@ -330,7 +357,8 @@ class Pocket {
                 'MobileNever' => 0,
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
-                'Type' => 'default'
+                'Type' => 'default',
+                'Roles' => null
                 ];
             $model->save($pocket);
         }

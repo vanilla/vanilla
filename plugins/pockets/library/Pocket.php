@@ -170,7 +170,7 @@ class Pocket {
         }
 
         // Check roles
-        if($this->hasRoles() && !$testMode && !$pocketAdmin){
+        if ($this->hasRoles() && !$testMode && !$pocketAdmin) {
             $roleModel = Gdn::getContainer()->get(RoleModel::class);
             $userID = Gdn::session()->UserID;
             $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);

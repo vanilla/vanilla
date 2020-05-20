@@ -9,21 +9,15 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 
 const sanitizeValue = (value: any) => {
-    return !value || value === "" ? [] : JSON.parse(value);
+    if (Array.isArray(value)) {
+        return value;
+    } else {
+        return !value || value === "" ? [] : JSON.parse(value);
+    }
 };
 
-export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements; id?: string; initialValue?: string }) {
-    const { id = "js-pocketRole" } = props;
-    const initialValue = sanitizeValue(props.initialValue);
-    const [roles, setRoles] = useState(initialValue);
-
-    const formField = useMemo(() => {
-        return document.getElementById(id);
-    }, []) as HTMLInputElement;
-
-    useEffect(() => {
-        setRoles(sanitizeValue(formField.value));
-    }, [roles]);
+export function PocketMultiRoleInput(props) {
+    const [roles, setRoles] = useState(sanitizeValue(props.value));
 
     return (
         <DashboardFormGroup label={t("Roles")} tag={props.tag}>
@@ -36,6 +30,7 @@ export function PocketMultiRoleInput(props: { tag?: keyof JSX.IntrinsicElements;
                     }}
                 />
             </div>
+            <input name={props.fieldName} type={"hidden"} value={JSON.stringify(roles)} />
         </DashboardFormGroup>
     );
 }

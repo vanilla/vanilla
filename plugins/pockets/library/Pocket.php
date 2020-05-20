@@ -99,7 +99,7 @@ class Pocket {
      */
     public function canRender($data) {
         $testMode = self::inTestMode($this);
-        $isAdmin = Gdn::session()->CheckPermission('Garden.Settings.Manage');
+        $pocketAdmin = Gdn::session()->CheckPermission(['Plugins.Pockets.Manage']);
 
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
@@ -122,7 +122,7 @@ class Pocket {
             return false;
         }
 
-        if ($testMode && !checkPermission('Plugins.Pockets.Manage')) {
+        if ($testMode && !$pocketAdmin) {
             return false;
         }
 
@@ -170,8 +170,8 @@ class Pocket {
         }
 
         // Check roles
-        if($this->hasRoles() && !($testMode && $isAdmin)){
-            $roleModel = new RoleModel();
+        if($this->hasRoles() && !($testMode && $pocketAdmin)){
+            $roleModel = Gdn::getContainer()->get(RoleModel::class);
             $userID = Gdn::session()->UserID;
             $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
             $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);

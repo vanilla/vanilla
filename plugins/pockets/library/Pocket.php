@@ -99,7 +99,7 @@ class Pocket {
      */
     public function canRender($data) {
         $testMode = self::inTestMode($this);
-        $pocketAdmin = Gdn::session()->CheckPermission(['Plugins.Pockets.Manage']);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
 
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
@@ -170,7 +170,7 @@ class Pocket {
         }
 
         // Check roles
-        if($this->hasRoles() && !($testMode && $pocketAdmin)){
+        if($this->hasRoles() && !$testMode && !$pocketAdmin){
             $roleModel = Gdn::getContainer()->get(RoleModel::class);
             $userID = Gdn::session()->UserID;
             $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);

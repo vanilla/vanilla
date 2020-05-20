@@ -13,10 +13,6 @@ use Vanilla\Contracts\ConfigurationInterface;
  */
 class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
 
-    const DEFAULT_WHITELIST = [
-        'https://www.google.com/recaptcha/api.js'
-    ];
-
     /**
      * @var ConfigurationInterface
      */
@@ -46,7 +42,6 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
      */
     private function getScriptSources(): array {
         $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, '\'self\'');
-        $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, implode(' ', self::DEFAULT_WHITELIST));
         if ($whitelist = $this->config->get('ContentSecurityPolicy.ScriptSrc.AllowedDomains', false)) {
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, implode(' ', $whitelist));
         }

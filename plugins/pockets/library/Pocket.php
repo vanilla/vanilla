@@ -166,8 +166,14 @@ class Pocket {
             }
         }
 
-        if($this->hasRoles()){
-            $break = "here";
+        $isAdmin = Gdn::session()->CheckPermission('Garden.Settings.Manage');
+        if($this->hasRoles() && !$isAdmin){
+            $roleModel = new RoleModel();
+            $userRoles = $roleModel->getByUserID(Gdn::session()->UserID);
+            $intersections = array_intersect(array_keys($userRoles), json_decode($this->Roles));
+            if (count($intersections) === 0) {
+                return false;
+            }
         }
 
         // If we've passed all of the tests then the pocket can be processed.

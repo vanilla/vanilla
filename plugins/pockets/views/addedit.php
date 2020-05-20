@@ -114,6 +114,18 @@ echo $Form->errors();
     );
     ?>
 
+    <?php
+        if (c("Feature.SubcommunityProducts.Enabled")) {
+            echo $Form->react(
+                "Subcommunity", "pocket-subcommunity-chooser",
+                [
+                    "tag" => "li",
+                    "value" => $Form->getValue("Subcommunities") ?? ""
+                ]
+            );
+        }
+    ?>
+
     <li class="form-group">
         <div class="label-wrap-wide">
             <?php echo $Form->label('Test Mode', 'Testing'); ?>

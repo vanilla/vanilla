@@ -480,7 +480,7 @@ class RequestTest extends SharedBootstrapTestCase {
     public function testAttributeAccessors(): void {
         $r = new Gdn_Request();
 
-        $this->assertNotFalse($r->getAttribute('foo'));
+        $this->assertNull($r->getAttribute('foo'));
         $r->setAttribute('foo', 'bar');
         $this->assertSame('bar', $r->getAttribute('foo'));
 

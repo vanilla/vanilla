@@ -175,6 +175,9 @@ class Pocket {
 
         // Check Subcommunities
         if ($this->hasSubcommunities()) {
+            if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
+                return false;
+            }
             $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
             $currentSubcommunity = $subcommunitiesModel::getCurrent();
             if (!$currentSubcommunity) {
@@ -258,7 +261,7 @@ class Pocket {
      * @return bool
      */
     public function hasSubcommunities() {
-        return c("Feature.SubcommunityProducts.Enabled") && !empty($this->Subcommunities);
+        return !empty($this->Subcommunities);
     }
 
     /**

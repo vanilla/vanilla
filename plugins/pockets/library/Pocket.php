@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
+
 /**
  * Class Pocket
  */
@@ -173,7 +175,7 @@ class Pocket {
         }
 
         // Check roles
-        if ($this->hasRoles() && !$testMode && !$pocketAdmin) {
+        if ($this->hasRoles() || ($testMode && $pocketAdmin)) {
             $roleModel = Gdn::getContainer()->get(RoleModel::class);
             $userID = Gdn::session()->UserID;
             $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
@@ -184,8 +186,21 @@ class Pocket {
         }
 
         // Check Subcommunities
-
-        // TODO
+        if ($this->hasSubcommunities()) {
+            if (count(json_decode($this->Subcommunities)) > 0) {
+                return false;
+            }
+//            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
+//            $subcommunityIDs = [];
+//            foreach ($subcommunitiesModel->all() as $subCom) {
+//                array_push($subcommunityIDs, $subCom["SubcommunityID"]);
+//            }
+//
+//            $intersections = array_intersect($subcommunityIDs, json_decode($this->Subcommunities));
+//            if (count($intersections) === 0) {
+//                return false;
+//            }
+        }
 
         // If we've passed all of the tests then the pocket can be processed.
         return true;
@@ -241,7 +256,7 @@ class Pocket {
      * @return bool
      */
     public function hasSubcommunities() {
-        return !empty($this->Subcommunities);
+        return c("Feature.SubcommunityProducts.Enabled") && !empty($this->Subcommunities);
     }
 
     /**

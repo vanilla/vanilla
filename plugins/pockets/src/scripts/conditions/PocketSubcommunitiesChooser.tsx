@@ -37,7 +37,7 @@ export function PocketSubcommunityChooser(props) {
                     onChange={selectedSubCommunities => {
                         setSubcommunities(
                             selectedSubCommunities.map(subCom => {
-                                return subCom.value;
+                                return parseInt(subCom.value);
                             }),
                         );
                     }}

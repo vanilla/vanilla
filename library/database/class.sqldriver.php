@@ -2038,7 +2038,9 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Adds to the $this->_Wheres collection. This is the most basic where that adds a freeform string of text.
-     *   It should be used only in conjunction with methods that properly escape the sql.
+     *
+     * It should be used only in conjunction with methods that properly escape the sql.
+     *
      * @param string $sql The condition to add.
      * @return Gdn_SQLDriver $this
      */
@@ -2079,7 +2081,7 @@ abstract class Gdn_SQLDriver {
      * databaseFunction('Value'). If DatabaseFunction contains a '%s' then sprintf will be used for to place DatabaseFunction into the value.
      * @param boolean $escapeFieldSql A boolean value indicating if $this->EscapeSql method should be called
      * on $field.
-     * @param boolean $EscapeValueString A boolean value indicating if $this->EscapeString method should be called
+     * @param boolean $escapeValueSql A boolean value indicating if $this->EscapeString method should be called
      * on $value.
      * @return Gdn_SQLDriver $this
      */
@@ -2096,6 +2098,8 @@ abstract class Gdn_SQLDriver {
                 } else {
                     $this->whereIn($subField, $subValue);
                 }
+            } elseif (is_object($subValue) && $subValue instanceof \Vanilla\Schema\RangeExpression) {
+                $this->whereRangeExpression($subField, $subValue);
             } else {
                 $whereExpr = $this->conditionExpr($subField, $subValue, $escapeFieldSql, $escapeValueSql);
                 if (strlen($whereExpr) > 0) {
@@ -2173,6 +2177,7 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $field The field to search in for $values.
      * @param array $values An array of values to look for in $field.
+     * @param bool $escape Whether or not to escape individual values.
      * @return Gdn_SQLDriver $this
      */
     public function whereIn($field, $values, $escape = true) {
@@ -2180,9 +2185,13 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * A convenience method for Gdn_DatabaseDriver::whereIn() that changes the operator to 'not in.'
+     * A convenience method for Gdn_DatabaseDriver::whereIn() that changes the operator to 'not in'.
+     *
+     * @param string $field
+     * @param array $values
+     * @param bool $escape
      * @see Gdn_DatabaseDriver::whereIn()
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
     public function whereNotIn($field, $values, $escape = true) {
         return $this->_whereIn($field, $values, 'not in', $escape);
@@ -2190,9 +2199,10 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Adds an Sql exists expression to the $this->_Wheres collection.
-     * @param Gdn_DatabaseDriver $sqlDriver The sql to add.
+     *
+     * @param Gdn_SQLDriver $sqlDriver The sql to add.
      * @param string $op Either 'exists' or 'not exists'
-     * @return Gdn_DatabaseDriver $this
+     * @return $this
      */
     public function whereExists($sqlDriver, $op = 'exists') {
         $sql = $op." (\r\n".$sqlDriver->getSelect()."\n)";
@@ -2209,10 +2219,29 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::whereExists() that changes the operator to 'not exists'.
+     * A convenience method for Gdn_DatabaseDriver::whereExists() that changes the operator to 'not exists'.
+     *
+     * @param Gdn_SQLDriver $sqlDriver
+     * @return $this
      * @see Gdn_DatabaseDriver::whereExists()
      */
     public function whereNotExists($sqlDriver) {
-        return $this->whereExists(@SqlDriver, 'not exists');
+        return $this->whereExists($sqlDriver, 'not exists');
+    }
+
+    /**
+     * Add a where clause that represents a range expression.
+     *
+     * @param string $field The name of the field.
+     * @param \Vanilla\Schema\RangeExpression $range The range expression to filter on.
+     */
+    private function whereRangeExpression(string $field, \Vanilla\Schema\RangeExpression $range): void {
+        foreach ($range->getValues() as $op => $value) {
+            if ($op === '=') {
+                $this->where($field, $value);
+            } else {
+                $this->where("$field $op", $value);
+            }
+        }
     }
 }

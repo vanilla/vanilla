@@ -872,6 +872,9 @@ class EntryController extends Gdn_Controller {
                             } catch (Gdn_UserException $ex) {
                                 $this->Form->addError($ex);
                             }
+                        } else {
+                            // If we have a user match & there is no password.
+                            $this->Form->addError(t('UserMatchNeedsPassword'));
                         }
                     }
                 }

@@ -373,9 +373,12 @@ class PocketsPlugin extends Gdn_Plugin {
             $roles = $form->getFormValue('Roles');
             $form->setFormValue('Roles', $roles);
 
+            // Subcommunities
+            $subcommunities = $form->getFormValue('Subcommunities');
+            $form->setFormValue('Subcommunities', $subcommunities);
+
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
-
 
             $saved = $form->save();
             if ($saved) {
@@ -691,6 +694,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
             ->column('Roles', "varchar(225)", null)
+            ->column('Subcommunities', "varchar(225)", null)
             ->set();
 
         $PermissionModel = Gdn::permissionModel();

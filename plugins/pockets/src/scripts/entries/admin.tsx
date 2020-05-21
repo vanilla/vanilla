@@ -9,4 +9,6 @@ import { PocketMultiRoleInput } from "../conditions/PocketMultiRoleInput";
 import { PocketSubcommunityChooser } from "../conditions/PocketSubcommunitiesChooser";
 
 addComponent("pocket-multi-role-input", PocketMultiRoleInput);
-addComponent("pocket-subcommunity-chooser", PocketSubcommunityChooser);
+
+// Do something to prevent crash here.
+addComponent("pocket-subcommunities-chooser", PocketSubcommunityChooser);

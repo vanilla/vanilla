@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from "react";
-import { SubcommunityChooser } from "@subcommunities/chooser/SubcommunityChooser";
-import { useSubcommunities } from "@subcommunities/subcommunities/subcommunitySelectors";
-import Loader from "@library/loaders/Loader";
+import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { t } from "@vanilla/i18n/src";
+import { componentExists, getComponent } from "@library/utility/componentRegistry";
 
 const sanitizeValue = (value: any) => {
     if (Array.isArray(value)) {
@@ -17,36 +17,33 @@ const sanitizeValue = (value: any) => {
 };
 
 export function PocketSubcommunityChooser(props) {
-    const [activeSection, setActiveSection] = useState(props.value);
+    const componentName = "multi-subcommunity-input";
+    const initialValues = sanitizeValue(props.value);
+    const [subcommunities, setSubcommunities] = useState(sanitizeValue(initialValues));
 
-    // const { subcommunitiesByID } = useSubcommunities();
-    // const communityData = subcommunitiesByID.data;
-    //
-    // if (!communityData) {
-    //     return <Loader small />;
-    // }
-    //
-    // return (
-    //     <ul>
-    //         {props.subcommunityIDs.map(id => {
-    //             return <li key={id}>{communityData[id].name + ` (${communityData[id].locale})`}</li>;
-    //         })}
-    //     </ul>
-    // );
+    // Must be after the useEffect and useState
+    let MultiSubcommunityInput;
+    if (componentExists(componentName)) {
+        MultiSubcommunityInput = getComponent(componentName);
+    } else {
+        return null;
+    }
 
     return (
-        <SubcommunityChooser activeSection={activeSection} setActiveSection={setActiveSection} />
-        // <DashboardFormGroup label={t("Roles")} tag={props.tag}>
-        //     <div className="input-wrap">
-        //         <MultiRoleInput
-        //             label={""}
-        //             value={roles ?? []}
-        //             onChange={viewRoleIDs => {
-        //                 setRoles(viewRoleIDs ?? []);
-        //             }}
-        //         />
-        //     </div>
-        //     <input name={props.fieldName} type={"hidden"} value={JSON.stringify(roles)} />
-        // </DashboardFormGroup>
+        <DashboardFormGroup label={t("Subcommunities")} tag={"div"}>
+            <div className="input-wrap">
+                <MultiSubcommunityInput.Component
+                    value={subcommunities ?? []}
+                    onChange={selectedSubCommunities => {
+                        setSubcommunities(
+                            selectedSubCommunities.map(subCom => {
+                                return subCom.value;
+                            }),
+                        );
+                    }}
+                />
+            </div>
+            <input name={props.fieldName} type={"hidden"} value={JSON.stringify(subcommunities)} />
+        </DashboardFormGroup>
     );
 }

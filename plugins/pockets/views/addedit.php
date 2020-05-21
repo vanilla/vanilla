@@ -54,6 +54,29 @@ echo $Form->errors();
         <?php echo $Form->dropdown('Location', array_merge(['' => '('.sprintf(t('Select a %s'), t('Location')).')'], $this->data('LocationsArray'))); ?>
         </div>
     </li>
+
+    <?php echo $Form->react(
+        "Roles", "pocket-multi-role-input",
+        [
+            "tag" => "li",
+            "value" => $Form->getValue("Roles") ?? ""
+        ]
+    );
+    ?>
+
+    <?php
+    // Is this good enough?
+    if (c("Feature.SubcommunityProducts.Enabled")) {
+        echo $Form->react(
+            "Subcommunities", "pocket-subcommunities-chooser",
+            [
+                "tag" => "li",
+                "value" => $Form->getValue("Subcommunities") ?? ""
+            ]
+        );
+    }
+    ?>
+
     <li class="js-repeat form-group">
         <?php echo $Form->labelWrap('Repeat', 'RepeatType'); ?>
         <div class="input-wrap">
@@ -105,26 +128,7 @@ echo $Form->errors();
         </div>
     </li>
 
-    <?php echo $Form->react(
-        "Roles", "pocket-multi-role-input",
-        [
-            "tag" => "li",
-            "value" => $Form->getValue("Roles") ?? ""
-        ]
-    );
-    ?>
 
-    <?php
-        if (c("Feature.SubcommunityProducts.Enabled")) {
-            echo $Form->react(
-                "Subcommunity", "pocket-subcommunity-chooser",
-                [
-                    "tag" => "li",
-                    "value" => $Form->getValue("Subcommunities") ?? ""
-                ]
-            );
-        }
-    ?>
 
     <li class="form-group">
         <div class="label-wrap-wide">

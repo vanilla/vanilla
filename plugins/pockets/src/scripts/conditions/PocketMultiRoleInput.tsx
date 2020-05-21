@@ -20,7 +20,7 @@ export function PocketMultiRoleInput(props) {
     const [roles, setRoles] = useState(sanitizeValue(props.value));
 
     return (
-        <DashboardFormGroup label={t("Roles")} tag={props.tag}>
+        <DashboardFormGroup label={t("Roles")} tag={"div"}>
             <div className="input-wrap">
                 <MultiRoleInput
                     label={""}

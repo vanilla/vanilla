@@ -70,6 +70,9 @@ class Pocket {
     /** @var array */
     public $Roles = [];
 
+    /** @var array */
+    public $Subcommunities = [];
+
     /**
      * Pocket constructor.
      *
@@ -180,6 +183,10 @@ class Pocket {
             }
         }
 
+        // Check Subcommunities
+
+        // TODO
+
         // If we've passed all of the tests then the pocket can be processed.
         return true;
     }
@@ -203,6 +210,7 @@ class Pocket {
         $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
         $this->TestMode = $data['TestMode'] ?? null;
         $this->Roles = $data['Roles'] ?? null;
+        $this->Subcommunities = $data['Subcommunities'] ?? null;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -219,12 +227,21 @@ class Pocket {
     }
 
     /**
-     * Determine whether the pocket is dependent on conditions
+     * Determine whether the pocket is dependent on role conditions
      *
      * @return bool
      */
     public function hasRoles() {
         return !empty($this->Roles);
+    }
+
+    /**
+     * Determine whether the pocket is dependent on subcommunity conditions
+     *
+     * @return bool
+     */
+    public function hasSubcommunities() {
+        return !empty($this->Subcommunities);
     }
 
     /**

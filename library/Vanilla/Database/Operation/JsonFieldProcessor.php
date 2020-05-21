@@ -61,7 +61,7 @@ class JsonFieldProcessor implements Processor {
         $set = $operation->getSet();
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
-                $packed = json_encode($set[$field]);
+                $packed = json_encode($set[$field], JSON_FORCE_OBJECT);
                 if ($packed === false) {
                     throw new \Exception("Unable to encode field as JSON.");
                 }

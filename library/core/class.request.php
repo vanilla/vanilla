@@ -1870,4 +1870,47 @@ class Gdn_Request implements RequestInterface {
         deprecated('Gdn_Request::withURI()', 'Gdn_Request::setURI()');
         return $this->setURI($uri);
     }
+
+    /**
+     * Retrieve attributes derived from the request.
+     *
+     * The request "attributes" may be used to allow injection of any
+     * parameters derived from the request: e.g., the results of path
+     * match operations; the results of decrypting cookies; the results of
+     * deserializing non-form-encoded message bodies; etc. Attributes
+     * will be application and request specific, and CAN be mutable.
+     *
+     * @return array Attributes derived from the request.
+     */
+    public function getAttributes() {
+        return $this->getRequestArguments(self::INPUT_CUSTOM);
+    }
+
+    /**
+     * Retrieve a single derived request attribute.
+     *
+     * Retrieves a single derived request attribute as described in
+     * getAttributes(). If the attribute has not been previously set, returns
+     * the default value as provided.
+     *
+     * This method obviates the need for a hasAttribute() method, as it allows
+     * specifying a default value to return if the attribute is not found.
+     *
+     * @param string $name The attribute name.
+     * @param mixed $default Default value to return if the attribute does not exist.
+     * @return mixed
+     */
+    public function getAttribute($name, $default = null) {
+        return $this->getValueFrom(self::INPUT_CUSTOM, $name, $default);
+    }
+
+    /**
+     * Set a custom attribute on the request.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setAttribute($name, $value) {
+        $this->setValueOn(self::INPUT_CUSTOM, $name, $value);
+    }
 }

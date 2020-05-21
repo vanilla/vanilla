@@ -2149,6 +2149,6 @@ class EntryController extends Gdn_Controller {
             $target = url(Gdn::router()->getDestination('DefaultController'));
         }
 
-        return $target;
+        return url($target, true);
     }
 }

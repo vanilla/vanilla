@@ -197,8 +197,8 @@
                                 </div>
                             {else}
                                 {if $Category}
-                                    <h2 class="H HomepageTitle">{$Category.Name}{follow_button}</h2>
-                                    <p class="P PageDescription">{$Category.Description}</p>
+                                    <h2 class="H HomepageTitle">{$Category.Name|strip_tags}{follow_button}</h2>
+                                    <p class="P PageDescription">{$Category.Description|strip_tags}</p>
                                 {else}
                                     {if {homepage_title} !== ""}
                                         <h2 class="H HomepageTitle">{homepage_title}</h2>

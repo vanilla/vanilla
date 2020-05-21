@@ -14,6 +14,9 @@ use Gdn_Request;
  */
 class RequestTest extends SharedBootstrapTestCase {
 
+    /**
+     * Provide some test URLs and how they should expand.
+     */
     public function provideUrls() {
         return [
             [
@@ -52,6 +55,9 @@ class RequestTest extends SharedBootstrapTestCase {
         ];
     }
 
+    /**
+     * The body should be the same as the POST.
+     */
     public function testBodyEquivalence() {
         $req = new Gdn_Request();
 
@@ -98,6 +104,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertNotInstanceOf(\Vanilla\UploadedFile::class, $request->post('Foo'), 'POST value overwritten by file.');
     }
 
+    /**
+     * Test `Gdn_Request::getUrl()`.
+     */
     public function testGetUrl() {
         $request = new Gdn_Request();
         $request->setScheme('http');
@@ -111,6 +120,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('http://localhost:8080/root-dir/path/to/resource.json?foo=bar', $request->getUrl());
     }
 
+    /**
+     * Test request header accessors.
+     */
     public function testGetHeaders() {
         $server = [
             'CONTENT_TYPE' => 'application/json',
@@ -129,6 +141,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertEquals($expectedHeaders, $request->getHeaders());
     }
 
+    /**
+     * Test request header accessors.
+     */
     public function testGetHeader() {
         $server = [
             'CONTENT_TYPE' => 'application/json',
@@ -148,6 +163,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertEquals('no-cache', $request->getHeader('cache-control'));
     }
 
+    /**
+     * Test request header accessors.
+     */
     public function testGetHeaderLine() {
         $server = [
             'CONTENT_LENGTH' => '',
@@ -163,6 +181,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertEquals('application/json,application/xml', $request->getHeaderLine('Accept'));
     }
 
+    /**
+     * Test request header accessors.
+     */
     public function testHasHeader() {
         $server = [
             'CONTENT_TYPE' => 'application/json',
@@ -184,6 +205,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertFalse($request->hasHeader('Auth'));
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getHost()` and `Gdn_Request::host()`.
+     */
     public function testHostEquivalence() {
         $req = new Gdn_Request();
 
@@ -194,6 +218,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($req->getHost(), $req->host());
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getHostAndPort()` and `Gdn_Request::hostAndPort()`.
+     */
     public function testHostAndPortEquivalence() {
         $req = new Gdn_Request();
 
@@ -206,6 +233,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($req->getHostAndPort(), $req->hostAndPort());
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getIP()` and `Gdn_Request::ipAddress()`.
+     */
     public function testIPEquivalence() {
         $req = new Gdn_Request();
 
@@ -213,6 +243,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($req->getIP(), $req->ipAddress());
     }
 
+    /**
+     * Test `Gdn_Request::mergeQuery()`.
+     */
     public function testMergeQuery() {
         $request = new Gdn_Request();
         $request->setQuery([
@@ -290,6 +323,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('/foo', $req->getPath());
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getPort()` and `Gdn_Request::port()`.
+     */
     public function testPortEquivalence() {
         $req = new Gdn_Request();
 
@@ -348,6 +384,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][1]);
     }
 
+    /**
+     * Test `Gdn_Request::getQuery()`.
+     */
     public function testQueryEquivalence() {
         $req = new Gdn_Request();
 
@@ -356,9 +395,11 @@ class RequestTest extends SharedBootstrapTestCase {
 
         $req->setRequestArguments(Gdn_Request::INPUT_GET, ['foo' => 'bar']);
         $this->assertSame($req->getQuery(), $req->getRequestArguments(Gdn_Request::INPUT_GET));
-
     }
 
+    /**
+     * Test `Gdn_Request::getQueryItem()`.
+     */
     public function testQueryItemEquivalence() {
         $req = new Gdn_Request();
 
@@ -369,6 +410,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($req->getQueryItem('foo'), $req->getValueFrom(Gdn_Request::INPUT_GET, 'foo'));
     }
 
+    /**
+     * Test `Gdn_Request::setFullPath()`.
+     */
     public function testSetFullPath() {
         $request = new Gdn_Request();
         $request->setRoot('root-dir');
@@ -379,6 +423,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('.json', $request->getExt());
     }
 
+    /**
+     * Test `Gdn_Request::setPathExt()`.
+     */
     public function testSetPathExt() {
         $request = new Gdn_Request();
         $request->setPathExt('path/to/resource.json');
@@ -387,6 +434,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('.json', $request->getExt());
     }
 
+    /**
+     * Test `Gdn_Request::setQueryItem()`.
+     */
     public function testSetQueryItem() {
         $request = new Gdn_Request();
         $request->setQuery([
@@ -400,6 +450,8 @@ class RequestTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test `Gdn_Request::setUrl()`.
+     *
      * @param string $url
      * @param array $expected
      * @dataProvider provideUrls
@@ -416,6 +468,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($expected['query'], $request->getQuery());
     }
 
+    /**
+     * Test compatibility of `Gdn_Request::getRoot()` and `Gdn_Request::webRoot()`.
+     */
     public function testRootEquivalence() {
         $req = new Gdn_Request();
 
@@ -439,6 +494,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('', $req->getRoot());
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getScheme()` and `Gdn_Request::scheme()`.
+     */
     public function testSchemeEquivalence() {
         $req = new Gdn_Request();
 
@@ -449,6 +507,9 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($req->getScheme(), $req->scheme());
     }
 
+    /**
+     * Test compatibility between `Gdn_Request::getUrl()` and `Gdn_Request::url('', true)`.
+     */
     public function testUrlEquivalence() {
         // Simulate that rewrite is ON
         $_SERVER['X_REWRITE'] = 1;

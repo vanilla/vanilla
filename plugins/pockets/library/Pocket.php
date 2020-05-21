@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
-
 /**
  * Class Pocket
  */
@@ -174,6 +172,27 @@ class Pocket {
             }
         }
 
+
+        // Check Subcommunities
+        if ($this->hasSubcommunities()) {
+            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
+            $currentSubcommunity = $subcommunitiesModel::getCurrent();
+            if (!$currentSubcommunity) {
+                return false;
+            }
+            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
+            $match = false;
+            foreach ($this->Subcommunities as $subComID) {
+                if ($subComID === $currentSubcommunityID) {
+                    $match = true;
+                    break;
+                }
+            }
+            if ($match === false) {
+                return false;
+            }
+        }
+
         // Check roles
         if ($this->hasRoles() && !($testMode && $pocketAdmin)) {
             $roleModel = Gdn::getContainer()->get(RoleModel::class);
@@ -183,23 +202,6 @@ class Pocket {
             if (count($intersections) === 0) {
                 return false;
             }
-        }
-
-        // Check Subcommunities
-        if ($this->hasSubcommunities()) {
-            if (count(json_decode($this->Subcommunities)) > 0) {
-                return false;
-            }
-//            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
-//            $subcommunityIDs = [];
-//            foreach ($subcommunitiesModel->all() as $subCom) {
-//                array_push($subcommunityIDs, $subCom["SubcommunityID"]);
-//            }
-//
-//            $intersections = array_intersect($subcommunityIDs, json_decode($this->Subcommunities));
-//            if (count($intersections) === 0) {
-//                return false;
-//            }
         }
 
         // If we've passed all of the tests then the pocket can be processed.
@@ -224,8 +226,8 @@ class Pocket {
         $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
         $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
         $this->TestMode = $data['TestMode'] ?? null;
-        $this->Roles = $data['Roles'] ?? null;
-        $this->Subcommunities = $data['Subcommunities'] ?? null;
+        $this->Roles = $data['Roles'] ? json_decode($data['Roles']) : null;
+        $this->Subcommunities = $data['Subcommunities'] ? json_decode($data['Subcommunities']) : null;
 
         // parse the frequency.
         $repeat = $data['Repeat'];

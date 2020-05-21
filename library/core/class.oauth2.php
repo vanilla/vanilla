@@ -581,8 +581,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         $proxy = new ProxyRequest();
 
         // Create default values of options to be passed to ProxyRequest.
-        $defaultOptions['ConnectTimeout'] = 10;
-        $defaultOptions['Timeout'] = 10;
+        $defaultOptions['ConnectTimeout'] = 20;
+        $defaultOptions['Timeout'] = 20;
 
         $headers = [];
 

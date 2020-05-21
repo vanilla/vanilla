@@ -395,7 +395,8 @@ class Pocket {
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
                 'Type' => 'default',
-                'Roles' => null
+                'Roles' => null,
+                'Subcommunities' => null,
                 ];
             $model->save($pocket);
         }

@@ -473,4 +473,17 @@ class RequestTest extends SharedBootstrapTestCase {
 
         $this->assertSame($req->getUrl(), $req->url('', true));
     }
+
+    /**
+     * Test basic attribute accessors.
+     */
+    public function testAttributeAccessors(): void {
+        $r = new Gdn_Request();
+
+        $this->assertNull($r->getAttribute('foo'));
+        $r->setAttribute('foo', 'bar');
+        $this->assertSame('bar', $r->getAttribute('foo'));
+
+        $this->assertArrayHasKey('foo', $r->getAttributes());
+    }
 }

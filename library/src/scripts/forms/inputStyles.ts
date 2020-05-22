@@ -85,14 +85,16 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         color: colorOut(colors.fg),
         ...borders(border),
         ...fonts(font),
-        lineHeight: unit(font.size),
         outline: 0,
         $nest: {
             ...placeholderStyles({
                 color: colorOut(colors.placeholder),
             }),
-            "&. .SelectOne__input": {
-                width: percent(100),
+            "& .SelectOne__input input": {
+                display: "inline-block",
+                maxWidth: percent(100),
+                overflow: "hidden",
+                lineHeight: undefined,
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({

@@ -5,9 +5,10 @@
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, pointerEvents, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
-import { inputMixin } from "@library/forms/inputStyles";
+import { inputMixin, inputVariables } from "@library/forms/inputStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
@@ -24,6 +25,8 @@ export const selectOneClasses = useThemeCache(() => {
     const style = styleFactory("selectOne");
     const vars = selectOneVariables();
     const globalVars = globalVariables();
+
+    const singleValueOffset = 26;
 
     const inputWrap = style("inputWrap", {
         $nest: {
@@ -52,10 +55,20 @@ export const selectOneClasses = useThemeCache(() => {
             },
             "& .SelectOne__single-value": {
                 textOverflow: "ellipsis",
-                maxWidth: calc(`100% - ${unit(vars.padding.right + 26)}`),
+                maxWidth: calc(`100% - ${unit(vars.padding.right + singleValueOffset)}`),
+            },
+            "& .SelectOne__single-value + div": {
+                textOverflow: "ellipsis",
+                maxWidth: calc(`100% - ${unit(vars.padding.right)}`),
+            },
+            "& .SelectOne__value-container.inputText.inputText": {
+                paddingRight: unit(inputVariables().sizing.height),
             },
             "& .SelectOne__value-container > *": {
                 width: percent(100),
+                overflow: "hidden",
+                lineHeight: "inherit",
+                ...pointerEvents(),
             },
             "& .SelectOne--is-disabled": {
                 cursor: "pointer",
@@ -65,6 +78,7 @@ export const selectOneClasses = useThemeCache(() => {
                 padding: 10,
                 overflow: "hidden",
             },
+            "& .inputBlock": inputMixin(),
         },
     });
 

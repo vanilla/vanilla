@@ -76,7 +76,14 @@ export default function SelectOne(props: ISelectOneProps) {
     const classes = selectOneClasses();
     const classesInputBlock = inputBlockClasses();
     return (
-        <div className={classNames(classesInputBlock.root, props.className)}>
+        <div
+            className={classNames(classesInputBlock.root, props.className)}
+            onClick={() => {
+                if (!isFocused && props.selectRef?.current) {
+                    props.selectRef?.current.focus();
+                }
+            }}
+        >
             {props.label !== null && (
                 <label htmlFor={inputID} className={classesInputBlock.labelAndDescription}>
                     <span className={classNames(classesInputBlock.labelText, props.label)}>{props.label}</span>

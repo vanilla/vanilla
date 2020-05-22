@@ -11,12 +11,13 @@ use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\ExternalAsset;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
+use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the asset preload model.
  */
-class AssetPreloadModelTest extends SharedBootstrapTestCase {
+class AssetPreloadModelTest extends MinimalContainerTestCase {
 
     use HtmlNormalizeTrait;
 

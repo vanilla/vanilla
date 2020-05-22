@@ -63,7 +63,7 @@ Gdn_Theme::assetEnd();
             &#9776;
         </button>
         <div class="navbar-brand">
-            <?php $title = c('Garden.Title'); ?>
+            <?php $title = Gdn::formatService()->renderPlainText(c('Garden.Title'), Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY); ?>
             <div class="navbar-image logo"><?php echo wrap('Vanilla Forums', 'span', ['class' => 'vanilla-logo vanilla-logo-white']); ?></div>
             <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
         </div>

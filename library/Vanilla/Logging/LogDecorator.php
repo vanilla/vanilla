@@ -9,6 +9,7 @@ namespace Vanilla\Logging;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Ramsey\Uuid\Uuid;
 
 /**
  * A decorator for the log that adds default context attributes based on the current request.
@@ -47,6 +48,14 @@ class LogDecorator implements LoggerInterface {
         $this->session = $session;
         $this->request = $request;
         $this->logger = $logger;
+
+        if (empty($request->getAttribute('requestID'))) {
+            try {
+                $request->setAttribute('requestID', Uuid::uuid1()->toString());
+            } catch (\Exception $ex) {
+                trigger_error("LogDecorator::__construct(): ".$ex->getMessage(), E_USER_WARNING);
+            }
+        }
     }
 
     /**
@@ -61,6 +70,7 @@ class LogDecorator implements LoggerInterface {
             'method' => $this->request->requestMethod(),
             'domain' => rtrim($this->request->url('/', true), '/'),
             'path' => $this->request->path(),
+            'requestID' => $this->request->getAttribute('requestID', null),
         ];
 
         $this->logger->log($level, $message, $context + $defaults);

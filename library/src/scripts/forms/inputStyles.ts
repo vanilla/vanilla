@@ -90,6 +90,9 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             ...placeholderStyles({
                 color: colorOut(colors.placeholder),
             }),
+            "& .SelectOne__input": {
+                width: percent(100),
+            },
             "& .SelectOne__input input": {
                 display: "inline-block",
                 maxWidth: percent(100),

@@ -63,12 +63,12 @@ export const selectOneClasses = useThemeCache(() => {
             },
             "& .SelectOne__value-container.inputText.inputText": {
                 paddingRight: unit(inputVariables().sizing.height),
+                ...pointerEvents(), // sometimes this element blocks the click to focus the input.
             },
             "& .SelectOne__value-container > *": {
                 width: percent(100),
                 overflow: "hidden",
                 lineHeight: "inherit",
-                ...pointerEvents(),
             },
             "& .SelectOne--is-disabled": {
                 cursor: "pointer",

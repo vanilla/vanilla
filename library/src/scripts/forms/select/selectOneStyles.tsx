@@ -72,5 +72,9 @@ export const selectOneClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.primary),
     });
 
-    return { inputWrap, checkIcon };
+    const checkBoxAfterInput = style("checkBoxAfterInput", {
+        marginTop: unit(6),
+    });
+
+    return { inputWrap, checkIcon, checkBoxAfterInput };
 });

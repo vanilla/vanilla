@@ -73,6 +73,13 @@ class Pocket {
     /** @var array */
     public $Subcommunities = [];
 
+    /** @var string */
+    public $Category = '';
+
+
+    /** @var bool */
+    public $InheritCategory = false;
+
     /**
      * Pocket constructor.
      *
@@ -207,6 +214,10 @@ class Pocket {
             }
         }
 
+        // Check Category
+
+        // TODO
+
         // If we've passed all of the tests then the pocket can be processed.
         return true;
     }
@@ -231,6 +242,8 @@ class Pocket {
         $this->TestMode = $data['TestMode'] ?? null;
         $this->Roles = $data['Roles'] ? json_decode($data['Roles']) : null;
         $this->Subcommunities = $data['Subcommunities'] ? json_decode($data['Subcommunities']) : null;
+        $this->Subcommunities = $data['Category'] ?? null;
+        $this->Subcommunities = $data['InheritCategory'] ?? false;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -262,6 +275,24 @@ class Pocket {
      */
     public function hasSubcommunities() {
         return !empty($this->Subcommunities);
+    }
+
+    /**
+     * Determine whether the pocket is dependent on category conditions
+     *
+     * @return bool
+     */
+    public function hasCategory() {
+        return !empty($this->Category);
+    }
+
+    /**
+     * Determine whether the pocket has category inheritance
+     *
+     * @return bool
+     */
+    public function hasCategoryInheritance() {
+        return !empty($this->InheritCategory);
     }
 
     /**

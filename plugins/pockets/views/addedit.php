@@ -65,13 +65,23 @@ echo $Form->errors();
     ?>
 
     <?php
-    // Is this good enough?
     if (c("Feature.SubcommunityProducts.Enabled")) {
         echo $Form->react(
             "Subcommunities", "pocket-subcommunities-chooser",
             [
                 "tag" => "li",
                 "value" => $Form->getValue("Subcommunities") ?? ""
+            ]
+        );
+
+
+
+        echo $Form->react(
+            "Category", "pocket-category-input",
+            [
+                "tag" => "li",
+                "value" => $Form->getValue("Category") ?? "",
+                "inherit" => $Form->getValue("InheritCategory") ?? "",
             ]
         );
     }

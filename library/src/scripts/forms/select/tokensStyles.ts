@@ -71,7 +71,7 @@ export const tokensClasses = useThemeCache(() => {
                         alignItems: "center",
                         justifyContent: "stretch",
                         ...margins({
-                            vertical: (formElVars.sizing.height - vars.token.minHeight) / 2 - formElVars.border.width,
+                            vertical: 0,
                         }),
                         minHeight: unit(vars.token.minHeight),
                     },

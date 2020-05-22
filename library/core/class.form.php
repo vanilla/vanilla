@@ -1796,7 +1796,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function react(string $fieldName, string $componentKey, array $props = []) {
+    public function react(string $fieldName, string $componentKey, array $props = [], string $child = "") {
         $value = $attributes['value'] ?? $this->getValue($fieldName);
         $tag = $props['tag'] ?? "div";
         $props = $props + [
@@ -1804,7 +1804,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'fieldName'  => $this->escapeFieldName($fieldName),
         ];
         $props = htmlspecialchars(json_encode($props), ENT_QUOTES);
-        return "<$tag data-react='$componentKey' data-props='$props'></$tag>";
+        return "<$tag data-react='$componentKey' data-props='$props'>$child</$tag>";
     }
 
     /**

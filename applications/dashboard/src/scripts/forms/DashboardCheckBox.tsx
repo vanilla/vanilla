@@ -12,7 +12,9 @@ interface IProps {
     className?: string;
     label: string;
     checked?: boolean;
+    name?: string;
     onChange?: (newValue: boolean) => void;
+    excludeFromICheck?: boolean;
 }
 
 export function DashboardCheckBox(props: IProps) {

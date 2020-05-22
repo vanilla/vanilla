@@ -12,7 +12,7 @@ namespace Vanilla\Web\ContentSecurityPolicy;
 class VanillaWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
 
     const VANILLA_WHITELIST = [
-        'https://www.google.com/recaptcha/api.js'
+        'https://www.google.com'
     ];
 
     /**

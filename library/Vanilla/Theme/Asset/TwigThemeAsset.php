@@ -41,6 +41,9 @@ class TwigThemeAsset extends HtmlThemeAsset {
         return ThemeAssetFactory::ASSET_TYPE_TWIG;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getAllowedTypes(): array {
         return [ThemeAssetFactory::ASSET_TYPE_TWIG, ThemeAssetFactory::ASSET_TYPE_HTML];
     }

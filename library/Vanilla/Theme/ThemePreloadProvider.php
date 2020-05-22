@@ -11,6 +11,8 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\Asset\HtmlThemeAsset;
+use Vanilla\Theme\Asset\JavascriptThemeAsset;
+use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Asset\TwigThemeAsset;
 use Vanilla\Web\Asset\AssetPreloader;
@@ -33,17 +35,14 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /** @var \ThemesApiController */
     private $themesApi;
 
-    /** @var RequestInterface */
-    private $request;
-
-    /** @var DeploymentCacheBuster */
-    private $cacheBuster;
+    /** @var ThemeService */
+    private $themeService;
 
     /** @var AssetPreloadModel */
     private $assetPreloader;
 
-    /** @var array|null */
-    private $themeData;
+    /** @var Theme */
+    private $theme;
 
     /** @var \Throwable */
     private $themeFetchError;
@@ -59,22 +58,19 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @param SiteMeta $siteMeta
      * @param \ThemesApiController $themesApi
-     * @param RequestInterface $request
-     * @param DeploymentCacheBuster $cacheBuster
+     * @param ThemeService $themeService
      * @param AssetPreloadModel $assetPreloader
      */
     public function __construct(
         SiteMeta $siteMeta,
         \ThemesApiController $themesApi,
-        RequestInterface $request,
-        DeploymentCacheBuster $cacheBuster,
+        ThemeService $themeService,
         AssetPreloadModel $assetPreloader
     ) {
         $this->siteMeta = $siteMeta;
         $this->themesApi = $themesApi;
-        $this->request = $request;
-        $this->cacheBuster = $cacheBuster;
         $this->assetPreloader = $assetPreloader;
+        $this->themeService = $themeService;
     }
 
     /**
@@ -112,64 +108,71 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @return ThemeScriptAsset|null
      */
     public function getThemeScript(): ?ThemeScriptAsset {
-        $data = $this->getThemeData();
-        if (!$data || !isset($data['assets']['javascript'])) {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
             return null;
         }
 
-        return new ThemeScriptAsset(
-            $this->request,
-            $this->getThemeKeyToPreload(),
-            // Use both the theme version and the deployment to make a more robust cache buster.
-            // People often forget to increment their theme version in file based themes
-            // so adding the deployment cache buster to the theme version handles this case.
-            $this->getThemeData()['version'] . '-' . $this->cacheBuster->value()
-        );
+        $script = $theme->getAssets()[ThemeAssetFactory::ASSET_SCRIPTS] ?? null;
+        if (!($script instanceof JavascriptThemeAsset) || !$script->__toString()) {
+            return null;
+        }
+
+        return new ThemeScriptAsset($script);
     }
 
     /**
-     * Get the theme data (with some local caching so it isn't requested twice).
-     *
-     * This data follows the format described in the ThemesApiController.
+     * Get the theme (with some local caching so it isn't requested twice).
      */
-    public function getThemeData(): ?array {
-        if (!$this->themeData) {
-            $themeKey = $this->getThemeKeyToPreload();
-
-            // Forced theme keys disable addon variables.
-            $args = ['allowAddonVariables' => !$this->forcedThemeKey];
-            if (!empty($this->revisionID)) {
-                // when theme-settings/{id}/revisions preview
-                $args['revisionID'] = $this->revisionID;
-            } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
-                $args['revisionID'] = $revisionID;
-            }
-
-            try {
-                $this->themeData = $this->themesApi->get(
-                    $themeKey,
-                    $args
-                );
-            } catch (\Throwable $e) {
-                // Prevent infinite loops.
-                // Our error handling page uses the theme when possible.
-                // As a result we absolutely CANNOT ever allow the this function to bubble up an error.
-                // If it did then we we get cascading OOM errors.
-                trigger_error("Could not load data for theme key $themeKey.");
-                $this->themeFetchError = $e;
-                $this->themeData = null;
-            }
+    public function getPreloadTheme(): ?Theme {
+        if (!$this->theme) {
+            $this->loadData();
         }
 
-        return $this->themeData;
+        return $this->theme;
+    }
+
+    /**
+     * Load data from the theme API.
+     */
+    private function loadData() {
+        $themeKey = $this->getThemeKeyToPreload();
+
+        // Forced theme keys disable addon variables.
+        $args = [
+            'allowAddonVariables' => !$this->forcedThemeKey,
+            'expand' => ['fonts.data', 'variables.data']
+        ];
+        if (!empty($this->revisionID)) {
+            // when theme-settings/{id}/revisions preview
+            $args['revisionID'] = $this->revisionID;
+        } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+            $args['revisionID'] = $revisionID;
+        }
+
+        try {
+            $response = $this->themesApi->get(
+                $themeKey,
+                $args
+            );
+            $this->theme = $response->getMeta('theme');
+        } catch (\Throwable $e) {
+            // Prevent infinite loops.
+            // Our error handling page uses the theme when possible.
+            // As a result we absolutely CANNOT ever allow the this function to bubble up an error.
+            // If it did then we we get cascading OOM errors.
+            trigger_error("Could not load data for theme key $themeKey.");
+            $this->themeFetchError = $e;
+            $this->theme = null;
+        }
     }
 
     /**
      * @return array
      */
     public function createActions(): array {
-        $themeData = $this->getThemeData();
-        if (!$themeData) {
+        $data = $this->getPreloadTheme();
+        if (!$data) {
             if ($this->themeFetchError) {
                 return [
                     new ReduxErrorAction($this->themeFetchError),
@@ -182,8 +185,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         // Preload the theme variables for the frontend.
         return [new ReduxAction(
             \ThemesApiController::GET_THEME_ACTION,
-            Data::box($themeData),
-            [ 'key' => $themeData ]
+            new Data($data),
+            [ 'key' => $data ]
         )];
     }
 
@@ -195,15 +198,13 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      */
     private function getThemeInlineCss(): string {
         if (!$this->inlineStyles) {
-            $themeData = $this->getThemeData();
-            if (!$themeData) {
+            $theme = $this->getPreloadTheme();
+            if (!$theme) {
                 return '';
             }
-            $themeKey = $this->getThemeKeyToPreload();
-            $styleSheet = $themeData['assets']['styles'] ?? null;
-            if ($styleSheet) {
-                $style = $this->themesApi->get_assets($themeKey, 'styles.css');
-                $this->inlineStyles = '<style>' . $style->getData() . '</style>';
+            $styles = $theme->getAssets()[ThemeAssetFactory::ASSET_STYLES] ?? null;
+            if ($styles) {
+                $this->inlineStyles = '<style>' . $styles->__toString() . '</style>';
             }
         }
 
@@ -216,12 +217,13 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @return string
      */
     public function getThemeFooterHtml(): string {
-        $themeData = $this->getThemeData();
-        if (!$themeData) {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
             return '';
         }
 
-        return $this->renderAsset($themeData['assets']['footer'] ?? null);
+        $footer = $theme->getAssets()[ThemeAssetFactory::ASSET_FOOTER] ?? null;
+        return $this->renderAsset($footer);
     }
 
     /**
@@ -230,13 +232,14 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      * @return string
      */
     public function getThemeHeaderHtml(): string {
-        $themeData = $this->getThemeData();
-        if (!$themeData) {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
             return '';
         }
-        $jsonAsset = $this->themeData['assets']['variables'];
-        if ($jsonAsset instanceof JsonThemeAsset) {
-            $bgImage = $jsonAsset->getDataArray()['titleBar']['colors']['bgImage'] ?? null;
+        $header = $theme->getAssets()[ThemeAssetFactory::ASSET_HEADER] ?? null;
+        $variables = $theme->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
+        if ($variables instanceof JsonThemeAsset) {
+            $bgImage = $variables->get('titleBar.colors.bgImage', null);
             if ($bgImage !== null) {
                 $asset = new ExternalAsset($bgImage);
                 $preloader = new AssetPreloader($asset, AssetPreloader::REL_PRELOAD, AssetPreloader::AS_IMAGE);
@@ -244,7 +247,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             }
         }
 
-        return $this->renderAsset($themeData['assets']['header'] ?? null);
+        return $this->renderAsset($header);
     }
 
 
@@ -258,7 +261,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     private function renderAsset(?ThemeAsset $themeAsset): string {
         $styles = $this->getThemeInlineCss();
         if ($themeAsset instanceof HtmlThemeAsset) {
-            return $styles . $themeAsset->getData();
+            return $styles . $themeAsset->renderHtml();
         } elseif ($themeAsset instanceof TwigThemeAsset) {
             return $styles . $themeAsset->renderHtml([]);
         } else {

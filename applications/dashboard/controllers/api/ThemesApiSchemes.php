@@ -85,16 +85,11 @@ trait ThemesApiSchemes {
                     "header?" => $this->assetInputSchema(),
                     "footer?" => $this->assetInputSchema(),
                     "variables?" => $this->assetInputSchema(),
-                    "fonts:s?",
-                    "scripts:s?",
-                    "styles:s?",
-                    "javascript:s?"
+                    "fonts?" => $this->assetInputSchema(),
+                    "scripts?" => $this->assetInputSchema(),
+                    "styles?" => $this->assetInputSchema(),
+                    "javascript?" => $this->assetInputSchema()
                 ])
-                    ->addValidator('header', [ThemeService::class, 'validator'])
-                    ->addValidator('footer', [ThemeService::class, 'validator'])
-                    ->addValidator('variables', [ThemeService::class, 'validator'])
-                    ->addValidator('fonts', [ThemeService::class, 'validator'])
-                    ->addValidator('scripts', [ThemeService::class, 'validator'])
             ]),
             $type
         );
@@ -129,16 +124,11 @@ trait ThemesApiSchemes {
                     "header?" => $this->assetInputSchema(),
                     "footer?" => $this->assetInputSchema(),
                     "variables?" => $this->assetInputSchema(),
-                    "fonts:s?",
-                    "scripts:s?",
-                    "styles:s?",
-                    "javascript:s?"
+                    "fonts?" => $this->assetInputSchema(),
+                    "scripts?" => $this->assetInputSchema(),
+                    "styles?" => $this->assetInputSchema(),
+                    "javascript?" => $this->assetInputSchema()
                 ])
-                    ->addValidator('header', [ThemeService::class, 'validator'])
-                    ->addValidator('footer', [ThemeService::class, 'validator'])
-                    ->addValidator('variables', [ThemeService::class, 'validator'])
-                    ->addValidator('fonts', [ThemeService::class, 'validator'])
-                    ->addValidator('scripts', [ThemeService::class, 'validator'])
             ]),
             $type
         );
@@ -152,11 +142,20 @@ trait ThemesApiSchemes {
         if (!$this->assetInputSchema) {
             $this->assetInputSchema = $this->schema([
                 'type:s',
-                'data:s|o'
+                'data:s|o' => [
+                    'minLength' => 0,
+                ]
             ]);
             $this->assetInputSchema->addValidator('', function ($data, ValidationField $field) {
                 if ($data['type'] !== ThemeAssetFactory::ASSET_TYPE_JSON && is_array($data['data'])) {
                     $field->addError('Objects for the `data` field are only supported when the type is `json`.');
+                }
+            });
+            $this->assetInputSchema->addFilter('data', function ($data) {
+                if (is_array($data)) {
+                    return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                } else {
+                    return $data;
                 }
             });
         }

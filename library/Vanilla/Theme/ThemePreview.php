@@ -65,12 +65,12 @@ class ThemePreview implements \JsonSerializable {
         $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
         $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
         $primary = $variables['global']['mainColors']['primary'] ?? null;
-        $this->variablePreview['global.mainColors.primary'] = $primary;
-        $this->variablePreview['global.mainColors.bg'] = $bg ?? null;
-        $this->variablePreview['global.mainColors.fg'] = $fg ?? null;
-        $this->variablePreview['titleBar.colors.bg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
-        $this->variablePreview['titleBar.colors.fg'] = $variables['titleBar']['colors']['fg'] ?? null;
-        $this->variablePreview['banner.outerBackground.image'] = $variables['splash']['outerBackground']['image']
+        $this->variablePreview['globalPrimary'] = $primary;
+        $this->variablePreview['globalBg'] = $bg ?? null;
+        $this->variablePreview['globalFg'] = $fg ?? null;
+        $this->variablePreview['titleBarBg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
+        $this->variablePreview['titleBarFg'] = $variables['titleBar']['colors']['fg'] ?? null;
+        $this->variablePreview['backgroundImage'] = $variables['splash']['outerBackground']['image']
             ?? $variables['banner']['outerBackground']['image']
             ?? null;
         return $this;

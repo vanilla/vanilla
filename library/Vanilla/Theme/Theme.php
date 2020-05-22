@@ -146,7 +146,7 @@ class Theme implements \JsonSerializable {
 
         $theme = new Theme([
             'themeID' => $addon->getKey(),
-            'type' => 'addon',
+            'type' => 'themeFile',
             'name' => $addon->getName(),
             'version' => $addon->getVersion(),
             'assets' => $assets,
@@ -272,13 +272,10 @@ class Theme implements \JsonSerializable {
         // Get the base variables asset.
         $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variablesAsset instanceof JsonThemeAsset) {
-            $existingVariables = $variablesAsset->getValue();
-        } else {
-            $existingVariables = [];
+            $merged = array_replace_recursive($variablesAsset->getValue(), $variables);
+            $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
+            $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
         }
-        $merged = array_replace_recursive($existingVariables, $variables);
-        $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE));
-        $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
     }
 
     /**

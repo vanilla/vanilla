@@ -28,13 +28,6 @@ class CssThemeAsset extends ThemeAsset {
     }
 
     /**
-     * @return string
-     */
-    public function jsonSerialize() {
-        return $this->url;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getDefaultType(): string {

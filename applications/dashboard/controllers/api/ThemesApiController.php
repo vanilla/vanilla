@@ -50,9 +50,9 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param string $themeKey The unique theme key or theme ID.
      * @param array $query
-     * @return array
+     * @return Data
      */
-    public function get(string $themeKey, array $query = []): array {
+    public function get(string $themeKey, array $query = []): Data {
         $this->permission();
         $out = $this->themeResultSchema();
         $in = $this->schema([
@@ -68,7 +68,7 @@ class ThemesApiController extends AbstractApiController {
 
         $theme = $this->themeService->getTheme($themeKey, $query);
         $this->handleAssetExpansions($theme, $params['expand']);
-        return $theme->jsonSerialize();
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**

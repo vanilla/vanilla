@@ -502,39 +502,6 @@ class ThemeService {
     }
 
     /**
-     * Basic input string validation function for html and json assets
-     *
-     * @param array $data
-     * @param ValidationField $field
-     * @return bool
-     */
-    public static function validator(array $data, ValidationField $field) {
-        $asset = ThemeAssetFactory::DEFAULT_ASSETS[$field->getName()];
-        $data = $data['data'];
-        switch ($asset['type']) {
-            case 'json':
-                $valid = true;
-                if ($asset['default'] === '[]') {
-                    $valid = substr($data, 0, 1) === '[';
-                    $valid = $valid && substr($data, -1) === ']';
-                } elseif ($asset['default'] === '{}') {
-                    $valid = substr($data, 0, 1) === '{';
-                    $valid = $valid && substr($data, -1) === '}';
-                }
-                $json = json_decode($data, true);
-                $valid = $valid && $json !== null;
-                break;
-            case 'html':
-            case 'css':
-            case 'js':
-            default:
-                $valid = true;
-                break;
-        }
-        return $valid;
-    }
-
-    /**
      * Normalize theme data.
      *
      * @param Theme $theme The theme data.

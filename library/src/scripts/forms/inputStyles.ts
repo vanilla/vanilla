@@ -20,7 +20,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
@@ -95,7 +95,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             },
             "& .SelectOne__input input": {
                 display: "inline-block",
-                maxWidth: percent(100),
+                width: important(`100%`),
                 overflow: "hidden",
                 lineHeight: undefined,
             },

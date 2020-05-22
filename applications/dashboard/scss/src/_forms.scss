@@ -119,6 +119,7 @@ form {
     > .input-wrap {
         @extend .col-sm-14;
         @extend .col-xs-24;
+        max-width: (7 / 12 * 100%);
 
         &.no-label {
             @extend .col-sm-offset-10;
@@ -146,6 +147,7 @@ form {
         flex-wrap: wrap;
         .input-wrap {
             margin-top: $spacer / 4;
+            max-width: 100%;
         }
     }
 }

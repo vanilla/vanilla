@@ -6671,6 +6671,9 @@ form ol li {
   padding-left: 18px;
   padding-right: 18px;
 }
+.form-group > .input-wrap, .form-group > .color-picker {
+  max-width: 58.3333333333%;
+}
 .form-group > .label-wrap-wide {
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
@@ -6688,6 +6691,7 @@ form ol li {
   }
   .form-group .input-wrap, .form-group .color-picker {
     margin-top: 4.5px;
+    max-width: 100%;
   }
 }
 

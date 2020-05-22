@@ -27,7 +27,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Activity data management.
  */
-class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class ActivityModel extends Gdn_Model implements FormatFieldInterface {
 
     use \Vanilla\FloodControlTrait;
 
@@ -1733,12 +1733,20 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFrom
                 $activity['ActivityID'] = $activityID;
 
                 if ($activity["Notified"] === self::SENT_PENDING || $activity['Emailed'] == self::SENT_PENDING) {
-                    $event = $this->eventFromRow(
-                        $activity,
-                        NotificationEvent::ACTION_INSERT,
-                        $this->userModel->currentFragment()
+                    $eventActivity = $this->getWhere(
+                        ["ActivityID" => $activityID],
+                        "",
+                        "",
+                        1
+                    )->firstRow() ?? [];
+                    $event = $this->notificationEventFromRow(
+                        $eventActivity,
+                        NotificationEvent::ACTION_INSERT
                     );
-                    $this->eventDispatcher->dispatch($event);
+
+                    if ($event instanceof ResourceEvent) {
+                        $this->eventDispatcher->dispatch($event);
+                    }
                 }
 
                 if ($activity['Emailed'] == self::SENT_PENDING) {
@@ -1942,6 +1950,27 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFrom
             "DisableFloodControl" => true,
             "QueueEmail" => $batchEmails,
         ];
+
+        if (Gdn_Cache::activeEnabled()) {
+            // Prefetch users, so they're cached when retrieved in later operations.
+            $prefetchUserIDs = [];
+            foreach (self::$Queue as $activities) {
+                foreach ($activities as $row) {
+                    $activity = $row[0] ?? [];
+                    $notifyUserID = $activity["NotifyUserID"] ?? null;
+                    if ($notifyUserID > 0) {
+                        $prefetchUserIDs[$notifyUserID] = true;
+                    }
+                }
+            }
+            if (!empty($prefetchUserIDs)) {
+                // We don't care about the return values. We just want the records cached.
+                $prefetchUserIDs = array_keys($prefetchUserIDs);
+                $this->userModel->getDefaultSSOIDs($prefetchUserIDs);
+                $this->userModel->getIDs($prefetchUserIDs);
+            }
+        }
+
         foreach (self::$Queue as $activities) {
             foreach ($activities as $row) {
                 $result[] = $this->save($row[0], false, $options + $row[1]);
@@ -2210,19 +2239,59 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFrom
      *
      * @param array $row
      * @param string $action
-     * @param array|null $sender
-     * @return NotificationEvent
+     * @return NotificationEvent|null
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
-        /** @var UserModel */
-        $this->userModel->expandUsers($row, ["ActivityUserID", "NotifyUserID", "RegardingUserID"]);
-        $notification = $this->normalizeRow($row);
-        $notification = $this->schema()->validate($notification);
+    private function notificationEventFromRow(array $row, string $action): ?NotificationEvent {
+        $notifyUserID = $row["NotifyUserID"] ?? 0;
+        if ($notifyUserID && $notifyUserID < 1) {
+            return null;
+        }
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        if (empty($notifyUserID)) {
+            return null;
+        }
+
+        $this->calculateRow($row);
+        $notification = $this->normalizeNotificationRow($row);
+
+        $notifyUser = $this->userModel->normalizeRow($notifyUser);
+        $notification["notifyUsers"] = [$notifyUser];
+        $notification = $this->notificationSchema()->validate($notification);
+
+        foreach ($notification["notifyUsers"] as &$currentUser) {
+            $currentUser = $this->addUserFragmentFields($currentUser);
+        }
+
         $result = new NotificationEvent(
-            NotificationEvent::ACTION_INSERT,
+            $action,
             ["notification" => $notification]
         );
+
         return $result;
+    }
+
+    /**
+     * Given a user fragment, augment it with helpful fields related to user notifications (e.g. email, SSO IDs).
+     *
+     * @param array $userFragment
+     * @return array
+     */
+    private function addUserFragmentFields(array $userFragment): array {
+        $userID = $userFragment["userID"] ?? null;
+
+        if ($userID > 0) {
+            $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+            $ssoID = $this->userModel->getDefaultSSOIDs([$userID]);
+
+            $userFragment["email"] = $user["Email"] ?? null;
+            $userFragment["ssoID"] = $ssoID[$userID] ?? null;
+        } else {
+            $userFragment["email"] = null;
+            $userFragment["ssoID"] = null;
+        }
+
+        return $userFragment;
     }
 
     /**
@@ -2231,17 +2300,14 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFrom
      * @param array $row
      * @return array
      */
-    public function normalizeRow(array $row): array {
-        $row["Url"] = !empty($row["Route"]) ? url($row["Route"], true) : null;
+    public function normalizeNotificationRow(array $row): array {
+        $row["notificationID"] = $row["ActivityID"];
+        $row["photoUrl"] = $row["Photo"];
+        $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
 
-        $notifyUser = $this->userModel->getID($row["NotifyUserID"], DATASET_TYPE_ARRAY);
-        $row["headline"] = $this->getActivityHeadline($row, $notifyUser);
-
-        $story = $row["Story"] ?? null;
-        $format = $row["Format"] ?? null;
-        if ($story && $format) {
-            $this->formatField($row, "Story", $format);
-        }
+        $body = formatString($row["Headline"], $row);
+        // Replace anchors with bold text until notifications can be spun off from activities.
+        $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
@@ -2253,23 +2319,24 @@ class ActivityModel extends Gdn_Model implements FormatFieldInterface, EventFrom
      *
      * @return Schema
      */
-    public function schema(): Schema {
+    public function notificationSchema(): Schema {
         $result = Schema::parse([
-            "activityID:i",
-            "story:s",
-            "dateInserted:dt",
-            "insertUserID:i",
-            "insertUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            "activityUserID:i",
-            "activityUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            "regardingUserID:i",
-            "regardingUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            "headline:s?",
-            "story:s",
-            "url:s?",
-            "recordType:s?",
-            "recordID:i?",
+            "notificationID" => ["type" => "integer"],
+            "notifyUsers?" => [
+                "items" => new UserFragmentSchema(),
+                "type" => "array",
+            ],
+            "body" => ["type" => "string"],
+            "photoUrl" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
+            "url" => ["type" => "string"],
+            "dateInserted" => ["type" => "datetime"],
+            "dateUpdated" => ["type" => "datetime"],
+            "read" => ["type" => "boolean"],
         ]);
+
         return $result;
     }
 }

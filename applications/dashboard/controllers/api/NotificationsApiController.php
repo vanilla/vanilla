@@ -134,15 +134,7 @@ class NotificationsApiController extends AbstractApiController {
      * @return array
      */
     private function normalizeOutput(array $row): array {
-        $row["notificationID"] = $row["ActivityID"];
-        $row["photoUrl"] = $row["Photo"];
-        $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
-
-        $body = formatString($row["Headline"], $row);
-        // Replace anchors with bold text until notifications can be spun off from activities.
-        $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
-
-        $row = ApiUtils::convertOutputKeys($row);
+        $row = $this->activityModel->normalizeNotificationRow($row);
         return $row;
     }
 
@@ -185,38 +177,7 @@ class NotificationsApiController extends AbstractApiController {
         static $schema;
 
         if ($schema === null) {
-            $schema = $this->schema([
-                "notificationID" => [
-                    "description" => "A unique ID to identify the notification.",
-                    "type" => "integer",
-                ],
-                "body" => [
-                    "description" => "The notification text. This contains some HTML, but only <b> tags.",
-                    "type" => "string",
-                ],
-                "photoUrl" => [
-                    "allowNull" => true,
-                    "description" => "An avatar or thumbnail associated with the notification.",
-                    "type" => "string",
-                ],
-                "url" => [
-                    "description" => "The target of the notification.",
-                    "type" => "string",
-                ],
-                "dateInserted" => [
-                    "description" => "When the notification was first made.",
-                    "type" => "datetime",
-                ],
-                "dateUpdated" => [
-                    // phpcs:ignore
-                    "description" => "When the notification was last updated.\n\nNotifications on the same record will group together into a single notification, updating just the dateUpdated property.",
-                    "type" => "datetime",
-                ],
-                "read" => [
-                    "description" => "Whether or not the notification has been seen.",
-                    "type" => "boolean",
-                ],
-            ], "NotificationSchema");
+            $schema = $this->schema($this->activityModel->notificationSchema(), "NotificationSchema");
         }
 
         return $schema;

@@ -13,9 +13,9 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Garden\Container\Reference;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**

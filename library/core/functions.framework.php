@@ -6,7 +6,7 @@
  * @since 4.0
  */
 
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\CacheControlMiddleware;
 
@@ -1550,9 +1550,9 @@ if (!function_exists('theme')) {
      * @return string Returns the name of the current theme.
      */
     function theme() {
-        /** @var ThemeModel $themeModel */
-        $themeModel = Gdn::getContainer()->get(ThemeModel::class);
-        return $themeModel->getCurrentThemeAddon()->getKey();
+        /** @var ThemeService $themeService */
+        $themeService = Gdn::getContainer()->get(ThemeService::class);
+        return $themeService->getCurrentThemeAddon()->getKey();
     }
 }
 

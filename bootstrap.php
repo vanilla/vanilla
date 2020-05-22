@@ -5,7 +5,6 @@ use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
-use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
@@ -129,9 +128,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('ThemeManager')
 
     // File base theme api provider
-    ->rule(\Vanilla\Models\ThemeModel::class)
+    ->rule(\Vanilla\Theme\ThemeService::class)
         ->setShared(true)
-        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Theme\FsThemeProvider::class)])
 
     ->rule(\Vanilla\Models\ThemeSectionModel::class)
     ->setShared(true)

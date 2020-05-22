@@ -13,6 +13,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
@@ -51,8 +52,8 @@ class SiteMeta implements \JsonSerializable {
     private $localeKey;
 
 
-    /** @var ThemeModel */
-    private $themeModel;
+    /** @var ThemeService */
+    private $themeService;
 
     /** @var string */
     private $activeThemeKey;
@@ -119,7 +120,7 @@ class SiteMeta implements \JsonSerializable {
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param ThemeFeatures $themeFeatures
-     * @param ThemeModel $themeModel
+     * @param ThemeService $themeService
      * @param Gdn_Session $session
      */
     public function __construct(
@@ -128,7 +129,7 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ThemeModel $themeModel,
+        ThemeService $themeService,
         Gdn_Session $session
     ) {
         $this->host = $request->getHost();
@@ -170,15 +171,15 @@ class SiteMeta implements \JsonSerializable {
         $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
 
         // Theming
-        $currentTheme = $themeModel->getCurrentTheme();
-        $currentThemeAddon = $themeModel->getCurrentThemeAddon();
+        $currentTheme = $themeService->getCurrentTheme();
+        $currentThemeAddon = $themeService->getCurrentThemeAddon();
 
-        $this->activeThemeKey = $currentTheme['themeID'];
-        $this->activeThemeRevisionID = $currentTheme['revisionID'] ?? null;
+        $this->activeThemeKey = $currentTheme->getThemeID();
+        $this->activeThemeRevisionID = $currentTheme->getRevisionID() ?? null;
         $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
-        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeModel::FALLBACK_THEME_KEY);
-        $this->themePreview =  $themeModel->getPreviewTheme();
+        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeService::FALLBACK_THEME_KEY);
+        $this->themePreview =  $themeService->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);

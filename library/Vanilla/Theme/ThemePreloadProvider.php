@@ -5,14 +5,14 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Models;
+namespace Vanilla\Theme;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
-use Vanilla\Theme\Asset;
-use Vanilla\Theme\HtmlAsset;
-use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\TwigAsset;
+use Vanilla\Models\SiteMeta;
+use Vanilla\Theme\Asset\HtmlThemeAsset;
+use Vanilla\Theme\Asset\ThemeAsset;
+use Vanilla\Theme\Asset\TwigThemeAsset;
 use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
@@ -80,7 +80,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @param int|string $forcedThemeKey
      */
-    public function setForcedThemeKey($forcedThemeKey, $revisionID = null): void {
+    public function setForcedThemeKey($forcedThemeKey): void {
         $this->forcedThemeKey = $forcedThemeKey;
     }
 
@@ -235,7 +235,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             return '';
         }
         $jsonAsset = $this->themeData['assets']['variables'];
-        if ($jsonAsset instanceof JsonAsset) {
+        if ($jsonAsset instanceof JsonThemeAsset) {
             $bgImage = $jsonAsset->getDataArray()['titleBar']['colors']['bgImage'] ?? null;
             if ($bgImage !== null) {
                 $asset = new ExternalAsset($bgImage);
@@ -251,15 +251,15 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * Render a theme asset for the header or footer.
      *
-     * @param Asset|null $themeAsset
+     * @param ThemeAsset|null $themeAsset
      *
      * @return string
      */
-    private function renderAsset(?Asset $themeAsset): string {
+    private function renderAsset(?ThemeAsset $themeAsset): string {
         $styles = $this->getThemeInlineCss();
-        if ($themeAsset instanceof HtmlAsset) {
+        if ($themeAsset instanceof HtmlThemeAsset) {
             return $styles . $themeAsset->getData();
-        } elseif ($themeAsset instanceof TwigAsset) {
+        } elseif ($themeAsset instanceof TwigThemeAsset) {
             return $styles . $themeAsset->renderHtml([]);
         } else {
             return '';

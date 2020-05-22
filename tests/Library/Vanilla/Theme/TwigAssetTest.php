@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Library\Theme;
 
-use Vanilla\Theme\TwigAsset;
+use Vanilla\Theme\TwigThemeAsset;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -26,7 +26,7 @@ class TwigAssetTest extends MinimalContainerTestCase {
 <div>Hello world. The date is {{ currentTime|date("m/d/Y")}}</div>
 HTML;
 
-        $asset = new TwigAsset($template);
+        $asset = new TwigThemeAsset($template);
         $this->assertEquals(
             "<div>Hello world. The date is 07/27/2015</div>",
             $asset->renderHtml(['currentTime' => self::NOW])
@@ -38,7 +38,7 @@ HTML;
      */
     public function testData() {
         $template = '<div>Hello world</div>';
-        $asset = new TwigAsset($template);
+        $asset = new TwigThemeAsset($template);
         $encoded = json_decode(json_encode($asset), true);
         $this->assertEquals(['type' => 'twig', 'template' => $template, 'data' => $template], $encoded);
     }

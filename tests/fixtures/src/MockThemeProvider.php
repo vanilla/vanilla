@@ -8,8 +8,8 @@
 namespace VanillaTests\Fixtures;
 
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Models\ThemeModel;
-use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\JsonThemeAsset;
 use Vanilla\Theme\ThemeProviderInterface;
 
 /**
@@ -20,11 +20,21 @@ class MockThemeProvider implements ThemeProviderInterface {
     /** @var array */
     private $themesByID = [];
 
+    /** @var int */
+    private $themeKeyType = ThemeProviderInterface::TYPE_FS;
+
+    /**
+     * @param int $themeKeyType
+     */
+    public function setThemeKeyType(int $themeKeyType): void {
+        $this->themeKeyType = $themeKeyType;
+    }
+
     /**
      * @inheritdoc
      */
     public function themeKeyType(): int {
-        return ThemeProviderInterface::TYPE_FS;
+        return $this->themeKeyType;
     }
 
     /**
@@ -50,7 +60,7 @@ class MockThemeProvider implements ThemeProviderInterface {
      */
     public function getAssetData($themeKey, string $assetKey, int $revisionID = null): string {
         $theme = $this->getThemeWithAssets($themeKey);
-        return $theme['assets'][$assetKey]->asArray()['data'] ?? ThemeModel::ASSET_LIST[$assetKey]['default'];
+        return $theme['assets'][$assetKey]->asArray()['data'] ?? ThemeService::ASSET_LIST[$assetKey]['default'];
     }
 
     /**
@@ -67,14 +77,17 @@ class MockThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function postTheme(array $body): array {
+        $themeID = $body['themeID'] ?? count($this->themesByID);
         $theme = array_merge_recursive([
+            'themeID' => $themeID,
+            'type' => 'mock',
             'assets' => [
-                'variables' => new JsonAsset('{}'),
+                'variables' => new JsonThemeAsset('{}'),
             ],
         ], $body);
 
-        $this->themesByID[$body['themeID']] = $theme;
-        return $body;
+        $this->themesByID[$themeID] = $theme;
+        return $theme;
     }
 
     /**

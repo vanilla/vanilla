@@ -8,9 +8,9 @@
 namespace VanillaTests\Models;
 
 use Vanilla\AddonManager;
-use Vanilla\Models\ThemeModel;
-use Vanilla\Models\ThemeModelHelper;
-use Vanilla\Theme\StyleAsset;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\Theme\CssThemeAsset;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
@@ -27,7 +27,6 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
     const ADDON_THEME = 'addon-theme';
 
     const MOBILE_ADDON_THEME = 'mobile-addon-theme';
-
 
     /** @var MockThemeProvider */
     private $mockThemeProvider;
@@ -47,7 +46,7 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
         self::configureContainer();
 
         self::container()
-            ->rule(ThemeModel::class)
+            ->rule(ThemeService::class)
             ->addCall('addThemeProvider', [$this->mockThemeProvider])
             ->setInstance(AddonManager::class, $this->addonManager);
     }
@@ -61,10 +60,10 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
     }
 
     /**
-     * @return ThemeModel
+     * @return ThemeService
      */
-    private function themeModel(): ThemeModel {
-        return self::container()->get(ThemeModel::class);
+    private function themeModel(): ThemeService {
+        return self::container()->get(ThemeService::class);
     }
 
     /**
@@ -81,14 +80,14 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
         $addonTheme = $this->mockThemeProvider->postTheme([
             'themeID' => self::ADDON_THEME,
             'assets' => [
-                'styles' => new StyleAsset(self::ADDON_THEME),
+                'styles' => new CssThemeAsset(self::ADDON_THEME),
             ]
         ]);
 
         $mobileTheme = $this->mockThemeProvider->postTheme([
             'themeID' => self::MOBILE_ADDON_THEME,
             'assets' => [
-                'styles' => new StyleAsset(self::MOBILE_ADDON_THEME),
+                'styles' => new CssThemeAsset(self::MOBILE_ADDON_THEME),
             ]
         ]);
 
@@ -96,14 +95,14 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
             'themeID' => self::ASSET_THEME,
             'parentTheme' => self::ADDON_THEME,
             'assets' => [
-                'styles' => new StyleAsset(self::ASSET_THEME),
+                'styles' => new CssThemeAsset(self::ASSET_THEME),
             ]
         ]);
 
         $this->setConfigs([
-            ThemeModelHelper::CONFIG_DESKTOP_THEME => self::ADDON_THEME,
-            ThemeModelHelper::CONFIG_MOBILE_THEME => self::MOBILE_ADDON_THEME,
-            ThemeModelHelper::CONFIG_CURRENT_THEME => self::ASSET_THEME,
+            ThemeServiceHelper::CONFIG_DESKTOP_THEME => self::ADDON_THEME,
+            ThemeServiceHelper::CONFIG_MOBILE_THEME => self::MOBILE_ADDON_THEME,
+            ThemeServiceHelper::CONFIG_CURRENT_THEME => self::ASSET_THEME,
         ]);
 
         $model = $this->themeModel();

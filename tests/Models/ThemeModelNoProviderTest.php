@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Models;
 
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use VanillaTests\SharedBootstrapTestCase;
 
 /**
@@ -16,10 +16,10 @@ use VanillaTests\SharedBootstrapTestCase;
 class ThemeModelNoProviderTest extends SharedBootstrapTestCase {
 
     /**
-     * @return ThemeModel
+     * @return ThemeService
      */
-    private function getThemeModel(): ThemeModel {
-        return self::container()->get(ThemeModel::class);
+    private function getThemeModel(): ThemeService {
+        return self::container()->get(ThemeService::class);
     }
 
     /**
@@ -29,7 +29,7 @@ class ThemeModelNoProviderTest extends SharedBootstrapTestCase {
         // No provider should be registered.
         $this->expectWarning();
         $theme = $this->getThemeModel()->getThemeWithAssets(1);
-        $this->assertSame(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
+        $this->assertSame(ThemeService::FALLBACK_THEME_KEY, $theme['themeID']);
     }
 
     /**
@@ -38,6 +38,6 @@ class ThemeModelNoProviderTest extends SharedBootstrapTestCase {
     public function testNoProviderRegisteredReturn() {
         // No provider should be registered.
         $theme = @$this->getThemeModel()->getThemeWithAssets(1);
-        $this->assertSame(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
+        $this->assertSame(ThemeService::FALLBACK_THEME_KEY, $theme['themeID']);
     }
 }

@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Theme\ThemeServiceHelper;
 
 if (!defined('APPLICATION')) {
     exit();
@@ -1048,7 +1048,7 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
 // Save current theme value into the visible themes. This way existing sites will continue to see them even if they get hidden.
 
 /**
- * @var ThemeModelHelper $themeHelper
+ * @var ThemeServiceHelper $themeHelper
  */
-$themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+$themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
 $themeHelper->saveCurrentThemeToVisible();

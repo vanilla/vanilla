@@ -343,6 +343,13 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Get the raw body of the post.
+     */
+    public function getRawBody(): string {
+        return file_get_contents("php://input") ?: '';
+    }
+
+    /**
      * Get the file extension of the request.
      *
      * @return string

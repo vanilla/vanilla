@@ -13,7 +13,7 @@ use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\AddonManager;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 
 /**
  * Utility functions for container configuration.
@@ -53,9 +53,9 @@ class ContainerUtils {
      */
     public static function currentTheme(): ReferenceInterface {
         return new Callback(function (ContainerInterface $dic) {
-            /** @type ThemeModel $themeModel */
-            $themeModel = $dic->get(ThemeModel::class);
-            return $themeModel->getCurrentThemeAddon();
+            /** @type ThemeService $themeService */
+            $themeService = $dic->get(ThemeService::class);
+            return $themeService->getCurrentThemeAddon();
         });
     }
 

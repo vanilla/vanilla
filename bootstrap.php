@@ -250,6 +250,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\VanillaWhitelistContentSecurityPolicyProvider::class)])
     ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)

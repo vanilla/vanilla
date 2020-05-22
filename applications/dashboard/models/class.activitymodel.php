@@ -8,30 +8,24 @@
  * @since 2.0
  */
 
-use Garden\Events\EventFromRowInterface;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
-use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Dashboard\Events\NotificationEvent;
 use Vanilla\Models\UserFragmentSchema;
-use Vanilla\SchemaFactory;
 use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Activity data management.
  */
-class ActivityModel extends Gdn_Model implements FormatFieldInterface {
+class ActivityModel extends Gdn_Model {
 
     use \Vanilla\FloodControlTrait;
-
-    use FormatFieldTrait;
 
     /** Maximum length of activity story excerpts. */
     private const DEFAULT_EXCERPT_LENGTH = 160;

@@ -46,7 +46,7 @@ class LoggerUtils {
             "resourceType" => $event->getType(),
         ];
         if (isset($payload[$event->getType()])) {
-            $result[$event->getType()] = $payload[$event>getType()];
+            $result[$event->getType()] = $payload[$event->getType()];
         }
 
         if ($event->getSender() !== null) {

@@ -24,10 +24,12 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface {
      */
     public function getLogEntry(): LogEntry {
         $context = LoggerUtils::resourceEventLogContext($this);
+        $context[Logger::FIELD_TARGET_USERID] = $context['user']['userID'];
+        $context[Logger::FIELD_TARGET_USERNAME] = $context['user']['name'];
 
         $log = new LogEntry(
             LogLevel::INFO,
-            $this->makeLogMessage($this->getAction(), $context['targetName'] ?? null, $context['username'] ?? null),
+            $this->makeLogMessage($this->getAction(), $context[Logger::FIELD_TARGET_USERNAME] ?? null, $context[Logger::FIELD_USERNAME] ?? null),
             $context
         );
         return $log;

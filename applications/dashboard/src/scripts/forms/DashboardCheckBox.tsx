@@ -19,10 +19,12 @@ interface IProps {
 
 export function DashboardCheckBox(props: IProps) {
     const { isInline } = useDashboardRadioGroup();
+    const { excludeFromICheck = true } = props;
 
     return (
         <CheckBox
             {...props}
+            excludeFromICheck={excludeFromICheck}
             onChange={e => props.onChange && props.onChange(!!e.target.checked)}
             isHorizontal={isInline}
         />

@@ -74,14 +74,14 @@ echo $Form->errors();
             ]
         );
 
-
-
+        $categoryID = $Form->getValue("Category") ?? "";
         echo $Form->react(
             "Category", "pocket-category-input",
             [
                 "tag" => "li",
-                "value" => $Form->getValue("Category") ?? "",
-                "inherit" => $Form->getValue("InheritCategory") ?? "",
+                "value" => $categoryID,
+                "name" => !empty($categoryID) ? CategoryModel::categories($categoryID)["Name"] : "",
+                "inheritCategory" => $Form->getValue("InheritCategory") ?? false,
             ]
         );
     }

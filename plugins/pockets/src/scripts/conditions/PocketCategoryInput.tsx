@@ -11,18 +11,22 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 import { inputClasses, inputMixin } from "@library/forms/inputStyles";
 import classNames from "classnames";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
+import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 
 export function PocketCategoryInput(props) {
     const [category, setCategory] = useState(
-        props.category
+        props.name && props.value
             ? {
-                  value: props.category,
-                  label: props.category,
+                  label: props.name,
+                  value: props.value,
               }
             : undefined,
     );
-    const [inheritCategory, setInheritCategory] = useState(!!props.inherit);
+
+    console.log("props: ", props);
+
+    const [inheritCategory, setInheritCategory] = useState(props.inheritCategory === 1);
 
     const classes = selectOneClasses();
     inputClasses().applyInputCSSRules();
@@ -36,7 +40,7 @@ export function PocketCategoryInput(props) {
                         onChange={(option: IComboBoxOption) => {
                             setCategory(option);
                         }}
-                        value={category ?? undefined}
+                        value={category}
                     />
                 </div>
                 <input
@@ -45,18 +49,17 @@ export function PocketCategoryInput(props) {
                     value={category && category.value ? category.value : undefined}
                 />
                 <div className={classNames("checkbox", classes.checkBoxAfterInput)}>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name={"InheritCategory"}
+                    <DashboardRadioGroup>
+                        <DashboardCheckBox
+                            checked={inheritCategory}
                             onChange={() => {
                                 setInheritCategory(!inheritCategory);
                             }}
-                            checked={inheritCategory}
+                            label={t("Apply to subcategories")}
                         />
-                        {t("Apply to subcategories")}
-                    </label>
+                    </DashboardRadioGroup>
                 </div>
+                <input name={"InheritCategory"} type={"hidden"} value={`${inheritCategory ? 1 : 0}`} />
             </div>
         </DashboardFormGroup>
     );

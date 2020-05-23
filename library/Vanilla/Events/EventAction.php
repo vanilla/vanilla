@@ -13,7 +13,7 @@ namespace Vanilla\Events;
  * All resource events should use actions from this list. If you think you need an action that isn't in this list, you
  * can make a pull request against this class. Please try and use existing actions as much as possible.
  */
-final class Action {
+final class EventAction {
     public const ADD = 'add';
     public const DELETE = 'delete';
     public const UPDATE = 'update';

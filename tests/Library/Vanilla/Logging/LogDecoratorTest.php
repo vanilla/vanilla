@@ -11,12 +11,13 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Logging\LogDecorator;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\Library\Vanilla\TestLogger;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `LogDecorator` class.
  */
 class LogDecoratorTest extends TestCase {
-    use BootstrapTrait;
+    use SiteTestTrait;
 
     /**
      * @var LogDecorator

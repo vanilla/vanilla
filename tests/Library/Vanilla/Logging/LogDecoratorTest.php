@@ -53,8 +53,9 @@ class LogDecoratorTest extends TestCase {
      * Test the basic decoration workflow.
      */
     public function testBasicDecoration() {
+
         $this->log->info('foo');
-        $this->assertLastContext(['userid' => 0]);
+        $this->assertLastContext(['userid' => \Gdn::session()->UserID]);
 
         $context = $this->testLogger->getLastContext();
         $this->assertArrayHasKey('username', $context);

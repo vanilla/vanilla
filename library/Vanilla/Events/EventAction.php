@@ -33,4 +33,15 @@ final class Action {
 
     public const SUCCESS = 'success';
     public const FAILURE = 'failure';
+
+    /**
+     * Generate an event name from a resource and an action.
+     *
+     * @param string $resource The name of the resource.
+     * @param string $action The action that is being taken on the resource. Usually one of the constants from this class.
+     * @return string Returns a full event name.
+     */
+    public static function eventName(string $resource, string $action): string {
+        return $resource.'_'.$action;
+    }
 }

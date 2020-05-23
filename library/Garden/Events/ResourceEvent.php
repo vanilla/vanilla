@@ -6,7 +6,7 @@
 
 namespace Garden\Events;
 
-use Vanilla\Events\Action;
+use Vanilla\Events\EventAction;
 
 /**
  * An event affecting a specific resource.
@@ -14,13 +14,13 @@ use Vanilla\Events\Action;
 abstract class ResourceEvent {
 
     /** A resource has been removed. */
-    public const ACTION_DELETE = Action::DELETE;
+    public const ACTION_DELETE = EventAction::DELETE;
 
     /** A resource has been created. */
-    public const ACTION_INSERT = Action::ADD;
+    public const ACTION_INSERT = EventAction::ADD;
 
     /** An existing resource has been updated. */
-    public const ACTION_UPDATE = Action::UPDATE;
+    public const ACTION_UPDATE = EventAction::UPDATE;
 
     /** @var string */
     protected $action;

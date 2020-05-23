@@ -22,6 +22,8 @@ class Logger {
     public const FIELD_CHANNEL = \Vanilla\Logger::FIELD_CHANNEL;
     public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
     public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
+    public const FIELD_USERID = \Vanilla\Logger::FIELD_USERID;
+    public const FIELD_USERNAME = \Vanilla\Logger::FIELD_USERNAME;
 
     public const CHANNEL_ADMIN = \Vanilla\Logger::CHANNEL_ADMIN;
     public const CHANNEL_APPLICATION = \Vanilla\Logger::CHANNEL_APPLICATION;

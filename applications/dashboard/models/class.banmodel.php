@@ -263,6 +263,15 @@ class BanModel extends Gdn_Model {
 
         $result = parent::delete($where, $options);
 
+        Logger::event(
+            \Vanilla\Events\EventAction::eventName(lcfirst($this->Name), \Vanilla\Events\EventAction::DELETE),
+            \Psr\Log\LogLevel::INFO,
+            "{username} deleted a ban rule.",
+            [
+                ''
+            ]
+        );
+
         if (isset($oldBan)) {
             $this->applyBan(null, $oldBan);
         }
@@ -389,6 +398,36 @@ class BanModel extends Gdn_Model {
             $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->getSystemUserID());
         }
 
+        // Log the ban.
+        $bannedString = $bannedValue ? 'banned' : 'unbanned';
+        if (is_array($ban)) {
+            Logger::event(
+                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Psr\Log\LogLevel::INFO,
+                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString by {banType}.",
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
+                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_USERID => $banningUserID,
+                    'banned' => $bannedValue,
+                    'banType' => strtolower($ban['BanType']),
+                    'banValue' => $ban['BanValue'],
+                ]
+            );
+        } else {
+            Logger::event(
+                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Psr\Log\LogLevel::INFO,
+                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString.",
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
+                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_USERID => $banningUserID,
+                    'banned' => $bannedValue,
+                ]
+            );
+        }
+
         // Add the activity.
         $activityModel = new ActivityModel();
         $activity = [
@@ -397,8 +436,6 @@ class BanModel extends Gdn_Model {
             'RegardingUserID' => $banningUserID,
             'NotifyUserID' => ActivityModel::NOTIFY_MODS
         ];
-
-        $bannedString = $bannedValue ? 'banned' : 'unbanned';
         if ($ban) {
             $activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$bannedString.' (based on {Data.BanType}: {Data.BanValue}).';
             $activity['Data'] = arrayTranslate($ban, ['BanType', 'BanValue']);

@@ -24,6 +24,8 @@ class Logger implements LoggerInterface {
     public const FIELD_CHANNEL = 'channel';
     public const FIELD_TARGET_USERID = 'targetUserID';
     public const FIELD_TARGET_USERNAME = 'targetName';
+    public const FIELD_USERID = 'userid';
+    public const FIELD_USERNAME = 'username';
 
     public const CHANNEL_ADMIN = 'admin';
     public const CHANNEL_APPLICATION = 'application';

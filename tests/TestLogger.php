@@ -19,7 +19,7 @@ class TestLogger implements LoggerInterface {
     /**
      * @var array
      */
-    private $log;
+    private $log = [];
 
     /**
      * {@inheritdoc}

@@ -63,6 +63,7 @@ abstract class AbstractAPIv2Test extends TestCase {
         $this->logger = new TestLogger();
         \Logger::addLogger($this->logger);
         $this->setUpTestTraits();
+        $this->setupSiteTestTrait();
     }
 
     /**

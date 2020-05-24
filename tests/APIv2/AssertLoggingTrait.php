@@ -7,9 +7,11 @@
 
 namespace VanillaTests\APIv2;
 
-
 use Vanilla\Events\EventAction;
 
+/**
+ * Use this trait if your resource is supposed to log its events.
+ */
 trait AssertLoggingTrait {
     protected $resourceName = 'n/a';
 

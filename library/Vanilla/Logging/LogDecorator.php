@@ -125,7 +125,7 @@ class LogDecorator implements LoggerInterface {
      *
      * @return array
      */
-    public function getStaticContextDefaults(): array {
+    public function getContextOverrides(): array {
         return $this->staticContextDefaults;
     }
 
@@ -134,7 +134,7 @@ class LogDecorator implements LoggerInterface {
      *
      * @param array $staticContextDefaults
      */
-    public function setStaticContextDefaults(array $staticContextDefaults): void {
+    public function setContextOverrides(array $staticContextDefaults): void {
         $this->staticContextDefaults = $staticContextDefaults;
     }
 }

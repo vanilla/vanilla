@@ -57,4 +57,68 @@ class LoggerTest extends TestCase {
         $this->expectException(\InvalidArgumentException::class);
         \Logger::addLogger($logger);
     }
+
+    /**
+     * Test the basic logging methds.
+     *
+     * @param string $level
+     * @dataProvider provideLogLevels
+     */
+    public function testBasicLoggingMethods(string $level): void {
+        $method = [\Logger::class, $level];
+        call_user_func($method, $level);
+        $this->assertLog([
+            'level' => $level,
+            'message' => $level,
+        ]);
+    }
+
+    /**
+     * Test priority labels.
+     *
+     * @param string $level
+     * @param int $priority
+     * @dataProvider provideLogLevels
+     */
+    public function testPriorityLabels(string $level, int $priority): void {
+        $this->assertSame($level, \Logger::priorityLabel($priority));
+    }
+
+    /**
+     * Test priority levels.
+     *
+     * @param string $level
+     * @param int $priority
+     * @dataProvider provideLogLevels
+     */
+    public function testLevelPriority(string $level, int $priority): void {
+        $this->assertSame($priority, \Logger::levelPriority($level));
+    }
+
+    /**
+     * Test get levels.
+     */
+    public function testGetLevels(): void {
+        $test = $this->provideLogLevels();
+        $levels = \Logger::getLevels();
+        $this->assertSame(count($test), count($levels));
+    }
+
+    /**
+     * Provide all of the log levels for testing.
+     *
+     * @return array
+     */
+    public function provideLogLevels(): array {
+        return [
+            LogLevel::DEBUG => [LogLevel::DEBUG, LOG_DEBUG],
+            LogLevel::INFO => [LogLevel::INFO, LOG_INFO],
+            LogLevel::NOTICE => [LogLevel::NOTICE, LOG_NOTICE],
+            LogLevel::WARNING => [LogLevel::WARNING, LOG_WARNING],
+            LogLevel::ERROR => [LogLevel::ERROR, LOG_ERR],
+            LogLevel::CRITICAL => [LogLevel::CRITICAL, LOG_CRIT],
+            LogLevel::ALERT => [LogLevel::ALERT, LOG_ALERT],
+            LogLevel::EMERGENCY => [LogLevel::EMERGENCY, LOG_EMERG],
+        ];
+    }
 }

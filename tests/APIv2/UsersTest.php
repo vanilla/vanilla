@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
+use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
@@ -17,7 +18,7 @@ use VanillaTests\Fixtures\TestUploader;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait;
+    use TestPutFieldTrait, AssertLoggingTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
@@ -43,6 +44,7 @@ class UsersTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/users';
+        $this->resourceName = 'user';
         $this->record = [
             'name' => null,
             'email' => null
@@ -441,6 +443,7 @@ class UsersTest extends AbstractResourceTest {
         unset($newRow['photo']);
 
         $this->assertRowsEqual($newRow, $r->getBody());
+        $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
 
         return $r->getBody();
     }

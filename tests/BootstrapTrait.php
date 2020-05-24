@@ -29,8 +29,7 @@ trait BootstrapTrait {
      * @inheritDoc
      */
     public function setupBoostrapTrait() {
-        /** @var TestLogger $logger */
-        $logger = static::container()->get(TestLogger::class);
+        $logger = $this->getTestLogger();
         $logger->clear();
     }
 
@@ -89,8 +88,7 @@ trait BootstrapTrait {
      * @param array $filter The log filter.
      */
     public function assertLog($filter = []) {
-        /** @var TestLogger $logger */
-        $logger = static::container()->get(TestLogger::class);
+        $logger = $this->getTestLogger();
         $item = $logger->search($filter);
         $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
@@ -101,8 +99,7 @@ trait BootstrapTrait {
      * @param string $message
      */
     public function assertLogMessage(string $message) {
-        /** @var TestLogger $logger */
-        $logger = static::container()->get(TestLogger::class);
+        $logger = $this->getTestLogger();
         $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
     }
 
@@ -135,5 +132,14 @@ trait BootstrapTrait {
                 $c->set($key, $value, true, false);
             }
         }
+    }
+
+    /**
+     * @return TestLogger
+     */
+    protected static function getTestLogger(): TestLogger {
+        /** @var TestLogger $logger */
+        $logger = static::container()->get(TestLogger::class);
+        return $logger;
     }
 }

@@ -93,7 +93,10 @@ class Logger {
      * @param LoggerInterface $logger Specify a new value to set the logger to.
      */
     public static function setLogger($logger = null) {
-        if ($logger instanceof \Vanilla\Logger) {
+        if ($logger === null) {
+            self::$instance = null;
+            self::$realLogger = null;
+        } elseif ($logger instanceof \Vanilla\Logger) {
             self::$instance = $logger;
         } else {
             deprecated('Logger::setLogger()', 'Logger::addLogger');

@@ -34,11 +34,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     protected $formattedFields = ['body'];
 
     /**
-     * @var TestLogger
-     */
-    protected $logger;
-
-    /**
      * Whether to start a session on setUp() or not.
      *
      * @param bool $enabled
@@ -60,8 +55,6 @@ abstract class AbstractAPIv2Test extends TestCase {
             $this->api->setTransientKey(md5(now()));
         }
 
-        $this->logger = new TestLogger();
-        \Logger::addLogger($this->logger);
         $this->setUpTestTraits();
         $this->setupSiteTestTrait();
     }
@@ -89,8 +82,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
-        \Logger::removeLogger($this->logger);
-        $this->logger = null;
     }
 
     /**
@@ -167,16 +158,6 @@ abstract class AbstractAPIv2Test extends TestCase {
 
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
-    }
-
-    /**
-     * Assert that something was logged.
-     *
-     * @param array $filter The log filter.
-     */
-    public function assertLog($filter = []) {
-        $item = $this->logger->search($filter);
-        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
 
     /**

@@ -75,6 +75,7 @@ class Bootstrap {
             $this->initializeAddons($container);
         }
         $this->setGlobals($container);
+        \Logger::setLogger(null);
     }
 
     /**

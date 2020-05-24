@@ -607,7 +607,7 @@ class UsersTest extends AbstractResourceTest {
                 'Garden.Registration.NameUnique' => true,
                 'Garden.Registration.EmailUnique' => true,
             ], function () use ($user) {
-                $this->logger->clear();
+                $this->getTestLogger()->clear();
                 $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
             });
             $this->fail('You shouldn\'t be able to reset a password with a username.');
@@ -619,7 +619,7 @@ class UsersTest extends AbstractResourceTest {
             'Garden.Registration.NameUnique' => true,
             'Garden.Registration.EmailUnique' => false,
         ], function () use ($user) {
-            $this->logger->clear();
+            $this->getTestLogger()->clear();
             $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
             $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
         });

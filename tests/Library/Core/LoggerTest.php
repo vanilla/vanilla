@@ -85,6 +85,13 @@ class LoggerTest extends TestCase {
     }
 
     /**
+     * An unknown priority should get a standard label.
+     */
+    public function testUnknownPriorityLabel(): void {
+        $this->assertSame('unknown', \Logger::priorityLabel('foo'));
+    }
+
+    /**
      * Test priority levels.
      *
      * @param string $level
@@ -93,6 +100,21 @@ class LoggerTest extends TestCase {
      */
     public function testLevelPriority(string $level, int $priority): void {
         $this->assertSame($priority, \Logger::levelPriority($level));
+    }
+
+    /**
+     * An empty level should be interpreted as debug level.
+     */
+    public function testEmptyLevelPriority(): void {
+        $this->assertSame(LOG_DEBUG, \Logger::levelPriority(''));
+    }
+
+    /**
+     * An unknown log level should be a notice.
+     */
+    public function testUnknownLevelPriority(): void {
+        $this->expectNotice();
+        \Logger::levelPriority('foo');
     }
 
     /**

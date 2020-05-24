@@ -74,6 +74,13 @@ trait SiteTestTrait {
     }
 
     /**
+     * Setup before each test.
+     */
+    public function setupSiteTestTrait(): void {
+        $this->setupBoostrapTrait();
+    }
+
+    /**
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
     private static function setupBeforeClassSiteTestTrait(): void {

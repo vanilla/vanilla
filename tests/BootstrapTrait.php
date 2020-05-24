@@ -26,6 +26,15 @@ trait BootstrapTrait {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function setupBoostrapTrait() {
+        /** @var TestLogger $logger */
+        $logger = static::container()->get(TestLogger::class);
+        $logger->clear();
+    }
+
+    /**
      * Create the container for the site.
      *
      * @return Container Returns a container.
@@ -72,6 +81,29 @@ trait BootstrapTrait {
      */
     protected static function bootstrap() {
         return self::$bootstrap;
+    }
+
+    /**
+     * Assert that something was logged.
+     *
+     * @param array $filter The log filter.
+     */
+    public function assertLog($filter = []) {
+        /** @var TestLogger $logger */
+        $logger = static::container()->get(TestLogger::class);
+        $item = $logger->search($filter);
+        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
+    }
+
+    /**
+     * Assert that the log has a message.
+     *
+     * @param string $message
+     */
+    public function assertLogMessage(string $message) {
+        /** @var TestLogger $logger */
+        $logger = static::container()->get(TestLogger::class);
+        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
     }
 
     /**

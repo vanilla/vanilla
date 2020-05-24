@@ -188,6 +188,10 @@ class Bootstrap {
             ->rule(\Vanilla\Logger::class)
             ->setShared(true)
             ->addAlias(LoggerInterface::class)
+            ->addCall('addLogger', [new Reference(TestLogger::class)])
+
+            ->rule(TestLogger::class)
+            ->setShared(true)
 
             ->rule(LoggerAwareInterface::class)
             ->addCall('setLogger')

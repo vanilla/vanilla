@@ -48,4 +48,13 @@ class LoggerTest extends TestCase {
             'level' => LogLevel::INFO,
         ]));
     }
+
+    /**
+     * You shouldn't be able to add a vanilla logger to the logger.
+     */
+    public function testAddInvalidLogger(): void {
+        $logger = new \Vanilla\Logger();
+        $this->expectException(\InvalidArgumentException::class);
+        \Logger::addLogger($logger);
+    }
 }

@@ -44,4 +44,22 @@ class ResourceEventTest extends TestCase {
         $resourceEvent = new TestResourceEvent(__FUNCTION__, []);
         $this->assertEquals("testResource", $resourceEvent->getType());
     }
+
+    /**
+     * Events should have their type and action in their full event name.
+     */
+    public function testFullEventName(): void {
+        $resourceEvent = new TestResourceEvent(__FUNCTION__, []);
+        $this->assertStringContainsString(__FUNCTION__, $resourceEvent->getFullEventName());
+        $this->assertStringContainsString($resourceEvent->getType(), $resourceEvent->getFullEventName());
+    }
+
+    /**
+     * The sender should be set unchanged.
+     */
+    public function testGetSender(): void {
+        $expected = ['foo' => 'bar'];
+        $resourceEvent = new TestResourceEvent(__FUNCTION__, [], $expected);
+        $this->assertSame($expected, $resourceEvent->getSender());
+    }
 }

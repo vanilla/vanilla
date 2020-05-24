@@ -99,11 +99,9 @@ abstract class ResourceEvent {
      * @return string
      */
     private function typeFromClass(): string {
-        $class = get_called_class();
-        if (($namespaceEnd = strrpos($class, '\\')) !== false) {
-            $baseName = substr($class, $namespaceEnd + 1);
-        } else {
-            $baseName = $class;
+        $baseName = get_called_class();
+        if (($namespaceEnd = strrpos($baseName, '\\')) !== false) {
+            $baseName = substr($baseName, $namespaceEnd + 1);
         }
         $type = lcfirst(preg_replace('/Event$/', '', $baseName));
         return $type;

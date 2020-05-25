@@ -17,7 +17,7 @@ const sanitizeValue = (value: any) => {
 };
 
 export function PocketMultiRoleInput(props) {
-    const [roles, setRoles] = useState(sanitizeValue(props.value));
+    const [roles, setRoles] = useState(sanitizeValue(props.defaultValue));
 
     console.log("props: ", props);
 

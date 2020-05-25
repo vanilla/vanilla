@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Addons\Pockets\PocketsModel;
+
 /**
  * Class PocketsPlugin
  */
@@ -177,9 +179,8 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Pockets'));
 
         // Grab the pockets from the DB.
-        $pocketData = Gdn::sql()
-            ->get('Pocket', 'Location, `Sort`')
-            ->resultArray();
+        $model = new PocketsModel();
+        $pocketData = $model->getAll();
 
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
@@ -315,15 +316,14 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     protected function _addEdit($sender, $pocketID = false) {
         $form = new Gdn_Form();
-        $pocketModel = new Gdn_Model('Pocket');
-        $pocketModel->removeFilterField("Attributes");
+        $pocketModel = new PocketsModel();
         $form->setModel($pocketModel);
         $sender->ConditionModule = new ConditionModule($sender);
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
-            $unflattened = unflattenArray('.', $form->formValues());
-            $form->formValues($unflattened);
+//            $unflattened = unflattenArray('.', $form->formValues());
+//            $form->formValues($unflattened);
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
@@ -385,13 +385,13 @@ class PocketsPlugin extends Gdn_Plugin {
         } else {
             if ($pocketID !== false) {
                 // Load the pocket.
-                $pocket = $pocketModel->getWhere(['PocketID' => $pocketID])->firstRow(DATASET_TYPE_ARRAY);
+                $pocket = $pocketModel->getID($pocketID);
                 if (!$pocket) {
                     return Gdn::dispatcher()->dispatch('Default404');
                 }
 
                 // Convert some of the pocket data into a format digestable by the form.
-                list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
+                [$repeatType, $repeatFrequency] = Pocket::parseRepeat($pocket['Repeat']);
                 $repeatFrequency += [1, 1];
 
                 $pocket['RepeatType'] = $repeatType;
@@ -512,7 +512,8 @@ class PocketsPlugin extends Gdn_Plugin {
             return;
         }
 
-        $pockets = Gdn::sql()->get('Pocket', 'Location, Sort, Name')->resultArray();
+        $model = new PocketsModel();
+        $pockets = $model->getAll();
         foreach ($pockets as $row) {
             $pocket = new Pocket();
             $pocket->load($row);
@@ -769,12 +770,11 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     function settingsController_AdditionalPocketFilterInputs_handler ($args) {
         $Form = $args['form'];
-        $attributes = $args['attributes'];
         echo $Form->react(
-            "Attributes.RoleIDs[]", "pocket-multi-role-input",
+            "RoleIDs",
+            "pocket-multi-role-input",
             [
                 "tag" => "li",
-                "value" => $attributes['RoleIDs'] ?? "[]"
             ]
         );
     }

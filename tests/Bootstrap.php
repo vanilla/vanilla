@@ -569,6 +569,9 @@ class Bootstrap {
             'lithecompiler',
             'lithestyleguide',
             'Warnings',
+            'NBBC',
+            'CustomCSS',
+            'Online'
         ];
         foreach ($excluded as $subdir) {
             $loader->excludeDirectory(PATH_PLUGINS.'/'.$subdir);

@@ -91,13 +91,27 @@ class ThemesApiController extends AbstractApiController {
     /**
      * Get a theme assets.
      *
+     * @param array $query
+     *
      * @return array
      */
-    public function index(): array {
+    public function index(array $query = []): array {
         $this->permission();
+        $in = $this->schema([
+            'allowAddonVariables:b?',
+            'expand?' => $this->assetExpandDefinition(),
+        ]);
         $out = $this->schema([":a" => $this->themeResultSchema()]);
+        $params = $in->validate($query);
+
+        if (!($params['allowAddonVariables'] ?? true)) {
+            $this->themeService->clearVariableProviders();
+        }
 
         $themes = $this->themeService->getThemes();
+        foreach ($themes as $theme) {
+            $this->handleAssetExpansions($theme, $params['expand']);
+        }
         $result = $out->validate($themes);
         return $result;
     }
@@ -119,7 +133,7 @@ class ThemesApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $normalizedTheme = $this->themeService->postTheme($body);
-
+        $this->handleAssetExpansions($normalizedTheme, true);
         $theme = $out->validate($normalizedTheme);
         return new Data($theme);
     }
@@ -142,6 +156,7 @@ class ThemesApiController extends AbstractApiController {
         $normalizedTheme = $this->themeService->patchTheme($themeID, $body);
 
         $theme = $out->validate($normalizedTheme);
+        $this->handleAssetExpansions($normalizedTheme, true);
         return new Data($theme);
     }
 
@@ -169,6 +184,7 @@ class ThemesApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $theme = $this->themeService->setCurrentTheme($body['themeID']);
+        $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
         return $theme;
     }
@@ -188,6 +204,7 @@ class ThemesApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $theme = $this->themeService->setPreviewTheme($body['themeID'], $body['revisionID'] ?? null);
+        $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
         return $theme;
     }
@@ -202,6 +219,7 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->themeResultSchema();
 
         $theme = $this->themeService->getCurrentTheme();
+        $this->handleAssetExpansions($theme, true);
         $result = $out->validate($theme);
         return new Data($result);
     }

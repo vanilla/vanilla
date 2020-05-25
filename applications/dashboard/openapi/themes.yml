@@ -16,7 +16,7 @@ x-aliases:
   ThemeSlug: &ThemeSlug
     description: Unique theme slug.
     in: path
-    name: key
+    name: themeID
     required: true
     schema:
       type: string
@@ -72,7 +72,7 @@ paths:
           description: Success
       tags:
         - Themes
-  /themes/{key}:
+  /themes/{themeID}:
     get:
       parameters:
         - $ref: "#/components/parameters/ExpandAssetsParam"
@@ -108,7 +108,7 @@ paths:
       tags:
         - Themes
       summary: Get all revisions for a theme.
-  /themes/{key}/assets/footer.html:
+  /themes/{themeID}/assets/footer.html:
     get:
       parameters:
         - *ThemeSlug
@@ -123,7 +123,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get the footer HTML of a theme.
-  /themes/{key}/assets/footer:
+  /themes/{themeID}/assets/footer:
     get:
       parameters:
         - *ThemeSlug
@@ -138,39 +138,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get the footer HTML of a theme.
-  /themes/{key}/assets/fonts.json:
-    get:
-      parameters:
-        - *ThemeSlug
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: "#/components/schemas/ThemeFont"
-                type: array
-          description: Success
-        404: *AssetNotFound
-      tags:
-        - Theme Assets
-      summary: Get custom fonts of a theme.
-  /themes/{key}/assets/fonts:
-    get:
-      parameters:
-        - *ThemeSlug
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ThemeFontsAsset"
-          description: Success
-        404: *AssetNotFound
-      tags:
-        - Theme Assets
-      summary: Get custom fonts of a theme.
-  /themes/{key}/assets/header.html:
+  /themes/{themeID}/assets/header.html:
     get:
       parameters:
         - *ThemeSlug
@@ -185,7 +153,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get the header HTML of a theme.
-  /themes/{key}/assets/header:
+  /themes/{themeID}/assets/header:
     get:
       parameters:
         - *ThemeSlug
@@ -200,7 +168,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get the header HTML of a theme.
-  /themes/{key}/assets/javascript.js:
+  /themes/{themeID}/assets/javascript.js:
     get:
       parameters:
         - *ThemeSlug
@@ -215,7 +183,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get JavaScript to be used as part of a theme.
-  /themes/{key}/assets/javascript:
+  /themes/{themeID}/assets/javascript:
     get:
       parameters:
         - *ThemeSlug
@@ -230,7 +198,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get JavaScript to be used as part of a theme.
-  /themes/{key}/assets/scripts.json:
+  /themes/{themeID}/assets/scripts.json:
     get:
       parameters:
         - *ThemeSlug
@@ -247,7 +215,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get additional script files of a theme.
-  /themes/{key}/assets/scripts:
+  /themes/{themeID}/assets/scripts:
     get:
       parameters:
         - *ThemeSlug
@@ -262,7 +230,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get additional script files of a theme.
-  /themes/{key}/assets/styles.css:
+  /themes/{themeID}/assets/styles.css:
     get:
       parameters:
         - *ThemeSlug
@@ -277,7 +245,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get theme styles.
-  /themes/{key}/assets/styles:
+  /themes/{themeID}/assets/styles:
     get:
       parameters:
         - *ThemeSlug
@@ -292,7 +260,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get theme styles.
-  /themes/{key}/assets/variables.json:
+  /themes/{themeID}/assets/variables.json:
     get:
       parameters:
         - *ThemeSlug
@@ -307,7 +275,7 @@ paths:
       tags:
         - Theme Assets
       summary: Get theme variables.
-  /themes/{key}/assets/variables:
+  /themes/{themeID}/assets/variables:
     get:
       parameters:
         - *ThemeSlug
@@ -346,7 +314,6 @@ components:
           - variables.data
           - header.data
           - footer.data
-          - fonts.data
     Theme:
       properties:
         themeID:
@@ -408,8 +375,6 @@ components:
           $ref: "#/components/schemas/ThemeHeaderAsset"
         footer:
           $ref: "#/components/schemas/ThemeFooterAsset"
-        fonts:
-          $ref: "#/components/schemas/ThemeFontsAsset"
         javascript:
           $ref: "#/components/schemas/ThemeJavascriptAsset"
         scripts:
@@ -422,38 +387,6 @@ components:
           $ref: "#/components/schemas/ThemeLogoAsset"
         mobileLogo:
           $ref: "#/components/schemas/ThemeMobileLogoAsset"
-      type: object
-    ThemeFont:
-      description: An external font resource.
-      properties:
-        fallbacks:
-          type: string
-          nullable: true
-        name:
-          type: string
-        type:
-          enum:
-            - url
-          type: string
-        url:
-          type: string
-      required:
-        - fallbacks
-        - name
-        - type
-        - url
-      type: object
-    ThemeFontsAsset:
-      description: A collection of external font resources.
-      properties:
-        <<: *AssetOut
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/ThemeFont"
-      required:
-        - url
-        - type
       type: object
     ThemeFooterAsset:
       description: Custom footer HTML.

@@ -46,6 +46,7 @@ export function useSwaggerUI(_options: { url?: string; spec?: object; [key: stri
                     plugins: [VanillaSwaggerPlugin()],
                     layout: "VanillaSwaggerLayout",
                     ..._options,
+                    operationsSorter: 'alpha',
                     deepLinking: true,
                     onComplete: () => {
                         const opblocks = swaggerRef.current!.querySelectorAll(".opblock-tag, .opblock");

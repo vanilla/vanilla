@@ -126,6 +126,10 @@ class ThemeAssetFactory {
      * @return ThemeAsset|null
      */
     public function createAsset(?Theme $theme, string $assetType, string $assetName, string $assetContents, bool $throw = false): ?ThemeAsset {
+        if ($assetType === 'data') {
+            $assetType = 'json';
+            trigger_error("Asset type 'data' is deprecated. Use 'json' instead.", E_USER_WARNING);
+        }
         $defaultAsset = self::DEFAULT_ASSETS[$assetName] ?? null;
         if ($defaultAsset) {
             $allowedTypes = $defaultAsset['allowedTypes'];

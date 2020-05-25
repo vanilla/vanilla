@@ -163,6 +163,6 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
-        $this->assertEquals('theme-foundation', $body['themeID']);
+        $this->assertEquals('theme-foundation', $body->getThemeID());
     }
 }

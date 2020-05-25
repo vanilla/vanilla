@@ -196,6 +196,9 @@ class TwigEnhancer {
      */
     public function renderControllerAsset(string $assetName): \Twig\Markup {
         $controller = Gdn::controller();
+        if (!$controller) {
+            return new \Twig\Markup("Could not render an asset without a Gdn_Controller instance", "utf-8");
+        }
         return $controller->renderAssetForTwig($assetName);
     }
 

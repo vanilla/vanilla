@@ -464,6 +464,10 @@ class Gdn_Theme {
                     $result = "<!-- Error: $name doesn't exist -->";
                 }
             } else {
+                if (!Gdn::controller()) {
+                    return "<!-- Error: Could not render module without a Gdn_Controller instance. -->";
+                }
+
                 $module = new $name(Gdn::controller(), '');
                 $module->Visible = true;
 

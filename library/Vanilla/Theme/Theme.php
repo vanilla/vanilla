@@ -54,7 +54,7 @@ class Theme implements \JsonSerializable {
     private $revisionName;
 
     /** @var string|null */
-    private $parentThemeID;
+    private $parentTheme;
 
     /** @var \DateTimeInterface|null */
     private $dateInserted;
@@ -194,7 +194,7 @@ class Theme implements \JsonSerializable {
         $this->insertUser = $data['insertUser'] ?? null;
         $this->dateInserted = $data['dateInserted'] ?? null;
         $this->current = $data['current'] ?? false;
-        $this->parentThemeID = $data['parentTheme'] ?? null;
+        $this->parentTheme = $data['parentTheme'] ?? null;
         $this->initializeAssets($data['assets']);
         $this->preview = new ThemePreview();
         $this->preview->addVariablePreview($this->assets['variables']);
@@ -214,7 +214,7 @@ class Theme implements \JsonSerializable {
             'insertUser' => $this->insertUser,
             'dateInserted' => $this->dateInserted,
             'current' => $this->current,
-            'parentThemeID' => $this->parentThemeID,
+            'parentTheme' => $this->parentTheme,
             'assets' => $this->assets,
             'preview' => $this->preview,
             'features' => $this->getFeatures(),
@@ -385,8 +385,8 @@ class Theme implements \JsonSerializable {
     /**
      * @return string|null
      */
-    public function getParentThemeID(): ?string {
-        return $this->parentThemeID;
+    public function getParentTheme(): ?string {
+        return $this->parentTheme;
     }
 
     /**

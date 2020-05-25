@@ -75,7 +75,7 @@ class MockThemeProvider implements ThemeProviderInterface {
      */
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->getTheme($themeKey);
-        return $theme->getParentThemeID() ?? $theme->getThemeID();
+        return $theme->getParentTheme() ?? $theme->getThemeID();
     }
 
     /**

@@ -96,7 +96,11 @@ class TwigThemeAsset extends HtmlThemeAsset {
      * @return string
      */
     public function renderHtml(array $data = []): string {
-        return $this->renderTwigFromString($this->getTemplate(), $data);
+        try {
+            return $this->renderTwigFromString($this->getTemplate(), $data);
+        } catch (\Exception $e) {
+            return "<p>" . formatException($e) . "</p>";
+        }
     }
 
     /**

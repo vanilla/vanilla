@@ -6,6 +6,7 @@
 
 namespace Vanilla\Theme\Asset;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeAssetFactory;
 
  /**
@@ -19,6 +20,9 @@ class JsonThemeAsset extends ThemeAsset {
     /** @var array */
     protected $data;
 
+    /** @var null|\Exception */
+    protected $error = null;
+
     /**
      * Configure the JSON asset.
      *
@@ -29,6 +33,7 @@ class JsonThemeAsset extends ThemeAsset {
         $this->url = $url;
         $decoded = json_decode($data, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->error = new ClientException('Error decoding JSON', 400, ['description' => json_last_error_msg()]);
             // It's a bad asset.
             // Replace the asset with some json containing the error message.
             $this->data = [
@@ -71,6 +76,15 @@ class JsonThemeAsset extends ThemeAsset {
      */
     public function getValue(): array {
         return $this->data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validate(): void {
+        if ($this->error) {
+            throw $this->error;
+        }
     }
 
     /**

@@ -217,6 +217,8 @@ class ThemesApiController extends AbstractApiController {
     public function put_assets(int $themeID, string $assetPath, RequestInterface $request): Data {
         $this->permission("Garden.Settings.Manage");
         $theme = $this->themeService->getTheme($themeID);
+
+        /** @var ThemeAsset $asset */
         [$asset, $assetName] = $this->extractInputAsset($theme, $assetPath, $request);
 
         // Try to create the asset.
@@ -319,6 +321,7 @@ class ThemesApiController extends AbstractApiController {
 
         // Try to create the asset.
         $asset = $this->assetFactory->createAsset($theme, $assetType, $assetName, $assetBody);
+        $asset->validate();
         return [$asset, $assetName];
     }
 

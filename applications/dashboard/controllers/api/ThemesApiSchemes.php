@@ -158,6 +158,24 @@ trait ThemesApiSchemes {
                     return $data;
                 }
             });
+            /** @var ThemeAssetFactory $assetFactory */
+            $assetFactory = $this->assetFactory;
+            $this->assetInputSchema->addValidator('', function ($data, ValidationField $field) use ($assetFactory) {
+                $type = $data['type'] ?? null;
+                $dataData = $data['data'] ?? null;
+
+                if ($dataData === null || $type === null) {
+                    // Will get caught in the normal validation.
+                    return;
+                }
+
+                $asset = $assetFactory->createAsset(null, $type, 'validate', $dataData);
+                try {
+                    $asset->validate();
+                } catch (Exception $e) {
+                    $field->getValidation()->addError('data', $e->getMessage());
+                }
+            });
         }
 
         return $this->assetInputSchema;

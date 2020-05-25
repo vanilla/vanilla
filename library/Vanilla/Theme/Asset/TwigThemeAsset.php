@@ -7,6 +7,7 @@
 namespace Vanilla\Theme\Asset;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Web\TwigRenderTrait;
 
@@ -78,6 +79,13 @@ class TwigThemeAsset extends HtmlThemeAsset {
             default:
                 return new Data($this->renderHtml());
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validate(): void {
+        $this->renderHtml();
     }
 
     /**

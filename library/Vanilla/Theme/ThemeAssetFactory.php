@@ -118,14 +118,14 @@ class ThemeAssetFactory {
     /**
      * Create an asset.
      *
-     * @param Theme $theme The theme the asset is being created for.
+     * @param Theme|null $theme The theme the asset is being created for.
      * @param string $assetType The ASSET_TYPE of the asset.
      * @param string $assetName The name of the asset.
      * @param string $assetContents The contents of the asset.
      * @param bool $throw Whether or not to throw an exception for an invalid asset.
      * @return ThemeAsset|null
      */
-    public function createAsset(Theme $theme, string $assetType, string $assetName, string $assetContents, bool $throw = false): ?ThemeAsset {
+    public function createAsset(?Theme $theme, string $assetType, string $assetName, string $assetContents, bool $throw = false): ?ThemeAsset {
         $defaultAsset = self::DEFAULT_ASSETS[$assetName] ?? null;
         if ($defaultAsset) {
             $allowedTypes = $defaultAsset['allowedTypes'];
@@ -140,8 +140,13 @@ class ThemeAssetFactory {
         }
 
         $asset = null;
-        $themeID = $theme->getThemeID();
-        $buster = $this->getThemeAssetCacheBuster($theme);
+        if ($theme) {
+            $themeID = $theme->getThemeID();
+            $buster = $this->getThemeAssetCacheBuster($theme);
+        } else {
+            $themeID = -1;
+            $buster = 'notheme';
+        }
         $defaultAssetType = self::DEFAULT_ASSETS[$assetName]['type'] ?? '';
         $defaultAssetExtension = $defaultAssetType ? ".$defaultAssetType" : "";
         $url = $this->request->getSimpleUrl("/api/v2/themes/$themeID/assets/$assetName$defaultAssetExtension?v=$buster");

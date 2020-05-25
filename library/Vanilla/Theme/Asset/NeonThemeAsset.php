@@ -37,6 +37,7 @@ class NeonThemeAsset extends JsonThemeAsset {
                 "error" => "Error decoding NE-ON",
                 "message" => $e->getMessage(),
             ];
+            $this->error = $e;
             $this->jsonString = json_encode($this->data);
         }
         $this->ensureArray();

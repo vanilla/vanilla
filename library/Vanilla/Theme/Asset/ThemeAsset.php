@@ -7,6 +7,7 @@
 namespace Vanilla\Theme\Asset;
 
  use Garden\Web\Data;
+ use Garden\Web\Exception\ClientException;
 
  /**
   * Basic theme asset.
@@ -40,6 +41,17 @@ abstract class ThemeAsset implements \JsonSerializable {
      * @return mixed
      */
     abstract public function getValue();
+
+    /**
+     * Validate the asset contents.
+     *
+     * @return void
+     *
+     * @throws ClientException If the asset is invalid.
+     */
+    public function validate(): void {
+        return;
+    }
 
     /**
      * Get the value of the asset.

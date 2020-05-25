@@ -394,6 +394,10 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
                 $text .= $blot->getContent();
             }
 
+            if ($blot instanceof ExternalBlot) {
+                return '(Embedded Media)';
+            }
+
             if ($blot instanceof NestingParentRendererInterface) {
                 foreach ($blot->getNestedGroups() as $nestedGroup) {
                     $text .= $nestedGroup->getUnsafeText();

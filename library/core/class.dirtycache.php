@@ -12,7 +12,7 @@
 /**
  * Cache Layer: Dirty.
  *
- * This is a cache implementation that caches nothing and always reports cache misses.
+ * This is a cache implementation that caches values in memory only for the time of the request.
  */
 class Gdn_Dirtycache extends Gdn_Cache {
 

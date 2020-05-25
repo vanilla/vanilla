@@ -565,9 +565,11 @@ class Bootstrap {
 
         $excluded = [
             'Mustache',
+            'mustache',
             'sitehub',
             'lithecompiler',
             'lithestyleguide',
+            'NBBC',
             'Warnings',
             'NBBC',
             'CustomCSS',

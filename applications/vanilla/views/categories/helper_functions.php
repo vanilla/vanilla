@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+if (!defined('APPLICATION')) exit();
 
 if (!function_exists('CategoryHeading')):
 
@@ -26,7 +28,7 @@ if (!function_exists('CategoryPhoto')):
 
         if ($photoUrl) {
             $result = anchor(
-                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row)).'" />',
+                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.Gdn::formatService()->renderPlainText(val('Name', $row), \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY).'" />',
                 categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category');
         } else {
@@ -149,6 +151,8 @@ if (!function_exists('writeListItem')):
         $writeChildren = getWriteChildrenMethod($category, $depth);
         $rssIcon = '';
         $headingLevel = $depth + 2;
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
 
         if (val('DisplayAs', $category) === 'Discussions') {
             $rssImage = img('applications/dashboard/design/images/rss.gif', ['alt' => t('RSS Feed')]);
@@ -184,7 +188,7 @@ if (!function_exists('writeListItem')):
                         ?>
                     </div>
                     <div class="CategoryDescription">
-                        <?php echo val('Description', $category) ?>
+                        <?php echo $htmlSanitizer->filter(val('Description', $category)); ?>
                     </div>
                     <div class="Meta">
                         <span class="MItem RSS"><?php echo $rssIcon ?></span>
@@ -264,6 +268,9 @@ if (!function_exists('WriteTableRow')):
         $writeChildren = getWriteChildrenMethod($row, $depth);
         $h = 'h'.($depth + 1);
         $level = 3;
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+
         ?>
         <tr class="<?php echo cssClass($row, true); ?>">
             <td class="CategoryName">
@@ -279,14 +286,14 @@ if (!function_exists('WriteTableRow')):
                     }
 
                     echo "<{$h} aria-level='".$level."' class='".$headingClass."'>";
-                    $safeName = htmlspecialchars($row['Name']);
+                    $safeName = Gdn::formatService()->renderPlainText($row['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
                     Gdn::controller()->fireEvent('AfterCategoryTitle');
                     echo "</{$h}>";
                     ?>
                     <div class="CategoryDescription">
-                        <?php echo $row['Description']; ?>
+                        <?php echo $htmlSanitizer->filter($row['Description']); ?>
                     </div>
                     <?php if ($writeChildren === 'list'): ?>
                         <div class="ChildCategories">
@@ -340,7 +347,7 @@ if (!function_exists('WriteTableRow')):
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);
 
                                 echo ' <span>',
-                                sprintf('in %s', anchor($lastCategory['Name'], categoryUrl($lastCategory, '', '//'))),
+                                sprintf('in %s', anchor(Gdn::formatService()->renderPlainText($lastCategory['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY), categoryUrl($lastCategory, '', '//'))),
                                 '</span>';
 
                             }
@@ -398,7 +405,7 @@ if (!function_exists('writeCategoryTable')):
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];
             $class = val('CssClass', $category);
-            $name = htmlspecialchars($category['Name']);
+            $name = Gdn::formatService()->renderPlainText($category['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
 
             if ($displayAs === 'Heading') :
                 if ($inTable) {

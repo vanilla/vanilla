@@ -8,13 +8,16 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
+use Gdn;
 use Gdn_Session;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Formatting\FormatService;
 
 /**
  * A class for gathering particular data about the site.
@@ -112,6 +115,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var string */
+    private $reCaptchaKey = '';
+
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * SiteMeta constructor.
      *
@@ -122,6 +131,7 @@ class SiteMeta implements \JsonSerializable {
      * @param ThemeFeatures $themeFeatures
      * @param ThemeService $themeService
      * @param Gdn_Session $session
+     * @param FormatService $formatService
      */
     public function __construct(
         RequestInterface $request,
@@ -130,9 +140,12 @@ class SiteMeta implements \JsonSerializable {
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
         ThemeService $themeService,
-        Gdn_Session $session
+        Gdn_Session $session,
+        FormatService $formatService
     ) {
         $this->host = $request->getHost();
+
+        $this->formatService = $formatService;
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
         // But never with a trailing slash.
@@ -149,7 +162,7 @@ class SiteMeta implements \JsonSerializable {
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
-        $this->siteTitle = $config->get('Garden.Title', "");
+        $this->siteTitle = $this->formatService->renderPlainText($config->get('Garden.Title', ""), HtmlFormat::FORMAT_KEY);
 
         $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
 
@@ -196,6 +209,8 @@ class SiteMeta implements \JsonSerializable {
         $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
+
+        $this->reCaptchaKey = $config->get("Recaptcha.PublicKey", '');
     }
 
     /**
@@ -243,6 +258,7 @@ class SiteMeta implements \JsonSerializable {
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
             'themePreview' => $this->themePreview,
+            'reCaptchaKey' => $this->reCaptchaKey,
         ];
     }
 

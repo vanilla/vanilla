@@ -73,6 +73,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
 
+    private const USERAUTHENTICATION_CACHE_EXPIRY = 60;
+
     /** @var EventManager */
     private $eventManager;
 
@@ -1533,11 +1535,45 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @param string $provider
      * @return array
      */
-    private function getUserAuthentications(array $userIDs, string $provider): array {
-        return $this->SQL->getWhere(
-            'UserAuthentication',
-            ['UserID' => $userIDs, 'ProviderKey' => $provider]
-        )->resultArray();
+    private function getAuthentications(array $userIDs, string $provider): array {
+        $result = [];
+
+        // Check the cache...
+        $cacheKeys = [];
+        foreach ($userIDs as $currentID) {
+            $cacheKeys[] = $this->authenticationCacheKey($provider, $currentID);
+        }
+        $cachedRows = Gdn::cache()->get($cacheKeys);
+
+        if (is_array($cachedRows)) {
+            $result = $result + array_values($cachedRows);
+            $userIDs = array_diff($userIDs, array_column($result, "UserID"));
+        }
+
+        // ...and query the DB for what's left.
+        if (!empty($userIDs)) {
+            $rows = $this->SQL->getWhere(
+                "UserAuthentication",
+                ["UserID" => $userIDs, "ProviderKey" => $provider]
+            )->resultArray();
+
+            foreach ($rows as $userAuthentication) {
+                $userID = $userAuthentication["UserID"] ?? null;
+                if ($userID === null) {
+                    continue;
+                }
+                $cacheKey = $this->authenticationCacheKey($provider, $userID);
+                Gdn::cache()->store(
+                    $cacheKey,
+                    $userAuthentication,
+                    [Gdn_Cache::FEATURE_EXPIRY => self::USERAUTHENTICATION_CACHE_EXPIRY]
+                );
+            }
+
+            $result = $result + $rows;
+        }
+
+        return $result;
     }
 
     /**
@@ -5588,6 +5624,18 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     }
 
     /**
+     * Generate a cache key for a user authentication row for a specific provider.
+     *
+     * @param string $provider
+     * @param int $userID
+     * @return string
+     */
+    private function authenticationCacheKey(string $provider, int $userID): string {
+        $result = "userAuthentication.{$provider}.{$userID}";
+        return $result;
+    }
+
+    /**
      * Given an array of user IDs
      *
      * @param array $userIDs
@@ -5601,7 +5649,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             return $result;
         }
 
-        $connections = $this->getUserAuthentications($userIDs, $defaultProvider["AuthenticationKey"]);
+        $connections = $this->getAuthentications($userIDs, $defaultProvider["AuthenticationKey"]);
         $mapping = array_column($connections, "ForeignUserKey", "UserID");
         foreach ($mapping as $userID => $ssoID) {
             $result[$userID] = $ssoID;

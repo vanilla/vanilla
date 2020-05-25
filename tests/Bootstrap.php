@@ -570,6 +570,7 @@ class Bootstrap {
             'sitehub',
             'lithecompiler',
             'lithestyleguide',
+            'NBBC',
             'Warnings',
         ];
         foreach ($excluded as $subdir) {

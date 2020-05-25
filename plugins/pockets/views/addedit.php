@@ -105,13 +105,10 @@ echo $Form->errors();
         </div>
     </li>
 
-    <?php echo $Form->react(
-        "Roles", "pocket-multi-role-input",
-        [
-            "tag" => "li",
-            "value" => $Form->getValue("Roles") ?? ""
-        ]
-    );
+    <?php
+    /** @var \Garden\EventManager $eventManager */
+    $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+    $eventManager->fire('settingsController_AdditionalPocketFilterInputs', ['form' => $Form, 'attributes' => json_decode($Form->getFormValue("Attributes", '[]'))]);
     ?>
 
     <li class="form-group">

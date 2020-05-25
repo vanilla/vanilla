@@ -68,7 +68,7 @@ class Pocket {
     public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
 
     /** @var array */
-    public $Roles = [];
+    public $Attributes = [];
 
     /**
      * Pocket constructor.
@@ -169,16 +169,9 @@ class Pocket {
             }
         }
 
-        // Check roles
-        if ($this->hasRoles() && !($testMode && $pocketAdmin)) {
-            $roleModel = Gdn::getContainer()->get(RoleModel::class);
-            $userID = Gdn::session()->UserID;
-            $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
-            $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);
-            if (count($intersections) === 0) {
-                return false;
-            }
-        }
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $eventManager->fire('settingsController_AdditionalPocketFilters', ["testMode" => $testMode, "pocketAdmin" => $pocketAdmin]);
 
         // If we've passed all of the tests then the pocket can be processed.
         return true;
@@ -202,7 +195,7 @@ class Pocket {
         $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
         $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
         $this->TestMode = $data['TestMode'] ?? null;
-        $this->Roles = $data['Roles'] ?? null;
+        $this->Attributes = $data['Attributes'] ?? null;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -216,15 +209,6 @@ class Pocket {
      */
     public function isAd() {
         return $this->Type == Pocket::TYPE_AD;
-    }
-
-    /**
-     * Determine whether the pocket is dependent on conditions
-     *
-     * @return bool
-     */
-    public function hasRoles() {
-        return !empty($this->Roles);
     }
 
     /**
@@ -358,7 +342,7 @@ class Pocket {
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
                 'Type' => 'default',
-                'Roles' => null
+                'Attributes' => null
                 ];
             $model->save($pocket);
         }

@@ -316,11 +316,14 @@ class PocketsPlugin extends Gdn_Plugin {
     protected function _addEdit($sender, $pocketID = false) {
         $form = new Gdn_Form();
         $pocketModel = new Gdn_Model('Pocket');
+        $pocketModel->removeFilterField("Attributes");
         $form->setModel($pocketModel);
         $sender->ConditionModule = new ConditionModule($sender);
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
+            $unflattened = unflattenArray('.', $form->formValues());
+            $form->formValues($unflattened);
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
@@ -369,13 +372,10 @@ class PocketsPlugin extends Gdn_Plugin {
                 // The 'TestMode' property will already be set to true in the UI, we'll let save() set it.
             }
 
-            // Roles
-            $roles = $form->getFormValue('Roles');
-            $form->setFormValue('Roles', $roles);
-
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
 
+            $form->setFormValue('Attributes', json_encode($unflattened['Attributes'], true));
 
             $saved = $form->save();
             if ($saved) {
@@ -690,7 +690,6 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('ShowInDashboard', 'tinyint', '0')
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
-            ->column('Roles', "varchar(225)", null)
             ->set();
 
         $PermissionModel = Gdn::permissionModel();
@@ -763,6 +762,46 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->jsonTarget('#pocket-locations-toggle', static::locationsToggle($on), 'Html');
         $sender->render('blank', 'utility', 'dashboard');
     }
+
+    /**
+     * @param \SettingsController $sender
+     * @param array $args
+     */
+    function settingsController_AdditionalPocketFilterInputs_handler ($args) {
+        $Form = $args['form'];
+        $attributes = $args['attributes'];
+        echo $Form->react(
+            "Attributes.RoleIDs[]", "pocket-multi-role-input",
+            [
+                "tag" => "li",
+                "value" => $attributes['RoleIDs'] ?? "[]"
+            ]
+        );
+    }
+
+
+    /**
+     * @param \SettingsController $sender
+     * @param array $args
+     */
+    function settingsController_AdditionalPocketFilters_handler ($args) {
+        $Form = $args['form'];
+        $attributes = $args["attributes"];
+        $roleIDs = $args['roleIDs'] ?? [];
+
+
+        if (!empty($roleIDs)) {
+            if (!($args['testMode'] && $args['pocketAdmin'])) {
+                $roleModel = Gdn::getContainer()->get(RoleModel::class);
+                $userID = Gdn::session()->UserID;
+                $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
+                $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);
+                if (count($intersections) === 0) {
+                    return false;
+                }
+            }
+        }
+    }
 }
 
 if (!function_exists('ValidateIntegerArray')) {
@@ -824,3 +863,4 @@ if (!function_exists('renderPocketToggle')) {
         return $return;
     }
 }
+

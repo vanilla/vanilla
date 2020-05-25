@@ -8,7 +8,7 @@
 import gdn from "@library/gdn";
 import { PromiseOrNormalCallback } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
-import { ensureScript } from "@vanilla/dom-utils/src";
+import { ensureScript } from "@vanilla/dom-utils";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";

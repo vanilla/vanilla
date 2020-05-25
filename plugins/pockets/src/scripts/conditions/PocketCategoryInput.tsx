@@ -24,12 +24,12 @@ export function PocketCategoryInput(props) {
             : undefined,
     );
 
-    console.log("props: ", props);
-
     const [inheritCategory, setInheritCategory] = useState(props.inheritCategory === 1);
 
     const classes = selectOneClasses();
     inputClasses().applyInputCSSRules();
+
+    const hasCategory = category && category.value;
 
     return (
         <DashboardFormGroup label={t("Category")} tag={"div"}>
@@ -43,19 +43,16 @@ export function PocketCategoryInput(props) {
                         value={category}
                     />
                 </div>
-                <input
-                    name={props.fieldName}
-                    type={"hidden"}
-                    value={category && category.value ? category.value : undefined}
-                />
+                <input name={props.fieldName} type={"hidden"} value={hasCategory ?? undefined} />
                 <div className={classNames("checkbox", classes.checkBoxAfterInput)}>
                     <DashboardRadioGroup>
                         <DashboardCheckBox
-                            checked={inheritCategory}
+                            checked={hasCategory ? inheritCategory : false}
                             onChange={() => {
                                 setInheritCategory(!inheritCategory);
                             }}
                             label={t("Apply to subcategories")}
+                            disabled={!hasCategory}
                         />
                     </DashboardRadioGroup>
                 </div>

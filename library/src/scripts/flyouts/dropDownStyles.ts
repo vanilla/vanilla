@@ -407,6 +407,9 @@ export const dropDownClasses = useThemeCache(() => {
 
     const check = style("check", {
         color: colorOut(globalVars.mainColors.primary),
+
+        /// Check to fix icon alignment.
+        transform: `translateX(4px)`,
     });
 
     const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;

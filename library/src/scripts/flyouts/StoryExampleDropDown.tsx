@@ -64,6 +64,9 @@ export function StoryExampleDropDown(props: IProps) {
             <DropDownItemLink name={t("Link 1")} to={"#"} />
             <DropDownItemLink name={t("Link 2")} to={"#"} />
             <DropDownItemLink name={t("Link 3")} to={"#"} />
+            <DropDownItemLink to="#" isChecked={true}>
+                Link with checkmark
+            </DropDownItemLink>
             <DropDownSection title={"Section Title"}>
                 <MeBoxDropDownItemList
                     emptyMessage={t("You do not have any notifications yet.")}

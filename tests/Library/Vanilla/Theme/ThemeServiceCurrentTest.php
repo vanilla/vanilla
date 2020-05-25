@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Models;
+namespace VanillaTests\Theme;
 
 use Vanilla\AddonManager;
+use Vanilla\Theme\Asset\CssThemeAsset;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
-use Vanilla\Theme\CssThemeAsset;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
@@ -20,7 +20,7 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for getting the current theme from the theme model.
  */
-class ThemeModelCurrentTest extends MinimalContainerTestCase {
+class ThemeServiceCurrentTest extends MinimalContainerTestCase {
 
     const ASSET_THEME = 'asset-theme';
 
@@ -80,7 +80,7 @@ class ThemeModelCurrentTest extends MinimalContainerTestCase {
         $addonTheme = $this->mockThemeProvider->postTheme([
             'themeID' => self::ADDON_THEME,
             'assets' => [
-                'styles' => new CssThemeAsset(self::ADDON_THEME),
+                'styles' => new CssThemeAsset(self::ADDON_THEME, ''),
             ]
         ]);
 

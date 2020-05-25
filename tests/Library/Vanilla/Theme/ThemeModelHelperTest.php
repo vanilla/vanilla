@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Models;
 
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\ThemeServiceHelper;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\MinimalContainerTestCase;

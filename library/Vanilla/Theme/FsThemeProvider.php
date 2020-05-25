@@ -94,7 +94,11 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getThemeAddon($themeKey): Addon {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!$theme) {
-            throw new NotFoundException("Theme");
+            // Try to load our fallback theme.
+            $theme = $this->addonManager->lookupTheme(ThemeService::FALLBACK_THEME_KEY);
+            if (!$theme) {
+                throw new NotFoundException("Theme");
+            }
         }
 
         return $theme;

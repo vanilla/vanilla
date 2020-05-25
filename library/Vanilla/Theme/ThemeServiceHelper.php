@@ -202,7 +202,7 @@ class ThemeServiceHelper {
             $themes[] = $currentTheme;
         }
 
-        $resultConfig = implode($themes, ",");
+        $resultConfig = implode(",", $themes);
         $this->config->saveToConfig(self::CONFIG_THEMES_VISIBLE, $resultConfig);
     }
 }

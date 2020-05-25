@@ -10,11 +10,8 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeSectionModel;
 use Vanilla\Site\SiteSectionModel;
-use Vanilla\Theme\Asset\JsonThemeAsset;
 use Garden\Web\Exception\ClientException;
-use Garden\Schema\ValidationField;
 use Vanilla\Theme\Asset\ThemeAsset;
 
 /**

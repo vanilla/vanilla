@@ -132,7 +132,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
         ->setShared(true)
         ->addCall("addThemeProvider", [new Reference(\Vanilla\Theme\FsThemeProvider::class)])
 
-    ->rule(\Vanilla\Models\ThemeSectionModel::class)
+    ->rule(\Vanilla\Theme\ThemeSectionModel::class)
     ->setShared(true)
 
     ->rule(ThemeFeatures::class)

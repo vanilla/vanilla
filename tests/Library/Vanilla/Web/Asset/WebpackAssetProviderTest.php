@@ -7,19 +7,15 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Asset;
 
-use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
-use Vanilla\Models\ThemeSectionModel;
-use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
-use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\MinimalContainerTestCase;
 

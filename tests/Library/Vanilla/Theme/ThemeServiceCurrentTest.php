@@ -5,16 +5,17 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Theme;
+namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\AddonManager;
 use Vanilla\Theme\Asset\CssThemeAsset;
+use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
-use VanillaTests\Fixtures\MockThemeProvider;
+use VanillaTests\Fixtures\Theme\MockThemeProvider;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -22,11 +23,11 @@ use VanillaTests\MinimalContainerTestCase;
  */
 class ThemeServiceCurrentTest extends MinimalContainerTestCase {
 
-    const ASSET_THEME = 'asset-theme';
+    const ASSET_THEME = 'mock-asset-theme';
 
-    const ADDON_THEME = 'addon-theme';
+    const ADDON_THEME = 'mock-addon-theme';
 
-    const MOBILE_ADDON_THEME = 'mobile-addon-theme';
+    const MOBILE_ADDON_THEME = 'mock-mobile-addon-theme';
 
     /** @var MockThemeProvider */
     private $mockThemeProvider;
@@ -70,34 +71,36 @@ class ThemeServiceCurrentTest extends MinimalContainerTestCase {
      * Test the we get consistent results when all themes are set to the same.
      */
     public function testGetCurrentAllSame() {
-        $this->addonManager->pushAddon(new MockAddon(self::ADDON_THEME, [
+        $addon = new MockAddon(self::ADDON_THEME, [
             'Features' => [
                 'SharedMasterView' => true,
             ]
-        ]));
-        $this->addonManager->pushAddon(new MockAddon(self::MOBILE_ADDON_THEME));
+        ]);
+        $mobileAddon = new MockAddon(self::MOBILE_ADDON_THEME);
+        $this->addonManager->pushAddon($addon);
+        $this->addonManager->pushAddon($mobileAddon);
 
-        $addonTheme = $this->mockThemeProvider->postTheme([
+        $addonTheme = $this->mockThemeProvider->addTheme([
             'themeID' => self::ADDON_THEME,
             'assets' => [
                 'styles' => new CssThemeAsset(self::ADDON_THEME, ''),
             ]
-        ]);
+        ], $addon);
 
-        $mobileTheme = $this->mockThemeProvider->postTheme([
+        $mobileTheme = $this->mockThemeProvider->addTheme([
             'themeID' => self::MOBILE_ADDON_THEME,
             'assets' => [
-                'styles' => new CssThemeAsset(self::MOBILE_ADDON_THEME),
+                'styles' => new CssThemeAsset(self::MOBILE_ADDON_THEME, ''),
             ]
-        ]);
+        ], $mobileAddon);
 
-        $assetTheme = $this->mockThemeProvider->postTheme([
+        $assetTheme = $this->mockThemeProvider->addTheme([
             'themeID' => self::ASSET_THEME,
             'parentTheme' => self::ADDON_THEME,
             'assets' => [
-                'styles' => new CssThemeAsset(self::ASSET_THEME),
+                'styles' => new CssThemeAsset(self::ASSET_THEME, ''),
             ]
-        ]);
+        ], $addon);
 
         $this->setConfigs([
             ThemeServiceHelper::CONFIG_DESKTOP_THEME => self::ADDON_THEME,
@@ -108,8 +111,8 @@ class ThemeServiceCurrentTest extends MinimalContainerTestCase {
         $model = $this->themeModel();
 
         $this->assertEquals(self::ADDON_THEME, $model->getCurrentThemeAddon()->getKey());
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()['themeID']);
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()['assets']['styles']->getData());
+        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getThemeID());
+        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         /** @var ThemeFeatures $features */
         $features = self::container()->get(ThemeFeatures::class);
@@ -121,11 +124,11 @@ class ThemeServiceCurrentTest extends MinimalContainerTestCase {
         $this->assertEquals(self::MOBILE_ADDON_THEME, $model->getCurrentThemeAddon()->getKey());
 
         // To the new system.
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()['themeID']);
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()['assets']['styles']->getData());
+        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getThemeID());
+        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         // We have overlayed the new assets on top.
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme(true)['assets']['styles']->getData());
+        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme(true)->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         // Theme features from the mobile theme were properly preserved.
         /** @var ThemeFeatures $features */

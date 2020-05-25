@@ -77,6 +77,94 @@ class ThemesTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Provide parameters for testing the validity of theme assets.
+     *
+     * @return array
+     */
+    public function provideAssetTypesNoExt(): array {
+        $assetRoot = PATH_ROOT . "/tests/fixtures/themes/asset-test/assets";
+        return [
+            [
+                "asset-test",
+                "fonts",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/fonts.json"), true),
+                ],
+            ],
+            [
+                "asset-test",
+                "variables",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/variables.json"), true),
+                ],
+            ],
+            [
+                "asset-test",
+                "scripts",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/scripts.json"), true),
+                ],
+            ],
+            [
+                "asset-test",
+                "header",
+                [
+                    'type' => 'html',
+                    'data' => file_get_contents("$assetRoot/header.html"),
+                ],
+            ],
+            [
+                "asset-test",
+                "footer",
+                [
+                    'type' => 'html',
+                    'data' => file_get_contents("$assetRoot/footer.html"),
+                ],
+            ],
+            [
+                "asset-test",
+                "javascript",
+                [
+                    'type' => 'js',
+                    'data' => file_get_contents("$assetRoot/javascript.js"),
+                ],
+            ],
+            [
+                "asset-test",
+                "styles",
+                [
+                    'type' => 'css',
+                    'data' => file_get_contents("$assetRoot/styles.css"),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Verify ability to grab individual theme assets with the proper content type.
+     *
+     * @param string $theme
+     * @param string $assetKey
+     * @param array $expected
+     * @dataProvider provideAssetTypesNoExt
+     */
+    public function testGetAssetNotExt(string $theme, string $assetKey, array $expected) {
+        $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals("application/json; charset=utf-8", $response->getHeader("Content-Type"));
+        $body = $response->getBody();
+
+        // There's a URL here. We're not going to be testing it.
+        $this->assertTrue(isset($body['url']));
+        unset($body['url']);
+
+        $this->assertEquals($expected, $body);
+    }
+
+    /**
      * Test getting a theme by its name.
      */
     public function testGetByName() {

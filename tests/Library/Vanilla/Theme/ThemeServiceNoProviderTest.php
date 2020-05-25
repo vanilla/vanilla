@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Theme;
+namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\ThemeService;
 use VanillaTests\SharedBootstrapTestCase;

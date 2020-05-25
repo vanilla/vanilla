@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Models;
+namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\ThemeServiceHelper;
 use VanillaTests\Fixtures\MockAddon;

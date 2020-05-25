@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Theme;
+namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\Asset\TwigThemeAsset;
 use VanillaTests\MinimalContainerTestCase;

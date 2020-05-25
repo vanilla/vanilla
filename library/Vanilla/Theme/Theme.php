@@ -101,7 +101,6 @@ class Theme implements \JsonSerializable {
      * @return Theme
      */
     public static function fromAddon(Addon $addon): Theme {
-        $currentThemeKey = \Gdn::config(ThemeServiceHelper::CONFIG_CURRENT_THEME, ThemeServiceHelper::CONFIG_DESKTOP_THEME);
         $key = $addon->getKey();
         $currentOptionKey = \Gdn::config('Garden.ThemeOptions.Styles.Value', '');
 
@@ -294,6 +293,7 @@ class Theme implements \JsonSerializable {
 
             if ($asset instanceof ThemeAsset) {
                 $this->assets[$assetName] = $asset;
+                continue;
             }
             $type = $asset['type'] ?? ThemeAssetFactory::DEFAULT_ASSETS[$assetName]['type'] ?? null;
             $data = $asset['data'] ?? null;
@@ -415,5 +415,33 @@ class Theme implements \JsonSerializable {
      */
     public function getAssets(): array {
         return $this->assets;
+    }
+
+    /**
+     * @param array $assets
+     */
+    public function setAssets(array $assets): void {
+        $this->assets = $assets;
+    }
+
+    /**
+     * Get a single theme asset.
+     *
+     * @param string $assetName
+     *
+     * @return ThemeAsset|null
+     */
+    public function getAsset(string $assetName): ?ThemeAsset {
+        return $this->assets[$assetName] ?? null;
+    }
+
+    /**
+     * Set a single theme asset.
+     *
+     * @param string $assetName
+     * @param ThemeAsset $asset
+     */
+    public function setAsset(string $assetName, ThemeAsset $asset): void {
+        $this->assets[$assetName] = $asset;
     }
 }

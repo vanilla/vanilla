@@ -14,7 +14,7 @@ namespace Vanilla\Theme\Asset;
   */
 abstract class ThemeAsset implements \JsonSerializable {
 
-    protected $includeValueInJson = false;
+    protected $includeValueInJson = true;
 
     /** @var string */
     protected $url = '';

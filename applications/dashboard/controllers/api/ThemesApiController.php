@@ -16,6 +16,7 @@ use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Web\CacheControlMiddleware;
 use VanillaTests\Fixtures\Request;
 
 /**
@@ -294,6 +295,11 @@ class ThemesApiController extends AbstractApiController {
         } else {
             $result = new Data($asset->jsonSerialize());
         }
+
+        // Set maximum cache durations for these static assets.
+        // We apply a cache buster when generating these URLs.
+        $result->setHeader('Cache-Control', CacheControlMiddleware::MAX_CACHE);
+        $result->setMeta(CacheControlMiddleware::META_NO_VARY, true);
 
         return $result;
     }

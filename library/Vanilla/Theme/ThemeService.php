@@ -345,7 +345,7 @@ class ThemeService {
 
             if ($needsMobileOverlay && $currentKey !== null) {
                 $assetOverlayTheme = $this->getThemeProvider($currentKey)->getTheme($currentKey);
-                $current['assets'] = $assetOverlayTheme['assets'];
+                $current->setAssets($assetOverlayTheme->getAssets());
             }
 
             $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();

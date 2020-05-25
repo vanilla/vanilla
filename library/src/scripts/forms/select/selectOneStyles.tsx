@@ -9,6 +9,7 @@ import { borders, colorOut, pointerEvents, unit } from "@library/styles/styleHel
 import { calc, percent } from "csx";
 import { inputMixin, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 
 export const selectOneVariables = useThemeCache(() => {
     const vars = variableFactory("selectOne");
@@ -87,7 +88,12 @@ export const selectOneClasses = useThemeCache(() => {
     });
 
     const checkBoxAfterInput = style("checkBoxAfterInput", {
-        marginTop: unit(6),
+        marginTop: unit(12),
+        $nest: {
+            [`& .${checkRadioClasses().root}`]: {
+                paddingLeft: 0,
+            },
+        },
     });
 
     return { inputWrap, checkIcon, checkBoxAfterInput };

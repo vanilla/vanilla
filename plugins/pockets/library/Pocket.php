@@ -216,7 +216,36 @@ class Pocket {
 
         // Check Category
 
-        // TODO
+        if (!empty($this->Category)) {
+            $controller = \Gdn::controller();
+            if (!$controller) {
+                return false;
+            }
+
+            $currentCategoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
+
+            if (!$currentCategoryID) {
+                return false;
+            }
+
+            if (!$this->InheritCategory) {
+                if ($currentCategoryID !== $this->Category) {
+                    return false;
+                }
+            } else {
+                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+                $currentCategory = $categoryModel->getID($currentCategoryID);
+                $parentIDs = [-1, $currentCategory->ParentCategoryID];
+                $ancestors = $categoryModel::getAncestors($currentCategory->ParentCategoryID, true);
+                if ($ancestors) {
+                    $parentIDs = array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID')));
+                    $match = array_search($this->Category, $parentIDs, true);
+                    if ($match === -1) {
+                        return false;
+                    }
+                }
+            }
+        }
 
         // If we've passed all of the tests then the pocket can be processed.
         return true;
@@ -242,8 +271,8 @@ class Pocket {
         $this->TestMode = $data['TestMode'] ?? null;
         $this->Roles = $data['Roles'] ? json_decode($data['Roles']) : null;
         $this->Subcommunities = $data['Subcommunities'] ? json_decode($data['Subcommunities']) : null;
-        $this->Subcommunities = $data['Category'] ?? null;
-        $this->Subcommunities = $data['InheritCategory'] ?? false;
+        $this->Category = $data['Category'] ?? null;
+        $this->InheritCategory = $data['InheritCategory'] ?? false;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -275,24 +304,6 @@ class Pocket {
      */
     public function hasSubcommunities() {
         return !empty($this->Subcommunities);
-    }
-
-    /**
-     * Determine whether the pocket is dependent on category conditions
-     *
-     * @return bool
-     */
-    public function hasCategory() {
-        return !empty($this->Category);
-    }
-
-    /**
-     * Determine whether the pocket has category inheritance
-     *
-     * @return bool
-     */
-    public function hasCategoryInheritance() {
-        return !empty($this->InheritCategory);
     }
 
     /**

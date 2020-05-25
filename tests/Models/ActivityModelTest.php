@@ -55,6 +55,24 @@ class ActivityModelTest extends TestCase {
     }
 
     /**
+     * Verify a notification event is not dispatched when no notifications are pending.
+     *
+     * @return void
+     */
+    public function testNotificationEventNotDispatched(): void {
+        $this->model->save([
+            "ActivityUserID" => 1,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_SKIPPED,
+            "NotifyUserID" => 2
+        ]);
+
+        $this->assertNull($this->lastEvent);
+    }
+
+    /**
      * Verify notification event dispatched when adding a new notification.
      *
      * @return void
@@ -68,7 +86,10 @@ class ActivityModelTest extends TestCase {
             "Notified" => ActivityModel::SENT_PENDING,
             "NotifyUserID" => 2
         ]);
+
         $this->assertInstanceOf(NotificationEvent::class, $this->lastEvent);
-        $this->assertEquals(NotificationEvent::ACTION_INSERT, $this->lastEvent->getAction());
+        $this->assertEquals("notification", $this->lastEvent->getType());
+        $this->assertNull($this->lastEvent->getSender());
+        $this->assertArrayHasKey("notification", $this->lastEvent->getPayload());
     }
 }

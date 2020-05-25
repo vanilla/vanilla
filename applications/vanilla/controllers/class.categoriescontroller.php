@@ -588,6 +588,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('CategoriesModule');
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 

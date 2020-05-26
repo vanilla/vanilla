@@ -910,7 +910,7 @@ class PocketsPlugin extends Gdn_Plugin {
         }
 
         return $existingCanRender;
-     }
+    }
 
     /**
      * Add some event handling for pocket rendering. - Roles

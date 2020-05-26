@@ -3,6 +3,7 @@
     "main": "./src/index.ts",
     "module": "./src/index.ts",
     "version": "3.0.1",
+    "license": "gpl-2.0-only",
     "dependencies": {
         "@vanilla/dom-utils": "^3.0.1",
         "lodash": "^4.17.11",

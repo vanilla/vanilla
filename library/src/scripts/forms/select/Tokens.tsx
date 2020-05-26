@@ -27,6 +27,7 @@ export interface ITokenProps extends IOptionalComponentID {
     value: IComboBoxOption[];
     onChange: (tokens: IComboBoxOption[]) => void;
     onInputChange?: (value: string) => void;
+    menuPlacement?: string;
 }
 
 interface IState {

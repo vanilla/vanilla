@@ -54,6 +54,13 @@ echo $Form->errors();
         <?php echo $Form->dropdown('Location', array_merge(['' => '('.sprintf(t('Select a %s'), t('Location')).')'], $this->data('LocationsArray'))); ?>
         </div>
     </li>
+
+    <?php
+    /** @var \Garden\EventManager $eventManager */
+    $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+    $eventManager->fire('settingsController_AdditionalPocketFilterInputs', ['form' => $Form, 'attributes' => json_decode($Form->getFormValue("Attributes", '[]'))]);
+    ?>
+
     <li class="js-repeat form-group">
         <?php echo $Form->labelWrap('Repeat', 'RepeatType'); ?>
         <div class="input-wrap">
@@ -91,6 +98,9 @@ echo $Form->errors();
         ?>
         </div>
     </li>
+
+
+
     <li class="form-group">
         <?php
             echo $Form->labelWrap('Conditions', ''); ?>
@@ -104,12 +114,6 @@ echo $Form->errors();
             ?>
         </div>
     </li>
-
-    <?php
-    /** @var \Garden\EventManager $eventManager */
-    $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-    $eventManager->fire('settingsController_AdditionalPocketFilterInputs', ['form' => $Form, 'attributes' => json_decode($Form->getFormValue("Attributes", '[]'))]);
-    ?>
 
     <li class="form-group">
         <div class="label-wrap-wide">

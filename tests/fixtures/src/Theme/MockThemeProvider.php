@@ -7,14 +7,10 @@
 
 namespace VanillaTests\Fixtures\Theme;
 
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
 use Vanilla\Theme\Asset\JsonThemeAsset;
-use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Theme;
-use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\Theme\ThemeProviderWriteInterface;
 
 /**
  * Mock provider for tests.

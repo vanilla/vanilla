@@ -577,7 +577,10 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $locationOptions = val($location, $this->Locations, []);
 
-        if ($this->ShowPocketLocations && arrasettingsController_AdditionalPocketFiltersy_key_exists($location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
+        if ($this->ShowPocketLocations &&
+            arrasettingsController_AdditionalPocketFiltersy_key_exists($location, $this->Locations) &&
+            checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin'
+        ) {
             $locationName = val("Name", $this->Locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
@@ -782,10 +785,12 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add multi role input to pocket filters
+     *
      * @param \SettingsController $sender
      * @param array $args
      */
-    function settingsController_AdditionalPocketFilterInputs_handler ($args) {
+    function settingsController_AdditionalPocketFilterInputs_handler($args) {
         $Form = $args['form'];
         echo $Form->react(
             "RoleIDs",

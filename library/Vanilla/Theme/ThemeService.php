@@ -173,12 +173,12 @@ class ThemeService {
     /**
      * Update theme name by ID.
      *
-     * @param int $themeID Theme ID
+     * @param string|int $themeID Theme ID
      * @param array $body Array of incoming params.
      *        fields: name (required)
      * @return Theme
      */
-    public function patchTheme(int $themeID, array $body): Theme {
+    public function patchTheme($themeID, array $body): Theme {
         $provider = $this->getWritableThemeProvider($themeID);
         $theme = $provider->patchTheme($themeID, $body);
         $theme = $this->normalizeTheme($theme);
@@ -188,9 +188,9 @@ class ThemeService {
     /**
      * Delete theme by ID.
      *
-     * @param int $themeID Theme ID
+     * @param string|int $themeID Theme ID
      */
-    public function deleteTheme(int $themeID) {
+    public function deleteTheme($themeID) {
         $provider = $this->getWritableThemeProvider($themeID);
         $provider->deleteTheme($themeID);
     }
@@ -486,10 +486,10 @@ class ThemeService {
     /**
      * Get theme revisions
      *
-     * @param int $themeKey
+     * @param string $themeKey
      * @return array
      */
-    public function getThemeRevisions(int $themeKey): array {
+    public function getThemeRevisions(string $themeKey): array {
         $provider = $this->getThemeProvider($themeKey);
         $revisions = $provider->getThemeRevisions($themeKey);
         foreach ($revisions as &$revision) {

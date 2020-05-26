@@ -58,6 +58,9 @@ class Pocket {
     /** $var string Whether the pocket is in test mode. */
     public $TestMode = false;
 
+    /** @var array */
+    public $Data = [];
+
     /** $var bool Whether to disable the pocket for embedded comments. * */
     public $EmbeddedNever = false;
 
@@ -171,10 +174,9 @@ class Pocket {
 
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $eventManager->fire('settingsController_AdditionalPocketFilters', ["testMode" => $testMode, "pocketAdmin" => $pocketAdmin]);
+        $eventResult = $eventManager->fireFilter('pocket_canRender', true, $this, $data);
 
-        // If we've passed all of the tests then the pocket can be processed.
-        return true;
+        return $eventResult;
     }
 
     /**
@@ -195,7 +197,7 @@ class Pocket {
         $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
         $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
         $this->TestMode = $data['TestMode'] ?? null;
-        $this->Attributes = $data['Attributes'] ?? null;
+        $this->Data = $data;
 
         // parse the frequency.
         $repeat = $data['Repeat'];

@@ -36,6 +36,9 @@ class PocketsPlugin extends Gdn_Plugin {
     /** Whether or not to display test items for all pockets. */
     public $ShowPocketLocations = null;
 
+    /** @var array */
+    private $userRoleIDs = null;
+
     /**
      * PocketsPlugin constructor.
      */
@@ -503,6 +506,20 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @return array
+     */
+    private function getUserRoleIDs(): array {
+        if ($this->userRoleIDs) {
+            return $this->userRoleIDs;
+        }
+        $roleModel = Gdn::getContainer()->get(RoleModel::class);
+        $userID = Gdn::session()->UserID;
+        $roles = $roleModel->getByUserID($userID)->resultArray();
+        $this->userRoleIDs = array_column($roles, 'RoleID');
+        return $this->userRoleIDs;
+    }
+
+    /**
      * Load all pockets from the database.
      *
      * @param bool $force If true, re-load data from DB even if it's loaded.
@@ -560,7 +577,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $locationOptions = val($location, $this->Locations, []);
 
-        if ($this->ShowPocketLocations && array_key_exists($location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
+        if ($this->ShowPocketLocations && arrasettingsController_AdditionalPocketFiltersy_key_exists($location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
             $locationName = val("Name", $this->Locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
@@ -779,28 +796,39 @@ class PocketsPlugin extends Gdn_Plugin {
         );
     }
 
-
     /**
-     * @param \SettingsController $sender
-     * @param array $args
+     * Add some event handling for pocket rendering.
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     * @return bool
      */
-    function settingsController_AdditionalPocketFilters_handler ($args) {
-        $Form = $args['form'];
-        $attributes = $args["attributes"];
-        $roleIDs = $args['roleIDs'] ?? [];
-
-
-        if (!empty($roleIDs)) {
-            if (!($args['testMode'] && $args['pocketAdmin'])) {
-                $roleModel = Gdn::getContainer()->get(RoleModel::class);
-                $userID = Gdn::session()->UserID;
-                $userRoles = $roleModel->getByUserID($userID)->datasetType(DATASET_TYPE_ARRAY);
-                $intersections = array_intersect(array_keys((array)$userRoles), $this->Roles);
-                if (count($intersections) === 0) {
-                    return false;
-                }
-            }
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        if (!$existingCanRender) {
+            return $existingCanRender;
         }
+
+        $testMode = Pocket::inTestMode($pocket);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+        $pocketData = $pocket->Data;
+        $roleIDs = $pocketData['RoleIDs'] ?? [];
+
+        if (empty($roleIDs)) {
+            return $existingCanRender;
+        }
+
+        if ($testMode && $pocketAdmin) {
+            return $existingCanRender;
+        }
+
+        $intersections = array_intersect($this->getUserRoleIDs(), $roleIDs);
+        if (count($intersections) === 0) {
+            return false;
+        }
+
+        return $existingCanRender;
     }
 }
 

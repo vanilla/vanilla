@@ -22,7 +22,7 @@ class PocketsModel extends \Gdn_Model {
     /**
      * @inheritdoc
      */
-    public function getID($iD, $options = []) {
+    public function getID($iD, $dataSetType = null, $options = []) {
         $result =  parent::getID($iD, DATASET_TYPE_ARRAY, $options);
         return $this->expandAttributes($result);
     }

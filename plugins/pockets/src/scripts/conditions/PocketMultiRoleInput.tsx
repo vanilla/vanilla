@@ -9,7 +9,6 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 
 export function PocketMultiRoleInput(props) {
-    console.log("props: ", props);
     const [roles, setRoles] = useState(props.initialValue && props.initialValue !== "" ? props.initialValue : []);
     return (
         <DashboardFormGroup label={t("Roles")} tag={"div"}>

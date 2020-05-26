@@ -32,7 +32,7 @@ export function isComponentThemingEnabled() {
     return useTheme;
 }
 
-interface IRegisteredComponent {
+export interface IRegisteredComponent {
     Component: React.ComponentType<any>;
     mountOptions?: IComponentMountOptions;
 }

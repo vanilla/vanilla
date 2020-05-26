@@ -134,7 +134,7 @@ trait ThemesApiSchemes {
     /**
      * Schema for asset arrays.
      *
-     * @param string The name of the field.
+     * @param string $fieldName The name of the field.
      *
      * @return Schema
      */

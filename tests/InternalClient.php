@@ -53,7 +53,9 @@ class InternalClient extends HttpClient {
             /** @var HttpResponse $response */
             $response = $next($request);
             if (stripos($response->getHeader('Content-Type'), 'application/json') !== false) {
-                $response->setBody(json_decode($response->getRawBody(), true));
+                if ($response->getBody()) {
+                    $response->setBody(json_decode($response->getRawBody(), true));
+                }
             }
             return $response;
         });

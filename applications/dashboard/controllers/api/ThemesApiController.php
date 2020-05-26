@@ -202,7 +202,7 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->themeResultSchema();
         $body = $in->validate($body);
 
-        $theme = $this->themeService->setPreviewTheme($body['themeID'], $body['revisionID'] ?? null);
+        $theme = $this->themeService->setPreviewTheme($body['themeID'] ?? null, $body['revisionID'] ?? null);
         $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
         return new Data($theme, ['theme' => $theme]);

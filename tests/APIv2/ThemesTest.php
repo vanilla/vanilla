@@ -272,6 +272,11 @@ class ThemesTest extends AbstractAPIv2Test {
         $body = $this->api()->get('/themes/current')->getBody();
         $this->assertNotEquals('keystone', $body['themeID']);
         $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
+
+        // Clear the preview
+        $response = $this->api()->put('/themes/preview', ['themeID' => null]);
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
     }
 
 

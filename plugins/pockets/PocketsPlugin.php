@@ -578,7 +578,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $locationOptions = val($location, $this->Locations, []);
 
         if ($this->ShowPocketLocations &&
-            arrasettingsController_AdditionalPocketFiltersy_key_exists($location, $this->Locations) &&
+            array_key_exists($location, $this->Locations) &&
             checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
             $locationName = val("Name", $this->Locations, $location);
             echo

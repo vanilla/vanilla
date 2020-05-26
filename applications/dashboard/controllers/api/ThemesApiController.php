@@ -174,9 +174,9 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param array $body Array of incoming params.
      *        fields: themeID (required)
-     * @return array
+     * @return Data
      */
-    public function put_current(array $body): array {
+    public function put_current(array $body): Data {
         $this->permission("Garden.Settings.Manage");
         $in = $this->themePutCurrentSchema('in');
         $out = $this->themeResultSchema();
@@ -185,7 +185,7 @@ class ThemesApiController extends AbstractApiController {
         $theme = $this->themeService->setCurrentTheme($body['themeID']);
         $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
-        return $theme;
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
@@ -194,9 +194,9 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param array $body Array of incoming params.
      *        fields: themeID (required)
-     * @return array
+     * @return Data
      */
-    public function put_preview(array $body): array {
+    public function put_preview(array $body): Data {
         $this->permission("Garden.Settings.Manage");
         $in = $this->themePutPreviewSchema('in');
         $out = $this->themeResultSchema();
@@ -205,7 +205,7 @@ class ThemesApiController extends AbstractApiController {
         $theme = $this->themeService->setPreviewTheme($body['themeID'], $body['revisionID'] ?? null);
         $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
-        return $theme;
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**

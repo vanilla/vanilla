@@ -203,7 +203,7 @@ class ThemeService {
      */
     public function setCurrentTheme($themeID): Theme {
         $previousTheme = $this->getCurrentTheme();
-        $previousProvider = $this->getThemeProvider($previousTheme['themeID']);
+        $previousProvider = $this->getThemeProvider($previousTheme->getThemeID());
         $newProvider = $this->getThemeProvider($themeID);
         $newTheme = $newProvider->setCurrentTheme($themeID);
 

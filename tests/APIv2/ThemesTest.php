@@ -17,6 +17,7 @@ use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use VanillaTests\InternalClient;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -248,9 +249,50 @@ class ThemesTest extends AbstractAPIv2Test {
     /**
      * Test /themes/current endpoint returns active theme (keystone).
      */
-    public function testCurrent() {
+    public function testGetCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
         $this->assertEquals('theme-foundation', $body['themeID']);
+    }
+
+    /**
+     * Test the theme preview endpoint.
+     */
+    public function testThemePreview() {
+        $response = $this->api()->put('/themes/preview', ['themeID' => 'keystone']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Make sure we didn't write to the config.
+        $this->assertNotEquals('keystone', \Gdn::config('Garden.Theme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
+
+        // Make sure other users don't see it.
+        $this->api()->setUserID(0);
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
+        $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
+    }
+
+
+    /**
+     * Test the theme preview endpoint.
+     */
+    public function testPutCurrent() {
+        // Make sure we don't start on keystone.
+        $this->assertNotEquals('keystone', \Gdn::config('Garden.Theme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
+
+        // Set the current theme.
+        $response = $this->api()->put('/themes/current', ['themeID' => 'keystone']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // The theme is set.
+        $this->assertEquals('keystone', \Gdn::config('Garden.Theme'));
+        $this->assertEquals('keystone', \Gdn::config('Garden.MobileTheme'));
+        $this->assertEquals('keystone', \Gdn::config('Garden.CurrentTheme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
     }
 }

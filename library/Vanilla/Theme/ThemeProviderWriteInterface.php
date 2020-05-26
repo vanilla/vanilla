@@ -25,19 +25,19 @@ interface ThemeProviderWriteInterface extends ThemeProviderInterface {
     /**
      * Update theme name by ID.
      *
-     * @param int $themeID Theme ID
+     * @param string|int $themeID Theme ID
      * @param array $body Array of incoming params.
      *        fields: name (required)
      * @return Theme
      */
-    public function patchTheme(int $themeID, array $body): Theme;
+    public function patchTheme($themeID, array $body): Theme;
 
     /**
      * Delete theme by ID.
      *
      * @param string|int $themeID Theme ID
      */
-    public function deleteTheme(int $themeID);
+    public function deleteTheme($themeID);
 
     /**
      * DELETE theme asset.
@@ -50,18 +50,18 @@ interface ThemeProviderWriteInterface extends ThemeProviderInterface {
     /**
      * Set theme asset (replace existing or create new if asset does not exist).
      *
-     * @param int $themeID Theme ID.
+     * @param string|int $themeID Theme ID.
      * @param string $assetKey Unique asset name (ex: header, footer, fonts, styles). Extension optional.
      * @param string $content Content for asset.
      *
      * @return ThemeAsset The update asset.
      */
-    public function setAsset(int $themeID, string $assetKey, string $content): ThemeAsset;
+    public function setAsset($themeID, string $assetKey, string $content): ThemeAsset;
 
     /**
      * Sparse update/set theme asset (update existing or create new if asset does not exist).
      *
-     * @param int $themeID The unique theme ID.
+     * @param string|int $themeID The unique theme ID.
      * @param string $assetKey Asset key.
      *        Note: only 'variables.json' allowed at the moment
      * @param string $data Data content for asset.
@@ -69,5 +69,5 @@ interface ThemeProviderWriteInterface extends ThemeProviderInterface {
      *
      * @return ThemeAsset
      */
-    public function sparseUpdateAsset(int $themeID, string $assetKey, string $data): ThemeAsset;
+    public function sparseUpdateAsset($themeID, string $assetKey, string $data): ThemeAsset;
 }

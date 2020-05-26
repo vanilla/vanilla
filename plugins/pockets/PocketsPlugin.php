@@ -325,8 +325,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
-//            $unflattened = unflattenArray('.', $form->formValues());
-//            $form->formValues($unflattened);
+            $unflattened = unflattenArray('.', $form->formValues());
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
@@ -790,6 +789,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function settingsController_additionalPocketFilterInputs_handler($args) {
         $Form = $args['form'];
+
         echo $Form->react(
             "RoleIDs",
             "pocket-multi-role-input",
@@ -797,18 +797,39 @@ class PocketsPlugin extends Gdn_Plugin {
                 "tag" => "li",
             ]
         );
+
+        $data = $Form->formData();
+        $categoryID = $data["CategoryID"];
+        $categoryLabel = null;
+        if (!empty($categoryID)) {
+            $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+            $currentCategory = $categoryModel->getID($categoryID);
+            $categoryLabel = $currentCategory->Name;
+        }
+
+        echo $Form->react(
+            "CategoryID",
+            "pocket-category-input",
+            [
+                "tag" => "li",
+                "label" => $categoryLabel,
+                "inheritCategory" => boolval($data["InheritCategory"] ?? 0)
+            ]
+        );
     }
 
+
     /**
-     * Add some event handling for pocket rendering.
+     * Add some event handling for pocket rendering. - Roles
      *
      * @param bool $existingCanRender
      * @param Pocket $pocket
      * @param array $requestData
      *
+     *
      * @return bool
      */
-    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+    function canRenderRoles(bool $existingCanRender, Pocket $pocket, array $requestData) {
         if (!$existingCanRender) {
             return $existingCanRender;
         }
@@ -830,7 +851,79 @@ class PocketsPlugin extends Gdn_Plugin {
         if (count($intersections) === 0) {
             return false;
         }
+        return true;
+    }
 
+    /**
+     * Add some event handling for pocket rendering. - Categories
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     *
+     * @return bool
+     */
+    function canRenderCategories(bool $existingCanRender, Pocket $pocket, array $requestData) {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+
+        $data = $pocket->Data;
+
+        if (empty($data["CategoryID"])) {
+            return false;
+        }
+
+        $controller = \Gdn::controller();
+        if (!$controller) {
+            return false;
+        }
+
+        $currentCategoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
+
+        if (!$currentCategoryID) {
+            return false;
+        }
+
+        if (!$data["InheritCategory"]) {
+            if ($currentCategoryID !== $pocket->Category) {
+                return false;
+            }
+        } else {
+            $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+            $currentCategory = $categoryModel->getID($currentCategoryID);
+            $parentIDs = [-1, $currentCategory->ParentCategoryID];
+            $ancestors = $categoryModel::getAncestors($currentCategory->ParentCategoryID, true);
+            if ($ancestors) {
+                $possibleIDs = array_push(array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID'))), $currentCategoryID);
+                $match = array_search($pocket->Category, $possibleIDs, true);
+                if ($match) {
+                    return false;
+                }
+            } else {
+                if ($currentCategoryID !== $pocket->Category) {
+                    return false;
+                }
+            }
+        }
+
+        return $existingCanRender;
+    }
+
+    /**
+     * Add some event handling for pocket rendering. - Roles
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     *
+     * @return bool
+     */
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        $existingCanRender = $this->canRenderRoles($existingCanRender, $pocket, $requestData);
+        $existingCanRender = $this->canRenderCategories($existingCanRender, $pocket, $requestData);
         return $existingCanRender;
     }
 }

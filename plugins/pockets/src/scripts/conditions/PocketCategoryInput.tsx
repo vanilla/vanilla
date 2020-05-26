@@ -16,15 +16,15 @@ import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 
 export function PocketCategoryInput(props) {
     const [category, setCategory] = useState(
-        props.name && props.value
+        props.label && props.initialValue
             ? {
-                  label: props.name,
-                  value: props.value,
+                  label: props.label,
+                  value: props.initialValue,
               }
             : undefined,
     );
 
-    const [inheritCategory, setInheritCategory] = useState(props.inheritCategory === 1);
+    const [inheritCategory, setInheritCategory] = useState(props.inheritCategory);
 
     const classes = selectOneClasses();
     inputClasses().applyInputCSSRules();

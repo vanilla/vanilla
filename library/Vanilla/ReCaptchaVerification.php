@@ -3,8 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-namespace Vanilla;
 
+namespace Vanilla;
 
 use Garden\Http\HttpClient;
 
@@ -13,13 +13,13 @@ use Garden\Http\HttpClient;
  */
 class ReCaptchaVerification {
 
-    CONST RECAPTCHA_V3_URL = "https://www.google.com/recaptcha/api/siteverify";
+    const RECAPTCHA_V3_URL = "https://www.google.com/recaptcha/api/siteverify";
 
     /** @var HttpClient */
     private $httpClient;
 
     /**
-     * reCaptchaVerification constructor.
+     * ReCaptchaVerification constructor.
      */
     public function __construct() {
         $this->httpClient = new HttpClient();

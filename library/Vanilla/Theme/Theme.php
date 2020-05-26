@@ -7,6 +7,7 @@
 
 namespace Vanilla\Theme;
 
+use Garden\JsonFilterTrait;
 use Garden\Schema\Schema;
 use Vanilla\Addon;
 use Vanilla\Theme\ThemeService;
@@ -25,6 +26,8 @@ use Vanilla\Utility\InstanceValidatorSchema;
  * Data class for themes.
  */
 class Theme implements \JsonSerializable {
+
+    use JsonFilterTrait;
 
     /** @var string */
     private $themeID;
@@ -209,7 +212,7 @@ class Theme implements \JsonSerializable {
      * @inheritdoc
      */
     public function jsonSerialize() {
-        return [
+        return $this->jsonFilter([
             'themeID' => $this->themeID,
             'type' => $this->type,
             'name' => $this->name,
@@ -225,7 +228,7 @@ class Theme implements \JsonSerializable {
             'preview' => $this->preview,
             'features' => $this->getFeatures(),
             'supportedSections' => $this->getSupportedSections(),
-        ];
+        ]);
     }
 
     /**

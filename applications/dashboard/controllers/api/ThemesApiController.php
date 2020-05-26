@@ -84,6 +84,9 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->themeResultSchema()]);
 
         $themeRevisions = $this->themeService->getThemeRevisions($themeID);
+        foreach ($themeRevisions as $theme) {
+            $this->handleAssetExpansions($theme, false);
+        }
         $result = $out->validate($themeRevisions);
         return $result;
     }

@@ -15,6 +15,7 @@ import { LoadStatus } from "@library/@types/api/core";
 
 interface IProps extends ISelectLookupProps {
     isLoading: boolean;
+    hideTitle?: boolean;
 }
 
 /**

@@ -33,16 +33,16 @@ export interface ITheme {
 }
 
 export interface IThemePreview {
-    info: Record<
+    info?: Record<
         string,
         {
             type: string;
             value: string;
         }
     >;
-    imageUrl: string | null;
-    variables: {
-        globalBg: string | null;
+    imageUrl?: string | null;
+    variables?: {
+        globalBg?: string | null;
         globalFg?: string | null;
         globalPrimary?: string | null;
         titleBarBg?: string | null;

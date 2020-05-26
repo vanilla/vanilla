@@ -9,7 +9,7 @@ import { themeCardClasses } from "./themePreviewCardStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, offsetLightness, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
+import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
@@ -21,7 +21,6 @@ import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DropDownItem from "@library/flyouts/items/DropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { color, ColorHelper } from "csx";
@@ -32,7 +31,7 @@ type ClickHandlerOrUrl = string | VoidFunction;
 
 interface IProps {
     name?: string;
-    preview: IThemePreview;
+    preview?: IThemePreview;
     onApply?: VoidFunction;
     isApplyLoading?: boolean;
     onPreview?: VoidFunction;
@@ -78,7 +77,7 @@ export default function ThemePreviewCard(props: IProps) {
                                 <span key={key} className={classes.menuBarDots}></span>
                             ))}
                         </div>
-                        {preview.imageUrl ? (
+                        {preview?.imageUrl ? (
                             <img className={classes.previewImage} src={preview.imageUrl} />
                         ) : (
                             <svg
@@ -91,10 +90,10 @@ export default function ThemePreviewCard(props: IProps) {
                                 <rect width="100%" height="100%" fill={vars.globalBg} />
                                 <g stroke="none" strokeWidth="1" fill={vars.globalBg} fillRule="evenodd">
                                     <g>
-                                        {preview.variables.backgroundImage ? (
+                                        {preview?.variables?.backgroundImage ? (
                                             <image
                                                 preserveAspectRatio="xMidYMid slice"
-                                                href={preview.variables.backgroundImage}
+                                                href={preview.variables?.backgroundImage}
                                                 width="310px"
                                                 height="61px"
                                                 x={0}
@@ -427,21 +426,21 @@ function LinkOrButton(props: { onClick: ClickHandlerOrUrl; children: React.React
     }
 }
 
-function calculateVars(preview: IThemePreview) {
+function calculateVars(preview?: IThemePreview) {
     const gVars = globalVariables();
     const titleVars = titleBarVariables();
-    const globalBg = preview.variables.globalBg ?? gVars.mainColors.bg;
-    let globalFg = preview.variables.globalFg ? color(preview.variables.globalFg) : gVars.mainColors.fg;
+    const globalBg = preview?.variables?.globalBg ?? gVars.mainColors.bg;
+    let globalFg = preview?.variables?.globalFg ? color(preview?.variables?.globalFg) : gVars.mainColors.fg;
     // Add a little opacity to the FG so it doesn't stick out so much.
     // Normal text isn't nearly so thick.
     globalFg = modifyColorBasedOnLightness(globalFg, 0.3) as ColorHelper;
 
-    const globalPrimary = preview.variables.globalPrimary
-        ? color(preview.variables.globalPrimary)
+    const globalPrimary = preview?.variables?.globalPrimary
+        ? color(preview?.variables?.globalPrimary)
         : gVars.mainColors.primary;
-    const titleBarBg = preview.variables.titleBarBg ? color(preview.variables.titleBarBg) : globalPrimary;
+    const titleBarBg = preview?.variables?.titleBarBg ? color(preview?.variables?.titleBarBg) : globalPrimary;
     const splashBg = modifyColorBasedOnLightness(globalPrimary, 0.12, true);
-    const titleBarFg = preview.variables.titleBarFg ?? titleVars.colors.fg;
+    const titleBarFg = preview?.variables?.titleBarFg ?? titleVars.colors.fg;
     return {
         globalFg: colorOut(globalFg),
         globalBg: colorOut(globalBg),

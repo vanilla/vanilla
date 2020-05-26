@@ -50,13 +50,13 @@ class ThemesTest extends AbstractAPIv2Test {
     public function provideAssetTypes(): array {
         $fixturesDir = PATH_ROOT . "/tests/fixtures";
         return [
-            ["asset-test", "fonts.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/fonts.json"), "application/json"],
+            ["asset-test", "fonts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/fonts.json")), "application/json"],
             ["asset-test", "footer.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/footer.html"), "text/html"],
             ["asset-test", "header.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/header.html"), "text/html"],
             ["asset-test", "javascript.js", file_get_contents("{$fixturesDir}/themes/asset-test/assets/javascript.js"), "application/javascript"],
-            ["asset-test", "scripts.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/scripts.json"), "application/json"],
+            ["asset-test", "scripts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/scripts.json")), "application/json"],
             ["asset-test", "styles.css", file_get_contents("{$fixturesDir}/themes/asset-test/assets/styles.css"), "text/css"],
-            ["asset-test", "variables.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/variables.json"), "application/json"],
+            ["asset-test", "variables.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/variables.json")), "application/json"],
         ];
     }
 
@@ -84,7 +84,7 @@ class ThemesTest extends AbstractAPIv2Test {
     public function provideAssetTypesNoExt(): array {
         $assetRoot = PATH_ROOT . "/tests/fixtures/themes/asset-test/assets";
         return [
-            [
+            'fonts' => [
                 "asset-test",
                 "fonts",
                 [
@@ -92,7 +92,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => json_decode(file_get_contents("$assetRoot/fonts.json"), true),
                 ],
             ],
-            [
+            'variables' => [
                 "asset-test",
                 "variables",
                 [
@@ -100,7 +100,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => json_decode(file_get_contents("$assetRoot/variables.json"), true),
                 ],
             ],
-            [
+            'scripts' => [
                 "asset-test",
                 "scripts",
                 [
@@ -108,7 +108,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => json_decode(file_get_contents("$assetRoot/scripts.json"), true),
                 ],
             ],
-            [
+            'header' => [
                 "asset-test",
                 "header",
                 [
@@ -116,7 +116,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => file_get_contents("$assetRoot/header.html"),
                 ],
             ],
-            [
+            'footer' => [
                 "asset-test",
                 "footer",
                 [
@@ -124,7 +124,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => file_get_contents("$assetRoot/footer.html"),
                 ],
             ],
-            [
+            'javascript' => [
                 "asset-test",
                 "javascript",
                 [
@@ -132,7 +132,7 @@ class ThemesTest extends AbstractAPIv2Test {
                     'data' => file_get_contents("$assetRoot/javascript.js"),
                 ],
             ],
-            [
+            'styles' => [
                 "asset-test",
                 "styles",
                 [
@@ -251,6 +251,6 @@ class ThemesTest extends AbstractAPIv2Test {
     public function testCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
-        $this->assertEquals('theme-foundation', $body->getThemeID());
+        $this->assertEquals('theme-foundation', $body['themeID']);
     }
 }

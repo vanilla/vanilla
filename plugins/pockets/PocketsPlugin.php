@@ -787,10 +787,9 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Add multi role input to pocket filters
      *
-     * @param \SettingsController $sender
      * @param array $args
      */
-    function settingsController_AdditionalPocketFilterInputs_handler($args) {
+    public function settingsController_AdditionalPocketFilterInputs_handler($args) {
         $Form = $args['form'];
         echo $Form->react(
             "RoleIDs",

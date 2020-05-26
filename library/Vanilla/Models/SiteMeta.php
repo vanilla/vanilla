@@ -116,7 +116,7 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var string */
     private $reCaptchaKey = '';
-  
+
     /** @var FormatService */
     private $formatService;
 
@@ -130,6 +130,7 @@ class SiteMeta implements \JsonSerializable {
      * @param ThemeFeatures $themeFeatures
      * @param ThemeModel $themeModel
      * @param Gdn_Session $session
+     * @param FormatService $formatService
      */
     public function __construct(
         RequestInterface $request,
@@ -208,7 +209,7 @@ class SiteMeta implements \JsonSerializable {
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
 
-        $this->reCaptchaKey = $config->get("Recaptcha.PublicKey", '');
+        $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", '');
     }
 
     /**

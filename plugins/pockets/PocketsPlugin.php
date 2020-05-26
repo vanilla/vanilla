@@ -789,7 +789,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param array $args
      */
-    public function settingsController_AdditionalPocketFilterInputs_handler($args) {
+    public function settingsController_additionalPocketFilterInputs_handler($args) {
         $Form = $args['form'];
         echo $Form->react(
             "RoleIDs",

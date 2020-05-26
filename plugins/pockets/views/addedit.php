@@ -58,7 +58,7 @@ echo $Form->errors();
     <?php
     /** @var \Garden\EventManager $eventManager */
     $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-    $eventManager->fire('settingsController_AdditionalPocketFilterInputs', ['form' => $Form, 'attributes' => json_decode($Form->getFormValue("Attributes", '[]'))]);
+    $eventManager->fire('settingsController_additionalPocketFilterInputs', ['form' => $Form, 'attributes' => json_decode($Form->getFormValue("Attributes", '[]'))]);
     ?>
 
     <li class="js-repeat form-group">

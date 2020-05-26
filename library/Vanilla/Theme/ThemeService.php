@@ -62,6 +62,9 @@ class ThemeService {
     /** @var FsThemeProvider */
     private $fallbackThemeProvider;
 
+    /** @var ThemeCache */
+    private $cache;
+
     /**
      * ThemeService constructor.
      *
@@ -72,6 +75,7 @@ class ThemeService {
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
      * @param FsThemeProvider $fallbackThemeProvider
+     * @param ThemeCache $cache
      */
     public function __construct(
         ConfigurationInterface $config,
@@ -80,7 +84,8 @@ class ThemeService {
         ThemeServiceHelper $themeHelper,
         ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel,
-        FsThemeProvider $fallbackThemeProvider
+        FsThemeProvider $fallbackThemeProvider,
+        ThemeCache $cache
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -89,6 +94,7 @@ class ThemeService {
         $this->themeSections = $themeSections;
         $this->siteSectionModel = $siteSectionModel;
         $this->fallbackThemeProvider = $fallbackThemeProvider;
+        $this->cache = $cache;
     }
 
     /**
@@ -133,9 +139,16 @@ class ThemeService {
      * @return Theme
      */
     public function getTheme($themeKey, array $query = []): Theme {
+        $cacheKey = $this->cache->cacheKey($themeKey, $query);
+        $result = $this->cache->get($cacheKey);
+        if ($result instanceof Theme) {
+            return $result;
+        }
+
         $provider = $this->getThemeProvider($themeKey);
         $theme = $provider->getTheme($themeKey, $query);
         $theme = $this->normalizeTheme($theme);
+        $this->cache->set($cacheKey, $theme);
         return $theme;
     }
 
@@ -166,6 +179,10 @@ class ThemeService {
     public function postTheme(array $body): Theme {
         $provider = $this->getWritableThemeProvider();
         $theme = $provider->postTheme($body);
+
+        // Clear the cache.
+        $this->cache->clear();
+
         $theme = $this->normalizeTheme($theme);
         return $theme;
     }
@@ -181,6 +198,10 @@ class ThemeService {
     public function patchTheme(int $themeID, array $body): Theme {
         $provider = $this->getWritableThemeProvider($themeID);
         $theme = $provider->patchTheme($themeID, $body);
+
+        // Clear the cache.
+        $this->cache->clear();
+
         $theme = $this->normalizeTheme($theme);
         return $theme;
     }
@@ -193,6 +214,8 @@ class ThemeService {
     public function deleteTheme(int $themeID) {
         $provider = $this->getWritableThemeProvider($themeID);
         $provider->deleteTheme($themeID);
+        // Clear the cache.
+        $this->cache->clear();
     }
 
     /**
@@ -210,6 +233,8 @@ class ThemeService {
         if ($previousProvider !== $newProvider && $previousProvider instanceof ThemeProviderCleanupInterface) {
             $previousProvider->afterCurrentProviderChange();
         }
+        // Clear the cache.
+        $this->cache->clear();
 
         $newTheme = $this->normalizeTheme($newTheme);
         return $newTheme;
@@ -231,6 +256,9 @@ class ThemeService {
             $provider = $this->getThemeProvider($themeID);
             $theme = $provider->setPreviewTheme($themeID, $revisionID);
         }
+
+        // No cache clearing required here. Themes are saved by their ID.
+
         $theme = $this->normalizeTheme($theme);
         return $theme;
     }
@@ -403,8 +431,9 @@ class ThemeService {
      */
     public function setAsset($themeID, string $assetKey, string $data): ThemeAsset {
         $provider = $this->getWritableThemeProvider($themeID);
-        $provider->setAsset($themeID, $assetKey, $data);
-        return $this->getTheme($themeID)->getAssets()[$assetKey];
+        $asset = $provider->setAsset($themeID, $assetKey, $data);
+        $this->cache->clear();
+        return $asset;
     }
 
     /**
@@ -419,8 +448,10 @@ class ThemeService {
      */
     public function sparseUpdateAsset($themeID, string $assetKey, string $data): ThemeAsset {
         $provider = $this->getWritableThemeProvider($themeID);
-        $provider->sparseUpdateAsset($themeID, $assetKey, $data);
-        return $this->getTheme($themeID)->getAssets()[$assetKey];
+        $asset = $provider->sparseUpdateAsset($themeID, $assetKey, $data);
+        // Clear the cache.
+        $this->cache->clear();
+        return $asset;
     }
 
     /**
@@ -455,7 +486,7 @@ class ThemeService {
             }
         }
 
-        throw new ServerException('No writable theme provider is configured.');
+        throw new ServerException("No writable theme provider is configured to handle theme '$themeID'.");
     }
 
     /**
@@ -469,6 +500,8 @@ class ThemeService {
     public function getAsset(string $themeID, string $assetKey): ?ThemeAsset {
         $provider = $this->getThemeProvider($themeID);
         $theme = $provider->getTheme($themeID);
+        // Clear the cache.
+        $this->cache->clear();
         return $theme->getAssets()[$assetKey] ?? null;
     }
 
@@ -481,6 +514,8 @@ class ThemeService {
     public function deleteAsset($themeKey, string $assetKey) {
         $provider = $this->getWritableThemeProvider($themeKey);
         $provider->deleteAsset($themeKey, $assetKey);
+        // Clear the cache.
+        $this->cache->clear();
     }
 
     /**

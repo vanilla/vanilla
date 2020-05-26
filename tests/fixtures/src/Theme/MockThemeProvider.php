@@ -9,16 +9,22 @@ namespace VanillaTests\Fixtures\Theme;
 
 use Vanilla\Addon;
 use Vanilla\Theme\Asset\JsonThemeAsset;
+use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeProviderInterface;
+use Vanilla\Theme\ThemeProviderWriteInterface;
+use VanillaTests\Fixtures\MockAddon;
 
 /**
  * Mock provider for tests.
  */
-class MockThemeProvider implements ThemeProviderInterface {
+class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInterface {
 
     /** @var Theme[] */
     private $themesByID = [];
+
+    /** @var Theme[] */
+    private $themeDataByID = [];
 
     ///
     /// ThemeProviderInterface
@@ -82,6 +88,60 @@ class MockThemeProvider implements ThemeProviderInterface {
     }
 
     ///
+    /// Write interface
+    ///
+
+    /**
+     * @inheritdoc
+     */
+    public function postTheme(array $body): Theme {
+        return $this->addTheme($body, new MockAddon('Fake Addon'));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function patchTheme($themeID, array $body): Theme {
+        [$existingData, $addon] = $this->themeDataByID[$themeID];
+        $newData = array_replace_recursive($existingData, $body);
+        return $this->addTheme($newData, $addon);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteTheme($themeID) {
+        unset($this->themesByID[$themeID]);
+        unset($this->themeDataByID[$themeID]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteAsset($themeKey, string $assetName) {
+        [$themeData, $addon] = $this->themeDataByID[$themeKey];
+        unset($themeData['assets'][$assetName]);
+        $this->addTheme($themeData, $addon);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAsset($themeID, string $assetKey, string $content): ThemeAsset {
+        [$themeData, $addon] = $this->themeDataByID[$themeID];
+        $themeData['assets'][$assetKey]['data'] = $content;
+        $this->addTheme($themeData, $addon);
+        return $this->getTheme($themeID)->getAsset($assetKey);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function sparseUpdateAsset($themeID, string $assetKey, string $data): ThemeAsset {
+        return $this->setAsset($themeID, $assetKey, $data);
+    }
+
+    ///
     /// Utilities
     ///
 
@@ -94,6 +154,8 @@ class MockThemeProvider implements ThemeProviderInterface {
      */
     public function addTheme(array $body, Addon $addon): Theme {
         $themeID = $body['themeID'] ?? count($this->themesByID);
+        $this->themeDataByID[$themeID] = [$body, $addon];
+
         $body = array_replace_recursive([
             'themeID' => (string) $themeID,
             'name' => 'A Mock theme',

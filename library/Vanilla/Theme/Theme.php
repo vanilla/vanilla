@@ -77,6 +77,9 @@ class Theme implements \JsonSerializable {
     /** @var string[] */
     private $supportedSections = [];
 
+    /** @var bool Set if the theme was pulled from the cache. */
+    private $isCacheHit = false;
+
     /**
      * @return Schema
      */
@@ -449,5 +452,19 @@ class Theme implements \JsonSerializable {
      */
     public function setAsset(string $assetName, ThemeAsset $asset): void {
         $this->assets[$assetName] = $asset;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCacheHit(): bool {
+        return $this->isCacheHit;
+    }
+
+    /**
+     * @param bool $isCacheHit
+     */
+    public function setIsCacheHit(bool $isCacheHit): void {
+        $this->isCacheHit = $isCacheHit;
     }
 }

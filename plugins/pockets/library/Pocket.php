@@ -58,6 +58,9 @@ class Pocket {
     /** $var string Whether the pocket is in test mode. */
     public $TestMode = false;
 
+    /** @var array */
+    public $Data = [];
+
     /** $var bool Whether to disable the pocket for embedded comments. * */
     public $EmbeddedNever = false;
 
@@ -66,6 +69,9 @@ class Pocket {
 
     /** @var array */
     public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
+
+    /** @var array */
+    public $Attributes = [];
 
     /**
      * Pocket constructor.
@@ -95,6 +101,9 @@ class Pocket {
      * @return bool
      */
     public function canRender($data) {
+        $testMode = self::inTestMode($this);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
         }
@@ -116,7 +125,7 @@ class Pocket {
             return false;
         }
 
-        if (self::inTestMode($this) && !checkPermission('Plugins.Pockets.Manage')) {
+        if ($testMode && !$pocketAdmin) {
             return false;
         }
 
@@ -163,8 +172,11 @@ class Pocket {
             }
         }
 
-        // If we've passed all of the tests then the pocket can be processed.
-        return true;
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $eventResult = $eventManager->fireFilter('pocket_canRender', true, $this, $data);
+
+        return $eventResult;
     }
 
     /**
@@ -181,10 +193,11 @@ class Pocket {
         $this->Page = $data['Page'];
         $this->MobileOnly = $data['MobileOnly'];
         $this->MobileNever = $data['MobileNever'];
-        $this->Type = val('Type', $data, Pocket::TYPE_DEFAULT);
-        $this->EmbeddedNever = val('EmbeddedNever', $data);
-        $this->ShowInDashboard = val('ShowInDashboard', $data);
-        $this->TestMode = val('TestMode', $data);
+        $this->Type = $data['Type'] ?? Pocket::TYPE_DEFAULT;
+        $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
+        $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
+        $this->TestMode = $data['TestMode'] ?? null;
+        $this->Data = $data;
 
         // parse the frequency.
         $repeat = $data['Repeat'];
@@ -330,7 +343,8 @@ class Pocket {
                 'MobileNever' => 0,
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
-                'Type' => 'default'
+                'Type' => 'default',
+                'Attributes' => null
                 ];
             $model->save($pocket);
         }

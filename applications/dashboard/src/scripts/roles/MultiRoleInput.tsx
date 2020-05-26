@@ -12,6 +12,7 @@ import { notEmpty } from "@vanilla/utils";
 interface IProps extends Omit<ITokenProps, "options" | "isLoading" | "value" | "onChange"> {
     value: number[];
     onChange: (tokens: number[]) => void;
+    menuPlacement?: string;
 }
 
 export function MultiRoleInput(props: IProps) {
@@ -40,6 +41,6 @@ export function MultiRoleInput(props: IProps) {
             }}
             options={roleOptions.data ?? []}
             isLoading={[LoadStatus.PENDING, LoadStatus.LOADING].includes(roleOptions.status)}
-        ></Tokens>
+        />
     );
 }

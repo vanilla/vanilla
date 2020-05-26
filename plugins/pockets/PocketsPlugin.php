@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Addons\Pockets\PocketsModel;
+
 /**
  * Class PocketsPlugin
  */
@@ -33,6 +35,9 @@ class PocketsPlugin extends Gdn_Plugin {
 
     /** Whether or not to display test items for all pockets. */
     public $ShowPocketLocations = null;
+
+    /** @var array */
+    private $userRoleIDs = null;
 
     /**
      * PocketsPlugin constructor.
@@ -177,9 +182,8 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Pockets'));
 
         // Grab the pockets from the DB.
-        $pocketData = Gdn::sql()
-            ->get('Pocket', 'Location, `Sort`')
-            ->resultArray();
+        $model = new PocketsModel();
+        $pocketData = $model->getAll();
 
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
@@ -315,12 +319,14 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     protected function _addEdit($sender, $pocketID = false) {
         $form = new Gdn_Form();
-        $pocketModel = new Gdn_Model('Pocket');
+        $pocketModel = new PocketsModel();
         $form->setModel($pocketModel);
         $sender->ConditionModule = new ConditionModule($sender);
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
+//            $unflattened = unflattenArray('.', $form->formValues());
+//            $form->formValues($unflattened);
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
@@ -372,6 +378,8 @@ class PocketsPlugin extends Gdn_Plugin {
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
 
+            $form->setFormValue('Attributes', json_encode($unflattened['Attributes'], true));
+
             $saved = $form->save();
             if ($saved) {
                 $sender->StatusMessage = t('Your changes have been saved.');
@@ -380,13 +388,13 @@ class PocketsPlugin extends Gdn_Plugin {
         } else {
             if ($pocketID !== false) {
                 // Load the pocket.
-                $pocket = $pocketModel->getWhere(['PocketID' => $pocketID])->firstRow(DATASET_TYPE_ARRAY);
+                $pocket = $pocketModel->getID($pocketID);
                 if (!$pocket) {
                     return Gdn::dispatcher()->dispatch('Default404');
                 }
 
                 // Convert some of the pocket data into a format digestable by the form.
-                list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
+                [$repeatType, $repeatFrequency] = Pocket::parseRepeat($pocket['Repeat']);
                 $repeatFrequency += [1, 1];
 
                 $pocket['RepeatType'] = $repeatType;
@@ -498,6 +506,20 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @return array
+     */
+    private function getUserRoleIDs(): array {
+        if ($this->userRoleIDs) {
+            return $this->userRoleIDs;
+        }
+        $roleModel = Gdn::getContainer()->get(RoleModel::class);
+        $userID = Gdn::session()->UserID;
+        $roles = $roleModel->getByUserID($userID)->resultArray();
+        $this->userRoleIDs = array_column($roles, 'RoleID');
+        return $this->userRoleIDs;
+    }
+
+    /**
      * Load all pockets from the database.
      *
      * @param bool $force If true, re-load data from DB even if it's loaded.
@@ -507,7 +529,8 @@ class PocketsPlugin extends Gdn_Plugin {
             return;
         }
 
-        $pockets = Gdn::sql()->get('Pocket', 'Location, Sort, Name')->resultArray();
+        $model = new PocketsModel();
+        $pockets = $model->getAll();
         foreach ($pockets as $row) {
             $pocket = new Pocket();
             $pocket->load($row);
@@ -554,7 +577,10 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $locationOptions = val($location, $this->Locations, []);
 
-        if ($this->ShowPocketLocations && array_key_exists($location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
+        if ($this->ShowPocketLocations &&
+            arrasettingsController_AdditionalPocketFiltersy_key_exists($location, $this->Locations) &&
+            checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin'
+        ) {
             $locationName = val("Name", $this->Locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
@@ -757,6 +783,57 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->jsonTarget('#pocket-locations-toggle', static::locationsToggle($on), 'Html');
         $sender->render('blank', 'utility', 'dashboard');
     }
+
+    /**
+     * Add multi role input to pocket filters
+     *
+     * @param array $args
+     */
+    public function settingsController_additionalPocketFilterInputs_handler($args) {
+        $Form = $args['form'];
+        echo $Form->react(
+            "RoleIDs",
+            "pocket-multi-role-input",
+            [
+                "tag" => "li",
+            ]
+        );
+    }
+
+    /**
+     * Add some event handling for pocket rendering.
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     * @return bool
+     */
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+
+        $testMode = Pocket::inTestMode($pocket);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+        $pocketData = $pocket->Data;
+        $roleIDs = $pocketData['RoleIDs'] ?? [];
+
+        if (empty($roleIDs)) {
+            return $existingCanRender;
+        }
+
+        if ($testMode && $pocketAdmin) {
+            return $existingCanRender;
+        }
+
+        $intersections = array_intersect($this->getUserRoleIDs(), $roleIDs);
+        if (count($intersections) === 0) {
+            return false;
+        }
+
+        return $existingCanRender;
+    }
 }
 
 if (!function_exists('ValidateIntegerArray')) {
@@ -818,3 +895,4 @@ if (!function_exists('renderPocketToggle')) {
         return $return;
     }
 }
+

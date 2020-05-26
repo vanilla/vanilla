@@ -134,7 +134,7 @@ class ThemeAssetFactory {
         if ($defaultAsset) {
             $allowedTypes = $defaultAsset['allowedTypes'];
             if (!in_array($assetType, $allowedTypes)) {
-                $message = "Invalid type $assetType for asset $assetName";
+                $message = "Invalid type '$assetType' for asset '$assetName'";
                 if ($throw) {
                     throw new ClientException($message);
                 } else {

@@ -19,10 +19,6 @@ use Vanilla\Theme\ThemeService;
  */
 trait ThemesApiSchemes {
 
-    /** @var Schema */
-    private $assetInputSchema;
-
-
     /**
      * Result theme schema
      *
@@ -82,13 +78,13 @@ trait ThemesApiSchemes {
                     'description' => 'Parent theme template version/revision.',
                 ],
                 'assets?' => Schema::parse([
-                    "header?" => $this->assetInputSchema(),
-                    "footer?" => $this->assetInputSchema(),
-                    "variables?" => $this->assetInputSchema(),
-                    "fonts?" => $this->assetInputSchema(),
-                    "scripts?" => $this->assetInputSchema(),
-                    "styles?" => $this->assetInputSchema(),
-                    "javascript?" => $this->assetInputSchema()
+                    "header?" => $this->assetInputSchema('header'),
+                    "footer?" => $this->assetInputSchema('footer'),
+                    "variables?" => $this->assetInputSchema('variables'),
+                    "fonts?" => $this->assetInputSchema('fonts'),
+                    "scripts?" => $this->assetInputSchema('scripts'),
+                    "styles?" => $this->assetInputSchema('styles'),
+                    "javascript?" => $this->assetInputSchema('javascript')
                 ])
             ]),
             $type
@@ -121,13 +117,13 @@ trait ThemesApiSchemes {
                     'description' => 'Theme revision name.',
                 ],
                 'assets?' => Schema::parse([
-                    "header?" => $this->assetInputSchema(),
-                    "footer?" => $this->assetInputSchema(),
-                    "variables?" => $this->assetInputSchema(),
-                    "fonts?" => $this->assetInputSchema(),
-                    "scripts?" => $this->assetInputSchema(),
-                    "styles?" => $this->assetInputSchema(),
-                    "javascript?" => $this->assetInputSchema()
+                    "header?" => $this->assetInputSchema('header'),
+                    "footer?" => $this->assetInputSchema('footer'),
+                    "variables?" => $this->assetInputSchema('variables'),
+                    "fonts?" => $this->assetInputSchema('fonts'),
+                    "scripts?" => $this->assetInputSchema('scripts'),
+                    "styles?" => $this->assetInputSchema('styles'),
+                    "javascript?" => $this->assetInputSchema('javascript')
                 ])
             ]),
             $type
@@ -137,48 +133,51 @@ trait ThemesApiSchemes {
 
     /**
      * Schema for asset arrays.
+     *
+     * @param string The name of the field.
+     *
+     * @return Schema
      */
-    public function assetInputSchema(): Schema {
-        if (!$this->assetInputSchema) {
-            $this->assetInputSchema = $this->schema([
-                'type:s',
-                'data:s|o' => [
-                    'minLength' => 0,
-                ]
-            ]);
-            $this->assetInputSchema->addValidator('', function ($data, ValidationField $field) {
-                if ($data['type'] !== ThemeAssetFactory::ASSET_TYPE_JSON && is_array($data['data'])) {
-                    $field->addError('Objects for the `data` field are only supported when the type is `json`.');
-                }
-            });
-            $this->assetInputSchema->addFilter('data', function ($data) {
-                if (is_array($data)) {
-                    return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-                } else {
-                    return $data;
-                }
-            });
-            /** @var ThemeAssetFactory $assetFactory */
-            $assetFactory = $this->assetFactory;
-            $this->assetInputSchema->addValidator('', function ($data, ValidationField $field) use ($assetFactory) {
-                $type = $data['type'] ?? null;
-                $dataData = $data['data'] ?? null;
+    public function assetInputSchema(string $fieldName): Schema {
+        $schema = $this->schema([
+            'type:s',
+            'data:s|o' => [
+                'minLength' => 0,
+            ]
+        ]);
+        $schema->addValidator('', function ($data, ValidationField $field) {
+            $type = $data['type'] ?? null;
+            $dataData = $data['data'] ?? null;
+            if ($type !== ThemeAssetFactory::ASSET_TYPE_JSON && is_array($dataData)) {
+                $field->addError('Objects for the `data` field are only supported when the type is `json`.');
+            }
+        });
+        $schema->addFilter('data', function ($data) {
+            if (is_array($data)) {
+                return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            } else {
+                return $data;
+            }
+        });
+        /** @var ThemeAssetFactory $assetFactory */
+        $assetFactory = $this->assetFactory;
+        $schema->addValidator('', function ($data, ValidationField $field) use ($assetFactory, $fieldName) {
+            $type = $data['type'] ?? null;
+            $dataData = $data['data'] ?? null;
 
-                if ($dataData === null || $type === null) {
-                    // Will get caught in the normal validation.
-                    return;
-                }
+            if ($dataData === null || $type === null) {
+                // Will get caught in the normal validation.
+                return;
+            }
 
-                $asset = $assetFactory->createAsset(null, $type, 'validate', $dataData);
-                try {
-                    $asset->validate();
-                } catch (Exception $e) {
-                    $field->getValidation()->addError('data', $e->getMessage());
-                }
-            });
-        }
-
-        return $this->assetInputSchema;
+            try {
+                $asset = $assetFactory->createAsset(null, $type, $fieldName, $dataData, true);
+                $asset->validate();
+            } catch (Exception $e) {
+                $field->addError($e->getMessage());
+            }
+        });
+        return $schema;
     }
 
     /**

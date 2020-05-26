@@ -112,8 +112,7 @@ class ThemesApiController extends AbstractApiController {
         foreach ($themes as $theme) {
             $this->handleAssetExpansions($theme, $params['expand']);
         }
-        $result = $out->validate($themes);
-        return $result;
+        return $themes;
     }
 
     /**
@@ -135,7 +134,7 @@ class ThemesApiController extends AbstractApiController {
         $normalizedTheme = $this->themeService->postTheme($body);
         $this->handleAssetExpansions($normalizedTheme, true);
         $theme = $out->validate($normalizedTheme);
-        return new Data($theme);
+        return new Data($theme, ['theme' => $theme]);
     }
 
 
@@ -157,7 +156,7 @@ class ThemesApiController extends AbstractApiController {
 
         $theme = $out->validate($normalizedTheme);
         $this->handleAssetExpansions($normalizedTheme, true);
-        return new Data($theme);
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
@@ -221,7 +220,7 @@ class ThemesApiController extends AbstractApiController {
         $theme = $this->themeService->getCurrentTheme();
         $this->handleAssetExpansions($theme, true);
         $result = $out->validate($theme);
-        return new Data($result);
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
@@ -311,7 +310,7 @@ class ThemesApiController extends AbstractApiController {
             }
             return $asset->render($ext);
         } else {
-            $result = new Data($asset->jsonSerialize());
+            $result = new Data($asset);
         }
 
         // Set maximum cache durations for these static assets.
@@ -336,7 +335,7 @@ class ThemesApiController extends AbstractApiController {
 
         if (!$assetType) {
             $body = $request->getBody();
-            $body = $this->assetInputSchema()->validate($body);
+            $body = $this->assetInputSchema($assetName)->validate($body);
             $assetType = $body['type'];
             $assetBody = is_array($body['data']) ? json_encode($body['data'], JSON_UNESCAPED_UNICODE) : $body['data'];
         } else {

@@ -65,6 +65,9 @@ class Theme implements \JsonSerializable {
     /** @var bool */
     private $current;
 
+    /** @var bool */
+    private $active;
+
     /** @var Addon|null */
     private $addon = null;
 
@@ -88,6 +91,7 @@ class Theme implements \JsonSerializable {
             'insertUser:o?',
             'dateInserted:dt?',
             'current:b?',
+            'active:b?',
             'parentTheme:s?',
             'assets:o?',
             'addon?' => new InstanceValidatorSchema(Addon::class),
@@ -195,6 +199,7 @@ class Theme implements \JsonSerializable {
         $this->dateInserted = $data['dateInserted'] ?? null;
         $this->current = $data['current'] ?? false;
         $this->parentTheme = $data['parentTheme'] ?? null;
+        $this->active = $data['active'] ?? true;
         $this->initializeAssets($data['assets']);
         $this->preview = new ThemePreview();
         $this->preview->addVariablePreview($this->assets['variables']);
@@ -214,6 +219,7 @@ class Theme implements \JsonSerializable {
             'insertUser' => $this->insertUser,
             'dateInserted' => $this->dateInserted,
             'current' => $this->current,
+            'active' => $this->active,
             'parentTheme' => $this->parentTheme,
             'assets' => $this->assets,
             'preview' => $this->preview,

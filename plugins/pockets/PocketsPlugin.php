@@ -829,7 +829,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-     private function canRenderRoles(bool $existingCanRender, Pocket $pocket, array $requestData) {
+    private function canRenderRoles(bool $existingCanRender, Pocket $pocket, array $requestData) {
         if (!$existingCanRender) {
             return $existingCanRender;
         }
@@ -852,7 +852,7 @@ class PocketsPlugin extends Gdn_Plugin {
             return false;
         }
         return true;
-    }
+     }
 
     /**
      * Add some event handling for pocket rendering. - Categories
@@ -864,7 +864,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-     private function canRenderCategories(bool $existingCanRender, Pocket $pocket, array $requestData) {
+    private function canRenderCategories(bool $existingCanRender, Pocket $pocket, array $requestData) {
         if (!$existingCanRender) {
             return $existingCanRender;
         }
@@ -909,7 +909,7 @@ class PocketsPlugin extends Gdn_Plugin {
         }
 
         return $existingCanRender;
-    }
+     }
 
     /**
      * Add some event handling for pocket rendering. - Roles

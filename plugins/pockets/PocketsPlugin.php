@@ -871,6 +871,11 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $pocketData = $pocket->Data;
         $categoryID = $pocketData['CategoryID'] ?? null;
+        if (!is_numeric($categoryID)) {
+            return false;
+        } else {
+            $categoryID = (int) $categoryID;
+        }
 
         if (empty($categoryID)) {
             return $existingCanRender;
@@ -887,26 +892,17 @@ class PocketsPlugin extends Gdn_Plugin {
             return false;
         }
 
-        if (!$pocketData["InheritCategory"]) {
-            if ($currentCategoryID !== $pocket->Category) {
+        if (!($pocketData["InheritCategory"] ?? false)) {
+            if ($currentCategoryID !== $categoryID) {
                 return false;
             }
         } else {
-            $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
-            $currentCategory = $categoryModel->getID($currentCategoryID);
-            $parentIDs = [-1, $currentCategory->ParentCategoryID];
-            $ancestors = $categoryModel::getAncestors($currentCategory->ParentCategoryID, true);
-            if ($ancestors) {
-                $possibleIDs = array_push(array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID'))), $currentCategoryID);
-                $match = array_search($pocket->Category, $possibleIDs, true);
-                if ($match) {
-                    return false;
-                }
-            } else {
-                if ($currentCategoryID !== $pocket->Category) {
-                    return false;
-                }
-            }
+            $ancestors = CategoryModel::getAncestors($currentCategoryID, true);
+            $ancestorIDs = array_column($ancestors, 'CategoryID');
+            $ancestorIDs[] = $currentCategoryID;
+            $ancestorIDs[] = -1;
+            $result = array_search($categoryID, $ancestorIDs, true) !== false;
+            return (bool) $result;
         }
 
         return $existingCanRender;

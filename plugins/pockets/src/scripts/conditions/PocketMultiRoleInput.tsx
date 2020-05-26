@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";

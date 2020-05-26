@@ -11,7 +11,7 @@ import { t } from "@vanilla/i18n/src";
 export function PocketMultiRoleInput(props) {
     const [roles, setRoles] = useState(props.initialValue === "" ? [] : props.initialValue);
     return (
-        <DashboardFormGroup label={t("Roles")} tag={props.tag}>
+        <DashboardFormGroup label={t("Roles")} tag={"div"}>
             <div className="input-wrap">
                 <MultiRoleInput
                     label={""}

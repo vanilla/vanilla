@@ -19,6 +19,7 @@ import { roleReducer } from "@dashboard/roles/roleReducer";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
+import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
@@ -26,6 +27,7 @@ disableComponentTheming();
 onContent(() => initAllUserContent());
 registerReducer("roles", roleReducer);
 registerReducer("themeSettings", themeSettingsReducer);
+registerReducer("forum", forumReducer);
 
 applySharedPortalContext(props => {
     const [navHeight, setNavHeight] = useState(0);

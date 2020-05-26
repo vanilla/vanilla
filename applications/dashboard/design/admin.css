@@ -6655,9 +6655,9 @@ form ol li {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -6665,10 +6665,14 @@ form ol li {
   padding-bottom: 16px;
   margin-bottom: 0;
   border-bottom: 1px dotted #e7e8e9;
+  width: 100%;
 }
 .form-group > .no-grid {
   padding-left: 18px;
   padding-right: 18px;
+}
+.form-group > .input-wrap, .form-group > .color-picker {
+  max-width: 58.3333333333%;
 }
 .form-group > .label-wrap-wide {
   -webkit-flex-grow: 1;
@@ -6680,8 +6684,14 @@ form ol li {
   padding-right: 18px;
 }
 @media (max-width: 543px) {
+  .form-group {
+    -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+  }
   .form-group .input-wrap, .form-group .color-picker {
     margin-top: 4.5px;
+    max-width: 100%;
   }
 }
 

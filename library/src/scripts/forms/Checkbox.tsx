@@ -23,6 +23,7 @@ interface IProps extends IOptionalComponentID {
     fakeFocus?: boolean;
     defaultChecked?: boolean;
     tooltipLabel?: boolean;
+    excludeFromICheck?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
@@ -46,7 +47,9 @@ export default function CheckBox(props: IProps) {
     return (
         <label className={classNames(props.className, classes.root, { isHorizontal })}>
             <input
-                className={classNames(classes.input, props.fakeFocus && "focus-visible")}
+                className={classNames(classes.input, props.fakeFocus && "focus-visible", {
+                    "exclude-icheck": props.excludeFromICheck,
+                })}
                 aria-labelledby={labelID}
                 type="checkbox"
                 onChange={props.onChange}

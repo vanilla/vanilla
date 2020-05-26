@@ -852,7 +852,7 @@ class PocketsPlugin extends Gdn_Plugin {
             return false;
         }
         return true;
-     }
+    }
 
     /**
      * Add some event handling for pocket rendering. - Categories
@@ -869,10 +869,11 @@ class PocketsPlugin extends Gdn_Plugin {
             return $existingCanRender;
         }
 
-        $data = $pocket->Data;
+        $pocketData = $pocket->Data;
+        $categoryID = $pocketData['CategoryID'] ?? null;
 
-        if (empty($data["CategoryID"])) {
-            return false;
+        if (empty($categoryID)) {
+            return $existingCanRender;
         }
 
         $controller = \Gdn::controller();
@@ -886,7 +887,7 @@ class PocketsPlugin extends Gdn_Plugin {
             return false;
         }
 
-        if (!$data["InheritCategory"]) {
+        if (!$pocketData["InheritCategory"]) {
             if ($currentCategoryID !== $pocket->Category) {
                 return false;
             }

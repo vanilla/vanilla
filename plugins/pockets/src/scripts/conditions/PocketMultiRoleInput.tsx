@@ -9,7 +9,8 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 
 export function PocketMultiRoleInput(props) {
-    const [roles, setRoles] = useState(props.initialValue === "" ? [] : props.initialValue);
+    console.log("props: ", props);
+    const [roles, setRoles] = useState(props.initialValue && props.initialValue !== "" ? props.initialValue : []);
     return (
         <DashboardFormGroup label={t("Roles")} tag={"div"}>
             <div className="input-wrap">
@@ -23,9 +24,10 @@ export function PocketMultiRoleInput(props) {
                 />
             </div>
             {!roles || (roles.length === 0 && <input name={props.fieldName + []} type={"hidden"} value={[]} />)}
-            {roles.map((role, key) => {
-                return <input key={key} name={props.fieldName + "[]"} type={"hidden"} value={role} />;
-            })}
+            {roles &&
+                roles.map((role, key) => {
+                    return <input key={key} name={props.fieldName + "[]"} type={"hidden"} value={role} />;
+                })}
         </DashboardFormGroup>
     );
 }

@@ -325,7 +325,6 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
-            $unflattened = unflattenArray('.', $form->formValues());
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
@@ -376,8 +375,6 @@ class PocketsPlugin extends Gdn_Plugin {
 
             $enabled = $form->getFormValue('Enabled');
             $form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
-
-            $form->setFormValue('Attributes', json_encode($unflattened['Attributes'], true));
 
             $saved = $form->save();
             if ($saved) {
@@ -802,9 +799,8 @@ class PocketsPlugin extends Gdn_Plugin {
         $categoryID = $data["CategoryID"];
         $categoryLabel = null;
         if (!empty($categoryID)) {
-            $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
-            $currentCategory = $categoryModel->getID($categoryID);
-            $categoryLabel = $currentCategory->Name;
+            $currentCategory = CategoryModel::categories($categoryID);
+            $categoryLabel = $currentCategory['Name'];
         }
 
         echo $Form->react(

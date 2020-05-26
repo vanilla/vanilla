@@ -796,6 +796,7 @@ class PocketsPlugin extends Gdn_Plugin {
             "pocket-multi-role-input",
             [
                 "tag" => "li",
+                "value" => $Form->getvalue("RoleIDs") ?? []
             ]
         );
     }

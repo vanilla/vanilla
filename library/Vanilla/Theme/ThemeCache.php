@@ -49,6 +49,9 @@ class ThemeCache {
      * @return array|null
      */
     public function get(string $key): ?Theme {
+        if (!$this->isEnabled) {
+            return null;
+        }
         $cacheResult = $this->cache->get($key);
         if ($cacheResult) {
             $theme = unserialize($cacheResult) ?: null;
@@ -101,7 +104,7 @@ class ThemeCache {
         ksort($args);
 
         $cacheKey = self::CACHE_KEY . '_' . $themeID.md5(json_encode($args));
-        
+
         return $cacheKey;
     }
 

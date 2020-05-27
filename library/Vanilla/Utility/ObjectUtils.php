@@ -34,7 +34,7 @@ final class ObjectUtils {
                     throw new \InvalidArgumentException("Object doesn't have a $key property.", 400);
                 }
             } catch (\Error $ex) {
-                // Private access error, chang to an exception.
+                // Private access error, change to an exception.
                 throw new \InvalidArgumentException("Could not set the $key property.", 403);
             }
         }

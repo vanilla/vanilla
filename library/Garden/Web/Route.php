@@ -49,7 +49,7 @@ abstract class Route {
         'args' => Route::MAP_ARGS | Route::MAP_QUERY,
         'body' => Route::MAP_BODY,
         'data' => Route::MAP_ARGS | Route::MAP_QUERY | Route::MAP_BODY,
-        'path' => Route::MAP_PATH
+        'path' => Route::MAP_PATH,
     ];
 
     private $defaults = [];

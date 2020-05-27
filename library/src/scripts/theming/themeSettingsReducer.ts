@@ -5,16 +5,16 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemeActions, { IManageTheme } from "@library/theming/ThemeActions";
+import ThemeActions from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { ThemeType } from "@library/theming/themeReducer";
+import { ThemeType, ITheme } from "@library/theming/themeReducer";
 
 export interface IThemesState {
     themes: ILoadable<{
-        currentTheme: IManageTheme;
-        templates: IManageTheme[];
-        themes: IManageTheme[];
+        currentTheme: ITheme;
+        templates: ITheme[];
+        themes: ITheme[];
     }>;
     applyStatus: ILoadable<{ themeID: number | string }>;
     previewStatus: ILoadable<{ themeID: number | string }>;
@@ -48,8 +48,8 @@ export const themeSettingsReducer = produce(
         })
         .case(ThemeActions.getAllThemes_ACS.done, (nextState, payload) => {
             let currentTheme;
-            let templates: IManageTheme[] = [];
-            let themes: IManageTheme[] = [];
+            let templates: ITheme[] = [];
+            let themes: ITheme[] = [];
 
             for (const theme of payload.result) {
                 if (theme.current) {

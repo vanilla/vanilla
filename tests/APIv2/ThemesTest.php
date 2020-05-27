@@ -13,10 +13,11 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Garden\Container\Reference;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use VanillaTests\InternalClient;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -50,13 +51,13 @@ class ThemesTest extends AbstractAPIv2Test {
     public function provideAssetTypes(): array {
         $fixturesDir = PATH_ROOT . "/tests/fixtures";
         return [
-            ["asset-test", "fonts.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/fonts.json"), "application/json"],
+            ["asset-test", "fonts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/fonts.json")), "application/json"],
             ["asset-test", "footer.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/footer.html"), "text/html"],
             ["asset-test", "header.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/header.html"), "text/html"],
             ["asset-test", "javascript.js", file_get_contents("{$fixturesDir}/themes/asset-test/assets/javascript.js"), "application/javascript"],
-            ["asset-test", "scripts.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/scripts.json"), "application/json"],
+            ["asset-test", "scripts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/scripts.json")), "application/json"],
             ["asset-test", "styles.css", file_get_contents("{$fixturesDir}/themes/asset-test/assets/styles.css"), "text/css"],
-            ["asset-test", "variables.json", file_get_contents("{$fixturesDir}/themes/asset-test/assets/variables.json"), "application/json"],
+            ["asset-test", "variables.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/variables.json")), "application/json"],
         ];
     }
 
@@ -74,6 +75,94 @@ class ThemesTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals($contentType, $response->getHeader("Content-Type"));
         $this->assertEquals($rawBody, $response->getRawBody());
+    }
+
+    /**
+     * Provide parameters for testing the validity of theme assets.
+     *
+     * @return array
+     */
+    public function provideAssetTypesNoExt(): array {
+        $assetRoot = PATH_ROOT . "/tests/fixtures/themes/asset-test/assets";
+        return [
+            'fonts' => [
+                "asset-test",
+                "fonts",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/fonts.json"), true),
+                ],
+            ],
+            'variables' => [
+                "asset-test",
+                "variables",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/variables.json"), true),
+                ],
+            ],
+            'scripts' => [
+                "asset-test",
+                "scripts",
+                [
+                    'type' => 'json',
+                    'data' => json_decode(file_get_contents("$assetRoot/scripts.json"), true),
+                ],
+            ],
+            'header' => [
+                "asset-test",
+                "header",
+                [
+                    'type' => 'html',
+                    'data' => file_get_contents("$assetRoot/header.html"),
+                ],
+            ],
+            'footer' => [
+                "asset-test",
+                "footer",
+                [
+                    'type' => 'html',
+                    'data' => file_get_contents("$assetRoot/footer.html"),
+                ],
+            ],
+            'javascript' => [
+                "asset-test",
+                "javascript",
+                [
+                    'type' => 'js',
+                    'data' => file_get_contents("$assetRoot/javascript.js"),
+                ],
+            ],
+            'styles' => [
+                "asset-test",
+                "styles",
+                [
+                    'type' => 'css',
+                    'data' => file_get_contents("$assetRoot/styles.css"),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Verify ability to grab individual theme assets with the proper content type.
+     *
+     * @param string $theme
+     * @param string $assetKey
+     * @param array $expected
+     * @dataProvider provideAssetTypesNoExt
+     */
+    public function testGetAssetNotExt(string $theme, string $assetKey, array $expected) {
+        $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals("application/json; charset=utf-8", $response->getHeader("Content-Type"));
+        $body = $response->getBody();
+
+        // There's a URL here. We're not going to be testing it.
+        $this->assertTrue(isset($body['url']));
+        unset($body['url']);
+
+        $this->assertEquals($expected, $body);
     }
 
     /**
@@ -160,9 +249,55 @@ class ThemesTest extends AbstractAPIv2Test {
     /**
      * Test /themes/current endpoint returns active theme (keystone).
      */
-    public function testCurrent() {
+    public function testGetCurrent() {
         $response = $this->api()->get("themes/current");
         $body = $response->getBody();
         $this->assertEquals('theme-foundation', $body['themeID']);
+    }
+
+    /**
+     * Test the theme preview endpoint.
+     */
+    public function testThemePreview() {
+        $response = $this->api()->put('/themes/preview', ['themeID' => 'keystone']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Make sure we didn't write to the config.
+        $this->assertNotEquals('keystone', \Gdn::config('Garden.Theme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
+
+        // Make sure other users don't see it.
+        $this->api()->setUserID(0);
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
+        $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
+
+        // Clear the preview
+        $response = $this->api()->put('/themes/preview', ['themeID' => null]);
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
+    }
+
+
+    /**
+     * Test the theme preview endpoint.
+     */
+    public function testPutCurrent() {
+        // Make sure we don't start on keystone.
+        $this->assertNotEquals('keystone', \Gdn::config('Garden.Theme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertNotEquals('keystone', $body['themeID']);
+
+        // Set the current theme.
+        $response = $this->api()->put('/themes/current', ['themeID' => 'keystone']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // The theme is set.
+        $this->assertEquals('keystone', \Gdn::config('Garden.Theme'));
+        $this->assertEquals('keystone', \Gdn::config('Garden.MobileTheme'));
+        $this->assertEquals('keystone', \Gdn::config('Garden.CurrentTheme'));
+        $body = $this->api()->get('/themes/current')->getBody();
+        $this->assertEquals('keystone', $body['themeID']);
     }
 }

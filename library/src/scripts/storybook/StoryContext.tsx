@@ -89,6 +89,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
                         data: {
                             variables: {
                                 data: (value.themeVars as any) ?? {},
+                                type: "json",
                             },
                         },
                         status: LoadStatus.SUCCESS,

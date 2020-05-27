@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import { VanillaSwaggerPlugin } from "@library/features/swagger/VanillaSwaggerPlugin";
 import { DEEP_LINK_ATTR } from "@library/features/swagger/VanillaSwaggerDeepLink";
 import { replaceDeepLinkScrolling } from "@library/features/swagger/replaceDeepLinkScrolling";
-import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 export interface ISwaggerHeading {
     text: string;
@@ -46,6 +45,7 @@ export function useSwaggerUI(_options: { url?: string; spec?: object; [key: stri
                     plugins: [VanillaSwaggerPlugin()],
                     layout: "VanillaSwaggerLayout",
                     ..._options,
+                    operationsSorter: "alpha",
                     deepLinking: true,
                     onComplete: () => {
                         const opblocks = swaggerRef.current!.querySelectorAll(".opblock-tag, .opblock");

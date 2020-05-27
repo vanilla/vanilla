@@ -7,7 +7,7 @@
 namespace Vanilla\Web;
 
 use Vanilla\Models\SiteMeta;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.

@@ -5,23 +5,22 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Models;
+namespace VanillaTests\Library\Vanilla\Theme;
 
-use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Theme\ThemeServiceHelper;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Tests for the theme helper model.
  */
-class ThemeModelHelperTest extends MinimalContainerTestCase {
+class ThemeServiceHelperTest extends MinimalContainerTestCase {
 
     /**
      * Utility for getting the helper.
      */
-    private function getHelper(): ThemeModelHelper {
-        return self::container()->get(ThemeModelHelper::class);
+    private function getHelper(): ThemeServiceHelper {
+        return self::container()->get(ThemeServiceHelper::class);
     }
 
     /**
@@ -130,27 +129,27 @@ class ThemeModelHelperTest extends MinimalContainerTestCase {
      */
     public function testSaveCurrentThemeToVisible() {
         $this->setConfigs([
-            ThemeModelHelper::CONFIG_THEMES_VISIBLE => ThemeModelHelper::ALL_VISIBLE,
-            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-active',
+            ThemeServiceHelper::CONFIG_THEMES_VISIBLE => ThemeServiceHelper::ALL_VISIBLE,
+            ThemeServiceHelper::CONFIG_DESKTOP_THEME => 'test-active',
         ]);
         $this->getHelper()->saveCurrentThemeToVisible();
-        $this->assertEquals(ThemeModelHelper::ALL_VISIBLE, self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
+        $this->assertEquals(ThemeServiceHelper::ALL_VISIBLE, self::getConfig()->get(ThemeServiceHelper::CONFIG_THEMES_VISIBLE));
 
         $this->setConfigs([
-            ThemeModelHelper::CONFIG_THEMES_VISIBLE => '',
-            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-active',
-            ThemeModelHelper::CONFIG_MOBILE_THEME => 'test-active',
+            ThemeServiceHelper::CONFIG_THEMES_VISIBLE => '',
+            ThemeServiceHelper::CONFIG_DESKTOP_THEME => 'test-active',
+            ThemeServiceHelper::CONFIG_MOBILE_THEME => 'test-active',
         ]);
         $this->getHelper()->saveCurrentThemeToVisible();
-        $this->assertEquals('test-active', self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
+        $this->assertEquals('test-active', self::getConfig()->get(ThemeServiceHelper::CONFIG_THEMES_VISIBLE));
 
         $this->setConfigs([
-            ThemeModelHelper::CONFIG_THEMES_VISIBLE => '',
-            ThemeModelHelper::CONFIG_DESKTOP_THEME => 'test-desktop',
-            ThemeModelHelper::CONFIG_MOBILE_THEME => 'test-mobile',
-            ThemeModelHelper::CONFIG_CURRENT_THEME => 'test-current',
+            ThemeServiceHelper::CONFIG_THEMES_VISIBLE => '',
+            ThemeServiceHelper::CONFIG_DESKTOP_THEME => 'test-desktop',
+            ThemeServiceHelper::CONFIG_MOBILE_THEME => 'test-mobile',
+            ThemeServiceHelper::CONFIG_CURRENT_THEME => 'test-current',
         ]);
         $this->getHelper()->saveCurrentThemeToVisible();
-        $this->assertEquals('test-desktop,test-mobile,test-current', self::getConfig()->get(ThemeModelHelper::CONFIG_THEMES_VISIBLE));
+        $this->assertEquals('test-desktop,test-mobile,test-current', self::getConfig()->get(ThemeServiceHelper::CONFIG_THEMES_VISIBLE));
     }
 }

@@ -42,7 +42,7 @@ export default function CurrentThemeInfo(props: IProps) {
                             <div key={i} className={classes.description}>
                                 <p>
                                     <strong>{key === "Description" ? "" : `${key}:`}</strong>{" "}
-                                    {value.type === "date" ? <DateTime timestamp={value.info} /> : value.info}
+                                    {value.type === "date" ? <DateTime timestamp={value.value} /> : value.value}
                                 </p>
                             </div>
                         ))}

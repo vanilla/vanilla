@@ -4,18 +4,17 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Models;
+namespace Vanilla\Theme;
 
 use Gdn_Session as SessionInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Theme\ThemeProviderInterface;
 
 /**
  * Theme helper functions.
  */
-class ThemeModelHelper {
+class ThemeServiceHelper {
 
     // Config holding all forced visiblity themes.
     const CONFIG_THEMES_VISIBLE = 'Garden.Themes.Visible';
@@ -40,7 +39,7 @@ class ThemeModelHelper {
     private $config;
 
     /**
-     * ThemeModelHelper constructor.
+     * ThemeServiceHelper constructor.
      *
      * @param AddonManager $addonManager
      * @param SessionInterface $session
@@ -122,33 +121,31 @@ class ThemeModelHelper {
     /**
      * Set session preview theme
      *
-     * @param string $themeKey
-     * @param ThemeProviderInterface $themeProvider
-     * @param int $revisionID
-     * @return array Theme info array
+     * @param Theme $theme
+     * @param int|null $revisionID
      */
-    public function setSessionPreviewTheme(string $themeKey, ThemeProviderInterface $themeProvider, ?int $revisionID = null): array {
-        $masterTheme = $themeProvider->getMasterThemeKey($themeKey);
-        $displayName = $themeProvider->getName($themeKey);
-        $this->session->setPreference('PreviewThemeKey', $themeKey);
+    public function setSessionPreviewTheme(Theme $theme, ?int $revisionID = null) {
+        $this->session->setPreference('PreviewThemeKey', $theme->getThemeID());
         $this->session->setPreference('PreviewThemeRevisionID', $revisionID);
 
-        $themeInfo = $this->addonManager->lookupTheme($masterTheme)->getInfo();
+        $addonKey = $theme->getAddon()->getKey();
+        $displayName = $theme->getName();
+
+        $themeInfo = $this->addonManager->lookupTheme($addonKey)->getInfo();
 
         $isMobile = $themeInfo['IsMobile'] ?? false;
 
         if ($isMobile) {
             $this->session->setPreference(
-                ['PreviewMobileThemeFolder' => $masterTheme,
+                ['PreviewMobileThemeFolder' => $addonKey,
                     'PreviewMobileThemeName' => $displayName]
             );
         } else {
             $this->session->setPreference(
-                ['PreviewThemeFolder' => $masterTheme,
+                ['PreviewThemeFolder' => $addonKey,
                     'PreviewThemeName' => $displayName]
             );
         }
-        return $themeInfo;
     }
 
     /**
@@ -205,7 +202,7 @@ class ThemeModelHelper {
             $themes[] = $currentTheme;
         }
 
-        $resultConfig = implode($themes, ",");
+        $resultConfig = implode(",", $themes);
         $this->config->saveToConfig(self::CONFIG_THEMES_VISIBLE, $resultConfig);
     }
 }

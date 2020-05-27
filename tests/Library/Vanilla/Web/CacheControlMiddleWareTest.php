@@ -52,19 +52,24 @@ class CacheControlMiddleWareTest extends TestCase {
      *
      * @param int $userID The userID code.
      * @param array $headers Array of http headers.
+     * @param array $meta Meta for the response data.
      * @param mixed $expected The expected result.
      * @dataProvider provideTestInvokeArrays
      */
-    public function testInvoke(int $userID, array $headers, $expected) {
+    public function testInvoke(int $userID, array $headers, array $meta, $expected) {
         $testSession = new Gdn_Session();
         $testSession->UserID = $userID;
         $testRequest = new Request('/', 'GET', [1, 2, 3]);
         $testObject = new CacheControlMiddleware($testSession);
-        $modifiedObject = $testObject($testRequest, function (RequestInterface $request) use ($headers) {
+        $modifiedObject = $testObject($testRequest, function (RequestInterface $request) use ($headers, $meta) {
             $r = new Data([]);
 
             foreach ($headers as $key => $value) {
                 $r->setHeader($key, $value);
+            }
+
+            foreach ($meta as $key => $value) {
+                $r->setMeta($key, $value);
             }
 
             return $r;
@@ -88,6 +93,7 @@ class CacheControlMiddleWareTest extends TestCase {
             'userIDZeroAndPublicCache' => [
                 0,
                 ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
+                [],
                 [
                     'Cache-Control' => 'public, max-age=120',
                     'Vary' => 'Accept-Encoding, Cookie',
@@ -96,6 +102,7 @@ class CacheControlMiddleWareTest extends TestCase {
             'userIDZeroAndNoCache' => [
                 0,
                 ['Cache-Control' => CacheControlMiddleware::NO_CACHE],
+                [],
                 [
                     'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
                     'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
@@ -105,6 +112,7 @@ class CacheControlMiddleWareTest extends TestCase {
             'userIDZeroAndNoCacheControlHeaderAtAll' => [
                 0,
                 ['Foo' => 'bar'],
+                [],
                 [
                     'Foo' => 'bar',
                     'Cache-Control' => 'public, max-age=120',
@@ -114,14 +122,24 @@ class CacheControlMiddleWareTest extends TestCase {
             'userID1AndPublicCache' => [
                 1,
                 ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
+                [],
                 [
                     'Cache-Control' => 'public, max-age=120',
                     'Vary' => 'Accept-Encoding, Cookie',
                 ],
             ],
+            'userID1AndPublicCacheNoVary' => [
+                1,
+                ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
+                [CacheControlMiddleware::META_NO_VARY => true],
+                [
+                    'Cache-Control' => 'public, max-age=120',
+                ],
+            ],
             'userID1AndNoCache' => [
                 1,
                 ['Cache-Control' => CacheControlMiddleware::NO_CACHE],
+                [],
                 [
                     'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
                     'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
@@ -131,6 +149,7 @@ class CacheControlMiddleWareTest extends TestCase {
             'userID1AndNoCacheControlHeaderAtAll' => [
                 1,
                 ['Foo' => 'bar'],
+                [],
                 [
                     'Foo' => 'bar',
                     'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
@@ -138,7 +157,6 @@ class CacheControlMiddleWareTest extends TestCase {
                     'Pragma' => 'no-cache',
                 ],
             ],
-
         ];
 
         return $r;

@@ -7,19 +7,15 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Asset;
 
-use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
-use Vanilla\Models\FsThemeProvider;
-use Vanilla\Models\ThemeModel;
-use Vanilla\Models\ThemeModelHelper;
-use Vanilla\Models\ThemeSectionModel;
-use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
-use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\MinimalContainerTestCase;
 
@@ -46,12 +42,12 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
         $session = new \Gdn_Session();
         $addonManager = new MockAddonManager($addons);
         $config = new MockConfig(['Garden.CurrentTheme'=>'default']);
-        $themeHelper = new ThemeModelHelper(
+        $themeHelper = new ThemeServiceHelper(
             $addonManager,
             $session,
             $config
         );
-        $themeModel = self::container()->getArgs(ThemeModel::class, [
+        $themeService = self::container()->getArgs(ThemeService::class, [
             $config,
             $session,
             $addonManager,
@@ -64,13 +60,13 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
             $config,
             $themeHelper
         );
-        $themeModel->addThemeProvider($fsThemeProvider);
+        $themeService->addThemeProvider($fsThemeProvider);
         $provider = new WebpackAssetProvider(
             $request,
             $addonManager,
             $session,
             $config,
-            $themeModel
+            $themeService
         );
         return $provider;
     }

@@ -10,7 +10,7 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
-use Vanilla\Models\ThemeSectionModel;
+use Vanilla\Theme\ThemeSectionModel;
 
 /**
  * Vanilla's event handlers.

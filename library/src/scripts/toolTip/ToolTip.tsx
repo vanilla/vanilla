@@ -79,7 +79,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: React.ReactN
                     <TooltipPopup
                         {...tooltip}
                         label={label}
-                        ariaLabel={ariaLabel ? ariaLabel : label}
+                        aria-label={ariaLabel ? ariaLabel : label}
                         position={toolBoxPosition}
                         className={classes.box}
                     />

@@ -30,14 +30,8 @@ export enum PreviewStatusType {
     APPLY = "apply",
     CANCEL = "cancel",
 }
-export interface IManageTheme extends ITheme {
-    preview: {
-        info: IThemeInfo;
-        [key: string]: any;
-    };
-}
 
-type IGetAllThemeResponse = IManageTheme[];
+type IGetAllThemeResponse = ITheme[];
 type IPatchThemeResponse = ITheme;
 
 interface IPutCurrentThemeRequest {
@@ -82,13 +76,11 @@ export default class ThemeActions extends ReduxActions {
 
     public static readonly getAllThemes_ACS = createAction.async<{}, IGetAllThemeResponse, IApiError>("GET_ALL_THEMES");
 
-    public static readonly putCurrentThemeACs = createAction.async<
-        { themeID: number | string },
-        IManageTheme,
-        IApiError
-    >("PUT_CURRENT");
+    public static readonly putCurrentThemeACs = createAction.async<{ themeID: number | string }, ITheme, IApiError>(
+        "PUT_CURRENT",
+    );
 
-    public static readonly putPreviewThemeACs = createAction.async<IPutCurrentThemeRequest, IManageTheme, IApiError>(
+    public static readonly putPreviewThemeACs = createAction.async<IPutCurrentThemeRequest, ITheme, IApiError>(
         "PUT_PREVIEW",
     );
 
@@ -106,9 +98,7 @@ export default class ThemeActions extends ReduxActions {
 
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
-            const params = { expand: "all" };
-            const response = await this.api.get(`/themes/`, { params });
-
+            const response = await this.api.get(`/themes`);
             return response.data;
         })();
         return this.dispatch(thunk);

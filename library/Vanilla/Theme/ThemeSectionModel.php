@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Models;
+namespace Vanilla\Theme;
 
 /**
  * Model for collecting information about what a theme applys to.

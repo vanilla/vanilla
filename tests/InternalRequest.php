@@ -65,7 +65,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      * {@inheritdoc}
      */
     public function setQuery(array $value) {
-        list($url, $query) = explode('?', $this->getUrl(), 1) + ['', ''];
+        [$url, $query] = explode('?', $this->getUrl(), 1) + ['', ''];
 
         if (empty($value)) {
             $this->setUrl($url);
@@ -89,7 +89,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
                 if (strpos($cookie, '=') === false) {
                     continue;
                 }
-                list($key, $val) = explode('=', $cookie);
+                [$key, $val] = explode('=', $cookie);
                 $cookies[$key] = rawurldecode($val);
             }
         }
@@ -135,6 +135,18 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         }
 
         return $request;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRawBody(): string {
+        $body = $this->getBody();
+        if (!is_string($body)) {
+            $body = json_encode($body, JSON_UNESCAPED_UNICODE);
+        }
+
+        return $body;
     }
 
     /**

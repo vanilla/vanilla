@@ -115,7 +115,7 @@ export function loadThemeFonts() {
             },
         };
         WebFont.load(webFontConfig);
-    } else if (fonts && fonts.data.length > 0) {
+    } else if (fonts && fonts.data && fonts.data.length > 0) {
         const webFontConfig = makeFontConfigFromFontVar(fonts.data);
         if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
             WebFont.load(webFontConfig);

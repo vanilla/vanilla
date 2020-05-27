@@ -5,8 +5,19 @@
  */
 
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Models\ThemeModel;
+use Garden\Web\RequestInterface;
+use Vanilla\ApiUtils;
+use Vanilla\Theme\Asset\ThemeAsset;
+use Vanilla\Theme\Theme;
+use Vanilla\Theme\ThemeAssetFactory;
+use Vanilla\Theme\ThemeService;
+use Vanilla\ThemingApi\Models\ThemeAssetModel;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Web\CacheControlMiddleware;
+use VanillaTests\Fixtures\Request;
 
 /**
  * API Controller for the `/themes` resource.
@@ -18,38 +29,21 @@ class ThemesApiController extends AbstractApiController {
     const GET_THEME_ACTION = "@@themes/GET_DONE";
     const GET_THEME_VARIABLES_ACTION = "@@themes/GET_VARIABLES_DONE";
 
-    /** @var ThemeModel */
-    private $themeModel;
+    /** @var ThemeService */
+    private $themeService;
+
+    /** @var ThemeAssetFactory */
+    private $assetFactory;
 
     /**
      * ThemesApiController constructor.
-     * @param ThemeModel $themeModel
-     */
-    public function __construct(ThemeModel $themeModel) {
-        $this->themeModel = $themeModel;
-    }
-
-    /**
-     * Get the content type for the provided asset.
      *
-     * @param string $assetKey
-     * @return string
+     * @param ThemeService $themeService
+     * @param ThemeAssetFactory $assetFactory
      */
-    private function contentTypeByAsset(string $assetKey): string {
-        $types = [
-            "fonts" => "application/json",
-            "footer" => "text/html",
-            "header" => "text/html",
-            "javascript" => "application/javascript",
-            "scripts" => "application/json",
-            "styles" => "text/css",
-            "variables" => "application/json",
-        ];
-        $basename = pathinfo($assetKey, PATHINFO_FILENAME);
-        if (!array_key_exists($basename, $types)) {
-            throw new ServerException("Could not find a content type for the asset: {$basename}");
-        }
-        return $types[$basename];
+    public function __construct(ThemeService $themeService, ThemeAssetFactory $assetFactory) {
+        $this->themeService = $themeService;
+        $this->assetFactory = $assetFactory;
     }
 
     /**
@@ -57,24 +51,25 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param string $themeKey The unique theme key or theme ID.
      * @param array $query
-     * @return array
+     * @return Data
      */
-    public function get(string $themeKey, array $query = []): array {
+    public function get(string $themeKey, array $query = []): Data {
         $this->permission();
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
         $in = $this->schema([
             'allowAddonVariables:b?',
-            'revisionID:i?'
+            'revisionID:i?',
+            'expand?' => $this->assetExpandDefinition(),
         ]);
         $params = $in->validate($query);
 
         if (!($params['allowAddonVariables'] ?? true)) {
-            $this->themeModel->clearVariableProviders();
+            $this->themeService->clearVariableProviders();
         }
 
-        $themeWithAssets = $this->themeModel->getThemeWithAssets($themeKey, $query);
-        $result = $out->validate($themeWithAssets);
-        return $result;
+        $theme = $this->themeService->getTheme($themeKey, $query);
+        $this->handleAssetExpansions($theme, $params['expand']);
+        return new Data($theme, ['theme' => $theme], [ 'X-App-Cache-Hit' => $theme->isCacheHit() ? '1' : '0' ]);
     }
 
     /**
@@ -86,9 +81,12 @@ class ThemesApiController extends AbstractApiController {
     public function get_revisions(int $themeID): array {
         $this->permission();
         $in = $this->schema([], 'in');
-        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
+        $out = $this->schema([":a" => $this->themeResultSchema()]);
 
-        $themeRevisions = $this->themeModel->getThemeRevisions($themeID);
+        $themeRevisions = $this->themeService->getThemeRevisions($themeID);
+        foreach ($themeRevisions as $theme) {
+            $this->handleAssetExpansions($theme, false);
+        }
         $result = $out->validate($themeRevisions);
         return $result;
     }
@@ -96,15 +94,28 @@ class ThemesApiController extends AbstractApiController {
     /**
      * Get a theme assets.
      *
+     * @param array $query
+     *
      * @return array
      */
-    public function index(): array {
+    public function index(array $query = []): array {
         $this->permission();
-        $out = $this->schema([":a" => $this->themesResultSchema('out')]);
+        $in = $this->schema([
+            'allowAddonVariables:b?',
+            'expand?' => $this->assetExpandDefinition(),
+        ]);
+        $out = $this->schema([":a" => $this->themeResultSchema()]);
+        $params = $in->validate($query);
 
-        $themes = $this->themeModel->getThemes();
-        $result = $out->validate($themes);
-        return $result;
+        if (!($params['allowAddonVariables'] ?? true)) {
+            $this->themeService->clearVariableProviders();
+        }
+
+        $themes = $this->themeService->getThemes();
+        foreach ($themes as $theme) {
+            $this->handleAssetExpansions($theme, $params['expand']);
+        }
+        return $themes;
     }
 
     /**
@@ -112,21 +123,21 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param array $body Array of incoming params.
      *        fields: name (required)
-     * @return array
+     * @return Data
      */
-    public function post(array $body): array {
+    public function post(array $body): Data {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->themePostSchema('in');
 
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
 
         $body = $in->validate($body);
 
-        $normalizedTheme = $this->themeModel->postTheme($body);
-
+        $normalizedTheme = $this->themeService->postTheme($body);
+        $this->handleAssetExpansions($normalizedTheme, true);
         $theme = $out->validate($normalizedTheme);
-        return $theme;
+        return new Data($theme, ['theme' => $theme]);
     }
 
 
@@ -136,18 +147,19 @@ class ThemesApiController extends AbstractApiController {
      * @param int $themeID Theme ID
      * @param array $body Array of incoming params.
      *        fields: name (required)
-     * @return array
+     * @return Data
      */
-    public function patch(int $themeID, array $body): array {
+    public function patch(int $themeID, array $body): Data {
         $this->permission("Garden.Settings.Manage");
         $in = $this->themePatchSchema('in');
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
         $body = $in->validate($body);
 
-        $normalizedTheme = $this->themeModel->patchTheme($themeID, $body);
+        $normalizedTheme = $this->themeService->patchTheme($themeID, $body);
 
         $theme = $out->validate($normalizedTheme);
-        return $theme;
+        $this->handleAssetExpansions($normalizedTheme, true);
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
@@ -157,7 +169,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function delete(int $themeID) {
         $this->permission("Garden.Settings.Manage");
-        $this->themeModel->deleteTheme($themeID);
+        $this->themeService->deleteTheme($themeID);
     }
 
     /**
@@ -165,17 +177,18 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param array $body Array of incoming params.
      *        fields: themeID (required)
-     * @return array
+     * @return Data
      */
-    public function put_current(array $body): array {
+    public function put_current(array $body): Data {
         $this->permission("Garden.Settings.Manage");
         $in = $this->themePutCurrentSchema('in');
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
         $body = $in->validate($body);
 
-        $theme = $this->themeModel->setCurrentTheme($body['themeID']);
+        $theme = $this->themeService->setCurrentTheme($body['themeID']);
+        $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
-        return $theme;
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
@@ -184,82 +197,75 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param array $body Array of incoming params.
      *        fields: themeID (required)
-     * @return array
+     * @return Data
      */
-    public function put_preview(array $body): array {
+    public function put_preview(array $body): Data {
         $this->permission("Garden.Settings.Manage");
         $in = $this->themePutPreviewSchema('in');
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
         $body = $in->validate($body);
 
-        $theme = $this->themeModel->setPreviewTheme($body['themeID'], $body['revisionID'] ?? null);
+        $theme = $this->themeService->setPreviewTheme($body['themeID'] ?? null, $body['revisionID'] ?? null);
+        $this->handleAssetExpansions($theme, true);
         $theme = $out->validate($theme);
-        return $theme;
+        return new Data($theme, ['theme' => $theme]);
     }
 
     /**
      * Get "current" theme.
      *
-     * @return array
+     * @return Data
      */
-    public function get_current(): ?array {
+    public function get_current(): Data {
         $this->permission();
-        $out = $this->themeResultSchema('out');
+        $out = $this->themeResultSchema();
 
-        $theme = $this->themeModel->getCurrentTheme();
-        return $out->validate($theme);
+        $theme = $this->themeService->getCurrentTheme();
+        $this->handleAssetExpansions($theme, true);
+        $result = $out->validate($theme);
+        return new Data($theme, ['theme' => $theme], [ 'X-App-Cache-Hit' => $theme->isCacheHit() ? '1' : '0' ]);
     }
 
     /**
      * PUT theme asset (update existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.
-     * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
-     * @param array $body Array of incoming params.
-     *              Should have 'data' key with content for asset.
+     * @param string $assetPath Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
+     * @param RequestInterface $request The request.
      *
-     * @return array
+     * @return Data
      */
-    public function put_assets(int $themeID, string $assetKey, array $body): array {
+    public function put_assets(int $themeID, string $assetPath, RequestInterface $request): Data {
         $this->permission("Garden.Settings.Manage");
+        $theme = $this->themeService->getTheme($themeID);
 
-        $in = $this->schema($this->assetsPutSchema(), 'in');
-        $out = $this->schema($this->assetsSchema(), 'out');
+        /** @var ThemeAsset $asset */
+        [$asset, $assetName] = $this->extractInputAsset($theme, $assetPath, $request);
 
-        $body = $in->validate($body);
-        $this->validateAssetKey($assetKey);
+        // Try to create the asset.
+        $this->themeService->setAsset($themeID, $assetName, $asset->__toString());
 
-        $asset = $this->themeModel->setAsset($themeID, $assetKey, $body['data']);
-
-        return $out->validate($asset);
+        return $this->get_assets($themeID, $assetPath);
     }
 
     /**
      * PATCH theme asset variables.json.
      *
      * @param int $themeID The unique theme ID.
-     * @param string $assetKey Asset key.
-     *        Note: only 'variables.json' allowed.
-     * @param array $body Array of incoming params.
-     *              Should have 'data' key with content for asset.
+     * @param string $assetPath Asset key.
+     * @param RequestInterface $request The request.
      *
-     * @return array
+     * @return Data
      */
-    public function patch_assets(int $themeID, string $assetKey, array $body): array {
+    public function patch_assets(int $themeID, string $assetPath, RequestInterface $request): Data {
         $this->permission("Garden.Settings.Manage");
+        $theme = $this->themeService->getTheme($themeID);
+        [$asset, $assetName] = $this->extractInputAsset($theme, $assetPath, $request);
 
-        $in = $this->schema($this->assetsPutSchema(), 'in');
-        $out = $this->schema($this->assetsSchema(), 'out');
+        // Try to create the asset.
+        $this->themeService->sparseUpdateAsset($themeID, $assetName, $asset->__toString());
 
-        $body = $in->validate($body);
-        $this->validateAssetKey($assetKey);
-        if ($assetKey !== 'variables') {
-            throw new ClientException('Asset "'.$assetKey.'" does not support PATCH method.', 501);
-        }
-
-        $asset = $this->themeModel->sparseAsset($themeID, $assetKey, $body['data']);
-
-        return $out->validate($asset);
+        return $this->get_assets($themeID, $assetPath);
     }
 
     /**
@@ -271,9 +277,14 @@ class ThemesApiController extends AbstractApiController {
     public function delete_assets(int $themeID, string $assetKey) {
         $this->permission("Garden.Settings.Manage");
 
-        $this->validateAssetKey($assetKey);
+        $theme = $this->themeService->getTheme($themeID);
+        /** @var ThemeAsset $asset */
+        [$asset, $assetKey, $ext] = $this->extractAssetForPath($theme, $assetKey);
+        if (!$asset) {
+            throw new NotFoundException('Asset');
+        }
 
-        $this->themeModel->deleteAsset($themeID, $assetKey);
+        $this->themeService->deleteAsset($themeID, $assetKey);
     }
 
     /**
@@ -285,35 +296,86 @@ class ThemesApiController extends AbstractApiController {
      *              in that case file content returned instaed of json structure
      * @link https://github.com/vanilla/roadmap/blob/master/theming/theming-data.md#api
      *
-     * @return array|Data
+     * @return Data
      */
-    public function get_assets(string $id, string $assetKey) {
+    public function get_assets(string $id, string $assetKey): Data {
         $this->permission();
-        $this->validateAssetKey($assetKey);
-        $content = $this->themeModel->getAssetData($id, $assetKey);
-        $contentType = $this->contentTypeByAsset($assetKey);
-        $result = new Data($content);
-        return $result->setHeader("Content-Type", $contentType);
+        $theme = $this->themeService->getTheme($id);
+        /** @var ThemeAsset $asset */
+        [$asset, $assetName, $ext] = $this->extractAssetForPath($theme, $assetKey);
+        if (!$asset) {
+            throw new NotFoundException('Asset');
+        }
+
+        if ($ext) {
+            if (!in_array($ext, $asset->getAllowedTypes())) {
+                throw new ClientException("Invalid extension '.$ext' for asset '$assetName'.");
+            }
+            return $asset->render($ext);
+        } else {
+            $result = new Data($asset);
+        }
+
+        // Set maximum cache durations for these static assets.
+        // We apply a cache buster when generating these URLs.
+        $result->setHeader('Cache-Control', CacheControlMiddleware::MAX_CACHE);
+        $result->setMeta(CacheControlMiddleware::META_NO_VARY, true);
+        $result->setMeta('X-App-Cache-Hit', $theme->isCacheHit() ? '1' : '0');
+
+        return $result;
     }
 
     /**
-     * Validate asset filename to ba part of allowed ASSET_LIST
+     * Extract an asset for input and validate it.
      *
-     * @param string $assetKey
-     * @throws \Garden\Schema\ValidationException If assetKey is invalid throw validation exception.
+     * @param Theme $theme The theme the asset will be inserted for.
+     * @param string $assetPath
+     * @param RequestInterface $request
+     *
+     * @return array [ThemeAsset, $assetName]
      */
-    private function validateAssetKey(string &$assetKey) {
-        $pathInfo = pathinfo($assetKey);
-        if (isset(ThemeModel::ASSET_LIST[$pathInfo['filename']])) {
-            if ($pathInfo['basename'] === ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']) {
-                $assetKey = $pathInfo['filename'];
-            } else {
-                throw new \Garden\Schema\ValidationException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
-                    'Try: '.ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']);
-            }
+    private function extractInputAsset(Theme $theme, string $assetPath, RequestInterface $request): array {
+        [$existingAsset, $assetName, $assetType] = $this->extractAssetForPath($theme, $assetPath);
+
+        if (!$assetType) {
+            $body = $request->getBody();
+            $body = $this->assetInputSchema($assetName)->validate($body);
+            $assetType = $body['type'];
+            $assetBody = is_array($body['data']) ? json_encode($body['data'], JSON_UNESCAPED_UNICODE) : $body['data'];
         } else {
-            throw new \Garden\Schema\ValidationException('Unknown asset "'.$pathInfo['filename'].'" field.'.
-                'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
+            $assetBody = $request->getRawBody();
+        }
+
+        // Try to create the asset.
+        $asset = $this->assetFactory->createAsset($theme, $assetType, $assetName, $assetBody);
+        $asset->validate();
+        return [$asset, $assetName];
+    }
+
+    /**
+     * Validate an asset exists on a theme and return the asset.
+     *
+     * @param Theme $theme
+     * @param string $assetPath
+     * @return array [ThemeAsset, string $assetName, string $extension]
+     */
+    private function extractAssetForPath(Theme $theme, string $assetPath): array {
+        $assetName = pathinfo($assetPath, PATHINFO_FILENAME);
+        $ext = pathinfo($assetPath, PATHINFO_EXTENSION);
+
+        $asset = $theme->getAssets()[$assetName] ?? null;
+        return [$asset, $assetName, $ext];
+    }
+
+    /**
+     * Expand/unexpand assets on a theme.
+     *
+     * @param Theme $theme
+     * @param array|bool $expandDefinition
+     */
+    private function handleAssetExpansions(Theme $theme, $expandDefinition) {
+        foreach ($theme->getAssets() as $assetName => $asset) {
+            $asset->setIncludeValueInJson($this->isExpandField("$assetName.data", $expandDefinition));
         }
     }
 }

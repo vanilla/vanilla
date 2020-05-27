@@ -13,7 +13,7 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -34,8 +34,8 @@ class WebpackAssetProvider {
     /** @var ConfigurationInterface */
     private $config;
 
-    /** @var ThemeModel */
-    private $themeModel;
+    /** @var ThemeService */
+    private $themeService;
 
     /** @var string */
     private $cacheBustingKey = '';
@@ -59,20 +59,20 @@ class WebpackAssetProvider {
      * @param AddonManager $addonManager
      * @param \Gdn_Session $session
      * @param ConfigurationInterface $config
-     * @param ThemeModel $themeModel
+     * @param ThemeService $themeService
      */
     public function __construct(
         RequestInterface $request,
         AddonManager $addonManager,
         \Gdn_Session $session,
         ConfigurationInterface $config,
-        ThemeModel $themeModel
+        ThemeService $themeService
     ) {
         $this->request = $request;
         $this->addonManager = $addonManager;
         $this->session = $session;
         $this->config = $config;
-        $this->themeModel = $themeModel;
+        $this->themeService = $themeService;
     }
 
     /**
@@ -203,10 +203,10 @@ class WebpackAssetProvider {
      */
     private function checkReplacePreview(Addon $addon): Addon {
         $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
-        $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
+        $currentThemeKey = $this->themeService->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
             if ($addon->getKey() === $currentThemeKey) {
-                $addonKey = $this->themeModel->getMasterThemeKey($previewThemeKey);
+                $addonKey = $this->themeService->getMasterThemeKey($previewThemeKey);
                 if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
                     $addon = $previewTheme;
                 }

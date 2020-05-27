@@ -673,7 +673,6 @@ class UsersTest extends AbstractResourceTest {
      */
     private function verifyRegistration(array $fields) {
         $registration = $this->api()->post('/users/register', $fields)->getBody();
-        $registration = $registration->getData();
         $user = $this->runWithAdminUser(function () use ($registration) {
             return $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
         });

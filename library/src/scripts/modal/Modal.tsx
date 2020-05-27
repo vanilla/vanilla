@@ -12,6 +12,15 @@ import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
 import { mountPortal } from "@vanilla/react-utils";
 
+React.memo(
+    function MyComponent() {
+        return <div></div>;
+    },
+    () => {
+        return true;
+    },
+);
+
 interface IProps {
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;

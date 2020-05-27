@@ -100,10 +100,8 @@ class ThemeCache {
         // Put args in a stable order.
         ksort($args);
 
-        $cacheKey = self::CACHE_KEY . '_' . $themeID;
-        foreach ($args as $key => $val) {
-            $cacheKey .= '_' . $key . '-' . json_encode($val);
-        }
+        $cacheKey = self::CACHE_KEY . '_' . $themeID.md5(json_encode($args));
+        
         return $cacheKey;
     }
 

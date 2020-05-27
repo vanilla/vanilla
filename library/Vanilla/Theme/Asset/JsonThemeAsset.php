@@ -40,7 +40,7 @@ class JsonThemeAsset extends ThemeAsset {
                 "error" => "Error decoding JSON",
                 "message" => json_last_error_msg(),
             ];
-            $this->jsonString = json_encode($this->data);
+            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
         } else {
             $this->jsonString = $data;
             $this->data = $decoded;
@@ -76,6 +76,24 @@ class JsonThemeAsset extends ThemeAsset {
      */
     public function getValue(): array {
         return $this->data;
+    }
+
+    /**
+     * Overridden so objects don't get coerced into arrays.
+     *
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        $result = [
+            'url' => $this->getUrl(),
+            'type' => $this->getDefaultType(),
+        ];
+
+        if ($this->includeValueInJson) {
+            $result['data'] = json_decode($this->jsonString);
+        }
+
+        return $result;
     }
 
     /**

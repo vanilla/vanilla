@@ -29,7 +29,7 @@ class NeonThemeAsset extends JsonThemeAsset {
         $this->neonString = $data;
         try {
             $this->data = Neon::decode($data);
-            $this->jsonString = json_encode($this->data);
+            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
         } catch (\Exception $e) {
             // It's a bad asset.
             // Replace the asset with some json containing the error message.

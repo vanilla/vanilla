@@ -38,6 +38,7 @@ class APIExpandMiddleware {
         "insertUser.ssoID" => "insertUserID",
         "lastInsertUser.ssoID" => "lastInsertUserID",
         "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
+        "lastUser.ssoID" => "lastUserID",
         "updateUser.ssoID" => "updateUserID",
         "user.ssoID" => "userID",
     ];

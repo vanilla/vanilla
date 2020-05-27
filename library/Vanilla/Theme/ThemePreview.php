@@ -66,8 +66,8 @@ class ThemePreview implements \JsonSerializable {
         $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
         $primary = $variables['global']['mainColors']['primary'] ?? null;
         $this->variablePreview['globalPrimary'] = $primary;
-        $this->variablePreview['globalBg'] = $bg ?? null;
-        $this->variablePreview['globalFg'] = $fg ?? null;
+        $this->variablePreview['globalBg'] = $bg;
+        $this->variablePreview['globalFg'] = $fg;
         $this->variablePreview['titleBarBg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
         $this->variablePreview['titleBarFg'] = $variables['titleBar']['colors']['fg'] ?? null;
         $this->variablePreview['backgroundImage'] = $variables['splash']['outerBackground']['image']

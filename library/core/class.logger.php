@@ -22,6 +22,8 @@ class Logger {
     public const FIELD_CHANNEL = \Vanilla\Logger::FIELD_CHANNEL;
     public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
     public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
+    public const FIELD_USERID = \Vanilla\Logger::FIELD_USERID;
+    public const FIELD_USERNAME = \Vanilla\Logger::FIELD_USERNAME;
 
     public const CHANNEL_ADMIN = \Vanilla\Logger::CHANNEL_ADMIN;
     public const CHANNEL_APPLICATION = \Vanilla\Logger::CHANNEL_APPLICATION;
@@ -91,7 +93,10 @@ class Logger {
      * @param LoggerInterface $logger Specify a new value to set the logger to.
      */
     public static function setLogger($logger = null) {
-        if ($logger instanceof \Vanilla\Logger) {
+        if ($logger === null) {
+            self::$instance = null;
+            self::$realLogger = null;
+        } elseif ($logger instanceof \Vanilla\Logger) {
             self::$instance = $logger;
         } else {
             deprecated('Logger::setLogger()', 'Logger::addLogger');
@@ -270,8 +275,7 @@ class Logger {
         } elseif (isset($priorities[$level])) {
             return $priorities[$level];
         } else {
-            error_log($level);
-            self::log(Logger::NOTICE, "Unknown log level {unknownLevel}.", ['unknownLevel' => $level]);
+            trigger_error("Unknown log level: $level.", E_USER_NOTICE);
             return LOG_DEBUG + 1;
         }
     }
@@ -322,25 +326,17 @@ class Logger {
      * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
      */
     public static function priorityLabel($priority) {
-        switch ($priority) {
-            case LOG_DEBUG:
-                return self::DEBUG;
-            case LOG_INFO:
-                return self::INFO;
-            case LOG_NOTICE:
-                return self::NOTICE;
-            case LOG_WARNING:
-                return self::WARNING;
-            case LOG_ERR:
-                return self::ERROR;
-            case LOG_CRIT:
-                return self::CRITICAL;
-            case LOG_ALERT:
-                return self::ALERT;
-            case LOG_EMERG:
-                return self::EMERGENCY;
-            default:
-                return 'unknown';
-        }
+        static $labels = [
+            LOG_DEBUG => self::DEBUG,
+            LOG_INFO => self::INFO,
+            LOG_NOTICE => self::NOTICE,
+            LOG_WARNING => self::WARNING,
+            LOG_ERR => self::ERROR,
+            LOG_CRIT => self::CRITICAL,
+            LOG_ALERT => self::ALERT,
+            LOG_EMERG => self::EMERGENCY,
+        ];
+
+        return $labels[$priority] ?? 'unknown';
     }
 }

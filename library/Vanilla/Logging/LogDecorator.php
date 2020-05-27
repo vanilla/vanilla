@@ -10,6 +10,7 @@ namespace Vanilla\Logging;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Ramsey\Uuid\Uuid;
+use Vanilla\Logger;
 
 /**
  * A decorator for the log that adds default context attributes based on the current request.
@@ -38,16 +39,23 @@ class LogDecorator implements LoggerInterface {
     private $staticContextDefaults = [];
 
     /**
+     * @var \UserModel
+     */
+    private $userModel;
+
+    /**
      * LogDecorator constructor.
      *
      * @param \Gdn_Session $session
      * @param \Gdn_Request $request
+     * @param \UserModel $userModel
      * @param LoggerInterface $logger
      */
-    public function __construct(\Gdn_Session $session, \Gdn_Request $request, LoggerInterface $logger) {
+    public function __construct(\Gdn_Session $session, \Gdn_Request $request, \UserModel $userModel, LoggerInterface $logger) {
         $this->session = $session;
         $this->request = $request;
         $this->logger = $logger;
+        $this->userModel = $userModel;
 
         if (empty($request->getAttribute('requestID'))) {
             try {
@@ -62,9 +70,8 @@ class LogDecorator implements LoggerInterface {
      * {@inheritdoc}
      */
     public function log($level, $message, array $context = array()) {
-        $defaults = $this->staticContextDefaults + [
-            'userid' => $this->session->UserID,
-            'username' => $this->session->User->Name ?? 'anonymous',
+        $context += $this->staticContextDefaults + [
+            Logger::FIELD_USERID => $this->session->UserID,
             'ip' => $this->request->ipAddress(),
             'timestamp' => time(),
             'method' => $this->request->requestMethod(),
@@ -73,7 +80,35 @@ class LogDecorator implements LoggerInterface {
             'requestID' => $this->request->getAttribute('requestID', null),
         ];
 
-        $this->logger->log($level, $message, $context + $defaults);
+        $this->addUsername(Logger::FIELD_USERID, Logger::FIELD_USERNAME, $context);
+        $this->addUsername(Logger::FIELD_TARGET_USERID, Logger::FIELD_TARGET_USERNAME, $context);
+
+        $this->logger->log($level, $message, $context);
+    }
+
+    /**
+     * Add a username to a log entry.
+     *
+     * @param string $idField
+     * @param string $nameField
+     * @param array $context
+     */
+    private function addUsername(string $idField, string $nameField, array &$context): void {
+        if (!array_key_exists($idField, $context) || array_key_exists($nameField, $context)) {
+            return;
+        }
+
+        if (empty($context[$idField])) {
+            $context[$nameField] = 'anonymous';
+        } else {
+            $user = $this->userModel->getID($context[$idField], DATASET_TYPE_OBJECT);
+
+            if ($user === false) {
+                $context[$nameField] = 'unknown';
+            } else {
+                $context[$nameField] = $user->Name;
+            }
+        }
     }
 
     /**
@@ -90,7 +125,7 @@ class LogDecorator implements LoggerInterface {
      *
      * @return array
      */
-    public function getStaticContextDefaults(): array {
+    public function getContextOverrides(): array {
         return $this->staticContextDefaults;
     }
 
@@ -99,7 +134,7 @@ class LogDecorator implements LoggerInterface {
      *
      * @param array $staticContextDefaults
      */
-    public function setStaticContextDefaults(array $staticContextDefaults): void {
+    public function setContextOverrides(array $staticContextDefaults): void {
         $this->staticContextDefaults = $staticContextDefaults;
     }
 }

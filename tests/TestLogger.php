@@ -19,7 +19,7 @@ class TestLogger implements LoggerInterface {
     /**
      * @var array
      */
-    private $log;
+    private $log = [];
 
     /**
      * {@inheritdoc}
@@ -68,6 +68,21 @@ class TestLogger implements LoggerInterface {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks to see if the log has a message, doing a substring match.
+     *
+     * @param string $message
+     * @return bool
+     */
+    public function hasMessage(string $message): bool {
+        foreach ($this->log as $item) {
+            if (strpos($item['message'], $message) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

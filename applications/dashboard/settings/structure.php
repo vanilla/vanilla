@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Theme\ThemeCache;
 use Vanilla\Theme\ThemeServiceHelper;
 
 if (!defined('APPLICATION')) {
@@ -1052,3 +1053,9 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
  */
 $themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
 $themeHelper->saveCurrentThemeToVisible();
+
+
+// Clear out the theme cache in case any file based themes were updated.
+/** @var ThemeCache $themeCache */
+$themeCache = Gdn::getContainer()->get(ThemeCache::class);
+$themeCache->clear();

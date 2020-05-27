@@ -7,6 +7,8 @@
 
 namespace Vanilla\Theme;
 
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Implement caching for the theme service.
  */
@@ -24,13 +26,20 @@ class ThemeCache {
     /** @var \Gdn_Cache */
     private $cache;
 
+    /** @var bool */
+    private $isEnabled;
+
     /**
      * DI.
      *
      * @param \Gdn_Cache $cache
+     * @param ConfigurationInterface $config
      */
-    public function __construct(\Gdn_Cache $cache) {
+    public function __construct(\Gdn_Cache $cache, ConfigurationInterface $config) {
         $this->cache = $cache;
+
+        // Disable caching while in debug mode.
+        $this->isEnabled = !$config->get('Debug', false);
     }
 
     /**

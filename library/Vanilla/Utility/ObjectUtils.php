@@ -17,8 +17,7 @@ final class ObjectUtils {
      * The array is parsed where keys represent properties to be set by the values. To set a property, the following is done:
      *
      * 1. Look for a method in the form: `set$property`.
-     * 2. Look for a method in the form: `with$property`.
-     * 3. Look for an actual property.
+     * 2. Look for an actual property.
      *
      * @param object $object The object to hydrate.
      * @param array $data The data to hydrate with.

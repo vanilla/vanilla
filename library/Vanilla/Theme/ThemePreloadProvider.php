@@ -113,7 +113,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
             return null;
         }
 
-        $script = $theme->getAssets()[ThemeAssetFactory::ASSET_SCRIPTS] ?? null;
+        $script = $theme->getAsset(ThemeAssetFactory::ASSET_JAVASCRIPT);
         if (!($script instanceof JavascriptThemeAsset) || !$script->__toString()) {
             return null;
         }

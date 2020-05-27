@@ -84,10 +84,16 @@ class JsonThemeAsset extends ThemeAsset {
      * @inheritdoc
      */
     public function jsonSerialize() {
-        return [
+        $result = [
+            'url' => $this->getUrl(),
             'type' => $this->getDefaultType(),
-            'data' => json_decode($this->jsonString),
         ];
+
+        if ($this->includeValueInJson) {
+            $result['data'] = json_decode($this->jsonString);
+        }
+
+        return $result;
     }
 
     /**

@@ -395,7 +395,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
             }
 
             if ($blot instanceof ExternalBlot) {
-                return '(Embedded Media)';
+                $embedType = $blot->getEmbedData()['type'] ?? 'Embedded Media';
+                return \Gdn::translate("(".$embedType.")");
             }
 
             if ($blot instanceof NestingParentRendererInterface) {

@@ -7,11 +7,16 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
-
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ObjectUtils;
 
+/**
+ * Tests for the `ObjectUtils` class.
+ */
 class ObjectUtilsTest extends TestCase {
+    /**
+     * Test the happy path fot `ObjectUtils::hydrate()`.
+     */
     public function testHydrateHappy(): void {
         $a = new class {
             public $a;
@@ -60,6 +65,9 @@ class ObjectUtilsTest extends TestCase {
         ObjectUtils::hydrate($a, ['a' => 'a']);
     }
 
+    /**
+     * Test `ObjectUtils::with()`.
+     */
     public function testWith(): void {
         $a = new class {
             public $a = 'a';
@@ -70,5 +78,4 @@ class ObjectUtilsTest extends TestCase {
         $this->assertSame('a', $a->a);
         $this->assertSame('b', $b->a);
     }
-
 }

@@ -146,7 +146,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param array $args
      * @return string
      */
-    public function AfterBanner_handler($sender, $args = []) {
+    public function afterBanner_handler($sender, $args = []) {
         ob_start();
         $this->processPockets($sender, "AfterBanner");
         $output = ob_get_clean();

@@ -3731,8 +3731,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
-            'updateUserID:i|n',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'updateUserID:i|n',
+            'lastUserID:i',
             'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [

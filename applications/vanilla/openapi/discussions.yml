@@ -891,6 +891,9 @@ components:
           type: integer
         lastPost:
           $ref: '#/components/schemas/PostFragment'
+        lastUserID:
+          type: integer
+          description: The last user to post in the discussion.
         lastUser:
           $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
         name:

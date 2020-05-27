@@ -54,7 +54,7 @@ class ObjectUtilsTest extends TestCase {
     }
 
     /**
-     * You can't set a non-public property.
+     * You can't set a non-existent property.
      */
     public function testHydrateMissing(): void {
         $a = new class {

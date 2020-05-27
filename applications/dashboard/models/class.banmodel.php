@@ -263,15 +263,6 @@ class BanModel extends Gdn_Model {
 
         $result = parent::delete($where, $options);
 
-        Logger::event(
-            \Vanilla\Events\EventAction::eventName(lcfirst($this->Name), \Vanilla\Events\EventAction::DELETE),
-            \Psr\Log\LogLevel::INFO,
-            "{username} deleted a ban rule.",
-            [
-                ''
-            ]
-        );
-
         if (isset($oldBan)) {
             $this->applyBan(null, $oldBan);
         }

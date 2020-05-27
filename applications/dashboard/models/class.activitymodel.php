@@ -806,7 +806,7 @@ class ActivityModel extends Gdn_Model {
     public function add($activityUserID, $activityType, $story = null, $regardingUserID = null, $commentActivityID = null, $route = null, $sendEmail = '') {
         // Get the ActivityTypeID & see if this is a notification.
         $activityTypeRow = self::getActivityType($activityType);
-        $notify = $activityTypeRow['Notify'] ? (bool)$activityTypeRow['Notify'] : false;
+        $notify = val('Notify', $activityTypeRow, false);
 
         if ($activityTypeRow === false) {
             trigger_error(

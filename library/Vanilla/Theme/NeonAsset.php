@@ -22,8 +22,6 @@ class NeonAsset extends JsonAsset {
      * @param string $data
      */
     public function __construct($data) {
-        $this->data = Neon::decode($data);
-
-        $result = true;
+        $this->data = json_decode(json_encode(Neon::decode($data), JSON_FORCE_OBJECT));
     }
 }

@@ -38,9 +38,9 @@
         $(document).delegate(".Flyout, .Dropdown", "click", function (e) {
             e.stopPropagation();
         });
-        $(document).on("click", function (e) {
+        $(document).on("click touchstart", function (e) {
             closeAllFlyouts();
-        })
+        });
     });
 
     /**

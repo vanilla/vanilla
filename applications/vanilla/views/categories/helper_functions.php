@@ -188,7 +188,7 @@ if (!function_exists('writeListItem')):
                         ?>
                     </div>
                     <div class="CategoryDescription">
-                        <?php echo $htmlSanitizer->filter(val('Description', $category)); ?>
+                        <?php echo $htmlSanitizer->filter((string)val('Description', $category, '')); ?>
                     </div>
                     <div class="Meta">
                         <span class="MItem RSS"><?php echo $rssIcon ?></span>
@@ -293,7 +293,7 @@ if (!function_exists('WriteTableRow')):
                     echo "</{$h}>";
                     ?>
                     <div class="CategoryDescription">
-                        <?php echo $htmlSanitizer->filter($row['Description']); ?>
+                        <?php echo $htmlSanitizer->filter($row['Description'] ?? ''); ?>
                     </div>
                     <?php if ($writeChildren === 'list'): ?>
                         <div class="ChildCategories">

@@ -71,6 +71,16 @@ class BannerImageModel {
         } else {
             $html = "<div data-react='community-content-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
         }
+
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            /** @var \Garden\EventManager $eventManager */
+            $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+            $afterBanner = $eventManager->fire('AfterBanner', $this);
+            if (!empty($afterBanner)) {
+                $html .= implode("", $afterBanner);
+            }
+        }
+
         return new \Twig\Markup($html, 'utf-8');
     }
 

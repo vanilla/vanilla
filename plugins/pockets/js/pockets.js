@@ -40,6 +40,7 @@ var revealRepeatOptions = function() {
 var toggleRepeat = function() {
     var selected = $("select[name$=Location] option:selected").text();
     switch (selected) {
+        case 'AfterBanner':
         case 'Custom':
             $('.js-repeat').hide();
             break;

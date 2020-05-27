@@ -368,18 +368,18 @@ class ThemeService {
             }
 
             // Try to get the base key.
-            $baseTheme = $this->getThemeProvider($baseKey)->getTheme($baseKey);
+            $baseTheme = $this->getTheme($baseKey);
             $current = $baseTheme;
 
             if ($needsMobileOverlay && $currentKey !== null) {
-                $assetOverlayTheme = $this->getThemeProvider($currentKey)->getTheme($currentKey);
+                $assetOverlayTheme = $this->getTheme($currentKey);
                 $current->setAssets($assetOverlayTheme->getAssets());
             }
 
             $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();
             if ($sectionThemeID !== null) {
                 // Check if the theme actually exists.
-                $sectionTheme = $this->getThemeProvider($sectionThemeID)->getTheme($sectionThemeID);
+                $sectionTheme = $this->getTheme($sectionThemeID);
                 if ($sectionTheme !== null) {
                     $current = $sectionTheme;
                 }
@@ -394,8 +394,7 @@ class ThemeService {
                     $args['revisionID'] = $previewThemeRevisionID;
                 }
 
-                $themeProvider = $this->getThemeProvider($previewThemeKey);
-                $previewTheme = $themeProvider->getTheme($previewThemeKey, $args);
+                $previewTheme = $this->getTheme($previewThemeKey, $args);
                 if ($previewTheme === null) {
                     // if we stored wrong preview key store in session, lets reset it.
                     $this->themeHelper->cancelSessionPreviewTheme();
@@ -406,14 +405,12 @@ class ThemeService {
 
             if ($current === null) {
                 // If we're still null, fallback to our default.
-                $provider = $this->getThemeProvider("FILE");
-                $current = $provider->getTheme(self::FALLBACK_THEME_KEY);
+                $this->getTheme(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             // If we had some exception during this, fallback to the default.
-            $provider = $this->getThemeProvider("FILE");
-            $current = $provider->getTheme(self::FALLBACK_THEME_KEY);
+            $this->getTheme(self::FALLBACK_THEME_KEY);
         }
 
         $current = $this->normalizeTheme($current);

@@ -69,7 +69,7 @@ class ThemesApiController extends AbstractApiController {
 
         $theme = $this->themeService->getTheme($themeKey, $query);
         $this->handleAssetExpansions($theme, $params['expand']);
-        return new Data($theme, ['theme' => $theme]);
+        return new Data($theme, ['theme' => $theme], [ 'X-App-Cache-Hit' => $theme->isCacheHit() ? '1' : '0' ]);
     }
 
     /**
@@ -220,7 +220,7 @@ class ThemesApiController extends AbstractApiController {
         $theme = $this->themeService->getCurrentTheme();
         $this->handleAssetExpansions($theme, true);
         $result = $out->validate($theme);
-        return new Data($theme, ['theme' => $theme]);
+        return new Data($theme, ['theme' => $theme], [ 'X-App-Cache-Hit' => $theme->isCacheHit() ? '1' : '0' ]);
     }
 
     /**
@@ -317,6 +317,7 @@ class ThemesApiController extends AbstractApiController {
         // We apply a cache buster when generating these URLs.
         $result->setHeader('Cache-Control', CacheControlMiddleware::MAX_CACHE);
         $result->setMeta(CacheControlMiddleware::META_NO_VARY, true);
+        $result->setMeta('X-App-Cache-Hit', $theme->isCacheHit() ? '1' : '0');
 
         return $result;
     }

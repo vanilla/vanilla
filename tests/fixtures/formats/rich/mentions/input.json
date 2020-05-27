@@ -5,6 +5,7 @@
                 "data": {
                     "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
                     "type": "quote",
+                    "embedType": "quote",
                     "recordID": 4,
                     "recordType": "comment",
                     "bodyRaw": [

@@ -52,6 +52,10 @@ class PocketsPlugin extends Gdn_Plugin {
             $colspan = c('Plugins.Pockets.Colspan', ($useAdminChecks) ? 6 : 5);
             $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
         }
+
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            $this->Locations['AfterBanner'] = ['Name' => 'After Banner'];
+        }
     }
 
     /**
@@ -133,6 +137,20 @@ class PocketsPlugin extends Gdn_Plugin {
             return;
         }
         $this->processPockets($sender, 'BetweenComments');
+    }
+
+    /**
+     * Hook into after banner pocket location
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     * @return string
+     */
+    public function afterBanner_handler($sender, $args = []) {
+        ob_start();
+        $this->processPockets($sender, "AfterBanner");
+        $output = ob_get_clean();
+        return $output;
     }
 
     /**
@@ -332,6 +350,10 @@ class PocketsPlugin extends Gdn_Plugin {
 
             // Convert the form data into a format digestable by the database.
             $repeat = $form->getFormValue('RepeatType');
+            if ($form->getFormValue("Location") === "AfterBanner") {
+                $repeat = Pocket::REPEAT_ONCE;
+            }
+
             switch ($repeat) {
                 case Pocket::REPEAT_EVERY:
                     $pocketModel->Validation->applyRule('EveryFrequency', 'Integer');
@@ -355,6 +377,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 default:
                     break;
             }
+
             $form->setFormValue('Repeat', $repeat);
             $form->setFormValue('Sort', 0);
             $form->setFormValue('Format', 'Raw');
@@ -547,7 +570,7 @@ class PocketsPlugin extends Gdn_Plugin {
         if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return;
         }
-        if (Gdn::controller()->data('_NoMessages') && $location != 'Head') {
+        if (Gdn::controller()->data('_NoMessages') && $location != 'Head' && $location !== 'AfterBanner') {
             return;
         }
 
@@ -867,14 +890,15 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $pocketData = $pocket->Data;
         $categoryID = $pocketData['CategoryID'] ?? null;
+
+        if (empty($categoryID)) {
+            return $existingCanRender;
+        }
+
         if (!is_numeric($categoryID)) {
             return false;
         } else {
             $categoryID = (int) $categoryID;
-        }
-
-        if (empty($categoryID)) {
-            return $existingCanRender;
         }
 
         $controller = \Gdn::controller();

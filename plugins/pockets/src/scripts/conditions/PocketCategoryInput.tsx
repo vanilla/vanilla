@@ -43,7 +43,7 @@ export function PocketCategoryInput(props) {
                         value={category}
                     />
                 </div>
-                <input name={props.fieldName} type={"hidden"} value={hasCategory ?? undefined} />
+                <input name={props.fieldName} type={"hidden"} value={hasCategory ?? ""} />
                 <div className={classNames("checkbox", classes.checkBoxAfterInput)}>
                     <DashboardRadioGroup>
                         <DashboardCheckBox

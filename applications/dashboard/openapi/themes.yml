@@ -8,6 +8,10 @@ x-aliases:
     url:
       type: string
       description: Absolute URL of the asset.
+    content-type:
+      description: The content-type of the asset.
+      type: string
+      example: application/json
   StringAssetOut: &StringAssetOut
     <<: *AssetOut
     data:

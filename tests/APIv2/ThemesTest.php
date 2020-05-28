@@ -91,6 +91,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'json',
                     'data' => json_decode(file_get_contents("$assetRoot/fonts.json"), true),
+                    'content-type' => 'application/json',
                 ],
             ],
             'variables' => [
@@ -99,6 +100,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'json',
                     'data' => json_decode(file_get_contents("$assetRoot/variables.json"), true),
+                    'content-type' => 'application/json',
                 ],
             ],
             'scripts' => [
@@ -107,6 +109,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'json',
                     'data' => json_decode(file_get_contents("$assetRoot/scripts.json"), true),
+                    'content-type' => 'application/json',
                 ],
             ],
             'header' => [
@@ -115,6 +118,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'html',
                     'data' => file_get_contents("$assetRoot/header.html"),
+                    'content-type' => 'text/html',
                 ],
             ],
             'footer' => [
@@ -123,6 +127,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'html',
                     'data' => file_get_contents("$assetRoot/footer.html"),
+                    'content-type' => 'text/html',
                 ],
             ],
             'javascript' => [
@@ -131,6 +136,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'js',
                     'data' => file_get_contents("$assetRoot/javascript.js"),
+                    'content-type' => 'application/javascript',
                 ],
             ],
             'styles' => [
@@ -139,6 +145,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 [
                     'type' => 'css',
                     'data' => file_get_contents("$assetRoot/styles.css"),
+                    'content-type' => 'text/css',
                 ],
             ],
         ];

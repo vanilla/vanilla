@@ -87,6 +87,7 @@ class JsonThemeAsset extends ThemeAsset {
         $result = [
             'url' => $this->getUrl(),
             'type' => $this->getDefaultType(),
+            'content-type' => $this->getContentType(),
         ];
 
         if ($this->includeValueInJson) {

@@ -30,10 +30,10 @@ export class CommunityCategoryInput extends React.Component<IProps> {
     public render() {
         return (
             <SelectLookup
+                placeholder=""
                 {...this.props}
                 label={this.props.label}
                 noOptionsMessage={this.noOptionsMessage}
-                placeholder=""
             />
         );
     }

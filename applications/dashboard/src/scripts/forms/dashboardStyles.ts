@@ -5,8 +5,6 @@
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles";
-import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -21,8 +19,22 @@ export const dashboardClasses = useThemeCache(() => {
         marginBottom: globalVars.gutter.size,
     });
 
+    const tokenInput = style("tokenInput", {
+        fontSize: "inherit",
+    });
+
+    const selectOne = style("selectOne", {
+        $nest: {
+            [`&.SelectOne__value-container.inputText.inputText`]: {
+                fontSize: "inherit",
+            },
+        },
+    });
+
     return {
         formList,
         helpAsset,
+        tokenInput,
+        selectOne,
     };
 });

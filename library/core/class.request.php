@@ -10,6 +10,8 @@
  * @since 2.0
  */
 use Garden\Web\RequestInterface;
+use League\Uri\Http;
+use Psr\Http\Message\UriInterface;
 use Vanilla\UploadedFile;
 
 /**
@@ -604,6 +606,18 @@ class Gdn_Request implements RequestInterface {
         $queryString = (empty($query) ? '' : '?'.http_build_query($query));
 
         return "{$scheme}://{$hostAndPort}{$fullPath}{$queryString}";
+    }
+
+    /**
+     * Retrieves the URI instance.
+     *
+     * This method MUST return a UriInterface instance.
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     * @return UriInterface Returns a UriInterface instance representing the URI of the request.
+     */
+    public function getUri() {
+        return Http::createFromString($this->getUrl());
     }
 
     /**

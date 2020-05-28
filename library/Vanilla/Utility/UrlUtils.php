@@ -7,6 +7,7 @@
 namespace Vanilla\Utility;
 
 use InvalidArgumentException;
+use Psr\Http\Message\UriInterface;
 
 /**
  * A collection of url utilities.
@@ -34,5 +35,19 @@ class UrlUtils {
         }
         $buildUrl = http_build_url($parsedLink);
         return $buildUrl;
+    }
+
+    /**
+     * Generate a new URI by replacing querystring elements from an existing URI.
+     *
+     * @param UriInterface $uri The base URI.
+     * @param array $replace The querystring replacement.
+     * @return UriInterface
+     */
+    public static function replaceQuery(UriInterface $uri, array $replace): UriInterface {
+        parse_str($uri->getQuery(), $query);
+        $query = array_replace($query, $replace);
+        $result = $uri->withQuery(http_build_query($query));
+        return $result;
     }
 }

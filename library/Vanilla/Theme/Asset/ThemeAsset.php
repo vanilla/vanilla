@@ -109,6 +109,7 @@ abstract class ThemeAsset implements \JsonSerializable {
         $result = [
             'url' => $this->getUrl(),
             'type' => $this->getDefaultType(),
+            'content-type' => $this->getContentType(),
         ];
 
         if ($this->includeValueInJson) {

@@ -156,7 +156,7 @@ class BBCode extends Gdn_Pluggable {
                 }
             } elseif (is_numeric($url)) {
                 $url = "/discussion/comment/$url#Comment_{$url}";
-            } elseif (!$bbcode->isValidURL($url)) {
+            } elseif (!$this->isValidURL($bbcode, $url)) {
                 $url = '';
             }
 
@@ -212,22 +212,21 @@ class BBCode extends Gdn_Pluggable {
      * @param string $content Value between the open and close tags, if any.
      * @return bool|string Formatted value.
      */
-    function doURL($bbcode, $action, $name, $default, $params, $content) {
+    public function doURL($bbcode, $action, $name, $default, $params, $content) {
         if ($action == Nbbc::BBCODE_CHECK) {
             return true;
         }
 
         $url = is_string($default) ? $default : $bbcode->unHtmlEncode(strip_tags($content));
 
-        if ($bbcode->isValidURL($url)) {
+        if ($this->isValidURL($bbcode, $url)) {
             if ($bbcode->getDebug()) {
                 print "ISVALIDURL<br />";
             }
 
             if ($bbcode->getUrlTargetable() !== false && isset($params['target'])) {
                 $target = " target=\"".htmlspecialchars($params['target'])."\"";
-            }
-            else {
+            } else {
                 $target = "";
             }
 
@@ -539,5 +538,18 @@ class BBCode extends Gdn_Pluggable {
     public function removeAttachment() {
         // We dont need this since we show attachments.
         return '<!-- phpBB Attachments -->';
+    }
+
+    /**
+     * @param $bbcode
+     * @param string $url
+     * @return mixed
+     */
+    protected function isValidURL($bbcode, string $url) {
+        $parsed = parse_url($url);
+        if ($parsed !== false && in_array($parsed['scheme'], ['http', 'https', 'ftp'], true)) {
+            return true;
+        }
+        return $bbcode->isValidURL($url);
     }
 }

@@ -541,11 +541,13 @@ class BBCode extends Gdn_Pluggable {
     }
 
     /**
-     * @param $bbcode
-     * @param string $url
-     * @return mixed
+     * Check to see if a URL is valid.
+     *
+     * @param Nbbc $bbcode The BBCode class to check the URL with.
+     * @param string $url The URL being checked.
+     * @return bool
      */
-    protected function isValidURL($bbcode, string $url) {
+    protected function isValidURL($bbcode, string $url): bool {
         $parsed = parse_url($url);
         if ($parsed !== false && in_array($parsed['scheme'], ['http', 'https', 'ftp'], true)) {
             return true;

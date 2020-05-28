@@ -23,9 +23,18 @@ export const dashboardClasses = useThemeCache(() => {
         fontSize: "inherit",
     });
 
+    const selectOne = style("selectOne", {
+        $nest: {
+            [`&.SelectOne__value-container.inputText.inputText`]: {
+                fontSize: "inherit",
+            },
+        },
+    });
+
     return {
         formList,
         helpAsset,
         tokenInput,
+        selectOne,
     };
 });

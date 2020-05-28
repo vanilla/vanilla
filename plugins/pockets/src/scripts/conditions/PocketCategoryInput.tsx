@@ -9,10 +9,11 @@ import { t } from "@vanilla/i18n/src";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
-import { inputClasses, inputMixin } from "@library/forms/inputStyles";
+import { inputClasses } from "@library/forms/inputStyles";
 import classNames from "classnames";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
 export function PocketCategoryInput(props) {
     const [category, setCategory] = useState(
@@ -36,7 +37,9 @@ export function PocketCategoryInput(props) {
             <div className="input-wrap">
                 <div className={classes.inputWrap}>
                     <CommunityCategoryInput
+                        placeholder={t("Select...")}
                         label={null}
+                        inputClassName={dashboardClasses().selectOne}
                         onChange={(option: IComboBoxOption) => {
                             setCategory(option);
                         }}

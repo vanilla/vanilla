@@ -28,6 +28,7 @@ export interface ITokenProps extends IOptionalComponentID {
     onChange: (tokens: IComboBoxOption[]) => void;
     onInputChange?: (value: string) => void;
     menuPlacement?: string;
+    showIndicator?: boolean;
 }
 
 interface IState {
@@ -55,7 +56,11 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
 
         return (
             <>
-                <div className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root)}>
+                <div
+                    className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root, {
+                        [classes.withIndicator]: this.props.showIndicator,
+                    })}
+                >
                     <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
                         <span className={classesInputBlock.labelText}>{this.props.label}</span>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
@@ -126,9 +131,8 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
      * Overwrite components in Select component
      */
     private get componentOverwrites() {
-        return {
+        const overwrites = {
             ClearIndicator: selectOverrides.NullComponent,
-            DropdownIndicator: selectOverrides.NullComponent,
             LoadingMessage: selectOverrides.OptionLoader,
             Menu:
                 !this.props.options || this.props.options?.length > 0
@@ -146,6 +150,12 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                 : selectOverrides.NullComponent,
             LoadingIndicator: selectOverrides.NullComponent,
         };
+
+        if (!this.props.showIndicator) {
+            overwrites["DropdownIndicator"] = selectOverrides.NullComponent;
+        }
+
+        return overwrites;
     }
 
     /**

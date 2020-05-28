@@ -5,13 +5,14 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { colorOut, IBorderRadiusValue, unit } from "@library/styles/styleHelpers";
+import { colorOut, IBorderRadiusValue, pointerEvents, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty, StandardLonghandPropertiesFallback } from "csstype";
-import { inputClasses } from "@library/forms/inputStyles";
+import { inputClasses, inputVariables } from "@library/forms/inputStyles";
+import { tokensClasses } from "@library/forms/select/tokensStyles";
 
 export const inputBlockVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -23,7 +24,6 @@ export const inputBlockVariables = useThemeCache(() => {
 export const inputBlockClasses = useThemeCache(() => {
     const style = styleFactory("inputBlock");
     const globalVars = globalVariables();
-    const vars = inputBlockVariables();
     const formElementVars = formElementsVariables();
 
     const inputText = style("inputText", {
@@ -67,6 +67,15 @@ export const inputBlockClasses = useThemeCache(() => {
             [`&.isHorizontal .${inputWrap}`]: {
                 display: "inline-flex",
                 flexGrow: 1,
+            },
+            [`&.${tokensClasses().withIndicator} .tokens__value-container`]: {
+                paddingRight: unit(inputVariables().sizing.height),
+            },
+            [`&.${tokensClasses().withIndicator} .tokens__indicators`]: {
+                position: "absolute",
+                top: 0,
+                right: 6,
+                bottom: 0,
             },
         },
     });

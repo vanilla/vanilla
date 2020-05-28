@@ -7,6 +7,8 @@ import React, { useState } from "react";
 import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { MultiSubcommunityInput } from "@subcommunities/chooser/MultiSubcommunityInput";
 
 export function PocketMultiRoleInput(props) {
     const [roles, setRoles] = useState(props.initialValue && props.initialValue !== "" ? props.initialValue : []);
@@ -14,6 +16,8 @@ export function PocketMultiRoleInput(props) {
         <DashboardFormGroup label={t("Roles")} tag={"div"}>
             <div className="input-wrap">
                 <MultiRoleInput
+                    showIndicator={true}
+                    className={dashboardClasses().tokenInput}
                     label={""}
                     value={roles ?? []}
                     onChange={viewRoleIDs => {

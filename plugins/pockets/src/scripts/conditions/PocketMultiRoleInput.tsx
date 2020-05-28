@@ -8,7 +8,6 @@ import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { MultiSubcommunityInput } from "@subcommunities/chooser/MultiSubcommunityInput";
 
 export function PocketMultiRoleInput(props) {
     const [roles, setRoles] = useState(props.initialValue && props.initialValue !== "" ? props.initialValue : []);

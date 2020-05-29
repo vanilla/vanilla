@@ -17,6 +17,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useState } from "react";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     className?: string;
@@ -62,6 +63,7 @@ export default function Hamburger(props: IProps) {
                     baseClass={ButtonTypes.ICON_COMPACT}
                     onClick={() => setIsOpen(false)}
                 >
+                    <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                     <CloseTinyIcon />
                 </Button>
                 <div className={classes.container}>

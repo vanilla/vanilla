@@ -54,7 +54,7 @@ export default function Tiles(props: IProps) {
                     <Paragraph>{props.emptyMessage}</Paragraph>
                 </div>
             ) : (
-                <div className={classNames(className, classes.root)}>
+                <nav className={classNames(className, classes.root)}>
                     <Heading
                         depth={titleLevel}
                         className={classNames(classes.title, props.hiddenTitle && visibility().visuallyHidden)}
@@ -76,7 +76,7 @@ export default function Tiles(props: IProps) {
                             </li>
                         ))}
                     </ul>
-                </div>
+                </nav>
             )}
         </Container>
     );

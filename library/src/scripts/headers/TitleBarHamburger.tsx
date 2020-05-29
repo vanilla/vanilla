@@ -6,8 +6,6 @@
 import TitleBar from "@library/headers/TitleBar";
 import * as React from "react";
 import { MemoryRouter } from "react-router";
-import FlexSpacer from "@library/layout/FlexSpacer";
-import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 
 interface IProps {
     contents: string; // HTML content

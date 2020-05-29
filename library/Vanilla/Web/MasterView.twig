@@ -30,7 +30,7 @@
                 <header id="titleBar"></header>
                 <div id="app" class="page-minHeight">
                     {%- if seoContent|default(false) -%}
-                        <noscript aria-hidden="true">
+                        <noscript id="fallbackPageContent">
                             <h1 class="heading heading-1 pageTitle">
                                 {{- title -}}
                             </h1>

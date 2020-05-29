@@ -69,7 +69,7 @@ function LinkMeta(props: ILinkMeta) {
         newRel.setAttribute("href", url);
 
         if (existingRel) {
-            existingRel.parentNode?.replaceChild(existingRel, newRel);
+            existingRel.parentNode?.replaceChild(newRel, existingRel);
         } else {
             document.head.appendChild(newRel);
         }

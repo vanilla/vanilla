@@ -132,7 +132,6 @@ export default function PanelLayout(props: IProps) {
                             className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
                                 [classes.isSticky]: isFixed,
                             })}
-                            tag="aside"
                         >
                             <PanelOverflow
                                 offset={overflowOffset}

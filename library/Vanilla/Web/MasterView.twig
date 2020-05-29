@@ -17,7 +17,7 @@
         </noscript>
     </head>
     <body class="{{ cssClasses }}">
-        <main id="page" class="page">
+        <div id="page" class="page">
             {%- if themeHeader -%}
                 <noscript id="themeHeader">
                     {{ themeHeader }}
@@ -30,7 +30,7 @@
                 <header id="titleBar"></header>
                 <div id="app" class="page-minHeight">
                     {%- if seoContent|default(false) -%}
-                        <noscript>
+                        <noscript aria-hidden="true">
                             <h1 class="heading heading-1 pageTitle">
                                 {{- title -}}
                             </h1>
@@ -43,7 +43,7 @@
             {%- if themeFooter -%}
                 <noscript id="themeFooter">{{ themeFooter }}</noscript>
             {%- endif -%}
-        </main>
+        </div>
         <div id="modals"></div>
     </body>
 </html>

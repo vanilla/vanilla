@@ -67,9 +67,10 @@ function LinkMeta(props: ILinkMeta) {
         const newRel = document.createElement("link");
         newRel.setAttribute("rel", rel);
         newRel.setAttribute("href", url);
+        newRel.setAttribute("data-testid", "link-rel-" + rel);
 
         if (existingRel) {
-            existingRel.parentNode?.replaceChild(existingRel, newRel);
+            existingRel.parentNode?.replaceChild(newRel, existingRel);
         } else {
             document.head.appendChild(newRel);
         }

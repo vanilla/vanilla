@@ -159,7 +159,11 @@ if (!function_exists('writeListItem')):
             <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
                 <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
-                    <?php echo Gdn_Format::text(val('Name', $category)); ?>
+                    <?php echo Gdn_Format::text(val('Name', $category));
+                    Gdn::controller()->EventArguments['ChildCategories'] = &$children;
+                    Gdn::controller()->EventArguments['Category'] = &$category;
+                    Gdn::controller()->fireEvent('AfterCategoryHeadingTitle');
+                    ?>
                 </div>
             </li>
         <?php else: ?>

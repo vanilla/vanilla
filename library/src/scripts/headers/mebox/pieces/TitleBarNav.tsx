@@ -11,6 +11,7 @@ import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/Tit
 import Permission from "@library/features/users/Permission";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
+import { t } from "@vanilla/i18n/src";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -89,6 +90,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                         classes.navigation,
                         this.props.isCentered && classes.navigationCentered,
                     )}
+                    aria-label={t("Navigation")}
                 >
                     <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
                         {this.props.children ? this.props.children : content}

@@ -107,7 +107,6 @@ export default function Banner(props: IProps) {
 
     return (
         <div
-            role="banner"
             ref={bannerContextRef}
             className={classNames(className, classes.root, {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,

@@ -13,7 +13,6 @@ import SmartLink from "@library/routing/links/SmartLink";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import Translate from "@library/content/Translate";
-import Container from "@library/layout/components/Container";
 
 interface IProps {
     classNames?: string;

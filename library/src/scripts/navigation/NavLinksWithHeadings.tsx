@@ -93,8 +93,6 @@ export default class NavLinksWithHeadings extends Component<IProps> {
     }
 
     private separator(classes?: string) {
-        return (
-            <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} role="presentation" />
-        );
+        return <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} />;
     }
 }

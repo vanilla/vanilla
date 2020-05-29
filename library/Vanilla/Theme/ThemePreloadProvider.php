@@ -146,7 +146,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         if (!empty($this->revisionID)) {
             // when theme-settings/{id}/revisions preview
             $args['revisionID'] = $this->revisionID;
-        } elseif (!empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
+        } elseif (!$this->forcedThemeKey && !empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
             $args['revisionID'] = $revisionID;
         }
 

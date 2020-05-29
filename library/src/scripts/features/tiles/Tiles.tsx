@@ -43,7 +43,7 @@ export enum TileAlignment {
 export default function Tiles(props: IProps) {
     const optionOverrides = { columns: props.columns, alignment: props.alignment };
     const options = tilesVariables(optionOverrides).options;
-    const { className, items } = props;
+    const { className, items, titleLevel = 2 } = props;
     const { columns } = options;
     const classes = tilesClasses(optionOverrides);
 
@@ -56,7 +56,7 @@ export default function Tiles(props: IProps) {
             ) : (
                 <div className={classNames(className, classes.root)}>
                     <Heading
-                        depth={props.titleLevel}
+                        depth={titleLevel}
                         className={classNames(classes.title, props.hiddenTitle && visibility().visuallyHidden)}
                     >
                         {props.title}
@@ -71,6 +71,7 @@ export default function Tiles(props: IProps) {
                                     description={tile.description}
                                     url={tile.url}
                                     columns={columns}
+                                    headingLevel={(titleLevel + 1) as 2}
                                 />
                             </li>
                         ))}

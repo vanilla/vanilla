@@ -67,6 +67,7 @@ function LinkMeta(props: ILinkMeta) {
         const newRel = document.createElement("link");
         newRel.setAttribute("rel", rel);
         newRel.setAttribute("href", url);
+        newRel.setAttribute("data-testid", "link-rel-" + rel);
 
         if (existingRel) {
             existingRel.parentNode?.replaceChild(newRel, existingRel);

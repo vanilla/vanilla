@@ -50,4 +50,32 @@ class UrlUtils {
         $result = $uri->withQuery(http_build_query($query));
         return $result;
     }
+
+    /**
+     * URL encode a decoded path.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function encodePath(string $path): string {
+        $parts = explode('/', $path);
+        $parts = array_map('rawurlencode', $parts);
+
+        $r = implode('/', $parts);
+        return $r;
+    }
+
+    /**
+     * URL decode an encoded path.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function decodePath(string $path): string {
+        $parts = explode('/', $path);
+        $parts = array_map('rawurldecode', $parts);
+
+        $r = implode('/', $parts);
+        return $r;
+    }
 }

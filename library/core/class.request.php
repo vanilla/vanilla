@@ -600,7 +600,7 @@ class Gdn_Request implements RequestInterface {
     public function getUrl() {
         $scheme = $this->getScheme();
         $hostAndPort = $this->getHostAndPort();
-        $fullPath = $this->getFullPath();
+        $fullPath = \Vanilla\Utility\UrlUtils::encodePath($this->getFullPath());
 
         $query = $this->getQuery();
         $queryString = (empty($query) ? '' : '?'.http_build_query($query));

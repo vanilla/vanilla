@@ -127,4 +127,15 @@ class UrlUtilsTest extends TestCase {
         $result = UrlUtils::replaceQuery($uri, $replace);
         $this->assertSame($expected, $result->getQuery());
     }
+
+    /**
+     * Test path encoding/decoding.
+     */
+    public function testEncodeDecodePath(): void {
+        $encoded = 'profile/Fran%23k';
+        $decoded = 'profile/Fran#k';
+
+        $this->assertSame($encoded, UrlUtils::encodePath($decoded));
+        $this->assertSame($decoded, UrlUtils::decodePath($encoded));
+    }
 }

@@ -1867,7 +1867,7 @@ class Gdn_Request implements RequestInterface {
      */
     public function withCustomArgs($customArgs) {
         deprecated(__METHOD__, __CLASS__.'::setAttribute()');
-        $this->_setRequestA[rguments(self::INPUT_CUSTOM, $customArgs);
+        $this->_setRequestArguments(self::INPUT_CUSTOM, $customArgs);
         return $this;
     }
 

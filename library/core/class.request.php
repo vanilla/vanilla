@@ -1862,9 +1862,12 @@ class Gdn_Request implements RequestInterface {
      * @param array $customArgs Key/value array of custom request argument data.
      * @flow chain
      * @return Gdn_Request
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function withCustomArgs($customArgs) {
-        $this->_setRequestArguments(self::INPUT_CUSTOM, $customArgs);
+        deprecated(__METHOD__, __CLASS__.'::setAttribute()');
+        $this->_setRequestA[rguments(self::INPUT_CUSTOM, $customArgs);
         return $this;
     }
 
@@ -1876,8 +1879,11 @@ class Gdn_Request implements RequestInterface {
      * @param array $args Optional argument list to forward to the method. Omit for none.
      * @flow chain
      * @return Gdn_Request
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function withControllerMethod($controller, $method = null, $args = []) {
+        deprecated(__METHOD__);
         if (is_a($controller, 'Gdn_Controller')) {
             // Convert object to string
             $matches = [];
@@ -1918,6 +1924,7 @@ class Gdn_Request implements RequestInterface {
      *
      * @param string $route
      * @return $this
+     * @deprecated
      */
     public function withRoute($route) {
         $parsedURI = Gdn::router()->getDestination($route);

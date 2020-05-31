@@ -26,7 +26,9 @@ class UrlUtils {
         if (!array_key_exists('host', $parsedLink)) {
             $parsedLink = parse_url('http://'.$url);
             if (!array_key_exists('host', $parsedLink)) {
+                // @codeCoverageIgnoreStart
                 throw new InvalidArgumentException('Url Invalid.');
+                // @codeCoverageIgnoreEnd
             }
         }
         $parsedLink['host'] = idn_to_ascii($parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);

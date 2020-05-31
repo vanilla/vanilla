@@ -45,7 +45,7 @@ class SsoUtils {
      */
     public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, ?\Psr\Log\LoggerInterface $logger = null) {
         $this->cookie = $cookie;
-        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-ssostatetoken';
+        $this->cookieName = '-ssostatetoken';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
         $this->session = $session;
         if ($logger === null) {
@@ -62,7 +62,7 @@ class SsoUtils {
      * Get a state token to verify on a subsequent request.
      *
      * @param bool $forceNew Force a new token to be generated.
-     * @return A state token.
+     * @return string A state token.
      */
     public function getStateToken($forceNew = false) {
         if ($this->stateToken === null || $forceNew) {

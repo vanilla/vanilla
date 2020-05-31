@@ -251,6 +251,11 @@ class Bootstrap {
             ->addAlias(Gdn::AliasLocale)
             ->addAlias(LocaleInterface::class)
 
+            ->rule(\Garden\Web\Cookie::class)
+            ->setShared(true)
+            ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
+            ->addAlias('Cookie')
+
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')
             ->setShared(true)

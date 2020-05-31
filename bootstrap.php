@@ -112,6 +112,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(Garden\Web\Cookie::class)
     ->setShared(true)
+    ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
     ->addAlias('Cookie')
 
     // PluginManager

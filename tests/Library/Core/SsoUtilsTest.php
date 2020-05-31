@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Core;
 
 use Garden\Web\Cookie;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\Bootstrap;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -43,11 +44,45 @@ class SsoUtilsTest extends TestCase {
     }
 
     /**
+     * @inheritDoc
+     */
+//    public function tearDown(): void {
+//        parent::tearDown();
+//        Bootstrap::cleanup($this->container());
+//    }
+
+    /**
      * Test creating and then verifying a state token.
      */
     public function testStateToken(): void {
         $token = $this->ssoUtils->getStateToken(true);
         $this->ssoUtils->verifyStateToken('test', $token);
         $this->assertTrue(true);
+    }
+
+    /**
+     * An empty state token should not verify.
+     */
+    public function testEmptyStateToken(): void {
+        $this->expectExceptionCode(403);
+        $this->ssoUtils->verifyStateToken('test', '');
+    }
+
+    /**
+     * An invalid state token should not verify.
+     */
+    public function testInvalidStateToken(): void {
+        $this->expectExceptionCode(400);
+        $this->ssoUtils->verifyStateToken('test', 'foo');
+    }
+
+    /**
+     * Test a valid token that hasn't been saved.
+     */
+    public function testDifferentToken(): void {
+        $token1 = $this->ssoUtils->getStateToken(true);
+        $token2 = $this->ssoUtils->getStateToken(true);
+        $this->expectExceptionCode(400);
+        $this->ssoUtils->verifyStateToken('test', $token1);
     }
 }

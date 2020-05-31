@@ -649,7 +649,7 @@ class RequestTest extends SharedBootstrapTestCase {
         $_COOKIE = $cooke;
         $_FILES = $files;
 
-        $request = new Gdn_Request();
+        $request = Gdn_Request::create()->fromEnvironment();
         return $request;
     }
 
@@ -661,5 +661,47 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame('http://dev.vanilla.localhost/profile/Fran%23k.html', $request->getUrl());
         $this->assertSame($request->getUrl(), $request->url('', true));
         $this->assertSame($request->getUrl(), (string)$request->getUri());
+    }
+
+    /**
+     * Test `Gdn_Request::pathAndQuery`.
+     *
+     * @param string $path
+     * @param array $get
+     * @param string $expected
+     * @dataProvider providePathAndQueryTests
+     */
+    public function testPathAndQuery(string $path, array $get, string $expected): void {
+        $request = self::createRequest($path, $get);
+        $this->assertSame($expected, $request->pathAndQuery());
+    }
+
+    /**
+     * Provide path and query tests.
+     *
+     * @return array
+     */
+    public function providePathAndQueryTests(): array {
+        $r = [
+            'no query' => ['/foo', [], 'foo'],
+            'query' => ['/foo', ['bar' => 'baz'], 'foo?bar=baz'],
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Test `Gdn_Request::pathAndQuery`.
+     *
+     * @param string $path
+     * @param array $get
+     * @param string $pathAndQuery
+     * @dataProvider providePathAndQueryTests
+     */
+    public function testSetPathAndQuery(string $path, array $get, string $pathAndQuery): void {
+        $request = self::createRequest();
+        $request->pathAndQuery($pathAndQuery);
+        $this->assertSame($path, $request->getPath());
+        $this->assertSame($get, $request->getQuery());
     }
 }

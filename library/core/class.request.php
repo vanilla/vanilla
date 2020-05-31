@@ -104,6 +104,7 @@ class Gdn_Request implements RequestInterface {
      * @return string Returns the current asset root.
      *
      * @deprecated 2.8 Use the explicit asset functions instead.
+     * @codeCoverageIgnore
      */
     public function assetRoot($assetRoot = null) {
         if ($assetRoot !== null) {

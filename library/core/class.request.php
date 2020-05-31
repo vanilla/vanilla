@@ -628,6 +628,8 @@ class Gdn_Request implements RequestInterface {
      * @param string $key Name of the request argument to retrieve.
      * @param mixed $default Value to return if argument not found.
      * @return mixed
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function getValue($key, $default = false) {
         return $this->merged($key, $default);
@@ -1167,6 +1169,8 @@ class Gdn_Request implements RequestInterface {
      * @param string|null $key The key of the post item or null to return the entire array.
      * @param mixed $default The value to return if the item isn't set.
      * @return mixed
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function merged($key = null, $default = null) {
         $merged = [];

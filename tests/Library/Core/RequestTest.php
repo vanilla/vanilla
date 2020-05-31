@@ -704,4 +704,54 @@ class RequestTest extends SharedBootstrapTestCase {
         $this->assertSame($path, $request->getPath());
         $this->assertSame($get, $request->getQuery());
     }
+
+    /**
+     * Only the first IP of multiple IPs should be looked at.
+     */
+    public function testIPCSV(): void {
+        $request = self::createRequest(['REMOTE_ADDR' => '1.2.3.4,5.6.7.8']);
+        $this->assertSame('1.2.3.4', $request->getIP());
+    }
+
+    /**
+     * Only the first IP of multiple IPs should be looked at.
+     */
+    public function testIPv6CSV(): void {
+        $request = self::createRequest(['REMOTE_ADDR' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334,foo']);
+        $this->assertSame('2001:0db8:85a3:0000:0000:8a2e:0370:7334', $request->getIP());
+    }
+
+    /**
+     * Test various HTTPs schemes.
+     */
+    public function testHttps(): void {
+        $request = self::createRequest(['HTTPS' => 'on']);
+        $this->assertSame('https', $request->getScheme());
+    }
+
+    /**
+     * Test paths when rewriting is off.
+     *
+     * @param array $get
+     * @param string $expected
+     * @dataProvider provideNonRewrittenPaths
+     */
+    public function testNonRewrittenPath(array $get, string $expected): void {
+        $request = self::createRequest(['X_REWRITE' => 0], $get);
+        $this->assertSame($expected, $request->getPath());
+    }
+
+    /**
+     * Provide non-rewritten path tests.
+     *
+     * @return array
+     */
+    public function provideNonRewrittenPaths(): array {
+        $r = [
+            'p' => [['p' => 'foo'], '/foo'],
+            '_p' => [['_p' => 'foo'], '/foo'],
+            '_p over p' => [['p' => 'bar', '_p' => 'foo'], '/foo'],
+        ];
+        return $r;
+    }
 }

@@ -60,6 +60,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
             borderType: BorderType.NONE as BorderType | "navLinks",
             maxWidth: globalVars.content.width,
             viewAll: {
+                to: undefined as string | undefined,
                 position: "bottom" as "top" | "bottom",
                 displayType: ButtonTypes.TEXT_PRIMARY,
             },

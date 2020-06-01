@@ -1089,7 +1089,7 @@ class Gdn_Request implements RequestInterface {
         if ($pathAndQuery) {
             // Parse out the path into parts.
             $parts = parse_url($pathAndQuery);
-            $path = val('path', $parts, '');
+            $path = \Vanilla\Utility\UrlUtils::decodePath($parts['path'] ?? '');
 
             // Check for a filename.
             $filename = basename($path);
@@ -1115,7 +1115,7 @@ class Gdn_Request implements RequestInterface {
         }
 
         // Construct the path and query.
-        $result = $this->path();
+        $result = $this->path(true);
 
 //      $Filename = $this->filename();
 //      if ($Filename && $Filename != 'default')

@@ -664,6 +664,23 @@ class RequestTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * The path and query should be encoded because it's often used for redirects.
+     */
+    public function testEncodedPathAndQuery(): void {
+        $request = self::createRequest('/profile/Fran#k.html');
+        $this->assertSame('profile/Fran%23k.html', $request->pathAndQuery());
+    }
+
+    /**
+     * Setting the path and query with an encoded path should work.
+     */
+    public function testSetEncodedPathAndQuery(): void {
+        $request = self::createRequest();
+        $request->pathAndQuery('profile/f%23o.html');
+        $this->assertSame('profile/f%23o.html', $request->pathAndQuery());
+    }
+
+    /**
      * Test `Gdn_Request::pathAndQuery`.
      *
      * @param string $path

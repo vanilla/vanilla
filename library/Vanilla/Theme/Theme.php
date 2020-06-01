@@ -423,6 +423,13 @@ class Theme implements \JsonSerializable {
     }
 
     /**
+     * @param bool $current
+     */
+    public function setCurrent(bool $current): void {
+        $this->current = $current;
+    }
+
+    /**
      * @return ThemeAsset[]
      */
     public function getAssets(): array {
@@ -470,4 +477,6 @@ class Theme implements \JsonSerializable {
     public function setIsCacheHit(bool $isCacheHit): void {
         $this->isCacheHit = $isCacheHit;
     }
+
+
 }

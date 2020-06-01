@@ -544,6 +544,10 @@ class ThemeService {
         }
         $theme->setSupportedSections($supportedSections);
 
+        // Fix current theme.
+        $currentThemeID = $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME, ThemeServiceHelper::CONFIG_MOBILE_THEME);
+        $theme->setCurrent($currentThemeID == $theme->getThemeID());
+
         $this->overlayAddonVariables($theme);
         return $theme;
     }

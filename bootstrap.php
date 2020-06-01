@@ -499,6 +499,9 @@ $dic->call(function (
     }
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
+    // Construct the logger earlier so that its dependencies are satisfied.
+    $log = $dic->get(\Psr\Log\LoggerInterface::class);
+
     // Load the configurations for enabled addons.
     foreach ($addonManager->getEnabled() as $addon) {
         /* @var Addon $addon */

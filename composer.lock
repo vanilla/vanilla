@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd65871abce34ef83aaee73d63f4643d",
+    "content-hash": "e6e470e2e2d316ccd21bb5519633a768",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -1407,25 +1407,25 @@
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "f901ede13e2185857ba45bd960ce1432d05a506e"
+                "reference": "8936e641be3b00a57282d05bb76c62f8ad7910e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/f901ede13e2185857ba45bd960ce1432d05a506e",
-                "reference": "f901ede13e2185857ba45bd960ce1432d05a506e",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/8936e641be3b00a57282d05bb76c62f8ad7910e6",
+                "reference": "8936e641be3b00a57282d05bb76c62f8ad7910e6",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1.0",
+                "php": ">=7.2.0",
                 "psr/container": "^1.0"
             },
             "require-dev": {
                 "ext-xdebug": "*",
-                "phpunit/phpunit": "^7.0"
+                "phpunit/phpunit": "~8.0"
             },
             "type": "library",
             "autoload": {
@@ -1444,7 +1444,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2019-09-22T03:02:07+00:00"
+            "time": "2020-06-01T20:36:13+00:00"
         },
         {
             "name": "vanilla/garden-http",
@@ -4119,8 +4119,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
@@ -4330,5 +4330,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

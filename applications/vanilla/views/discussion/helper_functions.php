@@ -425,7 +425,7 @@ if (!function_exists('WriteAdminCheck')):
         if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use')) {
             return;
         }
-        echo '<span class="AdminCheck"><input type="checkbox" name="Toggle"></span>';
+        echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="Toggle"></span>';
     }
 endif;
 

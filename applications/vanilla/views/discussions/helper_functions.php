@@ -41,11 +41,11 @@ if (!function_exists('AdminCheck')) {
                     $itemSelected = '';
 
                 $result = <<<EOT
-<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="{$discussion->DiscussionID}" $itemSelected /></span>
+<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" aria-label="{t('Select Discussion')}" value="{$discussion->DiscussionID}" $itemSelected /></span>
 EOT;
             }
         } else {
-            $result = '<span class="AdminCheck"><input type="checkbox" name="Toggle" /></span>';
+            $result = '<span class="AdminCheck"><input type="checkbox" aria-label="' . t('Select Discussion') . '" name="Toggle" /></span>';
         }
 
         if ($wrap) {
@@ -418,7 +418,7 @@ if (!function_exists('writeFilterTabs')) :
             if ($sender->CanEditDiscussions) {
                 ?>
                 <span class="Options"><span class="AdminCheck">
-                    <input type="checkbox" name="Toggle"/>
+                    <input type="checkbox" aria-label="<?php echo t('Select Discussion') ?>" name="Toggle"/>
                 </span></span>
             <?php } ?>
             <ul>

@@ -69,12 +69,14 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $isBookmarked = $discussion->Bookmarked == '1';
+        $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
+        $accessibleLabel = t($isBookmarked? 'Unbookmark' : 'Bookmark') . t('accessibility.titleSeparator', ': ') . htmlspecialchars($discussion->Name);
         return anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
             'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            ['title' => $title, 'aria-label' => $accessibleLabel]
         );
     }
 }

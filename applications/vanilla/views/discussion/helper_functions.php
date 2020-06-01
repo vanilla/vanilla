@@ -38,14 +38,17 @@ if (!function_exists('writeBookmarkLink')) :
         }
 
         $discussion = Gdn::controller()->data('Discussion');
+        $isBookmarked = $discussion->Bookmarked == '1';
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
+        $accessibleLabel = t($isBookmarked? 'Unbookmark' : 'Bookmark') .  t('accessibility.titleSeparator', ': ') . htmlspecialchars($discussion->Name);
+
         echo anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            'Hijack Bookmark'.($isBookmarked ? ' Bookmarked' : ''),
+            ['title' => $title, 'aria-label' => $accessibleLabel]
         );
     }
 endif;

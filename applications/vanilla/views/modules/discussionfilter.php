@@ -40,13 +40,13 @@ $titleClasses = HtmlUtils::classNames(
 );
 
 ?>
-<div class="BoxFilter BoxDiscussionFilter">
+<div class="BoxFilter BoxDiscussionFilter" role="navigation">
     <span class="<?php echo $titleClasses ?>">
         <h2 class="BoxFilter-Heading">
             <?php echo t('Quick Links'); ?>
         </h2>
     </span>
-    <ul role="nav" class="FilterMenu">
+    <ul class="FilterMenu">
         <?php
         $Controller->fireEvent('BeforeDiscussionFilters');
         //      if (c('Vanilla.Categories.ShowTabs')) {

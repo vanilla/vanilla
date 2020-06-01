@@ -42,7 +42,7 @@ interface IProps {
 export default function Banner(props: IProps) {
     const device = useDevice();
     const bannerContextRef = useBannerContainerDivRef();
-    const { setOverlayTitleBar } = useBannerContext();
+    const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
 
     const { action, className, isContentBanner } = props;
 
@@ -138,9 +138,12 @@ export default function Banner(props: IProps) {
                             <div className={classes.imagePositioner}>
                                 {/*For SEO & accessibility*/}
                                 {options.hideTitle && (
-                                    <Heading className={visibility().visuallyHidden} depth={1}>
-                                        {title}
-                                    </Heading>
+                                    <>
+                                        <Heading className={visibility().visuallyHidden} depth={1}>
+                                            {title}
+                                        </Heading>
+                                        {setRenderedH1(true)}
+                                    </>
                                 )}
                                 <ConditionalWrap
                                     className={classes.contentContainer(!rightImageSrc)}
@@ -175,9 +178,12 @@ export default function Banner(props: IProps) {
                         <div className={classes.imagePositioner}>
                             {/*For SEO & accessibility*/}
                             {options.hideTitle && (
-                                <Heading className={visibility().visuallyHidden} depth={1}>
-                                    {title}
-                                </Heading>
+                                <>
+                                    <Heading className={visibility().visuallyHidden} depth={1}>
+                                        {title}
+                                    </Heading>
+                                    {setRenderedH1(true)}
+                                </>
                             )}
                             <ConditionalWrap
                                 className={classes.contentContainer(!rightImageSrc)}
@@ -197,9 +203,12 @@ export default function Banner(props: IProps) {
                                     <div className={classes.titleWrap}>
                                         <FlexSpacer className={classes.titleFlexSpacer} />
                                         {title && (
-                                            <Heading className={classes.title} depth={1} isLarge>
-                                                {title}
-                                            </Heading>
+                                            <>
+                                                <Heading className={classes.title} depth={1} isLarge>
+                                                    {title}
+                                                </Heading>
+                                                {setRenderedH1(true)}
+                                            </>
                                         )}
                                         <div className={classNames(classes.text, classes.titleFlexSpacer)}>
                                             {action}

@@ -24,13 +24,13 @@ export function CoreErrorMessages(props: IProps) {
     };
     const { message, messageAsParagraph, description } = error;
     return (
-        <div className={classNames(props.className, classes.root)}>
+        <main className={classNames(props.className, classes.root)}>
             {error.icon}
             {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
             {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
             {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
             {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
-        </div>
+        </main>
     );
 }
 

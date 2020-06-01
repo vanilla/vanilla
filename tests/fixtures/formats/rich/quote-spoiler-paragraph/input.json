@@ -1,52 +1,52 @@
 [
-  {
-    "insert": {
-      "embed-external": {
-        "data": {
-          "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
-          "type": "quote",
-          "embedType": "quote",
-          "name": null,
-          "body": null,
-          "photoUrl": null,
-          "height": null,
-          "width": null,
-          "attributes": {
-            "commentID": 4,
-            "bodyRaw": [
-              {
-                "insert": "Hello world.\n"
-              }
-            ],
-            "dateInserted": "2019-01-01T00:00:01+00:00",
-            "dateUpdated": "2019-01-01T00:00:01+00:00",
-            "insertUser": {
-              "userID": 2,
-              "name": "Vanilla",
-              "photoUrl": "//wa.vanillicon.com/v2/2ab2554ee531b4bc41921f97c36b3169.svg",
-              "dateLastActive": "2019-01-01T00:00:01+00:00"
-            },
-            "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
-            "format": "Rich"
-          }
-        },
-        "loaderData": {
-          "type": "link",
-          "link": "https://vanillaforums.example/discussion/comment/1#Comment_1"
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
+                    "type": "quote",
+                    "embedType": "quote",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": null,
+                    "width": null,
+                    "attributes": {
+                        "commentID": 4,
+                        "bodyRaw": [
+                            {
+                                "insert": "Hello world.\n"
+                            }
+                        ],
+                        "dateInserted": "2019-01-01T00:00:01+00:00",
+                        "dateUpdated": "2019-01-01T00:00:01+00:00",
+                        "insertUser": {
+                            "userID": 2,
+                            "name": "Vanilla",
+                            "photoUrl": "//wa.vanillicon.com/v2/2ab2554ee531b4bc41921f97c36b3169.svg",
+                            "dateLastActive": "2019-01-01T00:00:01+00:00"
+                        },
+                        "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
+                        "format": "Rich"
+                    }
+                },
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://vanillaforums.example/discussion/comment/1#Comment_1"
+                }
+            }
         }
-      }
-    }
-  },
-  {
-    "insert": "This is a spoiler."
-  },
-  {
-    "attributes": {
-      "spoiler-line": true
     },
-    "insert": "\n"
-  },
-  {
-    "insert": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n"
-  }
+    {
+        "insert": "This is a spoiler."
+    },
+    {
+        "attributes": {
+            "spoiler-line": true
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n"
+    }
 ]

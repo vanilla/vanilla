@@ -1,4 +1,4 @@
-<div class="Trace">
+<div class="Trace" aria-hidden="true">
     <style>
         .Trace {
             width: 100%;

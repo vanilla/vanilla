@@ -70,7 +70,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
 
             return (
                 <Container fullGutter narrow>
-                    <nav
+                    <section
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
                     >
                         <Heading
@@ -84,7 +84,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                         />
                         {groupedContent}
                         {ungroupedContent}
-                    </nav>
+                    </section>
                 </Container>
             );
         } else {
@@ -93,8 +93,6 @@ export default class NavLinksWithHeadings extends Component<IProps> {
     }
 
     private separator(classes?: string) {
-        return (
-            <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} role="presentation" />
-        );
+        return <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} />;
     }
 }

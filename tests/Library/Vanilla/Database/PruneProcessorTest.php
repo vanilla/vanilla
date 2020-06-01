@@ -38,7 +38,7 @@ class PruneProcessorTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->pruner = new PruneProcessor('dateInserted');
+        $this->pruner = new PruneProcessor('dateInserted', '-30 days');
 
         $this->model = $this->createStub(PipelineModel::class);
         $this->model
@@ -61,7 +61,7 @@ class PruneProcessorTest extends TestCase {
         [$where, $options] = $this->pruneCall;
         $this->assertArrayHasKey('dateInserted <', $where);
         $this->assertSame($this->pruner->getPruneLimit(), $options[Model::OPT_LIMIT]);
-        $this->assertDateCloseTo($where['dateInserted <'], '-' . $this->pruner->getPruneAfter());
+        $this->assertDateCloseTo($where['dateInserted <'], $this->pruner->getPruneAfter());
     }
 
     /**

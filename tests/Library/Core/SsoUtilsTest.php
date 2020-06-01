@@ -44,14 +44,6 @@ class SsoUtilsTest extends TestCase {
     }
 
     /**
-     * @inheritDoc
-     */
-//    public function tearDown(): void {
-//        parent::tearDown();
-//        Bootstrap::cleanup($this->container());
-//    }
-
-    /**
      * Test creating and then verifying a state token.
      */
     public function testStateToken(): void {

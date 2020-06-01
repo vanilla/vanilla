@@ -6,30 +6,25 @@
 
 namespace Garden\Events;
 
-use Vanilla\Events\Action;
-
 /**
  * An event affecting a specific resource.
  */
 abstract class ResourceEvent {
 
     /** A resource has been removed. */
-    public const ACTION_DELETE = Action::DELETE;
+    public const ACTION_DELETE = "delete";
 
     /** A resource has been created. */
-    public const ACTION_INSERT = Action::ADD;
+    public const ACTION_INSERT = "insert";
 
     /** An existing resource has been updated. */
-    public const ACTION_UPDATE = Action::UPDATE;
+    public const ACTION_UPDATE = "update";
 
     /** @var string */
     protected $action;
 
     /** @var array */
     protected $payload;
-
-    /** @var array */
-    protected $sender;
 
     /** @var string */
     protected $type;
@@ -39,12 +34,10 @@ abstract class ResourceEvent {
      *
      * @param string $action
      * @param array $payload
-     * @param array $sender
      */
-    public function __construct(string $action, array $payload, ?array $sender = null) {
+    public function __construct(string $action, array $payload) {
         $this->action = $action;
         $this->payload = $payload;
-        $this->sender = $sender;
         $this->type = $this->typeFromClass();
     }
 
@@ -67,30 +60,12 @@ abstract class ResourceEvent {
     }
 
     /**
-     * Get the entity responsible for triggering the event, if available.
-     *
-     * @return array|null
-     */
-    public function getSender(): ?array {
-        return $this->sender;
-    }
-
-    /**
      * Get the event type.
      *
      * @return string
      */
     public function getType(): string {
         return $this->type;
-    }
-
-    /**
-     * Get the full name of the event.
-     *
-     * @return string
-     */
-    public function getFullEventName(): string {
-        return $this->getType().'_'.$this->getAction();
     }
 
     /**

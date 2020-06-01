@@ -9,7 +9,7 @@ namespace Vanilla\Community\Events;
 use Garden\Events\ResourceEvent;
 
 /**
- * Represent a discussion resource event.
+ * Represent a user resource event.
  */
-class DiscussionEvent extends ResourceEvent {
+class UserEvent extends ResourceEvent {
 }

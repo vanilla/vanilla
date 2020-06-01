@@ -8,8 +8,6 @@
 namespace Vanilla;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
-use Psr\Log\LogLevel;
 
 /**
  * A logger that can contain many loggers.
@@ -18,51 +16,29 @@ use Psr\Log\LogLevel;
  * @package Vanilla
  */
 class Logger implements LoggerInterface {
-    use LoggerTrait;
-
-    public const FIELD_EVENT = 'event';
-    public const FIELD_CHANNEL = 'channel';
-    public const FIELD_TARGET_USERID = 'targetUserID';
-    public const FIELD_TARGET_USERNAME = 'targetName';
-
-    public const CHANNEL_ADMIN = 'admin';
-    public const CHANNEL_APPLICATION = 'application';
-    public const CHANNEL_MODERATION = 'moderation';
-    public const CHANNEL_SECURITY = 'security';
-    public const CHANNEL_SYSTEM = 'system';
-    public const CHANNEL_DEFAULT = self::CHANNEL_APPLICATION;
-
-    public const CHANNELS = [
-        self::CHANNEL_ADMIN,
-        self::CHANNEL_APPLICATION,
-        self::CHANNEL_MODERATION,
-        self::CHANNEL_SECURITY,
-        self::CHANNEL_SYSTEM,
-    ];
+    /** Log type. */
+    const EMERGENCY = 'emergency';
 
     /** Log type. */
-    public const EMERGENCY = LogLevel::EMERGENCY;
+    const ALERT = 'alert';
 
     /** Log type. */
-    public const ALERT = LogLevel::ALERT;
+    const CRITICAL = 'critical';
 
     /** Log type. */
-    public const CRITICAL = LogLevel::CRITICAL;
+    const ERROR = 'error';
 
     /** Log type. */
-    public const ERROR = LogLevel::ERROR;
+    const WARNING = 'warning';
 
     /** Log type. */
-    public const WARNING = LogLevel::WARNING;
+    const NOTICE = 'notice';
 
     /** Log type. */
-    public const NOTICE = LogLevel::NOTICE;
+    const INFO = 'info';
 
     /** Log type. */
-    public const INFO = LogLevel::INFO;
-
-    /** Log type. */
-    public const DEBUG = LogLevel::DEBUG;
+    const DEBUG = 'debug';
 
     /**
      * @var array An array of loggers and levels.
@@ -150,6 +126,16 @@ class Logger implements LoggerInterface {
     }
 
     /**
+     * System is unusable.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     */
+    public function emergency($message, array $context = []) {
+        $this->log(self::EMERGENCY, $message, $context);
+    }
+
+    /**
      * Log with an arbitrary level.
      *
      * @param mixed $level One of the **Logger::*** constants.
@@ -185,4 +171,92 @@ class Logger implements LoggerInterface {
 
         $inCall = false;
     }
+
+    /**
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function alert($message, array $context = []) {
+        $this->log(self::ALERT, $message, $context);
+    }
+
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function critical($message, array $context = []) {
+        $this->log(self::CRITICAL, $message, $context);
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically be logged and monitored.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function error($message, array $context = []) {
+        $this->log(self::ERROR, $message, $context);
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function warning($message, array $context = []) {
+        $this->log(self::WARNING, $message, $context);
+    }
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function notice($message, array $context = []) {
+        $this->log(self::NOTICE, $message, $context);
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function info($message, array $context = []) {
+        $this->log(self::INFO, $message, $context);
+    }
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message The message to log. Put fields in {braces} to replace with context values.
+     * @param array $context The context to format the message with.
+     * @return null
+     */
+    public function debug($message, array $context = []) {
+        $this->log(self::DEBUG, $message, $context);
+    }
+
 }

@@ -10,8 +10,6 @@
 
 /**
  * A base logger interface that does nothing.
- *
- * @deprecated
  */
 class BaseLogger implements LoggerInterface {
 

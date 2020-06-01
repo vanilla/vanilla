@@ -393,13 +393,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
                 'theme_changed',
-                Logger::INFO,
                 'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
                 [
                     'themeType' => 'desktop',
                     'oldTheme' => $oldTheme,
-                    'newTheme' => $newTheme,
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+                    'newTheme' => $newTheme
                 ]
             );
         }
@@ -594,13 +592,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
                 'theme_changed',
-                Logger::INFO,
+                Logger::NOTICE,
                 'The {themeType} theme changed from {oldTheme} to {newTheme}.',
                 [
                     'themeType' => $isMobile ? 'mobile' : 'desktop',
                     'oldTheme' => $oldTheme,
-                    'newTheme' => $themeName,
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+                    'newTheme' => $themeName
                 ]
             );
         }

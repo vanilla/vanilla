@@ -579,7 +579,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                                         'maxVarcharLength' => $charLength['MaxLength'],
                                         'newLength' => $column->Length,
                                         'oldLength' => $existingColumn->Length,
-                                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
                                     ]
                                 );
 
@@ -733,8 +732,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'blob',
             'mediumblob',
             'longblob',
-            'bit',
-            'json',
+            'bit'
         ];
 
         $column->Type = strtolower($column->Type);

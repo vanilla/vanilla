@@ -17,7 +17,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
-use Vanilla\Logger;
 
 /**
  * Handles addon maintenance within the application.
@@ -205,12 +204,7 @@ class AddonModel implements LoggerAwareInterface {
         if (!$wasEnabled) {
             $this->logger->info(
                 'The {addonKey} {addonType} was enabled.',
-                [
-                    'event' => 'addon_enabled',
-                    'addonKey' => $addon->getKey(),
-                    'addonType' => $addon->getType(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
-                ]
+                ['event' => 'addon_enabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
             );
         }
     }
@@ -240,14 +234,9 @@ class AddonModel implements LoggerAwareInterface {
         // @TODO This if is a kludge because Vanilla's core applications are inconsistent.
         // Once the InstallModel is in use this code can be cleaned up by manual structure inclusion in addons.
         if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($addon->path($structure, Addon::PATH_FULL), get_included_files())) || $addon->getKey() === 'dashboard') {
-            $this->logger->debug(
+            $this->logger->info(
                 "Executing structure for {addonKey}.",
-                [
-                    'event' => 'addon_structure',
-                    'addonKey' => $addon->getKey(),
-                    'structureType' => 'file',
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
+                ['event' => 'addon_structure', 'addonKey' => $addon->getKey(), 'structureType' => 'file']
             );
 
             $this->includeFile($addon->path($structure, Addon::PATH_FULL));
@@ -270,13 +259,7 @@ class AddonModel implements LoggerAwareInterface {
 
             $this->logger->info(
                 "Calling {addonMethod} on {addonClass} for {addonKey}.",
-                [
-                    'event' => 'addon_method',
-                    'addonMethod' => $method,
-                    'addonClass' => $pluginClass,
-                    'addonKey' => $addon->getKey(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
+                ['event' => 'addon_method', 'addonMethod' => $method, 'addonClass' => $pluginClass, 'addonKey' => $addon->getKey()]
             );
 
             $this->container->call([$plugin, $method]);
@@ -316,12 +299,7 @@ class AddonModel implements LoggerAwareInterface {
         if ($permissions = $addon->getInfoValue('registerPermissions')) {
             $this->logger->info(
                 "Defining permissions for {addonKey}.",
-                [
-                    'event' => 'addon_permissions',
-                    'addonKey' => $addon->getKey(),
-                    'permissions' => $permissions,
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
+                ['event' => 'addon_permissions', 'addonKey' => $addon->getKey(), 'permissions' => $permissions]
             );
             $permissionModel = $this->container->get(PermissionModel::class);
             $permissionModel->define($permissions);
@@ -407,12 +385,7 @@ class AddonModel implements LoggerAwareInterface {
         if ($wasEnabled) {
             $this->logger->info(
                 'The {addonKey} {addonType} was disabled.',
-                [
-                    'event' => 'addon_disabled',
-                    'addonKey' => $addon->getKey(),
-                    'addonType' => $addon->getType(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
-                ]
+                ['event' => 'addon_disabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
             );
         }
 
@@ -430,14 +403,9 @@ class AddonModel implements LoggerAwareInterface {
     public function runStructure(Addon $addon) {
         // Look for a file.
         if ($structure = $addon->getSpecial('structure')) {
-            $this->logger->debug(
+            $this->logger->info(
                 "Executing structure for {addonKey}.",
-                [
-                    'event' => 'addon_structure',
-                    'addonKey' => $addon->getKey(),
-                    'structureType' => 'file',
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
+                ['event' => 'addon_structure', 'addonKey' => $addon->getKey(), 'structureType' => 'file']
             );
 
             $this->includeFile($addon->path($structure));

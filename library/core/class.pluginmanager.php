@@ -1169,7 +1169,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 'addon_disabled',
                 Logger::INFO,
                 'The {addonName} plugin was disabled.',
-                ['addonName' => $pluginName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
+                ['addonName' => $pluginName]
             );
         }
 
@@ -1289,7 +1289,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 'addon_enabled',
                 Logger::INFO,
                 'The {addonName} plugin was enabled.',
-                ['addonName' => $addon->getRawKey(), Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
+                ['addonName' => $addon->getRawKey()]
             );
         }
 

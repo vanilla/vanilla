@@ -229,44 +229,4 @@ EOT;
 
         $this->assertSame($expected, $actual);
     }
-
-    /**
-     * Adding "-" before an order field orders it in descending order.
-     */
-    public function testNegativeOrderBy() {
-        $actual = $this->sql->select()->from('foo')->orderBy('-foo, bar', 'asc')->getSelect();
-        $expected = <<<EOT
-select *
-from `GDN_foo` `foo`
-order by `foo` desc, `bar` asc
-EOT;
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * The `Gdn_SQLDriver::where()` method can take `RangeExpression` objects.
-     *
-     * @param RangeExpression $range
-     * @param string $expectedWhere
-     * @dataProvider testRangeExpressionTests
-     */
-    public function testRangeExpressionWhere(RangeExpression $range, string $expectedWhere) {
-        $actual = $this->sql->select()->from('foo')->where('b', $range)->getSelect();
-        $actual = preg_replace('`\s+`', ' ', $actual);
-        $this->assertStringContainsString($expectedWhere, $actual);
-    }
-
-    /**
-     * Provide some sample range expressions and expected where clauses.
-     *
-     * @return array
-     */
-    public function testRangeExpressionTests(): array {
-        $r = [
-            'basic' => [new RangeExpression('>', 1), 'where `b` > :b'],
-            'two values' => [new RangeExpression('>=', 1, '<=', 2), 'where `b` >= :b and `b` <= :b0'],
-            'in clause' => [new RangeExpression('=', [1, 2]), "where `b` in ('1', '2')"],
-        ];
-        return $r;
-    }
 }

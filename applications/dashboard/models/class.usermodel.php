@@ -9,10 +9,8 @@
  */
 
 use Garden\EventManager;
-use Garden\Events\ResourceEvent;
-use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
-use Vanilla\Dashboard\Events\UserEvent;
+use Vanilla\Community\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;
@@ -23,7 +21,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface {
+class UserModel extends Gdn_Model implements UserProviderInterface {
 
     /** @var int */
     const GUEST_USER_ID = 0;
@@ -78,9 +76,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     /** @var EventManager */
     private $eventManager;
 
-    /** @var Gdn_Session */
-    private $session;
-
     /** @var */
     public $SessionColumns;
 
@@ -114,9 +109,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         } else {
             $this->eventManager = $eventManager;
         }
-
-        /** @var Gdn_Session */
-        $this->session = Gdn::getContainer()->get(Gdn_Session::class);
 
         $this->addFilterField([
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
@@ -294,7 +286,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 'ActivityType' => 'Ban',
                 'NotifyUserID' => ActivityModel::NOTIFY_MODS,
                 'ActivityUserID' => $userID,
-                'RegardingUserID' => $this->session->UserID,
+                'RegardingUserID' => Gdn::session()->UserID,
                 'HeadlineFormat' => t('HeadlineFormat.Ban', '{RegardingUserID,You} banned {ActivityUserID,you}.'),
                 'Story' => $story,
                 'Data' => ['LogID' => $logID]];
@@ -467,7 +459,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 $attributes = [];
             }
 
-            $attributes['Log'][] = ['UserID' => $this->session->UserID, 'Date' => Gdn_Format::toDateTime()];
+            $attributes['Log'][] = ['UserID' => Gdn::session()->UserID, 'Date' => Gdn_Format::toDateTime()];
             $row = ['MergeID' => $mergeID, 'Attributes' => $attributes];
         } else {
             $row = [
@@ -636,7 +628,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 'ActivityType' => 'Ban',
                 'NotifyUserID' => ActivityModel::NOTIFY_MODS,
                 'ActivityUserID' => $userID,
-                'RegardingUserID' => $this->session->UserID,
+                'RegardingUserID' => Gdn::session()->UserID,
                 'HeadlineFormat' => t('HeadlineFormat.Unban', '{RegardingUserID,You} unbanned {ActivityUserID,you}.'),
                 'Story' => $story,
                 'Data' => [
@@ -983,11 +975,11 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @return array Returns a filtered version of {@link $data}.
      */
     public function filterForm($data, $register = false) {
-        if (!$register && $this->session->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
+        if (!$register && !Gdn::session()->checkPermission('Garden.Users.Edit') && !c("Garden.Profile.EditUsernames")) {
             $this->removeFilterField('Name');
         }
 
-        if (!$this->session->checkPermission('Garden.Moderation.Manage')) {
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $this->addFilterField(['Banned', 'Verified', 'Confirmed', 'RankID']);
         }
 
@@ -1068,17 +1060,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         $userID = $this->SQL->insert($this->Name, $fields);
-
-        if ($userID) {
-            $user = $this->getID($userID);
-            $userEvent = $this->eventFromRow(
-                (array)$user,
-                UserEvent::ACTION_INSERT,
-                $this->currentFragment()
-            );
-            $this->getEventManager()->dispatch($userEvent);
-        }
-
         if (is_array($roles)) {
             $this->saveRoles($userID, $roles, false);
         }
@@ -2393,18 +2374,18 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             if (self::requireConfirmEmail() && !val('NoConfirmEmail', $settings)) {
                 $emailIsSet = isset($fields['Email']);
                 $emailIsNotConfirmed = array_key_exists('Confirmed', $fields) && $fields['Confirmed'] == 0;
-                $validSession = $this->session->isValid();
+                $validSession = Gdn::session()->isValid();
 
                 $currentUserEmailIsBeingChanged =
                     $validSession
-                    && $userID == $this->session->UserID
-                    && $fields['Email'] != $this->session->User->Email
-                    && !$this->session->checkPermission('Garden.Users.Edit')
+                    && $userID == Gdn::session()->UserID
+                    && $fields['Email'] != Gdn::session()->User->Email
+                    && !Gdn::session()->checkPermission('Garden.Users.Edit')
                 ;
 
                 // Email address has changed
                 if ($emailIsSet && ($emailIsNotConfirmed || $currentUserEmailIsBeingChanged)) {
-                    $attributes = val('Attributes', $this->session->User);
+                    $attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);
                     }
@@ -2502,7 +2483,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                             }
 
                             $activityModel = new ActivityModel();
-                            if ($userID == $this->session->UserID) {
+                            if ($userID == Gdn::session()->UserID) {
                                 $headlineFormat = t('HeadlineFormat.PictureChange', '{RegardingUserID,You} changed {ActivityUserID,your} profile picture.');
                             } else {
                                 $headlineFormat = t('HeadlineFormat.PictureChange.ForUser', '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.');
@@ -2510,7 +2491,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
                             $activityModel->save([
                                 'ActivityUserID' => $userID,
-                                'RegardingUserID' => $this->session->UserID,
+                                'RegardingUserID' => Gdn::session()->UserID,
                                 'ActivityType' => 'PictureChange',
                                 'HeadlineFormat' => $headlineFormat,
                                 'Story' => img($photoUrl, ['alt' => t('Thumbnail')])
@@ -2553,7 +2534,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                         // Report the creation for mods.
                         $activityModel->save([
                             'ActivityType' => 'Registration',
-                            'ActivityUserID' => $this->session->UserID,
+                            'ActivityUserID' => Gdn::session()->UserID,
                             'RegardingUserID' => $userID,
                             'NotifyUserID' => ActivityModel::NOTIFY_MODS,
                             'HeadlineFormat' => t('HeadlineFormat.AddUser', '{ActivityUserID,user} added an account for {RegardingUserID,user}.')]);
@@ -2591,8 +2572,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $user = $this->getID($userID);
             $userEvent = $this->eventFromRow(
                 (array)$user,
-                $insert ? UserEvent::ACTION_INSERT : UserEvent::ACTION_UPDATE,
-                $this->currentFragment()
+                $insert ? UserEvent::ACTION_INSERT : UserEvent::ACTION_UPDATE
             );
             $this->getEventManager()->dispatch($userEvent);
         }
@@ -2604,22 +2584,14 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      *
      * @param array $row
      * @param string $action
-     * @param array $sender
      * @return UserEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    private function eventFromRow(array $row, string $action): UserEvent {
         $user = $this->normalizeRow($row, false);
         $user = $this->readSchema()->validate($user);
-
-        if ($sender) {
-            $senderSchema = new UserFragmentSchema();
-            $sender = $senderSchema->validate($sender);
-        }
-
         $result = new UserEvent(
             $action,
-            ["user" => $user],
-            $sender
+            ["user" => $user]
         );
         return $result;
     }
@@ -2855,13 +2827,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 Logger::event(
                     'role_remove',
                     Logger::INFO,
-                    "{".Logger::FIELD_TARGET_USERNAME."} removed from the {role} role.",
-                    [
-                        Logger::FIELD_TARGET_USERID => $User->UserID,
-                        Logger::FIELD_TARGET_USERNAME => $User->Name,
-                        'role' => $RoleName,
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
-                    ]
+                    "{username} removed {toUsername} from the {role} role.",
+                    ['touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName]
                 );
             }
 
@@ -2869,13 +2836,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 Logger::event(
                     'role_add',
                     Logger::INFO,
-                    "{".Logger::FIELD_TARGET_USERNAME."} added to the {role} role.",
-                    [
-                        Logger::FIELD_TARGET_USERID => $User->UserID,
-                        Logger::FIELD_TARGET_USERNAME => $User->Name,
-                        'role' => $RoleName,
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
-                    ]
+                    "{username} added {toUsername} to the {role} role.",
+                    ['touserid' => $User->UserID, 'toUsername' => $User->Name, 'role' => $RoleName]
                 );
             }
         }
@@ -3564,12 +3526,12 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         // Update session level information if necessary.
-        if ($userID == $this->session->UserID) {
+        if ($userID == Gdn::session()->UserID) {
             $iP = Gdn::request()->ipAddress();
             $fields['LastIPAddress'] = ipEncode($iP);
             $this->saveIP($userID, $iP);
 
-            if ($this->session->newVisit()) {
+            if (Gdn::session()->newVisit()) {
                 $fields['CountVisits'] = val('CountVisits', $user, 0) + 1;
                 $this->fireEvent('Visit');
             }
@@ -3920,7 +3882,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 $activityModel->save(
                     [
                     'ActivityType' => 'Registration',
-                    'ActivityUserID' => $this->session->UserID,
+                    'ActivityUserID' => Gdn::session()->UserID,
                     'RegardingUserID' => $userID,
                     'NotifyUserID' => ActivityModel::NOTIFY_MODS,
                         'HeadlineFormat' => t('HeadlineFormat.RegistrationApproval', '{ActivityUserID,user} approved the applications for {RegardingUserID,user}.')],
@@ -3928,7 +3890,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     ['GroupBy' => ['ActivityTypeID', 'ActivityUserID']]
                 );
 
-                Gdn::userModel()->saveAttribute($userID, 'ApprovedByUserID', $this->session->UserID);
+                Gdn::userModel()->saveAttribute($userID, 'ApprovedByUserID', Gdn::session()->UserID);
             }
 
 
@@ -3999,7 +3961,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     // We cannot keep emails until we have a method to purge deleted users.
                     // See https://github.com/vanilla/vanilla/pull/5808 for more details.
                     'OriginalName' => $userData['Name'],
-                    'DeletedBy' => $this->session->UserID,
+                    'DeletedBy' => Gdn::session()->UserID,
                 ]),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
@@ -4015,11 +3977,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         // Remove user's cache rows
         $this->clearCache($userID);
         if ($userData) {
-            $userEvent = $this->eventFromRow(
-                (array)$userData,
-                UserEvent::ACTION_DELETE,
-                $this->currentFragment()
-            );
+            $userEvent = $this->eventFromRow((array)$userData, UserEvent::ACTION_DELETE);
             $this->getEventManager()->dispatch($userEvent);
         }
         return true;
@@ -4368,7 +4326,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      */
     public function savePreference($userID, $preference, $value = '') {
         // Make sure that changes to the current user become effective immediately.
-        $session = $this->session;
+        $session = Gdn::session();
         if ($userID == $session->UserID) {
             $session->setPreference($preference, $value, false);
         }
@@ -4387,7 +4345,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      */
     public function saveAttribute($userID, $attribute, $value = '') {
         // Make sure that changes to the current user become effective immediately.
-        $session = $this->session;
+        $session = Gdn::session();
         if ($userID == $session->UserID) {
             $session->setAttribute($attribute, $value);
         }
@@ -4589,7 +4547,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     public function sendEmailConfirmationEmail($user = null, $force = false) {
 
         if (!$user) {
-            $user = $this->session->User;
+            $user = Gdn::session()->User;
         } elseif (is_numeric($user)) {
             $user = $this->getID($user);
         } elseif (is_string($user)) {
@@ -4675,7 +4633,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @throws Exception
      */
     public function sendWelcomeEmail($userID, $password, $registerType = 'Add', $additionalData = null) {
-        $session = $this->session;
+        $session = Gdn::session();
         $sender = $this->getID($session->UserID);
         $user = $this->getID($userID);
 
@@ -4784,7 +4742,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @param string $password
      */
     public function sendPasswordEmail($userID, $password) {
-        $session = $this->session;
+        $session = Gdn::session();
         $sender = $this->getID($session->UserID);
         $user = $this->getID($userID);
         $appTitle = Gdn::config('Garden.Title');
@@ -4952,7 +4910,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
+                    ['input' => $input]
                 );
             }
             return false;
@@ -4986,13 +4944,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                         'password_reset_request',
                         Logger::INFO,
                         '{email} has been sent a password reset email.',
-                        [
-                            'input' => $input,
-                            'email' => $user->Email,
-                            Logger::FIELD_TARGET_USERID => $user->UserID,
-                            Logger::FIELD_TARGET_USERNAME => $user->Name,
-                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
-                        ]
+                        ['input' => $input, 'email' => $user->Email, 'forUserID' => $user->UserID]
                     );
                 }
             } catch (Exception $ex) {
@@ -5002,22 +4954,14 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                             'password_reset_skipped',
                             Logger::INFO,
                             $ex->getMessage(),
-                            [
-                                'input' => $input,
-                                'email' => $user->Email,
-                                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
-                            ]
+                            ['input' => $input, 'email' => $user->Email]
                         );
                     } else {
                         Logger::event(
                             'password_reset_failure',
                             Logger::ERROR,
                             'The password reset email to {email} failed to send.',
-                            [
-                                'input' => $input,
-                                'email' => $user->Email,
-                                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
-                            ]
+                            ['input' => $input, 'email' => $user->Email]
                         );
                     }
                 }
@@ -5036,7 +4980,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     'password_reset_failure',
                     Logger::INFO,
                     'Can\'t find account associated with email/username {input}.',
-                    ['input' => $input, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
+                    ['input' => $input]
                 );
             }
             return false;
@@ -5448,7 +5392,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      */
     public function clearNavigationPreferences($userID = '') {
         if (!$userID) {
-            $userID = $this->session->UserID;
+            $userID = Gdn::session()->UserID;
         }
 
         $this->savePreference($userID, 'DashboardNav.Collapsed', []);
@@ -5467,7 +5411,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      */
     public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
         if (!$userID) {
-            $userID = $this->session->UserID;
+            $userID = Gdn::session()->UserID;
         }
 
         if ($url == '') {
@@ -5655,20 +5599,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $result[$userID] = $ssoID;
         }
 
-        return $result;
-    }
-
-    /**
-     * Get a fragment suitable for representing the current signed-in user or a guest if no user is signed-in..
-     *
-     * @return array
-     */
-    public function currentFragment(): array {
-        if ($this->session->UserID) {
-            $result = $this->getFragmentByID($this->session->UserID, true);
-        } else {
-            $result = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_GUEST);
-        }
         return $result;
     }
 }

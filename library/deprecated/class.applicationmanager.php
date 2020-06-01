@@ -231,7 +231,7 @@ class Gdn_ApplicationManager {
             'addon_enabled',
             Logger::NOTICE,
             'The {addonName} application was enabled.',
-            ['addonName' => $applicationName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
+            ['addonName' => $applicationName]
         );
 
         $this->EventArguments['AddonName'] = $applicationName;
@@ -312,7 +312,7 @@ class Gdn_ApplicationManager {
             'addon_disabled',
             Logger::NOTICE,
             'The {addonName} application was disabled.',
-            ['addonName' => $applicationName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
+            ['addonName' => $applicationName]
         );
 
         // Clear the object caches.

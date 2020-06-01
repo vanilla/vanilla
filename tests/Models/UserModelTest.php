@@ -9,7 +9,7 @@ namespace VanillaTests\Models;
 use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 use Garden\EventManager;
-use Vanilla\Dashboard\Events\UserEvent;
+use Vanilla\Community\Events\UserEvent;
 
 /**
  * Test {@link UserModel}.

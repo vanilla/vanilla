@@ -435,8 +435,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
                 [
                     'tableName' => $this->tableName(),
                     'rowCount' => $this->getRowCountEstimate($this->tableName()),
-                    'rowThreshold' => $this->getAlterTableThreshold(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                    'rowThreshold' => $this->getAlterTableThreshold()
                 ]
             );
             return true;

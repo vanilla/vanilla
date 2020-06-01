@@ -399,14 +399,15 @@ class PagerModule extends Gdn_Module {
             $pagesToDisplay = $pageCount;
         }
 
-        $pager = '';
+        $clientID = $this->ClientID;
+        $pager = '<span id="' . $clientID . ($type == 'more' ? 'After' : 'Before') . "-pagerTitle" . '" class="sr-only">' . t('Pagination') . '</span>';
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
         $linkCount = $pagesToDisplay + 2;
 
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
+            $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
             $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
         }
@@ -490,7 +491,6 @@ class PagerModule extends Gdn_Module {
             $pager = '';
         }
 
-        $clientID = $this->ClientID;
         $clientID = $type == 'more' ? $clientID.'After' : $clientID.'Before';
 
         if ($pager) {
@@ -509,8 +509,8 @@ class PagerModule extends Gdn_Module {
                 $this->Wrapper,
                 attribute([
                     'role' => 'navigation',
-                    'aria-label' => 'pagination',
                     'id' => $clientID,
+                    'aria-describedby' => $clientID . "-pagerTitle",
                     'class' => concatSep(
                         ' ',
                         $this->CssClass,

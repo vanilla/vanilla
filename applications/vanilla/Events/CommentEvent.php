@@ -7,22 +7,21 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
-use Psr\Log\LogLevel;
-use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
-use Vanilla\Logging\LoggerUtils;
 
 /**
  * Represent a comment resource event.
  */
 class CommentEvent extends ResourceEvent implements LoggableEventInterface {
+    use LoggableEventTrait;
+
     /**
      * @inheritDoc
      */
-    public function getLogEntry(): LogEntry {
-        $context = LoggerUtils::resourceEventLogContext($this);
-        $context['comment'] = array_intersect_key($payload["comment"] ?? [], [
+    private function getLogPayload(): array {
+        $payload = $this->getPayload();
+        $payload["comment"] = array_intersect_key($payload["comment"] ?? [], [
             "commentID" => true,
             "discussionID" => true,
             "dateInserted" => true,
@@ -30,15 +29,8 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface {
             "updateUserID" => true,
             "insertUserID" => true,
             "url" => true,
-            "name" => true,
+            "name?" => true,
         ]);
-
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
-
-        return $log;
+        return $payload;
     }
 }

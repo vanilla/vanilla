@@ -6,7 +6,7 @@
 
 namespace Garden\Events;
 
-use Vanilla\Events\EventAction;
+use Vanilla\Events\Action;
 
 /**
  * An event affecting a specific resource.
@@ -14,13 +14,13 @@ use Vanilla\Events\EventAction;
 abstract class ResourceEvent {
 
     /** A resource has been removed. */
-    public const ACTION_DELETE = EventAction::DELETE;
+    public const ACTION_DELETE = Action::DELETE;
 
     /** A resource has been created. */
-    public const ACTION_INSERT = EventAction::ADD;
+    public const ACTION_INSERT = Action::ADD;
 
     /** An existing resource has been updated. */
-    public const ACTION_UPDATE = EventAction::UPDATE;
+    public const ACTION_UPDATE = Action::UPDATE;
 
     /** @var string */
     protected $action;
@@ -99,9 +99,11 @@ abstract class ResourceEvent {
      * @return string
      */
     private function typeFromClass(): string {
-        $baseName = get_called_class();
-        if (($namespaceEnd = strrpos($baseName, '\\')) !== false) {
-            $baseName = substr($baseName, $namespaceEnd + 1);
+        $class = get_called_class();
+        if (($namespaceEnd = strrpos($class, '\\')) !== false) {
+            $baseName = substr($class, $namespaceEnd + 1);
+        } else {
+            $baseName = $class;
         }
         $type = lcfirst(preg_replace('/Event$/', '', $baseName));
         return $type;

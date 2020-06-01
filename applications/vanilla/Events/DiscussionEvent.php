@@ -7,21 +7,21 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
-use Psr\Log\LogLevel;
-use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
-use Vanilla\Logging\LoggerUtils;
+use Vanilla\Logging\LoggableEventTrait;
 
 /**
  * Represent a discussion resource event.
  */
 class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
+    use LoggableEventTrait;
+
     /**
      * @inheritDoc
      */
-    public function getLogEntry(): LogEntry {
-        $context = LoggerUtils::resourceEventLogContext($this);
-        $context['discussion'] = array_intersect_key($payload["discussion"] ?? [], [
+    private function getLogPayload(): array {
+        $payload = $this->getPayload();
+        $payload["discussion"] = array_intersect_key($payload["discussion"] ?? [], [
             "discussionID" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
@@ -30,13 +30,6 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
             "url" => true,
             "name" => true,
         ]);
-
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
-
-        return $log;
+        return $payload;
     }
 }

@@ -26,14 +26,6 @@ trait BootstrapTrait {
     }
 
     /**
-     * @inheritDoc
-     */
-    public function setupBoostrapTrait() {
-        $logger = $this->getTestLogger();
-        $logger->clear();
-    }
-
-    /**
      * Create the container for the site.
      *
      * @return Container Returns a container.
@@ -83,27 +75,6 @@ trait BootstrapTrait {
     }
 
     /**
-     * Assert that something was logged.
-     *
-     * @param array $filter The log filter.
-     */
-    public function assertLog($filter = []) {
-        $logger = $this->getTestLogger();
-        $item = $logger->search($filter);
-        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
-    }
-
-    /**
-     * Assert that the log has a message.
-     *
-     * @param string $message
-     */
-    public function assertLogMessage(string $message) {
-        $logger = $this->getTestLogger();
-        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
-    }
-
-    /**
      * Run a callback with the following config and restore the config after.
      *
      * @param array $config The config to set.
@@ -132,14 +103,5 @@ trait BootstrapTrait {
                 $c->set($key, $value, true, false);
             }
         }
-    }
-
-    /**
-     * @return TestLogger
-     */
-    protected static function getTestLogger(): TestLogger {
-        /** @var TestLogger $logger */
-        $logger = static::container()->get(TestLogger::class);
-        return $logger;
     }
 }

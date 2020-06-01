@@ -9,7 +9,6 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
-use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
@@ -18,7 +17,7 @@ use VanillaTests\Fixtures\TestUploader;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait;
+    use TestPutFieldTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
@@ -44,7 +43,6 @@ class UsersTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/users';
-        $this->resourceName = 'user';
         $this->record = [
             'name' => null,
             'email' => null
@@ -443,7 +441,6 @@ class UsersTest extends AbstractResourceTest {
         unset($newRow['photo']);
 
         $this->assertRowsEqual($newRow, $r->getBody());
-        $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
 
         return $r->getBody();
     }
@@ -610,7 +607,7 @@ class UsersTest extends AbstractResourceTest {
                 'Garden.Registration.NameUnique' => true,
                 'Garden.Registration.EmailUnique' => true,
             ], function () use ($user) {
-                $this->getTestLogger()->clear();
+                $this->logger->clear();
                 $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
             });
             $this->fail('You shouldn\'t be able to reset a password with a username.');
@@ -622,7 +619,7 @@ class UsersTest extends AbstractResourceTest {
             'Garden.Registration.NameUnique' => true,
             'Garden.Registration.EmailUnique' => false,
         ], function () use ($user) {
-            $this->getTestLogger()->clear();
+            $this->logger->clear();
             $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
             $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
         });

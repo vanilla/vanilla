@@ -9,14 +9,14 @@ namespace VanillaTests\Library\Vanilla\Logging;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Logging\LogDecorator;
-use VanillaTests\TestLogger;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\BootstrapTrait;
+use VanillaTests\Library\Vanilla\TestLogger;
 
 /**
  * Tests for the `LogDecorator` class.
  */
 class LogDecoratorTest extends TestCase {
-    use SiteTestTrait;
+    use BootstrapTrait;
 
     /**
      * @var LogDecorator
@@ -33,10 +33,19 @@ class LogDecoratorTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setupSiteTestTrait();
 
-        $logger = $this->container()->get(TestLogger::class);
-        $this->log = $this->container()->getArgs(LogDecorator::class, ['logger' => $logger]);
+        $this->testLogger = new TestLogger();
+        $this->log = $this->container()->getArgs(LogDecorator::class, ['logger' => $this->testLogger]);
+    }
+
+    /**
+     * Assert the last log context contains an expected context.
+     *
+     * @param array $context
+     */
+    protected function assertLastContext(array $context) {
+        $actual = array_intersect_key($this->testLogger->last[2], $context);
+        $this->assertSame($context, $actual);
     }
 
     /**
@@ -44,20 +53,25 @@ class LogDecoratorTest extends TestCase {
      */
     public function testBasicDecoration() {
         $this->log->info('foo');
-        $this->assertLog(['userid' => \Gdn::session()->UserID]);
+        $this->assertLastContext(['userid' => 0]);
+
+        $context = $this->testLogger->getLastContext();
+        $this->assertArrayHasKey('username', $context);
+        $this->assertArrayHasKey('ip', $context);
+        $this->assertArrayHasKey('timestamp', $context);
     }
 
     /**
      * Test the decorator's getter/setters.
      */
     public function testGetterSetter() {
-        $this->log->setContextOverrides(['foo' => 'bar']);
-        $this->assertSame(['foo' => 'bar'], $this->log->getContextOverrides());
+        $this->log->setStaticContextDefaults(['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $this->log->getStaticContextDefaults());
         $this->log->addStaticContextDefaults(['baz' => 'fra']);
-        $this->assertSame(['foo' => 'bar', 'baz' => 'fra'], $this->log->getContextOverrides());
+        $this->assertSame(['foo' => 'bar', 'baz' => 'fra'], $this->log->getStaticContextDefaults());
 
         $this->log->info('foo');
-        $this->assertLog(['foo' => 'bar', 'baz' => 'fra']);
+        $this->assertLastContext(['foo' => 'bar', 'baz' => 'fra']);
     }
 
     /**
@@ -65,9 +79,6 @@ class LogDecoratorTest extends TestCase {
      */
     public function testOverride() {
         $this->log->info('foo', ['userid' => 123]);
-        $this->assertLog([
-            'message' => 'foo',
-            'userid' => 123,
-        ]);
+        $this->assertSame(123, $this->testLogger->getLastContext()['userid']);
     }
 }

@@ -6,14 +6,15 @@
  */
 
 import { t, getMeta, siteUrl } from "@library/utility/appUtils";
-import { indexArrayByKey } from "@vanilla/utils";
-import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
+import { indexArrayByKey, notEmpty } from "@vanilla/utils";
+import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { humanFileSize } from "@library/utility/fileUtils";
 import { IApiError, IFieldError } from "@library/@types/api/core";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
-function fieldErrorTransformer(responseData) {
+function fieldErrorTransformer(responseData, headers: any) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
@@ -31,6 +32,65 @@ const apiv2 = axios.create({
     transformResponse: [...(axios.defaults.transformResponse as any), fieldErrorTransformer],
     paramsSerializer: params => qs.stringify(params),
 });
+
+/**
+ * Try to extract a JSON error out of a cloudflare HTML error.
+ */
+export function extractJsonErrorFromCFHtmlString(body: string): IError | null {
+    try {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(body, "text/html");
+        const details = dom.querySelector(".cf-error-details");
+        if (!details) {
+            return null;
+        }
+
+        const title = details.querySelector("h1")?.innerText ?? t("An Error has Occured");
+        const description = details.querySelector("p")?.innerText ?? "";
+
+        const footers = dom.querySelectorAll(".footer-p");
+        let rayID: string | null = null;
+        for (const footer of footers) {
+            if (!(footer instanceof HTMLElement)) {
+                continue;
+            }
+
+            if (!footer.innerText.includes("Ray ID")) {
+                continue;
+            }
+
+            rayID = footer.innerText;
+        }
+
+        return {
+            message: title,
+            description: [description, rayID].filter(notEmpty).join(" "),
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Error handler for cloudflare errors when making APIv2 requests.
+ */
+function cloudflareAxiosErrorHandler(error: AxiosError) {
+    const contentType = error.response?.headers?.["content-type"];
+    if (error.response && typeof contentType === "string" && contentType.startsWith("text/html")) {
+        // we have an HTML error.
+
+        const htmlResponse = error.response.data || "";
+        const newError = extractJsonErrorFromCFHtmlString(htmlResponse);
+        if (newError) {
+            return Promise.reject(newError);
+        }
+    }
+
+    return Promise.reject(error);
+}
+
+// Apply the cloudflare error handler.
+apiv2.interceptors.response.use(undefined, cloudflareAxiosErrorHandler);
 
 export default apiv2;
 

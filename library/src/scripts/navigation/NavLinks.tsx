@@ -13,7 +13,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import Translate from "@library/content/Translate";
-import Container from "@library/layout/components/Container";
+import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
     classNames?: string;
@@ -62,9 +62,15 @@ export default function NavLinks(props: IProps) {
                       />
                   </li>
               );
+    const titleID = useUniqueID("navLinkTitle");
     return (
-        <article className={classNames("navLinks", props.classNames, classes.root)}>
-            <Heading title={props.title} className={classNames("navLinks-title", classes.title)} depth={props.depth} />
+        <nav className={classNames("navLinks", props.classNames, classes.root)} aria-labelledby={titleID}>
+            <Heading
+                id={titleID}
+                title={props.title}
+                className={classNames("navLinks-title", classes.title)}
+                depth={props.depth}
+            />
             <ul className={classNames(classes.items)}>
                 {contents}
                 {props.url && props.accessibleViewAllMessage && (
@@ -78,6 +84,6 @@ export default function NavLinks(props: IProps) {
                     </li>
                 )}
             </ul>
-        </article>
+        </nav>
     );
 }

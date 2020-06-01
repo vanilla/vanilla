@@ -38,7 +38,7 @@ export function DropDownPanelNav(props: IProps) {
 
     return (
         <>
-            <DropDownItemSeparator />
+            <hr className={classes.separator} />
             <Heading
                 title={props.title}
                 className={classNames("dropDown-sectionHeading", classes.sectionHeading)}

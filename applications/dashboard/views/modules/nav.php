@@ -2,7 +2,7 @@
 /** @var NavModule $nav */
 $nav = $this;
 
-echo '<nav class="nav" role="navigation">';
+echo '<nav class="nav">';
 $items = $nav->getItems();
 if (!function_exists('renderNav')) {
     function renderNav($items) {

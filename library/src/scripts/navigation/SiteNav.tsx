@@ -64,19 +64,17 @@ export function SiteNav(props: IProps) {
 
     if (hasChildren) {
         return (
-            <nav onKeyDownCapture={handleKeyDown} className={classNames("siteNav", props.className, classes.root)}>
+            <nav
+                aria-labelledby={titleID}
+                onKeyDownCapture={handleKeyDown}
+                className={classNames("siteNav", props.className, classes.root)}
+            >
                 {props.title ? (
-                    <>
-                        <Heading
-                            title={props.title}
-                            className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
-                        />
-                        <ConditionalWrap condition={!!props.hiddenTitle} className={"sr-only"}>
-                            <PanelWidgetVerticalPadding>
-                                <Heading title={props.title} className={classNames("siteNav-title", classes.title)} />
-                            </PanelWidgetVerticalPadding>
-                        </ConditionalWrap>
-                    </>
+                    <Heading
+                        id={titleID}
+                        title={props.title}
+                        className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
+                    />
                 ) : (
                     <h2 id={titleID} className="sr-only">
                         {t("Navigation")}

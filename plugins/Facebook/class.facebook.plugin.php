@@ -268,7 +268,7 @@ class FacebookPlugin extends SSOAddon {
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Facebook',
             'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => $this->authorizeUri(false, self::profileConnecUrl()),
+            'ConnectUrl' => $this->authorizeUri(false, self::profileConnectUrl()),
             'Profile' => [
                 'Name' => val('name', $profile),
                 'Photo' => "//graph.facebook.com/{$profile['id']}/picture?width=200&height=200"
@@ -297,7 +297,7 @@ class FacebookPlugin extends SSOAddon {
         $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
 
         // Get the access token.
-        $accessToken = $this->getAccessToken($code, self::profileConnecUrl());
+        $accessToken = $this->getAccessToken($code, self::profileConnectUrl());
 
         // Get the profile.
         $profile = $this->getProfile($accessToken);
@@ -319,7 +319,7 @@ class FacebookPlugin extends SSOAddon {
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(self::profileConnecUrl());
+        redirectTo(self::profileConnectUrl());
     }
 
     /**
@@ -607,7 +607,7 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string URL.
      */
-    public static function profileConnecUrl() {
+    public static function profileConnectUrl() {
         return url('entry/connect/facebook', true);
     }
 

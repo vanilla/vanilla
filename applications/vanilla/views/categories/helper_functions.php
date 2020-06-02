@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('APPLICATION')) exit();
 
 if (!function_exists('CategoryHeading')):
@@ -270,6 +269,8 @@ if (!function_exists('WriteTableRow')):
         $level = 3;
         /** @var Vanilla\Formatting\Html\HtmlSanitizer */
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
 
         ?>
         <tr class="<?php echo cssClass($row, true); ?>">
@@ -338,12 +339,11 @@ if (!function_exists('WriteTableRow')):
                             ?>
                             <span class="Bullet">•</span>
                             <?php
-                            $lastDate = Gdn_Format::date($row['LastDateInserted'], 'html');
                             echo anchor(
-                                $lastDate,
+                                Gdn_Format::date($row['LastDateInserted'], 'html'),
                                 $row['LastUrl'],
                                 'CommentDate MItem', [
-                                    "aria-label" => accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$lastDate, '', '']),
+                                    "aria-label" => accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
                                 ]);
 
                             if (!empty($row['LastCategoryID'])) {

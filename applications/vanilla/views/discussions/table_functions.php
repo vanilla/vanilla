@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+
 
 if (!function_exists('WriteDiscussionHeading')) :
     /**
@@ -123,7 +125,10 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Block Wrap">
                     <?php
                     $firstUserName = is_array($first) ? $first["Name"] : $first->Name;
-                    $accessibleLinkLabelStartedBy = accessibleLabel('User "%s" started discussion "%s" on date %s', [Gdn_Format::date($discussion->FirstDate, 'html'), $discussion->Name, $firstUserName]);
+                    /** @var Vanilla\Formatting\DateTimeFormatter */
+                    $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
+                    $firstDate = $dateTimeFormatter->formatDate($discussion->FirstDate, false);
+                    $accessibleLinkLabelStartedBy = accessibleLabel('User "%s" started discussion "%s" on date %s', [$firstUserName, $discussion->Name, $firstDate]);
 
                     echo userPhoto($first, ['Size' => 'Small']);
                     echo userAnchor($first, 'UserLink BlockTitle');
@@ -161,7 +166,7 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Block Wrap">
                     <?php
                     $lastCommentUserName = is_array($last) ? $last["Name"] : $last->Name;
-                    $accessibleLinkLastComment = accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [Gdn_Format::date($discussion->LastDate, 'html'), $discussion->Name, $lastCommentUserName]);
+                    $accessibleLinkLastComment = accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussion->Name, $lastCommentUserName]);
                     if ($last) {
                         echo userPhoto($last, ['Size' => 'Small']);
                         echo userAnchor($last, 'UserLink BlockTitle');

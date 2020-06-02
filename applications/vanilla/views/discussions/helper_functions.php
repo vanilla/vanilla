@@ -121,6 +121,9 @@ if (!function_exists('WriteDiscussion')) :
         $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
         $category = CategoryModel::categories($discussion->CategoryID);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
+
 
         if ($session->UserID) {
             $discussionUrl .= '#latest';
@@ -198,23 +201,21 @@ if (!function_exists('WriteDiscussion')) :
                     $discussionName = is_array($discussion) ? $discussion['Name'] : $discussion->Name;
 
                     if ($discussion->LastCommentID != '') {
-                        $lastCommentDate = Gdn_Format::date($discussion->LastDate, "html");
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.$lastCommentDate.'</span>';
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, "html").'</span>';
                         $userName = $last->Name;
                         $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
-                        $accessibleVars = [$lastCommentDate, $last->Name, $discussionName];
+                        $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $last->Name, $discussionName];
                     } else {
-                        $lastCommentDate = Gdn_Format::date($discussion->FirstDate, "html");
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.$lastCommentDate;
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, "html");
                         if ($source = val('Source', $discussion)) {
                             echo ' '.sprintf(t('via %s'), t($source.' Source', $source));
                         }
                         echo '</span> ';
                         $template = t('User "%s" started discussion "%s" on date %s');
                         $userName = $first->Name;
-                        $accessibleVars = [$userName, $discussionName];
+                        $accessibleVars = [$userName, $discussionName, $dateTimeFormatter->formatDate($discussion->FirstDate, false)];
                     }
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&

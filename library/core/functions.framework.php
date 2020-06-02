@@ -1793,3 +1793,18 @@ if (!function_exists('write_ini_file')) {
         Gdn_FileSystem::saveFile($file, $string);
     }
 }
+
+if (!function_exists('accessibleLabel')) {
+    /**
+     * Provides an accessible context for clickable items, so they can make sense out of context.
+     *
+     * @param string $template The text template
+     * @param string $action The action or target
+     * @param string $context The context for the action
+     * @return string
+     */
+    function accessibleLabel($template, $action, $context) {
+        return sprintf(t($template), $action, htmlspecialchars($context));
+    }
+}
+

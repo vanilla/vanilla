@@ -71,7 +71,8 @@ if (!function_exists('BookmarkButton')) {
         // Bookmark link
         $isBookmarked = $discussion->Bookmarked == '1';
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
-        $accessibleLabel = t($isBookmarked? 'Unbookmark' : 'Bookmark') . t('accessibility.titleSeparator', ': ') . htmlspecialchars($discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($isBookmarked? 'Unbookmark' : 'Bookmark'), $discussion->Name);
+
         return anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
@@ -359,7 +360,10 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'">'.t($code).'</span> ';
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', $code), $discussion->Name);
+
+        return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
+
     }
 endif;
 

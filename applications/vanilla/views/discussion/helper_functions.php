@@ -42,7 +42,8 @@ if (!function_exists('writeBookmarkLink')) :
 
         // Bookmark link
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
-        $accessibleLabel = t($isBookmarked? 'Unbookmark' : 'Bookmark') .  t('accessibility.titleSeparator', ': ') . htmlspecialchars($discussion->Name);
+
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($isBookmarked? 'Unbookmark' : 'Bookmark'), $discussion->Name);
 
         echo anchor(
             $title,

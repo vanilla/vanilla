@@ -846,7 +846,7 @@ class CategoryModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $populate = function(array &$row, string $field) {
+        $populate = function (array &$row, string $field) {
             $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
             if ($categoryID) {
                 $category = self::categories($categoryID);

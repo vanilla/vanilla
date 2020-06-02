@@ -6,6 +6,7 @@ import { getMeta, t, assetUrl, formatUrl } from "@library/utility/appUtils";
 import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 type INavItemGenerator = () => ITitleBarNav;
 
@@ -15,8 +16,8 @@ export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
     navItemGenerators.push(navItemGetter);
 }
 
-export const navigationVariables = useThemeCache(() => {
-    const makeVars = variableFactory("navigation");
+export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeVars = variableFactory("navigation", forcedVars);
     const forumEnabled = getMeta("siteSection.apps.forum", true);
 
     let defaultForumLinks: ITitleBarNav[] = [];

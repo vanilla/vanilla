@@ -358,7 +358,7 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', $code), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
 
         return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
 

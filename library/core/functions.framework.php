@@ -1804,7 +1804,7 @@ if (!function_exists('accessibleLabel')) {
      * @return string
      */
     function accessibleLabel($template, $action, $context) {
-        return sprintf(t($template), $action, htmlspecialchars($context));
+        return htmlspecialchars(sprintf(t($template), $action, $context));
     }
 }
 

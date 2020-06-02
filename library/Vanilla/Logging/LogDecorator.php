@@ -46,12 +46,12 @@ class LogDecorator implements LoggerInterface {
     /**
      * LogDecorator constructor.
      *
-     * @param \Gdn_Session $session
-     * @param \Gdn_Request $request
-     * @param \UserModel $userModel
      * @param LoggerInterface $logger
+     * @param \Gdn_Request $request
+     * @param \Gdn_Session $session
+     * @param \UserModel $userModel
      */
-    public function __construct(\Gdn_Session $session, \Gdn_Request $request, \UserModel $userModel, LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger, \Gdn_Request $request, \Gdn_Session $session, \UserModel $userModel) {
         $this->session = $session;
         $this->request = $request;
         $this->logger = $logger;
@@ -72,11 +72,11 @@ class LogDecorator implements LoggerInterface {
     public function log($level, $message, array $context = array()) {
         $context += $this->staticContextDefaults + [
             Logger::FIELD_USERID => $this->session->UserID,
-            'ip' => $this->request->ipAddress(),
+            'ip' => $this->request->getIP(),
             'timestamp' => time(),
             'method' => $this->request->requestMethod(),
             'domain' => rtrim($this->request->url('/', true), '/'),
-            'path' => $this->request->path(),
+            'path' => $this->request->getPath(),
             'requestID' => $this->request->getAttribute('requestID', null),
         ];
 

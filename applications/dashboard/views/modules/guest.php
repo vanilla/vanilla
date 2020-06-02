@@ -12,16 +12,16 @@
     </p>
 
     <?php
-        if ($this->data('signInUrl')) {
-            echo '<div class="P">';
-            echo anchor(t('Sign In'), $this->data('signInUrl'), 'Button Primary'.(signInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow']);
+    if ($this->data('signInUrl')) {
+        echo '<div class="P">';
+        echo anchor(t('Sign In'), $this->data('signInUrl'), 'Button Primary'.(signInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow']);
 
-            if ($this->data('registerUrl')) {
-                echo ' '.anchor(t('Register', t('Apply for Membership', 'Register')), $this->data('registerUrl'), 'Button ApplyButton', ['rel' => 'nofollow']);
-            }
-
-            echo '</div>';
+        if ($this->data('registerUrl')) {
+            echo ' '.anchor(t('Register', t('Apply for Membership', 'Register')), $this->data('registerUrl'), 'Button ApplyButton', ['rel' => 'nofollow']);
         }
+
+        echo '</div>';
+    }
     ?>
     <?php $this->fireEvent('AfterSignInButton'); ?>
 </div>

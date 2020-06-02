@@ -43,12 +43,14 @@ import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodSty
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
+import { forumVariables } from "@library/forums/forumStyleVars";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export let compatibilityStyles: () => void;
 compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
+    const formVars = forumVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = colorOut(mainColors.fg);

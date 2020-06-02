@@ -40,9 +40,7 @@ if (!function_exists('AdminCheck')) {
                 else
                     $itemSelected = '';
 
-                $result = <<<EOT
-<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" aria-label="{t('Select Discussion')}" value="{$discussion->DiscussionID}" $itemSelected /></span>
-EOT;
+                $result = '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" aria-label="' . t('Select Discussion') . '" value="' . $discussion->DiscussionID . '" $itemSelected /></span>';
             }
         } else {
             $result = '<span class="AdminCheck"><input type="checkbox" aria-label="' . t('Select Discussion') . '" name="Toggle" /></span>';
@@ -71,7 +69,7 @@ if (!function_exists('BookmarkButton')) {
         // Bookmark link
         $isBookmarked = $discussion->Bookmarked == '1';
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($isBookmarked? 'Unbookmark' : 'Bookmark'), $discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
 
         return anchor(
             $title,
@@ -360,7 +358,7 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', $code), $discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', $code), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
 
         return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
 

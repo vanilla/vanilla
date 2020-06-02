@@ -468,7 +468,7 @@ class CategoryCollection {
      * @param array $options
      * @return array
      */
-    public function getDescendantIDs($parentIDs = -1, $options = []) {
+    public function getDescendantIDs(int $parentID = -1, array $options = []) {
         $ids = [];
         $parentIDs = [$parentIDs] ?: [-1];
         $defaultOptions = [

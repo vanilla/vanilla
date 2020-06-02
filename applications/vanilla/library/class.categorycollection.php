@@ -249,7 +249,8 @@ class CategoryCollection {
      */
     private function cacheKey($type, $id) {
         switch ($type) {
-            case self::$CACHE_CATEGORY;
+            case self::$CACHE_CATEGORY:
+            case self::$CACHE_CATEGORY_DESCENDANTS:
                 $r = $this->getCacheInc().$type.$id;
                 return $r;
             case self::$CACHE_CATEGORY_SLUG;
@@ -478,7 +479,7 @@ class CategoryCollection {
      * @return array
      */
     public function getDescendantIDs(int $parentID = -1, array $options = []): array {
-        $ids = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID)) ?? [];
+        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID)) ?? [];
         $parentIDs = [$parentID];
         $defaultOptions = [
             'maxDepth' => 3,
@@ -486,7 +487,8 @@ class CategoryCollection {
         ];
         $options = $options + $defaultOptions;
 
-        if (!$ids) {
+        $ids = [];
+        if (!$cachedIDs) {
             for ($i = 0; $i < $options['maxDepth']; $i++) {
                 $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
                 if (empty($childCategories)) {
@@ -503,6 +505,8 @@ class CategoryCollection {
                     $parentIDs = $childCategoriesIDs;
                 }
             }
+        } else {
+            $ids = $cachedIDs;
         }
 
         $this->cacheStore(

@@ -61,6 +61,12 @@ export const searchResultsVariables = useThemeCache(() => {
             bottom: 16,
             left: globalVars.gutter.half,
         },
+        margin: {
+            top: "initial",
+            right: "initial",
+            bottom: "initial",
+            left: "initial",
+        },
     });
 
     const mediaElement = makeThemeVars("mediaElement", {

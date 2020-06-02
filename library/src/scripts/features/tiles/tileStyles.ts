@@ -108,7 +108,7 @@ export const tileVariables = useThemeCache(() => {
 });
 
 export const tileClasses = useThemeCache(() => {
-    const vars = tileVariables();
+    const  vars = tileVariables();
     const globalVars = globalVariables();
     const style = styleFactory("tile");
     const shadow = shadowHelper();

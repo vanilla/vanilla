@@ -198,6 +198,7 @@ compatibilityStyles = useThemeCache(() => {
     cssOut(`.DataList .Item`, {
         borderTop: singleBorder(),
         borderBottom: singleBorder(),
+        ...margins(resultVars.spacing.margin),
         ...paddings(resultVars.spacing.padding),
     });
 

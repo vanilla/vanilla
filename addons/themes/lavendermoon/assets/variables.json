@@ -24,7 +24,7 @@
     "titleBar": {
         "colors": {
             "fg": "#fff",
-            "bg": "#6c1794"
+            "bg": "#fcba03"
         },
         "border": {
             "type": "border"

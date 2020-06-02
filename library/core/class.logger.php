@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
  *
  * If nothing sets logger then Logger will be set to BaseLogger which is a dry loop.
  *
- * @see BaseLogger
+ * @deprecated Inject a PSR logger into your class instead.
  */
 class Logger {
     public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
@@ -93,9 +93,10 @@ class Logger {
      * @param LoggerInterface $logger Specify a new value to set the logger to.
      */
     public static function setLogger($logger = null) {
+        self::$realLogger = null;
+
         if ($logger === null) {
             self::$instance = null;
-            self::$realLogger = null;
         } elseif ($logger instanceof \Vanilla\Logger) {
             self::$instance = $logger;
         } else {

@@ -20,7 +20,7 @@ class CategoryCollection {
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
     private static $CACHE_CATEGORY_SLUG = '/catslug/';
-
+    
     /**
      * @var int The absolute select limit of the categories.
      */
@@ -463,7 +463,7 @@ class CategoryCollection {
 
     /**
      * Get the id's of a category's descendants.
-     * @todo implement caching
+     *
      * @param int $parentID
      * @param array $options
      * @return array

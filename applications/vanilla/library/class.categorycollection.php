@@ -464,18 +464,17 @@ class CategoryCollection {
     /**
      * Get the id's of a category's descendants.
      *
-     * @param int $parentIDs
+     * @param int $parentID
      * @param array $options
      * @return array
      */
     public function getDescendantIDs(int $parentID = -1, array $options = []) {
         $ids = [];
-        $parentIDs = [$parentIDs] ?: [-1];
+        $parentIDs = [$parentID];
         $defaultOptions = [
             'maxDepth' => 3,
             'permission' => 'PermsDiscussionsView'
         ];
-        $options = array_change_key_case($options) ?: [];
         $options = $options + $defaultOptions ;
 
         for ($i = 0; $i < $options['maxDepth']; $i++) {
@@ -483,7 +482,7 @@ class CategoryCollection {
             if (empty($childCategories)) {
                 break;
             }
-            if (count($childCategories) === 1 ) {
+            if (count($childCategories) === 1) {
                 $childCategories = reset($childCategories);
                 $childCategoryID = [$childCategories['CategoryID']]?? [];
                 $ids = array_merge($ids, $childCategoryID);

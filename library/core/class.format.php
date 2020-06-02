@@ -155,7 +155,8 @@ class Gdn_Format {
             }
         } else {
             $activityRouteLink = url($activity->Route);
-            $route = anchor(t($activity->RouteCode), $activity->Route);
+            $routeCode = is_string($activity->RouteCode) ? $activity->RouteCode : $activity->ActivityName;
+            $route = anchor(t($routeCode, $activity->Name), $activity->Route);
         }
 
         // Translate the gender suffix.

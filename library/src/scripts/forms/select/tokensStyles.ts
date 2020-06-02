@@ -135,5 +135,13 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    return { root, removeIcon, inputWrap };
+    const withIndicator = style("withIndicator", {
+        $nest: {
+            "& .inputText.inputText": {
+                fontSize: "inherit",
+            },
+        },
+    });
+
+    return { root, removeIcon, inputWrap, withIndicator };
 });

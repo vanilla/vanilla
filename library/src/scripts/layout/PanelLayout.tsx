@@ -132,7 +132,6 @@ export default function PanelLayout(props: IProps) {
                             className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
                                 [classes.isSticky]: isFixed,
                             })}
-                            tag="aside"
                         >
                             <PanelOverflow
                                 offset={overflowOffset}
@@ -159,16 +158,16 @@ export default function PanelLayout(props: IProps) {
                         >
                             {childComponents.middleTop && <PanelArea>{childComponents.middleTop}</PanelArea>}
                             {!shouldRenderLeftPanel && childComponents.leftTop && (
-                                <PanelArea tag="aside">{childComponents.leftTop}</PanelArea>
+                                <PanelArea>{childComponents.leftTop}</PanelArea>
                             )}
                             {!shouldRenderRightPanel && childComponents.rightTop && (
-                                <PanelArea tag="aside">{childComponents.rightTop}</PanelArea>
+                                <PanelArea>{childComponents.rightTop}</PanelArea>
                             )}
                             <PanelArea className={classNames(props.growMiddleBottom ? inheritHeightClass() : "")}>
                                 {childComponents.middleBottom}
                             </PanelArea>
                             {!shouldRenderRightPanel && childComponents.rightBottom && (
-                                <PanelArea tag="aside">{childComponents.rightBottom}</PanelArea>
+                                <PanelArea>{childComponents.rightBottom}</PanelArea>
                             )}
                         </Panel>
                     </ContentTag>
@@ -179,12 +178,8 @@ export default function PanelLayout(props: IProps) {
                             })}
                         >
                             <PanelOverflow offset={overflowOffset}>
-                                {childComponents.rightTop && (
-                                    <PanelArea tag="aside">{childComponents.rightTop}</PanelArea>
-                                )}
-                                {childComponents.rightBottom && (
-                                    <PanelArea tag="aside">{childComponents.rightBottom}</PanelArea>
-                                )}
+                                {childComponents.rightTop && <PanelArea>{childComponents.rightTop}</PanelArea>}
+                                {childComponents.rightBottom && <PanelArea>{childComponents.rightBottom}</PanelArea>}
                             </PanelOverflow>
                         </Panel>
                     )}

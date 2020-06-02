@@ -343,7 +343,7 @@ if (!function_exists('WriteTableRow')):
                                 $row['LastUrl'],
                                 'CommentDate MItem');
 
-                            if (isset($row['LastCategoryID'])) {
+                            if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);
 
                                 echo ' <span>',

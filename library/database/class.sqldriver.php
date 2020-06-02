@@ -1749,6 +1749,17 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * An alias of `PDO::quote()`.
+     *
+     * @param mixed $value The value to quote
+     * @param int $type One of the `PDO::PARAM_*` constants.
+     * @return string
+     */
+    public function quote($value, $type = PDO::PARAM_STR): string {
+        return $this->Database->connection()->quote($value, $type);
+    }
+
+    /**
      * Quote an identifier such as a table or column name.
      *
      * @param string $string The identifier to quote.

@@ -23,7 +23,7 @@ export default class DropDownItemSeparator extends React.Component<IProps> {
         return (
             <div className={classNames(this.props.className, classes.separator)}>
                 <ScreenReaderContent>
-                    <hr role="separator" />
+                    <hr />
                 </ScreenReaderContent>
             </div>
         );

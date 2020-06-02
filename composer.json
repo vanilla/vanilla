@@ -49,7 +49,7 @@
         "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
-        "vanilla/garden-container": "^3.0.1",
+        "vanilla/garden-container": "^3.0.3",
         "vanilla/garden-http": "~2.1",
         "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",

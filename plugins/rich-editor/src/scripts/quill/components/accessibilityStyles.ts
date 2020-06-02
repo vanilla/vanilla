@@ -14,6 +14,11 @@ import { percent } from "csx";
 export const accessibilityCSS = useThemeCache(() => {
     const globalVars = globalVariables();
 
+    const fallbackContent = document.getElementById("fallbackPageContent");
+    if (fallbackContent) {
+        fallbackContent.remove(); // for accessibility, we can't have 2 <h1>s in the page.
+    }
+
     cssRule(".accessibility-jumpTo", {
         border: unit(0),
         clip: `rect(0 0 0 0)`,

@@ -20,7 +20,7 @@ class CategoryCollection {
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
     private static $CACHE_CATEGORY_SLUG = '/catslug/';
-    
+
     /**
      * @var int The absolute select limit of the categories.
      */
@@ -464,13 +464,13 @@ class CategoryCollection {
     /**
      * Get the id's of a category's descendants.
      *
-     * @param int $parentID
+     * @param int $parentIDs
      * @param array $options
      * @return array
      */
-    public function getDescendantIDs($parentID = -1, $options = []) {
+    public function getDescendantIDs($parentIDs = -1, $options = []) {
         $ids = [];
-        $parentID = $parentID ?: -1;
+        $parentIDs = [$parentIDs] ?: [-1];
         $defaultOptions = [
             'maxDepth' => 3,
             'permission' => 'PermsDiscussionsView'
@@ -479,15 +479,21 @@ class CategoryCollection {
         $options = $options + $defaultOptions ;
 
         for ($i = 0; $i < $options['maxDepth']; $i++) {
-            $childCategory = $this->getChildrenByParents([$parentID], $options['permission']);
-            $childCategory = reset($childCategory);
-            if (empty($childCategory)) {
+            $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
+            if (empty($childCategories)) {
                 break;
             }
-            $ids[] = $childCategory['CategoryID'] ?? null ;
-            $parentID = $childCategory['CategoryID'] ?? null;
+            if (count($childCategories) === 1 ) {
+                $childCategories = reset($childCategories);
+                $childCategoryID = [$childCategories['CategoryID']]?? [];
+                $ids = array_merge($ids, $childCategoryID);
+                $parentIDs = $childCategoryID;
+            } else {
+                $childCategoriesIDs = array_column($childCategories, 'CategoryID');
+                $ids = array_merge($ids, $childCategoriesIDs) ;
+                $parentIDs = $childCategoriesIDs;
+            }
         }
-
         return $ids;
     }
 

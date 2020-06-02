@@ -1808,3 +1808,24 @@ if (!function_exists('accessibleLabel')) {
     }
 }
 
+
+if (!function_exists('headingTag')) {
+    /**
+     * Keeps track of heading level for main area. Does not track panels or other peripheral regions.
+     *
+     * @param Controller $sender
+     * @param string $prefix
+     * @return string
+     */
+    function headingTag($sender, $prefix = "h") {
+        $currentLevel = 0;
+        if (!empty($sender->Data['mainHeadingLevel'])) {
+            $currentLevel = $sender->Data['mainHeadingLevel'];
+        } elseif(Gdn::themeFeatures()->useDataDrivenTheme()) {
+            $currentLevel = 1;
+        }
+        $sender->setData("mainHeadingLevel", ++$currentLevel);
+        return $prefix . $currentLevel;
+    }
+}
+

@@ -57,12 +57,6 @@ export const monoFallbacks = [
 ];
 
 export function fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
-    if (!Array.isArray(fontFamilies)) {
-        fontFamilies = [fontFamilies];
-    }
-
-    console.log("font families: ", fontFamilies);
-
     return fontFamilies
         .concat(options.isMonospaced ? monoFallbacks : fontFallbacks)
         .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))

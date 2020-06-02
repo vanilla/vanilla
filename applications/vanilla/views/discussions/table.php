@@ -16,8 +16,8 @@ $PagerOptions = ['Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->da
 if ($this->data('_PagerUrl')) {
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 }
-
-echo '<h1 class="H HomepageTitle">'.$this->data('Title').followButton($this->data('Category.CategoryID')).'</h1>';
+$tag = headingTag($this);
+echo '<' . $tag . ' class="H HomepageTitle">' . $this->data('Title') . followButton($this->data('Category.CategoryID')) . '</' . $tag . '>';
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
@@ -51,9 +51,11 @@ $this->fireEvent('PageControls');
 echo '</div>';
 
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
+    $subHeadingTag = headingTag($this);
+    $subHeadingTitle = t('Discussion List');
     ?>
     <div class="DataTableWrap">
-        <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
+        <?php echo "<$subHeadingTag class='sr-only'>$subHeadingTitle</$subHeadingTag>"; ?>
         <table class="DataTable DiscussionsTable">
             <thead>
             <?php

@@ -69,7 +69,7 @@ if (!function_exists('BookmarkButton')) {
         // Bookmark link
         $isBookmarked = $discussion->Bookmarked == '1';
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
 
         return anchor(
             $title,
@@ -195,16 +195,26 @@ if (!function_exists('WriteDiscussion')) :
 
                     $sender->fireEvent('AfterCountMeta');
 
+                    $discussionName = is_array($discussion) ? $discussion['Name'] : $discussion->Name;
+
                     if ($discussion->LastCommentID != '') {
+                        $lastCommentDate = Gdn_Format::date($discussion->LastDate, "html");
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, 'html').'</span>';
+                        echo ' <span class="MItem LastCommentDate">'.$lastCommentDate.'</span>';
+                        $userName = $last->Name;
+                        $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
+                        $accessibleVars = [$lastCommentDate, $last->Name, $discussionName];
                     } else {
+                        $lastCommentDate = Gdn_Format::date($discussion->FirstDate, "html");
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, 'html');
+                        echo ' <span class="MItem LastCommentDate">'.$lastCommentDate;
                         if ($source = val('Source', $discussion)) {
                             echo ' '.sprintf(t('via %s'), t($source.' Source', $source));
                         }
                         echo '</span> ';
+                        $template = t('User "%s" started discussion "%s" on date %s');
+                        $userName = $first->Name;
+                        $accessibleVars = [$userName, $discussionName];
                     }
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
@@ -214,7 +224,7 @@ if (!function_exists('WriteDiscussion')) :
                             anchor(htmlspecialchars($discussion->Category),
                             categoryUrl($discussion->CategoryUrlCode)),
                             'span',
-                            ['class' => 'MItem Category '.$category['CssClass']]
+                            ['class' => 'MItem Category '.$category['CssClass'], "aria-label" => accessibleLabel($template, $accessibleVars)]
                         );
                     }
                     $sender->fireEvent('DiscussionMeta');
@@ -358,7 +368,7 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
 
         return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
 

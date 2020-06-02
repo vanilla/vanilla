@@ -338,10 +338,13 @@ if (!function_exists('WriteTableRow')):
                             ?>
                             <span class="Bullet">•</span>
                             <?php
+                            $lastDate = Gdn_Format::date($row['LastDateInserted'], 'html');
                             echo anchor(
-                                Gdn_Format::date($row['LastDateInserted'], 'html'),
+                                $lastDate,
                                 $row['LastUrl'],
-                                'CommentDate MItem');
+                                'CommentDate MItem', [
+                                    "aria-label" => accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$lastDate, '', '']),
+                                ]);
 
                             if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);

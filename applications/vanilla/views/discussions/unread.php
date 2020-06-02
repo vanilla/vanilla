@@ -2,10 +2,11 @@
 $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
-echo '<h1 class="H HomepageTitle">'.
+$tag = headingTag($this);
+echo '<' . $tag . ' class="H HomepageTitle">'.
     adminCheck(NULL, ['', ' ']).
     $this->data('Title').
-    '</h1>';
+    '</' . $tag . '>';
 
 if ($Description = $this->description()) {
     echo wrap($Description, 'div', ['class' => 'P PageDescription']);

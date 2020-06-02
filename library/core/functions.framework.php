@@ -1799,12 +1799,11 @@ if (!function_exists('accessibleLabel')) {
      * Provides an accessible context for clickable items, so they can make sense out of context.
      *
      * @param string $template The text template
-     * @param string $action The action or target
-     * @param string $context The context for the action
+     * @param array $data The placeholder data
      * @return string
      */
-    function accessibleLabel($template, $action, $context) {
-        return htmlspecialchars(sprintf(t($template), $action, $context));
+    function accessibleLabel($template, $data) {
+        return htmlspecialchars(sprintf(t($template), ...$data));
     }
 }
 
@@ -1819,12 +1818,14 @@ if (!function_exists('headingTag')) {
      */
     function headingTag($sender, $prefix = "h") {
         $currentLevel = 0;
-        if (!empty($sender->Data['mainHeadingLevel'])) {
-            $currentLevel = $sender->Data['mainHeadingLevel'];
-        } elseif(Gdn::themeFeatures()->useDataDrivenTheme()) {
+        if (!Gdn::themeFeatures()->useDataDrivenTheme()) {
             $currentLevel = 1;
+        } else {
+            if (!empty($sender->Data['mainHeadingLevel'])) {
+                $currentLevel = $sender->Data['mainHeadingLevel'];
+            }
+            $sender->setData("mainHeadingLevel", ++$currentLevel);
         }
-        $sender->setData("mainHeadingLevel", ++$currentLevel);
         return $prefix . $currentLevel;
     }
 }

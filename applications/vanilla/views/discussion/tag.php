@@ -1,6 +1,11 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+$tag = 'h1';
+if ($this->data['mainHeadingLevel']) {
+    $tag = "h2";
+}
+
+echo "<$tag>" . $this->data('Title') . "</$tag>";
+
 /** @var Gdn_Form $form */
 $form = $this->Form;
 echo $form->open(['id' => 'DiscussionAddTagForm']);

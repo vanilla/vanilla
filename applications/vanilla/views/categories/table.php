@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) return;
 $userID = Gdn::session()->UserID;
 $categoryID = isset($this->Category) ? $this->Category->CategoryID : null;
+
+$tag = headingTag($this);
+echo "<$tag class='H HomepageTitle'>$this->data('Title').followButton($categoryID)</$tag>";
 ?>
-    <h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton($categoryID); ?></h1>
     <div class="P PageDescription"><?php echo $this->description(); ?></div>
 <?php
 $this->fireEvent('AfterDescription');

@@ -846,8 +846,9 @@ class CategoryModel extends Gdn_Model {
         $single = is_string(key($rows));
 
         $populate = function(array &$row) {
-            if (array_key_exists('CategoryID', $row)) {
-                $category = self::categories($row['CategoryID']);
+            $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
+            if ($categoryID) {
+                $category = self::categories($categoryID);
                 if ($category) {
                     setValue('Category', $row, $category);
                 }
@@ -1038,6 +1039,20 @@ class CategoryModel extends Gdn_Model {
         $result = $this->collection->getTree($categoryID, $options);
         return $result;
     }
+
+
+    /**
+     * Get the ID's of a descendant.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return array
+     */
+    public function getCategoryDescendantIDs(int $categoryID, array $options = []): array {
+        $result = $this->collection->getDescendantIDs($categoryID, $options);
+        return $result;
+    }
+
 
     /**
      * @param int|string $id The parent category ID or slug.

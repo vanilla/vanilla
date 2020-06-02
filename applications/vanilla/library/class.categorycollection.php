@@ -462,6 +462,36 @@ class CategoryCollection {
     }
 
     /**
+     * Get the id's of a category's descendants.
+     * @todo implement caching
+     * @param int $parentID
+     * @param array $options
+     * @return array
+     */
+    public function getDescendantIDs($parentID = -1, $options = []) {
+        $ids = [];
+        $parentID = $parentID ?: -1;
+        $defaultOptions = [
+            'maxDepth' => 3,
+            'permission' => 'PermsDiscussionsView'
+        ];
+        $options = array_change_key_case($options) ?: [];
+        $options = $options + $defaultOptions ;
+
+        for ($i = 0; $i < $options['maxDepth']; $i++) {
+            $childCategory = $this->getChildrenByParents([$parentID], $options['permission']);
+            $childCategory = reset($childCategory);
+            if (empty($childCategory)) {
+                break;
+            }
+            $ids[] = $childCategory['CategoryID'] ?? null ;
+            $parentID = $childCategory['CategoryID'] ?? null;
+        }
+
+        return $ids;
+    }
+
+    /**
      * Get all of the children of a parent category.
      *
      * @param int[] $parentIDs The IDs of the parent categories.

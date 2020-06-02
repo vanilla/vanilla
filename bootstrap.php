@@ -143,10 +143,10 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Logging\LogDecorator::class)
     ->setShared(true)
     ->setConstructorArgs(['logger' => new Reference(\Vanilla\Logger::class)])
-    ->addAlias(\Psr\Log\LoggerInterface::class)
 
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
+    ->addAlias(\Psr\Log\LoggerInterface::class)
 
     ->rule(\Psr\Log\LoggerAwareInterface::class)
     ->addCall('setLogger')
@@ -500,7 +500,11 @@ $dic->call(function (
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
     // Construct the logger earlier so that its dependencies are satisfied.
-    $log = $dic->get(\Psr\Log\LoggerInterface::class);
+    $log = $dic->get(\Vanilla\Logging\LogDecorator::class);
+    // Replace the logger interface with the decorator.
+    $dic->rule(\Vanilla\Logging\LogDecorator::class)
+        ->addAlias(\Psr\Log\LoggerInterface::class);
+    Logger::setLogger(null);
 
     // Load the configurations for enabled addons.
     foreach ($addonManager->getEnabled() as $addon) {
@@ -557,7 +561,7 @@ $dic->call(function (
 
 // Send out cookie headers.
 register_shutdown_function(function () use ($dic) {
-    $dic->call(function(Garden\Web\Cookie $cookie) {
+    $dic->call(function (Garden\Web\Cookie $cookie) {
         $cookie->flush();
     });
 });

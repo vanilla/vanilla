@@ -319,7 +319,7 @@ class FacebookPlugin extends SSOAddon {
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(userUrl($sender->User, '', 'connections'));
+        redirectTo(self::profileConnecUrl());
     }
 
     /**
@@ -608,7 +608,7 @@ class FacebookPlugin extends SSOAddon {
      * @return string URL.
      */
     public static function profileConnecUrl() {
-        return url(userUrl(Gdn::session()->User, false, 'facebookconnect'), true);
+        return url('entry/connect/facebook', true);
     }
 
     /**

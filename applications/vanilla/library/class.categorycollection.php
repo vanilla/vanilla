@@ -16,10 +16,18 @@ class CategoryCollection {
      * @var string The cache key prefix that stores categories by ID.
      */
     private static $CACHE_CATEGORY = '/cat/';
+
     /**
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
     private static $CACHE_CATEGORY_SLUG = '/catslug/';
+
+    /**
+     * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
+     */
+    private static $CACHE_CATEGORY_DESCENDANTS = '/catdescendants/';
+
+    /**
 
     /**
      * @var int The absolute select limit of the categories.
@@ -469,30 +477,38 @@ class CategoryCollection {
      * @return array
      */
     public function getDescendantIDs(int $parentID = -1, array $options = []) {
-        $ids = [];
+        $ids =  $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID));
         $parentIDs = [$parentID];
         $defaultOptions = [
             'maxDepth' => 3,
             'permission' => 'PermsDiscussionsView'
         ];
-        $options = $options + $defaultOptions ;
+        $options = $options + $defaultOptions;
 
-        for ($i = 0; $i < $options['maxDepth']; $i++) {
-            $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
-            if (empty($childCategories)) {
-                break;
-            }
-            if (count($childCategories) === 1) {
-                $childCategories = reset($childCategories);
-                $childCategoryID = [$childCategories['CategoryID']]?? [];
-                $ids = array_merge($ids, $childCategoryID);
-                $parentIDs = $childCategoryID;
-            } else {
-                $childCategoriesIDs = array_column($childCategories, 'CategoryID');
-                $ids = array_merge($ids, $childCategoriesIDs) ;
-                $parentIDs = $childCategoriesIDs;
+        if (!$ids) {
+            for ($i = 0; $i < $options['maxDepth']; $i++) {
+                $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
+                if (empty($childCategories)) {
+                    break;
+                }
+                if (count($childCategories) === 1) {
+                    $childCategories = reset($childCategories);
+                    $childCategoryID = [$childCategories['CategoryID']]?? [];
+                    $ids = array_merge($ids, $childCategoryID);
+                    $parentIDs = $childCategoryID;
+                } else {
+                    $childCategoriesIDs = array_column($childCategories, 'CategoryID');
+                    $ids = array_merge($ids, $childCategoriesIDs) ;
+                    $parentIDs = $childCategoriesIDs;
+                }
             }
         }
+
+        $this->cacheStore(
+            $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID),
+            $ids
+        );
+
         return $ids;
     }
 

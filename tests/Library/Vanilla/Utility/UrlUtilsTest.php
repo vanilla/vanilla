@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
+use League\Uri\Http;
 use Vanilla\Utility\UrlUtils;
 use PHPUnit\Framework\TestCase;
 
@@ -79,5 +80,62 @@ class UrlUtilsTest extends TestCase {
         $this->expectExceptionMessage('Domain Invalid.');
 
         UrlUtils::domainAsAscii('//goo�gle.com/');
+    }
+
+    /**
+     * Provide data for testing the replaceQuery method.
+     *
+     * @return array|array[]
+     */
+    public function provideQueryReplacements(): array {
+        $result = [
+            "Replace elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => "world", "hello" => "bar"],
+                "foo=world&hello=bar&a=1",
+            ],
+            "Remove elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => null, "a" => null],
+                "hello=world",
+            ],
+            "Remove all elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => null, "hello" => null, "a" => null],
+                "",
+            ],
+            "Empty changeset" => [
+                "foo=bar&hello=world&a=1",
+                [],
+                "foo=bar&hello=world&a=1",
+            ],
+        ];
+        return $result;
+    }
+
+    /**
+     * Verify updating URI query elements.
+     *
+     * @param string $query
+     * @param array $replace
+     * @param string $expected
+     * @dataProvider provideQueryReplacements
+     */
+    public function testReplaceQuery(string $query, array $replace, string $expected): void {
+        $uri = Http::createFromString("https://example.com")->withQuery($query);
+
+        $result = UrlUtils::replaceQuery($uri, $replace);
+        $this->assertSame($expected, $result->getQuery());
+    }
+
+    /**
+     * Test path encoding/decoding.
+     */
+    public function testEncodeDecodePath(): void {
+        $encoded = 'profile/Fran%23k';
+        $decoded = 'profile/Fran#k';
+
+        $this->assertSame($encoded, UrlUtils::encodePath($decoded));
+        $this->assertSame($decoded, UrlUtils::decodePath($encoded));
     }
 }

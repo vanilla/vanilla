@@ -67,7 +67,8 @@
         "symfony/polyfill-php74": "^1.13",
         "symfony/polyfill-php80": "^1.16",
         "metasyntactical/composer-plugin-license-check": "^0.5.0",
-        "nette/neon": "^3.1"
+        "nette/neon": "^3.1",
+        "league/uri": "^6.2"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",

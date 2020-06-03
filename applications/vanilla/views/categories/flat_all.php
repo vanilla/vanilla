@@ -4,9 +4,9 @@
     }
     $userID = Gdn::session()->UserID;
     $categoryID = $this->Category->CategoryID;
-    $tag = headingTag($this);
-    echo "<$tag class='H HomepageTitle'>$this->data('Title')</$tag>";
 ?>
+
+<h1 class="H HomepageTitle"><?php echo $this->data('Title'); ?></h1>
 
 <?php
     if ($description = $this->description()) {
@@ -16,10 +16,9 @@
 
     $categories = $this->data('CategoryTree');
     $this->EventArguments['NumRows'] = count($categories);
-    $subTitleCat = headingTag($this);
-    echo "<$subTitleCat class='sr-only'>" . t('Category List') . "</$subTitleCat>";
 ?>
 
+<h2 class="sr-only"><?php echo t('Category List'); ?></h2>
 <ul class="DataList CategoryList">
 <?php
     foreach ($categories as $category) {

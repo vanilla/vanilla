@@ -1,10 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $userID = Gdn::session()->UserID;
 $categoryID = $this->Category->CategoryID;
-
-$tag = headingTag($this);
-echo "<$tag class='H HomepageTitle'>$this->data('Title')</$tag>";
 ?>
+    <h1 class="H HomepageTitle"><?php echo $this->data('Title'); ?></h1>
     <div class="P PageDescription"><?php echo $this->description(); ?></div>
 <?php
 $this->fireEvent('AfterDescription');

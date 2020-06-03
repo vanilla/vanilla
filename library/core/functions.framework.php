@@ -1793,25 +1793,3 @@ if (!function_exists('write_ini_file')) {
         Gdn_FileSystem::saveFile($file, $string);
     }
 }
-
-if (!function_exists('headingTag')) {
-    /**
-     * Keeps track of heading level for main area. Does not track panels or other peripheral regions.
-     *
-     * @param Controller $sender
-     * @param string $prefix
-     * @return string
-     */
-    function headingTag($sender, $prefix = "h") {
-        $currentLevel = 0;
-        if (!Gdn::themeFeatures()->useDataDrivenTheme()) {
-            $currentLevel = 1;
-        } else {
-            if (!empty($sender->Data['mainHeadingLevel'])) {
-                $currentLevel = $sender->Data['mainHeadingLevel'];
-            }
-            $sender->setData("mainHeadingLevel", ++$currentLevel);
-        }
-        return $prefix . $currentLevel;
-    }
-}

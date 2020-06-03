@@ -5,12 +5,11 @@ include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanill
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 $checkMark = !$isDataDrivenTheme ? adminCheck(NULL, ['', ' ']) : '';
-$tag = headingTag($this);
-echo "<$tag class='H HomepageTitle'>".
+echo '<h1 class="H HomepageTitle">'.
     $checkMark.
     $this->data('Title').
     followButton($this->data('Category.CategoryID')).
-    "</$tag>";
+    '</h1>';
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);

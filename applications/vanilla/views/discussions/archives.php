@@ -1,9 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
-$tag = headingTag($this);
-echo "<$tag class='H'>$this->data('Title')</$tag>";
 ?>
 
+<h1 class="H"><?php echo $this->data('Title'); ?></h1>
 <div class="P PageDescription">
     <?php
     echo $this->data('_Description');

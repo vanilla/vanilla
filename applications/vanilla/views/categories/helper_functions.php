@@ -1,6 +1,6 @@
 <?php
+
 if (!defined('APPLICATION')) exit();
-use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
 
@@ -163,7 +163,11 @@ if (!function_exists('writeListItem')):
             <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
                 <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
-                    <?php echo Gdn_Format::text(val('Name', $category)); ?>
+                    <?php echo Gdn_Format::text(val('Name', $category));
+                    Gdn::controller()->EventArguments['ChildCategories'] = &$children;
+                    Gdn::controller()->EventArguments['Category'] = &$category;
+                    Gdn::controller()->fireEvent('AfterCategoryHeadingTitle');
+                    ?>
                 </div>
             </li>
         <?php else: ?>
@@ -375,7 +379,6 @@ if (!function_exists('writeCategoryList')):
      * Renders a category list (modern view).
      *
      * @param $categories
-     * @param Controller $sender
      * @param int $depth
      */
     function writeCategoryList($categories, $depth = 1) {
@@ -383,15 +386,10 @@ if (!function_exists('writeCategoryList')):
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
             return;
         }
-        $controller = Gdn::controller();
-        if ($controller) {
-            $tag = headingTag($controller);
-        } else {
-            $tag = "h2";
-        }
+
         ?>
         <div class="DataListWrap">
-            <?php echo "<$tag class='sr-only'>" . t('Category List') ."</$tag>"; ?>
+            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
             <ul class="DataList CategoryList">
                 <?php
                 foreach ($categories as $category) {

@@ -43,7 +43,7 @@ class JsonThemeAsset extends ThemeAsset {
             $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
         } else {
             $this->data = $decoded;
-            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
+            $this->jsonString = $data;
             $this->ensureArray();
         }
     }

@@ -1829,4 +1829,3 @@ if (!function_exists('headingTag')) {
         return $prefix . $currentLevel;
     }
 }
-

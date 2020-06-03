@@ -835,8 +835,9 @@ class CategoryModel extends Gdn_Model {
      * Add multi-dimensional category data to an array.
      *
      * @param array $rows Results we need to associate category data with.
+     * @param string $field
      */
-    public function expandCategories(array &$rows) {
+    public function expandCategories(array &$rows, string $field = 'Category') {
         if (count($rows) === 0) {
             // Nothing to do here.
             return;
@@ -845,21 +846,22 @@ class CategoryModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $populate = function(array &$row) {
-            if (array_key_exists('CategoryID', $row)) {
-                $category = self::categories($row['CategoryID']);
+        $populate = function (array &$row, string $field) {
+            $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
+            if ($categoryID) {
+                $category = self::categories($categoryID);
                 if ($category) {
-                    setValue('Category', $row, $category);
+                    setValue($field, $row, $category);
                 }
             }
         };
 
         // Inject those categories.
         if ($single) {
-            $populate($rows);
+            $populate($rows, $field);
         } else {
             foreach ($rows as &$row) {
-                $populate($row);
+                $populate($row, $field);
             }
         }
     }
@@ -1038,6 +1040,20 @@ class CategoryModel extends Gdn_Model {
         $result = $this->collection->getTree($categoryID, $options);
         return $result;
     }
+
+
+    /**
+     * Get the ID's of a descendant.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return array
+     */
+    public function getCategoryDescendantIDs(int $categoryID, array $options = []): array {
+        $result = $this->collection->getDescendantIDs($categoryID, $options);
+        return $result;
+    }
+
 
     /**
      * @param int|string $id The parent category ID or slug.

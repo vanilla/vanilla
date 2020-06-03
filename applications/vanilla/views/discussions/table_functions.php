@@ -129,7 +129,7 @@ if (!function_exists('writeDiscussionRow')) :
                     /** @var Vanilla\Formatting\DateTimeFormatter */
                     $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
                     $firstDate = $dateTimeFormatter->formatDate($discussion->FirstDate, false);
-                    $accessibleLinkLabelStartedBy= @HtmlUtils::accessibleLabel('User "%s" started discussion "%s" on date %s', [$firstUserName, $discussion->Name, $firstDate]);
+                    $accessibleLinkLabelStartedBy= HtmlUtils::accessibleLabel('User "%s" started discussion "%s" on date %s', [$firstUserName, $discussion->Name, $firstDate]);
 
                     echo userPhoto($first, ['Size' => 'Small']);
                     echo userAnchor($first, 'UserLink BlockTitle');
@@ -167,7 +167,7 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Block Wrap">
                     <?php
                     $lastCommentUserName = is_array($last) ? $last["Name"] : $last->Name;
-                    $accessibleLinkLastComment= @HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussion->Name, $lastCommentUserName]);
+                    $accessibleLinkLastComment= HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussion->Name, $lastCommentUserName]);
                     if ($last) {
                         echo userPhoto($last, ['Size' => 'Small']);
                         echo userAnchor($last, 'UserLink BlockTitle');

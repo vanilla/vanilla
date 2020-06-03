@@ -44,7 +44,7 @@ final class HtmlUtilsTest extends TestCase {
      * Formatting tags when the argument isn't supplied is a notice.
      */
     public function testFormatTagsInvalidArgNotice(): void {
-        $actual = @HtmlUtils::formatTags('Hello <0/>');
+        $actual = HtmlUtils::formatTags('Hello <0/>');
         $this->assertSame('Hello ', $actual);
 
         $this->expectNotice();

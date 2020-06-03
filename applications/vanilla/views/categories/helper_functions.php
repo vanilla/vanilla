@@ -374,6 +374,7 @@ if (!function_exists('writeCategoryList')):
      * Renders a category list (modern view).
      *
      * @param $categories
+     * @param Controller $sender
      * @param int $depth
      */
     function writeCategoryList($categories, $depth = 1) {
@@ -381,10 +382,15 @@ if (!function_exists('writeCategoryList')):
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
             return;
         }
-
+        $controller = Gdn::controller();
+        if ($controller) {
+            $tag = headingTag($controller);
+        } else {
+            $tag = "h2";
+        }
         ?>
         <div class="DataListWrap">
-            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
+            <?php echo "<$tag class='sr-only'>" . t('Category List') ."</$tag>"; ?>
             <ul class="DataList CategoryList">
                 <?php
                 foreach ($categories as $category) {

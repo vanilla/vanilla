@@ -205,7 +205,7 @@ if (!function_exists('WriteDiscussion')) :
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, "html").'</span>';
                         $userName = $last->Name;
                         $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
-                        $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $last->Name, $discussionName];
+                        $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussionName, $userName];
                     } else {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, "html");

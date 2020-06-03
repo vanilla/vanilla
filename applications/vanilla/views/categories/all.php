@@ -5,7 +5,7 @@ if (!is_null($this->Category)) {
     $title .= followButton($this->Category->CategoryID);
 }
 $tag = headingTag($this);
-echo "<$tag class='H HomepageTitle'>" . $title . "</$tag>";
+echo "<$tag class='H HomepageTitle'>$title</$tag>";
 if ($description = $this->description()) {
     echo wrap($description, 'div', ['class' => 'P PageDescription']);
 }

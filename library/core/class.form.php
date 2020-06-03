@@ -577,6 +577,8 @@ class Gdn_Form extends Gdn_Pluggable {
         // Write out the category options.
         $enableHeadings = $options['EnableHeadings'] ?? false;
         if (is_array($safeCategoryData)) {
+            $categoryNames = array_column($safeCategoryData, 'Name');
+            array_multisort($categoryNames, SORT_NATURAL, $safeCategoryData);
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
                 $isHeading = ($depth == 1 && $doHeadings) || $category['DisplayAs'] !== 'Discussions' || !$category['AllowDiscussions'];

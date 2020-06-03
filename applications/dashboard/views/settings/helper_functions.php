@@ -118,7 +118,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
     $addonInfo = $capitalCaseSheme->convertArrayKeys($addonInfo, ['RegisterPermissions']);
 
-    $screenName = $info['DisplayName'] ?? $info['displayName'] ?? $info['Name'] ?? $info['name'] ?? $addonName;
+    $screenName = $addonInfo['DisplayName'] ?? $addonInfo['displayName'] ?? $addonInfo['Name'] ?? $addonInfo['name'] ?? $addonName;
     $description = Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, '')));
     $id = Gdn_Format::url($addonName).'-addon';
     $documentationUrl = val('DocumentationUrl', $addonInfo, '');

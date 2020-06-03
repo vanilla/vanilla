@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 if ($this->data('EnableFollowingFilter')) {
     echo '<div class="PageControls Top">'.categoryFilters().'</div>';
@@ -32,7 +34,10 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
 
                     <?php if ($this->DiscussionData->numRows() == $this->DiscussionsPerCategory) : ?>
                         <div class="MorePager">
-                            <?php echo anchor(t('More Discussions'), '/categories/'.$Category->UrlCode); ?>
+                            <?php
+                            $moreLabel = t('More Discussions');
+                            $accessibleLabel= HtmlUtils::accessibleLabel('%s for category: "%s"', [$moreLabel, is_array($Category) ? $Category["Name"] : $Category->Name]);
+                            echo anchor($moreLabel, '/categories/'.$Category->UrlCode, ["aria-label" => $accessibleLabel]); ?>
                         </div>
                     <?php endif; ?>
 

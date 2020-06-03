@@ -1,5 +1,6 @@
 <?php
 if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
 
@@ -343,7 +344,7 @@ if (!function_exists('WriteTableRow')):
                                 Gdn_Format::date($row['LastDateInserted'], 'html'),
                                 $row['LastUrl'],
                                 'CommentDate MItem', [
-                                    "aria-label" => accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
+                                    "aria-label" => @HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
                                 ]);
 
                             if (!empty($row['LastCategoryID'])) {

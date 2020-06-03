@@ -7,6 +7,7 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+use Vanilla\Utility\HtmlUtils;
 
 
 if (!function_exists('formatBody')) :
@@ -43,7 +44,7 @@ if (!function_exists('writeBookmarkLink')) :
         // Bookmark link
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
 
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+        $accessibleLabel= @HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
 
         echo anchor(
             $title,

@@ -1,9 +1,7 @@
-<?php if (!defined('APPLICATION')) exit();
-$tag = 'h1';
-if ($this->data['mainHeadingLevel']) {
-    $tag = "h2";
-}
-
+<?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
+$tag = @HtmlUtils::accessibleLabel($this);
 echo "<$tag>" . $this->data('Title') . "</$tag>";
 
 /** @var Gdn_Form $form */

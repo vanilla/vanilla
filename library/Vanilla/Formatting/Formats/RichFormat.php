@@ -182,6 +182,25 @@ class RichFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
+    public function parseImageAttributes(string $content): array {
+        $urls = [];
+
+        try {
+            $embeds = $this->parseEmbedsOfType($content, ImageEmbed::class);
+
+            /** @var ImageEmbed $imageEmbed */
+            foreach ($embeds as $imageEmbed) {
+                $urls[] = $imageEmbed->getUrl();
+            }
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
+        }
+        return $urls;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function parseAttachments(string $content): array {
         $attachments = [];
 

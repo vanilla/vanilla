@@ -1794,20 +1794,6 @@ if (!function_exists('write_ini_file')) {
     }
 }
 
-if (!function_exists('accessibleLabel')) {
-    /**
-     * Provides an accessible context for clickable items, so they can make sense out of context.
-     *
-     * @param string $template The text template
-     * @param array $data The placeholder data
-     * @return string
-     */
-    function accessibleLabel($template, $data) {
-        return htmlspecialchars(sprintf(t($template), ...$data));
-    }
-}
-
-
 if (!function_exists('headingTag')) {
     /**
      * Keeps track of heading level for main area. Does not track panels or other peripheral regions.

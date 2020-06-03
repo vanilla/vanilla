@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('AdminCheck')) {
     /**
@@ -69,7 +71,7 @@ if (!function_exists('BookmarkButton')) {
         // Bookmark link
         $isBookmarked = $discussion->Bookmarked == '1';
         $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+        $accessibleLabel= @HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
 
         return anchor(
             $title,
@@ -225,7 +227,7 @@ if (!function_exists('WriteDiscussion')) :
                             anchor(htmlspecialchars($discussion->Category),
                             categoryUrl($discussion->CategoryUrlCode)),
                             'span',
-                            ['class' => 'MItem Category '.$category['CssClass'], "aria-label" => accessibleLabel($template, $accessibleVars)]
+                            ['class' => 'MItem Category '.$category['CssClass'], "aria-label" => @HtmlUtils::accessibleLabel($template, $accessibleVars)]
                         );
                     }
                     $sender->fireEvent('DiscussionMeta');
@@ -369,7 +371,7 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+        $accessibleLabel= @HtmlUtils::accessibleLabel('%s for discussion: "%s"', [sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
 
         return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
 

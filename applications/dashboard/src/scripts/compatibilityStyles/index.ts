@@ -191,6 +191,7 @@ compatibilityStyles = useThemeCache(() => {
 
     // Items
     const resultVars = searchResultsVariables();
+
     const horizontalPadding = resultVars.spacing.padding.left + resultVars.spacing.padding.right;
     cssOut(`.DataList, .Item-Header`, {
         marginLeft: unit(-resultVars.spacing.padding.left),
@@ -200,8 +201,8 @@ compatibilityStyles = useThemeCache(() => {
     cssOut(`.DataList .Item`, {
         borderTop: singleBorder(),
         borderBottom: singleBorder(),
-        ...margins(resultVars.spacing.margin),
-        ...paddings(resultVars.spacing.padding),
+        ...margins(formVars.lists.spacing.margin),
+        ...paddings(formVars.lists.spacing.padding),
     });
 
     cssOut(`.DataList .Item + .Item`, {

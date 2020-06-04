@@ -532,7 +532,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
         $columnNames = [
-            'Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Points',
+            'Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Visits', 'Points',
             'InviteUserID', 'InvitedByName', 'Location', 'Roles'
         ];
 
@@ -546,6 +546,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 'inet6_ntoa(u.LastIPAddress)',
                 'u.CountDiscussions',
                 'u.CountComments',
+                'u.CountVisits',
                 'u.Points',
                 'u.InviteUserID',
                 'u2.Name as InvitedByName',

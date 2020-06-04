@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('AdminCheck')) {
     /**
@@ -40,12 +42,10 @@ if (!function_exists('AdminCheck')) {
                 else
                     $itemSelected = '';
 
-                $result = <<<EOT
-<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" value="{$discussion->DiscussionID}" $itemSelected /></span>
-EOT;
+                $result = '<span class="AdminCheck"><input type="checkbox" name="DiscussionID[]" aria-label="' . t('Select Discussion') . '" value="' . $discussion->DiscussionID . '" $itemSelected /></span>';
             }
         } else {
-            $result = '<span class="AdminCheck"><input type="checkbox" name="Toggle" /></span>';
+            $result = '<span class="AdminCheck"><input type="checkbox" aria-label="' . t('Select Discussion') . '" name="Toggle" /></span>';
         }
 
         if ($wrap) {
@@ -69,12 +69,15 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $isBookmarked = $discussion->Bookmarked == '1';
+        $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
+        $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+
         return anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
             'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            ['title' => $title, 'aria-label' => $accessibleLabel]
         );
     }
 }
@@ -90,7 +93,8 @@ if (!function_exists('CategoryLink')) :
     function categoryLink($discussion, $prefix = ' ') {
         $category = CategoryModel::categories(val('CategoryID', $discussion));
         if ($category) {
-            return wrap($prefix.anchor(htmlspecialchars($category['Name']), $category['Url']), 'span', ['class' => 'MItem Category']);
+            $accessibleLabel= HtmlUtils::accessibleLabel('Category: "%s"', [is_array($category) ? $category["Name"] : $category->Name]);
+            return wrap($prefix.anchor(htmlspecialchars($category['Name'], ["aria-label" => $accessibleLabel]), $category['Url']), 'span', ['class' => 'MItem Category']);
         }
     }
 
@@ -120,6 +124,9 @@ if (!function_exists('WriteDiscussion')) :
         $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
         $category = CategoryModel::categories($discussion->CategoryID);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
+
 
         if ($session->UserID) {
             $discussionUrl .= '#latest';
@@ -191,27 +198,47 @@ if (!function_exists('WriteDiscussion')) :
              ?></span>
                     <?php
                     echo newComments($discussion);
+                    $layout = c('Vanilla.Categories.Layout');
 
                     $sender->fireEvent('AfterCountMeta');
 
+                    $discussionName = is_array($discussion) ? $discussion['Name'] : $discussion->Name;
+
                     if ($discussion->LastCommentID != '') {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, 'html').'</span>';
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, "html").'</span>';
+                        $userName = $last->Name;
+
+                        if ($layout !== "mixed") {
+                            $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
+                            $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussionName, $userName];
+                        } else {
+                            $template = t('Category: "%s"');
+                            $accessibleVars = [$discussion->Category];
+                        }
+
                     } else {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, 'html');
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, "html");
                         if ($source = val('Source', $discussion)) {
                             echo ' '.sprintf(t('via %s'), t($source.' Source', $source));
                         }
                         echo '</span> ';
+                        $template = t('User "%s" started discussion "%s" on date %s');
+                        $userName = $first->Name;
+                        $accessibleVars = [$userName, $discussionName, $dateTimeFormatter->formatDate($discussion->FirstDate, false)];
                     }
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
                         CategoryModel::checkPermission($category, 'Vanilla.Discussions.View')) {
-
+                        $accessibleAttributes = ["tabindex" => "0", "aria-label" => HtmlUtils::accessibleLabel($template, $accessibleVars)];
+                        if ($layout === "mixed") { // The links to categories are duplicates and have no accessible value
+                            $accessibleAttributes['tabindex'] = "-1";
+                            $accessibleAttributes['aria-hidden'] = "true";
+                        }
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),
-                            categoryUrl($discussion->CategoryUrlCode)),
+                                categoryUrl($discussion->CategoryUrlCode), $accessibleAttributes),
                             'span',
                             ['class' => 'MItem Category '.$category['CssClass']]
                         );
@@ -358,6 +385,7 @@ if (!function_exists('tag')) :
             $cssClass = "Tag-$code";
 
         return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'">'.t($code).'</span> ';
+
     }
 endif;
 
@@ -418,7 +446,7 @@ if (!function_exists('writeFilterTabs')) :
             if ($sender->CanEditDiscussions) {
                 ?>
                 <span class="Options"><span class="AdminCheck">
-                    <input type="checkbox" name="Toggle"/>
+                    <input type="checkbox" aria-label="<?php echo t('Select Discussion') ?>" name="Toggle"/>
                 </span></span>
             <?php } ?>
             <ul>

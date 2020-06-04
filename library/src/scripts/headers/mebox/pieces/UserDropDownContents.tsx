@@ -39,7 +39,7 @@ function UserDropDownContents(props: IProps) {
     const classesDropDown = dropDownClasses();
 
     return (
-        <div className={classNames(classesDropDown.verticalPadding, props.className)}>
+        <ul className={classNames(classesDropDown.verticalPadding, props.className)}>
             <DropDownUserCard className="userDropDown-userCard" />
             <DropDownItemSeparator />
             <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
@@ -87,7 +87,7 @@ function UserDropDownContents(props: IProps) {
                 <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
             </Permission>
             <DropDownItemLink to={signOutUrl} name={t("Sign Out")} />
-        </div>
+        </ul>
     );
 }
 

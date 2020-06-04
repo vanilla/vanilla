@@ -184,6 +184,8 @@ if (!function_exists('writePromotedContentRow')):
         $userPhoto = val('PhotoUrl', $author);
         $cssClass = val('CssClass', $author);
 
+        $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$categoryName]);
+
         if ($view == 'table') {
             ?>
             <tr id="Promoted_<?php echo $type.'_'.$id; ?>" class="Item PromotedContent-Item <?php echo $cssClass; ?>">
@@ -192,7 +194,7 @@ if (!function_exists('writePromotedContentRow')):
                         <a class="Title" href="<?php echo $url; ?>">
                             <?php echo $title; ?>
                         </a>
-                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>"
+                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>" aria-label="<?php echo $accessibleLabel; ?>"
                                                                                class="MItem-CategoryName"><?php echo $categoryName; ?></a></span>
 
                         <div class="Description"><?php echo $body; ?></div>
@@ -231,7 +233,7 @@ if (!function_exists('writePromotedContentRow')):
                     <div class="Meta">
                         <span class="MItem DiscussionAuthor"><ahref="<?php echo $userUrl; ?>
                             "><?php echo $username; ?></a></span>
-                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>"
+                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>" aria-label="<?php echo $accessibleLabel; ?>"
                                                                                class="MItem-CategoryName"><?php echo $categoryName; ?></a></span>
                     </div>
                 </div>

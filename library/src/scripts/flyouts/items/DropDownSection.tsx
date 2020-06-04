@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import DropDownItem from "@library/flyouts/items/DropDownItem";
 import Heading from "@library/layout/Heading";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -29,20 +28,19 @@ export default class DropDownSection extends React.Component<IProps> {
         const sectionNavTitle = uniqueIDFromPrefix("sectionNavTitle");
         return (
             <>
-                {!this.props.noSeparator && <hr className={classes.separator} />}
-                <nav
-                    className={classNames("dropDown-section", classes.section, this.props.className)}
-                    aria-describedby={sectionNavTitle}
-                >
-                    <Heading
-                        id={sectionNavTitle}
-                        title={this.props.title}
-                        className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
-                    />
-                    <ul className={classNames("dropDown-sectionContents", classes.sectionContents)}>
-                        {this.props.children}
-                    </ul>
-                </nav>
+                {!this.props.noSeparator && <DropDownItemSeparator />}
+                <li className={classNames("dropDown-section", classes.section, this.props.className)}>
+                    <nav aria-describedby={sectionNavTitle}>
+                        <Heading
+                            id={sectionNavTitle}
+                            title={this.props.title}
+                            className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
+                        />
+                        <ul className={classNames("dropDown-sectionContents", classes.sectionContents)}>
+                            {this.props.children}
+                        </ul>
+                    </nav>
+                </li>
             </>
         );
     }

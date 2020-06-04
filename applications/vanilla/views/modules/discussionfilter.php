@@ -1,8 +1,7 @@
 <?php
+if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
-
-if (!defined('APPLICATION')) exit();
 
 $Controller = Gdn::controller();
 $Session = Gdn::session();

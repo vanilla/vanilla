@@ -1,4 +1,7 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {

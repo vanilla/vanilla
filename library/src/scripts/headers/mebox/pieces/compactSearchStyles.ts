@@ -5,10 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit, modifyColorBasedOnLightness, IButtonStates } from "@library/styles/styleHelpers";
+import { colorOut, unit, modifyColorBasedOnLightness, borders, EMPTY_BORDER } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, important, percent, px, rgba } from "csx";
+import { important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -61,7 +61,8 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
     const fgColor = isTransparentButton ? colors.contrast : colors.fg;
     const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
 
-    const inputAndButton = makeThemeVars("inputAndButton", {
+    const borders = makeThemeVars("borders", {
+        ...EMPTY_BORDER,
         borderRadius: globalVars.border.radius,
     });
 
@@ -100,7 +101,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
             },
             radius: {
                 left: important(0),
-                right: important(unit(inputAndButton.borderRadius) as string),
+                right: important(unit(borders.borderRadius) as string),
             },
         },
         fonts: {
@@ -158,7 +159,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         },
     });
 
-    return { colors, inputAndButton, searchBar, searchButton, backgrounds };
+    return { colors, borders, searchBar, searchButton, backgrounds };
 });
 
 export const compactSearchClasses = useThemeCache(() => {
@@ -215,6 +216,7 @@ export const compactSearchClasses = useThemeCache(() => {
             justifyContent: "center",
             width: percent(100),
             position: "relative",
+            ...borders(vars.borders),
         },
         mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),

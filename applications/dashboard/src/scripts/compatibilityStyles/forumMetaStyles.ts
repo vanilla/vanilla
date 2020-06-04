@@ -42,7 +42,7 @@ export const forumMetaCSS = () => {
         .DataList .Meta
     `,
         {
-            color: colorOut(globalVars.meta.colors.fg),
+            color: colorOut(globalVars.meta.text.color),
             fontSize: unit(globalVars.meta.text.fontSize),
         },
     );

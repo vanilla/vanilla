@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
@@ -87,6 +87,11 @@ export default function DropDown(props: IDropDownProps) {
     const ownButtonRef = useRef<HTMLButtonElement>(null);
     const openDirection = resolveOpenDirection(props, props.buttonRef || ownButtonRef);
 
+    // IDs unique to the component instance.
+    const ID = useUniqueID("flyout");
+    const handleID = ID + "-handle";
+    const contentID = ID + "-contents";
+
     return (
         <FlyoutToggle
             id={id}
@@ -103,12 +108,14 @@ export default function DropDown(props: IDropDownProps) {
             openAsModal={openAsModal}
             initialFocusElement={props.initialFocusElement}
             tag={props.tag}
+            handleID={handleID}
+            contentID={contentID}
         >
             {params => {
                 return (
                     <DropDownContents
                         {...params}
-                        id={id + "-handle"}
+                        id={contentID}
                         parentID={id}
                         className={classNames(props.contentsClassName)}
                         renderLeft={[DropDownOpenDirection.ABOVE_LEFT, DropDownOpenDirection.BELOW_LEFT].includes(

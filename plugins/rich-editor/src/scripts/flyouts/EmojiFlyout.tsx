@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -15,8 +14,8 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EmojiIcon } from "@library/icons/editorIcons";
-import { visibility } from "@library/styles/styleHelpersVisibility";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
     disabled?: boolean;
@@ -27,7 +26,7 @@ interface IProps {
 
 export default class EmojiFlyout extends React.Component<IProps> {
     private titleRef = React.createRef<HTMLElement>();
-    private id = uniqueIDFromPrefix("emojiPopover");
+    private id = useUniqueID("emojiPopover");
 
     /**
      * @inheritDoc
@@ -35,6 +34,8 @@ export default class EmojiFlyout extends React.Component<IProps> {
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const label = t("Emoji Picker");
+        const handleID = this.id + "-handle";
+        const contentID = this.id + "-content";
         return (
             <FlyoutToggle
                 id={this.id}
@@ -54,6 +55,8 @@ export default class EmojiFlyout extends React.Component<IProps> {
                 renderLeft={this.props.renderLeft}
                 openAsModal={false}
                 initialFocusElement={this.titleRef.current}
+                handleID={handleID}
+                contentID={contentID}
             >
                 {(options: IFlyoutToggleChildParameters) => {
                     return (

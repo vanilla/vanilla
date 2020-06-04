@@ -11,12 +11,11 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { isAllowedUrl, t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
-import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -34,7 +33,7 @@ export default function EmbedFlyout(props: IProps) {
     const { quill, legacyMode } = useEditor();
     const inputRef = useRef<HTMLInputElement>(null);
     const embedModule = useMemo(() => quill && quill.getModule("embed/insertion"), [quill]);
-    const id = useMemo(() => uniqueIDFromPrefix("embedPopover"), []);
+    const id = useUniqueID("embedPopover");
     const titleID = id + "-title";
     const descriptionID = id + "-description";
 

@@ -93,7 +93,8 @@ if (!function_exists('CategoryLink')) :
     function categoryLink($discussion, $prefix = ' ') {
         $category = CategoryModel::categories(val('CategoryID', $discussion));
         if ($category) {
-            return wrap($prefix.anchor(htmlspecialchars($category['Name']), $category['Url']), 'span', ['class' => 'MItem Category']);
+            $accessibleLabel= HtmlUtils::accessibleLabel('Category: "%s"', [is_array($category) ? $category["Name"] : $category->Name]);
+            return wrap($prefix.anchor(htmlspecialchars($category['Name'], ["aria-label" => $accessibleLabel]), $category['Url']), 'span', ['class' => 'MItem Category']);
         }
     }
 
@@ -206,8 +207,15 @@ if (!function_exists('WriteDiscussion')) :
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, "html").'</span>';
                         $userName = $last->Name;
-                        $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
-                        $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussionName, $userName];
+
+                        if (c('Vanilla.Categories.Layout') !== "mixed") {
+                            $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
+                            $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussionName, $userName];
+                        } else {
+                            $template = t('Category: "%s"');
+                            $accessibleVars = [$discussion->Category];
+                        }
+
                     } else {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, "html");
@@ -222,12 +230,11 @@ if (!function_exists('WriteDiscussion')) :
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
                         CategoryModel::checkPermission($category, 'Vanilla.Discussions.View')) {
-
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),
-                            categoryUrl($discussion->CategoryUrlCode)),
+                                categoryUrl($discussion->CategoryUrlCode), ["aria-label" => HtmlUtils::accessibleLabel($template, $accessibleVars)]),
                             'span',
-                            ['class' => 'MItem Category '.$category['CssClass'], "aria-label" => HtmlUtils::accessibleLabel($template, $accessibleVars)]
+                            ['class' => 'MItem Category '.$category['CssClass']]
                         );
                     }
                     $sender->fireEvent('DiscussionMeta');
@@ -371,9 +378,7 @@ if (!function_exists('tag')) :
         if (!$cssClass)
             $cssClass = "Tag-$code";
 
-        $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [sprintf('Tagged with "%s"', t($code)), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
-
-        return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'" aria-label="' . $accessibleLabel . '">'.t($code).'</span> ';
+        return ' <span class="Tag '.$cssClass.'" title="'.htmlspecialchars(t($code)).'">'.t($code).'</span> ';
 
     }
 endif;

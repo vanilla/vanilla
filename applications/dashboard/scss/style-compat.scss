@@ -50,6 +50,6 @@ $staticVariables: true;
 @import "../../../library/src/scss/userContent/animations";
 @import "../../../library/src/scss/userContent/lists";
 
-body:not(.dashboard):not(.Dashboard) svg {
+body:not(.dashboard) svg {
     pointer-events: none !important;
 }

@@ -198,6 +198,7 @@ if (!function_exists('WriteDiscussion')) :
              ?></span>
                     <?php
                     echo newComments($discussion);
+                    $layout = c('Vanilla.Categories.Layout');
 
                     $sender->fireEvent('AfterCountMeta');
 
@@ -208,7 +209,7 @@ if (!function_exists('WriteDiscussion')) :
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, "html").'</span>';
                         $userName = $last->Name;
 
-                        if (c('Vanilla.Categories.Layout') !== "mixed") {
+                        if ($layout !== "mixed") {
                             $template = t('Most recent comment on date %s, in discussion "%s", by user "%s"');
                             $accessibleVars = [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussionName, $userName];
                         } else {
@@ -230,9 +231,14 @@ if (!function_exists('WriteDiscussion')) :
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
                         CategoryModel::checkPermission($category, 'Vanilla.Discussions.View')) {
+                        $accessibleAttributes = ["tabindex" => "0", "aria-label" => HtmlUtils::accessibleLabel($template, $accessibleVars)];
+                        if ($layout === "mixed") { // The links to categories are duplicates and have no accessible value
+                            $accessibleAttributes['tabindex'] = "-1";
+                            $accessibleAttributes['aria-hidden'] = "true";
+                        }
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),
-                                categoryUrl($discussion->CategoryUrlCode), ["aria-label" => HtmlUtils::accessibleLabel($template, $accessibleVars)]),
+                                categoryUrl($discussion->CategoryUrlCode), $accessibleAttributes),
                             'span',
                             ['class' => 'MItem Category '.$category['CssClass']]
                         );

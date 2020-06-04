@@ -21,7 +21,8 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                 <?php echo getOptions($Category); ?>
                 <h2 class="H">
                     <?php
-                        echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category));
+                        $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$Category->Name]);
+                        echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category), ["aria-label" => $accessibleLabel]);
                         Gdn::controller()->EventArguments['Category'] = $Category;
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                     ?>

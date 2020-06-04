@@ -577,8 +577,11 @@ class Gdn_Form extends Gdn_Pluggable {
         // Write out the category options.
         $enableHeadings = $options['EnableHeadings'] ?? false;
         if (is_array($safeCategoryData)) {
-            $categoryNames = array_column($safeCategoryData, 'Name');
-            array_multisort($categoryNames, SORT_NATURAL, $safeCategoryData);
+            usort($safeCategoryData, function (array $a, array $b) {
+                if ($a['ParentCategoryID'] !== -1 && $b['ParentCategoryID'] !== -1 && $a['ParentCategoryID'] === $b['ParentCategoryID']) {
+                    return ($a['Name'] > $b['Name']) ? +1 : -1;
+                }
+            });
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
                 $isHeading = ($depth == 1 && $doHeadings) || $category['DisplayAs'] !== 'Discussions' || !$category['AllowDiscussions'];

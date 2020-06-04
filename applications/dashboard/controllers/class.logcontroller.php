@@ -410,6 +410,9 @@ class LogController extends DashboardController {
 //      }
         $this->LogModel->recalculate();
 
+        // Clear LogCount's cache
+        $this->LogModel::clearOperationCountCache('spam');
+
         $this->setData('Complete');
         $this->setData('Count', count($logs));
         $this->render('Blank', 'Utility');

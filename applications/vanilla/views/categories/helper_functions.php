@@ -1,6 +1,6 @@
 <?php
-
 if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
 

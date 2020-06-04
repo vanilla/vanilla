@@ -6,6 +6,7 @@
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
 
 export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables();
@@ -27,6 +28,29 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 right: "initial",
                 bottom: "initial",
                 left: "initial",
+            },
+        },
+        colors: {
+            backgroundColor: "transparent",
+            backgroundColorRead: "transparent",
+        },
+        text: {
+            title: {
+                colors: {
+                    noState: "",
+                    focus: "",
+                    hover: "",
+                    active: "",
+                },
+            },
+            meta: {
+                colors: {
+                    noState: colorOut(globalVars.mainColors.fg),
+                    focus: colorOut(globalVars.links.colors.focus),
+                    keyboardFocus: colorOut(globalVars.links.colors.keyboardFocus),
+                    hover: colorOut(globalVars.links.colors.hover),
+                    active: colorOut(globalVars.links.colors.active),
+                },
             },
         },
     });

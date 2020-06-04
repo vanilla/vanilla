@@ -164,6 +164,7 @@ compatibilityStyles = useThemeCache(() => {
         `,
         {
             color: fg,
+            fontSize: vars.fonts.size.large,
         },
     );
 
@@ -203,6 +204,7 @@ compatibilityStyles = useThemeCache(() => {
         borderBottom: singleBorder(),
         ...margins(formVars.lists.spacing.margin),
         ...paddings(formVars.lists.spacing.padding),
+        backgroundColor: formVars.lists.colors.backgroundColor,
     });
 
     cssOut(`.DataList .Item + .Item`, {
@@ -347,7 +349,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Item.Read`, {
-        background: "none",
+        backgroundColor: formVars.lists.colors.backgroundColorRead,
     });
 
     cssOut(".Bullet, .QuickSearch", {

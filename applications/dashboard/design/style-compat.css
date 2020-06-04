@@ -2135,7 +2135,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 5px 0;
 }
 
-svg {
+body:not(.dashboard) svg {
   pointer-events: none !important;
 }
 

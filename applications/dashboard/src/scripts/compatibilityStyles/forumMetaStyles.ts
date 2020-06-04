@@ -14,6 +14,7 @@ import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { forumVariables } from "@library/forums/forumStyleVars";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
@@ -78,22 +79,22 @@ export const forumMetaCSS = () => {
             const linkStates = allLinkStates(
                 {
                     noState: {
-                        color: colorOut(globalVars.mainColors.fg),
+                        color: forumVariables().lists.text.meta.colors.noState,
                     },
                     hover: {
-                        color: colorOut(globalVars.links.colors.hover),
+                        color: forumVariables().lists.text.meta.colors.hover,
                         textDecoration: "underline",
                     },
                     focus: {
-                        color: colorOut(globalVars.links.colors.focus),
+                        color: forumVariables().lists.text.meta.colors.focus,
                         textDecoration: "underline",
                     },
                     keyboardFocus: {
-                        color: colorOut(globalVars.links.colors.keyboardFocus),
+                        color: forumVariables().lists.text.meta.colors.keyboardFocus,
                         textDecoration: "underline",
                     },
                     active: {
-                        color: colorOut(globalVars.links.colors.active),
+                        color: forumVariables().lists.text.meta.colors.active,
                         textDecoration: "underline",
                     },
                 },

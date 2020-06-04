@@ -7,6 +7,7 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+use Vanilla\Utility\HtmlUtils;
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
 $Discussion = $this->data('Discussion');

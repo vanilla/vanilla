@@ -257,6 +257,7 @@
 
 .OptionsTitle {
     @include sr-only;
+    font-size: inherit !important; // The title will be properly hidden with the sr-only mixin, but it needs a font size to be detectable by the screen reader.
 }
 
 .SocialIcon {

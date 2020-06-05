@@ -2,12 +2,13 @@
 /** @var DropdownModule $dropdown */
 $dropdown = $this;
 $trigger = $dropdown->getTrigger();
+$optionText = t('Options');
+$accessibleLabel = !empty($trigger['text']) ? $trigger['text'] : $optionText;
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
     if (($trigger['type'] ?? '') === 'button') :
-        $optionText = t('Options');
-    ?><span class="Button-Options">
+    ?><span class="Button-Options" tabindex="0" aria-label="<?php echo $accessibleLabel; ?>">
         <span class="OptionsTitle" title="<?php echo $optionText; ?>">
-            <?php echo !empty($trigger['text']) ? $trigger['text'] : $optionText; ?>
+            <?php echo $accessibleLabel; ?>
         </span>
         <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     </span>

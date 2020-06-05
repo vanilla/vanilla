@@ -9,15 +9,19 @@ import { TabsTypes } from "@library/sectioning/TabsTypes";
 
 interface IData {
     label: string;
-    panelData: string;
     contents: React.ReactNode;
     error?: React.ReactNode;
     warning?: React.ReactNode;
     disabled?: boolean;
+    [extra: string]: any;
 }
 interface IProps {
     data: IData[];
     tabType?: TabsTypes;
+    largeTabs?: boolean;
+    extendContainer?: boolean;
+    onChange?: (newTab: IData) => void;
+    extraButtons?: React.ReactNode;
 }
 
 export function Tabs(props: IProps) {
@@ -27,9 +31,10 @@ export function Tabs(props: IProps) {
 
     return (
         <ReachTabs
-            className={classes.root}
+            className={classes.root(props.extendContainer)}
             onChange={index => {
                 setActiveTab(index);
+                props.onChange?.(props.data[index]);
             }}
         >
             <TabList className={classes.tabList}>
@@ -38,7 +43,7 @@ export function Tabs(props: IProps) {
                     return (
                         <Tab
                             key={index}
-                            className={classNames(classes.tab, { [classes.isActive]: isActive })}
+                            className={classNames(classes.tab(props.largeTabs), { [classes.isActive]: isActive })}
                             disabled={tab.disabled}
                         >
                             <div>{tab.label}</div>
@@ -56,6 +61,7 @@ export function Tabs(props: IProps) {
                         </Tab>
                     );
                 })}
+                {props.extraButtons && <div className={classes.extraButtons}>{props.extraButtons}</div>}
             </TabList>
             <TabPanels className={classes.tabPanels}>
                 {data.map((tab, index) => {

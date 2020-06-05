@@ -19,7 +19,6 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
-    contentID: string;
     handleID: string;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
@@ -28,10 +27,9 @@ export interface IFlyoutToggleChildParameters {
 }
 
 interface IProps {
-    name?: string;
     id: string;
+    name?: string;
     contentID: string;
-    handleID: string;
     className?: string;
     buttonContents: React.ReactNode;
     disabled?: boolean;
@@ -51,7 +49,7 @@ interface IProps {
 }
 
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement, onVisibilityChange, onClose, id, handleID, contentID } = props;
+    const { initialFocusElement, onVisibilityChange, onClose, id, contentID } = props;
 
     // Focus management & visibility
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -130,7 +128,7 @@ export default function FlyoutToggle(props: IProps) {
     /**
      * Stop click propagation outside the flyout
      */
-    const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
+    const handleBlockEventPropagation = useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
     }, []);
 
@@ -158,9 +156,8 @@ export default function FlyoutToggle(props: IProps) {
     }, []);
 
     const childrenData: IFlyoutToggleChildParameters = {
-        id: id,
-        handleID: handleID,
-        contentID: contentID,
+        id: contentID,
+        handleID: id,
         isVisible: !!isVisible,
         closeMenuHandler,
         renderAbove: props.renderAbove,
@@ -173,15 +170,14 @@ export default function FlyoutToggle(props: IProps) {
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            id={id}
             className={classNames(classesDropDown, props.className, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
-            onClick={handleBlockEventPropogation}
+            onClick={handleBlockEventPropagation}
         >
             <Button
-                id={handleID}
+                id={id}
                 className={buttonClasses}
                 title={props.name}
                 aria-label={"name" in props ? props.name : undefined}

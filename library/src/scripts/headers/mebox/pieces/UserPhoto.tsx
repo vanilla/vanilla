@@ -10,6 +10,7 @@ import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles"
 import classNames from "classnames";
 import { UserIcon } from "@library/icons/titleBar";
 import { t } from "@vanilla/i18n/src";
+import { accessibleLabel } from "@library/utility/appUtils";
 
 export enum UserPhotoSize {
     SMALL = "small",
@@ -50,7 +51,7 @@ export class UserPhoto extends React.Component<IProps> {
                     <img
                         src={photoUrl}
                         title={name || ""}
-                        alt={encodeURI(t(`User: "%s"`).replace("%s", name))}
+                        alt={accessibleLabel(`User: "%s"`, name)}
                         className={classNames("userPhoto-photo", classes.photo)}
                     />
                 )}

@@ -4,21 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useRef } from "react";
-import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
-import Heading from "@library/layout/Heading";
+import React, { useRef } from "react";
 import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
-import FlexSpacer from "@library/layout/FlexSpacer";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import SmartAlign from "@library/layout/SmartAlign";
-import CloseButton from "@library/navigation/CloseButton";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
-import { props } from "bluebird";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 
@@ -94,7 +88,7 @@ export default function DropDown(props: IDropDownProps) {
 
     return (
         <FlyoutToggle
-            id={id}
+            id={handleID}
             className={classNames(props.className)}
             buttonBaseClass={props.buttonBaseClass || ButtonTypes.ICON}
             name={props.name!}
@@ -108,7 +102,6 @@ export default function DropDown(props: IDropDownProps) {
             openAsModal={openAsModal}
             initialFocusElement={props.initialFocusElement}
             tag={props.tag}
-            handleID={handleID}
             contentID={contentID}
         >
             {params => {
@@ -116,7 +109,6 @@ export default function DropDown(props: IDropDownProps) {
                     <DropDownContents
                         {...params}
                         id={contentID}
-                        parentID={id}
                         className={classNames(props.contentsClassName)}
                         renderLeft={[DropDownOpenDirection.ABOVE_LEFT, DropDownOpenDirection.BELOW_LEFT].includes(
                             openDirection,

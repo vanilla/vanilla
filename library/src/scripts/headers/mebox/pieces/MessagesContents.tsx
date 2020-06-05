@@ -12,11 +12,11 @@ import Loader from "@library/loaders/Loader";
 import { buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import apiv2 from "@library/apiv2";
-import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { t } from "@library/utility/appUtils";
+import { accessibleLabel, t } from "@library/utility/appUtils";
 import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -26,7 +26,6 @@ import { IConversation, GetConversationsExpand } from "@library/@types/api/conve
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
 import { ComposeIcon } from "@library/icons/titleBar";
-import Translate from "@library/content/Translate";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -130,7 +129,7 @@ function mapStateToProps(state: IConversationsStoreState) {
                 countMessages: conversation.countMessages,
                 message: messageDoc.body.textContent || "",
                 photo: conversation.lastMessage!.insertUser.photoUrl || null,
-                photoAlt: encodeURI(t(`User: "%s"`).replace("%s", conversation.lastMessage!.insertUser.name)),
+                photoAlt: accessibleLabel(`User: "%s"`, conversation.lastMessage!.insertUser.name)!,
                 to: conversation.url,
                 recordID: conversation.conversationID,
                 timestamp: conversation.lastMessage!.dateInserted,

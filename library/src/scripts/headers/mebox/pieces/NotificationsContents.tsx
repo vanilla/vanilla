@@ -22,7 +22,7 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { t } from "@library/utility/appUtils";
+import { accessibleLabel, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
@@ -157,6 +157,7 @@ function mapStateToProps(state: INotificationsStoreState) {
                       return {
                           message: notification.body,
                           photo: notification.photoUrl || null,
+                          photoAlt: accessibleLabel(t(`User: "%s"`), notification.activityName),
                           to: notification.url,
                           recordID: notification.notificationID,
                           timestamp: notification.dateUpdated,

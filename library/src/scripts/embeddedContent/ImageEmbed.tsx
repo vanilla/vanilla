@@ -16,6 +16,7 @@ import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { t } from "@vanilla/i18n/src";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { accessibleLabel } from "@library/utility/appUtils";
 
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
@@ -41,7 +42,7 @@ export function ImageEmbed(props: IProps) {
                     aria-describedby={descriptionID}
                     className={classNames("embedImage-img", FOCUS_CLASS)}
                     src={props.url}
-                    alt={props.name}
+                    alt={accessibleLabel(t(`User: "%s"`), props.name)}
                     tabIndex={props.inEditor ? -1 : undefined}
                 />
             </div>

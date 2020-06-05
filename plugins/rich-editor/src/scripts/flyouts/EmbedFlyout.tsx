@@ -98,13 +98,14 @@ export default function EmbedFlyout(props: IProps) {
         }
     }
 
+    const title = t("Insert Media");
+
     return (
         <>
             <DropDown
                 id={id}
-                name={t("Insert Media")}
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
-                title={t("Insert Media")}
+                title={title}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
                 buttonContents={
@@ -123,7 +124,7 @@ export default function EmbedFlyout(props: IProps) {
                 <Frame
                     body={
                         <FrameBody>
-                            <p className={style({ marginTop: 6, marginBottom: 6 })}>
+                            <p id={descriptionID} className={style({ marginTop: 6, marginBottom: 6 })}>
                                 {t("Paste the URL of the media you want.")}
                             </p>
                             <input
@@ -134,7 +135,7 @@ export default function EmbedFlyout(props: IProps) {
                                 value={url}
                                 onChange={inputChangeHandler}
                                 onKeyDown={buttonKeyDownHandler}
-                                aria-labelledby={titleID}
+                                aria-label={title}
                                 aria-describedby={descriptionID}
                                 ref={inputRef}
                             />

@@ -12,7 +12,6 @@ import MeBoxDropDownItem, {
 } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import classNames from "classnames";
-import Translate from "@library/content/Translate";
 
 export interface ITitleBarNavProps {
     className?: string;

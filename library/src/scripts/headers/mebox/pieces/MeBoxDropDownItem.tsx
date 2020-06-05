@@ -26,7 +26,8 @@ export interface IMeBoxItem {
     className?: string;
     message: string;
     photo: string | null;
-    photoAlt?: string;
+    photoAlt: string;
+    activityName?: string;
     recordID: number;
     timestamp: string;
     to: string;
@@ -50,7 +51,7 @@ type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
  */
 export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
-        const { unread, message, timestamp, to } = this.props;
+        const { unread, message, timestamp, to, photoAlt, photo } = this.props;
         const classesMeBoxMessage = meBoxMessageClasses();
         const classesMetas = metasClasses();
 
@@ -71,18 +72,16 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
             }
         }
 
+        console.log("YO MAN, ", photoAlt);
+
         return (
             <li className={classNames("meBoxMessage", this.props.className, classesMeBoxMessage.root)}>
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
                     <div className={classesMeBoxMessage.imageContainer}>
-                        {this.props.photo ? (
-                            <img
-                                className={classesMeBoxMessage.image}
-                                src={this.props.photo}
-                                alt={this.props.photoAlt}
-                            />
+                        {photo ? (
+                            <img className={classesMeBoxMessage.image} src={photo} alt={photoAlt} />
                         ) : (
-                            <NoUserPhotoIcon className={classesMeBoxMessage.image} />
+                            <NoUserPhotoIcon className={classesMeBoxMessage.image} photoAlt={photoAlt} />
                         )}
                     </div>
                     <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>

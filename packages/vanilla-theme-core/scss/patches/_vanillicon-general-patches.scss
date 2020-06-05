@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+@import "../../../../library/src/scss/mixins/mixin.utilities";
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -254,7 +256,7 @@
 }
 
 .OptionsTitle {
-    display: none;
+    @include sr-only;
 }
 
 .SocialIcon {

@@ -4,9 +4,10 @@ $dropdown = $this;
 $trigger = $dropdown->getTrigger();
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
     if (($trigger['type'] ?? '') === 'button') :
+        $optionText = t('Options');
     ?><span class="Button-Options">
-        <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
-            <?php echo $trigger['text']; ?>
+        <span class="OptionsTitle" title="<?php echo $optionText; ?>">
+            <?php echo !empty($trigger['text']) ? $trigger['text'] : $optionText; ?>
         </span>
         <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     </span>

@@ -98,13 +98,13 @@ interface FormatInterface {
     public function parseImageUrls(string $content): array;
 
     /**
-     * Parse image attributes out of the post contents.
+     * Parse image data from post content.
      *
      * @param string $content
      *
      * @return string[]
      */
-    public function parseImageAttributes(string $content): array;
+    public function parseImages(string $content): array;
 
     /**
      * Parse out a list of usernames mentioned in the post contents.

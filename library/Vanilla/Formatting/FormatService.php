@@ -144,10 +144,10 @@ class FormatService {
      *
      * @return string[]
      */
-    public function parseImageAttributes(string $content, ?string $format): array {
+    public function parseImages(string $content, ?string $format): array {
         return $this
             ->getFormatter($format)
-            ->parseImageAttributes($content);
+            ->parseImages($content);
     }
 
     /**

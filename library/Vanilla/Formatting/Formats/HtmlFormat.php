@@ -168,8 +168,8 @@ class HtmlFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function parseImageAttributes(string $content): array {
-        return [];
+    public function parseImages(string $content): array {
+        return ["ImageUrls" => parseImageUrls($content), "ImageAttrs" => []];
     }
 
     /**

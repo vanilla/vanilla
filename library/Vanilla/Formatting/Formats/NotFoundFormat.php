@@ -102,7 +102,7 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function parseImageAttributes(string $content): array {
+    public function parseImages(string $content): array {
         return [];
     }
 

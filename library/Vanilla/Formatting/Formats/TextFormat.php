@@ -74,7 +74,7 @@ class TextFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
-    public function parseImageAttributes(string $content): array {
+    public function parseImages(string $content): array {
         return [];
     }
 

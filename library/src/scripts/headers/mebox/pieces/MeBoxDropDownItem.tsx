@@ -26,6 +26,7 @@ export interface IMeBoxItem {
     className?: string;
     message: string;
     photo: string | null;
+    photoAlt?: string;
     recordID: number;
     timestamp: string;
     to: string;
@@ -75,7 +76,11 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
                     <div className={classesMeBoxMessage.imageContainer}>
                         {this.props.photo ? (
-                            <img className={classesMeBoxMessage.image} src={this.props.photo} />
+                            <img
+                                className={classesMeBoxMessage.image}
+                                src={this.props.photo}
+                                alt={this.props.photoAlt}
+                            />
                         ) : (
                             <NoUserPhotoIcon className={classesMeBoxMessage.image} />
                         )}

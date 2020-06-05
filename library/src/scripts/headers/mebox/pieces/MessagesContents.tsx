@@ -26,6 +26,7 @@ import { IConversation, GetConversationsExpand } from "@library/@types/api/conve
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
 import { ComposeIcon } from "@library/icons/titleBar";
+import Translate from "@library/content/Translate";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -123,11 +124,13 @@ function mapStateToProps(state: IConversationsStoreState) {
             conversation.participants.forEach(participant => {
                 authors.push(participant.user);
             });
+
             data.push({
                 authors,
                 countMessages: conversation.countMessages,
                 message: messageDoc.body.textContent || "",
                 photo: conversation.lastMessage!.insertUser.photoUrl || null,
+                photoAlt: encodeURI(t(`User: "%s"`).replace("%s", conversation.lastMessage!.insertUser.name)),
                 to: conversation.url,
                 recordID: conversation.conversationID,
                 timestamp: conversation.lastMessage!.dateInserted,

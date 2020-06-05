@@ -102,7 +102,7 @@ interface FormatInterface {
      *
      * @param string $content
      *
-     * @return string[]
+     * @return array
      */
     public function parseImages(string $content): array;
 

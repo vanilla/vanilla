@@ -142,7 +142,7 @@ class FormatService {
      * @param string $content
      * @param string|null $format The format of the content.
      *
-     * @return string[]
+     * @return array
      */
     public function parseImages(string $content, ?string $format): array {
         return $this

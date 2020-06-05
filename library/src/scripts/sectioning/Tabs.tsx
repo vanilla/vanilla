@@ -22,11 +22,12 @@ interface IProps {
     extendContainer?: boolean;
     onChange?: (newTab: IData) => void;
     extraButtons?: React.ReactNode;
+    defaultTabIndex?: number;
 }
 
 export function Tabs(props: IProps) {
-    const { data, tabType } = props;
-    const [activeTab, setActiveTab] = useState(0);
+    const { data, tabType, defaultTabIndex } = props;
+    const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
     const classes = tabType && tabType === TabsTypes.BROWSE ? tabBrowseClasses() : tabStandardClasses();
 
     return (

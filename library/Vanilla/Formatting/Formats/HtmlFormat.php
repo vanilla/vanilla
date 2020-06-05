@@ -166,6 +166,13 @@ class HtmlFormat extends BaseFormat {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function parseImageAttributes(string $content): array {
+        return [];
+    }
+
+    /**
      * Apply HTML processors.
      *
      * @param string $content

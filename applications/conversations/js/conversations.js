@@ -116,7 +116,8 @@ jQuery(document).ready(function($) {
                minChars: 1,
                zindex: 9999,
                prePopulate: author,
-               animateDropdown: false
+               animateDropdown: false,
+               ariaLabel: gdn.definition("Users"),
            });
       });
    };

@@ -72,8 +72,6 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
             }
         }
 
-        console.log("YO MAN, ", photoAlt);
-
         return (
             <li className={classNames("meBoxMessage", this.props.className, classesMeBoxMessage.root)}>
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>

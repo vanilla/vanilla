@@ -117,7 +117,7 @@ jQuery(document).ready(function($) {
                zindex: 9999,
                prePopulate: author,
                animateDropdown: false,
-               ariaLabel: gdn.definition("Users"),
+               ariaLabel: window.gdn.translate("Users"),
            });
       });
    };

@@ -48,7 +48,7 @@ var discussionTagging = {
                 tokenLimit: maxTags,
                 zindex: 3000,
                 allowTabOut: true,
-                ariaLabel: gdn.definition("Tag"),
+                ariaLabel: gdn.translate("Tag"),
             });
 
             // Show available link

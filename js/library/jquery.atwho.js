@@ -530,7 +530,7 @@
         this.app = app;
         this.at = at;
         this.$inputor = this.app.$inputor;
-        this.id = this.$inputor[0].id || uuid();
+        this.id = this.$inputor[0].id ? (this.$inputor[0].id + "-" + uuid()) : uuid();
         this.setting = null;
         this.query = null;
         this.pos = 0;

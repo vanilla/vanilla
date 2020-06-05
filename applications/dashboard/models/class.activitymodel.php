@@ -2326,7 +2326,7 @@ class ActivityModel extends Gdn_Model {
                 "allowNull" => true,
                 "type" => "string",
             ],
-            "activityName" => ["type" => "string"],
+            "activityName?" => ["type" => "string"],
             "url" => ["type" => "string"],
             "dateInserted" => ["type" => "datetime"],
             "dateUpdated" => ["type" => "datetime"],

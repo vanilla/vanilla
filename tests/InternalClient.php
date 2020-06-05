@@ -28,6 +28,11 @@ class InternalClient extends HttpClient {
     private $userID = self::DEFAULT_USER_ID;
 
     /**
+     * @var int
+     */
+    private $activityName;
+
+    /**
      * @var string
      */
     private $transientKey;
@@ -158,6 +163,15 @@ class InternalClient extends HttpClient {
      */
     public function getUserID() {
         return $this->userID;
+    }
+
+    /**
+     * Get the user ID that will be used to make requests.
+     *
+     * @return int Returns the activityName.
+     */
+    public function getActivityName() {
+        return $this->activityName;
     }
 
     /**

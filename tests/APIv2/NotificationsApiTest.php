@@ -32,6 +32,7 @@ class NotificationsApiTest extends AbstractAPIv2Test {
             "Emailed" => ActivityModel::SENT_PENDING,
             "NotifyUserID" => $this->api()->getUserID(),
             "Notified" => ActivityModel::SENT_PENDING,
+            "activityName" => $this->api()->getActivityName(),
         ]);
         return $result;
     }

@@ -42,7 +42,7 @@ class ApiUtilsTest extends SharedBootstrapTestCase {
             'parameter:s' => [
                 'x-filter' => [
                     'field' => 'FilterFieldName',
-                    'processor' => function($fieldName, $value) {
+                    'processor' => function ($fieldName, $value) {
                         return [$fieldName.'Processed' => $value.'Processed'];
                     }
                 ],
@@ -89,5 +89,36 @@ class ApiUtilsTest extends SharedBootstrapTestCase {
         ]);
 
         ApiUtils::queryToFilters($schema, ['parameter' => 'test']);
+    }
+
+    /**
+     * Do a basic test of the page header parsing functionality.
+     */
+    public function testParsePageHeader() {
+        $link = <<<EOT
+<http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1>; rel="first",
+<http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="next",
+<http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="last"
+EOT;
+
+        $expected = array (
+            'first' => 'http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1',
+            'next' => 'http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1',
+            'last' => 'http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1',
+        );
+
+        $actual = ApiUtils::parsePageHeader($link);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * A garbled link header should just return null.
+     */
+    public function testParsePageHeaderNull() {
+        $link = 'garbled';
+        $actual = ApiUtils::parsePageHeader($link);
+
+        $this->assertNull($actual);
     }
 }

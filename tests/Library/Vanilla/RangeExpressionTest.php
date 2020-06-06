@@ -239,4 +239,33 @@ class RangeExpressionTest extends TestCase {
         $actual = RangeExpression::parse('..a')->__toString();
         $this->assertSame('<=a', $actual);
     }
+
+    /**
+     * Zeros can be an edge case because they are empty.
+     */
+    public function testZeroRange(): void {
+        $actual = RangeExpression::parse('[0,0]');
+        $this->assertSame('0', $actual->getValues()['>=']);
+        $this->assertSame('0', $actual->getValues()['<=']);
+    }
+
+    /**
+     * Whitespace should be trimmed.
+     */
+    public function testWhitespace(): void {
+        $actual = RangeExpression::parse('( 0 , 1 )');
+        $this->assertSame('0', $actual->getValues()['>']);
+        $this->assertSame('1', $actual->getValues()['<']);
+    }
+
+    /**
+     * Just whitespace shouldn't be evaluated to a range.
+     */
+    public function testJustWhitespace(): void {
+        $actual = RangeExpression::parse('(0, )');
+        $this->assertArrayNotHasKey('<', $actual->getValues());
+
+        $actual = RangeExpression::parse('( ,1)');
+        $this->assertArrayNotHasKey('>', $actual->getValues());
+    }
 }

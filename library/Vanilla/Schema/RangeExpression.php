@@ -62,11 +62,11 @@ EOT;
 
     private const REGEX_RANGE = <<<EOT
 `
-^([[(])?        # Left bracket
-([^.,]+)?       # From
-(?:\.\.\.?|,)   # Separator
-([^.,\]\)]+)?   # To
-([)\]])?        # Right bracket
+^([[(])?\s*         # Left bracket
+([^.,\s]+)?           # From
+\s*(?:\.\.\.?|,)\s* # Separator
+([^.,\]\)\s]+)?       # To
+\s*([)\]])?            # Right bracket
 `
 mx
 EOT;
@@ -146,18 +146,18 @@ EOT;
             // This is a range expression (ex. '1..10', '(1,5]', '2020-05-01..2020-05-14)')
             [$_, $left, $from, $to, $right] = $m + array_fill(0, 5, '');
 
-            if (empty($from) && empty($to)) {
+            if ($from === '' && $to === '') {
                 throw self::createValidationException('At least one value in the range is required.');
             }
 
             $args = [];
-            if (!empty($from)) {
+            if ($from !== '') {
                 $from = self::validateValue($from, $valueSchema, $validation, 'from');
                 $args[] = $left ?: '>=';
                 $args[] = $from;
             }
 
-            if (!empty($to)) {
+            if ($to !== '') {
                 $to = self::validateValue($to, $valueSchema, $validation, 'to');
                 $args[] = $right ?: '<=';
                 $args[] = $to;

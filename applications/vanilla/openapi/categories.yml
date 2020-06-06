@@ -365,14 +365,11 @@ paths:
         in: query
         name: expand
         schema:
-          oneOf:
-            - type: array
-            - type: boolean
           items:
             enum:
-            - breadcrumbs
-            - parent
-            - all
+              - breadcrumbs
+              - parent
+              - all
             type: string
       responses:
         '200':

@@ -482,9 +482,9 @@ class CategoryModel extends Gdn_Model {
     /**
      * Get a list of IDs of categories visible to the current user.
      *
-     * @see CategoryModel::categoryWatch
-     * @param array $options Options compatible with CategoryModel::getVisibleCategories
+     * @param array $options Options compatible with `CategoryModel::getVisibleCategories()`.
      * @return array|bool An array of filtered category IDs or true if no categories were filtered.
+     * @see CategoryModel::categoryWatch
      */
     public function getVisibleCategoryIDs(array $options = []) {
         $categoryModel = self::instance();

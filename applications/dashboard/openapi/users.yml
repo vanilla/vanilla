@@ -39,7 +39,7 @@ paths:
           format: date-filter
           type: string
       - name: userID
-        description: One or more user IDs to lookup.
+        description: Filter by a range or CSV of user IDs.
         in: query
         schema:
           $ref: '#/components/schemas/RangeExpression'

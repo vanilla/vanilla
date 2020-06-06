@@ -4,28 +4,29 @@ paths:
   /categories:
     get:
       parameters:
-      - description: |
-          Parent category ID.
+      - name: categoryID
+        description: Filter by a range or CSV of category IDs.
+        in: query
+        schema:
+          $ref: '#/components/schemas/RangeExpression'
+      - description: Parent category ID.
         in: query
         name: parentCategoryID
         schema:
           type: integer
-      - description: |
-          Parent category URL code.
+      - description: Parent category URL code.
         in: query
         name: parentCategoryCode
         schema:
           type: string
-      - description: |
-          Only list categories followed by the current user.
+      - description: Only list categories followed by the current user.
         in: query
         name: followed
         required: true
         schema:
           default: false
           type: boolean
-      - description: |+
-
+      - description: The maximum tree depth to return when getting a tree structure.
         in: query
         name: maxDepth
         schema:
@@ -42,17 +43,7 @@ paths:
           default: false
           type: boolean
         allowEmptyValue: true
-      - description: >
-          Page number. Works with flat and followed categories. See <a
-          rel="nofollow"
-          href="https://docs.vanillaforums.com/apiv2/#pagination">Pagination</a>
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query

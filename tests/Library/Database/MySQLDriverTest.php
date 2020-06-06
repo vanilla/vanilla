@@ -266,6 +266,7 @@ EOT;
             'basic' => [new RangeExpression('>', 1), 'where `b` > :b'],
             'two values' => [new RangeExpression('>=', 1, '<=', 2), 'where `b` >= :b and `b` <= :b0'],
             'in clause' => [new RangeExpression('=', [1, 2]), "where `b` in ('1', '2')"],
+            'empty equals' => [new RangeExpression('=', []), "where 1 = 0"]
         ];
         return $r;
     }

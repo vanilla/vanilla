@@ -384,6 +384,11 @@ EOT;
                     break;
                 case '=':
                     $value = array_intersect((array)$value, (array)$range->getValue($op));
+                    if (count($value) === 1) {
+                        $value = array_pop($value);
+                    } else {
+                        $value = array_values($value);
+                    }
                     break;
             }
             $range->addValue($op, $value);

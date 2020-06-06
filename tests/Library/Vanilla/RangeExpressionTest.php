@@ -268,4 +268,63 @@ class RangeExpressionTest extends TestCase {
         $actual = RangeExpression::parse('( ,1)');
         $this->assertArrayNotHasKey('>', $actual->getValues());
     }
+
+    /**
+     * The value wither should return a new instance with the new value set.
+     */
+    public function testWithValue(): void {
+        $r1 = RangeExpression::parse('[1,2]');
+        $r2 = $r1->withValue('<=', 3);
+        $this->assertNotSame($r1, $r2);
+        $this->assertSame('1..3', (string)$r2);
+    }
+
+    /**
+     * Adding a filtered value should add it alongside other values.
+     */
+    public function testWithFilteredValueDifferent(): void {
+        $r1 = new RangeExpression('=', 1);
+        $r2 = $r1->withFilteredValue('>', 5);
+        $this->assertNotSame($r1, $r2);
+        $this->assertSame(1, $r2->getValue('='));
+        $this->assertSame(5, $r2->getValue('>'));
+    }
+
+    /**
+     * Test `RangeExpression::withFilteredValue()`.
+     *
+     * @param string $op
+     * @param mixed $value
+     * @param mixed $expected
+     * @dataProvider provideFilterValueMergeTests
+     */
+    public function testWithFilteredValueMerge(string $op, $value, $expected): void {
+        $r1 = new RangeExpression($op, 5);
+        $r2 = $r1->withFilteredValue($op, $value);
+        $this->assertSame(1, count($r2->getValues()), "The new value isn't supposed to add an operator");
+        $this->assertSame($expected, $r2->getValue($op));
+    }
+
+    /**
+     * Provide filter merge test data.
+     *
+     * @return array
+     */
+    public function provideFilterValueMergeTests(): array {
+        $r = [
+            'no change >' => ['>', 4, 5],
+            'no change >=' => ['>=', 4, 5],
+            'no change <' => ['<', 6, 5],
+            'no change <=' => ['<=', 6, 5],
+
+            'change >' => ['>', 6, 6],
+            'change >=' => ['>=', 6, 6],
+            'change <' => ['<', 4, 4],
+            'change <=' => ['<=', 4, 4],
+
+            'intersect' => ['=', [4, 5, 6], 5],
+            'empty' => ['=', [4, 6], []],
+        ];
+        return $r;
+    }
 }

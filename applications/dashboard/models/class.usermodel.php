@@ -3031,7 +3031,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     public function searchCount($filter = '') {
         if (is_array($filter)) {
             $where = $filter;
-            $keywords = $where['Keywords'] ?: '';
+            $keywords = $where['Keywords'] ?? '';
             unset($where['Keywords'], $where['Optimize']);
         } else {
             $keywords = $filter;

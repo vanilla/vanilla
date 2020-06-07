@@ -254,18 +254,27 @@ final class ArrayUtils {
     }
 
     /**
-     * @param array $arr1
-     * @param array $arr2
-     * @param callable|null $numeric
+     * Recursively merge two arrays with special handling for numeric arrays.
+     *
+     * This method is very similar to `array_merge_recursive()` however it allows you to customize the handling of
+     * numeric array merging. This is handy when you do have some nested numeric arrays because you rerely want the
+     * behavior of `array_merge_recursive()` when dealing with JSON style model data.
+     *
+     * @param array $arr1 The first array.
+     * @param array $arr2 The second array. This array will overwrite the first array when keys match.
+     * @param callable|null $numeric The merge function to use when numeric arrays are encountered.
+     * If you don't supply a callback then the arrays will be uniquely merged. If you want to supply a callback you can
+     * look at the default definition at the top of the method.
      * @return array
      */
     public static function arrayMergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
         if ($numeric === null) {
-            $numeric = function (array $arr1, array $arr2, $key): array {
+            $numeric = function (array $arr1, array $arr2, string $key): array {
                 return array_values(array_unique(array_merge($arr1, $arr2)));
             };
         }
 
+        // Do a full replace to simplify some of the walking logic.
         // For the purposes of this method, replace is the same as merge, but presumably faster.
         $arr = array_replace_recursive($arr1, $arr2);
 
@@ -287,9 +296,6 @@ final class ArrayUtils {
                             $clean($value, $arr1[$key] ?? null, $arr2[$key] ?? null);
                         }
                     }
-                } elseif (is_array($value)) {
-                    // Here we recurse to child arrays.
-//                    $clean($value, $arr1[$key] ?? null, $arr2[$key] ?? null);
                 }
             }
         };

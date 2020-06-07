@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f38cf22ccd5598e9d6107eed948d33ff",
+    "content-hash": "75fdc0c886fe8e83c005b18a1b707b3b",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -261,12 +261,6 @@
                 "uri-template",
                 "url",
                 "ws"
-            ],
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/nyamsprod",
-                    "type": "github"
-                }
             ],
             "time": "2020-03-17T14:40:17+00:00"
         },
@@ -4230,7 +4224,7 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v4.4.8",
+            "version": "v4.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
@@ -4314,8 +4308,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
@@ -4398,16 +4392,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.1.7",
+            "version": "4.7.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59"
+                "reference": "804aca422f1fe0104b1320ca09fd06cd0062782c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/935663ebc6917f4db45c7e613b5e8cb84cabac59",
-                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/804aca422f1fe0104b1320ca09fd06cd0062782c",
+                "reference": "804aca422f1fe0104b1320ca09fd06cd0062782c",
                 "shasum": ""
             },
             "require": {
@@ -4415,13 +4409,13 @@
                 "ext-libxml": "*",
                 "ext-simplexml": "*",
                 "php": ">=7.0.0",
-                "symfony/css-selector": "~3.0|~4.0"
+                "symfony/css-selector": "~3.0 || ~4.0 || ~5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0"
+                "phpunit/phpunit": "~6.0 || ~7.0"
             },
             "suggest": {
-                "voku/portable-utf8": "~4.0"
+                "voku/portable-utf8": "If you need e.g. UTF-8 fixed output."
             },
             "type": "library",
             "autoload": {
@@ -4435,14 +4429,14 @@
             ],
             "authors": [
                 {
-                    "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/",
-                    "role": "Developer"
-                },
-                {
                     "name": "dimabdc",
                     "email": "support@titor.ru",
                     "homepage": "http://github.com/dimabdc",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Lars Moelleken",
+                    "homepage": "http://www.moelleken.org/",
                     "role": "Developer"
                 }
             ],
@@ -4453,7 +4447,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2018-10-17T19:23:47+00:00"
+            "time": "2020-04-09T21:20:43+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -4525,6 +4519,5 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    },
-    "plugin-api-version": "1.1.0"
+    }
 }

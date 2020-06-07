@@ -334,9 +334,6 @@ class ArrayUtilsTest extends TestCase {
             'mismatch' => [
                 ['a' => ['a']], ['a' => 'a'], ['a' => 'a']
             ],
-            'root numeric' => [
-                ['a', 'b'], ['a', 'c'], ['a', 'b', 'c']
-            ],
         ];
         return $r;
     }

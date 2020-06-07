@@ -47,7 +47,7 @@
         "ramsey/uuid": "^3.0",
         "smarty/smarty": "~3.1",
         "symfony/polyfill-intl-idn": "^1.12",
-        "symfony/yaml": "^3.2",
+        "symfony/yaml": "^4.4",
         "tburry/pquery": "~1.1",
         "vanilla/garden-container": "^3.0.3",
         "vanilla/garden-http": "~2.1",

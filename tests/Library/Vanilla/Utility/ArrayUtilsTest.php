@@ -305,6 +305,11 @@ class ArrayUtilsTest extends TestCase {
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
     public function provideArrayMergeRecursiveTests(): array {
         $r = [
             'overwrite' => [

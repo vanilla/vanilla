@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f38cf22ccd5598e9d6107eed948d33ff",
+    "content-hash": "255b3e0e4ccfc1ae87e9604dc5f8233e",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -261,12 +261,6 @@
                 "uri-template",
                 "url",
                 "ws"
-            ],
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/nyamsprod",
-                    "type": "github"
-                }
             ],
             "time": "2020-03-17T14:40:17+00:00"
         },
@@ -4314,8 +4308,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
@@ -4349,16 +4343,16 @@
         },
         {
             "name": "voku/html-min",
-            "version": "3.0.5",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/HtmlMin.git",
-                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13"
+                "reference": "8031ec46a08e8d7ee0dcb5c7edd426c914d5385c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/58d870b95ca52bc9f55f91baed784556c2ca4a13",
-                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13",
+                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/8031ec46a08e8d7ee0dcb5c7edd426c914d5385c",
+                "reference": "8031ec46a08e8d7ee0dcb5c7edd426c914d5385c",
                 "shasum": ""
             },
             "require": {
@@ -4367,7 +4361,7 @@
                 "voku/simple_html_dom": "^4.1.7"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0"
+                "phpunit/phpunit": "~6.0 || ~7.0"
             },
             "type": "library",
             "autoload": {
@@ -4394,7 +4388,7 @@
                 "html",
                 "minifier"
             ],
-            "time": "2018-10-17T19:56:12+00:00"
+            "time": "2018-12-27T14:56:57+00:00"
         },
         {
             "name": "voku/simple_html_dom",
@@ -4525,6 +4519,5 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    },
-    "plugin-api-version": "1.1.0"
+    }
 }

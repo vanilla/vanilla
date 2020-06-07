@@ -92,7 +92,10 @@ class OpenAPIBuilderTest extends TestCase {
                 ['parameters' => [['name' => 'a', 'e' => [1]]]],
                 ['parameters' => [['name' => 'b'], ['name' => 'a', 'e' => [2]]]],
                 ['parameters' => [['name' => 'a', 'e' => [1, 2]], ['name' => 'b']]],
-            ]
+            ],
+            'required' => [
+                ['required' => ['a', 'c']], ['required' => ['a', 'b']], ['required' => ['a', 'c', 'b']]
+            ],
         ];
         return $r;
     }

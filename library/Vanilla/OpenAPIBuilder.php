@@ -72,6 +72,12 @@ class OpenAPIBuilder {
                     $r = array_unique(array_merge($arr1, $arr2));
                     sort($r);
                     break;
+                case 'parameters':
+                    // Parameters work a lot like associative arrays, but have to be made that way.
+                    $arr1 = array_column($arr1, null, 'name');
+                    $arr2 = array_column($arr2, null, 'name');
+                    $r = array_values(self::mergeSchemas($arr1, $arr2));
+                    break;
                 default:
                     $r = array_merge($arr1, $arr2);
             }

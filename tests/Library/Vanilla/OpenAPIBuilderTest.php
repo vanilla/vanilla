@@ -89,9 +89,9 @@ class OpenAPIBuilderTest extends TestCase {
                 ['enum' => ['a', 'c']], ['enum' => ['a', 'b']], ['enum' => ['a', 'b', 'c']]
             ],
             'parameters' => [
-                ['parameters' => [['name' => 'a']]],
-                ['parameters' => [['name' => 'b']]],
-                ['parameters' => [['name' => 'a'], ['name' => 'b']]],
+                ['parameters' => [['name' => 'a', 'e' => [1]]]],
+                ['parameters' => [['name' => 'b'], ['name' => 'a', 'e' => [2]]]],
+                ['parameters' => [['name' => 'a', 'e' => [1, 2]], ['name' => 'b']]],
             ]
         ];
         return $r;

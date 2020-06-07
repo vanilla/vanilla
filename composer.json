@@ -41,7 +41,7 @@
         "firebase/php-jwt": "^5.2",
         "michelf/php-markdown": "~1.9",
         "pclzip/pclzip": "~2.0",
-        "phpmailer/phpmailer": "~5.2",
+        "phpmailer/phpmailer": "~6.1",
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
         "ramsey/uuid": "^3.0",

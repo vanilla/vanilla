@@ -60,11 +60,12 @@ class OpenAPIBuilder {
      * @return array
      */
     public static function mergeSchemas(array $schema1, array $schema2): array {
-        // This method is on the conservative side. It has a whitelist of known numeric keys and their behavior.
-        // Everything else uses plain old `array_replace_recursive()`.
+        // This callback is on the conservative side. It has a whitelist of known numeric keys and their behavior.
+        // Everything else uses plain old `array_merge()`.
         $merge = function (array $arr1, array $arr2, string $key) {
             switch ($key) {
                 case 'required':
+                    // Don't sort required because it's often in a logical order already.
                     $r = array_values(array_unique(array_merge($arr1, $arr2)));
                     break;
                 case 'enum':

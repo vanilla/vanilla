@@ -280,4 +280,64 @@ class ArrayUtilsTest extends TestCase {
         $this->expectExceptionMessage('expects argument 1 to be an array or array-like object');
         ArrayUtils::keys("foo");
     }
+
+    /**
+     * Test `ArrayUtils::ArrayMergeRecursiveFancy()`.
+     *
+     * @param array $arr1
+     * @param array $arr2
+     * @param array $expected
+     * @dataProvider provideArrayMergeRecursiveTests
+     */
+    public function testArrayMergeRecursiveFancy(array $arr1, array $arr2, array $expected): void {
+        $tree = function (array &$arr) {
+            $arr['child'] = $arr;
+            unset($arr['child']['child']);
+        };
+        $tree($arr1);
+        $tree($arr2);
+        $tree($expected);
+
+        $actual = ArrayUtils::arrayMergeRecursive($arr1, $arr2);
+
+        ksort($actual);
+        ksort($expected);
+        $this->assertSame($expected, $actual);
+    }
+
+    public function provideArrayMergeRecursiveTests(): array {
+        $r = [
+            'overwrite' => [
+                ['a' => 'a'], ['a' => 'b'], ['a' => 'b']
+            ],
+            'just 1' => [
+                ['a' => 'a'], [], ['a' => 'a']
+            ],
+            'just 2' => [
+                [], ['a' => 'a'], ['a' => 'a']
+            ],
+            'numeric' => [
+                ['a' => ['a', 'b']], ['a' => ['a', 'c']], ['a' => ['a', 'b', 'c']]
+            ],
+            'just recurse 1' => [
+                ['a' => ['b' => 'c']], [], ['a' => ['b' => 'c']]
+            ],
+            'just recurse 2' => [
+                [], ['a' => ['b' => 'c']], ['a' => ['b' => 'c']]
+            ],
+            'empty numeric' => [
+                ['a' => []], ['a' => ['a']], ['a' => ['a']]
+            ],
+            'numeric empty' => [
+                ['a' => ['a']], ['a' => []], ['a' => ['a']]
+            ],
+            'mismatch' => [
+                ['a' => ['a']], ['a' => 'a'], ['a' => 'a']
+            ],
+            'root numeric' => [
+                ['a', 'b'], ['a', 'c'], ['a', 'b', 'c']
+            ],
+        ];
+        return $r;
+    }
 }

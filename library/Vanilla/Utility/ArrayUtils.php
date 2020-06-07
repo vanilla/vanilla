@@ -252,4 +252,49 @@ final class ArrayUtils {
         self::assertArray($array, __METHOD__.'() expects argument 1 to be an array or array-like object.');
         $m($array, []);
     }
+
+    /**
+     * @param array $arr1
+     * @param array $arr2
+     * @param callable|null $numeric
+     * @return array
+     */
+    public static function arrayMergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
+        if ($numeric === null) {
+            $numeric = function (array $arr1, array $arr2, $key): array {
+                return array_values(array_unique(array_merge($arr1, $arr2)));
+            };
+        }
+
+        // For the purposes of this method, replace is the same as merge, but presumably faster.
+        $arr = array_replace_recursive($arr1, $arr2);
+
+        $clean = function (array &$arr, array $arr1, array $arr2) use (&$clean, $numeric) {
+            foreach ($arr as $key => &$value) {
+                // Do both array's have the key. This would indicate this is a replace operation.
+                if (isset($arr1[$key]) && isset($arr2[$key])) {
+                    $v1 = $arr1[$key];
+                    $v2 = $arr2[$key];
+
+                    // Are both numeric array's.
+                    if (is_array($v1) && is_array($v2)) {
+                        if (isset($v1[0]) && (isset($v2[0]) || empty($v2))) {
+                            // This is the case where you have a numeric array replacing the other.
+                            // We rarely want that.
+                            $value = $numeric($v1, $v2, $key);
+                        } else {
+                            // Here we recurse to child arrays.
+                            $clean($value, $arr1[$key] ?? null, $arr2[$key] ?? null);
+                        }
+                    }
+                } elseif (is_array($value)) {
+                    // Here we recurse to child arrays.
+//                    $clean($value, $arr1[$key] ?? null, $arr2[$key] ?? null);
+                }
+            }
+        };
+        $clean($arr, $arr1, $arr2);
+
+        return $arr;
+    }
 }

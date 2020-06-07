@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f38cf22ccd5598e9d6107eed948d33ff",
+    "content-hash": "753660f2722874875f2a1d9c61bf17a3",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -261,12 +261,6 @@
                 "uri-template",
                 "url",
                 "ws"
-            ],
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/nyamsprod",
-                    "type": "github"
-                }
             ],
             "time": "2020-03-17T14:40:17+00:00"
         },
@@ -1740,20 +1734,20 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.10.2",
+            "version": "v2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "dded82253087836adc8c3274f75dcad185f10f67"
+                "reference": "17da87a83d15d45cfedc4d27cf800618160e1cbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/dded82253087836adc8c3274f75dcad185f10f67",
-                "reference": "dded82253087836adc8c3274f75dcad185f10f67",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/17da87a83d15d45cfedc4d27cf800618160e1cbf",
+                "reference": "17da87a83d15d45cfedc4d27cf800618160e1cbf",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6.0"
+                "php": ">=7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^6"
@@ -1775,7 +1769,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2019-12-01T20:32:59+00:00"
+            "time": "2019-03-03T13:29:22+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -4314,8 +4308,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
@@ -4525,6 +4519,5 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    },
-    "plugin-api-version": "1.1.0"
+    }
 }

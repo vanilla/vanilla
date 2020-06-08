@@ -13,7 +13,7 @@ use DOMNode;
  *
  * @package Vanilla\Utility
  */
-class HtmlSnippet  extends \DOMDocument {
+class HtmlSnippet extends \DOMDocument {
 
     const CONTENT_ID = '__contentID';
 

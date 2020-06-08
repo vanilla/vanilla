@@ -712,12 +712,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param string $exceptionMatch Exception string to match.
      * @param int $exceptionType Type of block exception.
+     * @throws Exception
      */
     public function addBlockException(string $exceptionMatch, int $exceptionType) {
         $allowedExceptionTypes = [self::BLOCK_NEVER, self::BLOCK_PERMISSION, self::BLOCK_ANY];
-        if (in_array($exceptionType, $allowedExceptionTypes)) {
-            $this->blockExceptions[$exceptionMatch] = $exceptionType;
+        if (!in_array($exceptionType, $allowedExceptionTypes)) {
+            throw new Exception('Exception type could not be found');
         }
+        $this->blockExceptions[$exceptionMatch] = $exceptionType;
     }
 
     /**

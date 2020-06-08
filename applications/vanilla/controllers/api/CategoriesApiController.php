@@ -335,7 +335,7 @@ class CategoriesApiController extends AbstractApiController {
             $where = [
                 'categoryID' => $range,
             ];
-            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'categoryID');
         } elseif ($query['followed'] ?? false) {
             $where = ['Followed' => true];
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
@@ -649,9 +649,9 @@ class CategoriesApiController extends AbstractApiController {
      * @param int|null $offset
      * @return array
      */
-    private function getCategoriesWhere(array $where, $limit, $offset): array {
+    private function getCategoriesWhere(array $where, $limit, $offset, $order = ''): array {
         $categories = $this->categoryModel
-            ->getWhere($where, '', 'asc', $limit, $offset)
+            ->getWhere($where, $order, '', $limit, $offset)
             ->resultArray();
 
         // Index by ID for category calculation functions.

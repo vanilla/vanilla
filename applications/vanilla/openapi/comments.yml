@@ -26,6 +26,16 @@ paths:
           default: '30'
           maximum: 100
           minimum: 1
+      - name: sort
+        description: Sort the results.
+        in: query
+        schema:
+            type: string
+            enum:
+              - dateInserted
+              - commentID
+              - -dateInserted
+              - -commentID
       - description: |
           Filter by author.
         in: query

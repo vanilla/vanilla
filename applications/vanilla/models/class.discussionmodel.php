@@ -914,7 +914,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function addFieldPrefix($fieldName, $prefix = 'd') {
         // Make sure there aren't any ambiguous discussion references.
         if (strpos($fieldName, '.') === false) {
-            $fieldName = $prefix.'.'.$fieldName;
+            $fieldName = ($fieldName[0] === '-' ? '-' : '').$prefix.'.'.ltrim($fieldName, '-');
         }
         return $fieldName;
     }
@@ -1303,9 +1303,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $wheres SQL conditions.
      * @param int $offset The number of records to skip.
      * @param int $limit The number of records to limit the query to.
+     * @param string[] $orderBy An array of column names for sorting.
      * @return object SQL result.
      */
-    public function getAnnouncements($wheres = '', $offset = 0, $limit = false) {
+    public function getAnnouncements($wheres = '', $offset = 0, $limit = false, array $orderBy = null) {
 
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
@@ -1391,9 +1392,13 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $this->SQL->limit($limit, $offset);
 
-        $orderBy = $this->getOrderBy();
+        $orderBy = $orderBy ?? $this->getOrderBy();
         foreach ($orderBy as $field => $direction) {
-            $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
+            if (is_numeric($field)) {
+                $this->SQL->orderBy($this->addFieldPrefix($direction));
+            } else {
+                $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
+            }
         }
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('beforeGetAnnouncements');

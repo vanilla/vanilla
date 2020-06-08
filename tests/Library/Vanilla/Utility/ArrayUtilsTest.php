@@ -298,7 +298,7 @@ class ArrayUtilsTest extends TestCase {
         $tree($arr2);
         $tree($expected);
 
-        $actual = ArrayUtils::arrayMergeRecursive($arr1, $arr2);
+        $actual = ArrayUtils::mergeRecursive($arr1, $arr2);
 
         ksort($actual);
         ksort($expected);

@@ -85,7 +85,7 @@ class OpenAPIBuilder {
             return $r;
         };
 
-        $schema1 = ArrayUtils::arrayMergeRecursive($schema1, $schema2, $merge);
+        $schema1 = ArrayUtils::mergeRecursive($schema1, $schema2, $merge);
         return $schema1;
     }
 

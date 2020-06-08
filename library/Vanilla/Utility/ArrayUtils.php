@@ -267,7 +267,7 @@ final class ArrayUtils {
      * look at the default definition at the top of the method.
      * @return array
      */
-    public static function arrayMergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
+    public static function mergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
         if ($numeric === null) {
             $numeric = function (array $arr1, array $arr2, string $key): array {
                 return array_values(array_unique(array_merge($arr1, $arr2)));

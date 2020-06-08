@@ -142,7 +142,7 @@ class CategoryModel extends Gdn_Model {
      */
     private static function loadAllCategories() {
         // Try and get the categories from the cache.
-        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
+//        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
         $rebuild = true;
 
         // If we received a valid data structure, extract the embedded expiry
@@ -173,6 +173,32 @@ class CategoryModel extends Gdn_Model {
 
                 self::$Categories = array_merge([], $sql->get()->resultArray());
                 self::$Categories = Gdn_DataSet::index(self::$Categories, 'CategoryID');
+
+                // Alphabetize the child categories if the parent is set to DisplayAs => 'Flat'
+                $flatCategories = [];
+                foreach (self::$Categories as $CategoryID => $cat) {
+                    if ($cat['DisplayAs'] === 'Flat') {
+                        $flatCategories[] = $CategoryID;
+                    }
+                }
+
+                if (count($flatCategories) > 0) {
+                    foreach ($flatCategories as $flatCat) {
+                        $toAlphabetize = array_filter(self::$Categories, function ($a) use ($flatCat) {
+                            return $a['ParentCategoryID'] === $flatCat;
+                        });
+                        usort($toAlphabetize, function ($a, $b) {
+                            return $a['Name'] <=> $b['Name'];
+                        });
+                        array_splice(
+                            self::$Categories,
+                            array_search($flatCat, array_keys(self::$Categories)) + 1,
+                            count($toAlphabetize),
+                            $toAlphabetize
+                        );
+                    }
+                }
+
                 self::buildCache();
 
                 // Release lock

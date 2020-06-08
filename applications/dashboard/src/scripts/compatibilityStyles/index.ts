@@ -36,6 +36,7 @@ import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
+import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
@@ -95,7 +96,6 @@ compatibilityStyles = useThemeCache(() => {
     );
 
     cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
-        background: bg,
         color: fg,
     });
 
@@ -295,6 +295,7 @@ compatibilityStyles = useThemeCache(() => {
         .Container a.UserLink.BlockTitle
     `,
         {
+            textOverflow: "inherit",
             fontWeight: vars.fonts.weights.bold,
         },
     );
@@ -371,6 +372,7 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
+    blockColumnCSS();
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

@@ -300,7 +300,9 @@
         td.FirstUser {
             position: relative;
             margin-top: 0;
-            font-size: $global-small_fontSize;
+            @if ($staticVariables) {
+                font-size: $global-small_fontSize;
+            }
 
             a {
                 font-size: inherit;
@@ -311,10 +313,12 @@
             }
 
             .PhotoWrap {
-                position: absolute;
+                @if ($staticVariables) {
+                    position: absolute;
+                    left: 0;
+                }
                 width: $theme-photo_size;
                 height: $theme-photo_size;
-                left: 0;
                 margin: 0;
 
                 img {

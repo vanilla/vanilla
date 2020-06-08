@@ -3021,7 +3021,9 @@ tr.CategoryHeading td {
   display: block;
   font-weight: bold;
   overflow: hidden;
-  text-overflow: ellipsis;
+  @if ($staticVariables) {
+    text-overflow: ellipsis;
+  }
   white-space: nowrap;
   padding-bottom: 3px;
   font-size: 12px;

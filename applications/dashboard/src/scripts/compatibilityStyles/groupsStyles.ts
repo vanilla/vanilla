@@ -123,7 +123,6 @@ export const groupsCSS = () => {
         ...paddings({
             ...layoutVars.cell.paddings,
         }),
-        backgroundColor: "transparent",
     });
 
     cssOut(`.Groups .DataTable .Item:first-child td, .DataTable .Item:first-child td`, {

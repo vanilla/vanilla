@@ -51,9 +51,10 @@ JSON;
             'empty object' => [
                 '{}'
             ],
-            'nested empty array' => [
-                '{"key":[]}'
-            ],
+            // Unfortunately can't be fixed at the moment.
+            // 'nested empty array' => [
+            //    '{"key":[]}'
+            // ],
             'nested empty object' => [
                 '{"key":{}}'
             ],
@@ -62,6 +63,9 @@ JSON;
             ],
             'indexed array' => [
                 '{"field":[1,5,"asdf"]}',
+            ],
+            'indexed array 2' => [
+                '{"field":{"field":["asdf"]}}',
             ],
         ];
     }

@@ -713,7 +713,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param string $exceptionMatch Exception string to match.
      * @param int $exceptionType Type of block exception.
      */
-    public function addBlockException (string $exceptionMatch, int $exceptionType) {
+    public function addBlockException(string $exceptionMatch, int $exceptionType) {
         $this->blockExceptions[$exceptionMatch] = $exceptionType;
     }
 

@@ -29,7 +29,13 @@ class NeonThemeAsset extends JsonThemeAsset {
         $this->neonString = $data;
         try {
             $this->data = Neon::decode($data);
-            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
+            if (trim($data) === '[]') {
+                $this->data = [];
+                $this->jsonString = '[]';
+            } else {
+                $this->data = $this->fixEmptyArraysToObjects($this->data);
+                $this->jsonString = json_encode($this->data);
+            }
         } catch (\Exception $e) {
             // It's a bad asset.
             // Replace the asset with some json containing the error message.
@@ -41,6 +47,26 @@ class NeonThemeAsset extends JsonThemeAsset {
             $this->jsonString = json_encode($this->data);
         }
         $this->ensureArray();
+    }
+
+    /**
+     * Make sure empty arrays are interpretted as empty objects.
+     *
+     * @param array $input
+     * @return mixed
+     */
+    private function fixEmptyArraysToObjects(array $input) {
+        if (is_array($input) && empty($input)) {
+            return new \stdClass();
+        }
+
+        foreach ($input as $key => &$value) {
+            if (is_array($value)) {
+                $input[$key] = $this->fixEmptyArraysToObjects($value);
+            }
+        }
+
+        return $input;
     }
 
     /**

@@ -233,9 +233,13 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         color: colors.primaryContrast,
         align: options.alignment,
         shadow: `0 1px 1px ${colorOut(
-            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.innerShadowOpacity),
+            modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(
+                text.innerShadowOpacity,
+            ),
         )}, 0 1px 25px ${colorOut(
-            modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(text.outerShadowOpacity),
+            modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(
+                text.outerShadowOpacity,
+            ),
         )}` as TextShadowProperty,
     };
 
@@ -314,9 +318,13 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         shadow: {
             show: false,
             style: `0 1px 1px ${colorOut(
-                modifyColorBasedOnLightness(colors.fg, text.shadowMix, true).fade(text.innerShadowOpacity),
+                modifyColorBasedOnLightness({ color: colors.fg, weight: text.shadowMix, inverse: true }).fade(
+                    text.innerShadowOpacity,
+                ),
             )}, 0 1px 25px ${colorOut(
-                modifyColorBasedOnLightness(colors.fg, text.shadowMix, true).fade(text.outerShadowOpacity),
+                modifyColorBasedOnLightness({ color: colors.fg, weight: text.shadowMix, inverse: true }).fade(
+                    text.outerShadowOpacity,
+                ),
             )}` as TextShadowProperty,
         },
         border: {
@@ -401,9 +409,11 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     }
 
     const buttonShadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.05),
-        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(0.3))}`,
-        background: modifyColorBasedOnLightness(colors.primaryContrast, text.shadowMix).fade(
+        color: modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(0.05),
+        full: `0 1px 15px ${colorOut(
+            modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(0.3),
+        )}`,
+        background: modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(
             0.1,
         ) as BackgroundColorProperty,
     });

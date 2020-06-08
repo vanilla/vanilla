@@ -97,9 +97,9 @@ export const titleBarVariables = useThemeCache(() => {
 
     const signIn = makeThemeVars("signIn", {
         fg: colors.fg,
-        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.1, true),
+        bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.1, inverse: true }),
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.2, inverse: true }),
         },
     });
 
@@ -123,7 +123,7 @@ export const titleBarVariables = useThemeCache(() => {
     });
 
     const bottomRow = makeThemeVars("bottomRow", {
-        bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
+        bg: modifyColorBasedOnLightness({ color: colors.bg, weight: 0.1 }).desaturate(0.2, true),
     });
 
     return {
@@ -414,7 +414,7 @@ export const titleBarClasses = useThemeCache(() => {
         $nest: {
             ".titleBar-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.fg, 1)),
+                backgroundColor: colorOut(modifyColorBasedOnLightness({ color: vars.colors.fg, weight: 1 })),
                 borderRadius: px(vars.button.borderRadius),
             },
         },

@@ -1,0 +1,19 @@
+openapi: 3.0.2
+info:
+paths:
+components:
+  responses:
+    PermissionError:
+      description: You don't have adequate permissions to access this resource.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: A message that tells you the permissions you need.
+              status:
+                type: number
+                description: The HTTP status code for the error.
+                format: int32

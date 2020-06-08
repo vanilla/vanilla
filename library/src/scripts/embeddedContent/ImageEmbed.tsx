@@ -42,7 +42,7 @@ export function ImageEmbed(props: IProps) {
                     aria-describedby={descriptionID}
                     className={classNames("embedImage-img", FOCUS_CLASS)}
                     src={props.url}
-                    alt={accessibleLabel(t(`User: "%s"`), props.name)}
+                    alt={accessibleLabel(t(`User: "%s"`), [props.name])}
                     tabIndex={props.inEditor ? -1 : undefined}
                 />
             </div>

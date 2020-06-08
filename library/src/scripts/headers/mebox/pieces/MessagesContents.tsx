@@ -129,7 +129,7 @@ function mapStateToProps(state: IConversationsStoreState) {
                 countMessages: conversation.countMessages,
                 message: messageDoc.body.textContent || "",
                 photo: conversation.lastMessage!.insertUser.photoUrl || null,
-                photoAlt: accessibleLabel(`User: "%s"`, conversation.lastMessage!.insertUser.name)!,
+                photoAlt: accessibleLabel(`User: "%s"`, [conversation.lastMessage!.insertUser.name])!,
                 to: conversation.url,
                 recordID: conversation.conversationID,
                 timestamp: conversation.lastMessage!.dateInserted,

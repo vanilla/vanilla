@@ -51,7 +51,7 @@ export class UserPhoto extends React.Component<IProps> {
                     <img
                         src={photoUrl}
                         title={name || ""}
-                        alt={accessibleLabel(`User: "%s"`, name)}
+                        alt={accessibleLabel(`User: "%s"`, [name])}
                         className={classNames("userPhoto-photo", classes.photo)}
                     />
                 )}

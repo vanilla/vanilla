@@ -9,7 +9,7 @@ import gdn from "@library/gdn";
 import { PromiseOrNormalCallback } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
 import { ensureScript } from "@vanilla/dom-utils";
-import { t } from "@vanilla/i18n";
+import { sprintf } from "sprintf-js";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
@@ -278,18 +278,9 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
  * @param template - the template for the string (must be translated ahead of time)
  * @param variable - the variable to insert in the template
  */
-export function accessibleLabel(template: string, variable?: string) {
+export function accessibleLabel(template: string, variable?: string[]) {
     if (!variable) {
         return undefined;
     }
-    const charMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-    };
-    return template.replace("%s", variable).replace(/[&<>"']/g, m => {
-        return charMap[m];
-    });
+    return sprintf(template, variable);
 }

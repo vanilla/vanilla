@@ -157,7 +157,9 @@ function mapStateToProps(state: INotificationsStoreState) {
                       return {
                           message: notification.body,
                           photo: notification.photoUrl || null,
-                          photoAlt: accessibleLabel(t(`User: "%s"`), notification.activityName),
+                          photoAlt: notification.activityName
+                              ? accessibleLabel(t(`User: "%s"`), [notification.activityName])
+                              : undefined,
                           to: notification.url,
                           recordID: notification.notificationID,
                           timestamp: notification.dateUpdated,

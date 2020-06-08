@@ -217,4 +217,18 @@ class ApiUtils {
             return null;
         }
     }
+
+    /**
+     * Takes an array of fields for a sort and adds their descending counterparts.
+     *
+     * @param string $fields
+     * @return array
+     */
+    public static function sortEnum(string ...$fields): array {
+        $desc = $fields;
+        foreach ($desc as &$field) {
+            $field = '-'.$field;
+        }
+        return array_merge($fields, $desc);
+    }
 }

@@ -142,7 +142,7 @@ class CategoryModel extends Gdn_Model {
      */
     private static function loadAllCategories() {
         // Try and get the categories from the cache.
-//        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
+        $categoriesCache = Gdn::cache()->get(self::CACHE_KEY);
         $rebuild = true;
 
         // If we received a valid data structure, extract the embedded expiry

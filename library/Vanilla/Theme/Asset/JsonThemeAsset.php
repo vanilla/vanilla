@@ -51,10 +51,9 @@ class JsonThemeAsset extends ThemeAsset {
             ];
             $this->jsonString = json_encode($this->data);
         } else {
-            $this->data = $decoded;
             $this->jsonString = $data;
-            $this->ensureArray();
             $this->data = $this->preservedOutputDecode($data);
+            $this->ensureArray();
         }
     }
 
@@ -100,9 +99,10 @@ class JsonThemeAsset extends ThemeAsset {
      * The JSON asset must be an array.
      */
     protected function ensureArray() {
-        if (!is_array($this->data)) {
+        if (!is_array($this->data) && !is_object($this->data)) {
             $this->data = [ 'value' => $this->data ];
             $this->error = new ClientException('JSON asset must be an object or array.');
+            $this->jsonString = json_encode($this->data);
         }
     }
 

@@ -20,6 +20,20 @@ use Vanilla\Web\Controller;
  */
 class ResourcesApiController extends Controller {
     /**
+     * @var ModelFactory
+     */
+    private $factory;
+
+    /**
+     * ResourcesApiController constructor.
+     *
+     * @param ModelFactory $factory
+     */
+    public function __construct(ModelFactory $factory) {
+        $this->factory = $factory;
+    }
+
+    /**
      * The `GET /resources` endpoint.
      *
      * @param array $query
@@ -51,20 +65,6 @@ class ResourcesApiController extends Controller {
     }
 
     /**
-     * @var ModelFactory
-     */
-    private $factory;
-
-    /**
-     * ResourcesApiController constructor.
-     *
-     * @param ModelFactory $factory
-     */
-    public function __construct(ModelFactory $factory) {
-        $this->factory = $factory;
-    }
-
-    /**
      * The `GET /resources/:recordType` endpoint.
      *
      * @param string $recordType
@@ -82,14 +82,30 @@ class ResourcesApiController extends Controller {
         $model = $this->factory->get($recordType);
         $recordType = $this->factory->getRecordType(get_class($model));
 
-        $r = [
+        $data = [
             'recordType' => $recordType,
         ];
         if (ModelUtils::isExpandOption('crawl', $query['expand']) && $model instanceof CrawlableInterface) {
-            $r['crawl'] = $model->getCrawlInfo();
-            $r['crawl']['url'] = \Gdn::request()->getSimpleUrl($r['crawl']['url']);
+            $data['crawl'] = $model->getCrawlInfo();
+            $data['crawl']['url'] = \Gdn::request()->getSimpleUrl($data['crawl']['url']);
         }
 
-        return new Data($r);
+        $out = Schema::parse([
+            'recordType:s',
+            'crawl?' => [
+                'url:s' => ['format' => 'uri'],
+                'parameter:s',
+                'count:i',
+                'min' => [
+                    'type' => ['integer', 'datetime'],
+                ],
+                'max' => [
+                    'type' => ['integer', 'datetime'],
+                ],
+            ]
+        ]);
+        $data = $out->validate($data);
+
+        return new Data($data);
     }
 }

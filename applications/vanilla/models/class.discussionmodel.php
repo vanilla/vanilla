@@ -27,7 +27,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface, \Vanilla\Contracts\Models\CrawlableInterface {
 
     use StaticInitializer;
 
@@ -3913,5 +3913,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $categoryModel = new CategoryModel();
         $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
         unset($categoryModel);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/discussions?pinOrder=mixed&sort=-discussionID',
+            'discussionID'
+        );
+        return $r;
     }
 }

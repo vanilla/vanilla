@@ -23,7 +23,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface {
+class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface, \Vanilla\Contracts\Models\CrawlableInterface {
 
     /** @var int */
     const GUEST_USER_ID = 0;
@@ -2885,7 +2885,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * Search users.
      *
      * @param array|string $filter
-     * @param string $orderFields
+     * @param string|array $orderFields
      * @param string $orderDirection
      * @param bool $limit
      * @param bool $offset
@@ -5670,5 +5670,17 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $result = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_GUEST);
         }
         return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/users?sort=-userID',
+            'userID'
+        );
+        return $r;
     }
 }

@@ -23,10 +23,12 @@ interface IProps {
     onChange?: (newTab: IData) => void;
     extraButtons?: React.ReactNode;
     defaultTabIndex?: number;
+    includeBorder?: boolean;
+    includeVerticalPadding?: boolean;
 }
 
 export function Tabs(props: IProps) {
-    const { data, tabType, defaultTabIndex } = props;
+    const { data, tabType, defaultTabIndex, includeBorder = true, includeVerticalPadding = true } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
     const classes = tabType && tabType === TabsTypes.BROWSE ? tabBrowseClasses() : tabStandardClasses();
 
@@ -38,7 +40,7 @@ export function Tabs(props: IProps) {
                 props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={classes.tabList}>
+            <TabList className={classes.tabList({ includeBorder })}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
@@ -67,7 +69,7 @@ export function Tabs(props: IProps) {
             <TabPanels className={classes.tabPanels}>
                 {data.map((tab, index) => {
                     return (
-                        <TabPanel className={classes.panel} key={index}>
+                        <TabPanel className={classes.panel({ includeVerticalPadding })} key={index}>
                             {data[index].contents}
                         </TabPanel>
                     );

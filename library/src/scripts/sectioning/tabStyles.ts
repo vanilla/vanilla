@@ -104,24 +104,26 @@ export const tabStandardClasses = useThemeCache(() => {
         width: "100%",
     });
 
-    const tabList = style("tabList", {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "stretch",
-        background: colorOut(vars.colors.bg),
-        ...sticky(),
-        top: 0,
-        zIndex: 1,
-        // Offset for the outer borders.
-        $nest: {
-            "button:first-child": {
-                borderLeft: 0,
+    const tabList = useThemeCache(() =>
+        style("tabList", {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+            background: colorOut(vars.colors.bg),
+            ...sticky(),
+            top: 0,
+            zIndex: 1,
+            // Offset for the outer borders.
+            $nest: {
+                "button:first-child": {
+                    borderLeft: 0,
+                },
+                "button:last-child": {
+                    borderRight: 0,
+                },
             },
-            "button:last-child": {
-                borderRight: 0,
-            },
-        },
-    });
+        }),
+    );
 
     const tab = useThemeCache(() =>
         style(
@@ -181,11 +183,13 @@ export const tabStandardClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const panel = style("panel", {
-        flexGrow: 1,
-        height: percent(100),
-        flexDirection: "column",
-    });
+    const panel = useThemeCache(() =>
+        style("panel", {
+            flexGrow: 1,
+            height: percent(100),
+            flexDirection: "column",
+        }),
+    );
 
     const isActive = style("isActive", {
         backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.bg, 0.65, true, true)),
@@ -236,11 +240,15 @@ export const tabBrowseClasses = useThemeCache(() => {
     );
     const tabPanels = style("tabPanels", {});
 
-    const tabList = style("tabList", {
-        display: "flex",
-        flexWrap: "wrap",
-        borderBottom: singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size }),
-    });
+    const tabList = useThemeCache((options?: { includeBorder?: boolean }) =>
+        style("tabList", {
+            display: "flex",
+            flexWrap: "wrap",
+            borderBottom: options?.includeBorder
+                ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
+                : undefined,
+        }),
+    );
 
     const tab = useThemeCache((largeTabs?: boolean) =>
         style("tab", {
@@ -263,26 +271,33 @@ export const tabBrowseClasses = useThemeCache(() => {
         }),
     );
 
-    const panel = style("panel", {
-        ...paddings({
-            vertical: "24px",
-            horizontal: horizontalPadding,
+    const panel = useThemeCache((options?: { includeVerticalPadding?: boolean }) =>
+        style("panel", {
+            ...paddings({
+                vertical: options?.includeVerticalPadding ? "24px" : 0,
+                horizontal: horizontalPadding,
+            }),
         }),
-    });
+    );
 
     const extraButtons = style(
         "extraButtons",
         {
-            ...paddings({ horizontal: horizontalPadding, vertical: verticalPadding }),
+            ...paddings({ horizontal: horizontalPadding / 2, vertical: verticalPadding }),
             flex: 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
         },
         mediaQueries.oneColumnDown({
+            borderTop: singleBorder(),
             width: "100%",
             flex: "1 0 auto",
             justifyContent: "flex-start",
+            ...paddings({
+                top: globalVars.gutter.size * 2, // For extra spacing from the mockup.
+                horizontal: horizontalPadding, // For proper alignment.
+            }),
         }),
     );
 

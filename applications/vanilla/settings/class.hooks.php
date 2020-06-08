@@ -15,7 +15,7 @@ use Vanilla\Theme\ThemeSectionModel;
 /**
  * Vanilla's event handlers.
  */
-class VanillaHooks implements Gdn_IPlugin {
+class VanillaHooks extends Gdn_Plugin {
 
     /**
      * Handle the container init event to register things with the container.

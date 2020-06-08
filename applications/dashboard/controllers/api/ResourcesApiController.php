@@ -9,8 +9,10 @@ namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Vanilla\ApiUtils;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Models\ModelFactory;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\Controller;
 
 /**
@@ -20,11 +22,10 @@ class ResourcesApiController extends Controller {
     /**
      * The `GET /resources` endpoint.
      *
-     * @param \Gdn_Request $request
      * @param array $query
      * @return Data
      */
-    public function index(\Gdn_Request $request, array $query = []): Data {
+    public function index(array $query = []): Data {
         $this->permission('Garden.Settings.Manage');
 
         $in = Schema::parse([
@@ -42,7 +43,7 @@ class ResourcesApiController extends Controller {
         foreach ($models as $recordType => $model) {
             $r[] = [
                 'recordType' => $recordType,
-                'url' => $request->getSimpleUrl("/api/v2/resources/$recordType"),
+                'url' => \Gdn::request()->getSimpleUrl("/api/v2/resources/$recordType"),
                 'crawlable' => ($model instanceof CrawlableInterface),
             ];
         }
@@ -66,12 +67,17 @@ class ResourcesApiController extends Controller {
     /**
      * The `GET /resources/:recordType` endpoint.
      *
-     * @param \Gdn_Request $request
      * @param string $recordType
+     * @param array $query
      * @return Data
      */
-    public function get(\Gdn_Request $request, string $recordType): Data {
+    public function get(string $recordType, array $query = []): Data {
         $this->permission('Garden.Settings.Manage');
+
+        $in = Schema::parse([
+            'expand?' => ApiUtils::getExpandDefinition(['crawl']),
+        ]);
+        $query = $in->validate($query);
 
         $model = $this->factory->get($recordType);
         $recordType = $this->factory->getRecordType(get_class($model));
@@ -79,9 +85,9 @@ class ResourcesApiController extends Controller {
         $r = [
             'recordType' => $recordType,
         ];
-        if ($model instanceof CrawlableInterface) {
+        if (ModelUtils::isExpandOption('crawl', $query['expand']) && $model instanceof CrawlableInterface) {
             $r['crawl'] = $model->getCrawlInfo();
-            $r['crawl']['url'] = $request->getSimpleUrl($r['crawl']['url']);
+            $r['crawl']['url'] = \Gdn::request()->getSimpleUrl($r['crawl']['url']);
         }
 
         return new Data($r);

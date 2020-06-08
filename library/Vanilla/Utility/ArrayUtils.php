@@ -303,4 +303,45 @@ final class ArrayUtils {
 
         return $arr;
     }
+
+    /**
+     * Return a function that can be used to sort a dataset by one or more keys.
+     *
+     * Consider a dataset that looks something like this:
+     *
+     * ```
+     * $data = [
+     *     ['score' => 0, 'date' => '2010-05-02', ...],
+     *     ...
+     * ]
+     * ```
+     *
+     * I can sort this dataset by score (descending), then date with the following code:
+     *
+     * ```
+     * usort($data, ArrayUtils::datasetSortCallback('-score', 'date'));
+     * ```
+     *
+     * @param string $keys The keys to sort by.
+     * @return callable Returns a function that can be passed to `usort`.
+     */
+    public static function sortCallback(string ...$keys): callable {
+        $sortKeys = [];
+        foreach ($keys as $key) {
+            if ($key[0] === '-') {
+                $sortKeys[substr($key, 0, 1)] = -1;
+            } else {
+                $sortKeys[$key] = 1;
+            }
+        }
+
+        return function ($a, $b) use ($sortKeys): int {
+            foreach ($sortKeys as $key => $desc) {
+                $s = $a <=> $b;
+                if ($s !== 0) {
+                    return $desc * $s;
+                }
+            }
+        };
+    }
 }

@@ -77,7 +77,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
         return (
             <>
                 {this.props.isCentered && <FlexSpacer actualSpacer />}
-                <nav
+                <div
                     ref={this.props.containerRef as any}
                     className={classNames(
                         "headerNavigation",
@@ -85,7 +85,6 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                         classes.navigation,
                         this.props.isCentered && classes.navigationCentered,
                     )}
-                    aria-label={t("Navigation")}
                 >
                     <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
                         {this.props.children ? this.props.children : content}
@@ -97,7 +96,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                         </>
                     </ul>
                     {this.props.afterNode}
-                </nav>
+                </div>
             </>
         );
     }

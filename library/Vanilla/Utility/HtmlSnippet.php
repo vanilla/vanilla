@@ -15,7 +15,7 @@ use DOMNode;
  */
 class HtmlSnippet  extends \DOMDocument {
 
-    const CONTENT_ID = 'contentID';
+    const CONTENT_ID = '__contentID';
 
     /**
      * Dom loadHmtl.

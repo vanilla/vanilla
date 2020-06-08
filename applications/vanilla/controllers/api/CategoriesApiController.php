@@ -647,6 +647,7 @@ class CategoriesApiController extends AbstractApiController {
      * @param array $where
      * @param int|null $limit
      * @param int|null $offset
+     * @param string $order
      * @return array
      */
     private function getCategoriesWhere(array $where, $limit, $offset, $order = ''): array {

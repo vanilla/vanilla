@@ -46,6 +46,17 @@ paths:
           schema:
             type: string
             example: discussion
+        - name: expand
+          description: Expand fields on the result.
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - all
+                - crawl
+          style: form
       responses:
         '200':
           description: Success
@@ -89,13 +100,19 @@ components:
               description: The URL template used to crawl the resource.
               format: uri
             min:
-              type: number
-              format: int32
               description: The minimum parameter value for crawling the resource.
+              oneOf:
+                - type: number
+                  format: int32
+                - type: string
+                  format: date-time
             max:
-              type: integer
-              format: int32
               description: The maximum parameter value for crawling the resource.
+              oneOf:
+                - type: number
+                  format: int32
+                - type: string
+                  format: date-time
             count:
               type: number
               format: int32

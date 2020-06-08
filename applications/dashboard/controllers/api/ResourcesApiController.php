@@ -65,20 +65,6 @@ class ResourcesApiController extends Controller {
     }
 
     /**
-     * @var ModelFactory
-     */
-    private $factory;
-
-    /**
-     * ResourcesApiController constructor.
-     *
-     * @param ModelFactory $factory
-     */
-    public function __construct(ModelFactory $factory) {
-        $this->factory = $factory;
-    }
-
-    /**
      * The `GET /resources/:recordType` endpoint.
      *
      * @param string $recordType

@@ -36,7 +36,6 @@ class ResourcesApiController extends Controller {
     /**
      * The `GET /resources` endpoint.
      *
-     * @param \Gdn_Request $request
      * @param array $query
      * @return Data
      */
@@ -82,7 +81,6 @@ class ResourcesApiController extends Controller {
     /**
      * The `GET /resources/:recordType` endpoint.
      *
-     * @param \Gdn_Request $request
      * @param string $recordType
      * @param array $query
      * @return Data

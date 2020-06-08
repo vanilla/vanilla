@@ -62,6 +62,7 @@ class ResourcesTest extends AbstractAPIv2Test {
         $resources = $this->api()->get('/resources', ['crawlable' => true])->getBody();
         foreach ($resources as $row) {
             ['url' => $url] = $row;
+            StringUtils::substringLeftTrim($url, $this->api()->getBaseUrl());
             $r = $this->api()->get($url, ['expand' => 'crawl'])->getBody();
             $this->assertIsInt($r['crawl']['count']);
         }

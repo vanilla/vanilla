@@ -64,4 +64,39 @@ class OpenAPIBuilderTest extends TestCase {
         chdir($dir);
         $this->assertSame(0, $result);
     }
+
+    /**
+     * Test specific OpenAPI schema merging bugs.
+     *
+     * @param array $schema1
+     * @param array $schema2
+     * @param array $expected
+     * @dataProvider provideSchemaMergeScenarios
+     */
+    public function testSchemaMergeBugs(array $schema1, array $schema2, array $expected) {
+        $actual = OpenAPIBuilder::mergeSchemas($schema1, $schema2);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideSchemaMergeScenarios(): array {
+        $r = [
+            'enum' => [
+                ['enum' => ['a', 'c']], ['enum' => ['a', 'b']], ['enum' => ['a', 'b', 'c']]
+            ],
+            'parameters' => [
+                ['parameters' => [['name' => 'a', 'e' => [1]]]],
+                ['parameters' => [['name' => 'b'], ['name' => 'a', 'e' => [2]]]],
+                ['parameters' => [['name' => 'a', 'e' => [1, 2]], ['name' => 'b']]],
+            ],
+            'required' => [
+                ['required' => ['a', 'c']], ['required' => ['a', 'b']], ['required' => ['a', 'c', 'b']]
+            ],
+        ];
+        return $r;
+    }
 }

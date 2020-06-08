@@ -142,4 +142,20 @@ trait BootstrapTrait {
         $logger = static::container()->get(TestLogger::class);
         return $logger;
     }
+
+    /**
+     * Configure the container for connecting to the database.
+     */
+    protected static function initializeDatabase() {
+        /** @var TestInstallModel $model */
+        $model = static::container()->get(TestInstallModel::class);
+        static::container()
+            ->rule(\Gdn_Database::class)
+            ->setConstructorArgs([
+                'Host' => $model->getDbHost(),
+                'Dbname' => $model->getDbName(),
+                'User' => $model->getDbUser(),
+                'Password' => $model->getDbPassword(),
+            ]);
+    }
 }

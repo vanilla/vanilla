@@ -40,12 +40,50 @@ class JsonThemeAsset extends ThemeAsset {
                 "error" => "Error decoding JSON",
                 "message" => json_last_error_msg(),
             ];
-            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
+            $this->jsonString = json_encode($this->data);
         } else {
-            $this->data = $decoded;
+            $this->data = $this->preservedOutputDecode($data);
             $this->jsonString = $data;
             $this->ensureArray();
         }
+    }
+
+    /**
+     * Render output in a way that tries to preserve arrays.
+     *
+     * @param string $jsonIn
+     *
+     * @return mixed
+     */
+    protected function preservedOutputDecode(string $jsonIn) {
+        if (trim($jsonIn) === '[]') {
+            return [];
+        } else {
+            $decoded = json_decode($jsonIn,true);
+            return $this->fixEmptyArraysToObjects($decoded);
+        }
+    }
+
+    /**
+     * Make sure empty arrays are interpretted as empty objects.
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    protected function fixEmptyArraysToObjects($input) {
+        if (is_array($input) && empty($input)) {
+            return new \stdClass();
+        }
+
+        if (is_iterable($input)) {
+            foreach ($input as $key => &$value) {
+                if (is_array($value)) {
+                    setvalr($key, $input, $this->fixEmptyArraysToObjects($value));
+                }
+            }
+        }
+
+        return $input;
     }
 
     /**
@@ -92,7 +130,7 @@ class JsonThemeAsset extends ThemeAsset {
         ];
 
         if ($this->includeValueInJson) {
-            $result['data'] = json_decode($this->jsonString);
+            $result['data'] = $this->preservedOutputDecode($this->jsonString);
         }
 
         return $result;

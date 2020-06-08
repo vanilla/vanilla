@@ -474,14 +474,7 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
-            'userID:a?' => [
-                'description' => 'One or more user IDs to lookup.',
-                'items' => ['type' => 'integer'],
-                'style' => 'form',
-                'x-filter' => [
-                    'field' => 'u.UserID',
-                ],
-            ],
+            'userID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'u.UserID']),
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
@@ -493,7 +486,7 @@ class UsersApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ]
-        ], ['UserIndex', 'in'])->setDescription('List users.');
+        ], ['UserIndex', 'in']);
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);

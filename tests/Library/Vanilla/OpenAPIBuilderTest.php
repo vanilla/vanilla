@@ -62,7 +62,7 @@ class OpenAPIBuilderTest extends TestCase {
         chdir(PATH_ROOT);
         exec("npx swagger-cli@2.3.4 validate $path", $output, $result);
         chdir($dir);
-        $this->assertSame(0, $result);
+        $this->assertSame(0, $result, $path);
     }
 
     /**

@@ -4,13 +4,16 @@ paths:
   /discussions:
     get:
       parameters:
+      - name: discussionID
+        description: Filter by a range or CSV of discussion IDs.
+        in: query
+        schema:
+          $ref: '#/components/schemas/RangeExpression'
       - description: Filter by a category.
         in: query
         name: categoryID
         schema:
           type: integer
-        x-filter:
-          field: d.CategoryID
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'

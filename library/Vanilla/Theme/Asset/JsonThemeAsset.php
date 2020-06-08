@@ -59,7 +59,7 @@ class JsonThemeAsset extends ThemeAsset {
         if (trim($jsonIn) === '[]') {
             return [];
         } else {
-            $decoded = json_decode($jsonIn,true);
+            $decoded = json_decode($jsonIn, true);
             return $this->fixEmptyArraysToObjects($decoded);
         }
     }

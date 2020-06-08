@@ -477,6 +477,4 @@ class Theme implements \JsonSerializable {
     public function setIsCacheHit(bool $isCacheHit): void {
         $this->isCacheHit = $isCacheHit;
     }
-
-
 }

@@ -10,7 +10,6 @@ import {
     unit,
     userSelect,
     importantColorOut,
-    getRatioBasedOnDarkness,
     modifyColorBasedOnLightness,
     isLightColor,
 } from "@library/styles/styleHelpers";
@@ -18,7 +17,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { important } from "csx";
-import main from "@storybook/api/dist/initial-state";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
@@ -108,17 +106,13 @@ export const paginationCSS = () => {
     });
 
     cssOut(`.Pager.NumberedPager > a.Highlight`, {
-        // backgroundColor: colorOut(mainColors.bg.mix(mainColors.fg, getRatioBasedOnDarkness(0.2, mainColors.bg))),
+        color: colorOut(isLightColor(mainColors.fg) ? mainColors.fg.fade(0.85) : mainColors.fg),
+        pointerEvents: "none",
         backgroundColor: colorOut(
             modifyColorBasedOnLightness({
                 color: mainColors.bg,
                 weight: 0.05,
             }),
         ),
-        $nest: {
-            "&:hover, &:focus, &:active": {
-                pointerEvents: "none",
-            },
-        },
     });
 };

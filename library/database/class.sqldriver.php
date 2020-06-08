@@ -662,7 +662,8 @@ abstract class Gdn_SQLDriver {
             $this->limit($limit, $offset);
         }
 
-        $result = $this->query($this->getSelect());
+        $sql = $this->getSelect();
+        $result = $this->query($sql);
         return $result;
     }
 

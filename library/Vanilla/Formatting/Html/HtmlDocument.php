@@ -23,7 +23,7 @@ class HtmlDocument {
      * @param string $innerHtml HTML to construct the DOM with.
      */
     public function __construct(string $innerHtml) {
-        $this->dom = new \DOMDocument();
+        $this->dom = new \DOMDocument('1.0', 'UTF-8');
 
         // DomDocument will automatically add html, head and body wrapper if we don't.
         // We add our own to ensure consistency.
@@ -31,29 +31,16 @@ class HtmlDocument {
     }
 
     /**
-     * Apply an array of processors in order.
+     * Query the DOM with some xpath.
      *
-     * @param string[] $processors An array of classes implemented HtmlProcessor.
-     * @return HtmlDocument
+     * @param string $xpathQuery
+     * @see https://devhints.io/xpath For a cheatsheet.
+     *
+     * @return \DOMNodeList
      */
-    public function applyProcessors(array $processors): HtmlDocument {
-        $document = $this;
-        foreach ($processors as $processor) {
-            if (!is_subclass_of($processor, HtmlProcessor::class, true)) {
-                trigger_error("$processor does not extends HtmlProcessor", E_USER_WARNING);
-                continue;
-            }
-
-            $actualProcessor = $processor;
-            if ($actualProcessor instanceof HtmlProcessor) {
-                $actualProcessor->setDocument($document);
-            } else {
-                // Construct it.
-                $actualProcessor = new $actualProcessor($document);
-            }
-            $document = $actualProcessor->processDocument();
-        }
-        return $document;
+    public function queryXPath(string $xpathQuery) {
+        $xpath = new \DOMXPath($this->getDom());
+        return $xpath->query($xpathQuery) ?: new \DOMNodeList();
     }
 
     /**

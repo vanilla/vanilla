@@ -30,10 +30,11 @@ class WysiwygFormat extends HtmlFormat {
     public function __construct(
         HtmlSanitizer $htmlSanitizer,
         HtmlEnhancer $htmlEnhancer,
-        HtmlPlainTextConverter $plainTextConverter
+        HtmlPlainTextConverter $plainTextConverter,
+        ZendeskWysiwygProcessor $zendeskWysiwygProcessor
     ) {
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
-        $this->processors[] = ZendeskWysiwygProcessor::class;
+        $this->addHtmlProcessor($zendeskWysiwygProcessor);
     }
 
     /**

@@ -16,22 +16,23 @@ use Vanilla\Formatting\Html\HtmlDocument;
 class HeadingHtmlProcessor extends HtmlProcessor {
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function processDocument(): HtmlDocument {
-        $this->getHeadings(true);
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        $this->getHeadings($document, true);
+        return $document;
     }
 
     /**
      * Get all the headings in the document.
      *
+     * @param HtmlDocument $document The document to parse.
      * @param bool $applyToDom Whether or not to apply the heading ids into the dom.
      *
      * @return Heading[]
      */
-    public function getHeadings(bool $applyToDom = false): array {
-        $domHeadings = $this->queryXPath('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
+    public function getHeadings(HtmlDocument $document, bool $applyToDom = false): array {
+        $domHeadings = $document->queryXPath('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
 
         /** @var Heading[] $headings */
         $headings = [];

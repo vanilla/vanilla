@@ -27,7 +27,6 @@ class TextFormat extends BaseFormat {
         $this->formatConfig = $formatConfig;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -39,6 +38,8 @@ class TextFormat extends BaseFormat {
         if ($this->formatConfig->shouldReplaceNewLines()) {
             $result = nl2br(trim($result));
         }
+
+        $result = $this->applyHtmlProcessors($result);
 
         return $result;
     }

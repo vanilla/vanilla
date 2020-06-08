@@ -16,7 +16,6 @@ import { t } from "@vanilla/i18n/src";
 export interface ITitleBarNavProps {
     className?: string;
     linkClassName?: string;
-    linkContentClassName?: string;
     listClassName?: string;
     children?: React.ReactNode;
     wrapper?: JSX.Element;
@@ -54,14 +53,10 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                   const component = (
                       <TitleBarNavItem
                           {...item}
-                          className={classNames(
-                              key === dataLength ? classes.lastItem : false,
-                              key === 0 ? classes.firstItem : false,
-                          )}
-                          linkContentClassName={classNames(
-                              this.props.linkContentClassName,
-                              key === dataLength ? classes.lastItem : false,
-                          )}
+                          className={classNames({
+                              [classes.lastItem]: dataLength === key,
+                              [classes.firstItem]: key === 0,
+                          })}
                           linkClassName={this.props.linkClassName}
                           key={key}
                       />

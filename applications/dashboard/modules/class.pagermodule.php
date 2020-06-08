@@ -425,7 +425,7 @@ class PagerModule extends Gdn_Module {
             // We don't need elipsis (ie. 1 2 3 4 5 6 7)
             for ($i = 1; $i <= $pageCount; $i++) {
                 $pager .= anchor(
-                    $i,
+                    $i . "jajfsajsdfjasjfdajsfjasjdfajsdf",
                     $this->pageUrl($i),
                     $this->_GetCssClass($i, $currentPage),
                     self::makeAttributes($i, $currentPage)

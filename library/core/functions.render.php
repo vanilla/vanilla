@@ -1160,6 +1160,7 @@ if (!function_exists('linkDropDown')) {
         $selectedLink = val($selectedKey, $links);
         $extraClasses = trim($extraClasses);
         $linkName = val('name', $selectedLink);
+        $downChevronLabel = t("Down Arrow");
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">
@@ -1167,7 +1168,7 @@ if (!function_exists('linkDropDown')) {
           <span class="selectBox-main">
               <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
-                <span class="vanillaDropDown-arrow">▾</span>
+                <span class="vanillaDropDown-arrow" aria-label="{$downChevronLabel}">▾</span>
               </a>
               <ul class="Flyout MenuItems selectBox-content" role="presentation">
 EOT;

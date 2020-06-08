@@ -6,12 +6,11 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
-import { colorOut, getRatioBasedOnDarkness } from "@library/styles/styleHelpersColors";
+import { colorOut } from "@library/styles/styleHelpersColors";
 import { fonts } from "@library/styles/styleHelpersTypography";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { ColorHelper, important } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { allLinkStates, paddings, unit, EMPTY_SPACING } from "@library/styles/styleHelpers";
+import { paddings, unit, EMPTY_SPACING } from "@library/styles/styleHelpers";
 import { siteNavVariables } from "@library/navigation/siteNavStyles";
 import { panelListVariables } from "@library/layout/panelListStyles";
 

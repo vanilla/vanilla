@@ -19,7 +19,6 @@ export interface ITitleBarNav {
     to: string;
     children: React.ReactNode;
     linkClassName?: string;
-    linkContentClassName?: string;
     buttonType?: ButtonTypes;
     permission?: string;
 }
@@ -41,17 +40,10 @@ export class TitleBarNavItem extends React.Component<IProps> {
                         this.props.linkClassName,
                         classes.link,
                         this.props.buttonType ? getButtonStyleFromBaseClass(this.props.buttonType) : "",
+                        isCurrent ? classes.linkActive : "",
                     )}
                 >
-                    <div
-                        className={classNames(
-                            this.props.linkContentClassName,
-                            classes.linkContent,
-                            isCurrent ? classes.linkActive : "",
-                        )}
-                    >
-                        {this.props.children}
-                    </div>
+                    {this.props.children}
                 </SmartLink>
             </TitleBarListItem>
         );

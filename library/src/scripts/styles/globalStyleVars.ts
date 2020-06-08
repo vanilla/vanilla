@@ -33,7 +33,8 @@ export enum GlobalPreset {
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    let colorPrimary = color("#0291db");
+    // let colorPrimary = color("#0291db"); 63
+    let colorPrimary = color("#037DBC");
     const makeThemeVars = variableFactory("global", forcedVars);
 
     const utility = {
@@ -86,9 +87,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // Shorthand checking bg color for darkness
     const getRatioBasedOnBackgroundDarkness = (
         weight: number,
-        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+        color: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
     ) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
+        return getRatioBasedOnDarkness(weight, color);
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {

@@ -19,6 +19,13 @@ class NeonThemeAsset extends JsonThemeAsset {
     protected $neonString;
 
     /**
+     * Make sure the error isn't included when serializing.
+     */
+    public function __sleep() {
+        return ['jsonString', 'data', 'neonString'];
+    }
+
+    /**
      * Configure the JSON asset.
      *
      * @param string $data
@@ -29,7 +36,7 @@ class NeonThemeAsset extends JsonThemeAsset {
         $this->neonString = $data;
         try {
             $this->data = Neon::decode($data);
-            $this->jsonString = json_encode($this->data, JSON_FORCE_OBJECT);
+            $this->jsonString = json_encode($this->fixEmptyArraysToObjects($this->data));
         } catch (\Exception $e) {
             // It's a bad asset.
             // Replace the asset with some json containing the error message.

@@ -177,7 +177,14 @@ export const tabStandardClasses = useThemeCache(() => {
     });
 
     const isActive = style("isActive", {
-        backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.bg, 0.65, true, true)),
+        backgroundColor: colorOut(
+            modifyColorBasedOnLightness({
+                color: vars.colors.bg,
+                weight: 0.65,
+                inverse: true,
+                flipWeightForDark: true,
+            }),
+        ),
     });
 
     return {

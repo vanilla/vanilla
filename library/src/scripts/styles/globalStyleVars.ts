@@ -86,9 +86,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // Shorthand checking bg color for darkness
     const getRatioBasedOnBackgroundDarkness = (
         weight: number,
-        bgColor: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
+        color: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
     ) => {
-        return getRatioBasedOnDarkness(weight, bgColor);
+        return getRatioBasedOnDarkness(weight, color);
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {
@@ -369,7 +369,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const overlayBg = modifyColorBasedOnLightness(mainColors.fg, 0.5);
+    const overlayBg = modifyColorBasedOnLightness({ color: mainColors.fg, weight: 0.5 });
     const overlay = makeThemeVars("overlay", {
         dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
         bg: overlayBg,

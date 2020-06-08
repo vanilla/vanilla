@@ -47,7 +47,8 @@ var discussionTagging = {
                 allowFreeTagging: tagAdd,
                 tokenLimit: maxTags,
                 zindex: 3000,
-                allowTabOut: true
+                allowTabOut: true,
+                ariaLabel: gdn.translate("Tag"),
             });
 
             // Show available link

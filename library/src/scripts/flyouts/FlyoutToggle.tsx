@@ -10,7 +10,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { forceRenderStyles } from "typestyle";
@@ -19,6 +19,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
+    handleID: string;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
     renderAbove?: boolean;
@@ -26,8 +27,9 @@ export interface IFlyoutToggleChildParameters {
 }
 
 interface IProps {
-    name?: string;
     id: string;
+    name?: string;
+    contentID: string;
     className?: string;
     buttonContents: React.ReactNode;
     disabled?: boolean;
@@ -47,12 +49,7 @@ interface IProps {
 }
 
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement, onVisibilityChange, onClose } = props;
-
-    // IDs unique to the component instance.
-    const ID = useMemo(() => uniqueIDFromPrefix("flyout"), []);
-    const buttonID = ID + "-handle";
-    const contentID = ID + "-contents";
+    const { initialFocusElement, onVisibilityChange, onClose, id, contentID } = props;
 
     // Focus management & visibility
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -131,7 +128,7 @@ export default function FlyoutToggle(props: IProps) {
     /**
      * Stop click propagation outside the flyout
      */
-    const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
+    const handleBlockEventPropagation = useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
     }, []);
 
@@ -160,6 +157,7 @@ export default function FlyoutToggle(props: IProps) {
 
     const childrenData: IFlyoutToggleChildParameters = {
         id: contentID,
+        handleID: id,
         isVisible: !!isVisible,
         closeMenuHandler,
         renderAbove: props.renderAbove,
@@ -172,15 +170,14 @@ export default function FlyoutToggle(props: IProps) {
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            id={ID}
             className={classNames(classesDropDown, props.className, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
-            onClick={handleBlockEventPropogation}
+            onClick={handleBlockEventPropagation}
         >
             <Button
-                id={buttonID}
+                id={id}
                 className={buttonClasses}
                 title={props.name}
                 aria-label={"name" in props ? props.name : undefined}

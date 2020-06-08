@@ -714,7 +714,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param int $exceptionType Type of block exception.
      */
     public function addBlockException(string $exceptionMatch, int $exceptionType) {
-        $this->blockExceptions[$exceptionMatch] = $exceptionType;
+        $allowedExceptionTypes = [self::BLOCK_NEVER, self::BLOCK_PERMISSION, self::BLOCK_ANY];
+        if (in_array($exceptionType, $allowedExceptionTypes)) {
+            $this->blockExceptions[$exceptionMatch] = $exceptionType;
+        }
     }
 
     /**

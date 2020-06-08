@@ -149,13 +149,15 @@ trait BootstrapTrait {
     protected static function initializeDatabase() {
         /** @var TestInstallModel $model */
         $model = static::container()->get(TestInstallModel::class);
-        static::container()
-            ->rule(\Gdn_Database::class)
-            ->setConstructorArgs([
-                'Host' => $model->getDbHost(),
-                'Dbname' => $model->getDbName(),
-                'User' => $model->getDbUser(),
-                'Password' => $model->getDbPassword(),
-            ]);
+
+        /** @var \Gdn_Database $database */
+        $database = static::container()->get(\Gdn_Database::class);
+
+        $database->init([
+            'Host' => $model->getDbHost(),
+            'Dbname' => $model->getDbName(),
+            'User' => $model->getDbUser(),
+            'Password' => $model->getDbPassword(),
+        ]);
     }
 }

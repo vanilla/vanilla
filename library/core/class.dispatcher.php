@@ -708,6 +708,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * Adds a dispatcher block exception.
+     *
+     * @param string $exceptionMatch Exception string to match.
+     * @param int $exceptionType Type of block exception.
+     */
+    public function addBlockException (string $exceptionMatch, int $exceptionType) {
+        $this->blockExceptions[$exceptionMatch] = $exceptionType;
+    }
+
+    /**
      * Rewrite the request based on rewrite rules (currently called routes in Vanilla).
      *
      * This method modifies the passed {@link $request} object. It can also cause a redirect if a rule matches that

@@ -100,6 +100,8 @@ components:
               description: The URL template used to crawl the resource.
               format: uri
             min:
+              type: number
+              format: int32
               description: The minimum parameter value for crawling the resource.
               oneOf:
                 - type: number

@@ -27,7 +27,10 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
     private $siteSectionModel;
 
     /**
+     * DI.
+     *
      * @param \CategoryCollection $categoryCollection
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(\CategoryCollection $categoryCollection, SiteSectionModel $siteSectionModel) {
         $this->categoryCollection = $categoryCollection;
@@ -41,7 +44,7 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
         $ancestors = $this->categoryCollection->getAncestors($record->getRecordID());
 
         $crumbs = [
-            new Breadcrumb(self::t('Home'), \Gdn::request()->url('/')),
+            new Breadcrumb(self::t('Home'), \Gdn::request()->url('/', true)),
         ];
         foreach ($ancestors as $ancestor) {
             if ($ancestor['CategoryID'] === -1) {
@@ -53,9 +56,9 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
                     continue;
                 };
 
-                $crumbs[] = new Breadcrumb(t('Categories'), url('/categories'));
+                $crumbs[] = new Breadcrumb(t('Categories'), url('/categories', true));
             } else {
-                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor));
+                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor, '', true));
             }
         }
         return $crumbs;

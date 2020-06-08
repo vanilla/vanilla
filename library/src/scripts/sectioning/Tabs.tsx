@@ -34,6 +34,7 @@ export function Tabs(props: IProps) {
 
     return (
         <ReachTabs
+            index={activeTab}
             className={classes.root(props.extendContainer)}
             onChange={index => {
                 setActiveTab(index);

@@ -32,6 +32,11 @@ class VanillaHooks implements Gdn_IPlugin {
 
         $dic->rule(ThemeSectionModel::class)
             ->addCall('registerLegacySection', [t('Forum')]);
+
+        $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
+        $mf->addModel('category', CategoryModel::class, 'cat');
+        $mf->addModel('discussion', DiscussionModel::class, 'd');
+        $mf->addModel('comment', CommentModel::class, 'c');
     }
 
     /**

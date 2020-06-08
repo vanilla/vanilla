@@ -1,0 +1,122 @@
+openapi: 3.0.2
+info:
+paths:
+  /resources:
+    get:
+      summary: List the resources available on the site.
+      tags:
+        - Resources
+      parameters:
+        - name: crawlable
+          in: query
+          schema:
+            type: boolean
+            description: Filter by resources that have crawling information.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceFragment'
+              example:
+                - recordType: user
+                  url: "https://example.com/api/v2/resources/user"
+                  hasCrawl: true
+                - recordType: discussion
+                  url: "https://example.com/api/v2/resources/discussion"
+                  hasCrawl: true
+                - recordType: comment
+                  url: "https://example.com/api/v2/resources/comment"
+                  hasCrawl: true
+        '403':
+          $ref: '#/components/responses/PermissionError'
+  /resources/{recordType}:
+    get:
+      summary: Get the details of a resource.
+      tags:
+        - Resources
+      parameters:
+        - name: recordType
+          description: The record type slug of the resource.
+          in: path
+          required: true
+          schema:
+            type: string
+            example: discussion
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '403':
+          $ref: '#/components/responses/PermissionError'
+components:
+  schemas:
+    ResourceFragment:
+      description: Meta information about a resource.
+      type: object
+      properties:
+        recordType:
+          type: string
+          description: The record the resource represents. Also the unique ID of the resource.
+        url:
+          type: string
+          description: The URL of the resource meta information.
+          format: uri
+        hasCrawl:
+          type: boolean
+          description: Whether or not the resource has crawl information.
+      required:
+        - recordType
+        - url
+        - hasCrawl
+    Resource:
+      type: object
+      properties:
+        recordType:
+          type: string
+          description: The record the resource represents. Also the unique ID of the resource.
+        crawl:
+          type: object
+          properties:
+            url:
+              type: string
+              description: The URL template used to crawl the resource.
+              format: uri
+            min:
+              type: number
+              format: int32
+              description: The minimum parameter value for crawling the resource.
+            max:
+              type: integer
+              format: int32
+              description: The maximum parameter value for crawling the resource.
+            count:
+              type: number
+              format: int32
+              description: The approximate number of rows the resource has.
+            parameter:
+              type: string
+              description: The name of the parameter you need to pass to the crawl URL.
+          required:
+            - url
+            - min
+            - max
+            - count
+            - parameter
+      required:
+        - recordType
+      example:
+        recordType: discussion
+        crawl:
+          url: https://example.com/api/v2/discussions?expand=crawl?order=-discussionID
+          min: 1,
+          max: 500000,
+          count: 499560,
+          parameter: discussionID
+

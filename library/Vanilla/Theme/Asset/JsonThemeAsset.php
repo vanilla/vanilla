@@ -24,6 +24,15 @@ class JsonThemeAsset extends ThemeAsset {
     protected $error = null;
 
     /**
+     * Make sure the error isn't included when serializing.
+     *
+     * IF YOU HAVE TO CHANGE THIS DON'T FORGET NeonThemeAsset::__sleep().
+     */
+    public function __sleep() {
+        return ['jsonString', 'data'];
+    }
+
+    /**
      * Configure the JSON asset.
      *
      * @param string $data
@@ -42,9 +51,10 @@ class JsonThemeAsset extends ThemeAsset {
             ];
             $this->jsonString = json_encode($this->data);
         } else {
-            $this->data = $this->preservedOutputDecode($data);
+            $this->data = $decoded;
             $this->jsonString = $data;
             $this->ensureArray();
+            $this->data = $this->preservedOutputDecode($data);
         }
     }
 
@@ -113,8 +123,8 @@ class JsonThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function getValue(): array {
-        return $this->data;
+    public function getValue() {
+        return json_decode($this->jsonString, true);
     }
 
     /**

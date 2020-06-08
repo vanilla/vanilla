@@ -19,6 +19,13 @@ class NeonThemeAsset extends JsonThemeAsset {
     protected $neonString;
 
     /**
+     * Make sure the error isn't included when serializing.
+     */
+    public function __sleep() {
+        return ['jsonString', 'data', 'neonString'];
+    }
+
+    /**
      * Configure the JSON asset.
      *
      * @param string $data

@@ -595,7 +595,7 @@ class FacebookPlugin extends SSOAddon {
      * @return mixed|string
      */
     public function getTargetUri() {
-        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', '/');
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', Gdn::request()->getPath());
         if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
             $target = '/';
         }

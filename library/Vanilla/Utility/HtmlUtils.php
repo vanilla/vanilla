@@ -153,6 +153,4 @@ final class HtmlUtils {
     public static function accessibleLabel($template, $data): string {
         return htmlspecialchars(sprintf(t($template), ...$data));
     }
-
-
 }

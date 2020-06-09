@@ -37,9 +37,7 @@ if (!("translate" in gdn)) {
 
 if (!("makeAccessiblePopup" in gdn)) {
     gdn.makeAccessiblePopup = ($popupEl, settings, sender) => {
-        console.log('here')
         if (sender) {
-            console.log('after sender')
             let id = sender.id;
             if (!id) {
                 id = uniqueIDFromPrefix("popup");

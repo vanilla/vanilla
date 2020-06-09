@@ -86,10 +86,12 @@ class DropdownModule extends Gdn_Module {
      * - **cssClass**: string - CSS class for the trigger.
      * - **icon**: string - Icon for the trigger.
      */
-    private $trigger = ['type' => 'button',
-                            'text' => '',
-                            'cssClass' => '',
-                            'icon' => 'caret-down'];
+    private $trigger = [
+        'type' => 'button',
+        'text' => '',
+        'cssClass' => '',
+        'icon' => 'caret-down',
+    ];
 
     /**
      * @var array Allowed trigger types.

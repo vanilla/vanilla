@@ -849,7 +849,7 @@ class TwitterPlugin extends SSOAddon {
         }
         $url = url("https://twitter.com/share?".http_build_query($params), true);
         $cssClass = 'ReactButton PopupWindow';
-        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow']);
+        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow', 'role' => 'button']);
     }
 
     /**

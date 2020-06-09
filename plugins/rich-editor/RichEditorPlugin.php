@@ -189,7 +189,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         $classes = 'ReactButton Quote Visible js-quoteButton';
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo "<a href='#' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
+        echo "<a href='#' role='button' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
         echo ' ';
     }
 

@@ -138,4 +138,35 @@ class UrlUtilsTest extends TestCase {
         $this->assertSame($encoded, UrlUtils::encodePath($decoded));
         $this->assertSame($decoded, UrlUtils::decodePath($encoded));
     }
+
+    /**
+     * Fix URLs with a mix of encoded and non-encoded UTF-8 in their paths.
+     *
+     * @param string $url
+     * @param string $expected
+     * @dataProvider provideFixUrlTests
+     */
+    public function testNormalizeEncoding(string $url, string $expected): void {
+        $fixed = UrlUtils::normalizeEncoding($url);
+        $this->assertSame($expected, $fixed);
+    }
+
+    /**
+     * Provide URL fix tests.
+     *
+     * @return array
+     */
+    public function provideFixUrlTests(): array {
+        $r = [
+            ['https://de.wikipedia.org/wiki/Prüfsumme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfsumme'],
+            ['https://de.wikipedia.org/wiki/Prüfsümme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfs%C3%BCmme'],
+            ['https://de.wikipedia.org/wiki/Pr%C3%BCfsumme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfsumme'],
+            ['https://de.wikipedia.org/wiki/Pr%C3%BCfsümme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfs%C3%BCmme'],
+            ['https://example.com', 'https://example.com'],
+            ['https://example.com/foo.html', 'https://example.com/foo.html'],
+            ['https://example.com/foo.html?q=a', 'https://example.com/foo.html?q=a'],
+            ['https://example.com/foo.html?q=ü', 'https://example.com/foo.html?q=%C3%BC'],
+        ];
+        return array_column($r, null, 0);
+    }
 }

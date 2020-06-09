@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
 use Garden\Schema\ValidationException;
+use League\Uri\Http;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
@@ -39,6 +40,7 @@ use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
+use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\RequestValidator;
 
 /**
@@ -245,6 +247,9 @@ class EmbedService implements EmbedCreatorInterface {
         // @see https://github.com/vanilla/dev-inter-ops/issues/23
         // We've had some situations where the site gets in an infinite loop requesting itself.
         $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+
+        // Normalize the encoding on the URL.
+        $url = (string)UrlUtils::normalizeEncoding(Http::createFromString($url));
 
         // Check the cache first.
         if (!$force) {

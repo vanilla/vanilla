@@ -196,7 +196,7 @@ class UploadedFile {
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
         $baseName = basename($this->getClientFilename(), ".${ext}");
         $baseName = sprintf($nameFormat, $baseName);
-        $baseName = \Gdn_Format::url($baseName);
+        $baseName = \Gdn_Format::url(urlencode($baseName));
         $uploadPath = FileUtils::generateUniqueUploadPath($ext, true, $baseName, $persistDirectory);
         return $uploadPath;
     }

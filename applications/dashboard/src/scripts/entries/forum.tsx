@@ -59,6 +59,11 @@ enableLegacyAnalyticsTick(true);
 // Configure page view tracking
 onReady(() => {
     initPageViewTracking(createBrowserHistory());
+    $(document).on("contentLoad", function(e) {
+        const popup = $(e.target).closest(".Popup");
+        if (popup.length > 0) {
+        }
+    });
 });
 
 addComponent("title-bar-hamburger", TitleBarHamburger);

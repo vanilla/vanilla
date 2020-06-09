@@ -15,6 +15,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
    // Allows generating a popup by jQuery.popup('contents')
    $.popup = function(options, data) {
 	  // Merge default settings:
+       $.popup.settings.selectLastFocus = gdn.focusedLastElement();
       var settings = $.extend({}, $.popup.settings, options);
       $.popup.init(settings)
 
@@ -119,7 +120,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
 
-      $('body').append(popupHtml);
+       $('body').append(popupHtml);
       if (settings.containerCssClass != '')
          $('#'+settings.popupId).addClass(settings.containerCssClass);
 
@@ -143,11 +144,22 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             $.popup.close(settings);
       })
 
-      if (settings.onUnload) {
-         $('#'+settings.popupId).bind('popupClose',function(){
-            setTimeout(settings.onUnload,1);
-         });
-      }
+      // if (settings.onUnload) {
+      //    $('#'+settings.popupId).bind('popupClose',function(){
+      //       setTimeout(settings.onUnload,1);
+      //    });
+      // }
+
+       if (settings.onUnload) {
+           $('#'+settings.popupId).bind('popupClose',function(){
+               setTimeout(function (settings, response) {
+                   if (settings.onUnload) {
+                       settings.onUnload(settings, response);
+                   }
+                   settings.selectLastFocus();
+               },1);
+           });
+       }
 
       // Replace language definitions
       if (!settings.confirm) {
@@ -348,6 +360,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Trigger an even that plugins can attach to when popups are revealed.
       $('body').trigger('popupReveal');
 
+       const $popupHtml = $('#'+settings.popupId);
+       gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
+
       return false;
    }
 
@@ -362,7 +377,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       hijackForms:      true,         // Hijack popup forms so they are handled in-page instead of posting the entire page back
       deliveryType:     'VIEW',            // Adds DeliveryType=3 to url so Garden doesn't pull the entire page
       mouseoverClass:   'Popable',    // CssClass to be applied to a popup link when hovering
-      onSave:           function(settings) {
+       selectLastFocus:  function() {},
+       onSave:           function(settings) {
          if (settings.sender) {
             $('#'+settings.popupId+' .Button:submit').attr('disabled', true).addClass('InProgress');
          }
@@ -378,8 +394,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       },
       containerCssClass: '',
       popupHtml:       '\
-  <div class="Overlay"> \
-    <div id="{popup.id}" class="Popup"> \
+    <div id="{popup.id}"  class="Popup" aria-labelledby="{popup.handleID}" aria-describedby="{popup.desc}" aria-modal="true" role="dialog"> \
+    <p class="sr-only" id="{popup.desc}">\
       <div class="Border"> \
         <div class="Body"> \
           <div class="Content"> \

@@ -15,7 +15,7 @@ use Garden\Web\Exception\ForbiddenException;
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -28,6 +28,7 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->resourceName = 'discussion';
 
         $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
+        $this->sortFields = ['dateLastComment', 'dateInserted', 'discussionID'];
 
         parent::__construct($name, $data, $dataName);
     }

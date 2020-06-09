@@ -66,7 +66,7 @@ function UserDropDownContents(props: IProps) {
                     <DropDownItemLinkWithCount
                         to={"/dashboard/user/applicants"}
                         name={t("Applicants")}
-                        count={getCountByName("Applications")}
+                        count={getCountByName("Applicants")}
                     />
                     <DropDownItemLinkWithCount
                         to={"/dashboard/log/spam"}

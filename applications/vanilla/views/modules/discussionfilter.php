@@ -1,8 +1,7 @@
 <?php
+if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
-
-if (!defined('APPLICATION')) exit();
 
 $Controller = Gdn::controller();
 $Session = Gdn::session();
@@ -38,11 +37,11 @@ $titleClasses = HtmlUtils::classNames(
     !Gdn::themeFeatures()->useDataDrivenTheme() && "sr-only",
     "BoxFilter-HeadingWrap"
 );
-
+$titleID = "BoxFilterTitle";
 ?>
-<div class="BoxFilter BoxDiscussionFilter" role="navigation">
+<div class="BoxFilter BoxDiscussionFilter" role="navigation" aria-labelledby="<?php echo $titleID ?>">
     <span class="<?php echo $titleClasses ?>">
-        <h2 class="BoxFilter-Heading">
+        <h2 id="<?php echo $titleID ?>" class="BoxFilter-Heading">
             <?php echo t('Quick Links'); ?>
         </h2>
     </span>

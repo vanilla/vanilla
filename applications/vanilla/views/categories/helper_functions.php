@@ -1,6 +1,6 @@
 <?php
-
 if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
 
@@ -274,6 +274,8 @@ if (!function_exists('WriteTableRow')):
         $level = 3;
         /** @var Vanilla\Formatting\Html\HtmlSanitizer */
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
 
         ?>
         <tr class="<?php echo cssClass($row, true); ?>">
@@ -345,7 +347,9 @@ if (!function_exists('WriteTableRow')):
                             echo anchor(
                                 Gdn_Format::date($row['LastDateInserted'], 'html'),
                                 $row['LastUrl'],
-                                'CommentDate MItem');
+                                'CommentDate MItem', [
+                                    "aria-label" => HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
+                                ]);
 
                             if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);

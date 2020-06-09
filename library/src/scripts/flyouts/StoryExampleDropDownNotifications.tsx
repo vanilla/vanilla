@@ -4,15 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
-import Button from "@library/forms/Button";
-import classNames from "classnames";
-import { useUniqueID } from "@library/utility/idUtils";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { StoryTile } from "@library/storybook/StoryTile";
-import { DeviceProvider, Devices, useDevice } from "@library/layout/DeviceContext";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
@@ -59,6 +52,7 @@ export function StoryExampleDropDown(props: IProps) {
                             type: MeBoxItemType.NOTIFICATION,
                             message: "Sample message",
                             photo: null,
+                            photoAlt: "",
                             recordID: 1,
                             timestamp: "2019-03-06 21:21:18",
                             to: "#",
@@ -68,6 +62,7 @@ export function StoryExampleDropDown(props: IProps) {
                             type: MeBoxItemType.NOTIFICATION,
                             message: "Sample message",
                             photo: null,
+                            photoAlt: "",
                             recordID: 1,
                             timestamp: "2019-03-06 21:21:18",
                             to: "#",

@@ -7,6 +7,7 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+use Vanilla\Utility\HtmlUtils;
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
 $Discussion = $this->data('Discussion');
@@ -65,9 +66,10 @@ $this->fireEvent('BeforeDiscussionDisplay');
                 }
                 // Category
                 if (c('Vanilla.Categories.Use')) {
+                    $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$this->data('Discussion.Category')]);
                     echo ' <span class="MItem Category">';
                     echo ' '.t('in').' ';
-                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), categoryUrl($this->data('Discussion.CategoryUrlCode')));
+                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), categoryUrl($this->data('Discussion.CategoryUrlCode')), ["aria-label" => $accessibleLabel]);
                     echo '</span> ';
                 }
 

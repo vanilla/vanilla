@@ -7,10 +7,9 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import Translate from "@library/content/Translate";
-import Result, { IResult } from "@library/result/Result";
+import Result from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
 
 interface IProps {
@@ -19,6 +18,7 @@ interface IProps {
     results: any[];
     result?: React.ComponentClass;
     emptyMessage?: string;
+    headingLevel?: 2 | 3;
 }
 
 /**
@@ -33,7 +33,7 @@ export default class ResultList extends React.Component<IProps> {
         if (hasResults) {
             const ResultComponent = this.props.result ? this.props.result : Result;
             content = this.props.results.map((result, i) => {
-                return <ResultComponent {...result} key={i} />;
+                return <ResultComponent {...result} key={i} headingLevel={this.props.headingLevel} />;
             });
         } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
             content = (

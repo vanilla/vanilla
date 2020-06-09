@@ -12,7 +12,6 @@ import { TabHandler } from "@vanilla/dom-utils";
 
 export interface IProps {
     id: string;
-    parentID: string;
     className?: string;
     children: React.ReactNode;
     isVisible?: boolean;
@@ -53,7 +52,6 @@ export default class DropDownContents extends React.Component<IProps> {
             <div
                 ref={this.selfRef}
                 id={this.props.id}
-                aria-labelledby={this.props.parentID}
                 className={classNames(
                     asDropDownClasses,
                     asModalClasses,

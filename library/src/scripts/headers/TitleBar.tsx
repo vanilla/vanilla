@@ -394,14 +394,14 @@ function DesktopMeBox() {
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSPARENT}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
-                    to={`/entry/signin?target=${window.location.href}`}
+                    to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSLUCID}
                     linkClassName={classNames(classes.register, classes.guestButton)}
-                    to={`/entry/register?target=${window.location.href}`}
+                    to={`/entry/register?target=${encodeURIComponent(window.location.href)}`}
                 >
                     {t("Register")}
                 </TitleBarNavItem>
@@ -430,7 +430,7 @@ function MobileMeBox() {
         return (
             <SmartLink
                 className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
-                to={`/entry/signin?target=${window.location.href}`}
+                to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
             >
                 <SignInIcon className={"titleBar-signInIcon"} />
             </SmartLink>

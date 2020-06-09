@@ -6,7 +6,7 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { containerMainStyles } from "@library/layout/components/containerStyles";
+import { containerMainStyles, containerMainMediaQueries } from "@library/layout/components/containerStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, important, percent, px } from "csx";
@@ -219,7 +219,7 @@ export const forumLayoutCSS = () => {
         }),
     );
 
-    cssOut(`.Container`, containerMainStyles() as NestedCSSProperties);
+    cssOut(`.Container`, containerMainStyles(), containerMainMediaQueries());
 
     cssOut(`.Frame-row`, {
         display: "flex",

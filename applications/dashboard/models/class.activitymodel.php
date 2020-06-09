@@ -2298,6 +2298,7 @@ class ActivityModel extends Gdn_Model {
         $row["notificationID"] = $row["ActivityID"];
         $row["photoUrl"] = $row["Photo"];
         $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
+        $row["activityName"] = $row["ActivityName"];
 
         $body = formatString($row["Headline"], $row);
         // Replace anchors with bold text until notifications can be spun off from activities.
@@ -2325,6 +2326,7 @@ class ActivityModel extends Gdn_Model {
                 "allowNull" => true,
                 "type" => "string",
             ],
+            "activityName?" => ["type" => "string"],
             "url" => ["type" => "string"],
             "dateInserted" => ["type" => "datetime"],
             "dateUpdated" => ["type" => "datetime"],

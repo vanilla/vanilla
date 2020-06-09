@@ -37,6 +37,7 @@ class SiteSectionSchema extends InstanceValidatorSchema {
             'sectionID' => $section->getSectionID(),
             'name' => $section->getSectionName(),
             'apps' => $section->applications(),
+            'attributes' => $section->getAttributes(),
         ];
     }
 }

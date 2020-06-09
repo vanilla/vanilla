@@ -1,4 +1,7 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
+
 
 if (!function_exists('WriteDiscussionHeading')) :
     /**
@@ -122,10 +125,18 @@ if (!function_exists('writeDiscussionRow')) :
             <td class="BlockColumn BlockColumn-User FirstUser">
                 <div class="Block Wrap">
                     <?php
+                    $firstUserName = is_array($first) ? $first["Name"] : $first->Name;
+                    /** @var Vanilla\Formatting\DateTimeFormatter */
+                    $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
+                    $firstDate = $dateTimeFormatter->formatDate($discussion->FirstDate, false);
+                    $accessibleLinkLabelStartedBy= HtmlUtils::accessibleLabel('User "%s" started discussion "%s" on date %s', [$firstUserName, $discussion->Name, $firstDate]);
+
                     echo userPhoto($first, ['Size' => 'Small']);
                     echo userAnchor($first, 'UserLink BlockTitle');
                     echo '<div class="Meta">';
-                    echo anchor(Gdn_Format::date($discussion->FirstDate, 'html'), $firstPageUrl, 'CommentDate MItem');
+                    echo anchor(Gdn_Format::date($discussion->FirstDate, 'html'), $firstPageUrl, 'CommentDate MItem', [
+                        "aria-label" => $accessibleLinkLabelStartedBy,
+                    ]);
                     echo '</div>';
                     ?>
                 </div>
@@ -155,11 +166,13 @@ if (!function_exists('writeDiscussionRow')) :
             <td class="BlockColumn BlockColumn-User LastUser">
                 <div class="Block Wrap">
                     <?php
+                    $lastCommentUserName = is_array($last) ? $last["Name"] : $last->Name;
+                    $accessibleLinkLastComment= HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($discussion->LastDate, false), $discussion->Name, $lastCommentUserName]);
                     if ($last) {
                         echo userPhoto($last, ['Size' => 'Small']);
                         echo userAnchor($last, 'UserLink BlockTitle');
                         echo '<div class="Meta">';
-                        echo anchor(Gdn_Format::date($discussion->LastDate, 'html'), $lastPageUrl, 'CommentDate MItem', ['rel' => 'nofollow']);
+                        echo anchor(Gdn_Format::date($discussion->LastDate, 'html'), $lastPageUrl, 'CommentDate MItem', ['rel' => 'nofollow', 'aria-label' => $accessibleLinkLastComment]);
                         echo '</div>';
                     } else {
                         echo '&nbsp;';

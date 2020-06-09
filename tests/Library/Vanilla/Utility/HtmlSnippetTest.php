@@ -47,7 +47,32 @@ class HtmlSnippetTest extends TestCase {
 <b>Hello World!.🤓</b>
 HTML;
         $this->html->loadHtml($html);
-        $result = $this->html->saveHtml();
+        $result = $this->html->saveHTML();
         $this->assertSame($html, $result);
+    }
+
+    /**
+     * HTML should be loaded and saved
+     *
+     * @param string $html
+     * @dataProvider provideHtmlSnippets
+     */
+    public function testLoadSaveHTML(string $html): void {
+        $this->html->loadHTML($html);
+        $actual = $this->html->saveHTML();
+        $this->assertSame($html, $actual);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideHtmlSnippets(): array {
+        $r = [
+            'plain text' => ['Hello world!'],
+            'one tag' => ['<b>Hello world!🤓</b>'],
+            'multiple tags' => ["<div>a</div>\n\n<div>b</div>"],
+            'mixed plain text and tags' => ['a <b>b</b>'],
+        ];
+        return $r;
     }
 }

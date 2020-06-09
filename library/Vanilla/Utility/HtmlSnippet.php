@@ -61,7 +61,7 @@ HTML;
      * @param null $options
      * @return string
      */
-    public function saveHtml(DOMNode $node = null, $options = null) {
+    public function saveHTML(DOMNode $node = null, $options = null) {
         if ($node === null) {
             $content = $this->getElementById(self::CONTENT_ID);
             $htmlBodyString = $this->saveHtml($content, LIBXML_NOEMPTYTAG);

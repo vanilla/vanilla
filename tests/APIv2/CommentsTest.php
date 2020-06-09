@@ -13,7 +13,7 @@ use DiscussionModel;
  * Test the /api/v2/discussions endpoints.
  */
 class CommentsTest extends AbstractResourceTest {
-    use AssertLoggingTrait;
+    use AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
 
     /**
      * {@inheritdoc}

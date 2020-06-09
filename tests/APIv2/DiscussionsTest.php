@@ -15,7 +15,7 @@ use Garden\Web\Exception\ForbiddenException;
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
 
     /** @var array */
     private static $categoryIDs = [];

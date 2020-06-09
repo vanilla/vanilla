@@ -5,8 +5,11 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { TabHandler } from "@vanilla/dom-utils/src";
+import { translate } from "@vanilla/i18n/src";
+
 
 interface IGdn {
     meta: AnyObject;

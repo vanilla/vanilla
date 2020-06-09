@@ -11,6 +11,8 @@ import React from "react";
 import TextEditor from "@library/textEditor/TextEditor";
 import { StoryTextContent } from "@library/storybook/storyData";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export default {
     title: "Tabs",
@@ -18,10 +20,10 @@ export default {
 
 export function TextEditors() {
     const tabData = [
-        { label: "Header", panelData: "header", contents: <TextEditor language={"html"} /> },
-        { label: "Footer", panelData: "footer", contents: <TextEditor language={"html"} /> },
-        { label: "CSS", panelData: "css", contents: <TextEditor language={"css"} /> },
-        { label: "JS", panelData: "js", contents: <TextEditor language={"javascript"} /> },
+        { label: "Header", contents: <TextEditor language={"html"} /> },
+        { label: "Footer", contents: <TextEditor language={"html"} /> },
+        { label: "CSS", contents: <TextEditor language={"css"} /> },
+        { label: "JS", contents: <TextEditor language={"javascript"} /> },
     ];
 
     return (
@@ -79,32 +81,40 @@ export function TabWithErrors() {
     );
 }
 
-export function TabBrowse() {
+export function TabBrowse(tabProps?: Partial<React.ComponentProps<typeof Tabs>>) {
     return (
         <>
             <StoryContent>
                 <StoryHeading>Browse Tab Styles</StoryHeading>
             </StoryContent>
             <Tabs
+                {...tabProps}
                 tabType={TabsTypes.BROWSE}
                 data={[
                     {
                         label: "Tab 1",
-                        panelData: "",
                         contents: <StoryTextContent firstTitle={"Hello Tab 1"} />,
                     },
                     {
                         label: "Tab 2",
-                        panelData: "",
                         contents: <StoryTextContent firstTitle={"Hello Tab 2"} />,
                     },
                     {
                         label: "Tab 3",
-                        panelData: "",
                         contents: <StoryTextContent firstTitle={"Hello Tab 3"} />,
                     },
                 ]}
             />
         </>
+    );
+}
+
+export function TabBrowseLarge() {
+    return (
+        <TabBrowse
+            largeTabs
+            extendContainer
+            extraButtons={<Button baseClass={ButtonTypes.PRIMARY}>Extra Button</Button>}
+        />
     );
 }

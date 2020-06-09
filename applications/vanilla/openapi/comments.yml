@@ -4,10 +4,14 @@ paths:
   /comments:
     get:
       parameters:
+      - name: commentID
+        in: query
+        description: Filter by a range or CSV of comment IDs.
+        schema:
+          $ref: '#/components/schemas/RangeExpression'
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
-      - description: |
-          The discussion ID.
+      - description: The discussion ID.
         in: query
         name: discussionID
         schema:

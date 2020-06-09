@@ -15,6 +15,7 @@ use Vanilla\Navigation\BreadcrumbModel;
  * Test the /api/v2/categories endpoints.
  */
 class CategoriesTest extends AbstractResourceTest {
+    use TestPrimaryKeyRangeFilterTrait;
 
     /** This category should never exist. */
     const BAD_CATEGORY_ID = 999;
@@ -65,8 +66,10 @@ class CategoriesTest extends AbstractResourceTest {
             switch ($key) {
                 case 'urlcode':
                     $value = md5($value);
+                    break;
                 case 'displayAs':
                     $value = $value === 'flat' ? 'categories' : 'flat';
+                    break;
             }
             $row[$key] = $value;
         }
@@ -358,5 +361,13 @@ class CategoriesTest extends AbstractResourceTest {
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertFalse($categories[$row['categoryID']]['followed']);
+    }
+
+    /**
+     * Make sure `GET /categories` doesn't allow invalid querystring parameters.
+     */
+    public function testOnlyOneOfIndexQuery(): void {
+        $this->expectExceptionMessage('Only one of categoryID, parentCategoryID, parentCategoryCode, followed are allowed.');
+        $r = $this->api()->get($this->baseUrl, ['categoryID' => 123, 'followed' => true]);
     }
 }

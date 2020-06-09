@@ -93,8 +93,13 @@ if (!function_exists('CategoryLink')) :
     function categoryLink($discussion, $prefix = ' ') {
         $category = CategoryModel::categories(val('CategoryID', $discussion));
         if ($category) {
-            $accessibleLabel= HtmlUtils::accessibleLabel('Category: "%s"', [is_array($category) ? $category["Name"] : $category->Name]);
-            return wrap($prefix.anchor(htmlspecialchars($category['Name'], ["aria-label" => $accessibleLabel]), $category['Url']), 'span', ['class' => 'MItem Category']);
+            $name = is_array($category) ? $category["Name"] : $category->Name;
+            $accessibleLabel= HtmlUtils::accessibleLabel('Category: "%s"', [$name]);
+            return wrap(
+        $prefix.anchor(htmlspecialchars($name), $category['Url'], ["aria-label" => $accessibleLabel]),
+                'span',
+                ['class' => 'MItem Category']
+            );
         }
     }
 

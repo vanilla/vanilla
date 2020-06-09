@@ -80,7 +80,7 @@ HTML;
      */
     public function getHtmlContent($htmlString): string {
         $contentID = preg_quote(self::CONTENT_ID);
-        $htmlString = preg_replace('`^<div id="'.$contentID.'">(.*)</div>`', '${1}', $htmlString);;
+        $htmlString = preg_replace('`^<div id="'.$contentID.'">(.*)</div>`', '${1}', $htmlString);
         return $htmlString;
     }
 }

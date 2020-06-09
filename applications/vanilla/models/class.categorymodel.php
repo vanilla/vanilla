@@ -161,43 +161,7 @@ class CategoryModel extends Gdn_Model {
             // Try to get a rebuild lock
             $haveRebuildLock = self::rebuildLock();
             if ($haveRebuildLock || !self::$Categories) {
-                $sql = Gdn::sql();
-                $sql = clone $sql;
-                $sql->reset();
-
-                $sql->select('c.*')
-                    ->from('Category c')
-                    //->select('lc.DateInserted', '', 'DateLastComment')
-                    //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
-                    ->orderBy('c.TreeLeft');
-
-                self::$Categories = array_merge([], $sql->get()->resultArray());
-                self::$Categories = Gdn_DataSet::index(self::$Categories, 'CategoryID');
-
-                // Alphabetize the child categories if the parent is set to DisplayAs => 'Flat'
-                $flatCategories = [];
-                foreach (self::$Categories as $CategoryID => $cat) {
-                    if ($cat['DisplayAs'] === 'Flat') {
-                        $flatCategories[] = $CategoryID;
-                    }
-                }
-
-                if (count($flatCategories) > 0) {
-                    foreach ($flatCategories as $flatCat) {
-                        $toAlphabetize = array_filter(self::$Categories, function ($a) use ($flatCat) {
-                            return $a['ParentCategoryID'] === $flatCat;
-                        });
-                        usort($toAlphabetize, function ($a, $b) {
-                            return $a['Name'] <=> $b['Name'];
-                        });
-                        array_splice(
-                            self::$Categories,
-                            array_search($flatCat, array_keys(self::$Categories)) + 1,
-                            count($toAlphabetize),
-                            $toAlphabetize
-                        );
-                    }
-                }
+                self::$Categories = static::instance()->loadAllCategoriesDb();
 
                 self::buildCache();
 
@@ -311,6 +275,27 @@ class CategoryModel extends Gdn_Model {
             $userData = [];
             return $userData;
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function loadAllCategoriesDb(): array {
+        $sql = clone $this->SQL;
+        $sql->reset();
+
+        $sql->select('c.*')
+            ->from('Category c')
+            //->select('lc.DateInserted', '', 'DateLastComment')
+            //->join('Comment lc', 'c.LastCommentID = lc.CommentID', 'left')
+            ->orderBy('c.TreeLeft');
+
+        $categories = array_merge([], $sql->get()->resultArray());
+        $categories = Gdn_DataSet::index($categories, 'CategoryID');
+
+        $this->sortFlatCategories($categories);
+
+        return $categories;
     }
 
     /**
@@ -1791,8 +1776,15 @@ class CategoryModel extends Gdn_Model {
      * @param bool $addUserCategory
      */
     public static function joinUserData(&$categories, $addUserCategory = true) {
+        $test = [];
+        foreach ($categories as $category) {
+            $test[$category['CategoryID']][] = $category;
+        }
+
         $iDs = array_column($categories, 'CategoryID', 'CategoryID');
         $categories = array_combine($iDs, $categories);
+
+
 
         if ($addUserCategory) {
             $userData = self::instance()->getUserCategories();
@@ -3801,5 +3793,46 @@ SQL;
             'url:s' => 'Full URL to the category.',
         ], 'CategoryFragment');
         return $result;
+    }
+
+    /**
+     * @param array $categories
+     * @return array
+     */
+    protected function sortFlatCategories(array &$categories): void {
+        $bak = $categories;
+
+        // Alphabetize the child categories if the parent is set to DisplayAs => 'Flat'
+        $flatCategories = [];
+        foreach ($categories as $CategoryID => $cat) {
+            if ($cat['DisplayAs'] === 'Flat') {
+                $flatCategories[] = $CategoryID;
+            }
+        }
+
+        if (count($flatCategories) > 0) {
+            foreach ($flatCategories as $flatCat) {
+                $toAlphabetize = array_filter($categories, function ($a) use ($flatCat) {
+                    return $a['ParentCategoryID'] === $flatCat;
+                });
+                usort($toAlphabetize, function ($a, $b) {
+                    return strcasecmp($a['Name'], $b['Name']);
+                });
+                array_splice(
+                    $categories,
+                    array_search($flatCat, array_keys($categories)) + 1,
+                    count($toAlphabetize),
+                    $toAlphabetize
+                );
+            }
+        }
+
+        $iDs = array_column($categories, 'CategoryID', 'CategoryID');
+        if (count($iDs) !== count($categories)) {
+            foreach ($bak as &$v) {
+                $v = arrayTranslate($v, ['CategoryID', 'TreeLeft', 'TreeRight', 'ParentCategoryID', 'Name', 'DisplayAs']);
+            }
+            $foo = 'bar';
+        }
     }
 }

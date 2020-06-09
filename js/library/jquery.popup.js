@@ -143,17 +143,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             $.popup.close(settings);
       })
 
-
-
-
-       $('#'+settings.popupId).bind('popupClose',function(){
-           setTimeout(function (settings, response) {
-                   settings.onUnload(settings, response);
-
-           },1);
-       });
-
-
+       if (settings.onUnload) {
+           $('#'+settings.popupId).bind('popupClose',function(){
+               setTimeout(settings.onUnload,1);
+           });
+       }
 
       // Replace language definitions
       if (!settings.confirm) {
@@ -191,6 +185,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
        if (!settings.confirm) {
           $.popup.loading(settings);
        }
+
 
 	   var target = $.popup.findTarget(settings);
        if (settings.confirm) {
@@ -250,6 +245,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 //        });
           }
        }
+       const $popupHtml = $('#'+settings.popupId);
+       gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
    }
 
    $.popup.reveal = function(settings, data) {
@@ -260,18 +257,15 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       } else if (data !== null && typeof(data) == 'object') {
          json = data;
       }
-
       if (json == false) {
          // This is something other than json, so just put it into the popup directly
          if (data) { // Prevent blank popups
              $('#'+settings.popupId+' .Content').append(data).trigger('contentLoad');
          }
-
       } else {
          gdn.inform(json);
          formSaved = json['FormSaved'];
          data = json['Data'];
-
          // Add any js that's come in.
          $(json.js).each(function(i, el){
             var v_js  = document.createElement('script');
@@ -291,7 +285,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       $('#'+settings.popupId+' .Loading').remove();
       $('#'+settings.popupId+' .Body').children().fadeIn('normal');
-
       $('#'+settings.popupId+' .Close').unbind().click(function() {
          return $.popup.close(settings);
       });

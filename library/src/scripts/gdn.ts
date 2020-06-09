@@ -7,6 +7,7 @@
  */
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { TabHandler } from "@vanilla/dom-utils/src";
+import {translate} from "@vanilla/i18n/src";
 
 interface IGdn {
     meta: AnyObject;
@@ -30,9 +31,15 @@ if (!("translations" in gdn)) {
     gdn.translations = {};
 }
 
-if (!("makeAccesiblePopup" in gdn)) {
+if (!("translate" in gdn)) {
+    gdn.translate = translate;
+}
+
+if (!("makeAccessiblePopup" in gdn)) {
     gdn.makeAccessiblePopup = ($popupEl, settings, sender) => {
+        console.log('here')
         if (sender) {
+            console.log('after sender')
             let id = sender.id;
             if (!id) {
                 id = uniqueIDFromPrefix("popup");
@@ -43,7 +50,6 @@ if (!("makeAccesiblePopup" in gdn)) {
         }
 
         $.each($popupEl.find("a, input"), function(i, link) {
-            console.log("link: ", link);
             if (link.tagName && link.tagName.toLowerCase() === "a") {
                 link.setAttribute("tabindex", "0");
             }

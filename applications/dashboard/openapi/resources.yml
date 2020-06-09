@@ -24,13 +24,13 @@ paths:
               example:
                 - recordType: user
                   url: "https://example.com/api/v2/resources/user"
-                  hasCrawl: true
+                  crawlable: true
                 - recordType: discussion
                   url: "https://example.com/api/v2/resources/discussion"
-                  hasCrawl: true
+                  crawlable: true
                 - recordType: comment
                   url: "https://example.com/api/v2/resources/comment"
-                  hasCrawl: true
+                  crawlable: true
         '403':
           $ref: '#/components/responses/PermissionError'
   /resources/{recordType}:
@@ -79,13 +79,13 @@ components:
           type: string
           description: The URL of the resource meta information.
           format: uri
-        hasCrawl:
+        crawlable:
           type: boolean
           description: Whether or not the resource has crawl information.
       required:
         - recordType
         - url
-        - hasCrawl
+        - crawlable
     Resource:
       type: object
       properties:

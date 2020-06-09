@@ -40,6 +40,8 @@ class CategoryModel extends Gdn_Model {
     /** Flag for aggregating discussion counts. */
     const AGGREGATE_DISCUSSION = 'discussion';
 
+    const DISPLAY_FLAT = 'Flat';
+
     /**
      * @var CategoryModel $instance;
      */
@@ -3795,11 +3797,23 @@ SQL;
         return $result;
     }
 
+    protected function sortFlatCategories(array &$categories): void {
+        $categories = array_column($categories, null, 'CategoryID');
+
+        uasort($categories, function ($a, $b) use ($categories) {
+            if ($a['ParentCategoryID'] !== $b['ParentCategoryID'] || $categories[$a['ParentCategoryID']]['DisplayAs'] !== self::DISPLAY_FLAT) {
+                return $a['TreeLeft'] <=> $b['TreeLeft'];
+            } else {
+                return strcasecmp($a['Name'], $b['Name']);
+            }
+        });
+    }
+
     /**
      * @param array $categories
      * @return array
      */
-    protected function sortFlatCategories(array &$categories): void {
+    protected function sortFlatCategories2(array &$categories): void {
         $bak = $categories;
 
         // Alphabetize the child categories if the parent is set to DisplayAs => 'Flat'

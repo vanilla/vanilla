@@ -832,6 +832,17 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get a fragment of the root category for display.
+     */
+    public function getRootCategoryForDisplay() {
+        $category = self::categories(-1);
+        $category['Name'] = Gdn::config('Garden.Title');
+        $category['Url'] = Gdn::request()->getSimpleUrl('/categories');
+        $category['UrlCode'] = '';
+        return $category;
+    }
+
+    /**
      * Add multi-dimensional category data to an array.
      *
      * @param array $rows Results we need to associate category data with.
@@ -850,7 +861,9 @@ class CategoryModel extends Gdn_Model {
             $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
             if ($categoryID) {
                 $category = self::categories($categoryID);
-                if ($category) {
+                if ($categoryID === -1) {
+                    setValue($field, $row, $this->getRootCategoryForDisplay());
+                } elseif ($category) {
                     setValue($field, $row, $category);
                 }
             }

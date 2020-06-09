@@ -473,6 +473,15 @@ class LogModel extends Gdn_Pluggable {
         return $count;
     }
 
+    /**
+     * Clear specific operation counts cache key
+     *
+     * @param string $operation
+     */
+    public static function clearOperationCountCache($operation) {
+        Gdn::cache()->remove('Moderation.LogCount.'.$operation);
+    }
+
 
     /**
      * Log an operation into the log table.

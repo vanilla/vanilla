@@ -63,4 +63,10 @@ components:
               type: string
           required:
             - ssoID
+    RangeExpression:
+      description: Specify a range or CSV of values.
+      type: string
+      format: range-expression
+      externalDocs:
+        url: https://success.vanillaforums.com/kb/articles/308-range-expressions
 

@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import React, { useRef } from "react";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -15,8 +14,8 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EmojiIcon } from "@library/icons/editorIcons";
-import { visibility } from "@library/styles/styleHelpersVisibility";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
     disabled?: boolean;
@@ -25,48 +24,51 @@ interface IProps {
     legacyMode: boolean;
 }
 
-export default class EmojiFlyout extends React.Component<IProps> {
-    private titleRef = React.createRef<HTMLElement>();
-    private id = uniqueIDFromPrefix("emojiPopover");
+export function EmojiFlyout(props: IProps) {
+    const titleRef = useRef<HTMLDivElement>(null);
+    const id = useUniqueID("emojiFlyout");
 
     /**
      * @inheritDoc
      */
-    public render() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const label = t("Emoji Picker");
-        return (
-            <FlyoutToggle
-                id={this.id}
-                className="emojiPicker"
-                buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
-                onVisibilityChange={forceSelectionUpdate}
-                disabled={this.props.disabled}
-                name={label}
-                buttonContents={
-                    <>
-                        <ScreenReaderContent>{label}</ScreenReaderContent>
-                        <IconForButtonWrap icon={<EmojiIcon />} />
-                    </>
-                }
-                buttonBaseClass={ButtonTypes.ICON}
-                renderAbove={this.props.renderAbove}
-                renderLeft={this.props.renderLeft}
-                openAsModal={false}
-                initialFocusElement={this.titleRef.current}
-            >
-                {(options: IFlyoutToggleChildParameters) => {
-                    return (
-                        <EmojiPicker
-                            {...options}
-                            titleRef={this.titleRef}
-                            renderAbove={this.props.renderAbove}
-                            renderLeft={this.props.renderLeft}
-                            contentID={options.id}
-                        />
-                    );
-                }}
-            </FlyoutToggle>
-        );
-    }
+
+    const classesRichEditor = richEditorClasses(props.legacyMode);
+    const label = t("Emoji Picker");
+    const handleID = id + "-handle";
+    const contentID = id + "-content";
+    return (
+        <FlyoutToggle
+            id={handleID}
+            className="emojiPicker"
+            buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
+            onVisibilityChange={forceSelectionUpdate}
+            disabled={props.disabled}
+            name={label}
+            buttonContents={
+                <>
+                    <ScreenReaderContent>{label}</ScreenReaderContent>
+                    <IconForButtonWrap icon={<EmojiIcon />} />
+                </>
+            }
+            buttonBaseClass={ButtonTypes.ICON}
+            renderAbove={props.renderAbove}
+            renderLeft={props.renderLeft}
+            openAsModal={false}
+            initialFocusElement={titleRef.current}
+            contentID={contentID}
+        >
+            {(options: IFlyoutToggleChildParameters) => {
+                return (
+                    <EmojiPicker
+                        {...options}
+                        id={contentID}
+                        handleID={handleID}
+                        titleRef={titleRef}
+                        renderAbove={props.renderAbove}
+                        renderLeft={props.renderLeft}
+                    />
+                );
+            }}
+        </FlyoutToggle>
+    );
 }

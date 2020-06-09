@@ -280,11 +280,10 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
+            'categoryID?' => \Vanilla\Schema\RangeExpression::createSchema([':int']),
             'parentCategoryID:i?',
             'parentCategoryCode:s?',
-            'followed:b' => [
-                'default' => false,
-            ],
+            'followed:b?',
             'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2,
@@ -302,7 +301,9 @@ class CategoriesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-        ], 'in')->setDescription('List categories.');
+        ], 'in')
+            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'parentCategoryID', 'parentCategoryCode', 'followed']))
+            ->setDescription('List categories.');
         $out = $this->schema([':a' => $this->schemaWithChildren()], 'out');
 
         $query = $in->validate($query);
@@ -320,20 +321,24 @@ class CategoriesApiController extends AbstractApiController {
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if ($query['followed']) {
-            $categories = $this->categoryModel
-                ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
-                ->resultArray();
+        if (!empty($query['categoryID'])) {
+            /** @var \Vanilla\Schema\RangeExpression $range */
+            $range = $query['categoryID'];
 
-            // Index by ID for category calculation functions.
-            $categories = array_column($categories, null, 'CategoryID');
-            $categories = $this->categoryModel->flattenCategories($categories);
-            // Reset indexes for proper output detection as an indexed array.
-            $categories = array_values($categories);
+            $categoryIDs = $this->categoryModel->getVisibleCategoryIDs();
+            if ($categoryIDs === true) {
+                $range = $range->withFilteredValue('>', 0);
+            } else {
+                $range = $range->withFilteredValue('=', $categoryIDs);
+            }
 
-            $totalCountCallBack = function() {
-                return $this->categoryModel->getCount(['Followed' => true]);
-            };
+            $where = [
+                'categoryID' => $range,
+            ];
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+        } elseif ($query['followed'] ?? false) {
+            $where = ['Followed' => true];
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
@@ -341,7 +346,7 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
 
-            $totalCountCallBack = function() use ($parent) {
+            $totalCountCallBack = function () use ($parent) {
                 return $parent['CountCategories'];
             };
         } else {
@@ -634,5 +639,30 @@ class CategoriesApiController extends AbstractApiController {
         $schema = $this->fullSchema();
         $result = $schema->merge(Schema::parse($attributes));
         return $this->schema($result, $type);
+    }
+
+    /**
+     * Extracted from `index()`.
+     *
+     * @param array $where
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array
+     */
+    private function getCategoriesWhere(array $where, $limit, $offset): array {
+        $categories = $this->categoryModel
+            ->getWhere($where, '', 'asc', $limit, $offset)
+            ->resultArray();
+
+        // Index by ID for category calculation functions.
+        $categories = array_column($categories, null, 'CategoryID');
+        $categories = $this->categoryModel->flattenCategories($categories);
+        // Reset indexes for proper output detection as an indexed array.
+        $categories = array_values($categories);
+
+        $totalCountCallBack = function () use ($where) {
+            return $this->categoryModel->getCount($where);
+        };
+        return [$categories, $totalCountCallBack];
     }
 }

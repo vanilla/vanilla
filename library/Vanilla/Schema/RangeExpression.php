@@ -62,11 +62,11 @@ EOT;
 
     private const REGEX_RANGE = <<<EOT
 `
-^([[(])?        # Left bracket
-([^.,]+)?       # From
-(?:\.\.\.?|,)   # Separator
-([^.,\]\)]+)?   # To
-([)\]])?        # Right bracket
+^([[(])?\s*         # Left bracket
+([^.,\s]+)?           # From
+\s*(?:\.\.\.?|,)\s* # Separator
+([^.,\]\)\s]+)?       # To
+\s*([)\]])?            # Right bracket
 `
 mx
 EOT;
@@ -146,18 +146,18 @@ EOT;
             // This is a range expression (ex. '1..10', '(1,5]', '2020-05-01..2020-05-14)')
             [$_, $left, $from, $to, $right] = $m + array_fill(0, 5, '');
 
-            if (empty($from) && empty($to)) {
+            if ($from === '' && $to === '') {
                 throw self::createValidationException('At least one value in the range is required.');
             }
 
             $args = [];
-            if (!empty($from)) {
+            if ($from !== '') {
                 $from = self::validateValue($from, $valueSchema, $validation, 'from');
                 $args[] = $left ?: '>=';
                 $args[] = $from;
             }
 
-            if (!empty($to)) {
+            if ($to !== '') {
                 $to = self::validateValue($to, $valueSchema, $validation, 'to');
                 $args[] = $right ?: '<=';
                 $args[] = $to;
@@ -227,24 +227,7 @@ EOT;
      * @return $this
      */
     private function addValue(string $op, $value): self {
-        if (!in_array($op, self::OPERATORS)) {
-            switch ($op) {
-                case '[':
-                    $op = '>=';
-                    break;
-                case ']':
-                    $op = '<=';
-                    break;
-                case '(':
-                    $op = '>';
-                    break;
-                case ')':
-                    $op = '<';
-                    break;
-                default:
-                    throw new \InvalidArgumentException("Invalid operator: $op", 400);
-            }
-        }
+        $op = $this->translateOp($op);
 
         $this->values[$op] = $value;
         return $this;
@@ -294,6 +277,16 @@ EOT;
     }
 
     /**
+     * Get the filter value for a single operator.
+     *
+     * @param string $op The operator to inspect.
+     * @return mixed|null Returns the filter value or **null** if there isn't one.
+     */
+    public function getValue(string $op) {
+        return $this->values[$this->translateOp($op)] ?? null;
+    }
+
+    /**
      * Create a range expression and set its original expression.
      *
      * @param string $expr
@@ -338,5 +331,96 @@ EOT;
             return '';
             // @codeCoverageIgnoreStop
         }
+    }
+
+    /**
+     * Create a new range with a different value.
+     *
+     * @param string $op The operator to add.
+     * @param mixed $value The value at the operator.
+     * @return RangeExpression
+     */
+    public function withValue(string $op, $value): RangeExpression {
+        $range = clone $this;
+        $range->originalString = null;
+        $range->addValue($op, $value);
+        return $range;
+    }
+
+    /**
+     * Add a value to the range, merging with the existing filter.
+     *
+     * This method is similar to an AND operation.
+     *
+     * Example:
+     *
+     * ```php
+     * $range = new Range('>', 5);
+     * $range2 = $range->withFilteredValue('>', 6);
+     * echo $range2->getValue('>'); // outputs 6
+     * ```
+     *
+     * @param string $op The operator to add.
+     * @param mixed $value The new filter value.
+     * @return RangeExpression
+     */
+    public function withFilteredValue(string $op, $value): RangeExpression {
+        $op = $this->translateOp($op);
+        $range = clone $this;
+        $range->originalString = null;
+
+        if (!isset($range->values[$op])) {
+            $range->addValue($op, $value);
+        } else {
+            // If we have a similar op then we need to pick the "stricter" one.
+            switch ($op) {
+                case '>':
+                case '>=':
+                    $value = max($value, $range->getValue($op));
+                    break;
+                case '<':
+                case '<=':
+                    $value = min($value, $range->getValue($op));
+                    break;
+                case '=':
+                    $value = array_intersect((array)$value, (array)$range->getValue($op));
+                    if (count($value) === 1) {
+                        $value = array_pop($value);
+                    } else {
+                        $value = array_values($value);
+                    }
+                    break;
+            }
+            $range->addValue($op, $value);
+        }
+        return $range;
+    }
+
+    /**
+     * Translate an operator into its canonical form.
+     *
+     * @param string $op
+     * @return string
+     */
+    private function translateOp(string $op): string {
+        if (!in_array($op, self::OPERATORS)) {
+            switch ($op) {
+                case '[':
+                    $op = '>=';
+                    break;
+                case ']':
+                    $op = '<=';
+                    break;
+                case '(':
+                    $op = '>';
+                    break;
+                case ')':
+                    $op = '<';
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Invalid operator: $op", 400);
+            }
+        }
+        return $op;
     }
 }

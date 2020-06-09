@@ -85,6 +85,15 @@ abstract class AbstractEmbed implements \JsonSerializable {
     }
 
     /**
+     * Get the alt text for the embed.
+     *
+     * @return string
+     */
+    public function getAlt(): string {
+        return $this->data['name'];
+    }
+
+    /**
      * Render the HTML form of the embed.
      *
      * This default implementation assumes javascript rendering the browser.

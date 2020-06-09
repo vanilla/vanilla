@@ -157,6 +157,19 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
             );
         }
 
+        $siteSections[] = new MockSiteSection(
+            "single_siteSectionName_ru",
+            "ru",
+            '/single-ru',
+            "single-mockSiteSection-ru",
+            "mockSiteSectionGroup-3",
+            [
+                'Destination' => 'discussions',
+                'Type' => 'Internal'
+            ],
+            'keystone'
+        );
+
         /** @var MockSiteSectionProvider $provider */
         $provider = \Gdn::getContainer()->get(MockSiteSectionProvider::class);
         $provider->addSiteSections($siteSections);

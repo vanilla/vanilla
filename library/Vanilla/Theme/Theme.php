@@ -284,7 +284,7 @@ class Theme implements \JsonSerializable {
         $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variablesAsset instanceof JsonThemeAsset) {
             $merged = array_replace_recursive($variablesAsset->getValue(), $variables);
-            $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT), $variablesAsset->getUrl());
+            $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
             $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
         }
     }
@@ -477,6 +477,4 @@ class Theme implements \JsonSerializable {
     public function setIsCacheHit(bool $isCacheHit): void {
         $this->isCacheHit = $isCacheHit;
     }
-
-
 }

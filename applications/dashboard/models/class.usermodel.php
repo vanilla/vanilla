@@ -3031,7 +3031,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     public function searchCount($filter = '') {
         if (is_array($filter)) {
             $where = $filter;
-            $keywords = $where['Keywords'];
+            $keywords = $where['Keywords'] ?? '';
             unset($where['Keywords'], $where['Optimize']);
         } else {
             $keywords = $filter;
@@ -3059,7 +3059,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         if (filter_var($keywords, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6) !== false) {
             $fields = ['LastIPAddress'];
             $this->addIpFilters($keywords, $fields);
-        } else if ($roleID) {
+        } elseif ($roleID) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $roleID");
         } else {
             // Search on the user table.

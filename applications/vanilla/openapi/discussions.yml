@@ -4,13 +4,16 @@ paths:
   /discussions:
     get:
       parameters:
+      - name: discussionID
+        description: Filter by a range or CSV of discussion IDs.
+        in: query
+        schema:
+          $ref: '#/components/schemas/RangeExpression'
       - description: Filter by a category.
         in: query
         name: categoryID
         schema:
           type: integer
-        x-filter:
-          field: d.CategoryID
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'
@@ -72,25 +75,7 @@ paths:
           type: integer
         x-filter:
           field: d.InsertUserID
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - all
-            - category
-            - insertUser
-            - lastUser
-            - lastPost
-            - lastPost.body
-            - lastPost.insertUser
-            - reactions
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       - description: The group the discussion is in.
         in: query
         name: groupID
@@ -139,24 +124,7 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - insertUser
-            - lastUser
-            - lastPost
-            - lastPost.body
-            - lastPost.insertUser
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '200':
           content:
@@ -241,13 +209,7 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
-      - description: |
-          Expand associated records.
-        in: query
-        name: expand
-        schema:
-          default: false
-          type: boolean
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '200':
           content:
@@ -270,19 +232,7 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '204':
           description: Success
@@ -298,19 +248,7 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '200':
           content:
@@ -392,19 +330,7 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '200':
           content:
@@ -478,19 +404,7 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '200':
           content:
@@ -694,19 +608,7 @@ paths:
         required: true
         schema:
           type: integer
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - reactions
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/DiscussionExpand'
       responses:
         '204':
           description: Success
@@ -774,6 +676,25 @@ components:
       schema:
         format: date-filter
         type: string
+    DiscussionExpand:
+      name: expand
+      description: >
+        Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - all
+          - category
+          - insertUser
+          - lastUser
+          - lastPost
+          - lastPost.body
+          - lastPost.insertUser
+          - reactions
+      style: form
   schemas:
     CategoryFragment:
       properties:

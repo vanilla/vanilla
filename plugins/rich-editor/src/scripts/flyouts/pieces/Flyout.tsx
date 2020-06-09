@@ -16,14 +16,14 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IState {
     id: string;
-    descriptionID?: string;
+    descriptionID: string;
     titleID: string;
 }
 
 interface IProps extends IWithEditorProps {
     id: string;
     titleID: string;
-    descriptionID?: string;
+    descriptionID: string;
     title: string;
     accessibleDescription?: string;
     isVisible: boolean;

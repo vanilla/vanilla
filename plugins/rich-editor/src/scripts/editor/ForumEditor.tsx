@@ -16,9 +16,11 @@ import { Provider } from "react-redux";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { useUniqueID } from "@library/utility/idUtils";
 import { hasPermission } from "@library/features/users/Permission";
+import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
+    descriptionID?: string;
 }
 
 /**
@@ -30,9 +32,6 @@ export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
     const [hasFocus, setHasFocus] = useState(false);
-
-    const embedOptionsID = useUniqueID("embedOptions");
-
     return (
         <Provider store={store}>
             <DeviceProvider>
@@ -52,6 +51,7 @@ export function ForumEditor(props: IProps) {
                             hasFocus && "focus-visible",
                         )}
                     >
+                        {props.descriptionID && <EditorDescriptions id={props.descriptionID} />}
                         <EditorContent legacyTextArea={props.legacyTextArea} />
                         <EditorParagraphMenu />
                         <EditorInlineMenus />

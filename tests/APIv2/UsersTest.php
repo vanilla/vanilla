@@ -18,7 +18,7 @@ use VanillaTests\Fixtures\TestUploader;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;

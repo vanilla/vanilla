@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps, withRouter, useLocation } from "react-router";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 import { formatUrl, siteUrl } from "@library/utility/appUtils";
@@ -24,50 +24,50 @@ export interface ITitleBarNav {
     permission?: string;
 }
 
-interface IProps extends ITitleBarNav, RouteComponentProps<{}> {}
+interface IProps extends ITitleBarNav {}
 
 /**
  * Implements Navigation item component for header
  */
-export class TitleBarNavItem extends React.Component<IProps> {
-    public render() {
-        const isCurrent = this.currentPage();
-        const classes = titleBarNavClasses();
-        return (
-            <TitleBarListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
-                <SmartLink
-                    to={this.props.to}
-                    className={classNames(
-                        this.props.linkClassName,
-                        classes.link,
-                        this.props.buttonType ? getButtonStyleFromBaseClass(this.props.buttonType) : "",
-                    )}
-                >
-                    <div
-                        className={classNames(
-                            this.props.linkContentClassName,
-                            classes.linkContent,
-                            isCurrent ? classes.linkActive : "",
-                        )}
-                    >
-                        {this.props.children}
-                    </div>
-                </SmartLink>
-            </TitleBarListItem>
-        );
-    }
+export function TitleBarNavItem(props: IProps) {
+    const location = useLocation();
 
     /**
      * Checks if we're on the current page
-     * Note that this won't work with non-canonical URLHeaderLogo.tsxs
+     * Note that won't work with non-canonical URLHeaderLogo.tsx
      */
-    public currentPage = (): boolean => {
-        if (this.props.location && this.props.location.pathname) {
-            return siteUrl(window.location.pathname) === formatUrl(this.props.to, true);
+    const currentPage = (): boolean => {
+        if (location && location.pathname) {
+            return siteUrl(window.location.pathname) === formatUrl(props.to, true);
         } else {
             return false;
         }
     };
+    const isCurrent = currentPage();
+    const classes = titleBarNavClasses();
+
+    return (
+        <TitleBarListItem className={classNames(props.className, classes.root, { isCurrent })}>
+            <SmartLink
+                to={props.to}
+                className={classNames(
+                    props.linkClassName,
+                    classes.link,
+                    props.buttonType ? getButtonStyleFromBaseClass(props.buttonType) : "",
+                )}
+            >
+                <div
+                    className={classNames(
+                        props.linkContentClassName,
+                        classes.linkContent,
+                        isCurrent ? classes.linkActive : "",
+                    )}
+                >
+                    {props.children}
+                </div>
+            </SmartLink>
+        </TitleBarListItem>
+    );
 }
 
-export default withRouter(TitleBarNavItem);
+export default TitleBarNavItem;

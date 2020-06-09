@@ -1,6 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
+if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
+$tag = HtmlUtils::accessibleLabel($this);
+echo "<$tag>" . $this->data('Title') . "</$tag>";
+
 /** @var Gdn_Form $form */
 $form = $this->Form;
 echo $form->open(['id' => 'DiscussionAddTagForm']);

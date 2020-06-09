@@ -16,6 +16,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
 import { all } from "q";
+import { navigationVariables } from "@library/headers/navigationVariables";
 
 ///
 /// Types
@@ -199,6 +200,7 @@ function variableGenerator(variables: IThemeVariables) {
         contentBanner: contentBannerVariables(variables),
         titleBar: titleBarVariables(variables),
         userContent: userContentVariables(variables),
+        navigation: navigationVariables(variables),
     };
 
     // Mix in the addons generator variables.

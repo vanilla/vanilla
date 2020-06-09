@@ -364,6 +364,13 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(dropDownVariables().item.colors.fg) });
 
+    cssOut(`.HomepageTitle, .pageNotFoundTitle`, {
+        ...fonts({
+            size: vars.fonts.size.largeTitle,
+            weight: vars.fonts.weights.bold,
+        }),
+    });
+
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

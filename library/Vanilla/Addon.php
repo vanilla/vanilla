@@ -1101,7 +1101,11 @@ class Addon {
      * @return string Returns the name of the addon or its key if it has no name.
      */
     public function getName() {
-        return $this->getInfoValue('name', $this->getRawKey());
+        $displayName = $this->getInfoValue('displayName');
+        $name = $this->getInfoValue('name');
+        $rawKey = $this->getRawKey();
+
+        return $displayName ?? $name ?? $rawKey;
     }
 
     /**

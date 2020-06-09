@@ -82,7 +82,7 @@ function ErrorSignIn() {
     const { currentUser } = useUsersState();
     if (currentUser.status === LoadStatus.SUCCESS && currentUser.data && isUserGuest(currentUser.data)) {
         return (
-            <LinkAsButton to={formatUrl(`/entry/signin?Target=${encodeURIComponent(window.location.href)}`)}>
+            <LinkAsButton to={`/entry/signin?Target=${encodeURIComponent(window.location.href)}`}>
                 {t("Sign In")}
             </LinkAsButton>
         );

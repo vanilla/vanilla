@@ -40,7 +40,8 @@ EMOJIS.forEach((data, key) => {
 const lastEmojiIndex = EMOJIS.length - 1;
 
 interface IProps extends IWithEditorProps, IFlyoutToggleChildParameters {
-    contentID: string;
+    id: string;
+    handleID: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
@@ -49,7 +50,7 @@ interface IProps extends IWithEditorProps, IFlyoutToggleChildParameters {
 
 interface IState {
     id: string;
-    contentID: string;
+    handleID: string;
     activeIndex: number;
     rowStartIndex: number;
     scrollToRow: number;
@@ -67,7 +68,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         super(props);
         this.state = {
             id: props.id,
-            contentID: props.contentID,
+            handleID: props.handleID,
             activeIndex: 0,
             title: t("Emojis"),
             scrollToRow: 0,

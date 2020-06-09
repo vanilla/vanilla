@@ -62,9 +62,26 @@ class ResourcesTest extends AbstractAPIv2Test {
         $resources = $this->api()->get('/resources', ['crawlable' => true])->getBody();
         foreach ($resources as $row) {
             ['url' => $url] = $row;
-            StringUtils::substringLeftTrim($url, $this->api()->getBaseUrl());
             $r = $this->api()->get($url, ['expand' => 'crawl'])->getBody();
             $this->assertIsInt($r['crawl']['count']);
+        }
+    }
+
+    /**
+     * A basic smoke test of the individual resource endpoints.
+     */
+    public function testResourceCrawlInspectionAndCrawl(): void {
+        $resources = $this->api()->get('/resources', ['crawlable' => true])->getBody();
+        foreach ($resources as $row) {
+            ['url' => $url] = $row;
+            $r = $this->api()->get($url, ['expand' => 'crawl'])->getBody();
+            ['url' => $crawlUrl, 'parameter' => $param, 'min' => $min, 'max' => $max] = $r['crawl'];
+
+            $min = $min ?? 0;
+            $max = $max ?? 100;
+
+            $crawl = $this->api()->get($crawlUrl, [$param => "$min..$max"]);
+            $this->assertSame(200, $crawl->getStatusCode());
         }
     }
 }

@@ -7,11 +7,10 @@
 import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { t } from "@vanilla/i18n/src";
 
 export interface ITitleBarNavProps {
     className?: string;

@@ -1,0 +1,38 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: $global-color_primary, $speed: 0.7s) {
+    @include defaultTransition(opacity);
+    display: block;
+    width: $dimension;
+    height: $dimension;
+    border-radius: 50%;
+    border: {
+        top: $thickness solid $color;
+        right: $thickness solid rgba($color, 0.3);
+        bottom: $thickness solid rgba($color, 0.3);
+        left: $thickness solid rgba($color, 0.3);
+    }
+    transform: translateZ(0);
+    animation: spinnerLoader $speed infinite ease-in-out;
+
+    &::after {
+        border-radius: 50%;
+        width: $dimension;
+        height: $dimension;
+    }
+}
+
+
+$spinnerOffset: 73deg;
+@keyframes spinnerLoader {
+    0% {
+        transform: rotate($spinnerOffset);
+    }
+    100% {
+        transform: rotate(#{360 + $spinnerOffset});
+    }
+}

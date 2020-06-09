@@ -1,0 +1,30 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin shadow-embed($baseColor: $global-color_fg) {
+  box-shadow: 0 1px 3px 0 rgba($baseColor, .3);
+}
+
+@mixin shadow-embed-hover($baseColor: $global-color_fg) {
+  box-shadow: 0 1px 3px 0 rgba($baseColor, .7);
+}
+
+@mixin shadow-dropDown($baseColor: #000) {
+  box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
+}
+
+@mixin shadow-modal($baseColor: #000) {
+  box-shadow: 0 5px 20px rgba($baseColor, .5);
+}
+
+@mixin shadow-contrast($baseColor: $global-color_fg, $border: false, $borderRadius: 0) {
+    $shadowColor : rgba($baseColor, .2);
+    box-shadow: 0 0 3px 0 $shadowColor;
+    @if ($border) {
+        outline: solid $shadowColor 1px;
+        border-radius: $borderRadius;
+    }
+}

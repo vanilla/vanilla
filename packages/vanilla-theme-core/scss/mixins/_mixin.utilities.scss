@@ -1,0 +1,125 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@function parseInt($n) {
+    @return $n / ($n * 0 + 1);
+}
+
+@function stripUnit($number) {
+    @if type-of($number) == "number" and not unitless($number) {
+        @return $number / ($number * 0 + 1);
+    }
+
+    @return $number;
+}
+
+@function remToPx($rem) {
+    @return (stripUnit($rem) * stripUnit($baseFontSize)) + 0px; // Keep "px" for converting to pixels
+}
+
+@function replace($string, $search, $replace: "") {
+    $string: $string + "";
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+@function removeHash($string) {
+    @return replace($string, "#");
+}
+
+@function maxMinValue($input, $min, $max){
+    @if $input > $max {
+        @return $max;
+    } @else if $input < $min {
+        @return    $min;
+    } @else {
+        @return $input;
+    }
+}
+
+@function sqrt($r) {
+    $x0: 1;
+    $x1: $x0;
+
+    @for $i from 1 through 10 {
+        $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+        $x0: $x1;
+    }
+
+    @return $x1;
+}
+
+@function pow($number, $exponent: 2) {
+    $value: 1;
+
+    @if $exponent > 0 {
+        @for $i from 1 through $exponent {
+            $value: $value * $number;
+        }
+    }
+
+    @return $value;
+}
+
+
+@function pythagoreanTheorem-hypotenuse($a, $b) {
+    @return sqrt( pow($a) + pow($b) );
+}
+
+@function pythagoreanTheorem-getSquareSides($hypotenuse) {
+    @return sqrt( pow(stripUnit($hypotenuse)) / 2 );
+}
+
+
+@function pythagoreanTheorem-getMissingSide($hypotenuse, $side) {
+    @return sqrt( sqrt($hypotenuse) - sqrt($side) );
+}
+
+@function getEm($numerator, $denominator) {
+    @return (stripUnit($numerator)/stripUnit($denominator)) * 1em;
+}
+
+@mixin generateStylesFromMap($map) {
+    @each $property, $value in $map {
+        #{$property} : $value;
+    }
+}
+
+@mixin clearfix() {
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+@function mixContentBgAndFg($percent) {
+    @return mix($global-color-bg, $global-color-fg, $percent);
+}
+
+@mixin sr-only {
+    position: absolute !important;
+    display: block !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+}
+
+@mixin ieHack {
+    // IE 10 and 11 only
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+        @content;
+    }
+}

@@ -1,0 +1,33 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin fullBackground {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+@mixin bgMiddle {
+  background: {
+    position: 50% 50%;
+    repeat: no-repeat;
+  }
+}
+
+@mixin bgCover($img: false) {
+  @include bgMiddle;
+  background: {
+    size: cover;
+
+    @if $img and $img != none {
+      image: url($img);
+    }
+  }
+}

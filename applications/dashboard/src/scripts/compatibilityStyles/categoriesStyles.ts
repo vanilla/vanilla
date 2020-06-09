@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, colorOut, importantUnit, unit } from "@library/styles/styleHelpers";
+import { colorOut, fonts, importantUnit, margins, unit } from "@library/styles/styleHelpers";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, translateY } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const forumCategoriesVariables = useThemeCache(() => {
@@ -95,35 +95,35 @@ export const categoriesCSS = () => {
 
     cssOut(`.CategoryBox`, {
         position: "relative",
-        display: "flex",
     });
 
     cssOut(`.CategoryBox .H`, {
-        fontSize: unit(globalVars.fonts.size.largeTitle),
+        ...fonts({
+            size: globalVars.fonts.size.largeTitle,
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
     });
 
-    cssOut(`.CategoryBox.hasOptions`, {
+    cssOut(`.CategoryBox-Head`, {
+        position: "relative",
         display: "flex",
         flexWrap: "wrap",
         alignItems: "flex-start",
         justifyContent: "flex-start",
+        width: percent(100),
     });
 
-    cssOut(`.CategoryBox.hasOptions .H`, {
-        position: "relative",
+    cssOut(`.CategoryBox-Head .H`, {
         width: calc(`100% - ${unit(35)}`),
-        marginTop: unit(globalVars.fonts.size.largeTitle),
-        marginLeft: "auto",
-        $nest: {
-            "& > *": {
-                width: percent(100),
-            },
-        },
     });
 
-    cssOut(`.CategoryBox > .OptionsMenu`, {
-        // ...absolutePosition.topRight(),
+    cssOut(`.CategoryBox-Head .OptionsMenu`, {
         float: "none",
-        marginRight: unit(0),
+        transform: translateY(`-50%`),
+        ...margins({
+            horizontal: 0,
+            top: unit((globalVars.fonts.size.largeTitle * globalVars.lineHeights.condensed) / 2),
+            left: "auto",
+        }),
     });
 };

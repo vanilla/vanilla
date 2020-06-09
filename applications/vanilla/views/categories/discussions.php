@@ -6,6 +6,7 @@ if ($this->data('EnableFollowingFilter')) {
     echo '<div class="PageControls Top">'.categoryFilters().'</div>';
 }
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
+$dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 ?>
 <div class="Categories">
     <?php if ($this->CategoryData->numRows() > 0): ?>
@@ -16,12 +17,16 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                 $this->Category = $Category;
                 $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
                 $options = getOptions($Category);
+
             ?>
 
-            <div class="CategoryBox<?php echo (!empty($options) ? " hasOptions" : ""); ?> Category-<?php echo $Category->UrlCode; ?>">
+            <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
                 <?php
-                    if ()
-                    echo $options;
+                    if (!$dataDriven) {
+                        echo $options;
+                    } else {
+                        echo "<div class='CategoryBox-Head'>";
+                    }
                 ?>
                 <h2 class="H">
                     <?php
@@ -31,7 +36,12 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                     ?>
                 </h2>
-
+                <?php
+                    if ($dataDriven) {
+                        echo $options;
+                        echo "</div>";
+                    }
+                ?>
                 <?php if (isset($this->DiscussionData) && $this->DiscussionData->numRows() > 0) : ?>
                     <ul class="DataList Discussions">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>

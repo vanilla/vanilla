@@ -200,11 +200,17 @@ compatibilityStyles = useThemeCache(() => {
         width: calc(`100% + ${unit(horizontalPadding)}`),
     });
 
-    cssOut(`.DataList .Item`, {
-        borderTop: singleBorder(),
-        borderBottom: singleBorder(),
-        ...paddings(resultVars.spacing.padding),
-    });
+    cssOut(
+        `
+        .DataList .Item,
+        .DataList .Empty,
+    `,
+        {
+            borderTop: singleBorder(),
+            borderBottom: singleBorder(),
+            ...paddings(resultVars.spacing.padding),
+        },
+    );
 
     cssOut(`.DataList .Item + .Item`, {
         borderTop: "none",

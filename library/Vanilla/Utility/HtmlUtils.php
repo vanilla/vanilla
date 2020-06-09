@@ -13,6 +13,10 @@ namespace Vanilla\Utility;
  * DO NOT ADD PROPERTIES OR NON-STATIC METHODS TO THIS CLASS.
  */
 final class HtmlUtils {
+
+    /** @var string[] Keep track of dom IDs */
+    private static $domIDs = [];
+
     /**
      * Takes an array of attributes and formats them in attribute="value" format.
      *
@@ -124,6 +128,20 @@ final class HtmlUtils {
     }
 
 
+    /**
+     * Provides a unique id
+     *
+     * @param string $prefix ID prefix
+
+     * @return string
+     */
+    public static function uniqueElementID($prefix): string {
+        if (empty(self::$domIDs[$prefix])) {
+            self::$domIDs[$prefix] = 0;
+        }
+        return $prefix . ++self::$domIDs[$prefix];
+    }
+
 
     /**
      * Provides an accessible context for clickable items, so they can make sense out of context.
@@ -135,4 +153,6 @@ final class HtmlUtils {
     public static function accessibleLabel($template, $data): string {
         return htmlspecialchars(sprintf(t($template), ...$data));
     }
+
+
 }

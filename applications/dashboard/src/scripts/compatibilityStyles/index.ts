@@ -289,17 +289,6 @@ compatibilityStyles = useThemeCache(() => {
         opacity: 1,
     });
 
-    cssOut(
-        `
-        .Container a.UserLink,
-        .Container a.UserLink.BlockTitle
-    `,
-        {
-            textOverflow: "inherit",
-            fontWeight: vars.fonts.weights.bold,
-        },
-    );
-
     cssOut(".Panel > * + *", {
         marginTop: unit(24),
     });

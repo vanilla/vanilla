@@ -16,6 +16,24 @@ export function blockColumnCSS() {
     const forumVars = forumVariables();
     const userPhotoSizing = forumVars.userPhoto.sizing;
     const mixins = userPhotoMixins(forumVars.userPhoto);
+    const margin = 12;
+
+    cssOut(`.Block.Wrap`, {
+        overflow: "hidden",
+        textOverflow: "hidden",
+    });
+
+    cssOut(
+        `
+        .Container a.UserLink,
+        .Container a.UserLink.BlockTitle
+    `,
+        {
+            // textOverflow: "inherit",
+            fontWeight: globalVars.fonts.weights.bold,
+        },
+    );
+
     // Reworked placement of BlockColumn, because they were misaligned and also causing false positives on the accessibility tests.
     cssOut(`.BlockColumn .Block.Wrap`, {
         display: "flex",
@@ -25,6 +43,7 @@ export function blockColumnCSS() {
         justifyContent: "space-between",
         alignItems: "flex-end",
         minHeight: unit(userPhotoSizing.medium),
+        textOverflow: "ellipsis",
     });
 
     cssOut(
@@ -53,7 +72,7 @@ export function blockColumnCSS() {
         .DataTable .Block.Wrap .Meta
         `,
         {
-            width: calc(`100% - ${unit(userPhotoSizing.medium + 12)}`),
+            width: calc(`100% - ${unit(userPhotoSizing.medium + margin)}`),
             margin: 0,
         },
     );
@@ -84,8 +103,6 @@ export function blockColumnCSS() {
         .DataTable tbody td.LastUser .PhotoWrap img,
         .DataTable tbody td.FirstUser .PhotoWrap img
     `,
-        {
-            ...mixins.photo,
-        },
+        mixins.photo,
     );
 }

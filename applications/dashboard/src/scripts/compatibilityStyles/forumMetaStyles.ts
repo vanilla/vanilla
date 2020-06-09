@@ -16,13 +16,12 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
-    cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
+    cssOut(selector, metaContainerStyles(overwrites));
 };
 
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
 
     mixinMetaLinkContainer(".DataList");
     mixinMetaLinkContainer(".DataList-Search");
@@ -41,7 +40,7 @@ export const forumMetaCSS = () => {
         .DataList .Meta
     `,
         {
-            color: colorOut(globalVars.meta.colors.fg),
+            color: colorOut(globalVars.meta.text.color),
             fontSize: unit(globalVars.meta.text.fontSize),
         },
     );

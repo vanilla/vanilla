@@ -128,7 +128,7 @@ const titleBarNavClasses = useThemeCache(() => {
         justifyContent: "center",
         minHeight: unit(vars.item.size),
         textDecoration: "none",
-        alignSelf: "stretch",
+        alignSelf: "center",
         paddingLeft: unit(vars.navLinks.padding.left),
         paddingRight: unit(vars.navLinks.padding.right),
         fontSize: unit(vars.navLinks.fontSize),

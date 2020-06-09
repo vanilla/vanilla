@@ -86,7 +86,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                         this.props.isCentered && classes.navigationCentered,
                     )}
                 >
-                    <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
+                    <ul className={classNames(this.props.listClassName, classes.items)}>
                         {this.props.children ? this.props.children : content}
                         <>
                             {this.props.excludeExtraNavItems ??

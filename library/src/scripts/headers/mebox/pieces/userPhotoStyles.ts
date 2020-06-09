@@ -4,9 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { NestedCSSProperties } from "typestyle/lib/types";
 

@@ -408,4 +408,37 @@ class ArrayUtilsTest extends TestCase {
         ];
         return $r;
     }
+
+    /**
+     * Test `ArrayUtils::sortCallback()`.
+     *
+     * @param array $fields
+     * @param int $expected
+     * @dataProvider provideSortCallbackTests
+     */
+    public function testSortCallback(array $fields, int $expected) {
+        $a = ['a' => 1, 'b' => 'B', 'c' => 1];
+        $b = ['a' => 1, 'b' => 'a', 'c' => 2];
+
+        $fn = ArrayUtils::sortCallback(...$fields);
+
+        $actual = $fn($a, $b);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideSortCallbackTests(): array {
+        $r = [
+            'same' => [['a'], 0],
+            'case insensitive' => [['b'], 1],
+            'multi' => [['a', 'b'], 1],
+            'multi bail' => [['c', 'b'], -1],
+            'desc' => [['-c'], 1],
+        ];
+        return $r;
+    }
 }

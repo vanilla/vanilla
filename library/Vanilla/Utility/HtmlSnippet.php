@@ -47,11 +47,11 @@ HTML;
             $content = $this->getElementById(self::CONTENT_ID);
             $htmlBodyString = $this->saveXML($content, LIBXML_NOEMPTYTAG);
             $htmlBodyString = $this->getHtmlContent($htmlBodyString);
+            return $htmlBodyString;
         } else {
             $htmlBodyString = parent::saveXML($node, $options);
-            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
+            return $htmlBodyString;
         }
-        return $htmlBodyString;
     }
 
     /**
@@ -66,11 +66,11 @@ HTML;
             $content = $this->getElementById(self::CONTENT_ID);
             $htmlBodyString = $this->saveHtml($content, LIBXML_NOEMPTYTAG);
             $htmlBodyString = $this->getHtmlContent($htmlBodyString);
+            return $htmlBodyString;
         } else {
             $htmlBodyString = parent::saveHtml($node);
-            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
+            return $htmlBodyString;
         }
-        return $htmlBodyString;
     }
 
     /**
@@ -78,9 +78,9 @@ HTML;
      *
      * @param string $htmlString
      */
-    public function getHtmlContent(string $htmlString): string {
-        $htmlString = preg_replace('#<div id="'.self::CONTENT_ID.'">#', '', $htmlString);
-        $htmlString = preg_replace('#</div>#', '', $htmlString);
+    public function getHtmlContent($htmlString): string {
+        $contentID = preg_quote(self::CONTENT_ID);
+        $htmlString = preg_replace('`^<div id="'.$contentID.'">(.*)</div>`', '${1}', $htmlString);;
         return $htmlString;
     }
 }

@@ -91,7 +91,7 @@ class ModelFactory implements ContainerInterface {
      * @throws NotFoundExceptionInterface Throws an exception when the ref isn't found.
      */
     public function getRecordType(string $ref): string {
-        $r = $this->getRecordTypes()[$ref];
+        $r = $this->getRecordTypes()[$ref] ?? null;
         if ($r !== null) {
             return $r;
         }

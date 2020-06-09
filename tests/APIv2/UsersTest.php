@@ -18,7 +18,7 @@ use VanillaTests\Fixtures\TestUploader;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
@@ -49,6 +49,7 @@ class UsersTest extends AbstractResourceTest {
             'name' => null,
             'email' => null
         ];
+        $this->sortFields = ['dateInserted', 'dateLastActive', 'name', 'userID'];
 
         parent::__construct($name, $data, $dataName);
     }

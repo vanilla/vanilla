@@ -322,6 +322,8 @@ final class ArrayUtils {
      * usort($data, ArrayUtils::datasetSortCallback('-score', 'date'));
      * ```
      *
+     * Note that string comparisons are case-insensitive to emulate common database collations.
+     *
      * @param string $keys The keys to sort by.
      * @return callable Returns a function that can be passed to `usort`.
      */
@@ -329,19 +331,29 @@ final class ArrayUtils {
         $sortKeys = [];
         foreach ($keys as $key) {
             if ($key[0] === '-') {
-                $sortKeys[substr($key, 0, 1)] = -1;
+                $sortKeys[substr($key, 1)] = -1;
             } else {
                 $sortKeys[$key] = 1;
             }
         }
 
         return function ($a, $b) use ($sortKeys): int {
-            foreach ($sortKeys as $key => $desc) {
-                $s = $a <=> $b;
+            foreach ($sortKeys as $key => $dir) {
+                $va = $a[$key];
+                $vb = $b[$key];
+
+                if (is_string($va) && is_string($vb)) {
+                    // Emulate case insensitive database collations.
+                    $s = strcasecmp($va, $vb);
+                } else {
+                    $s = $va <=> $vb;
+                }
+
                 if ($s !== 0) {
-                    return $desc * $s;
+                    return $dir * $s;
                 }
             }
+            return 0;
         };
     }
 }

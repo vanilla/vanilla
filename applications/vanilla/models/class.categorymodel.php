@@ -482,9 +482,9 @@ class CategoryModel extends Gdn_Model {
     /**
      * Get a list of IDs of categories visible to the current user.
      *
-     * @see CategoryModel::categoryWatch
-     * @param array $options Options compatible with CategoryModel::getVisibleCategories
+     * @param array $options Options compatible with `CategoryModel::getVisibleCategories()`.
      * @return array|bool An array of filtered category IDs or true if no categories were filtered.
+     * @see CategoryModel::categoryWatch
      */
     public function getVisibleCategoryIDs(array $options = []) {
         $categoryModel = self::instance();
@@ -832,11 +832,23 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get a fragment of the root category for display.
+     */
+    public function getRootCategoryForDisplay() {
+        $category = self::categories(-1);
+        $category['Name'] = Gdn::config('Garden.Title');
+        $category['Url'] = Gdn::request()->getSimpleUrl('/categories');
+        $category['UrlCode'] = '';
+        return $category;
+    }
+
+    /**
      * Add multi-dimensional category data to an array.
      *
      * @param array $rows Results we need to associate category data with.
+     * @param string $field
      */
-    public function expandCategories(array &$rows) {
+    public function expandCategories(array &$rows, string $field = 'Category') {
         if (count($rows) === 0) {
             // Nothing to do here.
             return;
@@ -845,21 +857,24 @@ class CategoryModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $populate = function(array &$row) {
-            if (array_key_exists('CategoryID', $row)) {
-                $category = self::categories($row['CategoryID']);
-                if ($category) {
-                    setValue('Category', $row, $category);
+        $populate = function (array &$row, string $field) {
+            $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
+            if ($categoryID) {
+                $category = self::categories($categoryID);
+                if ($categoryID === -1) {
+                    setValue($field, $row, $this->getRootCategoryForDisplay());
+                } elseif ($category) {
+                    setValue($field, $row, $category);
                 }
             }
         };
 
         // Inject those categories.
         if ($single) {
-            $populate($rows);
+            $populate($rows, $field);
         } else {
             foreach ($rows as &$row) {
-                $populate($row);
+                $populate($row, $field);
             }
         }
     }
@@ -1038,6 +1053,20 @@ class CategoryModel extends Gdn_Model {
         $result = $this->collection->getTree($categoryID, $options);
         return $result;
     }
+
+
+    /**
+     * Get the ID's of a descendant.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return array
+     */
+    public function getCategoryDescendantIDs(int $categoryID, array $options = []): array {
+        $result = $this->collection->getDescendantIDs($categoryID, $options);
+        return $result;
+    }
+
 
     /**
      * @param int|string $id The parent category ID or slug.

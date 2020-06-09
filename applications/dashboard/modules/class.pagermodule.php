@@ -323,6 +323,7 @@ class PagerModule extends Gdn_Module {
     private static function makeAttributes(int $page, int $currentPage): array {
         $attrs = [
             'aria-label' => sprintf(t('Page %s'), $page),
+            'tabindex' => '0'
         ];
 
         if ($page === $currentPage - 1) {
@@ -354,12 +355,15 @@ class PagerModule extends Gdn_Module {
      * Builds page navigation links.
      *
      * @param string $type Type of link to return: 'more' or 'less'.
+     * @param array $attributes Extra attributes
      * @return string HTML page navigation links.
      */
-    public function toString($type = 'more') {
+    public function toString($type = 'more', $attributes = []) {
         if ($this->_PropertiesDefined === false) {
             trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
+
+        $isAfter = $type == 'more';
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(['%1$s', '%2$s', '%s'], '{Page}', $this->Url);
@@ -367,7 +371,7 @@ class PagerModule extends Gdn_Module {
         $this->addRelLinks(Gdn::controller());
 
         if ($this->TotalRecords === false) {
-            return $this->toStringPrevNext($type);
+            return $this->toStringPrevNext($type, $attributes);
         }
 
         // Get total page count, allowing override
@@ -382,7 +386,7 @@ class PagerModule extends Gdn_Module {
             return sprintf(
                 $this->Wrapper,
                 attribute(['class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
-                $this->previousLink($pageCount + 1)
+                $this->previousLink($pageCount + 1, $attributes)
             );
         }
 
@@ -399,16 +403,18 @@ class PagerModule extends Gdn_Module {
             $pagesToDisplay = $pageCount;
         }
 
-        $pager = '';
+        $clientID = $this->ClientID;
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
         $linkCount = $pagesToDisplay + 2;
 
+        $pager = "";
+
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
+            $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
+            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev', 'tabindex' => "0"]);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -483,15 +489,14 @@ class PagerModule extends Gdn_Module {
                 $nextText,
                 $this->pageUrl($currentPage + 1),
                 'Next Pager-nav',
-                ['rel' => 'next']
+                ['rel' => 'next', 'tabindex' => "0"]
             ); // extra sprintf parameter in case old url style is set
         }
         if ($pageCount <= 1) {
             $pager = '';
         }
 
-        $clientID = $this->ClientID;
-        $clientID = $type == 'more' ? $clientID.'After' : $clientID.'Before';
+        $clientID = $isAfter ? $clientID.'After' : $clientID.'Before';
 
         if ($pager) {
             if (isset($this->HtmlBefore)) {
@@ -505,19 +510,20 @@ class PagerModule extends Gdn_Module {
         if ($pager === '') {
             return $pager;
         } else {
+            $attributes = [
+                'role' => 'navigation',
+                'id' => $clientID,
+                'aria-label' => t('Pagination') . " - " . ($isAfter ? t("Bottom") : t('Top')) ,
+                'class' => concatSep(
+                    ' ',
+                    $this->CssClass,
+                    'PagerLinkCount-' . $linkCount,
+                    static::NUMBERED_CLASS
+                ),
+            ];
             return sprintf(
                 $this->Wrapper,
-                attribute([
-                    'role' => 'navigation',
-                    'aria-label' => 'pagination',
-                    'id' => $clientID,
-                    'class' => concatSep(
-                        ' ',
-                        $this->CssClass,
-                        'PagerLinkCount-' . $linkCount,
-                        static::NUMBERED_CLASS
-                    ),
-                ]),
+                attribute($attributes),
                 $pager
             );
         }
@@ -527,10 +533,12 @@ class PagerModule extends Gdn_Module {
      *
      *
      * @param string $type
+     * @param array $attributes
      * @return string
      */
-    public function toStringPrevNext($type = 'more') {
+    public function toStringPrevNext($type = 'more', $attributes = []) {
         $currentPage = pageNumber($this->Offset, $this->Limit);
+        $isAfter = $type == "more";
 
         $pager = '';
 
@@ -550,7 +558,7 @@ class PagerModule extends Gdn_Module {
         }
 
         $clientID = $this->ClientID;
-        $clientID = $type == 'more' ? $clientID.'After' : $clientID.'Before';
+        $clientID = $isAfter ? $clientID.'After' : $clientID.'Before';
 
         if (isset($this->HtmlBefore)) {
             $pager = $this->HtmlBefore.$pager;
@@ -558,7 +566,7 @@ class PagerModule extends Gdn_Module {
 
         return $pager == '' ? '' : sprintf(
             $this->Wrapper,
-            attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
+            attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS), ['tabindex' =>  '0']]),
             $pager
         );
     }
@@ -665,9 +673,10 @@ class PagerModule extends Gdn_Module {
 
     /**
      * @param $currentPage
+     * @param array $options
      * @return string
      */
-    private function previousLink($currentPage): string {
-        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
+    private function previousLink($currentPage, $options): string {
+        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev', 'tabindex' => '0']);
     }
 }

@@ -247,7 +247,7 @@ export function UserIcon(props: { filled?: boolean; className?: string }) {
     );
 }
 
-export function NoUserPhotoIcon(props: { className?: string }) {
+export function NoUserPhotoIcon(props: { className?: string; photoAlt?: string }) {
     const title = t("User");
     const classes = iconClasses();
     return (
@@ -256,8 +256,9 @@ export function NoUserPhotoIcon(props: { className?: string }) {
             viewBox="0 0 24 24"
             className={classNames(classes.standard, "icon-noUserPhoto", props.className)}
             aria-hidden="true"
+            aria-label={props.photoAlt}
         >
-            <title>{title}</title>
+            <title>{props.photoAlt || title}</title>
             <path
                 d="M12.046,12.907c-2.225,0-4.03-2.218-4.03-4.954C8.016,4.16,9.82,3,12.046,3s4.03,1.16,4.03,4.953C16.076,10.689,14.271,12.907,12.046,12.907Zm8.9,6.452a17.94,17.94,0,0,1-.194,4.2A1.025,1.025,0,0,1,19.9,24H3.96a1.024,1.024,0,0,1-.852-.443,17.956,17.956,0,0,1,.04-4.2l2.033-4.39a1,1,0,0,1,.46-.469L8.8,12.926a.211.211,0,0,1,.217.017,5.149,5.149,0,0,0,6.068,0,.211.211,0,0,1,.216-.017L18.452,14.5a1,1,0,0,1,.46.469Z"
                 fill="currentColor"

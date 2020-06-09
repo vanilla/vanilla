@@ -82,7 +82,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
                     { [classes.offsetPadding]: props.offsetPadding },
                 )}
                 buttonContents={<SelectBoxButton activeItem={selectedOption} />}
-                buttonClassName={classNames(props.buttonClassName, "selectBox-toggle", classes.toggle)}
+                buttonClassName={classNames(props.buttonClassName, classes.toggle)}
                 contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
                 buttonBaseClass={props.buttonBaseClass}
                 openAsModal={props.openAsModal}

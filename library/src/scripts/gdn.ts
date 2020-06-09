@@ -5,6 +5,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { translate } from "@vanilla/i18n/src";
 
 interface IGdn {
     meta: AnyObject;
@@ -26,6 +27,10 @@ if (!("permissions" in gdn)) {
 
 if (!("translations" in gdn)) {
     gdn.translations = {};
+}
+
+if (!("translate" in gdn)) {
+    gdn.translate = translate;
 }
 
 export default gdn as IGdn;

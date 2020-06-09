@@ -248,7 +248,7 @@ EOT;
      *
      * @param RangeExpression $range
      * @param string $expectedWhere
-     * @dataProvider testRangeExpressionTests
+     * @dataProvider provideRangeExpressionTests
      */
     public function testRangeExpressionWhere(RangeExpression $range, string $expectedWhere) {
         $actual = $this->sql->select()->from('foo')->where('b', $range)->getSelect();
@@ -261,11 +261,12 @@ EOT;
      *
      * @return array
      */
-    public function testRangeExpressionTests(): array {
+    public function provideRangeExpressionTests(): array {
         $r = [
             'basic' => [new RangeExpression('>', 1), 'where `b` > :b'],
             'two values' => [new RangeExpression('>=', 1, '<=', 2), 'where `b` >= :b and `b` <= :b0'],
             'in clause' => [new RangeExpression('=', [1, 2]), "where `b` in ('1', '2')"],
+            'empty equals' => [new RangeExpression('=', []), "where 1 = 0"]
         ];
         return $r;
     }

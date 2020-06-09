@@ -7,6 +7,7 @@
 namespace Vanilla\Utility;
 
 use InvalidArgumentException;
+use Psr\Http\Message\UriInterface;
 
 /**
  * A collection of url utilities.
@@ -25,7 +26,9 @@ class UrlUtils {
         if (!array_key_exists('host', $parsedLink)) {
             $parsedLink = parse_url('http://'.$url);
             if (!array_key_exists('host', $parsedLink)) {
+                // @codeCoverageIgnoreStart
                 throw new InvalidArgumentException('Url Invalid.');
+                // @codeCoverageIgnoreEnd
             }
         }
         $parsedLink['host'] = idn_to_ascii($parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
@@ -34,5 +37,47 @@ class UrlUtils {
         }
         $buildUrl = http_build_url($parsedLink);
         return $buildUrl;
+    }
+
+    /**
+     * Generate a new URI by replacing querystring elements from an existing URI.
+     *
+     * @param UriInterface $uri The base URI.
+     * @param array $replace The querystring replacement.
+     * @return UriInterface
+     */
+    public static function replaceQuery(UriInterface $uri, array $replace): UriInterface {
+        parse_str($uri->getQuery(), $query);
+        $query = array_replace($query, $replace);
+        $result = $uri->withQuery(http_build_query($query));
+        return $result;
+    }
+
+    /**
+     * URL encode a decoded path.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function encodePath(string $path): string {
+        $parts = explode('/', $path);
+        $parts = array_map('rawurlencode', $parts);
+
+        $r = implode('/', $parts);
+        return $r;
+    }
+
+    /**
+     * URL decode an encoded path.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function decodePath(string $path): string {
+        $parts = explode('/', $path);
+        $parts = array_map('rawurldecode', $parts);
+
+        $r = implode('/', $parts);
+        return $r;
     }
 }

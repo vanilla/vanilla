@@ -1,6 +1,6 @@
 <?php
-
 if (!defined('APPLICATION')) exit();
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
 
@@ -163,7 +163,11 @@ if (!function_exists('writeListItem')):
             <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
                 <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
-                    <?php echo Gdn_Format::text(val('Name', $category)); ?>
+                    <?php echo Gdn_Format::text(val('Name', $category));
+                    Gdn::controller()->EventArguments['ChildCategories'] = &$children;
+                    Gdn::controller()->EventArguments['Category'] = &$category;
+                    Gdn::controller()->fireEvent('AfterCategoryHeadingTitle');
+                    ?>
                 </div>
             </li>
         <?php else: ?>
@@ -270,6 +274,8 @@ if (!function_exists('WriteTableRow')):
         $level = 3;
         /** @var Vanilla\Formatting\Html\HtmlSanitizer */
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
 
         ?>
         <tr class="<?php echo cssClass($row, true); ?>">
@@ -341,7 +347,9 @@ if (!function_exists('WriteTableRow')):
                             echo anchor(
                                 Gdn_Format::date($row['LastDateInserted'], 'html'),
                                 $row['LastUrl'],
-                                'CommentDate MItem');
+                                'CommentDate MItem', [
+                                    "aria-label" => HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
+                                ]);
 
                             if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);

@@ -137,6 +137,20 @@ class FormatService {
     }
 
     /**
+     * Parse image attributes out of the post contents.
+     *
+     * @param string $content
+     * @param string|null $format The format of the content.
+     *
+     * @return array
+     */
+    public function parseImages(string $content, ?string $format): array {
+        return $this
+            ->getFormatter($format)
+            ->parseImages($content);
+    }
+
+    /**
      * Parse out a list of headings from the post contents.
      *
      * @param string $content The raw content to parse.

@@ -15,6 +15,7 @@ import { ILinkListData } from "@library/@types/api/core";
 import NavLinks, { INavLinkNoItemComponent } from "@library/navigation/NavLinks";
 import Container from "@library/layout/components/Container";
 import { visibility } from "@library/styles/styleHelpers";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 interface IProps {
     title: string; // For accessibility, title of group
@@ -68,12 +69,16 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                 );
             });
 
+            const sectionTitleID = uniqueIDFromPrefix("navLinksSectionTitle");
+
             return (
                 <Container fullGutter narrow>
-                    <nav
+                    <section
+                        aria-labelledby={sectionTitleID}
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}
                     >
                         <Heading
+                            id={sectionTitleID}
                             title={this.props.title}
                             depth={this.props.depth}
                             className={classNames(
@@ -84,7 +89,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                         />
                         {groupedContent}
                         {ungroupedContent}
-                    </nav>
+                    </section>
                 </Container>
             );
         } else {
@@ -93,8 +98,6 @@ export default class NavLinksWithHeadings extends Component<IProps> {
     }
 
     private separator(classes?: string) {
-        return (
-            <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} role="presentation" />
-        );
+        return <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} />;
     }
 }

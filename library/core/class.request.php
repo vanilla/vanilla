@@ -10,6 +10,8 @@
  * @since 2.0
  */
 use Garden\Web\RequestInterface;
+use League\Uri\Http;
+use Psr\Http\Message\UriInterface;
 use Vanilla\UploadedFile;
 
 /**
@@ -102,6 +104,7 @@ class Gdn_Request implements RequestInterface {
      * @return string Returns the current asset root.
      *
      * @deprecated 2.8 Use the explicit asset functions instead.
+     * @codeCoverageIgnore
      */
     public function assetRoot($assetRoot = null) {
         if ($assetRoot !== null) {
@@ -598,12 +601,24 @@ class Gdn_Request implements RequestInterface {
     public function getUrl() {
         $scheme = $this->getScheme();
         $hostAndPort = $this->getHostAndPort();
-        $fullPath = $this->getFullPath();
+        $fullPath = \Vanilla\Utility\UrlUtils::encodePath($this->getFullPath());
 
         $query = $this->getQuery();
         $queryString = (empty($query) ? '' : '?'.http_build_query($query));
 
         return "{$scheme}://{$hostAndPort}{$fullPath}{$queryString}";
+    }
+
+    /**
+     * Retrieves the URI instance.
+     *
+     * This method MUST return a UriInterface instance.
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     * @return UriInterface Returns a UriInterface instance representing the URI of the request.
+     */
+    public function getUri() {
+        return Http::createFromString($this->getUrl());
     }
 
     /**
@@ -613,6 +628,8 @@ class Gdn_Request implements RequestInterface {
      * @param string $key Name of the request argument to retrieve.
      * @param mixed $default Value to return if argument not found.
      * @return mixed
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function getValue($key, $default = false) {
         return $this->merged($key, $default);
@@ -1072,7 +1089,7 @@ class Gdn_Request implements RequestInterface {
         if ($pathAndQuery) {
             // Parse out the path into parts.
             $parts = parse_url($pathAndQuery);
-            $path = val('path', $parts, '');
+            $path = \Vanilla\Utility\UrlUtils::decodePath($parts['path'] ?? '');
 
             // Check for a filename.
             $filename = basename($path);
@@ -1098,7 +1115,7 @@ class Gdn_Request implements RequestInterface {
         }
 
         // Construct the path and query.
-        $result = $this->path();
+        $result = $this->path(true);
 
 //      $Filename = $this->filename();
 //      if ($Filename && $Filename != 'default')
@@ -1152,6 +1169,8 @@ class Gdn_Request implements RequestInterface {
      * @param string|null $key The key of the post item or null to return the entire array.
      * @param mixed $default The value to return if the item isn't set.
      * @return mixed
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function merged($key = null, $default = null) {
         $merged = [];
@@ -1843,8 +1862,11 @@ class Gdn_Request implements RequestInterface {
      * @param array $customArgs Key/value array of custom request argument data.
      * @flow chain
      * @return Gdn_Request
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function withCustomArgs($customArgs) {
+        deprecated(__METHOD__, __CLASS__.'::setAttribute()');
         $this->_setRequestArguments(self::INPUT_CUSTOM, $customArgs);
         return $this;
     }
@@ -1857,8 +1879,11 @@ class Gdn_Request implements RequestInterface {
      * @param array $args Optional argument list to forward to the method. Omit for none.
      * @flow chain
      * @return Gdn_Request
+     * @deprecated
+     * @codeCoverageIgnore
      */
     public function withControllerMethod($controller, $method = null, $args = []) {
+        deprecated(__METHOD__);
         if (is_a($controller, 'Gdn_Controller')) {
             // Convert object to string
             $matches = [];
@@ -1899,6 +1924,7 @@ class Gdn_Request implements RequestInterface {
      *
      * @param string $route
      * @return $this
+     * @deprecated
      */
     public function withRoute($route) {
         $parsedURI = Gdn::router()->getDestination($route);

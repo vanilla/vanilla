@@ -1535,7 +1535,7 @@ if (!function_exists('userPhotoUrl')) {
         $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
         $photo = val('Photo', $user);
         if ($fullUser && $fullUser['Banned']) {
-            $photo = 'https://images.v-cdn.net/banned_100.png';
+            $photo = c('Garden.BannedPhotoSmall', c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_100.png'));
         }
 
         if ($photo) {

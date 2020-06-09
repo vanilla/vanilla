@@ -122,4 +122,17 @@ final class HtmlUtils {
 
         return $r;
     }
+
+
+
+    /**
+     * Provides an accessible context for clickable items, so they can make sense out of context.
+     *
+     * @param string $template The text template
+     * @param array $data The placeholder data
+     * @return string
+     */
+    public static function accessibleLabel($template, $data): string {
+        return htmlspecialchars(sprintf(t($template), ...$data));
+    }
 }

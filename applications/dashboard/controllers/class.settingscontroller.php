@@ -1241,6 +1241,7 @@ class SettingsController extends DashboardController {
 
         Gdn_Theme::section('DashboardHome');
         $this->setData('IsWidePage', true);
+        $this->CssClass .= " dashboard";
 
         $this->render('index');
     }

@@ -19,6 +19,7 @@ interface IProps {
     errorMessage?: string;
     forceError?: boolean;
     allowEmpty?: true;
+    placeholder?: string;
 }
 
 export function ThemeInputText(props: IProps) {
@@ -70,6 +71,7 @@ export function ThemeInputText(props: IProps) {
             <InputTextBlock
                 errors={showError ? errors : undefined}
                 inputProps={{
+                    placeholder: props.placeholder,
                     autoComplete: false,
                     defaultValue: defaultValue,
                     className: classes.input,

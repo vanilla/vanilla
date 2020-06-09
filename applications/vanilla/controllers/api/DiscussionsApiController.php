@@ -260,7 +260,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row, true);
         return $result;
     }
 
@@ -418,6 +418,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
+            'discussionID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'd.discussionID']),
             'categoryID:i?' => [
                 'description' => 'Filter by a category.',
                 'x-filter' => [
@@ -455,10 +456,9 @@ class DiscussionsApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
             ],
-            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
+            'pinned:b?',
             'pinOrder:s?' => [
                 'default' => 'first',
-                'description' => 'If including pinned posts, in what order should they be integrated? When "first", discussions pinned to a specific category will only be affected if the discussion\'s category is passed as the categoryID parameter. Cannot be used with the pinned parameter.',
                 'enum' => ['first', 'mixed'],
             ],
             'page:i?' => [

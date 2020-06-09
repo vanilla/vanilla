@@ -7,6 +7,6 @@
 </div>
 
 <?php if (debug() && $this->data('Trace')): ?>
-<h2>Trace</h2>
-<pre stye="text-align"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
+<h2 class="Trace-Title">Trace</h2>
+<pre class="Trace"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
 <?php endif; ?>

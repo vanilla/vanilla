@@ -2248,7 +2248,7 @@ img.LeftAlign {
 }
 
 .ClearFix {
-  clear: both;
+  /* clear: both; */
 }
 
 .codeBlock,

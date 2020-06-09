@@ -2267,7 +2267,9 @@ img.LeftAlign {
 }
 
 .ClearFix {
-  clear: both;
+  @if ($staticVariables) {
+    clear: both;
+  }
 }
 
 .codeBlock,

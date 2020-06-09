@@ -15,10 +15,14 @@ $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
 
                 $this->Category = $Category;
                 $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
+                $options = getOptions($Category);
             ?>
 
-            <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
-                <?php echo getOptions($Category); ?>
+            <div class="CategoryBox<?php echo (!empty($options) ? " hasOptions" : ""); ?> Category-<?php echo $Category->UrlCode; ?>">
+                <?php
+                    if ()
+                    echo $options;
+                ?>
                 <h2 class="H">
                     <?php
                         $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$Category->Name]);

@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, importantUnit, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, importantUnit, unit } from "@library/styles/styleHelpers";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { important } from "csx";
+import { calc, important, percent } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const forumCategoriesVariables = useThemeCache(() => {
@@ -92,4 +92,38 @@ export const categoriesCSS = () => {
             height: unit(vars.image.width),
         },
     );
+
+    cssOut(`.CategoryBox`, {
+        position: "relative",
+        display: "flex",
+    });
+
+    cssOut(`.CategoryBox .H`, {
+        fontSize: unit(globalVars.fonts.size.largeTitle),
+    });
+
+    cssOut(`.CategoryBox.hasOptions`, {
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+    });
+
+    cssOut(`.CategoryBox.hasOptions .H`, {
+        position: "relative",
+        width: calc(`100% - ${unit(35)}`),
+        marginTop: unit(globalVars.fonts.size.largeTitle),
+        marginLeft: "auto",
+        $nest: {
+            "& > *": {
+                width: percent(100),
+            },
+        },
+    });
+
+    cssOut(`.CategoryBox > .OptionsMenu`, {
+        // ...absolutePosition.topRight(),
+        float: "none",
+        marginRight: unit(0),
+    });
 };

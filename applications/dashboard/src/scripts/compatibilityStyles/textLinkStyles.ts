@@ -49,6 +49,16 @@ export const textLinkCSS = () => {
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
+    mixinTextLinkNoDefaultLinkAppearance(`
+        .Content .DataList a,
+        .Content .DataList-Search a,
+        .Content .Breadcrumbs a,
+        .Content .MessageList a,
+        .Content .DataTableWrap a,
+        .Content .Container .Frame-contentWrap .ChildCategories a,
+        .Content .Item.Application .Meta a,
+        .Content .Meta.Group-Meta.Group-Info a
+    `);
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item h3 a");
     mixinTextLinkNoDefaultLinkAppearance(".DataList .Item a.Title");
 

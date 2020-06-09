@@ -11,7 +11,16 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    borders,
+    importantUnit,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -104,10 +113,6 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".Box h4", { color: fg });
-
-    cssOut(`.CategoryBox > .OptionsMenu`, {
-        marginRight: unit(layoutVars.cell.paddings.horizontal),
-    });
 
     const panelSelectors = `
         .About a,

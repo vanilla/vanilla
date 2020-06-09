@@ -63,11 +63,11 @@ export function useTabKeyboardHandler(
             if (!tabHandler) {
                 return;
             }
-            const previousElement = tabHandler.getNext();
-            if (previousElement) {
+            const nextElement = tabHandler.getNext();
+            if (nextElement) {
                 event.preventDefault();
                 event.stopPropagation();
-                previousElement.focus();
+                nextElement.focus();
             }
         },
         [makeTabHandler],

@@ -46,6 +46,7 @@ export const textLinkCSS = () => {
         default: globalVars.links.colors.default,
     });
     mixinClickInput(".DataList .Item .Title a");
+    mixinClickInput("body.Section-Entry label.RadioLabel a, body.Section-Entry label.CheckBoxLabel a");
 
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");

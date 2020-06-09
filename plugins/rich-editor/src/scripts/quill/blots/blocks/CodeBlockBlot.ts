@@ -29,6 +29,7 @@ export default class CodeBlockBlot extends CodeBlock {
                 const result = highlightTextSync(text);
                 if (result !== null) {
                     this.domNode.innerHTML = result;
+                    this.domNode.setAttribute("tabindex", "0");
                     this.domNode.normalize();
                     this.attach();
                 } else {

@@ -7,6 +7,7 @@
  */
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { TabHandler } from "@vanilla/dom-utils/src";
+import { useTabKeyboardHandler } from "@vanilla/react-utils/src";
 
 interface IGdn {
     meta: AnyObject;
@@ -30,49 +31,58 @@ if (!("translations" in gdn)) {
     gdn.translations = {};
 }
 
-gdn.focusedLastElement = () => {
-    const lastElementClicked = document.activeElement
-        ? (document.activeElement as HTMLElement)
-        : (document.body as HTMLElement);
-    return () => {
-        if ("focus" in lastElementClicked) {
-            lastElementClicked.focus();
-        }
-    };
-};
-
 gdn.makeAccessiblePopup = ($popupEl, settings, sender) => {
-    console.log("propEl", $popupEl);
-    console.log("settings", settings);
-    console.log("sender", sender);
-    let $popup = $popupEl.find("#" + settings.popupId);
-    console.log("popup", $popup[0]);
     if (sender) {
         let id = sender.id;
         if (!id) {
             let unqiueID = uniqueIDFromPrefix("popup");
             sender.setAttribute("id", unqiueID);
-            $popup.attr("id", unqiueID);
+            $popupEl.attr("id", unqiueID);
         } else {
-            $popup.attr("aria-labelledby", id);
+            $popupEl.attr("aria-labelledby", id);
         }
     }
 
-    // let id = settings.sender ? settings.sender.id : "nothing";
+    $.each($popupEl.find("a, input"), function(i, link) {
+        console.log("link: ", link);
+        if (link.tagName && link.tagName.toLowerCase() === "a") {
+            link.setAttribute("tabindex", "0");
+        }
+    });
 
-    //
-    const tabHandler = new TabHandler($popup[0]);
-    console.log("tabhandler", tabHandler);
-    // // 2. Select first element tabHandler.getInitial()?.focus();
-    const firstElement = tabHandler.getInitial()?.focus();
-    console.log(firstElement);
+    const tabHandler = new TabHandler($popupEl[0]);
 
-    //useTabKeyboardHandler(popup.get(0));
+    tabHandler.getInitial()?.focus();
+    if (!tabHandler) {
+        return;
+    }
 
-    // set keyboard shortcuts from useTabKeyboardHandler.ts
-    // allow you to tab through a loop down (tab) or loop up (shift + tab)
-    // Handle escape (either from escape key or close, or hitting the grey area around)
-    // call the gdn set last focus.
+    const elements = tabHandler.getAll() ?? [];
+    elements.map((element, i) => {
+        if (element.tagName.toLowerCase() === "a") {
+            element.setAttribute("tabindex", "0");
+        }
+        element.addEventListener("keydown", e => {
+            const tabKey = 9;
+            if (e.keyCode === tabKey) {
+                if (!e.shiftKey) {
+                    const nextElement = tabHandler.getNext(document.activeElement, false, true);
+                    if (nextElement) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextElement.focus();
+                    }
+                } else {
+                    const nextElement = tabHandler.getNext(document.activeElement, true, true);
+                    if (nextElement) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextElement.focus();
+                    }
+                }
+            }
+        });
+    });
 };
 
 export default gdn as IGdn;

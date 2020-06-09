@@ -147,7 +147,7 @@ class UrlUtilsTest extends TestCase {
      * @dataProvider provideFixUrlTests
      */
     public function testNormalizeEncoding(string $url, string $expected): void {
-        $fixed = UrlUtils::normalizeEncoding($url);
+        $fixed = (string)UrlUtils::normalizeEncoding(Http::createFromString($url));
         $this->assertSame($expected, $fixed);
     }
 

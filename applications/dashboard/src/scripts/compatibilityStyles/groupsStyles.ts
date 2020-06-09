@@ -100,11 +100,6 @@ export const groupsCSS = () => {
         top: unit(vars.banner.height - vars.logo.height / 2),
         background: "transparent",
         zIndex: 1,
-        $nest: {
-            "&:hover .ChangePicture": {
-                opacity: 1,
-            },
-        },
     });
 
     cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
@@ -131,15 +126,6 @@ export const groupsCSS = () => {
 
     cssOut(`.GroupOptions`, {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
-    });
-
-    cssOut(`.PhotoWrap:hover a.ChangePicture`, {
-        opacity: 0,
-        backgroundColor: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
-        color: colorOut(globalVars.elementaryColors.white),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {

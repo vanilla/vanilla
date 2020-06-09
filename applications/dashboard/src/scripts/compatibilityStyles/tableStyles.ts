@@ -42,17 +42,4 @@ export const tableCSS = () => {
             textDecoration: important("none"),
         },
     );
-
-    const linkColors = vars.links.colors;
-    cssOut(
-        `.Container .DataTable .DiscussionName > .Wrap > a.MItem.Category`,
-        clickableItemStates({
-            default: linkColors.default ? { borderColor: colorOut(linkColors.default) } : undefined,
-            hover: linkColors.hover ? { borderColor: colorOut(linkColors.hover) } : undefined,
-            focus: linkColors.focus ? { borderColor: colorOut(linkColors.focus) } : undefined,
-            keyboardFocus: linkColors.keyboardFocus ? { borderColor: colorOut(linkColors.keyboardFocus) } : undefined,
-            active: linkColors.active ? { borderColor: colorOut(linkColors.active) } : undefined,
-            visited: linkColors.visited ? { borderColor: colorOut(linkColors.visited) } : undefined,
-        }),
-    );
 };

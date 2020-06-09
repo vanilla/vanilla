@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+use Vanilla\Utility\HtmlUtils;
 function writeActivity($activity, $sender, $session) {
     $activity = (object)$activity;
     // If this was a status update or a wall comment, don't bother with activity strings
@@ -7,11 +7,14 @@ function writeActivity($activity, $sender, $session) {
     $activityType = $activityType[0];
     $author = userBuilder($activity, 'Activity');
     $photoAnchor = '';
+    $userName = is_array($author) ? $author["Name"] : $author->Name;
+
+    $accessibleLinkLabel = HtmlUtils::accessibleLabel('User: "%s"', [$userName]);
 
     if ($activity->Photo) {
         $photoAnchor = anchor(
-            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium', 'aria-hidden' => 'true']),
-            $activity->PhotoUrl, 'PhotoWrap');
+            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium', 'alt' => $userName]),
+            $activity->PhotoUrl, 'PhotoWrap', ['aria-label' => $accessibleLinkLabel]);
     }
 
     $cssClass = 'Item Activity Activity-'.$activityType;
@@ -156,7 +159,7 @@ if (!function_exists('WriteActivityComment')):
                     <span class="DateCreated"><?php echo Gdn_Format::date($comment['DateInserted'], 'html'); ?></span>
                     <?php
                     if (ActivityModel::canDelete($activity)) {
-                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->transientKey().'&target='.urlencode(Gdn_Url::request()), 'DeleteComment');
+                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->transientKey().'&target='.urlencode(Gdn_Url::request()), 'DeleteComment', ["role" => "button"]);
                     }
                     ?>
                 </div>

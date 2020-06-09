@@ -12,6 +12,7 @@ export default class CodeBlockBlot extends CodeBlock {
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute("spellcheck", false);
+        domNode.setAttribute("tabindex", "0");
         domNode.classList.add("code");
         domNode.classList.add("codeBlock");
         return domNode;

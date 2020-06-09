@@ -16,8 +16,9 @@ export function initCodeHighlighting() {
 export async function highlightCodeBlocks(domNode: HTMLElement = document.body) {
     const hljs = await importHLJS();
     const blocks = domNode.querySelectorAll(".code.codeBlock");
-    blocks.forEach(text => {
-        text.hljs.highlightBlock(text);
+    blocks.forEach(node => {
+        node.setAttribute("tabindex", "0");
+        hljs.highlightBlock(node);
     });
 }
 

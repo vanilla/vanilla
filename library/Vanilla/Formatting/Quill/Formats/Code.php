@@ -37,6 +37,7 @@ class Code extends AbstractFormat {
         return [
             "class" => "code codeInline",
             "spellcheck" => "false",
+            "tabindex" => "0",
         ];
     }
 }

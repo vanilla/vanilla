@@ -10,6 +10,7 @@
 
 use Vanilla\Formatting\Formats;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('alternate')) {
     /**
@@ -1519,7 +1520,9 @@ if (!function_exists('userPhoto')) {
 
         $href = (val('NoLink', $options)) ? '' : ' href="'.url(userUrl($fullUser)).'"';
 
-        return '<a title="'.$title.'"'.$href.$linkClass.'>'
+        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
+
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '">'
                 .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
             .'</a>';
     }

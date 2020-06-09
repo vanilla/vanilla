@@ -46,10 +46,12 @@ HTML;
         if ($node === null) {
             $content = $this->getElementById(self::CONTENT_ID);
             $htmlBodyString = $this->saveXML($content, LIBXML_NOEMPTYTAG);
-            return $htmlBodyString;
+            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
         } else {
-            return parent::saveXML($node, $options);
+            $htmlBodyString = parent::saveXML($node, $options);
+            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
         }
+        return $htmlBodyString;
     }
 
     /**
@@ -63,9 +65,22 @@ HTML;
         if ($node === null) {
             $content = $this->getElementById(self::CONTENT_ID);
             $htmlBodyString = $this->saveHtml($content, LIBXML_NOEMPTYTAG);
-            return $htmlBodyString;
+            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
         } else {
-            return parent::saveHtml($node);
+            $htmlBodyString = parent::saveHtml($node);
+            $htmlBodyString = $this->getHtmlContent($htmlBodyString);
         }
+        return $htmlBodyString;
+    }
+
+    /**
+     * Return the html content.
+     *
+     * @param string $htmlString
+     */
+    public function getHtmlContent(string $htmlString): string {
+        $htmlString = preg_replace('#<div id="'.self::CONTENT_ID.'">#', '', $htmlString);
+        $htmlString = preg_replace('#</div>#', '', $htmlString);
+        return $htmlString;
     }
 }

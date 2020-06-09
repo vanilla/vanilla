@@ -36,7 +36,7 @@ class HtmlSnippetTest extends TestCase {
         $html = 'Hello World!.';
         $this->html->loadHtml($html);
         $result = $this->html->saveXML();
-        $this->assertSame($html, substr($result, 22, -6));
+        $this->assertSame($html, $result);
     }
 
     /**
@@ -48,6 +48,6 @@ class HtmlSnippetTest extends TestCase {
 HTML;
         $this->html->loadHtml($html);
         $result = $this->html->saveHtml();
-        $this->assertSame($html, substr($result, 22, -6));
+        $this->assertSame($html, $result);
     }
 }

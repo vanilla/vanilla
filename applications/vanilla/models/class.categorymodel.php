@@ -187,15 +187,17 @@ class CategoryModel extends Gdn_Model {
                         $toAlphabetize = array_filter(self::$Categories, function ($a) use ($flatCat) {
                             return $a['ParentCategoryID'] === $flatCat;
                         });
-                        usort($toAlphabetize, function ($a, $b) {
-                            return $a['Name'] <=> $b['Name'];
-                        });
-                        array_splice(
-                            self::$Categories,
-                            array_search($flatCat, array_keys(self::$Categories)) + 1,
-                            count($toAlphabetize),
-                            $toAlphabetize
-                        );
+                        if (count($toAlphabetize) !== 0) {
+                            usort($toAlphabetize, function ($a, $b) {
+                                return strcasecmp($a['Name'], $b['Name']);
+                            });
+                            array_splice(
+                                self::$Categories,
+                                array_search($flatCat, array_keys(self::$Categories)),
+                                count($toAlphabetize) + 1,
+                                $toAlphabetize
+                            );
+                        }
                     }
                 }
 

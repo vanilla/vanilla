@@ -245,7 +245,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 //        });
           }
        }
-       const $popupHtml = $('#'+settings.popupId);
+       var $popupHtml = $('#'+settings.popupId);
        gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
    }
 
@@ -347,7 +347,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Trigger an even that plugins can attach to when popups are revealed.
       $('body').trigger('popupReveal');
 
-       const $popupHtml = $('#'+settings.popupId);
+       var $popupHtml = $('#'+settings.popupId);
        gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
 
       return false;

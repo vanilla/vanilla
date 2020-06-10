@@ -9,7 +9,7 @@ import DateTime, { DateFormats } from "@library/content/DateTime";
 
 export interface IProps {
     dateStarts: string;
-    dateEnds: string;
+    dateEnds?: string;
 }
 
 /**
@@ -22,8 +22,13 @@ export function FromToDateTime(props: IProps) {
     return (
         <>
             {startDate}
-            {endDate && " - "}
-            {endDate}
+            {props.dateEnds && (
+                <>
+                    {" "}
+                    {endDate && " - "}
+                    {endDate}
+                </>
+            )}
         </>
     );
 }

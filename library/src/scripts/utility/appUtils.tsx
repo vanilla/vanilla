@@ -91,7 +91,8 @@ interface ISiteSection {
     sectionGroup: string;
     sectionID: string;
     name: string;
-    apps: { [key: string]: boolean };
+    apps: Record<string, boolean>;
+    attributes: Record<string, any>;
 }
 
 /**

@@ -77,16 +77,19 @@ export const containerMainStyles = (): NestedCSSProperties => {
     };
 };
 
+export function containerMainMediaQueries() {
+    const mediaQueries = layoutVariables().mediaQueries();
+    const vars = containerVariables();
+    return mediaQueries.oneColumnDown({
+        ...paddings(vars.spacing.mobile.padding),
+    });
+}
+
 export const containerClasses = useThemeCache(() => {
     const style = styleFactory("container");
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = containerVariables();
-    const root = style(
-        containerMainStyles() as NestedCSSProperties,
-        mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.mobile.padding),
-        }),
-    );
+    const root = style(containerMainStyles(), containerMainMediaQueries());
 
     const fullGutter = style(
         "fullGutter",

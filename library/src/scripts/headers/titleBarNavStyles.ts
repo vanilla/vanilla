@@ -168,14 +168,6 @@ const titleBarNavClasses = useThemeCache(() => {
         },
     });
 
-    // const linkContent = style("linkContent", {
-    //     position: "relative",
-    //     display: "inline-flex",
-    //     alignItems: "center",
-    //     alignSelf: "center",
-    //     height: 0, // IE11 Fix.
-    // });
-
     const firstItem = style("lastItem", {
         zIndex: 2,
     });

@@ -38,17 +38,11 @@ paths:
         schema:
           format: date-filter
           type: string
-      - description: |
-          One or more user IDs to lookup.
+      - name: userID
+        description: Filter by a range or CSV of user IDs.
         in: query
-        name: userID
         schema:
-          items:
-            type: integer
-          type: array
-        style: form
-        x-filter:
-          field: u.UserID
+          $ref: '#/components/schemas/RangeExpression'
       - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.

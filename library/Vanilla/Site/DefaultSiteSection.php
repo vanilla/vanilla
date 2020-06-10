@@ -121,7 +121,9 @@ class DefaultSiteSection implements SiteSectionInterface {
      * @inheritdoc
      */
     public function getAttributes(): array {
-        return [];
+        return [
+            'CategoryID' => -1,
+        ];
     }
 
     /**

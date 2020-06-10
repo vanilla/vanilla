@@ -252,4 +252,55 @@ final class ArrayUtils {
         self::assertArray($array, __METHOD__.'() expects argument 1 to be an array or array-like object.');
         $m($array, []);
     }
+
+    /**
+     * Recursively merge two arrays with special handling for numeric arrays.
+     *
+     * This method is very similar to `array_merge_recursive()` however it allows you to customize the handling of
+     * numeric array merging. This is handy when you do have some nested numeric arrays because you rerely want the
+     * behavior of `array_merge_recursive()` when dealing with JSON style model data.
+     *
+     * @param array $arr1 The first array.
+     * @param array $arr2 The second array. This array will overwrite the first array when keys match.
+     * @param callable|null $numeric The merge function to use when numeric arrays are encountered.
+     * If you don't supply a callback then the arrays will be uniquely merged. If you want to supply a callback you can
+     * look at the default definition at the top of the method.
+     * @return array
+     */
+    public static function mergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
+        if ($numeric === null) {
+            $numeric = function (array $arr1, array $arr2, string $key): array {
+                return array_values(array_unique(array_merge($arr1, $arr2)));
+            };
+        }
+
+        // Do a full replace to simplify some of the walking logic.
+        // For the purposes of this method, replace is the same as merge, but presumably faster.
+        $arr = array_replace_recursive($arr1, $arr2);
+
+        $clean = function (array &$arr, array $arr1, array $arr2) use (&$clean, $numeric) {
+            foreach ($arr as $key => &$value) {
+                // Do both array's have the key. This would indicate this is a replace operation.
+                if (isset($arr1[$key]) && isset($arr2[$key])) {
+                    $v1 = $arr1[$key];
+                    $v2 = $arr2[$key];
+
+                    // Are both numeric array's.
+                    if (is_array($v1) && is_array($v2)) {
+                        if (isset($v1[0]) && (isset($v2[0]) || empty($v2))) {
+                            // This is the case where you have a numeric array replacing the other.
+                            // We rarely want that.
+                            $value = $numeric($v1, $v2, $key);
+                        } else {
+                            // Here we recurse to child arrays.
+                            $clean($value, $arr1[$key] ?? null, $arr2[$key] ?? null);
+                        }
+                    }
+                }
+            }
+        };
+        $clean($arr, $arr1, $arr2);
+
+        return $arr;
+    }
 }

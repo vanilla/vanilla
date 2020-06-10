@@ -8,7 +8,7 @@
 import {
     absolutePosition,
     colorOut,
-    importantColorOut,
+    margins,
     negativeUnit,
     paddings,
     singleBorder,
@@ -159,18 +159,9 @@ export const groupsCSS = () => {
         },
     );
 
-    cssOut(
-        `.Group-Box .PageControls .H`,
-        {
-            margin: 0,
-        },
-        mediaQueries.xs({
-            position: "relative",
-            top: "auto",
-            left: "auto",
-            right: "auto",
-        }),
-    );
+    cssOut(`.Group-Box .PageControls .H`, {
+        margin: 0,
+    });
 
     cssOut(`.Group-Box.Group-MembersPreview .H`, {
         position: "relative",
@@ -262,11 +253,44 @@ export const groupsCSS = () => {
         },
     });
 
-    cssOut(`.Group-Box .PageControls .Button-Controls`, {
-        ...absolutePosition.middleRightOfParent(),
-    });
+    cssOut(
+        `.Group-Box .PageControls .Button-Controls`,
+        mediaQueries.aboveMobile({
+            ...absolutePosition.middleRightOfParent(),
+        }),
+    );
 
     cssOut(`.Group-Box`, {
         marginBottom: unit(36),
     });
+
+    cssOut(`.Group-Header-Actions`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: percent(100),
+        ...margins({
+            vertical: unit(globalVars.gutter.size),
+        }),
+    });
+    cssOut(
+        `
+        .Group-Header-Actions .Group-Buttons,
+        .Group-Header-Actions .ButtonGroup,
+    `,
+        {
+            position: "relative",
+            top: "auto",
+        },
+    );
+
+    cssOut(
+        `.Section-Group .H`,
+        mediaQueries.tabletDown({
+            textAlign: "left",
+        }),
+        mediaQueries.mobileDown({
+            marginBottom: unit(6),
+        }),
+    );
 };

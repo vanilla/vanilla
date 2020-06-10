@@ -10,12 +10,13 @@ namespace VanillaTests\APIv2;
 use CategoryModel;
 use DiscussionModel;
 use Garden\Web\Exception\ForbiddenException;
+use VanillaTests\Models\TestDiscussionModelTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait, TestDiscussionModelTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -32,6 +33,7 @@ class DiscussionsTest extends AbstractResourceTest {
 
         parent::__construct($name, $data, $dataName);
     }
+
 
     /**
      * {@inheritdoc}
@@ -99,7 +101,9 @@ class DiscussionsTest extends AbstractResourceTest {
     public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
+        $this->model = $this->container()->get(DiscussionModel::class);
     }
+
     /**
      * Verify a bookmarked discussion shows up under /discussions/bookmarked.
      */
@@ -289,5 +293,36 @@ class DiscussionsTest extends AbstractResourceTest {
 
         $discussion = $this->api()->get("$this->baseUrl/{$row['discussionID']}")->getBody();
         $this->assertNotEmpty($discussion['name']);
+    }
+
+    /**
+     * Announcements should obey the sort.
+     */
+    public function testAnnouncementSort(): void {
+        $this->insertRecords(3, ['Announce' => 1]);
+
+        $fields = ['discussionID', '-discussionID'];
+
+        foreach ($fields as $field) {
+            $rows = $this->api()->get($this->baseUrl, ['pinned' => true, 'sort' => $field])->getBody();
+            $this->assertNotEmpty($rows);
+            $this->assertSorted($rows, $field);
+        }
+    }
+
+    /**
+     * A mix of announcements and discussions should sort properly.
+     */
+    public function testAnnouncementMixed(): void {
+        $this->insertRecords(2, ['Announce' => 1]);
+        $this->insertRecords(2);
+
+        $fields = ['discussionID', '-discussionID'];
+
+        foreach ($fields as $field) {
+            $rows = $this->api()->get($this->baseUrl, ['pinOrder' => 'first', 'sort' => $field])->getBody();
+            $this->assertNotEmpty($rows);
+            $this->assertSorted($rows, '-pinned', $field);
+        }
     }
 }

@@ -508,12 +508,12 @@ class DiscussionsApiController extends AbstractApiController {
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
-            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, (array)($query['sort'] ?? []))->resultArray();
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();
         } else {
             $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
             [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort'] ?? '');
             if ($pinOrder == 'first') {
-                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, (array)($query['sort'] ?? []))->resultArray();
+                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, $query['sort'] ?? '')->resultArray();
                 $discussions = $this->discussionModel->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)->resultArray();
                 $rows = array_merge($announcements, $discussions);
             } else {

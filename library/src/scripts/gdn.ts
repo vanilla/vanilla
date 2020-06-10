@@ -7,7 +7,7 @@
  */
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { TabHandler } from "@vanilla/dom-utils/src";
-import {translate} from "@vanilla/i18n/src";
+import { translate } from "@vanilla/i18n/src";
 
 interface IGdn {
     meta: AnyObject;

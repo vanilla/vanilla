@@ -280,6 +280,8 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get all the categories from the DB.
+     *
      * @return array
      */
     protected function loadAllCategoriesDb(): array {
@@ -3797,6 +3799,10 @@ SQL;
         return $result;
     }
 
+    /**
+     * Sorts child categories alphabetically if the parent display type is 'Flat'
+     * @param array $categories
+     */
     protected function sortFlatCategories(array &$categories): void {
         $categories = array_column($categories, null, 'CategoryID');
 
@@ -3807,46 +3813,5 @@ SQL;
                 return strcasecmp($a['Name'], $b['Name']);
             }
         });
-    }
-
-    /**
-     * @param array $categories
-     * @return array
-     */
-    protected function sortFlatCategories2(array &$categories): void {
-        $bak = $categories;
-
-        // Alphabetize the child categories if the parent is set to DisplayAs => 'Flat'
-        $flatCategories = [];
-        foreach ($categories as $CategoryID => $cat) {
-            if ($cat['DisplayAs'] === 'Flat') {
-                $flatCategories[] = $CategoryID;
-            }
-        }
-
-        if (count($flatCategories) > 0) {
-            foreach ($flatCategories as $flatCat) {
-                $toAlphabetize = array_filter($categories, function ($a) use ($flatCat) {
-                    return $a['ParentCategoryID'] === $flatCat;
-                });
-                usort($toAlphabetize, function ($a, $b) {
-                    return strcasecmp($a['Name'], $b['Name']);
-                });
-                array_splice(
-                    $categories,
-                    array_search($flatCat, array_keys($categories)) + 1,
-                    count($toAlphabetize),
-                    $toAlphabetize
-                );
-            }
-        }
-
-        $iDs = array_column($categories, 'CategoryID', 'CategoryID');
-        if (count($iDs) !== count($categories)) {
-            foreach ($bak as &$v) {
-                $v = arrayTranslate($v, ['CategoryID', 'TreeLeft', 'TreeRight', 'ParentCategoryID', 'Name', 'DisplayAs']);
-            }
-            $foo = 'bar';
-        }
     }
 }

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, importantColorOut, srOnly } from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, importantColorOut, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
@@ -23,16 +23,21 @@ export const profilePageCSS = () => {
         color: importantColorOut(globalVars.elementaryColors.lowContrast),
     });
 
-    cssOut(`.PhotoWrap a.ChangePicture`, {
-        textDecoration: "none",
+    cssOut(`.PhotoWrap a.ChangePicture .ChangePicture-Text `, {
+        ...absolutePosition.fullSizeOfParent(),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
+        ...userSelect(),
     });
-
     cssOut(`.PhotoWrap a.ChangePicture:not(:hover) .ChangePicture-Text `, {
         ...srOnly(), // still visible to screen readers
     });
 
     cssOut(`.PhotoWrap a.ChangePicture`, {
-        backgroundColor: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
+        background: important("none"),
+        textDecoration: "none",
         color: colorOut(globalVars.elementaryColors.white),
         display: important("flex"),
         alignItems: "center",
@@ -42,5 +47,13 @@ export const profilePageCSS = () => {
 
     cssOut(`body.Section-Profile .Panel .PhotoWrapLarge`, {
         position: "relative",
+    });
+
+    cssOut(`.PhotoWrap a.ChangePicture .icon`, {
+        display: "inline-block",
+        verticalAlign: "middle",
+        fontSize: unit(20),
+        color: colorOut(globalVars.elementaryColors.white),
+        marginRight: unit(10),
     });
 };

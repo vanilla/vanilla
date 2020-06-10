@@ -15,7 +15,7 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, percent, translateX } from "csx";
+import { calc, important, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -195,10 +195,15 @@ export const groupsCSS = () => {
         ...metaItemStyle(),
     });
 
-    cssOut(`body.Groups .Button.Handle .Sprite, body.Groups .NavButton.Handle .Sprite`, {
-        marginRight: negativeUnit(2),
-        transform: translateX(`5px`),
-    });
+    cssOut(
+        `
+        body.Groups .NavButton.Handle.GroupOptionsTitle .Sprite
+    `,
+        {
+            marginRight: negativeUnit(2),
+            transform: translateX(`5px`),
+        },
+    );
 
     cssOut(`body.Groups .StructuredForm .Buttons-Confirm`, {
         textAlign: "left",

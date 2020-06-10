@@ -56,30 +56,35 @@ export const buttonCSS = () => {
     const handleSize = formElementVars.sizing.height - borderOffset;
 
     if (buttonBorderRadius && buttonBorderRadius > 0) {
-        cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
+        cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
             marginTop: unit((formElementVars.sizing.height * 2) / 36), // center vertically
             marginRight: unit(buttonBorderRadius * 0.035), // offset based on border radius. No radius will give no offset.
             maxHeight: unit(handleSize),
             height: unit(handleSize),
             lineHeight: unit(handleSize),
+            maxWidth: unit(handleSize),
+            minWidth: unit(handleSize),
         });
     }
 
-    cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
+    cssOut(`.Frame .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         height: unit(handleSize),
         maxHeight: unit(handleSize),
         width: unit(handleSize),
-        maxWidth: unit(handleSize),
         background: important("transparent"),
         backgroundColor: important("none"),
         ...borders({
             color: rgba(0, 0, 0, 0),
         }),
+        maxWidth: unit(handleSize),
+        minWidth: unit(handleSize),
     });
 
-    cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle`, {
+    cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle`, {
+        position: "absolute",
         top: unit(0),
         right: unit(formElementVars.border.width),
+        bottom: unit(0),
         minWidth: importantUnit(handleSize),
         maxWidth: importantUnit(handleSize),
         maxHeight: importantUnit(handleSize),
@@ -88,11 +93,20 @@ export const buttonCSS = () => {
         width: importantUnit(handleSize),
         borderTopRightRadius: unit(buttonBorderRadius),
         borderBottomRightRadius: unit(buttonBorderRadius),
+        display: "block",
     });
 
-    cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
+    cssOut(`.Frame .ButtonGroup.Multi.Open .Button.Handle`, {
         backgroundColor: colorOut(globalVars.mainColors.secondary),
         width: unit(formElementVars.sizing.height),
+    });
+
+    cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Sprite.SpDropdownHandle`, {
+        ...absolutePosition.fullSizeOfParent(),
+        padding: important(0),
+        border: important(0),
+        borderRadius: important(0),
+        minWidth: unit(handleSize),
     });
 
     cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
@@ -106,12 +120,6 @@ export const buttonCSS = () => {
                 ...paddings({
                     horizontal: formElementVars.sizing.height,
                 }),
-            },
-            "& .Sprite.SpDropdownHandle": {
-                ...absolutePosition.fullSizeOfParent(),
-                padding: important(0),
-                border: important(0),
-                borderRadius: important(0),
             },
             "& .Button.Handle": {
                 ...absolutePosition.middleRightOfParent(),

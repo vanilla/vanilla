@@ -33,14 +33,29 @@ trait TestSortingTrait {
         foreach ($fields as $field) {
             /* @var AbstractResourceTest $this */
             $actual = $this->api()->get($this->indexUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
-            $expected = $actual;
-            usort($expected, ArrayUtils::sortCallback($field));
-
-            $actual = array_values(array_unique(array_column($actual, trim($field, '-'))));
-            $expected = array_values(array_unique(array_column($expected, trim($field, '-'))));
-
-            $this->assertSame($expected, $actual, "Sort test failed for $field");
+            static::assertSorted($actual, $field);
         }
+    }
+
+    /**
+     * Assert that a dataset is properly sorted.
+     *
+     * @param array $arr The actual array to assert.
+     * @param string $fields The fields the dataset should be sorted by.
+     */
+    public static function assertSorted(array $arr, string ...$fields): void {
+        $sorted = $arr;
+        usort($sorted, ArrayUtils::sortCallback(...$fields));
+
+        $actual = $expected = [];
+        for ($i = 0; $i < count($arr); $i++) {
+            foreach ($fields as $field) {
+                $j = trim($field, '-');
+                $actual[$i][$j] = $arr[$i][$j];
+                $expected[$i][$j] = $sorted[$i][$j];
+            }
+        }
+        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same.");
     }
 
     /**

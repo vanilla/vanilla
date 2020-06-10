@@ -1303,15 +1303,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $wheres SQL conditions.
      * @param int $offset The number of records to skip.
      * @param int $limit The number of records to limit the query to.
-     * @param string[] $orderBy An array of column names for sorting.
-     * @return object SQL result.
+     * @param string|string[]|null $orderBy An array of column names for sorting.
+     * @return Gdn_DataSet SQL result.
      */
-    public function getAnnouncements($wheres = '', $offset = 0, $limit = false, array $orderBy = null) {
-
+    public function getAnnouncements($wheres = '', $offset = 0, $limit = false, $orderBy = null) {
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
         if ($limit === false) {
-            c('Vanilla.Discussions.PerPage', 30);
+            $limit = c('Vanilla.Discussions.PerPage', 30);
         }
         $userID = $session->UserID > 0 ? $session->UserID : 0;
         $categoryID = val('d.CategoryID', $wheres, 0);
@@ -1393,13 +1392,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $this->SQL->limit($limit, $offset);
 
         $orderBy = $orderBy ?? $this->getOrderBy();
-        foreach ($orderBy as $field => $direction) {
-            if (is_numeric($field)) {
-                $this->SQL->orderBy($this->addFieldPrefix($direction));
-            } else {
-                $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
-            }
-        }
+        $this->SQL->orderByPrefix('d.', $orderBy);
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('beforeGetAnnouncements');
 

@@ -314,13 +314,14 @@ class DiscussionsTest extends AbstractResourceTest {
      * A mix of announcements and discussions should sort properly.
      */
     public function testAnnouncementMixed(): void {
-        $this->insertRecords(2, ['Announce' => 1]);
-        $this->insertRecords(2);
+        $rows = $this->insertRecords(2, ['Announce' => 1]);
+        $rows = array_merge($rows, $this->insertRecords(2));
+        $ids = array_column($rows, 'DiscussionID');
 
         $fields = ['discussionID', '-discussionID'];
 
         foreach ($fields as $field) {
-            $rows = $this->api()->get($this->baseUrl, ['pinOrder' => 'first', 'sort' => $field])->getBody();
+            $rows = $this->api()->get($this->baseUrl, ['discussionID' => $ids, 'pinOrder' => 'first', 'sort' => $field])->getBody();
             $this->assertNotEmpty($rows);
             $this->assertSorted($rows, '-pinned', $field);
         }

@@ -505,7 +505,7 @@ class DiscussionsApiController extends AbstractApiController {
             $query['pinOrder'] = 'mixed';
         }
 
-        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
+        $pinned = $query['pinned'] ?? null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
             $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();

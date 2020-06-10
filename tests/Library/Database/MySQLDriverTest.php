@@ -275,7 +275,7 @@ EOT;
      * Test the various legacy order Bys.
      *
      * @param string $expected
-     * @param mixed ...$params
+     * @param mixed $params
      * @dataProvider provideOrderBys
      */
     public function testLegacyOrderBys($expected, ...$params): void {

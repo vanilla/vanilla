@@ -122,7 +122,7 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getAttributes(): array {
         return [
-            'CategoryID' => -1,
+            'categoryID' => -1,
         ];
     }
 

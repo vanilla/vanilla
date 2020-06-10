@@ -81,7 +81,7 @@ if (!$hasUserID) {
                     '<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
                     '<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
 
-                echo wrap(t('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
+                echo wrap(t('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3', ["aria-level" => 2]);
 
                 echo '</div>';
                 ?>
@@ -136,7 +136,7 @@ if (!$hasUserID) {
                     // No Users were found in GDN_User
                     if (count($ExistingUsers) === 0 && !$NoConnectName) {
                         echo \Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.');
-                        echo $this->Form->textbox('ConnectName');
+                        echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
                     }
                     ?>
                 </li>

@@ -19,7 +19,7 @@ export const metasVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("color", {
-        fg: globalVars.mixBgAndFg(0.85),
+        fg: globalVars.elementaryColors.lowContrast,
         hover: {
             fg: globalVars.links.colors.active,
         },

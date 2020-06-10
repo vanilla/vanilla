@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
+<?php echo "<h1 class='sr-only'>" . t('Search') . "</h1>" ?>
 <?php if (!count($this->data('SearchResults')) && $this->data('SearchTerm'))
     echo '<p class="NoResults">', sprintf(t('No results for %s.', 'No results for <b>%s</b>.'), $this->data('SearchTerm')), '</p>';
 ?>
     <ol id="search-results" class="DataList DataList-Search" start="<?php echo $this->data('From'); ?>">
         <?php foreach ($this->data('SearchResults') as $Row): ?>
             <li class="Item Item-Search">
-                <h3><?php echo anchor(htmlspecialchars($Row['Title']), $Row['Url']); ?></h3>
+                <h3 aria-level="2"><?php echo anchor(htmlspecialchars($Row['Title']), $Row['Url']); ?></h3>
 
                 <div class="Item-Body Media">
                     <?php

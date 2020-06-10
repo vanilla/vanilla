@@ -98,7 +98,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $(document).unbind('keydown.popup');
       $('#'+settings.popupId).trigger('popupClose');
       $('.Overlay').remove();
-
+      settings.sender.focus();
       return false;
    }
 
@@ -119,7 +119,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       popupHtml = popupHtml.replace('{popup.id}', settings.popupId);
 
-      $('body').append(popupHtml);
+       $('body').append(popupHtml);
       if (settings.containerCssClass != '')
          $('#'+settings.popupId).addClass(settings.containerCssClass);
 
@@ -143,11 +143,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             $.popup.close(settings);
       })
 
-      if (settings.onUnload) {
-         $('#'+settings.popupId).bind('popupClose',function(){
-            setTimeout(settings.onUnload,1);
-         });
-      }
+       if (settings.onUnload) {
+           $('#'+settings.popupId).bind('popupClose',function(){
+               setTimeout(settings.onUnload,1);
+           });
+       }
 
       // Replace language definitions
       if (!settings.confirm) {
@@ -185,6 +185,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
        if (!settings.confirm) {
           $.popup.loading(settings);
        }
+
 
 	   var target = $.popup.findTarget(settings);
        if (settings.confirm) {
@@ -244,6 +245,8 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 //        });
           }
        }
+       const $popupHtml = $('#'+settings.popupId);
+       gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
    }
 
    $.popup.reveal = function(settings, data) {
@@ -254,18 +257,15 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       } else if (data !== null && typeof(data) == 'object') {
          json = data;
       }
-
       if (json == false) {
          // This is something other than json, so just put it into the popup directly
          if (data) { // Prevent blank popups
              $('#'+settings.popupId+' .Content').append(data).trigger('contentLoad');
          }
-
       } else {
          gdn.inform(json);
          formSaved = json['FormSaved'];
          data = json['Data'];
-
          // Add any js that's come in.
          $(json.js).each(function(i, el){
             var v_js  = document.createElement('script');
@@ -285,7 +285,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       $('#'+settings.popupId+' .Loading').remove();
       $('#'+settings.popupId+' .Body').children().fadeIn('normal');
-
       $('#'+settings.popupId+' .Close').unbind().click(function() {
          return $.popup.close(settings);
       });
@@ -348,6 +347,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // Trigger an even that plugins can attach to when popups are revealed.
       $('body').trigger('popupReveal');
 
+       const $popupHtml = $('#'+settings.popupId);
+       gdn.makeAccessiblePopup($popupHtml, settings, settings.sender);
+
       return false;
    }
 
@@ -362,7 +364,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       hijackForms:      true,         // Hijack popup forms so they are handled in-page instead of posting the entire page back
       deliveryType:     'VIEW',            // Adds DeliveryType=3 to url so Garden doesn't pull the entire page
       mouseoverClass:   'Popable',    // CssClass to be applied to a popup link when hovering
-      onSave:           function(settings) {
+       onSave:           function(settings) {
          if (settings.sender) {
             $('#'+settings.popupId+' .Button:submit').attr('disabled', true).addClass('InProgress');
          }
@@ -378,14 +380,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       },
       containerCssClass: '',
       popupHtml:       '\
-  <div class="Overlay"> \
-    <div id="{popup.id}" class="Popup"> \
+    <div class="Overlay"> \
+    <div id="{popup.id}"  class="Popup" aria-labelledby="{popup.handleID}" aria-describedby="{popup.desc}" aria-modal="true" role="dialog"> \
       <div class="Border"> \
         <div class="Body"> \
           <div class="Content"> \
           </div> \
           <div class="Footer"> \
-            <a href="#" class="Close"><span>&times;</span></a> \
+            <a href="#" class="Close" tabindex="0"><span>&times;</span></a> \
           </div> \
         </div> \
       </div> \

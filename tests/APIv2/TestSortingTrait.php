@@ -55,7 +55,7 @@ trait TestSortingTrait {
                 $expected[$i][$j] = $sorted[$i][$j];
             }
         }
-        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same.");
+        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same: ".implode(', ', $fields));
     }
 
     /**

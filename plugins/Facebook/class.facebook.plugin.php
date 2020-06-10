@@ -268,7 +268,7 @@ class FacebookPlugin extends SSOAddon {
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Facebook',
             'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => $this->authorizeUri(false, self::profileConnecUrl()),
+            'ConnectUrl' => $this->authorizeUri(false, self::profileConnectUrl()),
             'Profile' => [
                 'Name' => val('name', $profile),
                 'Photo' => "//graph.facebook.com/{$profile['id']}/picture?width=200&height=200"
@@ -297,7 +297,7 @@ class FacebookPlugin extends SSOAddon {
         $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
 
         // Get the access token.
-        $accessToken = $this->getAccessToken($code, self::profileConnecUrl());
+        $accessToken = $this->getAccessToken($code, self::profileConnectUrl());
 
         // Get the profile.
         $profile = $this->getProfile($accessToken);
@@ -319,7 +319,7 @@ class FacebookPlugin extends SSOAddon {
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(userUrl($sender->User, '', 'connections'));
+        redirectTo(self::profileConnectUrl());
     }
 
     /**
@@ -595,7 +595,7 @@ class FacebookPlugin extends SSOAddon {
      * @return mixed|string
      */
     public function getTargetUri() {
-        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', '/');
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', Gdn::request()->getPath());
         if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
             $target = '/';
         }
@@ -607,8 +607,8 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string URL.
      */
-    public static function profileConnecUrl() {
-        return url(userUrl(Gdn::session()->User, false, 'facebookconnect'), true);
+    public static function profileConnectUrl() {
+        return url('entry/connect/facebook', true);
     }
 
     /**

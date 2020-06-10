@@ -45,7 +45,7 @@ trait TestDiscussionModelTrait {
      */
     private function insertRecords(int $count, array $overrides = []): array {
         for ($i = 0; $i < $count; $i++) {
-            $ids[] = $this->model->insert($this->createRecord($overrides));
+            $ids[] = $this->model->save($this->createRecord($overrides));
         }
         $rows = $this->model->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
         return $rows;

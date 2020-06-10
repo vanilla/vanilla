@@ -101,6 +101,7 @@ class DiscussionsTest extends AbstractResourceTest {
     public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
+        $this->model = $this->container()->get(DiscussionModel::class);
     }
 
     /**

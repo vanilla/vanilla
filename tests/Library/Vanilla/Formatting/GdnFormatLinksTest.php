@@ -139,6 +139,40 @@ HTML;
     }
 
     /**
+     * Test that braces are allowed after the '//', but not before.
+     *
+     * @param string $input String with braces to test.
+     * @param string $expected Expected output.
+     * @dataProvider provideTestBracesData
+     */
+    public function testBraces($input, $expected) {
+        $actual = Gdn_Format::links($input);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return array Array of strings to test.
+     */
+    public function provideTestBracesData(): array {
+        $r = [
+            'bracesBeforeSlashes' => [
+                'h{tt}p://www.foo.bar',
+                'h{tt}p://www.foo.bar',
+            ],
+            'bracesBetweenSlashes' => [
+                'http:/{/www.foo.bar',
+                'http:/{/www.foo.bar',
+            ],
+            'bracesAfterSlashes' => [
+                'http://www.{foo}.bar',
+                '<a href="http://www.{foo}.bar" rel="nofollow">http://www.{foo}.bar</a>'
+            ],
+        ];
+
+        return $r;
+    }
+
+    /**
      * Test link formatting when nofollow is disabled.
      *
      * The following flags are set so that the static values are restored properly.

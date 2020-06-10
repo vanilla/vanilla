@@ -29,7 +29,6 @@ export function blockColumnCSS() {
         .Container a.UserLink.BlockTitle
     `,
         {
-            // textOverflow: "inherit",
             fontWeight: globalVars.fonts.weights.bold,
         },
     );

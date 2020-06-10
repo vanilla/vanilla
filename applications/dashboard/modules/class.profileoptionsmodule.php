@@ -18,7 +18,16 @@ class ProfileOptionsModule extends Gdn_Module {
     public function __construct() {
         $this->profileOptionsDropdown = new DropdownModule();
         $this->profileOptionsDropdown->setView('dropdown-navbutton');
-        $this->profileOptionsDropdown->setTrigger(sprite('SpEditProfile', 'Sprite16').' <span class="sr-only">'.t('Edit Profile').'</span>', 'button', 'ProfileButtons Button-EditProfile', $icon = 'caret-down', $url = '', ["aria-label" => t("Edit Profile")]);
+        $this->profileOptionsDropdown->setTrigger(
+            sprite('SpEditProfile', 'Sprite16').' <span class="sr-only">'.t('Edit Profile').'</span>',
+            'button',
+            'ProfileButtons Button-EditProfile',
+            $icon = 'caret-down',
+            $url = '',
+            [
+                "aria-label" => t("Edit Profile")
+            ]
+        );
         $this->fetchProfileOptionsData();
     }
 

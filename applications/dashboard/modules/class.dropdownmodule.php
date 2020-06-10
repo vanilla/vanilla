@@ -69,6 +69,7 @@
  *
  */
 use Vanilla\Utility\HtmlUtils;
+
 class DropdownModule extends Gdn_Module {
 
     use NestedCollection;

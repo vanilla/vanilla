@@ -268,7 +268,7 @@ class CategoriesController extends VanillaController {
         if (!$categoryIdentifier) {
             /** @var SiteSectionInterface $siteSection */
             $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
-            $categoryIdentifier = $siteSection->getAttributes()['CategoryID'] ?? '';
+            $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? '';
         }
 
         // Figure out which category layout to choose (Defined on "Homepage" settings page).

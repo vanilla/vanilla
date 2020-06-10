@@ -126,6 +126,7 @@ export const groupsCSS = () => {
 
     cssOut(`.GroupOptions`, {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
+        marginLeft: "auto",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
@@ -227,6 +228,7 @@ export const groupsCSS = () => {
 
     cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
         paddingLeft: unit(0),
+        paddingRight: unit(70),
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons`, {
@@ -285,12 +287,26 @@ export const groupsCSS = () => {
     );
 
     cssOut(
-        `.Section-Group .H`,
+        `.Section-Group .Group-Box .H`,
         mediaQueries.tabletDown({
             textAlign: "left",
         }),
         mediaQueries.mobileDown({
             marginBottom: unit(6),
+        }),
+    );
+
+    cssOut(
+        `
+        .Button-Controls.Button-Controls
+    `,
+        mediaQueries.mobileDown({
+            display: "block",
+            $nest: {
+                [`& .Button`]: {
+                    marginRight: "auto",
+                },
+            },
         }),
     );
 };

@@ -12,6 +12,7 @@ export default class CodeBlockBlot extends CodeBlock {
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute("spellcheck", false);
+        domNode.setAttribute("tabindex", "0");
         domNode.classList.add("code");
         domNode.classList.add("codeBlock");
         return domNode;
@@ -29,6 +30,7 @@ export default class CodeBlockBlot extends CodeBlock {
                 const result = highlightTextSync(text);
                 if (result !== null) {
                     this.domNode.innerHTML = result;
+                    this.domNode.setAttribute("tabindex", "0");
                     this.domNode.normalize();
                     this.attach();
                 } else {

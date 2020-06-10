@@ -9,7 +9,6 @@ import { IUserFragment } from "@library/@types/api/users";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
 import classNames from "classnames";
 import { UserIcon } from "@library/icons/titleBar";
-import { t } from "@vanilla/i18n/src";
 import { accessibleLabel } from "@library/utility/appUtils";
 
 export enum UserPhotoSize {

@@ -7,16 +7,14 @@
 import React from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { t } from "@vanilla/i18n/src";
 
 export interface ITitleBarNavProps {
     className?: string;
     linkClassName?: string;
-    linkContentClassName?: string;
     listClassName?: string;
     children?: React.ReactNode;
     wrapper?: JSX.Element;
@@ -54,14 +52,10 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                   const component = (
                       <TitleBarNavItem
                           {...item}
-                          className={classNames(
-                              key === dataLength ? classes.lastItem : false,
-                              key === 0 ? classes.firstItem : false,
-                          )}
-                          linkContentClassName={classNames(
-                              this.props.linkContentClassName,
-                              key === dataLength ? classes.lastItem : false,
-                          )}
+                          className={classNames({
+                              [classes.lastItem]: dataLength === key,
+                              [classes.firstItem]: key === 0,
+                          })}
                           linkClassName={this.props.linkClassName}
                           key={key}
                       />
@@ -91,7 +85,7 @@ export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
                         this.props.isCentered && classes.navigationCentered,
                     )}
                 >
-                    <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
+                    <ul className={classNames(this.props.listClassName, classes.items)}>
                         {this.props.children ? this.props.children : content}
                         <>
                             {this.props.excludeExtraNavItems ??

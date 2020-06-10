@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
-import { RouteComponentProps, withRouter, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 import { formatUrl, siteUrl } from "@library/utility/appUtils";
@@ -56,13 +56,7 @@ export function TitleBarNavItem(props: IProps) {
                     props.buttonType ? getButtonStyleFromBaseClass(props.buttonType) : "",
                 )}
             >
-                <div
-                    className={classNames(
-                        props.linkContentClassName,
-                        classes.linkContent,
-                        isCurrent ? classes.linkActive : "",
-                    )}
-                >
+                <div className={classNames(props.linkContentClassName, isCurrent ? classes.linkActive : "")}>
                     {props.children}
                 </div>
             </SmartLink>

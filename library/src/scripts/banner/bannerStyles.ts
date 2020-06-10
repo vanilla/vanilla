@@ -190,7 +190,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     const outerBackgroundInit = makeThemeVars("outerBackground", {
         ...EMPTY_BACKGROUND,
-        color: colors.primary.lighten("12%"),
+        color: modifyColorBasedOnLightness({ color: colors.primary, weight: 0.05, inverse: true }),
         repeat: "no-repeat",
         position: "50% 50%",
         size: "cover",

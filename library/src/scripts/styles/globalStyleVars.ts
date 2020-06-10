@@ -33,7 +33,8 @@ export enum GlobalPreset {
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    let colorPrimary = color("#0291db");
+    // let colorPrimary = color("#0291db");
+    let colorPrimary = color("#037DBC");
     const makeThemeVars = variableFactory("global", forcedVars);
 
     const utility = {
@@ -66,13 +67,13 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const elementaryColors = {
         black: color("#000"),
         almostBlack: color("#323639"),
-        greyText: color("#555a62"),
+        lowContrast: color("#555a62"),
         white: color("#fff"),
         transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
-        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.greyText : elementaryColors.white,
+        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.lowContrast : elementaryColors.white,
         bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
@@ -325,7 +326,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const meta = makeThemeVars("meta", {
         text: {
             fontSize: fonts.size.small,
-            color: mixBgAndFg(0.85),
+            color: elementaryColors.lowContrast,
             margin: 4,
         },
         spacing: {

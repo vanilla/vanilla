@@ -209,7 +209,7 @@ if (!function_exists('writePromotedContentRow')):
                             <?php
                                 $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$username]);
                             ?>
-                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="$accessibleLabel">
+                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="<?php echo $accessibleLabel; ?>">
                         </a>
                         <a class="UserLink BlockTitle" href="<?php echo $userUrl; ?>"><?php echo $username; ?></a>
 

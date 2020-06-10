@@ -208,7 +208,7 @@ class FacebookPlugin extends SSOAddon {
             sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')),
             url($sharingUrl, true),
             'ReactButton PopupWindow',
-            ['rel' => 'nofollow']
+            ['rel' => 'nofollow', 'role' => 'button']
         );
     }
 

@@ -91,7 +91,7 @@ export const buttonCSS = () => {
     });
 
     cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
-        backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
+        backgroundColor: colorOut(globalVars.mainColors.secondary),
         width: unit(formElementVars.sizing.height),
     });
 

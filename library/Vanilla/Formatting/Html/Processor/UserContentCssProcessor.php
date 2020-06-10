@@ -57,6 +57,7 @@ class UserContentCssProcessor extends HtmlProcessor {
             }
 
             $this->setAttribute($codeBlock, "spellcheck", "false");
+            $this->setAttribute($codeBlock, "tabindex", "0");
         }
     }
 

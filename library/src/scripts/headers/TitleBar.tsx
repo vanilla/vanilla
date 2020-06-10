@@ -163,7 +163,6 @@ export default function TitleBar(_props: IProps) {
                                 }
                                 className={classes.nav}
                                 linkClassName={classes.topElement}
-                                linkContentClassName="titleBar-navLinkContent"
                                 afterNode={
                                     !isCompact &&
                                     isDesktopLogoCentered && (

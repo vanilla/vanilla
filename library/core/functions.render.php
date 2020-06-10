@@ -10,6 +10,7 @@
 
 use Vanilla\Formatting\Formats;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('alternate')) {
     /**
@@ -293,7 +294,7 @@ if (!function_exists('buttonDropDown')) {
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul role="menu" class="Dropdown MenuItems">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -368,7 +369,7 @@ if (!function_exists('buttonGroup')) {
                 echo $toggleButton;
             }
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul class="Dropdown MenuItems" role="menu">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -1160,6 +1161,7 @@ if (!function_exists('linkDropDown')) {
         $selectedLink = val($selectedKey, $links);
         $extraClasses = trim($extraClasses);
         $linkName = val('name', $selectedLink);
+        $downChevronLabel = t("Down Arrow");
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">
@@ -1167,9 +1169,9 @@ if (!function_exists('linkDropDown')) {
           <span class="selectBox-main">
               <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
-                <span class="vanillaDropDown-arrow">▾</span>
+                <span class="vanillaDropDown-arrow" aria-label="{$downChevronLabel}">▾</span>
               </a>
-              <ul class="Flyout MenuItems selectBox-content" role="presentation">
+              <ul class="Flyout MenuItems selectBox-content" role="menu">
 EOT;
         foreach($links as $i => $link) {
                 if (val('separator', $link)) {
@@ -1178,8 +1180,8 @@ EOT;
                     $output .= '</li>';
                 } else {
                     if (val('active', $link)) {
-                        $output .= '<li class="selectBox-item isActive" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                        $output .= '<li class="selectBox-item isActive" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0">';
                         $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
                         $output .= '      <title>✓</title>';
                         $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
@@ -1190,8 +1192,8 @@ EOT;
                         $output .= '  </a>';
                         $output .= '</li>';
                     } else {
-                        $output .= '<li class="selectBox-item" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                        $output .= '<li class="selectBox-item" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
                         $output .=      val('name', $link);
                         $output .= '  </a>';
                         $output .= '</li>';
@@ -1518,7 +1520,9 @@ if (!function_exists('userPhoto')) {
 
         $href = (val('NoLink', $options)) ? '' : ' href="'.url(userUrl($fullUser)).'"';
 
-        return '<a title="'.$title.'"'.$href.$linkClass.'>'
+        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
+
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '">'
                 .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
             .'</a>';
     }

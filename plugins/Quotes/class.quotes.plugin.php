@@ -276,7 +276,12 @@ class QuotesPlugin extends Gdn_Plugin {
         }
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$object->DiscussionID}/{$objectID}", true), 'ReactButton Quote Visible').' ';
+        echo anchor(
+            sprite('ReactQuote', 'ReactSprite').' '.t('Quote'),
+            url("post/quote/{$object->DiscussionID}/{$objectID}", true),
+            'ReactButton Quote Visible',
+            ['role' => 'button']
+        ).' ';
     }
 
     /**

@@ -9,5 +9,5 @@ import classNames from "classnames";
 
 export function EmbedTitle(props: HTMLAttributes<HTMLHeadingElement>) {
     const classes = embedContainerClasses();
-    return <h3 {...props} className={classNames(classes.title, props.className)} />;
+    return <h2 {...props} className={classNames(classes.title, props.className)} />;
 }

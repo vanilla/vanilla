@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use DiscussionModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Useful methods for testing a discussion model.
@@ -53,10 +54,13 @@ trait TestDiscussionModelTrait {
      * @return array
      */
     private function insertDiscussions(int $count, array $overrides = []): array {
+        $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));
         }
         $rows = $this->discussionModel->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
+        TestCase::assertCount($count, $rows, "Not enough test discussions were inserted.");
+
         return $rows;
     }
 }

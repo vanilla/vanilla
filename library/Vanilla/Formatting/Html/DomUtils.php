@@ -10,11 +10,10 @@ namespace Vanilla\Formatting\Html;
 use DOMDocument;
 
 /**
- * Class DomUtils
+ * Class for stripping images and truncating text from a Dom.
  *
  */
 final class DomUtils {
-
 
     /**
      * Remove embeds from the dom.

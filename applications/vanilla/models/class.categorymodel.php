@@ -2980,6 +2980,22 @@ class CategoryModel extends Gdn_Model {
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
             $Fields = $this->coerceData($Fields);
+
+            // Validate our parent category.
+            if ($Fields['ParentCategoryID'] ?? false) {
+                $parentCategoryID = $Fields['ParentCategoryID'];
+                $existingCategory = self::categories();
+                if (!$existingCategory) {
+                    $this->Validation->addValidationResult('ParentCategoryID', "Category for ParentCategoryID $parentCategoryID does not exist.");
+                    return false;
+                }
+
+                if ($CategoryID !== false && $CategoryID === $parentCategoryID) {
+                    $this->Validation->addValidationResult('ParentCategoryID', "A Category cannot add itself as a parent.");
+                    return false;
+                }
+            }
+
             unset($Fields['CategoryID']);
             $Fields['AllowDiscussions'] = isset($Fields['AllowDiscussions']) ? (bool)$Fields['AllowDiscussions'] : (bool)$AllowDiscussions;
 

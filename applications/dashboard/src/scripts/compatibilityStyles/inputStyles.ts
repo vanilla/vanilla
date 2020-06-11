@@ -135,14 +135,6 @@ export const inputCSS = () => {
         },
     });
 
-    cssOut(".Handle.Handle", {
-        $nest: {
-            "&:hover, &:focus, &.focus-visible, &:active": {
-                color: colorOut(globalVars.mainColors.primary),
-            },
-        },
-    });
-
     cssOut(".AdvancedSearch .Handle.Handle .Arrow::after", {
         color: "inherit",
     });

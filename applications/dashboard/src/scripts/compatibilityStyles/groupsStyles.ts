@@ -8,14 +8,14 @@
 import {
     absolutePosition,
     colorOut,
-    importantColorOut,
+    margins,
     negativeUnit,
     paddings,
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, percent, translateX } from "csx";
+import { calc, important, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -126,6 +126,7 @@ export const groupsCSS = () => {
 
     cssOut(`.GroupOptions`, {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
+        marginLeft: "auto",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
@@ -159,18 +160,9 @@ export const groupsCSS = () => {
         },
     );
 
-    cssOut(
-        `.Group-Box .PageControls .H`,
-        {
-            margin: 0,
-        },
-        mediaQueries.xs({
-            position: "relative",
-            top: "auto",
-            left: "auto",
-            right: "auto",
-        }),
-    );
+    cssOut(`.Group-Box .PageControls .H`, {
+        margin: 0,
+    });
 
     cssOut(`.Group-Box.Group-MembersPreview .H`, {
         position: "relative",
@@ -195,10 +187,15 @@ export const groupsCSS = () => {
         ...metaItemStyle(),
     });
 
-    cssOut(`body.Groups .Button.Handle .Sprite, body.Groups .NavButton.Handle .Sprite`, {
-        marginRight: negativeUnit(2),
-        transform: translateX(`5px`),
-    });
+    cssOut(
+        `
+        body.Groups .NavButton.Handle.GroupOptionsTitle .Sprite
+    `,
+        {
+            marginRight: negativeUnit(2),
+            transform: translateX(`5px`),
+        },
+    );
 
     cssOut(`body.Groups .StructuredForm .Buttons-Confirm`, {
         textAlign: "left",
@@ -231,6 +228,7 @@ export const groupsCSS = () => {
 
     cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
         paddingLeft: unit(0),
+        paddingRight: unit(70),
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons`, {
@@ -257,11 +255,70 @@ export const groupsCSS = () => {
         },
     });
 
-    cssOut(`.Group-Box .PageControls .Button-Controls`, {
-        ...absolutePosition.middleRightOfParent(),
-    });
+    cssOut(
+        `.Group-Box .PageControls .Button-Controls`,
+        mediaQueries.aboveMobile({
+            ...absolutePosition.middleRightOfParent(),
+        }),
+    );
 
     cssOut(`.Group-Box`, {
         marginBottom: unit(36),
     });
+
+    cssOut(`.Group-Header-Actions`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: percent(100),
+        ...margins({
+            vertical: unit(globalVars.gutter.size),
+        }),
+    });
+    cssOut(
+        `
+        .Group-Header-Actions .Group-Buttons,
+        .Group-Header-Actions .ButtonGroup,
+    `,
+        {
+            position: "relative",
+            top: "auto",
+        },
+    );
+
+    cssOut(
+        `.Section-Group .Group-Box .H,
+        .Section-Group .Group-Box .EmptyMessage`,
+        {
+            textAlign: "left",
+        },
+        mediaQueries.tabletDown({
+            textAlign: "left",
+        }),
+        mediaQueries.mobileDown({
+            marginBottom: unit(6),
+        }),
+    );
+
+    cssOut(`.Section-Group .Group-Title`, {
+        fontSize: globalVars.fonts.size.title,
+    });
+
+    cssOut(`.Section-Group .Group-Box .H`, {
+        fontSize: globalVars.fonts.size.subTitle,
+    });
+
+    cssOut(
+        `
+        .Button-Controls.Button-Controls
+    `,
+        mediaQueries.mobileDown({
+            display: "block",
+            $nest: {
+                [`& .Button`]: {
+                    marginRight: "auto",
+                },
+            },
+        }),
+    );
 };

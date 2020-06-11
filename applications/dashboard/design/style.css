@@ -562,10 +562,10 @@ div.FileUpload .CurrentImage {
   border-right-width: 1px;
 }
 
-.Button.Active,
-.ButtonGroup.Open .Button.Handle,
-.Button:focus,
-.Button:active {
+body:not(.dataDriven) .Button.Active,
+body:not(.dataDriven) .ButtonGroup.Open .Button.Handle,
+body:not(.dataDriven) .Button:focus,
+body:not(.dataDriven) .Button:active {
   border-color: #aaa;
   color: #333;
   background: #f7f7f7;
@@ -634,7 +634,7 @@ div.FileUpload .CurrentImage {
   background-color: #fdfdfd;
 }
 
-.ButtonGroup.Open .NavButton.Handle {
+body:not(.dataDriven) .ButtonGroup.Open .NavButton.Handle {
   color: #333;
   background: #eee;
 }
@@ -2248,7 +2248,7 @@ img.LeftAlign {
 }
 
 .ClearFix {
-  /* clear: both; */
+  clear: both;
 }
 
 .codeBlock,

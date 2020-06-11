@@ -87,7 +87,7 @@ class MasterViewRenderer {
 
         $extraData = [
             $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig('Content'),
-            'cssClasses' => $controller->data('CssClass') . ' isLoading',
+            'cssClasses' => $controller->data('CssClass') . ' isLoading' . (\Gdn::themeFeatures()->useDataDrivenTheme() ? ' dataDriven' : ''),
             'pageHead' => $controller->renderAssetForTwig('Head'),
         ];
 

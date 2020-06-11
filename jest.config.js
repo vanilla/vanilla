@@ -22,9 +22,6 @@ function scanAddons(addonDir) {
 
     keys.forEach(key => {
         let root = path.join(VANILLA_ROOT, addonDir, key);
-        if (fs.existsSync(root)) {
-            root = fs.realpathSync(root);
-        }
         if (fs.existsSync(path.join(root, "src/scripts/entries")) && key !== "vanilla") {
             addonRootDirs.push(root);
             const nodeModules = path.join(root, "node_modules");

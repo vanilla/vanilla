@@ -1776,19 +1776,13 @@ class CategoryModel extends Gdn_Model {
      *
      * @since 2.0.18
      * @access public
-     * @param array &$categories
+     *
+     * @param array $categories
      * @param bool $addUserCategory
      */
     public static function joinUserData(&$categories, $addUserCategory = true) {
-        $test = [];
-        foreach ($categories as $category) {
-            $test[$category['CategoryID']][] = $category;
-        }
-
         $iDs = array_column($categories, 'CategoryID', 'CategoryID');
         $categories = array_combine($iDs, $categories);
-
-
 
         if ($addUserCategory) {
             $userData = self::instance()->getUserCategories();

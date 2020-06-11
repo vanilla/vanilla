@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Models;
 
+use DiscussionModel;
+
 /**
  * Useful methods for testing a discussion model.
  */
@@ -14,7 +16,14 @@ trait TestDiscussionModelTrait {
     /**
      * @var \DiscussionModel
      */
-    private $model;
+    private $discussionModel;
+
+    /**
+     * Instantiate a fresh model for each
+     */
+    protected function setupTestDiscussionModelTrait() {
+        $this->discussionModel = $this->container()->get(DiscussionModel::class);
+    }
 
     /**
      * Create a test record.
@@ -23,7 +32,7 @@ trait TestDiscussionModelTrait {
      *
      * @return array
      */
-    public function createRecord(array $override): array {
+    public function newDiscussion(array $override): array {
         static $i = 1;
 
         $r = $override + [
@@ -43,11 +52,11 @@ trait TestDiscussionModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    private function insertRecords(int $count, array $overrides = []): array {
+    private function insertDiscussions(int $count, array $overrides = []): array {
         for ($i = 0; $i < $count; $i++) {
-            $ids[] = $this->model->save($this->createRecord($overrides));
+            $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));
         }
-        $rows = $this->model->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
+        $rows = $this->discussionModel->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
         return $rows;
     }
 }

@@ -57,7 +57,7 @@ class DiscussionModelTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->model = $this->container()->get(\DiscussionModel::class);
+        $this->setupTestDiscussionModelTrait();
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
         $this->backupSession();
@@ -83,24 +83,24 @@ class DiscussionModelTest extends TestCase {
      * An empty archive date should be null.
      */
     public function testArchiveDateEmpty() {
-        $this->model->setArchiveDate('');
-        $this->assertNull($this->model->getArchiveDate());
+        $this->discussionModel->setArchiveDate('');
+        $this->assertNull($this->discussionModel->getArchiveDate());
     }
 
     /**
      * A date expression is valid.
      */
     public function testDayInPast() {
-        $this->model->setArchiveDate('-3 days');
-        $this->assertLessThan($this->now, $this->model->getArchiveDate());
+        $this->discussionModel->setArchiveDate('-3 days');
+        $this->assertLessThan($this->now, $this->discussionModel->getArchiveDate());
     }
 
     /**
      * A future date expression gets flipped to the past.
      */
     public function testDayFlippedToPast() {
-        $this->model->setArchiveDate('3 days');
-        $this->assertLessThan($this->now, $this->model->getArchiveDate());
+        $this->discussionModel->setArchiveDate('3 days');
+        $this->assertLessThan($this->now, $this->discussionModel->getArchiveDate());
     }
 
     /**
@@ -109,7 +109,7 @@ class DiscussionModelTest extends TestCase {
     public function testInvalidArchiveDate() {
         $this->expectException(\Exception::class);
 
-        $this->model->setArchiveDate('dnsfids');
+        $this->discussionModel->setArchiveDate('dnsfids');
     }
 
     /**
@@ -121,8 +121,8 @@ class DiscussionModelTest extends TestCase {
      * @dataProvider provideIsArchivedTests
      */
     public function testIsArchived(string $archiveDate, ?string $dateLastComment, bool $expected) {
-        $this->model->setArchiveDate($archiveDate);
-        $actual = $this->model->isArchived($dateLastComment);
+        $this->discussionModel->setArchiveDate($archiveDate);
+        $actual = $this->discussionModel->isArchived($dateLastComment);
         $this->assertSame($expected, $actual);
     }
 
@@ -130,10 +130,10 @@ class DiscussionModelTest extends TestCase {
      * An invalid date should return a warning.
      */
     public function testIsArchivedInvalidDate() {
-        $this->model->setArchiveDate('2019-10-26');
+        $this->discussionModel->setArchiveDate('2019-10-26');
 
         $this->runWithExpectedError(function () {
-            $actual = $this->model->isArchived('fldjsjs');
+            $actual = $this->discussionModel->isArchived('fldjsjs');
             $this->assertFalse($actual);
         }, self::assertErrorNumber(E_USER_WARNING));
     }
@@ -321,11 +321,11 @@ class DiscussionModelTest extends TestCase {
         ?string $testMaxDateInserted,
         $expected
     ) {
-        $this->model->DateLastViewed = $testDiscussionArray['DateLastViewed'];
-        $this->model->CountCommentWatch = $testDiscussionArray['CountCommentWatch'];
-        $this->model->DateInserted = $testDiscussionArray['DateInserted'];
-        $this->model->DateLastComment = $testDiscussionArray['DateLastComment'];
-        $actual = $this->model->calculateWatch($this->model, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted);
+        $this->discussionModel->DateLastViewed = $testDiscussionArray['DateLastViewed'];
+        $this->discussionModel->CountCommentWatch = $testDiscussionArray['CountCommentWatch'];
+        $this->discussionModel->DateInserted = $testDiscussionArray['DateInserted'];
+        $this->discussionModel->DateLastComment = $testDiscussionArray['DateLastComment'];
+        $actual = $this->discussionModel->calculateWatch($this->discussionModel, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted);
         $this->assertSame($expected, $actual);
     }
 
@@ -449,7 +449,7 @@ class DiscussionModelTest extends TestCase {
         ?string $userLastReadDate,
         $expected
     ) {
-        $actual = $this->model->calculateCommentReadData(
+        $actual = $this->discussionModel->calculateCommentReadData(
             $discussionCommentCount,
             $discussionLastCommentDate,
             $userReadComments,
@@ -567,12 +567,12 @@ class DiscussionModelTest extends TestCase {
      * @return void
      */
     public function testDeleteEventDispatched(): void {
-        $discussionID = $this->model->save([
+        $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
             "Format" => "markdown",
         ]);
-        $this->model->deleteID($discussionID);
+        $this->discussionModel->deleteID($discussionID);
 
         $this->assertInstanceOf(DiscussionEvent::class, $this->lastEvent);
         $this->assertEquals(DiscussionEvent::ACTION_DELETE, $this->lastEvent->getAction());
@@ -584,7 +584,7 @@ class DiscussionModelTest extends TestCase {
      * @return void
      */
     public function testSaveInsertEventDispatched(): void {
-        $this->model->save([
+        $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
             "Format" => "markdown",
@@ -599,12 +599,12 @@ class DiscussionModelTest extends TestCase {
      * @return void
      */
     public function testSaveUpdateEventDispatched(): void {
-        $discussionID = $this->model->save([
+        $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
             "Format" => "markdown",
         ]);
-        $this->model->save([
+        $this->discussionModel->save([
             "DiscussionID" => $discussionID,
             "Body" => "Hello again, world.",
         ]);
@@ -633,9 +633,9 @@ class DiscussionModelTest extends TestCase {
         ];
 
         // Confirm the initial state, so changes are easy to detect.
-        $discussionID = $this->model->save($discussion);
-        $this->assertNotEmpty($discussionID, $this->model->Validation->resultsText());
-        $discussion = $this->model->getID($discussionID);
+        $discussionID = $this->discussionModel->save($discussion);
+        $this->assertNotEmpty($discussionID, $this->discussionModel->Validation->resultsText());
+        $discussion = $this->discussionModel->getID($discussionID);
         $this->assertIsObject($discussion);
         $this->assertNull(
             $discussion->CountCommentWatch,
@@ -643,8 +643,8 @@ class DiscussionModelTest extends TestCase {
         );
 
         // Create a comment watch status.
-        $this->model->setWatch($discussion, 10, 0, $discussion->CountComments);
-        $discussionFirstVisit = $this->model->getID($discussionID);
+        $this->discussionModel->setWatch($discussion, 10, 0, $discussion->CountComments);
+        $discussionFirstVisit = $this->discussionModel->getID($discussionID);
         $this->assertSame(
             $discussionFirstVisit->CountComments,
             $discussionFirstVisit->CountCommentWatch,
@@ -653,9 +653,9 @@ class DiscussionModelTest extends TestCase {
 
         // Update an existing comment watch status.
         $updatedCountComments = $countComments + 1;
-        $this->model->setField($discussionID, "CountComments", $updatedCountComments);
-        $this->model->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
-        $discussionSecondVisit = $this->model->getID($discussionID);
+        $this->discussionModel->setField($discussionID, "CountComments", $updatedCountComments);
+        $this->discussionModel->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
+        $discussionSecondVisit = $this->discussionModel->getID($discussionID);
         $this->assertSame(
             $discussionSecondVisit->CountComments,
             $discussionSecondVisit->CountCommentWatch,
@@ -705,7 +705,7 @@ class DiscussionModelTest extends TestCase {
             "CountCommentWatch" => $discussionMarkedRead ? 5 : null,
         ];
 
-        $this->model->calculate($discussion);
+        $this->discussionModel->calculate($discussion);
 
         $this->assertSame($expected, $discussion->DateLastViewed);
 
@@ -764,5 +764,16 @@ class DiscussionModelTest extends TestCase {
             ],
         ];
         return $result;
+    }
+
+    /**
+     * Announcements should properly sort.
+     */
+    public function testAnnouncementSorting() {
+        $row = ['Name' => 'ax1', 'Announce' => 1];
+        $this->insertDiscussions(10, $row);
+
+        $rows = $this->discussionModel->getAnnouncements($row, 0, false, '-DiscussionID')->resultArray();
+        TestSortingTrait::assertSorted($rows, '-DiscussionID');
     }
 }

@@ -12,11 +12,12 @@ use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\InternalClient;
+use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\TestLogger;
 
 abstract class AbstractAPIv2Test extends TestCase {
-    use SiteTestTrait;
+    use SiteTestTrait, SetupTraitsTrait;
 
     /**
      * @var InternalClient
@@ -56,24 +57,6 @@ abstract class AbstractAPIv2Test extends TestCase {
         }
 
         $this->setUpTestTraits();
-        $this->setupSiteTestTrait();
-    }
-
-    /**
-     * Setup test traits.
-     *
-     * Any trait that defines a method `setUpNameOfTrait` will be called.
-     */
-    public function setUpTestTraits() {
-        $uses = array_flip(class_uses(static::class));
-        foreach ($uses as $traitName) {
-            $shortName = (new \ReflectionClass($traitName))->getShortName();
-            $methodName = 'setUp'.$shortName;
-
-            if (method_exists($this, $methodName)) {
-                call_user_func([$this, $methodName]);
-            }
-        }
     }
 
     /**
@@ -82,6 +65,8 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
+
+        $this->tearDownTestTraits();
     }
 
     /**

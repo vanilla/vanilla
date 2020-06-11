@@ -22,6 +22,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import gdn from "@library/gdn";
+import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 
 /**
  * Implements User Drop down for header
@@ -45,7 +46,7 @@ function UserDropDownContents(props: IProps) {
         <div className={classNames(props.className, classesDropDown.verticalPadding)}>
             <DropDownUserCard className="userDropDown-userCard" />
             <DropDownItemSeparator />
-            <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+            <DropDownEditProfileLink />
             <DropDownSection title={t("Discussions")}>
                 <DropDownItemLinkWithCount
                     to={"/discussions/bookmarked"}

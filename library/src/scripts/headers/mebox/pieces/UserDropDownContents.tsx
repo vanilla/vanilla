@@ -19,6 +19,7 @@ import { getSiteSection, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 
 /**
  * Implements User Drop down for header
@@ -41,8 +42,7 @@ function UserDropDownContents(props: IProps) {
     return (
         <ul className={classNames(classesDropDown.verticalPadding, props.className)}>
             <DropDownUserCard className="userDropDown-userCard" />
-            <DropDownItemSeparator />
-            <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+            <DropDownEditProfileLink />
             {UserDropDownContents.extraUserDropDownComponents.map((ComponentName, index) => {
                 return <ComponentName key={index} getCountByName={getCountByName} />;
             })}

@@ -17,8 +17,7 @@ use Garden\Container\Container;
  * Class SharedBootstrapTestCase.
  */
 class SharedBootstrapTestCase extends TestCase {
-
-    use BootstrapTrait {
+    use SetupTraitsTrait, BootstrapTrait {
         setUpBeforeClass as bootstrapSetupBeforeClass;
         teardownAfterClass as bootstrapTeardownAfterClass;
     }
@@ -49,6 +48,22 @@ class SharedBootstrapTestCase extends TestCase {
         if ($containerCorruption) {
             throw new Exception('A container has not been properly cleaned by a previous test!');
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->setupTestTraits();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->tearDownTestTraits();
     }
 
     /**

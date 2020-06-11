@@ -6,7 +6,8 @@
 
 namespace VanillaTests\Models;
 
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
+use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 use Garden\EventManager;
 use Vanilla\Community\Events\CommentEvent;
@@ -14,8 +15,8 @@ use Vanilla\Community\Events\CommentEvent;
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends SharedBootstrapTestCase {
-    use SiteTestTrait {
+class CommentModelTest extends TestCase {
+    use SetupTraitsTrait, TestCommentModelTrait, SiteTestTrait {
         setupBeforeClass as baseSetupBeforeClass;
     }
 
@@ -26,11 +27,6 @@ class CommentModelTest extends SharedBootstrapTestCase {
      * @var \DiscussionModel
      */
     private $discussionModel;
-
-    /**
-     * @var \CommentModel
-     */
-    private $commentModel;
 
     /**
      * {@inheritdoc}
@@ -46,7 +42,9 @@ class CommentModelTest extends SharedBootstrapTestCase {
      * Setup
      */
     public function setup(): void {
-        $this->commentModel = $this->container()->get(\CommentModel::class);
+        parent::setUp();
+        $this->setupTestTraits();
+
         $this->discussionModel = $this->container()->get(\DiscussionModel::class);
         // Make event testing a little easier.
         $this->container()->setInstance(self::class, $this);

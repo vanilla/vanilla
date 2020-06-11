@@ -40,7 +40,11 @@ class CategoryModel extends Gdn_Model {
     /** Flag for aggregating discussion counts. */
     const AGGREGATE_DISCUSSION = 'discussion';
 
+    /** @var Constants for category display options. */
     const DISPLAY_FLAT = 'Flat';
+    const DISPLAY_HEADING = 'Heading';
+    const DISPLAY_DISCUSSIONS = 'Discussions';
+    const DISPLAY_NESTED = 'Nested';
 
     /**
      * @var CategoryModel $instance;
@@ -69,10 +73,10 @@ class CategoryModel extends Gdn_Model {
 
     /** @var array Valid values => labels for DisplayAs column. */
     private static $displayAsOptions = [
-        'Discussions' => 'Discussions',
-        'Categories' => 'Nested',
-        'Flat' => 'Flat',
-        'Heading' => 'Heading'
+        'Discussions' => self::DISPLAY_DISCUSSIONS,
+        'Categories' => self::DISPLAY_NESTED,
+        'Flat' => self::DISPLAY_FLAT,
+        'Heading' => self::DISPLAY_HEADING
     ];
 
     /** @var bool Whether or not to explicitly shard the categories cache. */
@@ -1812,7 +1816,7 @@ class CategoryModel extends Gdn_Model {
                 $categories[$iD]['Followed'] = boolval($row['Followed'] ?? false);
 
                 // Calculate the read field.
-                if ($category['DisplayAs'] == 'Heading') {
+                if ($category['DisplayAs'] == self::DISPLAY_HEADING) {
                     $categories[$iD]['Read'] = false;
                 } elseif ($dateMarkedRead) {
                     if ($lastDateInserted = ($category['LastDateInserted'] ?? false)) {
@@ -2158,7 +2162,7 @@ class CategoryModel extends Gdn_Model {
                 $iD = $category['UrlCode'];
             }
 
-            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
+            if ($includeHeadings || $category['DisplayAs'] !== self::DISPLAY_HEADING) {
                 $result[$iD] = $category;
             }
         }
@@ -2221,7 +2225,7 @@ class CategoryModel extends Gdn_Model {
             return [];
         }
 
-        if (val('DisplayAs', $parent) === 'Flat') {
+        if (val('DisplayAs', $parent) === self::DISPLAY_FLAT) {
             $categories = self::instance()->getTreeAsFlat($parent['CategoryID']);
         } else {
             $categories = self::instance()->collection->getTree($parent['CategoryID'], ['maxdepth' => 10]);
@@ -3726,7 +3730,7 @@ SQL;
         $query = $this->SQL
             ->from('Category c')
             ->where('CategoryID >', 0)
-            ->where('DisplayAs <>', 'Heading')
+            ->where('DisplayAs <>', self::DISPLAY_HEADING)
             ->like('Name', $name)
             ->orderBy('Name');
         if ($limit !== null) {
@@ -3739,7 +3743,7 @@ SQL;
         $result = [];
         foreach ($categories as $category) {
             self::calculate($category);
-            if ($category['DisplayAs'] === 'Heading') {
+            if ($category['DisplayAs'] === self::DISPLAY_HEADING) {
                 continue;
             }
 

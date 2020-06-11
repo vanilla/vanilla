@@ -57,32 +57,32 @@ class CategoryModelTest extends TestCase {
     public function testSortFlatCategoriesOrdersCorrectly(): void {
         $categories = [
                 10 =>
-                array (
-                    'CategoryID' => 10,
-                    'TreeLeft' => 1,
-                    'TreeRight' => 27,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'parent',
-                    'DisplayAs' => 'Flat',
-                ),
+                    [
+                        'CategoryID' => 10,
+                        'TreeLeft' => 1,
+                        'TreeRight' => 27,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'parent',
+                        'DisplayAs' => 'Flat',
+                    ],
                 1 =>
-                array (
-                    'CategoryID' => 1,
-                    'TreeLeft' => 2,
-                    'TreeRight' => 3,
-                    'ParentCategoryID' => 10,
-                    'Name' => 'foo',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 1,
+                        'TreeLeft' => 2,
+                        'TreeRight' => 3,
+                        'ParentCategoryID' => 10,
+                        'Name' => 'foo',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 6 =>
-                array (
-                    'CategoryID' => 6,
-                    'TreeLeft' => 2,
-                    'TreeRight' => 3,
-                    'ParentCategoryID' => 10,
-                    'Name' => 'bar',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 6,
+                        'TreeLeft' => 2,
+                        'TreeRight' => 3,
+                        'ParentCategoryID' => 10,
+                        'Name' => 'bar',
+                        'DisplayAs' => 'Discussions',
+                    ],
         ];
         $unsortedCategories = $categories;
         $sortedCategories = $categories;
@@ -114,189 +114,189 @@ class CategoryModelTest extends TestCase {
      */
     public function provideTestCategories(): array {
         $r = [
-            'localHostData' => [[
+            'localHostData' => [
                 -1 =>
-                array (
-                    'CategoryID' => -1,
-                    'TreeLeft' => 1,
-                    'TreeRight' => 40,
-                    'ParentCategoryID' => null,
-                    'Name' => 'Root',
-                    'DisplayAs' => 'Categories',
-                ),
+                    [
+                        'CategoryID' => -1,
+                        'TreeLeft' => 1,
+                        'TreeRight' => 40,
+                        'ParentCategoryID' => null,
+                        'Name' => 'Root',
+                        'DisplayAs' => 'Categories',
+                    ],
                 1 =>
-                array (
-                    'CategoryID' => 1,
-                    'TreeLeft' => 2,
-                    'TreeRight' => 3,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'General',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 1,
+                        'TreeLeft' => 2,
+                        'TreeRight' => 3,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'General',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 18 =>
-                array (
-                    'CategoryID' => 18,
-                    'TreeLeft' => 4,
-                    'TreeRight' => 9,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'German',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 18,
+                        'TreeLeft' => 4,
+                        'TreeRight' => 9,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'German',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 19 =>
-                array (
-                    'CategoryID' => 19,
-                    'TreeLeft' => 5,
-                    'TreeRight' => 8,
-                    'ParentCategoryID' => 18,
-                    'Name' => 'German-Sub',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 19,
+                        'TreeLeft' => 5,
+                        'TreeRight' => 8,
+                        'ParentCategoryID' => 18,
+                        'Name' => 'German-Sub',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 20 =>
-                array (
-                    'CategoryID' => 20,
-                    'TreeLeft' => 6,
-                    'TreeRight' => 7,
-                    'ParentCategoryID' => 19,
-                    'Name' => 'German-Sub-Sub',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 20,
+                        'TreeLeft' => 6,
+                        'TreeRight' => 7,
+                        'ParentCategoryID' => 19,
+                        'Name' => 'German-Sub-Sub',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 15 =>
-                array (
-                    'CategoryID' => 15,
-                    'TreeLeft' => 10,
-                    'TreeRight' => 11,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Sub-recordGroup',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 15,
+                        'TreeLeft' => 10,
+                        'TreeRight' => 11,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Sub-recordGroup',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 12 =>
-                array (
-                    'CategoryID' => 12,
-                    'TreeLeft' => 12,
-                    'TreeRight' => 17,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Big Category',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 12,
+                        'TreeLeft' => 12,
+                        'TreeRight' => 17,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Big Category',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 13 =>
-                array (
-                    'CategoryID' => 13,
-                    'TreeLeft' => 13,
-                    'TreeRight' => 16,
-                    'ParentCategoryID' => 12,
-                    'Name' => 'Inner Category',
-                    'DisplayAs' => 'Categories',
-                ),
+                    [
+                        'CategoryID' => 13,
+                        'TreeLeft' => 13,
+                        'TreeRight' => 16,
+                        'ParentCategoryID' => 12,
+                        'Name' => 'Inner Category',
+                        'DisplayAs' => 'Categories',
+                    ],
                 14 =>
-                array (
-                    'CategoryID' => 14,
-                    'TreeLeft' => 14,
-                    'TreeRight' => 15,
-                    'ParentCategoryID' => 13,
-                    'Name' => 'Innermost Category',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 14,
+                        'TreeLeft' => 14,
+                        'TreeRight' => 15,
+                        'ParentCategoryID' => 13,
+                        'Name' => 'Innermost Category',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 11 =>
-                array (
-                    'CategoryID' => 11,
-                    'TreeLeft' => 18,
-                    'TreeRight' => 19,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Reported Posts',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 11,
+                        'TreeLeft' => 18,
+                        'TreeRight' => 19,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Reported Posts',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 10 =>
-                array (
-                    'CategoryID' => 10,
-                    'TreeLeft' => 20,
-                    'TreeRight' => 25,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Social Groups',
-                    'DisplayAs' => 'Flat',
-                ),
+                    [
+                        'CategoryID' => 10,
+                        'TreeLeft' => 20,
+                        'TreeRight' => 25,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Social Groups',
+                        'DisplayAs' => 'Flat',
+                    ],
                 16 =>
-                array (
-                    'CategoryID' => 16,
-                    'TreeLeft' => 21,
-                    'TreeRight' => 22,
-                    'ParentCategoryID' => 10,
-                    'Name' => 'Soul Records',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 16,
+                        'TreeLeft' => 21,
+                        'TreeRight' => 22,
+                        'ParentCategoryID' => 10,
+                        'Name' => 'Soul Records',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 17 =>
-                array (
-                    'CategoryID' => 17,
-                    'TreeLeft' => 23,
-                    'TreeRight' => 24,
-                    'ParentCategoryID' => 10,
-                    'Name' => 'Metal Records',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 17,
+                        'TreeLeft' => 23,
+                        'TreeRight' => 24,
+                        'ParentCategoryID' => 10,
+                        'Name' => 'Metal Records',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 9 =>
-                array (
-                    'CategoryID' => 9,
-                    'TreeLeft' => 26,
-                    'TreeRight' => 27,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Great New Ideas',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 9,
+                        'TreeLeft' => 26,
+                        'TreeRight' => 27,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Great New Ideas',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 8 =>
-                array (
-                    'CategoryID' => 8,
-                    'TreeLeft' => 28,
-                    'TreeRight' => 29,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Top Secret Category',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 8,
+                        'TreeLeft' => 28,
+                        'TreeRight' => 29,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Top Secret Category',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 2 =>
-                array (
-                    'CategoryID' => 2,
-                    'TreeLeft' => 30,
-                    'TreeRight' => 39,
-                    'ParentCategoryID' => -1,
-                    'Name' => 'Category with Categories',
-                    'DisplayAs' => 'Flat',
-                ),
+                    [
+                        'CategoryID' => 2,
+                        'TreeLeft' => 30,
+                        'TreeRight' => 39,
+                        'ParentCategoryID' => -1,
+                        'Name' => 'Category with Categories',
+                        'DisplayAs' => 'Flat',
+                    ],
                 21 =>
-                array (
-                    'CategoryID' => 21,
-                    'TreeLeft' => 31,
-                    'TreeRight' => 32,
-                    'ParentCategoryID' => 2,
-                    'Name' => 'Another Subcategory',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 21,
+                        'TreeLeft' => 31,
+                        'TreeRight' => 32,
+                        'ParentCategoryID' => 2,
+                        'Name' => 'Another Subcategory',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 7 =>
-                array (
-                    'CategoryID' => 7,
-                    'TreeLeft' => 33,
-                    'TreeRight' => 34,
-                    'ParentCategoryID' => 2,
-                    'Name' => 'Subcategory3',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 7,
+                        'TreeLeft' => 33,
+                        'TreeRight' => 34,
+                        'ParentCategoryID' => 2,
+                        'Name' => 'Subcategory3',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 6 =>
-                array (
-                    'CategoryID' => 6,
-                    'TreeLeft' => 35,
-                    'TreeRight' => 36,
-                    'ParentCategoryID' => 2,
-                    'Name' => 'Subcategory2',
-                    'DisplayAs' => 'Discussions',
-                ),
+                    [
+                        'CategoryID' => 6,
+                        'TreeLeft' => 35,
+                        'TreeRight' => 36,
+                        'ParentCategoryID' => 2,
+                        'Name' => 'Subcategory2',
+                        'DisplayAs' => 'Discussions',
+                    ],
                 3 =>
-                array (
-                    'CategoryID' => 3,
-                    'TreeLeft' => 37,
-                    'TreeRight' => 38,
-                    'ParentCategoryID' => 2,
-                    'Name' => 'Subcategory1',
-                    'DisplayAs' => 'Discussions',
-                ),
-            ]],
-            'testCategoryData' => [[
+                    [
+                        'CategoryID' => 3,
+                        'TreeLeft' => 37,
+                        'TreeRight' => 38,
+                        'ParentCategoryID' => 2,
+                        'Name' => 'Subcategory1',
+                        'DisplayAs' => 'Discussions',
+                    ],
+            ],
+            'testCategoryData' => [
                 -1 =>
                     [
                         'CategoryID' => -1,
@@ -594,7 +594,7 @@ class CategoryModelTest extends TestCase {
                         'Name' => 'Test Category 10 Tue, 09 Jun 2020 21:45:13 +0000',
                         'DisplayAs' => 'Categories',
                     ],
-            ]],
+            ],
         ];
         return $r;
     }

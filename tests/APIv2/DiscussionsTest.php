@@ -102,6 +102,7 @@ class DiscussionsTest extends AbstractResourceTest {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
         $this->setupTestDiscussionModelTrait();
+        $this->setupTraits();
     }
 
     /**

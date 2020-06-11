@@ -142,7 +142,7 @@ class ThemeService {
         $cacheKey = $this->cache->cacheKey($themeKey, $query);
         $result = $this->cache->get($cacheKey);
         if ($result instanceof Theme) {
-            return $result;
+            return $this->normalizeTheme($result);
         }
 
         $provider = $this->getThemeProvider($themeKey);

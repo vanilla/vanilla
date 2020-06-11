@@ -101,7 +101,8 @@ class DiscussionsTest extends AbstractResourceTest {
     public function setUp(): void {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
-        $this->model = $this->container()->get(DiscussionModel::class);
+        $this->setupTestDiscussionModelTrait();
+        $this->setupTraits();
     }
 
     /**
@@ -299,7 +300,7 @@ class DiscussionsTest extends AbstractResourceTest {
      * Announcements should obey the sort.
      */
     public function testAnnouncementSort(): void {
-        $this->insertRecords(3, ['Announce' => 1]);
+        $this->insertDiscussions(3, ['Announce' => 1]);
 
         $fields = ['discussionID', '-discussionID'];
 
@@ -314,8 +315,8 @@ class DiscussionsTest extends AbstractResourceTest {
      * A mix of announcements and discussions should sort properly.
      */
     public function testAnnouncementMixed(): void {
-        $rows = $this->insertRecords(2, ['Announce' => 1]);
-        $rows = array_merge($rows, $this->insertRecords(2));
+        $rows = $this->insertDiscussions(2, ['Announce' => 1]);
+        $rows = array_merge($rows, $this->insertDiscussions(2));
         $ids = array_column($rows, 'DiscussionID');
 
         $fields = ['discussionID', '-discussionID'];

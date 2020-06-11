@@ -114,7 +114,7 @@ class CategoryModelTest extends TestCase {
      */
     public function provideTestCategories(): array {
         $r = [
-            'localHostData' => [
+            'localHostData' => [[
                 -1 =>
                     [
                         'CategoryID' => -1,
@@ -295,8 +295,8 @@ class CategoryModelTest extends TestCase {
                         'Name' => 'Subcategory1',
                         'DisplayAs' => 'Discussions',
                     ],
-            ],
-            'testCategoryData' => [
+            ]],
+            'testCategoryData' => [[
                 -1 =>
                     [
                         'CategoryID' => -1,
@@ -594,7 +594,7 @@ class CategoryModelTest extends TestCase {
                         'Name' => 'Test Category 10 Tue, 09 Jun 2020 21:45:13 +0000',
                         'DisplayAs' => 'Categories',
                     ],
-            ],
+            ]],
         ];
         return $r;
     }

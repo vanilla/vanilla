@@ -21,7 +21,7 @@ trait TestDiscussionModelTrait {
     /**
      * Instantiate a fresh model for each
      */
-    protected function setupTestDiscussionModelTrait() {
+    protected function setupTestDiscussionModel() {
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
     }
 

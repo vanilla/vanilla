@@ -287,7 +287,11 @@ export const groupsCSS = () => {
     );
 
     cssOut(
-        `.Section-Group .Group-Box .H`,
+        `.Section-Group .Group-Box .H,
+        .Section-Group .Group-Box .EmptyMessage`,
+        {
+            textAlign: "left",
+        },
         mediaQueries.tabletDown({
             textAlign: "left",
         }),
@@ -295,6 +299,14 @@ export const groupsCSS = () => {
             marginBottom: unit(6),
         }),
     );
+
+    cssOut(`.Section-Group .Group-Title`, {
+        fontSize: globalVars.fonts.size.title,
+    });
+
+    cssOut(`.Section-Group .Group-Box .H`, {
+        fontSize: globalVars.fonts.size.subTitle,
+    });
 
     cssOut(
         `

@@ -2253,6 +2253,10 @@ class ActivityModel extends Gdn_Model {
         $notification["notifyUsers"] = [$notifyUser];
         $notification = $this->notificationSchema()->validate($notification);
 
+        // Pre-fetch user authentication rows for caching.
+        $notifyUserIDs = array_column($notification["notifyUsers"], "userID");
+        $this->userModel->getDefaultSSOIDs($notifyUserIDs);
+
         foreach ($notification["notifyUsers"] as &$currentUser) {
             $currentUser = $this->addUserFragmentFields($currentUser);
         }

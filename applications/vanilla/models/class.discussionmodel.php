@@ -3880,6 +3880,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      *
      * @param object $discussion
      * @deprecated
+     * @codeCoverageIgnore
      */
     protected function markCategoryReadFuzzy($discussion): void {
         /**

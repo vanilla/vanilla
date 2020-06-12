@@ -109,9 +109,9 @@ HTML;
      *
      * @param string $input String with parentheses to test.
      * @param string $expected Expected output.
-     * @dataProvider provideTestCommasData
+     * @dataProvider provideTestParenthesesData
      */
-    public function testCommas($input, $expected) {
+    public function testParentheses($input, $expected) {
         $actual = Gdn_Format::links($input);
         $this->assertSame($expected, $actual);
     }
@@ -119,7 +119,7 @@ HTML;
     /**
      * @return array Array of strings to test.
      */
-    public function provideTestCommasData(): array {
+    public function provideTestParenthesesData(): array {
         $r = [
             'parensBeforeSlashes' => [
                 'h(tt)p://www.foo.bar',
@@ -164,8 +164,28 @@ HTML;
                 'http:/{/www.foo.bar',
             ],
             'bracesAfterSlashes' => [
-                'http://www.{foo}.bar',
-                '<a href="http://www.{foo}.bar" rel="nofollow">http://www.{foo}.bar</a>'
+                'http://www.foo.com/{bar}',
+                '<a href="http://www.foo.com/{bar}" rel="nofollow">http://www.foo.com/{bar}</a>'
+            ],
+            'realWorldAgain' => [
+                  'https://mydrive.tomtom.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={%22departu'.
+                  're%22:true,%22traffic%22:true,%22routeType%22:%22FASTEST%22,%22travelMode%22:%22CAR%22,%22date%22:%22'.
+                  '1593608700000%22,%22points%22:%5B%22hw~60.16981,24.93813~A~Helsinki%20Uusimaa,%20FIN%22,%22hw~60.59796,'.
+                  '27.79943~A~Virolahti%20(Vaalimaa)%20Kymenlaakso,%20FIN%22,%22hw~60.59615,27.91827~A~Seleznevskoye%20(To'.
+                  'rfyanovka)%20Northwestern%20Federal%20District,%20RUS%22,%22hw~59.93848,30.31248~A~Saint%20Petersburg%20'.
+                  'Northwestern%20Federal%20District,%20RUS%22%5D,%22avoidCriteria%22:%5B%5D%7D+ver=3',
+                  '<a href="https://mydrive.tomtom.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={%22depa'.
+                  'rture%22:true,%22traffic%22:true,%22routeType%22:%22FASTEST%22,%22travelMode%22:%22CAR%22,%22date%22:%2215'.
+                  '93608700000%22,%22points%22:%5B%22hw~60.16981,24.93813~A~Helsinki%20Uusimaa,%20FIN%22,%22hw~60.59796,27.79'.
+                  '943~A~Virolahti%20(Vaalimaa)%20Kymenlaakso,%20FIN%22,%22hw~60.59615,27.91827~A~Seleznevskoye%20(Torfyanovka'.
+                  ')%20Northwestern%20Federal%20District,%20RUS%22,%22hw~59.93848,30.31248~A~Saint%20Petersburg%20Northwester'.
+                  'n%20Federal%20District,%20RUS%22%5D,%22avoidCriteria%22:%5B%5D%7D+ver=3" rel="nofollow">https://mydrive.to'.
+                  'mtom.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={&quot;departure&quot;:true,&quot;traf'.
+                  'fic&quot;:true,&quot;routeType&quot;:&quot;FASTEST&quot;,&quot;travelMode&quot;:&quot;CAR&quot;,&quot;date&q'.
+                  'uot;:&quot;1593608700000&quot;,&quot;points&quot;:[&quot;hw~60.16981,24.93813~A~Helsinki Uusimaa, FIN&quot;,&'.
+                  'quot;hw~60.59796,27.79943~A~Virolahti (Vaalimaa) Kymenlaakso, FIN&quot;,&quot;hw~60.59615,27.91827~A~Selezne'.
+                  'vskoye (Torfyanovka) Northwestern Federal District, RUS&quot;,&quot;hw~59.93848,30.31248~A~Saint Petersburg N'.
+                  'orthwestern Federal District, RUS&quot;],&quot;avoidCriteria&quot;:[]}+ver=3</a>'
             ],
         ];
 

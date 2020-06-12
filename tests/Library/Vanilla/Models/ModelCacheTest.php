@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 use Vanilla\Models\PipelineModel;
@@ -95,9 +96,9 @@ class ModelCacheTest extends TestCase {
      * Test that we can get and invalidate from the cache.
      */
     public function testAutoInvalidation() {
+        $this->model->addPipelinePostProcessor($this->modelCache->createInvalidationProcessor());
         $fooID = $this->insertOne('foo');
         $this->insertOne('bar');
-        $this->model->addPipelinePostProcessor($this->modelCache->createInvalidationProcessor());
 
         $hydrator = function () {
             return $this->model->get();
@@ -120,6 +121,51 @@ class ModelCacheTest extends TestCase {
         $this->model->update(['name' => 'foo update'], ['modelID' => $fooID]);
         $result = $this->modelCache->getCachedOrHydrate([], $hydrator);
         $this->assertSame(['foo update', 'bar'], array_column($result, 'name'));
+    }
+
+    /**
+     * Test the full record cache model.
+     */
+    public function testFullRecordCacheModelInvalidation() {
+        /** @var FullRecordCacheModel $model */
+        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model']);
+        $model->getModelCache()->setCache(new \Gdn_Dirtycache());
+        $this->model = $model;
+
+        $fooID = $this->insertOne('foo');
+        $this->insertOne('bar');
+
+        $result = $this->model->get();
+        $this->assertSame(['foo', 'bar'], array_column($result, 'name'));
+
+        // Insert another. This should invalidate the cache.
+        $bar2ID = $this->insertOne('bar2');
+        $result = $this->model->getAll();
+        $this->assertSame(['foo', 'bar', 'bar2'], array_column($result, 'name'));
+
+        // Delete an item.
+        $this->model->delete(['modelID' => $bar2ID]);
+        $result = $this->model->getAll();
+        $this->assertSame(['foo', 'bar'], array_column($result, 'name'));
+
+        // Update an item.
+        $this->model->update(['name' => 'foo update'], ['modelID' => $fooID]);
+        $result = $this->model->getAll();
+        $this->assertSame(['foo update', 'bar'], array_column($result, 'name'));
+
+        // Make sure where's still work.
+        $result = $this->model->get(['name' => 'bar']);
+        $this->assertSame(['bar'], array_column($result, 'name'));
+
+        $result = $this->model->selectSingle(['modelID' => $fooID]);
+        $this->assertSame('foo update', $result);
+    }
+
+    /**
+     * Use the model to assert a bunch of cache tests.
+     */
+    public function assertInvalidation() {
+
     }
 
     /**

@@ -90,12 +90,38 @@ class UploadedFileTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test that we can safely persist files with url_encoded characters in their name.
+     *
+     * @param string $name
+     *
+     * @dataProvider provideImagesEncodedChars
+     */
+    public function testPersistFileEncodedChars(string $name) {
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl($name);
+
+        // Save the upload.
+        $file->persistUpload();
+        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
+        $this->assertStringContainsString('my-25e5-259c-2596-25e7-2589-2587.png', $file->getPersistedPath());
+    }
+
+    /**
      * @return string[][]
      */
     public function provideImagesWithSpaces(): array {
         return [
             'no url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image with spaces.jpg'],
             'with url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image%20with%20spaces.jpg'],
+        ];
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provideImagesEncodedChars(): array {
+        return [
+            'with url encoding chinese chars' => ['https://us.v-cdn.net/5022541/uploads/320EG16UF3D6/my-%25E5%259C%2596%25E7%2589%2587.png'],
         ];
     }
 

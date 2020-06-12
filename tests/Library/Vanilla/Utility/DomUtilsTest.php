@@ -82,7 +82,9 @@ class DomUtilsTest extends MinimalContainerTestCase {
      */
     public function testGroupInputs(array $providers) {
         foreach ($providers as $method => $fixtureDir) {
-            $this->assetFixturePassesForUtils($fixtureDir, $method);
+            $this->getFixturePassesForUtils($fixtureDir, $method);
+            list($expected, $actual) = $this->getFixturePassesForUtils($fixtureDir, $method);
+            $this->assertHtmlStringEqualsHtmlString($expected, $actual);
         }
     }
 
@@ -111,7 +113,7 @@ class DomUtilsTest extends MinimalContainerTestCase {
      * @param callable $callable
      * @param mixed $param
      */
-    public function assetFixturePassesForUtils(string $fixtureDir, callable $callable, $param = false) {
+    public function getFixturePassesForUtils(string $fixtureDir, callable $callable, $param = false) {
         list($input, $expectedHtml, $expectedText) = $this->getFixture($fixtureDir);
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -124,8 +126,7 @@ class DomUtilsTest extends MinimalContainerTestCase {
         $internalHtml = $dom->saveHTML();
         $htmlDocument = new HtmlDocument($internalHtml);
         $result = $htmlDocument->getInnerHtml();
-
-        $this->assertHtmlStringEqualsHtmlString($expectedHtml, $result);
+        return [$expectedHtml, $result];
     }
 
       /**

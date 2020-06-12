@@ -17,7 +17,7 @@ import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableIte
 import { forumVariables } from "@library/forums/forumStyleVars";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
-    cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
+    cssOut(selector, metaContainerStyles(overwrites));
 };
 
 export const linkSelectors = `
@@ -34,7 +34,6 @@ export const linkSelectors = `
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
 
     mixinMetaLinkContainer(".DataList");
     mixinMetaLinkContainer(".DataList-Search");

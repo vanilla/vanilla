@@ -290,6 +290,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
+            'commentID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'CommentID']),
             'dateInserted?' => new DateFilterSchema([
                 'description' => 'When the comment was created.',
                 'x-filter' => [
@@ -308,7 +309,7 @@ class CommentsApiController extends AbstractApiController {
                 'description' => 'The discussion ID.',
                 'x-filter' => [
                     'field' => 'DiscussionID',
-                    'processor' => function($name, $value) {
+                    'processor' => function ($name, $value) {
                         $discussion = $this->discussionByID($value);
                         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
                         return [$name => $value];
@@ -334,7 +335,7 @@ class CommentsApiController extends AbstractApiController {
                 ],
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
-        ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
+        ], ['CommentIndex', 'in'])->requireOneOf(['commentID', 'discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);

@@ -65,10 +65,7 @@ function mixinTag(selector: string, overwrite?: {}) {
     if (selectors.length === 0) {
         selectors.push(selector);
     }
-
     const vars = tagVariables();
-    const globalVars = globalVariables();
-
     selectors.map(s => {
         cssOut(selector, {
             maxWidth: percent(100),

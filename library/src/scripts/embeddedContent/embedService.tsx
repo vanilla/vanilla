@@ -92,9 +92,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
 
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
-        if (inEditor) {
-            ensureEmbedDescription();
-        }
+        ensureEmbedDescription();
 
         data = {
             ...data,

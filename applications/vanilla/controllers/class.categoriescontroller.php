@@ -11,6 +11,7 @@
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -268,7 +269,9 @@ class CategoriesController extends VanillaController {
         if (!$categoryIdentifier) {
             /** @var SiteSectionInterface $siteSection */
             $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
-            $categoryIdentifier = $siteSection->getAttributes()['CategoryID'] ?? '';
+            if (!($siteSection instanceof DefaultSiteSection)) {
+                $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? '';
+            }
         }
 
         // Figure out which category layout to choose (Defined on "Homepage" settings page).

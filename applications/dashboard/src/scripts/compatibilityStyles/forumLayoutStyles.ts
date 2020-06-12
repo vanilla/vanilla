@@ -6,7 +6,7 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { containerMainStyles } from "@library/layout/components/containerStyles";
+import { containerMainMediaQueries, containerMainStyles } from "@library/layout/components/containerStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, important, percent, px } from "csx";
@@ -84,6 +84,15 @@ export const forumLayoutVariables = useThemeCache(() => {
             );
         };
 
+        const aboveMobile = (styles: NestedCSSProperties) => {
+            return media(
+                {
+                    minWidth: px(foundationalWidths.breakPoints.mobile + 1),
+                },
+                styles,
+            );
+        };
+
         const mobileDown = (styles: NestedCSSProperties) => {
             return mobile(styles, false);
         };
@@ -97,6 +106,15 @@ export const forumLayoutVariables = useThemeCache(() => {
             );
         };
 
+        const aboveXs = (styles: NestedCSSProperties) => {
+            return media(
+                {
+                    minWidth: px(foundationalWidths.breakPoints.xs + 1),
+                },
+                styles,
+            );
+        };
+
         return {
             noBleed,
             noBleedDown,
@@ -104,8 +122,10 @@ export const forumLayoutVariables = useThemeCache(() => {
             oneColumnDown,
             tablet,
             tabletDown,
+            aboveMobile,
             mobile,
             mobileDown,
+            aboveXs,
             xs,
         };
     };
@@ -219,7 +239,7 @@ export const forumLayoutCSS = () => {
         }),
     );
 
-    cssOut(`.Container`, containerMainStyles() as NestedCSSProperties);
+    cssOut(`.Container`, containerMainStyles(), containerMainMediaQueries());
 
     cssOut(`.Frame-row`, {
         display: "flex",

@@ -233,8 +233,7 @@
         display: inherit;
     }
 
-    .MItem.RSS,
-    .MItem.LastCommentDate {
+    .MItem.RSS {
         display: none;
     }
 
@@ -734,7 +733,7 @@
     }
 }
 
-.DataList.Announcements {
+.Group-Content .DataList {
 
     .ItemContent.Discussion {
         padding-left: 0;

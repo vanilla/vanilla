@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 $User = val('User', Gdn::controller());
 if (!$User && Gdn::session()->isValid()) {
     $User = Gdn::session()->User;
@@ -31,7 +31,8 @@ if ($Photo) : ?>
         $canEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || checkPermission('Garden.Users.Edit');
 
         if (!$User->Banned && $canEditPhotos && (Gdn::session()->UserID == $User->UserID || checkPermission('Garden.Users.Edit'))) {
-            echo anchor(wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture Popup');
+            $contents = ($dataDriven ? '<span class="icon icon-camera"></span>' : '').t('Change Icon');
+            echo anchor(wrap($contents, "span", ["class" => "ChangePicture-Text"]), '/profile/picture?userid='.$User->UserID, 'ChangePicture Popup', ["aria-label" => t("Change Picture")]);
         }
 
         echo img($Photo, ['class' => 'ProfilePhotoLarge', 'alt' => $PhotoAlt]);

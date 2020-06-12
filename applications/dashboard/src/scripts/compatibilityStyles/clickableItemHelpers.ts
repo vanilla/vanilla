@@ -15,6 +15,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import merge from "lodash/merge";
 import { NestedCSSSelectors } from "typestyle/src/types";
+import { important } from "csx";
 
 export const EMPTY_STATE_COLORS = {
     default: undefined as undefined | ColorValues,
@@ -93,16 +94,20 @@ export interface IClickableItemEnforcedStates {
     allStates: undefined;
 }
 
+export interface IClickableItemOptions {
+    disableTextDecoration?: boolean;
+}
+
 export const clickableItemStates = (
     overwriteColors?: ILinkColorOverwritesWithOptions,
-    overwritesSpecial?: IClickableItemOptionalStates,
+    options?: IClickableItemOptions,
 ) => {
     const vars = globalVariables();
+    const { disableTextDecoration } = options || { disableTextDecoration: false };
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
 
     overwriteColors = { ...EMPTY_STATE_COLORS, ...(overwriteColors ?? {}) };
-    overwritesSpecial = { ...EMPTY_STATE_STYLES, ...(overwritesSpecial ?? {}) } as IClickableItemEnforcedStates;
 
     const mergedColors = {
         default: !overwriteColors.skipDefault
@@ -120,30 +125,41 @@ export const clickableItemStates = (
         visited: linkStyleFallbacks(overwriteColors.visited, overwriteColors.allStates, linkColors.visited),
     };
 
+    const textDecoration = disableTextDecoration ? important("none") : undefined;
+
     const styles = {
         default: {
             color: colorOut(mergedColors.default),
+            textDecoration,
         },
         hover: {
             color: colorOut(mergedColors.hover),
             cursor: "pointer",
+            textDecoration,
         },
         focus: {
             color: colorOut(mergedColors.focus),
+            textDecoration,
         },
         clickFocus: {
             color: colorOut(mergedColors.focus),
+            textDecoration,
         },
         keyboardFocus: {
             color: colorOut(mergedColors.keyboardFocus),
+            textDecoration,
         },
         active: {
             color: colorOut(mergedColors.active),
             cursor: "pointer",
+            textDecoration,
         },
-        visited: {
-            color: mergedColors.visited ? colorOut(mergedColors.visited) : undefined,
-        },
+        visited: mergedColors.visited
+            ? {
+                  color: colorOut(mergedColors.visited),
+                  textDecoration,
+              }
+            : undefined,
     };
 
     const final = {

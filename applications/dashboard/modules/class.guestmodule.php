@@ -44,12 +44,22 @@ class GuestModule extends Gdn_Module {
     }
 
     /**
+     * Get module data
+     */
+    public function getData() {
+        $controller = Gdn::controller();
+        $this->setData('signInUrl', signInUrl($controller->SelfUrl));
+        $this->setData('registerUrl', registerUrl($controller->SelfUrl));
+    }
+
+    /**
      * Render.
      *
      * @return string
      */
     public function toString() {
         if (!Gdn::session()->isValid()) {
+            $this->getData();
             return parent::toString();
         }
 

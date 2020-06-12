@@ -206,7 +206,10 @@ if (!function_exists('writePromotedContentRow')):
                 <td class="BlockColumn BlockColumn-User User">
                     <div class="Block Wrap">
                         <a class="PhotoWrap PhotoWrapSmall" href="<?php echo $userUrl; ?>">
-                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>">
+                            <?php
+                                $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$username]);
+                            ?>
+                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="<?php echo $accessibleLabel; ?>">
                         </a>
                         <a class="UserLink BlockTitle" href="<?php echo $userUrl; ?>"><?php echo $username; ?></a>
 

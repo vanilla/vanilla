@@ -38,13 +38,13 @@ class LogCounterProvider implements CounterProviderInterface {
     public function getMenuCounters(): array {
         $counters = [];
         $permissions = $this->session->getPermissions();
-        if ($permissions->hasAny(['Garden.Moderation.Manage', 'Garden.Spam.Manage'])) {
-            $recordCount = $this->logModel->getCountWhere(['Operation' => ['Spam']]);
+        if ($permissions->hasAny(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'])) {
+            $recordCount = $this->logModel->getOperationCount('spam');
             $counters[] = new Counter("SpamQueue", $recordCount);
         }
 
         if ($permissions->hasAny(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'])) {
-            $recordCount = $this->logModel->getCountWhere(['Operation' => ['Moderate', 'Pending']]);
+            $recordCount = $this->logModel->getOperationCount('moderate,pending');
             $counters[] = new Counter("ModerationQueue", $recordCount);
         }
         return $counters;

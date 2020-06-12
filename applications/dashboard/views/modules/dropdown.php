@@ -2,11 +2,14 @@
 /** @var DropdownModule $dropdown */
 $dropdown = $this;
 $trigger = $dropdown->getTrigger();
+$optionText = t('Options');
+$accessibleLabel = !empty($trigger['text']) ? $trigger['text'] : $optionText;
+$triggerID = $dropdown->getTriggerId();
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
     if (($trigger['type'] ?? '') === 'button') :
-    ?><span class="Button-Options">
-        <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
-            <?php echo $trigger['text']; ?>
+    ?><span class="Button-Options" tabindex="0" aria-label="<?php echo $accessibleLabel; ?>" id="<?php echo $triggerID; ?>">
+        <span class="OptionsTitle" title="<?php echo $optionText; ?>">
+            <?php echo $accessibleLabel; ?>
         </span>
         <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     </span>
@@ -19,7 +22,7 @@ $trigger = $dropdown->getTrigger();
         $alert = !empty($dropdown->data('DashboardCount', '')) ? wrap($dropdown->data('DashboardCount', ''), 'span', ['class' => 'Alert']) : '';
         echo anchor($icon.$text.$alert, $url, $cssClass, $attributes);
     endif; ?>
-    <ul class="Flyout MenuItems list-reset <?php echo $dropdown->getListCssClass(); ?>" role="menu" aria-labelledby="<?php echo $dropdown->getTriggerId(); ?>">
+    <ul class="Flyout MenuItems list-reset <?php echo $dropdown->getListCssClass(); ?>" role="menu" aria-labelledby="<?php echo $triggerID; ?>">
         <?php foreach($dropdown->getItems() as $item) {
             if (($item['type'] ?? '') == 'group') { ?>
                 <li role="presentation" class="dropdown-header <?php echo $item['cssClass'] ?? ''; ?>">

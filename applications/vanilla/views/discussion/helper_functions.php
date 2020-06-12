@@ -565,7 +565,7 @@ if (!function_exists('writeCommentOptions')) :
                     $controller->CheckedComments = $session->getAttribute('CheckedComments', []);
                 }
                 $itemSelected = inSubArray($id, $controller->CheckedComments);
-                echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
+                echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
             }
         }
     }

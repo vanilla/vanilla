@@ -5,7 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, unit, userSelect, importantColorOut } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    userSelect,
+    importantColorOut,
+    modifyColorBasedOnLightness,
+    isLightColor,
+} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
@@ -15,7 +22,6 @@ export const paginationCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
     const primary = colorOut(mainColors.primary);
-    const primaryContrast = colorOut(mainColors.primaryContrast);
 
     mixinClickInput(
         `
@@ -29,7 +35,7 @@ export const paginationCSS = () => {
             },
             allStates: {
                 ...userSelect(),
-                backgroundColor: colorOut(globalVars.mainColors.fg.fade(0.05)),
+                backgroundColor: colorOut(mainColors.fg.fade(0.05)),
             },
         },
     );
@@ -67,7 +73,7 @@ export const paginationCSS = () => {
 
     cssOut(`.Pager span`, {
         cursor: important("default"),
-        backgroundColor: importantColorOut(globalVars.mainColors.bg),
+        backgroundColor: importantColorOut(mainColors.bg),
         color: importantColorOut(globalVars.links.colors.default),
         opacity: 0.5,
     });
@@ -84,7 +90,7 @@ export const paginationCSS = () => {
         textAlign: "right",
         $nest: {
             "& a": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: colorOut(mainColors.primary),
             },
         },
     });
@@ -97,5 +103,16 @@ export const paginationCSS = () => {
 
     cssOut(`.PageControls.PageControls .selectBox`, {
         height: "auto",
+    });
+
+    cssOut(`.Pager.NumberedPager > a.Highlight`, {
+        color: colorOut(isLightColor(mainColors.fg) ? mainColors.fg.fade(0.85) : mainColors.fg),
+        pointerEvents: "none",
+        backgroundColor: colorOut(
+            modifyColorBasedOnLightness({
+                color: mainColors.bg,
+                weight: 0.05,
+            }),
+        ),
     });
 };

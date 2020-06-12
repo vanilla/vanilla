@@ -37,6 +37,7 @@ const notificationsData = [
     {
         message: "<strong>Stephane</strong> commented on <strong>Resolved</strong>",
         photo: "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        photoAlt: 'Guest: "Test"',
         to: "https://dev.vanilla.localhost/en-hutch/discussion/comment/1007#Comment_1007",
         recordID: 332,
         timestamp: "2018-11-27T18:32:43+00:00",

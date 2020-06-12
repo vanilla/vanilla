@@ -199,14 +199,16 @@ a.MoreWrap,
         }
     }
 
-    > a.Highlight,
-    > a.Highlight:focus,
-    > a.Highlight:hover {
-        position: relative;
-        z-index: 1;
-        background: $pager-highlight_bg;
-        border: 1px solid $pager-highlight-border;
-        color: $pager-highlight_color;
+    @if($staticVariables) {
+        > a.Highlight,
+        > a.Highlight:focus,
+        > a.Highlight:hover {
+            position: relative;
+            z-index: 1;
+            background: $pager-highlight_bg;
+            border: 1px solid $pager-highlight-border;
+            color: $pager-highlight_color;
+        }
     }
 
     > a.Ellipsis {

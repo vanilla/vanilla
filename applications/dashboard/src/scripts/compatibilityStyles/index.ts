@@ -11,7 +11,16 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    borders,
+    importantUnit,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -36,6 +45,7 @@ import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
+import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
@@ -97,7 +107,6 @@ compatibilityStyles = useThemeCache(() => {
     );
 
     cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
-        background: bg,
         color: fg,
     });
 
@@ -106,10 +115,6 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".Box h4", { color: fg });
-
-    cssOut(`.CategoryBox > .OptionsMenu`, {
-        marginRight: unit(layoutVars.cell.paddings.horizontal),
-    });
 
     const panelSelectors = `
         .About a,
@@ -199,13 +204,19 @@ compatibilityStyles = useThemeCache(() => {
         width: calc(`100% + ${unit(horizontalPadding)}`),
     });
 
-    cssOut(`.DataList .Item`, {
-        borderTop: singleBorder(),
-        borderBottom: singleBorder(),
-        ...margins(formVars.lists.spacing.margin),
-        ...paddings(formVars.lists.spacing.padding),
-        backgroundColor: colorOut(formVars.lists.colors.bg),
-    });
+    cssOut(
+        `
+        .DataList .Item,
+        .DataList .Empty,
+    `,
+        {
+            borderTop: singleBorder(),
+            borderBottom: singleBorder(),
+            ...paddings(resultVars.spacing.padding),
+            ...margins(formVars.lists.spacing.margin),
+            backgroundColor: colorOut(formVars.lists.colors.bg),
+        },
+    );
 
     cssOut(`.DataList .Item + .Item`, {
         borderTop: "none",
@@ -295,16 +306,6 @@ compatibilityStyles = useThemeCache(() => {
         opacity: 1,
     });
 
-    cssOut(
-        `
-        .Container a.UserLink,
-        .Container a.UserLink.BlockTitle
-    `,
-        {
-            fontWeight: vars.fonts.weights.bold,
-        },
-    );
-
     cssOut(".Panel > * + *", {
         marginTop: unit(24),
     });
@@ -377,6 +378,7 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
+    blockColumnCSS();
     buttonCSS();
     flyoutCSS();
     textLinkCSS();

@@ -112,4 +112,29 @@ class ThemeCacheTest extends MockThemeTestCase {
         $theme = $this->service->getTheme(self::MOCK_THEME_ID);
         $this->assertEquals(false, $theme->isCacheHit());
     }
+
+    /**
+     * Test caching of a theme with an error asset.
+     */
+    public function testCacheErrorAsset() {
+        $addon = new MockAddon(self::MOCK_THEME_ID);
+        $this->addonManager->pushAddon($addon);
+
+        $this->mockThemeProvider->addTheme([
+            'themeID' => self::MOCK_THEME_ID,
+            'assets' => [
+                'variables' => [
+                    'type' => 'json',
+                    'data' => '{asdfasdf',
+                ],
+            ],
+        ], $addon);
+
+        $this->service = $this->themeService();
+        $this->service->getTheme(self::MOCK_THEME_ID);
+        $this->service->getTheme(self::MOCK_THEME_ID);
+
+        // Make sure no exceptions were thrown.
+        $this->assertTrue(true);
+    }
 }

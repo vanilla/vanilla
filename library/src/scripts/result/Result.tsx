@@ -32,7 +32,7 @@ export interface IResult {
  */
 export default class Result extends React.Component<IResult> {
     public static defaultProps = {
-        headingLevel: 3,
+        headingLevel: 2,
     };
 
     public render() {
@@ -64,20 +64,14 @@ export default class Result extends React.Component<IResult> {
         ) : null;
 
         return (
-            <li className={classNames("searchResults-item", classesSearchResults.item, this.props.className)}>
-                <article className={classNames("searchResults-result", classesSearchResults.result)}>
-                    <SmartLink to={this.props.url} className={classNames("searchResult", classes.root)} tabIndex={0}>
-                        <div className={classNames("searchResult-main", classes.main, { hasMedia: !!media })}>
-                            <HeadingTag className={classNames("searchResult-title", classes.title)}>
-                                {this.props.name}
-                            </HeadingTag>
-                            {this.props.meta && (
-                                <div className={classNames("searchResult-metas", "metas", classes.metas)}>
-                                    {this.props.meta}
-                                </div>
-                            )}
+            <li className={classNames(classesSearchResults.item, this.props.className)}>
+                <article className={classNames(classesSearchResults.result)}>
+                    <SmartLink to={this.props.url} className={classNames(classes.root)} tabIndex={0}>
+                        <div className={classNames(classes.main, { hasMedia: !!media })}>
+                            <HeadingTag className={classNames(classes.title)}>{this.props.name}</HeadingTag>
+                            {this.props.meta && <div className={classNames(classes.metas)}>{this.props.meta}</div>}
                             {!!this.props.excerpt && (
-                                <Paragraph className={classNames("searchResult-excerpt", classes.excerpt)}>
+                                <Paragraph className={classNames(classes.excerpt)}>
                                     <TruncatedText maxCharCount={160}>{this.props.excerpt}</TruncatedText>
                                 </Paragraph>
                             )}

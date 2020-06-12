@@ -4,66 +4,76 @@
  * @license GPL-2.0-only
  */
 
-import { debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-export const userPhotoVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("userPhoto");
+export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeThemeVars = variableFactory("userPhoto", forcedVars);
 
-    const border = {
+    const border = makeThemeVars("border", {
         radius: "50%",
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         small: 28,
         medium: 40,
         large: 100,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
     return { border, sizing };
 });
 
-export const userPhotoClasses = useThemeCache(() => {
-    const vars = userPhotoVariables();
-    const debug = debugHelper("userPhoto");
-
-    const root = style({
-        ...debug.name(),
+export const userPhotoMixins = vars => {
+    const root = {
         position: "relative",
         borderRadius: vars.border.radius,
         overflow: "hidden",
-    });
+    } as NestedCSSProperties;
 
-    const photo = style({
+    const photo = {
         ...objectFitWithFallback(),
-        ...debug.name("photo"),
-    });
+    } as NestedCSSProperties;
 
-    const small = style({
+    const small = {
         width: unit(vars.sizing.small),
         height: unit(vars.sizing.small),
-        ...debug.name("small"),
-    });
+    } as NestedCSSProperties;
 
-    const medium = style({
+    const medium = {
         width: unit(vars.sizing.medium),
         height: unit(vars.sizing.medium),
-        ...debug.name("medium"),
-    });
+    } as NestedCSSProperties;
 
-    const large = style({
+    const large = {
         width: unit(vars.sizing.large),
         height: unit(vars.sizing.large),
-        ...debug.name("large"),
-    });
+    } as NestedCSSProperties;
 
+    return {
+        root,
+        photo,
+        small,
+        medium,
+        large,
+    };
+};
+
+export const userPhotoClasses = useThemeCache(() => {
+    const vars = userPhotoVariables();
+    const style = styleFactory("userPhoto");
+    // I'm doing this so we can import the styles in the compatibility styles.
+    const mixinStyles = userPhotoMixins(vars);
+    const root = style(mixinStyles.root);
+    const photo = style("photo", mixinStyles.photo);
+    const small = style("small", mixinStyles.small);
+    const medium = style("medium", mixinStyles.medium);
+    const large = style("large", mixinStyles.large);
     return { root, small, medium, large, photo };
 });

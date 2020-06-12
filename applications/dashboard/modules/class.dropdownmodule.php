@@ -68,6 +68,8 @@
  *
  *
  */
+use Vanilla\Utility\HtmlUtils;
+
 class DropdownModule extends Gdn_Module {
 
     use NestedCollection;
@@ -85,10 +87,12 @@ class DropdownModule extends Gdn_Module {
      * - **cssClass**: string - CSS class for the trigger.
      * - **icon**: string - Icon for the trigger.
      */
-    private $trigger = ['type' => 'button',
-                            'text' => '',
-                            'cssClass' => '',
-                            'icon' => 'caret-down'];
+    private $trigger = [
+        'type' => 'button',
+        'text' => '',
+        'cssClass' => '',
+        'icon' => 'caret-down',
+    ];
 
     /**
      * @var array Allowed trigger types.
@@ -119,12 +123,12 @@ class DropdownModule extends Gdn_Module {
      * @param string $listCssClass A potential CSS class of the list <ul> block.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
-    public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
+    public function __construct($triggerIdPrefix = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
         parent::__construct();
         $this->flatten = true;
         $this->useCssPrefix = $useCssPrefix;
 
-        $this->triggerId = $triggerId;
+        $this->triggerId = HtmlUtils::uniqueElementID($triggerIdPrefix);
         $this->trigger['text'] = $triggerText;
         $this->cssClass = $cssClass;
         $this->listCssClass = trim($listCssClass);

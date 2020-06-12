@@ -109,13 +109,13 @@ $getMeBox = function($user, $isChecked) use ($form) {
 <?php
                     echo $form->label('Username', 'createUserName');
                     echo wrap(t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
-                    echo $form->textbox('createUserName');
+                    echo $form->textbox('createUserName', ["aria-label" => t("Username")]);
 ?>
                     </li>
                     <li>
 <?php
                     echo $form->label('Email', 'createUserEmail');
-                    echo $form->textBox('createUserEmail');
+                    echo $form->textBox('createUserEmail', ["aria-label" => t("Email")]);
 ?>
                     </li>
                 </ul>

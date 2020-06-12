@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, importantUnit, unit } from "@library/styles/styleHelpers";
+import { colorOut, fonts, importantUnit, margins, unit } from "@library/styles/styleHelpers";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { important } from "csx";
+import { calc, important, percent, translateY } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const forumCategoriesVariables = useThemeCache(() => {
@@ -94,4 +94,38 @@ export const categoriesCSS = () => {
             height: unit(vars.image.width),
         },
     );
+
+    cssOut(`.CategoryBox`, {
+        position: "relative",
+    });
+
+    cssOut(`.CategoryBox .H`, {
+        ...fonts({
+            size: globalVars.fonts.size.largeTitle,
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
+    });
+
+    cssOut(`.CategoryBox-Head`, {
+        position: "relative",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        width: percent(100),
+    });
+
+    cssOut(`.CategoryBox-Head .H`, {
+        width: calc(`100% - ${unit(35)}`),
+    });
+
+    cssOut(`.CategoryBox-Head .OptionsMenu`, {
+        float: "none",
+        transform: translateY(`-50%`),
+        ...margins({
+            horizontal: 0,
+            top: unit((globalVars.fonts.size.largeTitle * globalVars.lineHeights.condensed) / 2),
+            left: "auto",
+        }),
+    });
 };

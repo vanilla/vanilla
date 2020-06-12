@@ -9,6 +9,7 @@ namespace Vanilla;
 
 use Garden\Web\RequestInterface;
 use Symfony\Component\Yaml\Yaml;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A class for building a full OpenAPI 3.0 spec by combining all of the add-on OpenAPI files.
@@ -46,6 +47,46 @@ class OpenAPIBuilder {
         $this->addonManager = $addonManager;
         $this->cachePath = $cachePath ?: PATH_CACHE.'/openapi.php';
         $this->request = $request;
+    }
+
+    /**
+     * Merge two Opan API schemas.
+     *
+     * Although this class uses this method to always merge top-level schemas, it should support any schema fragment so
+     * long as both schemas are at the same level.
+     *
+     * @param array $schema1
+     * @param array $schema2
+     * @return array
+     */
+    public static function mergeSchemas(array $schema1, array $schema2): array {
+        // This callback is on the conservative side. It has a whitelist of known numeric keys and their behavior.
+        // Everything else uses plain old `array_merge()`.
+        $merge = function (array $arr1, array $arr2, string $key) {
+            switch ($key) {
+                case 'required':
+                    // Don't sort required because it's often in a logical order already.
+                    $r = array_values(array_unique(array_merge($arr1, $arr2)));
+                    break;
+                case 'enum':
+                case 'tags':
+                    $r = array_unique(array_merge($arr1, $arr2));
+                    sort($r);
+                    break;
+                case 'parameters':
+                    // Parameters work a lot like associative arrays, but have to be made that way.
+                    $arr1 = array_column($arr1, null, 'name');
+                    $arr2 = array_column($arr2, null, 'name');
+                    $r = array_values(self::mergeSchemas($arr1, $arr2));
+                    break;
+                default:
+                    $r = array_merge($arr1, $arr2);
+            }
+            return $r;
+        };
+
+        $schema1 = ArrayUtils::mergeRecursive($schema1, $schema2, $merge);
+        return $schema1;
     }
 
     /**
@@ -196,7 +237,7 @@ class OpenAPIBuilder {
                 $this->cleanData($data);
                 $this->annotateData($data, $addon);
                 $results[] = $data;
-                $result = array_replace_recursive($result, $data);
+                $result = self::mergeSchemas($result, $data);
             }
         }
 

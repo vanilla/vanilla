@@ -300,7 +300,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $url = url("post/googleplus/{$args['RecordType']}?id={$args['RecordID']}", true);
         $cssClass = 'ReactButton PopupWindow';
 
-        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $url, $cssClass, ['rel' => 'nofollow']).' ';
+        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $url, $cssClass, ['rel' => 'nofollow', 'role' => 'button']).' ';
     }
 
     /**

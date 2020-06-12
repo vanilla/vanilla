@@ -433,13 +433,13 @@ function calculateVars(preview?: IThemePreview) {
     let globalFg = preview?.variables?.globalFg ? color(preview?.variables?.globalFg) : gVars.mainColors.fg;
     // Add a little opacity to the FG so it doesn't stick out so much.
     // Normal text isn't nearly so thick.
-    globalFg = modifyColorBasedOnLightness(globalFg, 0.3) as ColorHelper;
+    globalFg = modifyColorBasedOnLightness({ color: globalFg, weight: 0.3 }) as ColorHelper;
 
     const globalPrimary = preview?.variables?.globalPrimary
         ? color(preview?.variables?.globalPrimary)
         : gVars.mainColors.primary;
     const titleBarBg = preview?.variables?.titleBarBg ? color(preview?.variables?.titleBarBg) : globalPrimary;
-    const splashBg = modifyColorBasedOnLightness(globalPrimary, 0.12, true);
+    const splashBg = modifyColorBasedOnLightness({ color: globalPrimary, weight: 0.12, inverse: true });
     const titleBarFg = preview?.variables?.titleBarFg ?? titleVars.colors.fg;
     return {
         globalFg: colorOut(globalFg),

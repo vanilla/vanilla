@@ -558,7 +558,7 @@ div.FileUpload .CurrentImage {
   border-right-width: 1px;
 }
 
-@if ($staticVariables) {
+body:not(.dataDriven) {
     .Button.Active,
     .ButtonGroup.Open .Button.Handle,
     .Button:focus,
@@ -635,19 +635,20 @@ div.FileUpload .CurrentImage {
   background-color: $grey-c;
 }
 
-@if ($staticVariables) {
+body:not(.dataDriven) {
     .ButtonGroup.Open .NavButton.Handle {
       color: $grey-1;
       background: $grey-5;
     }
-
-    /* Split Button Dropdown */
-    .ButtonGroup.Multi > .NavButton:first-child,
-    .ButtonGroup.Multi > .Button:first-child {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
 }
+
+/* Split Button Dropdown */
+.ButtonGroup.Multi > .NavButton:first-child,
+.ButtonGroup.Multi > .Button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 
 .ButtonGroup.Multi > .NavButton.Handle,
 .ButtonGroup.Multi > .Button.Handle {
@@ -2267,7 +2268,9 @@ img.LeftAlign {
 }
 
 .ClearFix {
-  clear: both;
+  @if ($staticVariables) {
+    clear: both;
+  }
 }
 
 .codeBlock,
@@ -3021,7 +3024,9 @@ tr.CategoryHeading td {
   display: block;
   font-weight: bold;
   overflow: hidden;
-  text-overflow: ellipsis;
+  @if ($staticVariables) {
+    text-overflow: ellipsis;
+  }
   white-space: nowrap;
   padding-bottom: 3px;
   font-size: 12px;

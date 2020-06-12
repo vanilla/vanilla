@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\AddonManager;
 use Vanilla\Theme\Asset\CssThemeAsset;
+use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
@@ -96,5 +97,75 @@ class ThemeServiceCurrentTest extends MockThemeTestCase {
         /** @var ThemeFeatures $features */
         $features = self::container()->get(ThemeFeatures::class);
         $this->assertEquals(false, $features->useSharedMasterView());
+    }
+
+    /**
+     * Test theme variable overlay.
+     *
+     * @param array $in1
+     * @param array $overlay
+     * @param array $expected
+     *
+     * @dataProvider provideVariableOverlay
+     */
+    public function testThemeVariableOverlay(array $in1, array $overlay, array $expected) {
+        $addon = new MockAddon(self::ADDON_THEME, []);
+        $mobileAddon = new MockAddon(self::MOBILE_ADDON_THEME);
+        $this->addonManager->pushAddon($addon);
+
+        $addonTheme = $this->mockThemeProvider->addTheme([
+            'themeID' => self::ADDON_THEME,
+            'assets' => [
+                'variables' => new JsonThemeAsset(json_encode($in1), ''),
+            ]
+        ], $addon);
+
+        $addonTheme->overlayVariables($overlay);
+        $this->assertEquals($expected, $addonTheme->getAsset('variables')->getValue());
+    }
+
+    /**
+     * @return array
+     */
+    public function provideVariableOverlay(): array {
+        return [
+            'simple' => [
+                [ 'foo' => 'foo' ],
+                [ 'bar' => 'bar' ],
+                [
+                    'foo' => 'foo',
+                    'bar' => 'bar'
+                ],
+            ],
+            'nested' => [
+                [
+                    'foo' => [
+                        'foo1' => 'foo1',
+                    ],
+                ],
+                [
+                    'foo' => [
+                        'foo2' => 'foo2',
+                    ],
+                ],
+                [
+                    'foo' => [
+                        'foo1' => 'foo1',
+                        'foo2' => 'foo2',
+                    ],
+                ],
+            ],
+            'array' => [
+                [
+                    'foo' => [1, 2, 3],
+                ],
+                [
+                    'foo' => [1.1],
+                ],
+                [
+                    'foo' => [1.1],
+                ],
+            ],
+        ];
     }
 }

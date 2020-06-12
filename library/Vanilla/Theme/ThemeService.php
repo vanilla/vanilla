@@ -142,7 +142,7 @@ class ThemeService {
         $cacheKey = $this->cache->cacheKey($themeKey, $query);
         $result = $this->cache->get($cacheKey);
         if ($result instanceof Theme) {
-            return $result;
+            return $this->normalizeTheme($result);
         }
 
         $provider = $this->getThemeProvider($themeKey);
@@ -545,8 +545,11 @@ class ThemeService {
         $theme->setSupportedSections($supportedSections);
 
         // Fix current theme.
-        $currentThemeID = $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME, ThemeServiceHelper::CONFIG_MOBILE_THEME);
-        $theme->setCurrent($currentThemeID == $theme->getThemeID());
+        $currentThemeID =
+            $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME)
+            ?: $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
+        $isCurrent = $currentThemeID == $theme->getThemeID();
+        $theme->setCurrent($isCurrent);
 
         $this->overlayAddonVariables($theme);
         return $theme;

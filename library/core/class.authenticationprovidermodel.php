@@ -103,6 +103,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
                     ->get()
                     ->resultArray()
                 ;
+                $cache->store(self::ALL_CACHE_KEY, $data, [
+                    Gdn_Cache::FEATURE_EXPIRY => 120, // 2 minute expiry.
+                ]);
             }
         }
 

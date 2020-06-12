@@ -14,7 +14,7 @@ namespace Vanilla\Models;
 class FullRecordCacheModel extends PipelineModel {
 
     /** @var ModelCache $cache */
-    private $modelCache;
+    protected $modelCache;
 
     /**
      * Model constructor.

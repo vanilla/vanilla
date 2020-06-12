@@ -158,14 +158,7 @@ class ModelCacheTest extends TestCase {
         $this->assertSame(['bar'], array_column($result, 'name'));
 
         $result = $this->model->selectSingle(['modelID' => $fooID]);
-        $this->assertSame('foo update', $result);
-    }
-
-    /**
-     * Use the model to assert a bunch of cache tests.
-     */
-    public function assertInvalidation() {
-
+        $this->assertSame('foo update', $result['name']);
     }
 
     /**

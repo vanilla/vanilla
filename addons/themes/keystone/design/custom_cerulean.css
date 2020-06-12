@@ -177,7 +177,7 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */.ActivateSlider{-webkit-box-shadow:none;background-color:rgba(0,0,0,.03);border:0 solid #d6d9dd;border-radius:4px;box-shadow:none}.DataList-Connections .Button.ActivateSlider-Button{background:#fff;border:1px solid #377cae;border-radius:4px;color:#3d8ac1;cursor:pointer;display:inline-block;font-size:14px;line-height:36px;margin:0;min-height:36px;padding:0 12px;white-space:nowrap}.DataList-Connections .Button.ActivateSlider-Button:focus,.DataList-Connections .Button.ActivateSlider-Button:hover{text-decoration:none}.DataList-Connections .ActivateSlider-Active .Button{background:#3d8ac1;border-color:#377cae;color:#fff}
+ */.ActivateSlider{-webkit-box-shadow:none;background-color:rgba(0,0,0,.03);border:0 solid #d6d9dd;border-radius:4px;box-shadow:none}.DataList-Connections .Button.ActivateSlider-Button{background:#fff;border:1px solid #377cae;border-radius:4px;color:#3d8ac1;cursor:pointer;display:inline-block;font-size:14px;line-height:36px;margin:0;max-width:80%;min-height:36px;padding:0 12px;white-space:nowrap}.DataList-Connections .Button.ActivateSlider-Button:focus,.DataList-Connections .Button.ActivateSlider-Button:hover{text-decoration:none}.DataList-Connections .ActivateSlider{min-width:200px}.DataList-Connections .ActivateSlider-Active .Button{background:#3d8ac1;border-color:#377cae;color:#fff}
 
 /*!
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>

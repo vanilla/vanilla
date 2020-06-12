@@ -17,6 +17,7 @@
         display: inline-block;
         cursor: pointer;
         margin: 0;
+        max-width: 80%;
         font-size: $global-medium_fontSize;
         background: $global-color_white;
         color: $global-color_primary;
@@ -32,6 +33,10 @@
         &:hover {
             text-decoration: none;
         }
+    }
+
+    .ActivateSlider {
+        min-width: 200px;
     }
 
     .ActivateSlider-Active .Button{

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Models;
 
+use Vanilla\FeatureFlagHelper;
 use Vanilla\InjectableInterface;
 
 /**
@@ -26,6 +27,8 @@ class ModelCache implements InjectableInterface {
         \Gdn_Cache::FEATURE_EXPIRY => 600,
     ];
 
+    const DISABLE_FEATURE_FLAG = "Feature.DisableNewModelCaching.Enabled";
+
     /** @var string */
     private $namespace;
 
@@ -37,6 +40,9 @@ class ModelCache implements InjectableInterface {
 
     /** @var \Gdn_Cache */
     private $cache;
+
+    /** @var bool */
+    private $isFeatureDisabled;
 
     /**
      * Create a cache from a model.
@@ -60,6 +66,7 @@ class ModelCache implements InjectableInterface {
     public function __construct(string $namespace, ?array $defaultCacheOptions = []) {
         $this->namespace = $namespace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
+        $this->isFeatureDisabled = \Gdn::config(self::DISABLE_FEATURE_FLAG);
     }
 
     /**
@@ -95,6 +102,10 @@ class ModelCache implements InjectableInterface {
      * @return mixed
      */
     public function getCachedOrHydrate(array $keyArgs, callable $hydrate, ?array $cacheOptions = []) {
+        if ($this->isFeatureDisabled) {
+            return $hydrate();
+        }
+
         $key = $this->createCacheKey($keyArgs);
         $result = $this->cache->get($key);
 
@@ -138,6 +149,10 @@ class ModelCache implements InjectableInterface {
      * @return int
      */
     private function getIncrementingKey(): int {
+        if ($this->isFeatureDisabled) {
+            return 0;
+        }
+
         if ($this->incrementingKey === null) {
             $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->namespace;
             $result = $this->cache->get($incrementKeyCacheKey);
@@ -157,6 +172,9 @@ class ModelCache implements InjectableInterface {
      * Update the incrementing key.
      */
     private function rolloverIncrementingKey(): void {
+        if ($this->isFeatureDisabled) {
+            return;
+        }
         $key = $this->getIncrementingKey();
 
         $newKey = $key + 1;

@@ -162,6 +162,23 @@ class ModelCacheTest extends TestCase {
     }
 
     /**
+     * We have a feature flag to disable the new caching if it causes issues.
+     */
+    public function testCacheDisabled() {
+        $this->runWithConfig([
+            ModelCache::DISABLE_FEATURE_FLAG => true,
+        ], function () {
+            $this->modelCache = ModelCache::fromModel($this->model);
+            $mockCache = $this->createMock(\Gdn_Dirtycache::class);
+            $mockCache
+                ->expects($this->never())
+                ->method($this->anything());
+            $this->modelCache->setCache($mockCache);
+            $this->testAutoInvalidation();
+        });
+    }
+
+    /**
      * Insert a basic test row.
      *
      * @param string $name

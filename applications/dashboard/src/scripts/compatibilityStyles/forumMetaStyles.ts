@@ -20,6 +20,17 @@ export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles({ flexContents: true, ...overwrites }));
 };
 
+export const linkSelectors = `
+    .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .Username,
+    .MessageList .ItemDiscussion .Username,
+    .AuthorInfo .MItem.RoleTracker a:not(.Tag),
+    .MItem > a:not(.Tag),
+`;
+
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
@@ -47,17 +58,6 @@ export const forumMetaCSS = () => {
         },
     );
 
-    const linkSelectors = `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        .AuthorInfo .MItem.RoleTracker a:not(.Tag),
-        .MItem > a:not(.Tag),
-        `;
-
     cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
         padding: 0,
         margin: 0,
@@ -80,22 +80,22 @@ export const forumMetaCSS = () => {
             const linkStates = allLinkStates(
                 {
                     noState: {
-                        color: forumVariables().lists.text.meta.colors.noState,
+                        color: colorOut(globalVars.mainColors.fg),
                     },
                     hover: {
-                        color: forumVariables().lists.text.meta.colors.hover,
+                        color: colorOut(globalVars.links.colors.hover),
                         textDecoration: "underline",
                     },
                     focus: {
-                        color: forumVariables().lists.text.meta.colors.focus,
+                        color: colorOut(globalVars.links.colors.focus),
                         textDecoration: "underline",
                     },
                     keyboardFocus: {
-                        color: forumVariables().lists.text.meta.colors.keyboardFocus,
+                        color: colorOut(globalVars.links.colors.keyboardFocus),
                         textDecoration: "underline",
                     },
                     active: {
-                        color: forumVariables().lists.text.meta.colors.active,
+                        color: colorOut(globalVars.links.colors.active),
                         textDecoration: "underline",
                     },
                 },

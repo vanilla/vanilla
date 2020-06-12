@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Dani M. <dani,m@vanillaforums.com>
+ * @author Isis Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -13,7 +14,7 @@ use DOMDocument;
  * Class for stripping images and truncating text from a Dom.
  *
  */
-final class DomUtils {
+ class DomUtils {
 
     /**
      * Remove embeds from the dom.
@@ -66,21 +67,22 @@ final class DomUtils {
      * Recursively truncate text while preserving html tags.
      *
      * @param mixed $element Dom element.
-     * @param int $wordCount Number of words to truncate to.
+     * @param int $limit Number of words to truncate to.
      * @return int Return limit used to count remaining tags.
      */
-    private function truncateWordsRecursive($element, int $wordCount): int {
-        if ($wordCount > 0) {
+    private function truncateWordsRecursive($element, int $limit): int {
+        $wordCount = $limit;
+        if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
-                $wordCount -= str_word_count($element->data);
-                if ($wordCount < 0) {
-                    $element->nodeValue = substr($element->nodeValue, 0, str_word_count($element->data));
+                $limit -= str_word_count($element->data);
+                if ($limit < 0) {
+                    $element->nodeValue = implode(' ', array_slice(explode(' ', $element->data), 0, $wordCount));
                 }
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
-                    if ($wordCount > 0) {
-                        $wordCount = $this->truncateWordsRecursive($element->childNodes->item($i), $wordCount);
+                    if ($limit > 0) {
+                        $limit = $this->truncateWordsRecursive($element->childNodes->item($i), $limit);
                     } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;
@@ -88,6 +90,6 @@ final class DomUtils {
                 }
             }
         }
-        return $wordCount;
+        return $limit;
     }
 }

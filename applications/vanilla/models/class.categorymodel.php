@@ -855,7 +855,8 @@ class CategoryModel extends Gdn_Model {
      */
     public function getRootCategoryForDisplay() {
         $category = self::categories(-1);
-        $category['Name'] = Gdn::config('Garden.Title');
+        $name =  Gdn::config('Garden.Title');
+        $category['Name'] = !empty($name) ? $name : 'Vanilla';
         $category['Url'] = Gdn::request()->getSimpleUrl('/categories');
         $category['UrlCode'] = '';
         return $category;

@@ -27,7 +27,7 @@ class ModelCache implements InjectableInterface {
         \Gdn_Cache::FEATURE_EXPIRY => 600,
     ];
 
-    const DISABLE_FEATURE_FLAG = "Feature.DisableNewModelCaching.Enabled";
+    const DISABLE_FEATURE_FLAG = "DisableNewModelCaching";
 
     /** @var string */
     private $namespace;
@@ -66,7 +66,7 @@ class ModelCache implements InjectableInterface {
     public function __construct(string $namespace, ?array $defaultCacheOptions = []) {
         $this->namespace = $namespace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
-        $this->isFeatureDisabled = \Gdn::config(self::DISABLE_FEATURE_FLAG);
+        $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
     }
 
     /**
@@ -86,7 +86,7 @@ class ModelCache implements InjectableInterface {
      * @return string
      */
     public function createCacheKey(array $keyArgs): string {
-        $key = $this->namespace . '-' . $this->getIncrementingKey() . '-' . md5(json_encode($keyArgs));
+        $key = $this->namespace . '-' . $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
         return $key;
     }
 

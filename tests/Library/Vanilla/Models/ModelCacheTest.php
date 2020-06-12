@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
@@ -165,8 +166,9 @@ class ModelCacheTest extends TestCase {
      * We have a feature flag to disable the new caching if it causes issues.
      */
     public function testCacheDisabled() {
+        FeatureFlagHelper::clearCache();
         $this->runWithConfig([
-            ModelCache::DISABLE_FEATURE_FLAG => true,
+            'Feature.'.ModelCache::DISABLE_FEATURE_FLAG.'.Enabled' => true,
         ], function () {
             $this->modelCache = ModelCache::fromModel($this->model);
             $mockCache = $this->createMock(\Gdn_Dirtycache::class);
@@ -176,6 +178,7 @@ class ModelCacheTest extends TestCase {
             $this->modelCache->setCache($mockCache);
             $this->testAutoInvalidation();
         });
+        FeatureFlagHelper::clearCache();
     }
 
     /**

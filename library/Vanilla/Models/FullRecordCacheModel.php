@@ -45,6 +45,7 @@ class FullRecordCacheModel extends PipelineModel {
             [
                 'where' => $where,
                 'options' => $options,
+                'function' => __FUNCTION__, // For uniqueness.
             ],
             function () use ($where, $options) {
                 return parent::get($where, $options);

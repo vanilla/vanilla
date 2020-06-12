@@ -20,6 +20,7 @@ use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\Asset\NeonThemeAsset;
 use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Asset\TwigThemeAsset;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
@@ -283,7 +284,11 @@ class Theme implements \JsonSerializable {
         // Get the base variables asset.
         $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variablesAsset instanceof JsonThemeAsset) {
-            $merged = array_replace_recursive($variablesAsset->getValue(), $variables);
+            // We want to fully replace arrays instead of merging them.
+            // This mirrors our frontend variable handling.
+            $merged = ArrayUtils::mergeRecursive($variablesAsset->getValue(), $variables, function ($arr1, $arr2) {
+                return $arr2;
+            });
             $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
             $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
         }

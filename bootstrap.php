@@ -318,6 +318,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Gdn_Model')
     ->setShared(true)
 
+    ->rule(Model::class)
+    ->setShared(true)
+
     ->rule(Contracts\Models\UserProviderInterface::class)
     ->setClass(UserModel::class)
 

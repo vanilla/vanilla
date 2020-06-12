@@ -104,7 +104,7 @@ class BannerImageModel {
         if (!$slug) {
             $parentID = $category['ParentCategoryID'];
             if ($parentID == $categoryID) {
-                c(self::DEFAULT_CONFIG_KEY);
+                $slug = c(self::DEFAULT_CONFIG_KEY);
             } else {
                 $slug = self::getBannerImageSlug($parentID);
             }

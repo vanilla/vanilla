@@ -3867,7 +3867,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         // If there is a discrepancy between $countWatch and $discussion->CountCommentWatch,
         // update CountCommentWatch with the correct value.
         $discussion->CountCommentWatch = $countWatch;
+        if (\Vanilla\FeatureFlagHelper::featureEnabled('markCategoryReadFuzzy')) {
+            $this->markCategoryReadFuzzy($discussion);
+        }
+    }
 
+    /**
+     * Mark categories that this discussion was in as read.
+     *
+     * This method was extracted from `DiscussionModel::setWatch()`. It's not something I want running and I'm not sure
+     * if it even works. It will be put behind a feature flag for now.
+     *
+     * @param object $discussion
+     * @deprecated
+     */
+    protected function markCategoryReadFuzzy($discussion): void {
         /**
          * Fuzzy way of trying to automatically mark a category read again
          * if the user reads all the comments on the first few pages.

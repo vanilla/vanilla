@@ -36,7 +36,6 @@ trait TestSortingTrait {
             static::assertSorted($actual, $field);
         }
     }
-            usort($expected, ArrayUtils::sortCallback($field));
 
     /**
      * Assert that a dataset is properly sorted.

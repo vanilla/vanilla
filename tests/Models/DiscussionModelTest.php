@@ -13,6 +13,7 @@ use Garden\EventManager;
 use Gdn;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\DiscussionEvent;
+use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\ExpectErrorTrait;
 use VanillaTests\SiteTestTrait;
 
@@ -20,15 +21,10 @@ use VanillaTests\SiteTestTrait;
  * Some basic tests for the `DiscussionModel`.
  */
 class DiscussionModelTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait;
+    use SiteTestTrait, ExpectErrorTrait, TestDiscussionModelTrait;
 
     /** @var DiscussionEvent */
     private $lastEvent;
-
-    /**
-     * @var \DiscussionModel
-     */
-    private $model;
 
     /**
      * @var \DateTimeImmutable
@@ -403,7 +399,7 @@ class DiscussionModelTest extends TestCase {
             ],
             'User Has Read Page One, but not Page Two' => [
                 [
-                    'DateLastViewed' =>  '2020-01-18 19:20:02',
+                    'DateLastViewed' => '2020-01-18 19:20:02',
                     'CountCommentWatch' => 30,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-19 19:20:02',

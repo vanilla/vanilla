@@ -48,13 +48,13 @@ class DomUtilsTest extends MinimalContainerTestCase {
     /**
      * Test various format tag formats.
      *
-     * @param string $actual
+     * @param string $html
      * @param string $expected
      * @dataProvider provideImageData
      */
-    public function testStripImages($expected, $actual) {
+    public function testStripImages(string $html, string $expected): void {
         $dom = new DOMDocument();
-        $dom->loadHTML($actual);
+        $dom->loadHTML($html);
         DomUtils::stripImages($dom);
         $result = $dom->saveHTML();
         $this->assertHtmlStringEqualsHtmlString($expected, $result);
@@ -63,16 +63,21 @@ class DomUtilsTest extends MinimalContainerTestCase {
     /**
      * Test truncating words.
      *
-     * @param string $actual
+     * @param int $wordCount
+     * @param string $html
      * @param string $expected
-     * @dataProvider provideTruncateWordsData
+     * @dataProvider provideTrimWordsTests
      */
-    public function testTruncateWordCount($wordCount, $expected, $actual) {
-        $domDocument = new HtmlDocument($actual);
+    public function testTrimWords($wordCount, $html, $expected) {
+        $domDocument = new HtmlDocument($html);
+
+        // This assertion tests against bugs in the HtmlDocument class itself.
+        $this->assertHtmlStringEqualsHtmlString($html, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
+
         $dom = $domDocument->getDom();
-        DomUtils::truncateWords($dom, $wordCount);
-        $result = $domDocument->getInnerHtml();
-        $this->assertHtmlStringEqualsHtmlString($expected, $result);
+        DomUtils::trimWords($dom, $wordCount);
+        $actual = $domDocument->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 
     /**
@@ -147,11 +152,24 @@ class DomUtilsTest extends MinimalContainerTestCase {
      * Provide tests for `TestTruncateWords()`.
      * @return array
      */
-    public function provideTruncateWordsData(): array {
+    public function provideTrimWordsTests(): array {
         $r = [
-            'Test10Words' => ['10', '<p>Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi</p>', '<p>Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic.</p><br><p>Gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato.</p>'],
-            'Test2Words' => ['2', 'One dollar', 'One dollar'],
-            'Test5Words' => ['4', 'One dollar and eighty-seven', 'One dollar and eighty-seven cents'],
+            'Test10Words' => [
+                10,
+                '<p>Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi '.
+                    'tomatillo melon azuki bean garlic.</p><br><p>Gumbo beet greens corn soko endive gumbo gourd. '.
+                    'Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato.</p>',
+                '<p>Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi</p>'
+            ],
+            'Test2Words' => [2, 'One dollar', 'One dollar'],
+            'Test5Words' => [4, 'One dollar and eighty-seven cents', 'One dollar and eighty-seven'],
+            'mixed nested' => [2, 'a <b>b</b> c', 'a <b>b</b>'],
+            "short html" => [4, 'a b', 'a b'],
+            'heavily nested' => [
+                2,
+                '<div><div><div><div>this</div> is a word</div></div> <b>okay?</b></div>',
+                '<div><div><div><div>this</div> is</div></div></div>'
+            ],
         ];
 
         return $r;

@@ -59,7 +59,7 @@ use DOMDocument;
      * @param DOMDocument $dom
      * @param int $wordCount Number of words to truncate to
      */
-    public static function truncateWords(DOMDocument $dom, int $wordCount): void {
+    public static function trimWords(DOMDocument $dom, int $wordCount): void {
         (new self)->truncateWordsRecursive($dom->documentElement, $wordCount);
     }
 

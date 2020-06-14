@@ -440,7 +440,7 @@ abstract class Gdn_Cache {
     /**
      * Check if a value exists in the cache.
      *
-     * @param string $Key Cache key used for storage.
+     * @param string $key Cache key used for storage.
      * @return array array(key => value) for existing key or false if not found.
      */
     abstract public function exists($key);
@@ -448,8 +448,8 @@ abstract class Gdn_Cache {
     /**
      * Retrieve a key's value from the cache.
      *
-     * @param string $Key Cache key used for storage.
-     * @param array $Options
+     * @param string|string[] $key Cache key(s) used for storage.
+     * @param array $options
      * @return mixed key value or false on failure or not found.
      */
     abstract public function get($key, $options = []);
@@ -457,8 +457,8 @@ abstract class Gdn_Cache {
     /**
      * Remove a key/value pair from the cache.
      *
-     * @param string $Key Cache key used for storage.
-     * @param array $Options
+     * @param string $key Cache key used for storage.
+     * @param array $options
      * @return boolean true on success or false on failure.
      */
     abstract public function remove($key, $options = []);
@@ -468,9 +468,9 @@ abstract class Gdn_Cache {
      *
      * This will fail if the provided key does not already exist.
      *
-     * @param string $Key Cache key used for storage.
-     * @param mixed $Value Value to be cached.
-     * @param array $Options
+     * @param string $key Cache key used for storage.
+     * @param mixed $value Value to be cached.
+     * @param array $options
      * @return boolean true on success or false on failure.
      */
     abstract public function replace($key, $value, $options = []);
@@ -481,8 +481,8 @@ abstract class Gdn_Cache {
      * This will fail if the key does not already exist. Cannot take the value
      * of $Key below 0.
      *
-     * @param string $Key Cache key used for storage.
-     * @param int $Amount Amount to shift value up.
+     * @param string $key Cache key used for storage.
+     * @param int $amount Amount to shift value up.
      * @return int new value or false on failure.
      */
     abstract public function increment($key, $amount = 1, $options = []);
@@ -493,8 +493,9 @@ abstract class Gdn_Cache {
      * This will fail if the key does not already exist. Cannot take the value
      * of $Key below 0.
      *
-     * @param string $Key Cache key used for storage.
-     * @param int $Amount Amount to shift value down.
+     * @param string $key Cache key used for storage.
+     * @param int $amount Amount to shift value down.
+     * @param array $options
      * @return int new value or false on failure.
      */
     abstract public function decrement($key, $amount = 1, $options = []);
@@ -502,10 +503,10 @@ abstract class Gdn_Cache {
     /**
      * Add a container to the cache pool.
      *
-     * @param array $Options An array of options with container constants as keys.
+     * @param array $options An array of options with container constants as keys.
      *  - CONTAINER_LOCATION: required. the location of the container. SERVER:IP, Filepath, etc.
      *  - CONTAINER_PERSISTENT: optional (default true). whether to use connect() or pconnect() where applicable.
-     *  - CONTAINER_WEIGHT: optional (default 1). number of buckets to create for this server which in turn control its probability of it being selected.
+     *  - CONTAINER_WEIGHT: optional (default 1). number of buckets to create for this server which control its probability of it being selected.
      *  - CONTAINER_RETRYINT: optional (default 15s). controls how often a failed container will be retried, the default value is 15 seconds.
      *  - CONTAINER_TIMEOUT: optional (default 1s). amount of time to wait for connection to container before timing out.
      *  - CONTAINER_CALLBACK: optional (default null). callback to execute if container fails to open/connect.
@@ -528,8 +529,8 @@ abstract class Gdn_Cache {
     /**
      *
      *
-     * @param string $Key Cache key.
-     * @param array $Options
+     * @param string $key Cache key.
+     * @param array $options
      * @return mixed
      */
     protected function fallback($key, $options) {

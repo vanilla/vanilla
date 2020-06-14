@@ -24,9 +24,24 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
         $this->cacheObject = $cacheObject;
     }
 
+    /**
+     * Convert a TTL to seconds.
+     *
+     * @param int|\DateInterval $ttl
+     * @return int|null Returns a number of seconds or **null** on failture.
+     */
+    protected function ttlToSeconds($ttl): ?int {
+        if (is_numeric($ttl)) {
+            return (int)$ttl;
+        } elseif (is_object($ttl) && $ttl instanceof \DateInterval) {
+            return $ttl->s + 60 * $ttl->i + 3600 * $ttl->h + 86400 * $ttl->d;
+        } else {
+            return null;
+        }
+    }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         $value = $this->cacheObject->get($key);
@@ -37,40 +52,48 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function set($key, $value, $ttl = null) {
         $options = [];
         if ($ttl !== null) {
-            $options[FEATURE_EXPIRY] = $ttl;
+            $options[\Gdn_Cache::FEATURE_EXPIRY] = $this->ttlToSeconds($ttl);
         }
         return $this->cacheObject->store($key, $value, $ttl);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delete($key) {
         return $this->cacheObject->remove($key);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getMultiple($keys, $default = null) {
-        $result = [];
-        foreach($keys as $key) {
+        if (is_object($keys) && $keys instanceof iterable) {
+            $keys = iterator_to_array($keys);
+        }
+
+        $result = $this->cacheObject->get($keys);
+        if (count($keys) >= count($result)) {
+            $result += array_fill_keys($keys, $default);
+        }
+
+        foreach ($keys as $key) {
             $result[$key] = $this->get($key, $default);
         }
         return $result;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setMultiple($values, $ttl = null) {
         $success = true;
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             if ($this->set($key, $value, $ttl) === false) {
                 $success = false;
                 break;
@@ -80,11 +103,11 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function deleteMultiple($keys) {
         $success = true;
-        foreach($values as $key) {
+        foreach ($keys as $key) {
             if ($this->delete($key) === false) {
                 $success = false;
                 break;
@@ -94,11 +117,17 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function has($key) {
         return $this->cacheObject->exists($key);
     }
 
 
+    /**
+     * @inheritDoc
+     */
+    public function clear() {
+        return $this->cacheObject->flush();
+    }
 }

@@ -5,10 +5,9 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Core\Caching;
+namespace VanillaTests\Library\Core\Cache;
 
 use Cache\IntegrationTests\SimpleCacheTest;
-use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Cache\ValidatingCacheCacheAdapter;
 
 /**

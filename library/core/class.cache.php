@@ -530,11 +530,12 @@ abstract class Gdn_Cache {
     abstract public function flush();
 
     /**
-     *
+     * Try and get a cache key or fallback to a query or callback.
      *
      * @param string $key Cache key.
      * @param array $options
      * @return mixed
+     * @deprecated This method should be avoided because it has a hidden dependency on `Gdn_Database`.
      */
     protected function fallback($key, $options) {
         $fallback = val(Gdn_Cache::FEATURE_FALLBACK, $options, null);

@@ -10,7 +10,7 @@ namespace Vanilla;
 /**
  * Interface CacheInterface.
  *
- * @package Vanilla
+ * @deprecated Use \Psr\SimpleCache\CacheInterface instead.
  */
 interface CacheInterface extends \Psr\SimpleCache\CacheInterface {
 }

@@ -80,7 +80,9 @@
         "mikey179/vfsstream": "~1.6",
         "phing/phing": "2.*",
         "roave/security-advisories": "dev-master",
-        "nette/robot-loader": "^3.2"
+        "nette/robot-loader": "^3.2",
+        "cache/integration-tests": "dev-master",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "provide": {
         "ext-gd": "*"

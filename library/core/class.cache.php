@@ -44,6 +44,9 @@ abstract class Gdn_Cache {
     /** Allows querying DB for missing keys, or firing a callback. */
     const FEATURE_FALLBACK = 'f_fallback';
 
+    /** Allows failure to fetch to return a default value. */
+    const FEATURE_DEFAULT = 'f_default';
+
     /** In incr/decr ops, what should the initial value be. */
     const FEATURE_INITIAL = 'f_initial';
 

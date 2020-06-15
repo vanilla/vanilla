@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f38cf22ccd5598e9d6107eed948d33ff",
+    "content-hash": "cba57b73c5c4555cb43f7fa8735b5698",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -1812,16 +1812,16 @@
         },
         {
             "name": "vanilla/js-connect-php",
-            "version": "v3.0",
+            "version": "v3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/jsConnectPHP.git",
-                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b"
+                "reference": "daa1c1ddda5355c4ebd12e05dca29ff3bdb3ff0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/jsConnectPHP/zipball/9b7317b15ef8ef514905b287dde3c2e965ea138b",
-                "reference": "9b7317b15ef8ef514905b287dde3c2e965ea138b",
+                "url": "https://api.github.com/repos/vanilla/jsConnectPHP/zipball/daa1c1ddda5355c4ebd12e05dca29ff3bdb3ff0e",
+                "reference": "daa1c1ddda5355c4ebd12e05dca29ff3bdb3ff0e",
                 "shasum": ""
             },
             "require": {
@@ -1856,7 +1856,7 @@
                 }
             ],
             "description": "Client library for Vanilla's jsConnect SSO system.",
-            "time": "2020-04-03T16:13:41+00:00"
+            "time": "2020-06-12T18:50:48+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -4519,5 +4519,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

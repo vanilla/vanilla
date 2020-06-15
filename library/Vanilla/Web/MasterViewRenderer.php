@@ -10,7 +10,7 @@ namespace Vanilla\Web;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 
 /**
  * Class for mapping data inside of a Gdn_Controller for the twig master view.
@@ -81,11 +81,13 @@ class MasterViewRenderer {
             $this->getSharedData()
         );
 
+        $data['title'] = $data['Title'] ?? $this->siteMeta->getSiteTitle();
+
+        $bodyHtmlKey = $controller->getIsReactView() ? 'seoContent' : 'bodyContent';
+
         $extraData = [
-            'bodyContent' =>
-                $this->renderThemeContentView($data)
-                ?? $controller->renderAssetForTwig('Content'),
-            'cssClasses' => $controller->data('CssClass') . ' isLoading',
+            $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig('Content'),
+            'cssClasses' => $controller->data('CssClass') . ' isLoading' . (\Gdn::themeFeatures()->useDataDrivenTheme() ? ' dataDriven' : ''),
             'pageHead' => $controller->renderAssetForTwig('Head'),
         ];
 

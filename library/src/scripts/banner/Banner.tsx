@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import React, { useEffect } from "react";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -11,11 +12,10 @@ import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
-import { useBannerContainerDivRef } from "@library/banner/BannerContext";
+import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { useDebugValue } from "react";
 import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -42,8 +42,9 @@ interface IProps {
 export default function Banner(props: IProps) {
     const device = useDevice();
     const bannerContextRef = useBannerContainerDivRef();
+    const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
 
-    const { action, className, title, isContentBanner } = props;
+    const { action, className, isContentBanner } = props;
 
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
@@ -51,7 +52,13 @@ export default function Banner(props: IProps) {
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
     const { options } = vars;
 
+    const { title = vars.title.text } = props;
+
     useComponentDebug({ vars });
+
+    useEffect(() => {
+        setOverlayTitleBar(!!options.overlayTitleBar);
+    }, [options.overlayTitleBar]);
 
     if (!options.enabled) {
         return null;
@@ -100,7 +107,7 @@ export default function Banner(props: IProps) {
 
     return (
         <div
-            ref={options.overlayTitleBar ? bannerContextRef : undefined}
+            ref={bannerContextRef}
             className={classNames(className, classes.root, {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,
             })}
@@ -131,9 +138,12 @@ export default function Banner(props: IProps) {
                             <div className={classes.imagePositioner}>
                                 {/*For SEO & accessibility*/}
                                 {options.hideTitle && (
-                                    <Heading className={visibility().visuallyHidden} depth={1}>
-                                        {title}
-                                    </Heading>
+                                    <>
+                                        <Heading className={visibility().visuallyHidden} depth={1}>
+                                            {title}
+                                        </Heading>
+                                        {setRenderedH1(true)}
+                                    </>
                                 )}
                                 <ConditionalWrap
                                     className={classes.contentContainer(!rightImageSrc)}
@@ -143,7 +153,7 @@ export default function Banner(props: IProps) {
                                         !options.hideDescription ||
                                         !!logoImageSrc
                                     }
-                                ></ConditionalWrap>
+                                />
                                 {rightImageSrc && (
                                     <div className={classes.imageElementContainer}>
                                         {/*We rely on the title for screen readers as we don't yet have alt text hooked up to image*/}
@@ -152,7 +162,7 @@ export default function Banner(props: IProps) {
                                 )}
                             </div>
                         </Container>
-                        {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }}></div>}
+                        {showBottomSearch && <div className={classes.searchStrip} style={{ background: "none" }} />}
                     </div>
                 </div>
                 {/* Main Content Area
@@ -168,9 +178,12 @@ export default function Banner(props: IProps) {
                         <div className={classes.imagePositioner}>
                             {/*For SEO & accessibility*/}
                             {options.hideTitle && (
-                                <Heading className={visibility().visuallyHidden} depth={1}>
-                                    {title}
-                                </Heading>
+                                <>
+                                    <Heading className={visibility().visuallyHidden} depth={1}>
+                                        {title}
+                                    </Heading>
+                                    {setRenderedH1(true)}
+                                </>
                             )}
                             <ConditionalWrap
                                 className={classes.contentContainer(!rightImageSrc)}
@@ -190,9 +203,12 @@ export default function Banner(props: IProps) {
                                     <div className={classes.titleWrap}>
                                         <FlexSpacer className={classes.titleFlexSpacer} />
                                         {title && (
-                                            <Heading className={classes.title} depth={1} isLarge>
-                                                {title}
-                                            </Heading>
+                                            <>
+                                                <Heading className={classes.title} depth={1} isLarge>
+                                                    {title}
+                                                </Heading>
+                                                {setRenderedH1(true)}
+                                            </>
                                         )}
                                         <div className={classNames(classes.text, classes.titleFlexSpacer)}>
                                             {action}

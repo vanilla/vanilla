@@ -41,7 +41,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
 
     constructor(props: IProps) {
         super(props);
-        this.ID = this.props.parentID + `${this.props.parentID}-dropDown`;
+        this.ID = `${this.props.parentID}-dropDown-${this.props.index}`;
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";

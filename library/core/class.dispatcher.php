@@ -708,6 +708,21 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * Adds a dispatcher block exception.
+     *
+     * @param string $exceptionMatch Exception string to match.
+     * @param int $exceptionType Type of block exception.
+     * @throws InvalidArgumentException Throws and exception if exception type is not found.
+     */
+    public function addBlockException(string $exceptionMatch, int $exceptionType) {
+        $allowedExceptionTypes = [self::BLOCK_NEVER, self::BLOCK_PERMISSION, self::BLOCK_ANY];
+        if (!in_array($exceptionType, $allowedExceptionTypes)) {
+            throw new InvalidArgumentException('Exception type could not be found.', 500);
+        }
+        $this->blockExceptions[$exceptionMatch] = $exceptionType;
+    }
+
+    /**
      * Rewrite the request based on rewrite rules (currently called routes in Vanilla).
      *
      * This method modifies the passed {@link $request} object. It can also cause a redirect if a rule matches that

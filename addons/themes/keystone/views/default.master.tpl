@@ -33,15 +33,15 @@
             </div>
         {/if}
     {/if}
-   
+
     {if !$DataDrivenTitleBar}
         {activity_link format=$linkFormat}
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {knowledge_link format=$linkFormat}
         {custom_menu format=$linkFormat}
-       
-       
+
+
     {/if}
 {/capture}
 
@@ -51,7 +51,7 @@
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {custom_menu format=$linkFormat}
-       
+
     {/if}
 {/capture}
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -92,8 +92,7 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="Frame" id="page">
-
+    <div class="Frame">
         {if $DataDrivenTitleBar}
             <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true">
                 {$smarty.capture.menu}
@@ -157,7 +156,7 @@
                                     </div>
                                 {/if}
                                {$smarty.capture.navLinks}
-                               
+
                                 <div class='Navigation-linkContainer'>
                                     {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
                                 </div>
@@ -179,7 +178,7 @@
                 </div>
             {/if}
             <div class="Frame-body">
-                
+
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList", "CategoryDiscussionList"])}
                     <div class="Herobanner">
@@ -197,8 +196,8 @@
                                 </div>
                             {else}
                                 {if $Category}
-                                    <h2 class="H HomepageTitle">{$Category.Name}{follow_button}</h2>
-                                    <p class="P PageDescription">{$Category.Description}</p>
+                                    <h2 class="H HomepageTitle">{$Category.Name|strip_tags}{follow_button}</h2>
+                                    <p class="P PageDescription">{$Category.Description|strip_tags}</p>
                                 {else}
                                     {if {homepage_title} !== ""}
                                         <h2 class="H HomepageTitle">{homepage_title}</h2>

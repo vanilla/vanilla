@@ -85,7 +85,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @return string[] Additional post formats.
      */
     public function getPostFormats_handler(array $postFormats): array {
-        $postFormats[] = RichFormat::FORMAT_KEY;
+        $postFormats[] = 'Rich'; // The config values have always been uppercase. (including in default configs).
         return $postFormats;
     }
 
@@ -189,7 +189,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         $classes = 'ReactButton Quote Visible js-quoteButton';
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo "<a href='#' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
+        echo "<a href='#' role='button' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
         echo ' ';
     }
 

@@ -253,6 +253,7 @@ $.TokenList = function (input, url_or_data, settings) {
             outline: "none"
         })
         .attr("id", $(input).data("settings").idPrefix + input.id)
+        .attr("aria-label", $(input).data("settings").ariaLabel)
         .focus(function () {
             if ($(input).data("settings").disabled) {
                 return false;

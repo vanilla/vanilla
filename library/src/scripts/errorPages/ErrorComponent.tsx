@@ -29,7 +29,7 @@ export function ErrorPage(props: IProps) {
 
     return (
         <DocumentTitle title={message}>
-            <Container className={classes.inheritHeight}>
+            <Container className={classes.inheritHeight} tag={"main"}>
                 <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                     <PanelWidget className={classes.inheritHeight}>
                         <CoreErrorMessages {...props} className={classes.inheritHeight} />

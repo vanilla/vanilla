@@ -17,7 +17,7 @@ import {
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { important, percent, px, rgba } from "csx";
+import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -123,7 +123,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPreset = makeThemeVars("standard", {
         preset: {
             ...standardPresetInit2.preset,
-            borderState: standardPresetInit2.preset.bgState,
+            border:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? standardPresetInit2.preset.border
+                    : standardPresetInit2.preset.bg,
+            borderState:
+                standardPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? standardPresetInit2.preset.fgState
+                    : standardPresetInit2.preset.bgState,
         },
     });
 

@@ -146,7 +146,6 @@ class EntryController extends Gdn_Controller {
         $authenticationStep = $authenticator->currentStep();
 
         switch ($authenticationStep) {
-
             // User is already logged in
             case Gdn_Authenticator::MODE_REPEAT:
                 $reaction = $authenticator->repeatResponse();
@@ -161,14 +160,14 @@ class EntryController extends Gdn_Controller {
                     Logger::event(
                         'signin_failure',
                         Logger::WARNING,
-                        '{username} failed to sign in. Some or all credentials were missing.'
+                        '{username} failed to sign in. Some or all credentials were missing.',
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
                 break;
 
             // All information is present, authenticate
             case Gdn_Authenticator::MODE_VALIDATE:
-
                 // Attempt to authenticate.
                 try {
                     if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
@@ -190,7 +189,8 @@ class EntryController extends Gdn_Controller {
                                 Logger::event(
                                     'signin_failure',
                                     Logger::WARNING,
-                                    '{username} failed to sign in. Permission denied.'
+                                    '{username} failed to sign in. Permission denied.',
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $reaction = $authenticator->failedResponse();
                                 break;
@@ -200,7 +200,8 @@ class EntryController extends Gdn_Controller {
                                 Logger::event(
                                     'signin_failure',
                                     Logger::WARNING,
-                                    '{username} failed to sign in. Authentication denied.'
+                                    '{username} failed to sign in. Authentication denied.',
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $reaction = $authenticator->failedResponse();
                                 break;
@@ -210,7 +211,8 @@ class EntryController extends Gdn_Controller {
                                 Logger::event(
                                     'signin_failure',
                                     Logger::WARNING,
-                                    '{username} failed to sign in. More information needed from user.'
+                                    '{username} failed to sign in. More information needed from user.',
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                                 );
                                 $this->addCredentialErrorToForm('ErrorInsufficient');
 
@@ -870,6 +872,9 @@ class EntryController extends Gdn_Controller {
                             } catch (Gdn_UserException $ex) {
                                 $this->Form->addError($ex);
                             }
+                        } else {
+                            // If we have a user match & there is no password.
+                            $this->Form->addError(t('UserMatchNeedsPassword'));
                         }
                     }
                 }
@@ -912,7 +917,11 @@ class EntryController extends Gdn_Controller {
 
                 // Sign the user in.
                 Gdn::userModel()->fireEvent('BeforeSignIn', ['UserID' => $this->Form->getFormValue('UserID')]);
-                Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
+                Gdn::session()->start(
+                    $this->Form->getFormValue('UserID'),
+                    true,
+                    (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true))
+                );
                 Gdn::userModel()->fireEvent('AfterSignIn');
 
                 // Move along.
@@ -1068,7 +1077,10 @@ class EntryController extends Gdn_Controller {
                         'legacy_embed_signin',
                         Logger::INFO,
                         'Signed in using the legacy embed method',
-                        ['login' => $this->Form->getFormValue('Email')]
+                        [
+                            'login' => $this->Form->getFormValue('Email'),
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        ]
                     );
                 } else {
                     $this->Form->addError('Please try again.');
@@ -1086,7 +1098,15 @@ class EntryController extends Gdn_Controller {
 
                 if (!$user) {
                     $this->addCredentialErrorToForm('@' . sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))));
-                    Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', ['signin' => $email]);
+                    Logger::event(
+                        'signin_failure',
+                        Logger::INFO,
+                        'Failed to sign in. User not found: {signin}',
+                        [
+                            'signin' => $email,
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        ]
+                    );
                     $this->fireEvent('BadSignIn', [
                         'Email' => $email,
                         'Password' => $this->Form->getFormValue('Password'),
@@ -1136,7 +1156,7 @@ class EntryController extends Gdn_Controller {
                                 'signin_failure',
                                 Logger::WARNING,
                                 '{username} failed to sign in.  Invalid password.',
-                                ['InsertName' => $user->Name]
+                                ['InsertName' => $user->Name, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                             );
                             $this->fireEvent('BadSignIn', [
                                 'Email' => $email,
@@ -1150,7 +1170,6 @@ class EntryController extends Gdn_Controller {
                     }
                 }
             }
-
         } else {
             if ($target = $this->Request->get('Target')) {
                 $this->Form->addHidden('Target', $target);
@@ -1213,7 +1232,6 @@ class EntryController extends Gdn_Controller {
         $syncScreen = c('Garden.Authenticator.SyncScreen', 'on');
         switch ($syncScreen) {
             case 'on':
-
                 // Authenticator events fired inside
                 $this->syncScreen($authenticator, $userInfo, $payload);
 
@@ -1316,7 +1334,6 @@ class EntryController extends Gdn_Controller {
                 Gdn::request()->withRoute('DefaultController');
 
                 return Gdn::dispatcher()->dispatch();
-
             } elseif (val('NewAccount', $formValues)) {
                 $authResponse = Gdn_Authenticator::AUTH_CREATED;
 
@@ -1325,7 +1342,6 @@ class EntryController extends Gdn_Controller {
                 $formValues['Email'] = $formValues['NewEmail'];
                 $userID = $this->UserModel->synchronize($userInfo['UserKey'], $formValues);
                 $this->Form->setValidationResults($this->UserModel->validationResults());
-
             } else {
                 $authResponse = Gdn_Authenticator::AUTH_SUCCESS;
 
@@ -1344,7 +1360,8 @@ class EntryController extends Gdn_Controller {
                     Logger::event(
                         'signin_failure',
                         Logger::WARNING,
-                        '{username} failed to sign in. Invalid credentials.'
+                        '{username} failed to sign in. Invalid credentials.',
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
 
@@ -1849,7 +1866,8 @@ class EntryController extends Gdn_Controller {
             Logger::event(
                 'password_reset_failure',
                 Logger::NOTICE,
-                '{username} failed to authenticate password reset request.'
+                '{username} failed to authenticate password reset request.',
+                [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
             );
             $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $userID,
@@ -1862,7 +1880,8 @@ class EntryController extends Gdn_Controller {
             Logger::event(
                 'password_reset_failure',
                 Logger::NOTICE,
-                '{username} has an expired reset token.'
+                '{username} has an expired reset token.',
+                [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
             );
             $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $userID,
@@ -1896,13 +1915,15 @@ class EntryController extends Gdn_Controller {
                     Logger::event(
                         'password_reset_failure',
                         Logger::NOTICE,
-                        'Failed to reset the password for {username}. Password is invalid.'
+                        'Failed to reset the password for {username}. Password is invalid.',
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 } elseif ($password != $passwordMatch) {
                     Logger::event(
                         'password_reset_failure',
                         Logger::NOTICE,
-                        'Failed to reset the password for {username}. Passwords did not match.'
+                        'Failed to reset the password for {username}. Passwords did not match.',
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                 }
 
@@ -1911,13 +1932,13 @@ class EntryController extends Gdn_Controller {
                     Logger::event(
                         'password_reset',
                         Logger::NOTICE,
-                        '{username} has reset their password.'
+                        '{username} has reset their password.',
+                        [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                     );
                     Gdn::session()->start($user->UserID, true);
                     $this->setRedirectTo('/', false);
                 }
             }
-
         } else {
             $this->setData('Fatal', true);
         }
@@ -2033,7 +2054,6 @@ class EntryController extends Gdn_Controller {
 
         switch ($reaction) {
             case Gdn_Authenticator::REACT_RENDER:
-
                 break;
 
             case Gdn_Authenticator::REACT_EXIT:
@@ -2129,6 +2149,6 @@ class EntryController extends Gdn_Controller {
             $target = url(Gdn::router()->getDestination('DefaultController'));
         }
 
-        return $target;
+        return url($target, true);
     }
 }

@@ -103,12 +103,13 @@ form {
     @extend .row;
 
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     padding-top: 16px;
     padding-bottom: 16px;
     margin-bottom: 0;
     border-bottom: $border-width dotted #e7e8e9;
+    width: 100%;
 
     > .no-grid {
         padding-left: $padding-row;
@@ -118,6 +119,7 @@ form {
     > .input-wrap {
         @extend .col-sm-14;
         @extend .col-xs-24;
+        max-width: (7 / 12 * 100%);
 
         &.no-label {
             @extend .col-sm-offset-10;
@@ -142,8 +144,10 @@ form {
     }
 
     @include media-breakpoint-down(xs) {
+        flex-wrap: wrap;
         .input-wrap {
             margin-top: $spacer / 4;
+            max-width: 100%;
         }
     }
 }

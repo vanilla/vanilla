@@ -28,26 +28,45 @@ components:
       - roleID
       - name
     UserFragment:
-      type: object
-      properties:
-        userID:
-          description: The ID of the user.
-          type: integer
-        name:
-          description: The username of the user.
-          minLength: 1
-          type: string
-        photoUrl:
-          description: The URL of the user's avatar picture.
-          minLength: 1
-          type: string
-        dateLastActive:
-          description: Time the user was last active.
-          format: date-time
-          nullable: true
-          type: string
-      required:
-      - userID
-      - name
-      - photoUrl
-      - dateLastActive
+      oneOf:
+        - type: object
+          properties:
+            userID:
+              description: The ID of the user.
+              type: integer
+            name:
+              description: The username of the user.
+              minLength: 1
+              type: string
+            photoUrl:
+              description: The URL of the user's avatar picture.
+              minLength: 1
+              type: string
+            dateLastActive:
+              description: Time the user was last active.
+              format: date-time
+              nullable: true
+              type: string
+            ssoID:
+              description: The unique ID of the user from the source site, if using SSO.
+              type: string
+          required:
+            - userID
+            - name
+            - photoUrl
+            - dateLastActive
+        - type: object
+          description: A user fragment when only expanding by ssoID.
+          properties:
+            ssoID:
+              description: The unique ID of the user from the source site, if using SSO.
+              type: string
+          required:
+            - ssoID
+    RangeExpression:
+      description: Specify a range or CSV of values.
+      type: string
+      format: range-expression
+      externalDocs:
+        url: https://success.vanillaforums.com/kb/articles/308-range-expressions
+

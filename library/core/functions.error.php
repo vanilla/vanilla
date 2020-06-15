@@ -270,7 +270,7 @@ function gdn_ExceptionHandler($Exception) {
 
         if ($DeliveryType != DELIVERY_TYPE_ALL) {
             if (!$Debug) {
-                die('<b class="Bonk">Whoops! There was an error.</b>');
+                die('<b class="Bonk">'.t("Whoops! There was an error.").'</b>');
             }
 
             // This is an ajax request, so dump an error that is more eye-friendly in the debugger

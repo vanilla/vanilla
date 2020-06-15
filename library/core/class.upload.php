@@ -10,6 +10,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Handles file uploads.
  */
@@ -27,6 +29,12 @@ class Gdn_Upload extends Gdn_Pluggable {
     /** @var \Vanilla\FileUtils */
     protected $fileUtils;
 
+    /** @var array|null */
+    private $uploadWebPaths;
+
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * Class constructor.
      */
@@ -35,6 +43,7 @@ class Gdn_Upload extends Gdn_Pluggable {
         parent::__construct();
         $this->ClassName = 'Gdn_Upload';
 
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->fileUtils = Gdn::getContainer()->get(\Vanilla\FileUtils::class);
     }
 
@@ -263,29 +272,21 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
+     * Generate a target name for a file.
      *
-     *
-     * @param $targetFolder
+     * @param mixed $targetFolder
      * @param string $extension
      * @param bool $chunk
      * @return string
+     *
+     * @deprecated Use \Vanilla\FileUtils::generateUniqueUploadPath()
      */
     public function generateTargetName($targetFolder, $extension = 'jpg', $chunk = false) {
         if (!$extension) {
             $extension = trim(pathinfo($this->_UploadedFile['name'], PATHINFO_EXTENSION), '.');
         }
 
-        do {
-            if ($chunk) {
-                $name = randomString(12);
-                $subdir = sprintf('%03d', mt_rand(0, 999)).'/';
-            } else {
-                $name = randomString(12);
-                $subdir = '';
-            }
-            $path = "$targetFolder/{$subdir}$name.$extension";
-        } while (file_exists($path));
-        return $path;
+        return \Vanilla\FileUtils::generateUniqueUploadPath((string) $extension, (bool) $chunk, '', (string) $targetFolder);
     }
 
     /**
@@ -326,14 +327,15 @@ class Gdn_Upload extends Gdn_Pluggable {
                 mkdir(dirname($target), 0777, true);
             }
 
-            if (stringBeginsWith($source, PATH_UPLOADS)) {
-                rename($source, $target);
+            if ($copy) {
+                $result = copy($source, $target);
+            } elseif (stringBeginsWith($source, PATH_UPLOADS)) {
+                $result = rename($source, $target);
             } else {
-                $isUpload = $this->fileUtils->isUploadedFile($source);
-                $result = ($copy && $isUpload) ? copy($source, $target) : $this->fileUtils->moveUploadedFile($source, $target);
-                if (!$result) {
-                    throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
-                }
+                $result = $this->fileUtils->moveUploadedFile($source, $target);
+            }
+            if (!$result) {
+                throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
             }
         }
 
@@ -352,19 +354,15 @@ class Gdn_Upload extends Gdn_Pluggable {
     }
 
     /**
-     * Returns the url prefix for a given type.
+     * Get all base upload directories.
      *
-     * If there is a plugin that wants to store uploads at a different location or in a different way then they register
-     * themselves by subscribing to the Gdn_Upload_GetUrls_Handler event. After that they will be available here.
+     * The default and most common directory is https://mysite.com/forum/uploads.
      *
-     * @param string $type The type of upload to get the prefix for.
-     * @return string The url prefix.
+     * @return array
      */
-    public static function urls($type = null) {
-        static $urls = null;
-
-        if ($urls === null) {
-            $urls = [
+    public function getUploadWebPaths(): array {
+        if ($this->uploadWebPaths === null) {
+            $this->uploadWebPaths = [
                 '' => asset('/uploads', true),
                 'static://v' => rtrim(asset('/', true), '/')
             ];
@@ -372,23 +370,68 @@ class Gdn_Upload extends Gdn_Pluggable {
             $sender = new stdClass();
             $sender->Returns = [];
             $sender->EventArguments = [];
-            $sender->EventArguments['Urls'] =& $urls;
+            $sender->EventArguments['Urls'] =& $this->uploadWebPaths;
+            $this->eventManager->fire('Gdn_Upload_GetUrls', $sender, $sender->EventArguments);
+        }
+        return $this->uploadWebPaths;
+    }
 
-            Gdn::pluginManager()->callEventHandlers($sender, 'Gdn_Upload', 'GetUrls');
+    /**
+     * Check if a URL is one of our own web paths.
+     *
+     * @param string $url
+     *
+     * @return bool
+     */
+    public function isOwnWebPath(string $url): bool {
+        $parsedUrl = parse_url($url);
+        foreach ($this->getUploadWebPaths() as $_ => $ownUrl) {
+            $parsedOwnUrl = parse_url($ownUrl);
+
+            $isSameHost = strcasecmp($parsedUrl['host'] ?? '', $parsedOwnUrl['host']) === 0;
+            $hasRootPath = stringBeginsWith($parsedUrl['path'] ?? '', $parsedOwnUrl['path'], true);
+            if ($isSameHost && $hasRootPath) {
+                return true;
+            }
         }
 
-        if ($type === null) {
-            return $urls;
-        }
-        if (isset($urls[$type])) {
-            return $urls[$type];
-        }
         return false;
     }
 
     /**
+     * Get an upload web path for a particular type.
+     *
+     * @param string $type
+     *
+     * @return string|null
+     */
+    public function getUploadWebPath(string $type): ?string {
+        return $this->getUploadWebPaths()[$type] ?? null;
+    }
+
+    /**
+     * Returns the url prefix for a given type.
+     *
+     * If there is a plugin that wants to store uploads at a different location or in a different way then they register
+     * themselves by subscribing to the Gdn_Upload_GetUrls_Handler event. After that they will be available here.
+     *
+     * @param string $type The type of upload to get the prefix for.
+     * @return string|array|false An array of URL prefixes or a single URL prefix if it's type is passed.
+     * @deprecated getUploadWebPaths or getUploadWebPath
+     */
+    public static function urls($type = null) {
+        /** @var Gdn_Upload $upload */
+        $upload = \Gdn::getContainer()->get(Gdn_Upload::class);
+        if ($type === null) {
+            return $upload->getUploadWebPaths();
+        } else {
+            return $upload->getUploadWebPath($type) ?? false;
+        }
+    }
+
+    /**
      * Check to see whether the user has selected a file for uploading.
-     * 
+     *
      * @param $inputName The input name of the file.
      * @return bool Whether a file has been selected for the fiels.
      */

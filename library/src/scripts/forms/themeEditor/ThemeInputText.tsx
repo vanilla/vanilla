@@ -18,6 +18,8 @@ interface IProps {
     validation?: (newValue: string) => boolean;
     errorMessage?: string;
     forceError?: boolean;
+    allowEmpty?: true;
+    placeholder?: string;
 }
 
 export function ThemeInputText(props: IProps) {
@@ -28,6 +30,7 @@ export function ThemeInputText(props: IProps) {
         },
         errorMessage,
         forceError,
+        allowEmpty,
     } = props;
     const classes = themeInputTextClasses();
 
@@ -48,7 +51,11 @@ export function ThemeInputText(props: IProps) {
     const _debounceInput = useCallback(
         debounce(
             (newValue: string) => {
-                setValue(newValue);
+                if (allowEmpty) {
+                    setValue(newValue, true);
+                } else {
+                    setValue(newValue);
+                }
             },
             debounceTime,
             { trailing: true, leading: true },
@@ -64,6 +71,7 @@ export function ThemeInputText(props: IProps) {
             <InputTextBlock
                 errors={showError ? errors : undefined}
                 inputProps={{
+                    placeholder: props.placeholder,
                     autoComplete: false,
                     defaultValue: defaultValue,
                     className: classes.input,

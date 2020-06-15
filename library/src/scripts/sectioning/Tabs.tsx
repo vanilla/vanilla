@@ -1,45 +1,53 @@
 import React, { ReactElement, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
-import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/TabStyles";
+import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { ErrorIcon, WarningIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { WarningIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 
 interface IData {
     label: string;
-    panelData: string;
     contents: React.ReactNode;
     error?: React.ReactNode;
     warning?: React.ReactNode;
     disabled?: boolean;
+    [extra: string]: any;
 }
 interface IProps {
     data: IData[];
     tabType?: TabsTypes;
+    largeTabs?: boolean;
+    extendContainer?: boolean;
+    onChange?: (newTab: IData) => void;
+    extraButtons?: React.ReactNode;
+    defaultTabIndex?: number;
+    includeBorder?: boolean;
+    includeVerticalPadding?: boolean;
 }
 
 export function Tabs(props: IProps) {
-    const { data, tabType } = props;
-    const [activeTab, setActiveTab] = useState(0);
+    const { data, tabType, defaultTabIndex, includeBorder = true, includeVerticalPadding = true } = props;
+    const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
     const classes = tabType && tabType === TabsTypes.BROWSE ? tabBrowseClasses() : tabStandardClasses();
 
     return (
         <ReachTabs
-            className={classes.root}
+            index={activeTab}
+            className={classes.root(props.extendContainer)}
             onChange={index => {
                 setActiveTab(index);
+                props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={classes.tabList}>
+            <TabList className={classes.tabList({ includeBorder })}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
                         <Tab
                             key={index}
-                            className={classNames(classes.tab, { [classes.isActive]: isActive })}
+                            className={classNames(classes.tab(props.largeTabs), { [classes.isActive]: isActive })}
                             disabled={tab.disabled}
                         >
                             <div>{tab.label}</div>
@@ -57,11 +65,12 @@ export function Tabs(props: IProps) {
                         </Tab>
                     );
                 })}
+                {props.extraButtons && <div className={classes.extraButtons}>{props.extraButtons}</div>}
             </TabList>
             <TabPanels className={classes.tabPanels}>
                 {data.map((tab, index) => {
                     return (
-                        <TabPanel className={classes.panel} key={index}>
+                        <TabPanel className={classes.panel({ includeVerticalPadding })} key={index}>
                             {data[index].contents}
                         </TabPanel>
                     );

@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
+use League\Uri\Http;
 use Vanilla\Utility\UrlUtils;
 use PHPUnit\Framework\TestCase;
 
@@ -79,5 +80,93 @@ class UrlUtilsTest extends TestCase {
         $this->expectExceptionMessage('Domain Invalid.');
 
         UrlUtils::domainAsAscii('//goo�gle.com/');
+    }
+
+    /**
+     * Provide data for testing the replaceQuery method.
+     *
+     * @return array|array[]
+     */
+    public function provideQueryReplacements(): array {
+        $result = [
+            "Replace elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => "world", "hello" => "bar"],
+                "foo=world&hello=bar&a=1",
+            ],
+            "Remove elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => null, "a" => null],
+                "hello=world",
+            ],
+            "Remove all elements" => [
+                "foo=bar&hello=world&a=1",
+                ["foo" => null, "hello" => null, "a" => null],
+                "",
+            ],
+            "Empty changeset" => [
+                "foo=bar&hello=world&a=1",
+                [],
+                "foo=bar&hello=world&a=1",
+            ],
+        ];
+        return $result;
+    }
+
+    /**
+     * Verify updating URI query elements.
+     *
+     * @param string $query
+     * @param array $replace
+     * @param string $expected
+     * @dataProvider provideQueryReplacements
+     */
+    public function testReplaceQuery(string $query, array $replace, string $expected): void {
+        $uri = Http::createFromString("https://example.com")->withQuery($query);
+
+        $result = UrlUtils::replaceQuery($uri, $replace);
+        $this->assertSame($expected, $result->getQuery());
+    }
+
+    /**
+     * Test path encoding/decoding.
+     */
+    public function testEncodeDecodePath(): void {
+        $encoded = 'profile/Fran%23k';
+        $decoded = 'profile/Fran#k';
+
+        $this->assertSame($encoded, UrlUtils::encodePath($decoded));
+        $this->assertSame($decoded, UrlUtils::decodePath($encoded));
+    }
+
+    /**
+     * Fix URLs with a mix of encoded and non-encoded UTF-8 in their paths.
+     *
+     * @param string $url
+     * @param string $expected
+     * @dataProvider provideFixUrlTests
+     */
+    public function testNormalizeEncoding(string $url, string $expected): void {
+        $fixed = (string)UrlUtils::normalizeEncoding(Http::createFromString($url));
+        $this->assertSame($expected, $fixed);
+    }
+
+    /**
+     * Provide URL fix tests.
+     *
+     * @return array
+     */
+    public function provideFixUrlTests(): array {
+        $r = [
+            ['https://de.wikipedia.org/wiki/Prüfsumme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfsumme'],
+            ['https://de.wikipedia.org/wiki/Prüfsümme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfs%C3%BCmme'],
+            ['https://de.wikipedia.org/wiki/Pr%C3%BCfsumme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfsumme'],
+            ['https://de.wikipedia.org/wiki/Pr%C3%BCfsümme', 'https://de.wikipedia.org/wiki/Pr%C3%BCfs%C3%BCmme'],
+            ['https://example.com', 'https://example.com'],
+            ['https://example.com/foo.html', 'https://example.com/foo.html'],
+            ['https://example.com/foo.html?q=a', 'https://example.com/foo.html?q=a'],
+            ['https://example.com/foo.html?q=ü', 'https://example.com/foo.html?q=%C3%BC'],
+        ];
+        return array_column($r, null, 0);
     }
 }

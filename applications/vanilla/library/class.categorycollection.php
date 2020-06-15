@@ -16,10 +16,18 @@ class CategoryCollection {
      * @var string The cache key prefix that stores categories by ID.
      */
     private static $CACHE_CATEGORY = '/cat/';
+
     /**
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
     private static $CACHE_CATEGORY_SLUG = '/catslug/';
+
+    /**
+     * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
+     */
+    private static $CACHE_CATEGORY_DESCENDANTS = '/catdescendants/';
+
+    /**
 
     /**
      * @var int The absolute select limit of the categories.
@@ -241,7 +249,8 @@ class CategoryCollection {
      */
     private function cacheKey($type, $id) {
         switch ($type) {
-            case self::$CACHE_CATEGORY;
+            case self::$CACHE_CATEGORY:
+            case self::$CACHE_CATEGORY_DESCENDANTS:
                 $r = $this->getCacheInc().$type.$id;
                 return $r;
             case self::$CACHE_CATEGORY_SLUG;
@@ -459,6 +468,53 @@ class CategoryCollection {
         }
 
         return $tree;
+    }
+
+    /**
+     * Get the id's of a category's descendants.
+     *
+     * @param int $parentID
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getDescendantIDs(int $parentID = -1, array $options = []): array {
+        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID)) ?? [];
+        $parentIDs = [$parentID];
+        $defaultOptions = [
+            'maxDepth' => 3,
+            'permission' => 'PermsDiscussionsView'
+        ];
+        $options = $options + $defaultOptions;
+
+        $ids = [];
+        if (!$cachedIDs) {
+            for ($i = 0; $i < $options['maxDepth']; $i++) {
+                $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
+                if (empty($childCategories)) {
+                    break;
+                }
+                if (count($childCategories) === 1) {
+                    $childCategories = reset($childCategories);
+                    $childCategoryID = [$childCategories['CategoryID']]?? [];
+                    $ids = array_merge($ids, $childCategoryID);
+                    $parentIDs = $childCategoryID;
+                } else {
+                    $childCategoriesIDs = array_column($childCategories, 'CategoryID');
+                    $ids = array_merge($ids, $childCategoriesIDs) ;
+                    $parentIDs = $childCategoriesIDs;
+                }
+            }
+        } else {
+            $ids = $cachedIDs;
+        }
+
+        $this->cacheStore(
+            $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID),
+            $ids
+        );
+
+        return $ids;
     }
 
     /**

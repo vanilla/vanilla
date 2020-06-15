@@ -21,6 +21,20 @@ export function hashString(str: string): number {
     return str.split("").reduce(hashReduce, 0);
 }
 
+/**
+ * Hash an object into a short key, that is stable no matter what order the parameters are.
+ */
+export function stableObjectHash<T extends object>(obj: T): number {
+    // Sort the object first.
+    const ordered: any = {};
+    Object.keys(obj)
+        .sort()
+        .forEach(function(key) {
+            ordered[key] = obj[key];
+        });
+    return hashString(JSON.stringify(ordered));
+}
+
 type CompareReturn = -1 | 0 | 1;
 
 /**

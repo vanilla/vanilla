@@ -8,11 +8,17 @@
  * @since 2.0
  */
 
+use Garden\Events\ResourceEvent;
+use Garden\Schema\Schema;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
-use \Vanilla\Formatting\Formats;
+use Vanilla\Formatting\Formats;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Dashboard\Events\NotificationEvent;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Activity data management.
@@ -66,6 +72,9 @@ class ActivityModel extends Gdn_Model {
     /** @var ActivityEmail[] Emails pending sending. */
     private static $emailQueue = [];
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /** @var Psr\Log\LoggerInterface */
     private $logger;
 
@@ -77,21 +86,38 @@ class ActivityModel extends Gdn_Model {
     /** @var FormatService */
     private $formatService;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
      * @param LoggerInterface $logger
+     * @param FormatService $formatService
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Gdn_Validation $validation = null, ?LoggerInterface $logger = null, ?FormatService $formatService = null) {
+    public function __construct(
+        Gdn_Validation $validation = null,
+        ?LoggerInterface $logger = null,
+        ?FormatService $formatService = null,
+        ?EventDispatcherInterface $eventDispatcher = null
+    ) {
         parent::__construct('Activity', $validation);
+
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {
             $this->setPruneAfter('2 months');
         }
-        $this->formatService = $formatService instanceof FormatService ? $formatService : Gdn::getContainer()->get(FormatService::class);
-        $this->logger = $logger instanceof LoggerInterface ? $logger : Gdn::getContainer()->get(LoggerInterface::class);
+
+        $this->formatService = $formatService instanceof FormatService ?
+            $formatService : Gdn::getContainer()->get(FormatService::class);
+        $this->logger = $logger instanceof LoggerInterface ?
+            $logger : Gdn::getContainer()->get(LoggerInterface::class);
+        $this->eventDispatcher = $eventDispatcher instanceof EventDispatcherInterface ?
+            $eventDispatcher : Gdn::getContainer()->get(EventDispatcherInterface::class);
+        $this->userModel = Gdn::getContainer()->get(UserModel::class);
     }
 
     /**
@@ -190,7 +216,7 @@ class ActivityModel extends Gdn_Model {
                 $row['Photo'] = $row['ActivityPhoto'];
                 $row['PhotoUrl'] = userUrl($row, 'Activity');
             } else {
-                $user = Gdn::userModel()->getID($row['ActivityUserID'], DATASET_TYPE_ARRAY);
+                $user = $this->userModel->getID($row['ActivityUserID'], DATASET_TYPE_ARRAY);
                 if ($user) {
                     $photo = $user['Photo'];
                     $row['PhotoUrl'] = userUrl($user);
@@ -365,7 +391,7 @@ class ActivityModel extends Gdn_Model {
             ->get();
 
         self::getUsers($result->resultArray());
-        Gdn::userModel()->joinUsers(
+        $this->userModel->joinUsers(
             $result->resultArray(),
             ['ActivityUserID', 'RegardingUserID'],
             ['Join' => ['Name', 'Email', 'Gender', 'Photo']]
@@ -447,7 +473,7 @@ class ActivityModel extends Gdn_Model {
             ->limit($limit, $offset)
             ->get();
 
-        Gdn::userModel()->joinUsers($result, ['ActivityUserID', 'RegardingUserID'], ['Join' => ['Name', 'Photo', 'Email', 'Gender']]);
+        $this->userModel->joinUsers($result, ['ActivityUserID', 'RegardingUserID'], ['Join' => ['Name', 'Photo', 'Email', 'Gender']]);
 
         $this->EventArguments['Data'] =& $result;
         $this->fireEvent('AfterGet');
@@ -651,7 +677,7 @@ class ActivityModel extends Gdn_Model {
         $result->datasetType(DATASET_TYPE_ARRAY);
 
         self::getUsers($result->resultArray());
-        Gdn::userModel()->joinUsers(
+        $this->userModel->joinUsers(
             $result->resultArray(),
             ['ActivityUserID', 'RegardingUserID'],
             ['Join' => ['Name', 'Photo', 'Email', 'Gender']]
@@ -738,7 +764,7 @@ class ActivityModel extends Gdn_Model {
     public function getComment($iD) {
         $activity = $this->SQL->getWhere('ActivityComment', ['ActivityCommentID' => $iD])->resultArray();
         if ($activity) {
-            Gdn::userModel()->joinUsers($activity, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
+            $this->userModel->joinUsers($activity, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
             return array_shift($activity);
         }
         return false;
@@ -759,7 +785,7 @@ class ActivityModel extends Gdn_Model {
             ->whereIn('c.ActivityID', $activityIDs)
             ->orderBy('c.ActivityID, c.DateInserted')
             ->get()->resultArray();
-        Gdn::userModel()->joinUsers($result, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
+        $this->userModel->joinUsers($result, ['InsertUserID'], ['Join' => ['Name', 'Photo', 'Email']]);
         return $result;
     }
 
@@ -919,7 +945,7 @@ class ActivityModel extends Gdn_Model {
             $Activity->Route = '/activity/item/'.$Activity->CommentActivityID;
         }
 
-        $User = Gdn::userModel()->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
+        $User = $this->userModel->getID($Activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
         if ($User) {
             if ($Force) {
@@ -1041,7 +1067,7 @@ class ActivityModel extends Gdn_Model {
 
         $activity = (array)$activity;
 
-        $user = Gdn::userModel()->getID($activity['NotifyUserID'], DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($activity['NotifyUserID'], DATASET_TYPE_ARRAY);
         if (!$user) {
             return false;
         }
@@ -1274,7 +1300,7 @@ class ActivityModel extends Gdn_Model {
 
                     try {
                         // Only send if the user is not banned
-                        $user = Gdn::userModel()->getID($userID);
+                        $user = $this->userModel->getID($userID);
                         if (!val('Banned', $user)) {
                             $email->send();
                             $emailed = self::SENT_OK;
@@ -1402,7 +1428,7 @@ class ActivityModel extends Gdn_Model {
             $activity->RegardingUserID = $commentActivity->RegardingUserID;
             $activity->Route = '/activity/item/'.$activity->CommentActivityID;
         }
-        $user = Gdn::userModel()->getID($activity->RegardingUserID, DATASET_TYPE_OBJECT);
+        $user = $this->userModel->getID($activity->RegardingUserID, DATASET_TYPE_OBJECT);
 
         if ($user) {
             if ($force) {
@@ -1700,6 +1726,23 @@ class ActivityModel extends Gdn_Model {
                 $activityID = $this->SQL->insert('Activity', $activity);
                 $activity['ActivityID'] = $activityID;
 
+                if ($activity["Notified"] === self::SENT_PENDING || $activity['Emailed'] == self::SENT_PENDING) {
+                    $eventActivity = $this->getWhere(
+                        ["ActivityID" => $activityID],
+                        "",
+                        "",
+                        1
+                    )->firstRow() ?? [];
+                    $event = $this->notificationEventFromRow(
+                        $eventActivity,
+                        NotificationEvent::ACTION_INSERT
+                    );
+
+                    if ($event instanceof ResourceEvent) {
+                        $this->eventDispatcher->dispatch($event);
+                    }
+                }
+
                 if ($activity['Emailed'] == self::SENT_PENDING) {
                     $this->queueEmail($emailFields + $activity, $options);
                 }
@@ -1730,8 +1773,8 @@ class ActivityModel extends Gdn_Model {
         }
 
         if ($notificationInc > 0) {
-            $countNotifications = Gdn::userModel()->getID($activity['NotifyUserID'])->CountNotifications + $notificationInc;
-            Gdn::userModel()->setField($activity['NotifyUserID'], 'CountNotifications', $countNotifications);
+            $countNotifications = $this->userModel->getID($activity['NotifyUserID'])->CountNotifications + $notificationInc;
+            $this->userModel->setField($activity['NotifyUserID'], 'CountNotifications', $countNotifications);
         }
 
         // If this is a wall post then we need to notify on that.
@@ -1768,9 +1811,9 @@ class ActivityModel extends Gdn_Model {
             ['NotifyUserID' => $userID, 'Notified' => self::SENT_PENDING]
         );
 
-        $user = Gdn::userModel()->getID($userID);
+        $user = $this->userModel->getID($userID);
         if (val('CountNotifications', $user) != 0) {
-            Gdn::userModel()->setField($userID, 'CountNotifications', 0);
+            $this->userModel->setField($userID, 'CountNotifications', 0);
         }
     }
 
@@ -1847,7 +1890,7 @@ class ActivityModel extends Gdn_Model {
      * @param $wallPost
      */
     protected function notifyWallComment($comment, $wallPost) {
-        $notifyUser = Gdn::userModel()->getID($wallPost['ActivityUserID']);
+        $notifyUser = $this->userModel->getID($wallPost['ActivityUserID']);
 
         $activity = [
             'ActivityType' => 'WallComment',
@@ -1871,7 +1914,7 @@ class ActivityModel extends Gdn_Model {
      * @param $wallPost
      */
     protected function notifyWallPost($wallPost) {
-        $notifyUser = Gdn::userModel()->getID($wallPost['ActivityUserID']);
+        $notifyUser = $this->userModel->getID($wallPost['ActivityUserID']);
 
         $activity = [
             'ActivityType' => 'WallPost',
@@ -1901,6 +1944,27 @@ class ActivityModel extends Gdn_Model {
             "DisableFloodControl" => true,
             "QueueEmail" => $batchEmails,
         ];
+
+        if (Gdn_Cache::activeEnabled()) {
+            // Prefetch users, so they're cached when retrieved in later operations.
+            $prefetchUserIDs = [];
+            foreach (self::$Queue as $activities) {
+                foreach ($activities as $row) {
+                    $activity = $row[0] ?? [];
+                    $notifyUserID = $activity["NotifyUserID"] ?? null;
+                    if ($notifyUserID > 0) {
+                        $prefetchUserIDs[$notifyUserID] = true;
+                    }
+                }
+            }
+            if (!empty($prefetchUserIDs)) {
+                // We don't care about the return values. We just want the records cached.
+                $prefetchUserIDs = array_keys($prefetchUserIDs);
+                $this->userModel->getDefaultSSOIDs($prefetchUserIDs);
+                $this->userModel->getIDs($prefetchUserIDs);
+            }
+        }
+
         foreach (self::$Queue as $activities) {
             foreach ($activities as $row) {
                 $result[] = $this->save($row[0], false, $options + $row[1]);
@@ -2009,7 +2073,7 @@ class ActivityModel extends Gdn_Model {
             return;
         }
 
-        $user = Gdn::userModel()->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
         if (!is_array($user) || !array_key_exists("Email", $user)) {
             return;
         }
@@ -2162,5 +2226,117 @@ class ActivityModel extends Gdn_Model {
             $email->clear();
             $batchOffset += $batchSize;
         }
+    }
+
+    /**
+     * Generate a notification event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @return NotificationEvent|null
+     */
+    private function notificationEventFromRow(array $row, string $action): ?NotificationEvent {
+        $notifyUserID = $row["NotifyUserID"] ?? 0;
+        if ($notifyUserID && $notifyUserID < 1) {
+            return null;
+        }
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        if (empty($notifyUserID)) {
+            return null;
+        }
+
+        $this->calculateRow($row);
+        $notification = $this->normalizeNotificationRow($row);
+
+        $notifyUser = $this->userModel->normalizeRow($notifyUser);
+        $notification["notifyUsers"] = [$notifyUser];
+        $notification = $this->notificationSchema()->validate($notification);
+
+        // Pre-fetch user authentication rows for caching.
+        $notifyUserIDs = array_column($notification["notifyUsers"], "userID");
+        $this->userModel->getDefaultSSOIDs($notifyUserIDs);
+
+        foreach ($notification["notifyUsers"] as &$currentUser) {
+            $currentUser = $this->addUserFragmentFields($currentUser);
+        }
+
+        $result = new NotificationEvent(
+            $action,
+            ["notification" => $notification]
+        );
+
+        return $result;
+    }
+
+    /**
+     * Given a user fragment, augment it with helpful fields related to user notifications (e.g. email, SSO IDs).
+     *
+     * @param array $userFragment
+     * @return array
+     */
+    private function addUserFragmentFields(array $userFragment): array {
+        $userID = $userFragment["userID"] ?? null;
+
+        if ($userID > 0) {
+            $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+            $ssoID = $this->userModel->getDefaultSSOIDs([$userID]);
+
+            $userFragment["email"] = $user["Email"] ?? null;
+            $userFragment["ssoID"] = $ssoID[$userID] ?? null;
+        } else {
+            $userFragment["email"] = null;
+            $userFragment["ssoID"] = null;
+        }
+
+        return $userFragment;
+    }
+
+    /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @return array
+     */
+    public function normalizeNotificationRow(array $row): array {
+        $row["notificationID"] = $row["ActivityID"];
+        $row["photoUrl"] = $row["Photo"];
+        $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
+        $row["activityName"] = $row["ActivityName"];
+
+        $body = formatString($row["Headline"], $row);
+        // Replace anchors with bold text until notifications can be spun off from activities.
+        $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
+
+        $scheme = new CamelCaseScheme();
+        $result = $scheme->convertArrayKeys($row);
+        return $result;
+    }
+
+    /**
+     * Get a schema instance comprised of standard activity fields.
+     *
+     * @return Schema
+     */
+    public function notificationSchema(): Schema {
+        $result = Schema::parse([
+            "notificationID" => ["type" => "integer"],
+            "notifyUsers?" => [
+                "items" => new UserFragmentSchema(),
+                "type" => "array",
+            ],
+            "body" => ["type" => "string"],
+            "photoUrl" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
+            "activityName?" => ["type" => "string"],
+            "url" => ["type" => "string"],
+            "dateInserted" => ["type" => "datetime"],
+            "dateUpdated" => ["type" => "datetime"],
+            "read" => ["type" => "boolean"],
+        ]);
+
+        return $result;
     }
 }

@@ -5,9 +5,9 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Theme;
+namespace VanillaTests\Library\Vanilla\Theme;
 
-use Vanilla\Theme\TwigAsset;
+use Vanilla\Theme\Asset\TwigThemeAsset;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -26,7 +26,7 @@ class TwigAssetTest extends MinimalContainerTestCase {
 <div>Hello world. The date is {{ currentTime|date("m/d/Y")}}</div>
 HTML;
 
-        $asset = new TwigAsset($template);
+        $asset = new TwigThemeAsset($template, '');
         $this->assertEquals(
             "<div>Hello world. The date is 07/27/2015</div>",
             $asset->renderHtml(['currentTime' => self::NOW])
@@ -38,8 +38,9 @@ HTML;
      */
     public function testData() {
         $template = '<div>Hello world</div>';
-        $asset = new TwigAsset($template);
+        $asset = new TwigThemeAsset($template, 'https://url.com');
+        $asset->setIncludeValueInJson(true);
         $encoded = json_decode(json_encode($asset), true);
-        $this->assertEquals(['type' => 'twig', 'template' => $template, 'data' => $template], $encoded);
+        $this->assertEquals(['type' => 'html', 'template' => $template, 'data' => $template, 'url' => 'https://url.com'], $encoded);
     }
 }

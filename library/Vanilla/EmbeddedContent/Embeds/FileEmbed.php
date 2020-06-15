@@ -35,6 +35,10 @@ class FileEmbed extends AbstractEmbed {
             $data = $attributes + $data;
         }
 
+        if (!isset($data['foreignUrl'])) {
+            $data['foreignUrl'] = null;
+        }
+
         // The `type` field may contain the mime-type data.
 
         return $data;

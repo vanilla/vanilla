@@ -7,7 +7,7 @@
 
 namespace Vanilla\Theme;
 
-use Vanilla\Contracts\AddonInterface;
+use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
 
 /**
@@ -15,7 +15,7 @@ use Vanilla\Contracts\ConfigurationInterface;
  */
 class ThemeFeatures implements \JsonSerializable {
 
-    /** @var AddonInterface */
+    /** @var Addon */
     private $theme;
 
     /** @var ConfigurationInterface */
@@ -29,15 +29,16 @@ class ThemeFeatures implements \JsonSerializable {
         'ProfileHeader' => false,
         'DataDrivenTheme' => false,
         'DisableKludgedVars' => false,
+        'NewEventsPage' => false,
     ];
 
     /**
      * Constuctor.
      *
      * @param ConfigurationInterface $config
-     * @param AddonInterface $theme
+     * @param Addon $theme
      */
-    public function __construct(ConfigurationInterface $config, AddonInterface $theme) {
+    public function __construct(ConfigurationInterface $config, Addon $theme) {
         $this->config = $config;
         $this->theme = $theme;
     }
@@ -76,6 +77,7 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['ProfileHeader'] = true;
             $themeValues['SharedMasterView'] = true;
             $themeValues['NewFlyouts'] = true;
+            $themeValues['NewEventsPage'] = true;
         }
 
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);

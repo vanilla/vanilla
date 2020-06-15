@@ -34,11 +34,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     protected $formattedFields = ['body'];
 
     /**
-     * @var TestLogger
-     */
-    protected $logger;
-
-    /**
      * Whether to start a session on setUp() or not.
      *
      * @param bool $enabled
@@ -60,8 +55,25 @@ abstract class AbstractAPIv2Test extends TestCase {
             $this->api->setTransientKey(md5(now()));
         }
 
-        $this->logger = new TestLogger();
-        \Logger::addLogger($this->logger);
+        $this->setUpTestTraits();
+        $this->setupSiteTestTrait();
+    }
+
+    /**
+     * Setup test traits.
+     *
+     * Any trait that defines a method `setUpNameOfTrait` will be called.
+     */
+    public function setUpTestTraits() {
+        $uses = array_flip(class_uses(static::class));
+        foreach ($uses as $traitName) {
+            $shortName = (new \ReflectionClass($traitName))->getShortName();
+            $methodName = 'setUp'.$shortName;
+
+            if (method_exists($this, $methodName)) {
+                call_user_func([$this, $methodName]);
+            }
+        }
     }
 
     /**
@@ -70,8 +82,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
-        \Logger::removeLogger($this->logger);
-        $this->logger = null;
     }
 
     /**
@@ -140,19 +150,14 @@ abstract class AbstractAPIv2Test extends TestCase {
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="first"/', $link) === 1);
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="next"/', $link, $matches) === 1);
 
-        $result = $this->api()->get(str_replace('/api/v2', '', $matches[1]));
+        // Ensure we are getting full url
+        $parsedMatch = parse_url($matches[1]);
+        $this->assertTrue($parsedMatch['scheme'] === 'http' || $parsedMatch['scheme'] === 'https');
+
+        $result = $this->api()->get($resourcePath . '?' . $parsedMatch['query']);
+
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
-    }
-
-    /**
-     * Assert that something was logged.
-     *
-     * @param array $filter The log filter.
-     */
-    public function assertLog($filter = []) {
-        $item = $this->logger->search($filter);
-        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
 
     /**

@@ -6,12 +6,14 @@
 
 use VanillaTests\NullContainer;
 
+require_once __DIR__.'/definitions.php';
+
 // Use consistent timezone for all tests.
 date_default_timezone_set("UTC");
 
 ini_set("default_charset", "UTF-8");
-
 error_reporting(E_ALL);
+
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
     'PHPUnit\\Framework\\TestCase' => 'PHPUnit_Framework_TestCase', // See https://github.com/php-fig/log/pull/52
@@ -21,11 +23,6 @@ foreach ($classCompatibility as $class => $legacyClass) {
         class_alias($class, $legacyClass);
     }
 }
-
-// Define some constants to help with testing.
-define('APPLICATION', 'Vanilla Tests');
-define('PATH_ROOT', realpath(__DIR__.'/..'));
-define("PATH_FIXTURES", PATH_ROOT . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "fixtures");
 
 // Copy the cgi-bin files.
 $dir = PATH_ROOT.'/cgi-bin';
@@ -45,17 +42,25 @@ foreach ($files as $file) {
 // ===========================================================================
 require PATH_ROOT.'/environment.php';
 
+// Allow any addon class to be auto-loaded.
+\VanillaTests\Bootstrap::registerAutoloader();
+
+
 // Allow a test before.
 $bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';
 if (file_exists($bootstrapTestFile)) {
     require_once $bootstrapTestFile;
 }
 
-// This effectively disable the auto instanciation of a new container when calling Gdn::getContainer();
+// This effectively disable the auto instantiation of a new container when calling Gdn::getContainer();
 Gdn::setContainer(new NullContainer());
 
 // Clear the test cache.
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
+
+// Ensure our uploads directory exists.
+mkdir(PATH_ROOT.'/tests/cache', 0777);
+mkdir(PATH_UPLOADS, 0777);
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
 

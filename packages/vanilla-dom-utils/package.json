@@ -3,6 +3,7 @@
     "main": "./src/index.ts",
     "module": "./src/index.ts",
     "version": "3.0.1",
+    "license": "gpl-2.0-only",
     "dependencies": {
         "@vanilla/utils": "^3.0.1",
         "focus-visible": "4.1.5",

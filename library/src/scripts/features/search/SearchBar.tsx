@@ -277,6 +277,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         className={classNames("searchBar-content", classes.content, this.props.contentClass, {
                             hasFocus: this.state.focus,
                         })}
+                        role="search"
                     >
                         <div
                             className={classNames(

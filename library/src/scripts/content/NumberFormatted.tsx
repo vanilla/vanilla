@@ -7,10 +7,12 @@
 import * as React from "react";
 import classNames from "classnames";
 import numeral from "numeral";
+import { numberFormattedClasses } from "@library/content/NumberFormatted.styles";
 
 interface IProps {
     value: number;
     className?: string;
+    title?: string;
 }
 
 /**
@@ -23,10 +25,11 @@ export default class NumberFormatted extends React.Component<IProps> {
         const value = numeral(this.props.value);
         const compactValue = this.stripTrailingZeros(value.format("0a.0"));
         const fullValue = value.format();
+        const classes = numberFormattedClasses();
 
         const Tag = fullValue === compactValue ? `span` : `abbr`;
         return (
-            <Tag title={fullValue} className={classNames("number", className)}>
+            <Tag title={this.props.title || fullValue} className={classNames("number", className, classes.root)}>
                 {compactValue}
             </Tag>
         );

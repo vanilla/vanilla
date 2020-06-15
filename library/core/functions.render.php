@@ -10,6 +10,7 @@
 
 use Vanilla\Formatting\Formats;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('alternate')) {
     /**
@@ -293,7 +294,7 @@ if (!function_exists('buttonDropDown')) {
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul role="menu" class="Dropdown MenuItems">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -368,7 +369,7 @@ if (!function_exists('buttonGroup')) {
                 echo $toggleButton;
             }
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul class="Dropdown MenuItems" role="menu">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -488,20 +489,6 @@ if (!function_exists('categoryUrl')) {
             $result .= '/p'.$page;
         }
         return url($result, $withDomain);
-    }
-}
-
-if (!function_exists('condense')) {
-    /**
-     *
-     *
-     * @param string $html
-     * @return mixed
-     */
-    function condense($html) {
-        $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
-        $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
-        return $html;
     }
 }
 
@@ -631,6 +618,12 @@ if (!function_exists('cssClass')) {
             if ($_CssClss = ($user['_CssClass'] ?? false)) {
                 $cssClass .= ' '.$_CssClss;
             }
+        }
+
+        if (array_key_exists('imageSource', $row)) {
+            $cssClass .= " hasPhotoWrap";
+        } else {
+            $cssClass .= " noPhotoWrap";
         }
 
         return trim($cssClass);
@@ -903,24 +896,6 @@ if (!function_exists('filtersDropDown')) {
     }
 }
 
-if (!function_exists('fixnl2br')) {
-    /**
-     * Removes the break above and below tags that have a natural margin.
-     *
-     * @param string $text The text to fix.
-     * @return string
-     * @since 2.1
-     *
-     * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
-     */
-    function fixnl2br($text) {
-        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
-        /** @var Formats\HtmlFormat $htmlFormat */
-        $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
-        return $htmlFormat->cleanupLineBreaks((string) $text);
-    }
-}
-
 if (!function_exists('formatIP')) {
     /**
      * Format an IP address for display.
@@ -1186,6 +1161,7 @@ if (!function_exists('linkDropDown')) {
         $selectedLink = val($selectedKey, $links);
         $extraClasses = trim($extraClasses);
         $linkName = val('name', $selectedLink);
+        $downChevronLabel = t("Down Arrow");
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">
@@ -1193,9 +1169,9 @@ if (!function_exists('linkDropDown')) {
           <span class="selectBox-main">
               <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
-                <span class="vanillaDropDown-arrow">▾</span>
+                <span class="vanillaDropDown-arrow" aria-label="{$downChevronLabel}">▾</span>
               </a>
-              <ul class="Flyout MenuItems selectBox-content" role="presentation">
+              <ul class="Flyout MenuItems selectBox-content" role="menu">
 EOT;
         foreach($links as $i => $link) {
                 if (val('separator', $link)) {
@@ -1204,8 +1180,8 @@ EOT;
                     $output .= '</li>';
                 } else {
                     if (val('active', $link)) {
-                        $output .= '<li class="selectBox-item isActive" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                        $output .= '<li class="selectBox-item isActive" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0">';
                         $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
                         $output .= '      <title>✓</title>';
                         $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
@@ -1216,8 +1192,8 @@ EOT;
                         $output .= '  </a>';
                         $output .= '</li>';
                     } else {
-                        $output .= '<li class="selectBox-item" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                        $output .= '<li class="selectBox-item" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
                         $output .=      val('name', $link);
                         $output .= '  </a>';
                         $output .= '</li>';
@@ -1544,7 +1520,9 @@ if (!function_exists('userPhoto')) {
 
         $href = (val('NoLink', $options)) ? '' : ' href="'.url(userUrl($fullUser)).'"';
 
-        return '<a title="'.$title.'"'.$href.$linkClass.'>'
+        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
+
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '">'
                 .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
             .'</a>';
     }
@@ -1561,7 +1539,7 @@ if (!function_exists('userPhotoUrl')) {
         $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
         $photo = val('Photo', $user);
         if ($fullUser && $fullUser['Banned']) {
-            $photo = 'https://images.v-cdn.net/banned_100.png';
+            $photo = c('Garden.BannedPhotoSmall', c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_100.png'));
         }
 
         if ($photo) {
@@ -1655,32 +1633,6 @@ if (!function_exists('wrapIf')) {
         } else {
             return wrap($string, $tag, $attributes);
         }
-    }
-}
-
-if (!function_exists('discussionLink')) {
-    /**
-     * Build URL for discussion.
-     *
-     * @deprecated discussionUrl()
-     * @param $discussion
-     * @param bool $extended
-     * @return string
-     */
-    function discussionLink($discussion, $extended = true) {
-        deprecated('discussionLink', 'discussionUrl');
-
-        $discussionID = val('DiscussionID', $discussion);
-        $discussionName = val('Name', $discussion);
-        $parts = [
-            'discussion',
-            $discussionID,
-            Gdn_Format::url($discussionName)
-        ];
-        if ($extended) {
-            $parts[] = ($discussion->CountCommentWatch > 0) ? '#Item_'.$discussion->CountCommentWatch : '';
-        }
-        return url(implode('/', $parts), true);
     }
 }
 

@@ -250,9 +250,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         height: calc(#{$GroupBanner-height} - 50px);
     }
 }
-
 .Button-Controls.Button-Controls {
-    order: 2;
+    @if ($staticVariables) {
+        order: 2;
+    }
     margin-right: 0;
     display: flex;
     justify-content: flex-end;

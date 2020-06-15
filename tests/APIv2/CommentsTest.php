@@ -13,12 +13,14 @@ use DiscussionModel;
  * Test the /api/v2/discussions endpoints.
  */
 class CommentsTest extends AbstractResourceTest {
+    use AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/comments';
+        $this->resourceName = 'comment';
         $this->record += ['discussionID' => 1];
 
         parent::__construct($name, $data, $dataName);

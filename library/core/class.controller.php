@@ -9,7 +9,7 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
@@ -220,6 +220,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /** @var string|null  */
     protected $_PageName = null;
+
+    /** @var bool */
+    protected $isReactView = false;
 
     /**
      * Gdn_Controller constructor.
@@ -738,6 +741,22 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->_DeliveryMethod;
+    }
+
+    /**
+     * Tell the controller to render as a full react view, instead of custom theme views.
+     *
+     * @param bool $isReactView
+     */
+    public function setIsReactView(bool $isReactView) {
+        $this->isReactView = $isReactView;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsReactView(): bool {
+        return $this->isReactView;
     }
 
     /**
@@ -1263,6 +1282,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 '{username} was denied access to {path}.',
                 [
                     'permission' => $permission,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                 ]
             );
 
@@ -1275,7 +1295,12 @@ class Gdn_Controller extends Gdn_Pluggable {
         } else {
             $required = array_intersect((array)$permission, ['Garden.Settings.Manage', 'Garden.Moderation.Manage']);
             if (!empty($required)) {
-                Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
+                Logger::logAccess(
+                    'security_access',
+                    Logger::INFO,
+                    "{username} accessed {path}.",
+                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
+                );
             }
         }
     }
@@ -2106,6 +2131,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->ApplicationFolder.'_'.$controllerName.'_'.
                     Gdn_Format::alphaNumeric(strtolower($this->RequestMethod))
                 );
+                $this->BodyIdentifier = $bodyIdentifier;
                 include $masterViewPath;
             } else {
                 $viewHandler->render($masterViewPath, $this);

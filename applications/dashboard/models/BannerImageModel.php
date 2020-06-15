@@ -7,7 +7,10 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use Gdn;
 use Vanilla\AliasLoader;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Models\SiteMeta;
 
 /**
@@ -22,13 +25,17 @@ class BannerImageModel {
     /** @var SiteMeta */
     private $siteMeta;
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * BannerImageModel constructor.
      *
      * @param SiteMeta $siteMeta
      */
-    public function __construct(SiteMeta $siteMeta) {
+    public function __construct(SiteMeta $siteMeta, FormatService $formatService) {
         $this->siteMeta = $siteMeta;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -41,16 +48,21 @@ class BannerImageModel {
     public function renderBanner(array $props = []): \Twig\Markup {
         $controller = \Gdn::controller();
         $defaultProps = [
-            'title' => $controller->data(
-                'Category.Name',
-                $this->siteMeta->getSiteTitle()
-            ),
             'description' => $controller->data(
                 'Category.Description',
                 $controller->description()
             ),
             'backgroundImage' => self::getCurrentBannerImageLink(),
         ];
+        $title = $controller->data('Category.Name');
+
+        if ($title) {
+              $defaultProps['title'] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
+        }
+
+        //filter description before passing on to the component
+        $defaultProps['description'] = $this->formatService->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
+
         $props = array_merge($defaultProps, $props);
         $html = "";
         $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
@@ -59,6 +71,14 @@ class BannerImageModel {
         } else {
             $html = "<div data-react='community-content-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
         }
+
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $afterBanner = $eventManager->fire('AfterBanner', $this);
+        if (!empty($afterBanner)) {
+            $html .= implode("", $afterBanner);
+        }
+
         return new \Twig\Markup($html, 'utf-8');
     }
 
@@ -78,12 +98,16 @@ class BannerImageModel {
             return c(self::DEFAULT_CONFIG_KEY);
         }
 
-        $category = \CategoryModel::instance()->getID($categoryID, DATASET_TYPE_ARRAY);
+        $category = \CategoryModel::categories($categoryID);
         $slug = $category['BannerImage'];
 
         if (!$slug) {
             $parentID = $category['ParentCategoryID'];
-            $slug = self::getBannerImageSlug($parentID);
+            if ($parentID == $categoryID) {
+                $slug = c(self::DEFAULT_CONFIG_KEY);
+            } else {
+                $slug = self::getBannerImageSlug($parentID);
+            }
         }
         return $slug;
     }

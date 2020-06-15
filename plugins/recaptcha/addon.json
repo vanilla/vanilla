@@ -2,6 +2,7 @@
     "name": "reCAPTCHA Support",
     "description": "Add recaptcha validation to signups.",
     "version": "0.1",
+    "settingsUrl": "/settings/registration",
     "mobileFriendly": true,
     "icon": "recaptcha_support.png",
     "key": "recaptcha",

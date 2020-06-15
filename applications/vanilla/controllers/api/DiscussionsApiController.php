@@ -88,7 +88,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser', 'reactions'])
         ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -112,6 +112,8 @@ class DiscussionsApiController extends AbstractApiController {
         $this->expandLastCommentBody($rows, $query['expand']);
 
         $result = $out->validate($rows);
+
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $rows);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in);
 
@@ -258,7 +260,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row, true);
         return $result;
     }
 
@@ -416,6 +418,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
+            'discussionID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'd.discussionID']),
             'categoryID:i?' => [
                 'description' => 'Filter by a category.',
                 'x-filter' => [
@@ -453,10 +456,9 @@ class DiscussionsApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
             ],
-            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
+            'pinned:b?',
             'pinOrder:s?' => [
                 'default' => 'first',
-                'description' => 'If including pinned posts, in what order should they be integrated? When "first", discussions pinned to a specific category will only be affected if the discussion\'s category is passed as the categoryID parameter. Cannot be used with the pinned parameter.',
                 'enum' => ['first', 'mixed'],
             ],
             'page:i?' => [
@@ -533,7 +535,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_indexOutput', $result, $this, $in, $query, $rows);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $rows);
 
         $whereCount = count($where);
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
@@ -575,9 +577,11 @@ class DiscussionsApiController extends AbstractApiController {
             $categoryID = $discussionData['CategoryID'];
         }
 
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $permissionCategoryID = self::getPermissionID($categoryID);
+
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $permissionCategoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $permissionCategoryID);
 
         $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
@@ -585,6 +589,21 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $this->discussionByID($id);
         $result = $this->normalizeOutput($result);
         return $out->validate($result);
+    }
+
+    /**
+     * Get the category permission ID.
+     *
+     * @param int $categoryID The category ID.
+     * @return int Returns the associated permission ID.
+     */
+    public static function getPermissionID(int $categoryID): int {
+        $category = CategoryModel::categories($categoryID);
+        if ($category) {
+            return $category['PermissionCategoryID'];
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -602,10 +621,11 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
+        $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
-        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
-        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
-        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryPermissionID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryPermissionID);
 
         $discussionData = ApiUtils::convertInputKeys($body);
         $id = $this->discussionModel->save($discussionData);

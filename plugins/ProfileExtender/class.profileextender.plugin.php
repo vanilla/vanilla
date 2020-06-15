@@ -519,6 +519,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
     /**
      * Endpoint to export basic user data along with all custom fields into CSV.
+     *
+     * @param UtilityController $sender
      */
     public function utilityController_exportProfiles_create($sender) {
         // Clear our ability to do this.
@@ -529,7 +531,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName', 'Location', 'Roles'];
+        $columnNames = [
+            'Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Visits', 'Points',
+            'InviteUserID', 'InvitedByName', 'Location', 'Roles'
+        ];
 
         // Set up our basic query.
         Gdn::sql()
@@ -541,6 +546,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 'inet6_ntoa(u.LastIPAddress)',
                 'u.CountDiscussions',
                 'u.CountComments',
+                'u.CountVisits',
                 'u.Points',
                 'u.InviteUserID',
                 'u2.Name as InvitedByName',
@@ -574,8 +580,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $columnNames[] = val('Label', $fieldData, $slug);
 
             // Add this field to the query.
+            $quoted = Gdn::sql()->quote("Profile.$slug");
             Gdn::sql()
-                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = 'Profile.$slug'", 'left')
+                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
                 ->select('a'.$i.'.Value', '', $slug);
             $i++;
         }

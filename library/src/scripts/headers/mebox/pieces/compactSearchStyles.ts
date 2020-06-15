@@ -29,7 +29,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
     const isTransparentButton = searchButtonOptions.preset === ButtonPreset.TRANSPARENT;
     const isSolidButton = searchButtonOptions.preset === ButtonPreset.SOLID || isUnifiedBorder; // force solid button when using unified border
 
-    let baseColor = modifyColorBasedOnLightness(titleBarVars.colors.bg, 0.2);
+    let baseColor = modifyColorBasedOnLightness({ color: titleBarVars.colors.bg, weight: 0.2 });
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
         baseColor = baseColor.fade(0.3);

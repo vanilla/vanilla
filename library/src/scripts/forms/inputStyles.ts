@@ -12,6 +12,7 @@ import {
     EMPTY_BORDER,
     EMPTY_FONTS,
     fonts,
+    getHorizontalPaddingForTextInput,
     IBordersWithRadius,
     placeholderStyles,
     textInputSizingFromFixedHeight,
@@ -19,7 +20,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
@@ -60,9 +61,9 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+export const inputMixinVars = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
     const inputVars = inputVariables();
-    const variables = {
+    return {
         sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
         font: merge(inputVars.font, vars?.font ?? {}),
         colors: merge(inputVars.colors, vars?.colors ?? {}),
@@ -72,7 +73,10 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
             ...(vars?.border ?? {}),
         },
     };
+};
 
+export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+    const variables = inputMixinVars(vars);
     const { sizing, font, colors, border } = variables;
 
     return {
@@ -81,14 +85,25 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         color: colorOut(colors.fg),
         ...borders(border),
         ...fonts(font),
-        lineHeight: unit(font.size),
         outline: 0,
         $nest: {
             ...placeholderStyles({
                 color: colorOut(colors.placeholder),
             }),
-            "&. .SelectOne__input": {
+            "& .SelectOne__input": {
                 width: percent(100),
+            },
+            "& .SelectOne__placeholder": {
+                color: colorOut(formElementsVariables().placeholder.color),
+            },
+            "& .tokens__placeholder": {
+                color: colorOut(formElementsVariables().placeholder.color),
+            },
+            "& .SelectOne__input input": {
+                display: "inline-block",
+                width: important(`100%`),
+                overflow: "hidden",
+                lineHeight: undefined,
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({

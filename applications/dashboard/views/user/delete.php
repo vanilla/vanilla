@@ -18,5 +18,4 @@ if ($this->data("CanDelete")) {
     <div class="label-wrap-wide"><?php echo t('UserDeleteMessage', "Delete the user and completely remove all of the user's content. This may cause discussions to be disjointed. Best option for removing spam."); ?></div>
     <div class="input-wrap-right"><?php echo anchor(t('UserDelete', 'Delete User Content'), 'user/delete/'.$this->User->UserID.'/delete', 'btn btn-secondary js-modal', ['data-css-class' => 'modal-sm']); ?></div>
 </div>
-
 <?php } ?>

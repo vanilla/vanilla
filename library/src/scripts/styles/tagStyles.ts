@@ -20,47 +20,17 @@ export const tagVariables = useThemeCache(() => {
         ...(EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS as ILinkColorOverwritesWithOptions),
     } as ILinkColorOverwritesWithOptions);
 
-    const allStyles = {
-        textDecoration: important("none"),
-    };
+    const linkColors = clickableItemStates(colorOverwrite, { disableTextDecoration: true });
 
-    const linkColors = clickableItemStates(colorOverwrite);
-    const allStateColor =
-        linkColors.$nest && linkColors.$nest["&&:hover"] && linkColors.$nest["&&:hover"].color
-            ? linkColors.$nest["&&:hover"].color
-            : undefined;
-    const allStates = {
-        color: allStateColor,
-        ...borders({ color: allStateColor } as IBorderStyles, {}),
-    };
-
-    const $nest = merge(linkColors.$nest, {
-        "&&:hover": {
-            ...allStyles,
-            ...allStates,
-        },
-        "&&:focus": {
-            ...allStyles,
-            ...allStates,
-        },
-        "&&.focus-visible": {
-            ...allStyles,
-            ...allStates,
-        },
-        "&&:active": {
-            ...allStyles,
-            ...allStates,
-        },
-        "&:visited": undefined,
-    }) as NestedCSSProperties;
+    const $nest = makeThemeVars("states", linkColors.$nest || {});
 
     const colors = makeThemeVars("color", {
-        fg: linkColors.color,
+        fg: globalVars.elementaryColors.lowContrast,
     });
 
     const font = makeThemeVars("font", {
         ...EMPTY_FONTS,
-        fg: colors.fg,
+        color: colors.fg,
         lineHeight: globalVars.lineHeights.meta,
         size: globalVars.fonts.size.small,
     } as IFont);

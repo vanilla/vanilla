@@ -34,7 +34,7 @@ class Request implements RequestInterface {
         $query = [];
 
         if (strpos($path, '?')) {
-            list($path, $queryString) = explode('?', $path, 2);
+            [$path, $queryString] = explode('?', $path, 2);
             parse_str($queryString, $query);
         }
 
@@ -111,6 +111,14 @@ class Request implements RequestInterface {
     public function getBody() {
         return $this->body;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRawBody(): string {
+        return is_string($this->body) ? $this->body : json_encode($this->body, JSON_UNESCAPED_UNICODE);
+    }
+
 
     /**
      * Set the body of the message.

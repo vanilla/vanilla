@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Schema\RangeExpression;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -81,6 +82,11 @@ class MySQLDriverTest extends TestCase {
         $this->assertStringContainsString('`1=sleep(1) and 1`', $sql);
     }
 
+    /**
+     * Provide table aliases and tables.
+     *
+     * @return array
+     */
     public function provideAliasData() {
         return [
             ["Test t", "`GDN_Test` `t`"],
@@ -95,6 +101,9 @@ class MySQLDriverTest extends TestCase {
     /**
      * Test the alias mapping in the SQL driver.
      *
+     * @param string $input
+     * @param string $expected
+     * @param bool $escape
      * @dataProvider provideAliasData
      */
     public function testMapAliases($input, $expected, $escape = true) {
@@ -205,5 +214,60 @@ EOT;
 
         $r = $this->sql->delete('testDelete', ['name' => $id]);
         $this->assertEquals(2, $r);
+    }
+
+    /**
+     * Test a basic where in clause.
+     */
+    public function testWhereInField() {
+        $actual = $this->sql->select()->from('foo')->where('bar', [1, 2, 'three'])->getSelect();
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+where `bar` in ('1', '2', 'three')
+EOT;
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Adding "-" before an order field orders it in descending order.
+     */
+    public function testNegativeOrderBy() {
+        $actual = $this->sql->select()->from('foo')->orderBy('-foo, bar', 'asc')->getSelect();
+        $expected = <<<EOT
+select *
+from `GDN_foo` `foo`
+order by `foo` desc, `bar` asc
+EOT;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * The `Gdn_SQLDriver::where()` method can take `RangeExpression` objects.
+     *
+     * @param RangeExpression $range
+     * @param string $expectedWhere
+     * @dataProvider provideRangeExpressionTests
+     */
+    public function testRangeExpressionWhere(RangeExpression $range, string $expectedWhere) {
+        $actual = $this->sql->select()->from('foo')->where('b', $range)->getSelect();
+        $actual = preg_replace('`\s+`', ' ', $actual);
+        $this->assertStringContainsString($expectedWhere, $actual);
+    }
+
+    /**
+     * Provide some sample range expressions and expected where clauses.
+     *
+     * @return array
+     */
+    public function provideRangeExpressionTests(): array {
+        $r = [
+            'basic' => [new RangeExpression('>', 1), 'where `b` > :b'],
+            'two values' => [new RangeExpression('>=', 1, '<=', 2), 'where `b` >= :b and `b` <= :b0'],
+            'in clause' => [new RangeExpression('=', [1, 2]), "where `b` in ('1', '2')"],
+            'empty equals' => [new RangeExpression('=', []), "where 1 = 0"]
+        ];
+        return $r;
     }
 }

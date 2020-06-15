@@ -309,6 +309,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             cWindow: iframeWindow,
         })
         .atwho({
+            alias: "emoji",
             at: ":",
             tpl: emojiTemplate,
             insert_tpl: "${atwho-data-value}",

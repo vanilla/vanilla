@@ -83,6 +83,9 @@ trait PrunableTrait {
      */
     public function prune($limit = null) {
         $date = $this->getPruneDate();
+        if ($date === null) {
+            return;
+        }
 
         $options = [];
         if ($limit === null) {

@@ -5,6 +5,10 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ForbiddenException;
+use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -30,15 +34,21 @@ class CategoriesApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * CategoriesApiController constructor.
      *
      * @param CategoryModel $categoryModel
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->categoryModel = $categoryModel;
+        $this->breadcrumbModel = $breadcrumbModel;
     }
 
     /**
@@ -135,6 +145,8 @@ class CategoriesApiController extends AbstractApiController {
                 'enum' => ['categories', 'discussions', 'flat', 'heading'],
                 'default' => 'discussions'
             ],
+            'iconUrl:s|n?',
+            'bannerUrl:s|n?',
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
@@ -152,8 +164,10 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if unable to find the category.
      * @return array
      */
-    public function get($id) {
-        $this->permission('Garden.Settings.Manage');
+    public function get(int $id) {
+        if (!$this->categoryModel::checkPermission($id, 'Vanilla.Discussions.View')) {
+            throw new ForbiddenException('Category');
+        }
 
         $in = $this->idParamSchema()->setDescription('Get a category.');
         $out = $this->schema($this->schemaWithParent(), 'out');
@@ -216,7 +230,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
             $this->isExpandField('parent', $query['expand']),
@@ -266,33 +280,30 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'parentCategoryID:i?' => 'Parent category ID.',
-            'parentCategoryCode:s?' => 'Parent category URL code.',
-            'followed:b' => [
-                'default' => false,
-                'description' => 'Only list categories followed by the current user.',
-            ],
+            'categoryID?' => \Vanilla\Schema\RangeExpression::createSchema([':int']),
+            'parentCategoryID:i?',
+            'parentCategoryCode:s?',
+            'followed:b?',
             'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2,
             ],
             'archived:b|n' => [
-                'description' => 'Filter by archived status of a category. True for archived only. False for no archived categories. Not compatible with followed filter.',
                 'default' => false
             ],
             'page:i?' => [
-                'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages(),
             ],
             'limit:i?' => [
-                'description' => 'Desired number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-        ], 'in')->setDescription('List categories.');
+        ], 'in')
+            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'parentCategoryID', 'parentCategoryCode', 'followed']))
+            ->setDescription('List categories.');
         $out = $this->schema([':a' => $this->schemaWithChildren()], 'out');
 
         $query = $in->validate($query);
@@ -308,22 +319,26 @@ class CategoriesApiController extends AbstractApiController {
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if ($query['followed']) {
-            $categories = $this->categoryModel
-                ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
-                ->resultArray();
+        if (!empty($query['categoryID'])) {
+            /** @var \Vanilla\Schema\RangeExpression $range */
+            $range = $query['categoryID'];
 
-            // Index by ID for category calculation functions.
-            $categories = array_column($categories, null, 'CategoryID');
-            $categories = $this->categoryModel->flattenCategories($categories);
-            // Reset indexes for proper output detection as an indexed array.
-            $categories = array_values($categories);
+            $categoryIDs = $this->categoryModel->getVisibleCategoryIDs();
+            if ($categoryIDs === true) {
+                $range = $range->withFilteredValue('>', 0);
+            } else {
+                $range = $range->withFilteredValue('=', $categoryIDs);
+            }
 
-            $totalCountCallBack = function() {
-                return $this->categoryModel->getCount(['Followed' => true]);
-            };
+            $where = [
+                'categoryID' => $range,
+            ];
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+        } elseif ($query['followed'] ?? false) {
+            $where = ['Followed' => true];
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
@@ -331,7 +346,7 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
 
-            $totalCountCallBack = function() use ($parent) {
+            $totalCountCallBack = function () use ($parent) {
                 return $parent['CountCategories'];
             };
         } else {
@@ -517,6 +532,11 @@ class CategoriesApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
+        if ($dbRecord['CategoryID'] === -1) {
+            $dbRecord['Url'] = url('/categories');
+            $dbRecord['DisplayAs'] = 'Discussions';
+        }
+
         if ($dbRecord['ParentCategoryID'] <= 0) {
             $dbRecord['ParentCategoryID'] = null;
         }
@@ -529,8 +549,10 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $dbRecord['isArchived'] = $dbRecord['Archived'];
-
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($dbRecord['CategoryID']));
+        $schemaRecord['iconUrl'] = $dbRecord['Photo'] ? Gdn_UploadImage::url($dbRecord['Photo']) : null;
+        $schemaRecord['bannerUrl'] = BannerImageModel::getBannerImageSlug($dbRecord['CategoryID']) ?: null;
         return $schemaRecord;
     }
 
@@ -617,5 +639,30 @@ class CategoriesApiController extends AbstractApiController {
         $schema = $this->fullSchema();
         $result = $schema->merge(Schema::parse($attributes));
         return $this->schema($result, $type);
+    }
+
+    /**
+     * Extracted from `index()`.
+     *
+     * @param array $where
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array
+     */
+    private function getCategoriesWhere(array $where, $limit, $offset): array {
+        $categories = $this->categoryModel
+            ->getWhere($where, '', 'asc', $limit, $offset)
+            ->resultArray();
+
+        // Index by ID for category calculation functions.
+        $categories = array_column($categories, null, 'CategoryID');
+        $categories = $this->categoryModel->flattenCategories($categories);
+        // Reset indexes for proper output detection as an indexed array.
+        $categories = array_values($categories);
+
+        $totalCountCallBack = function () use ($where) {
+            return $this->categoryModel->getCount($where);
+        };
+        return [$categories, $totalCountCallBack];
     }
 }

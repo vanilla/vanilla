@@ -23,6 +23,7 @@ export function DefaultBannerBg(props: IProps) {
             xmlnsXlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 1600 250"
             preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
         >
             <defs>
                 <linearGradient

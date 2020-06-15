@@ -51,7 +51,7 @@ export const isLightColor = (color: ColorHelper) => {
  * @param weight - The weight for the color mix
  * @param bgColor - Check background color to determine if we're in a dark theme
  */
-export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) => {
+export const getRatioBasedOnDarkness = (weight: number, color: ColorHelper) => {
     if (weight > 1) {
         logError("The weight cannot be greater than 1.");
         weight = 1;
@@ -60,7 +60,7 @@ export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) =>
         weight = 0;
     }
 
-    if (isLightColor(bgColor)) {
+    if (isLightColor(color)) {
         return weight;
     } else {
         return 1 - weight;
@@ -76,13 +76,15 @@ export const getRatioBasedOnDarkness = (weight: number, bgColor: ColorHelper) =>
  * @param debug - Turn on debug logs
  * Note, however, that we do not check if you've reached a maximum. Example: If you want to darken pure black, you get back pure black.
  */
-export const modifyColorBasedOnLightness = (
-    color: ColorHelper,
-    weight: number,
-    inverse: boolean = false,
-    flipWeightForDark = false,
-    debug = false,
-) => {
+export const modifyColorBasedOnLightness = (props: {
+    color: ColorHelper;
+    weight: number;
+    inverse?: boolean;
+    flipWeightForDark?: boolean;
+    debug?: boolean;
+}) => {
+    const { color, inverse = false, flipWeightForDark = false, debug = false } = props;
+    let weight = props.weight;
     logDebugConditionnal(debug, "=== start modifyColorBasedOnLightness debug ===");
     logDebugConditionnal(debug, "initial color: ", color);
     logDebugConditionnal(debug, "initial weight: ", weight);

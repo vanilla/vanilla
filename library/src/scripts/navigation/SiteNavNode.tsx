@@ -48,7 +48,7 @@ export default class SiteNavNode extends React.Component<IProps> {
         const { activeRecord } = this.props;
 
         let linkContents;
-        const linkContentClasses = classNames("siteNavNode-link", classes.link, {
+        const linkContentClasses = classNames(classes.link, {
             hasChildren: collapsible,
             isFirstLevel: this.props.depth === 0,
         });
@@ -101,6 +101,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                         collapsible={collapsible}
                         onItemHover={this.props.onItemHover}
                         clickableCategoryLabels={!!this.props.clickableCategoryLabels}
+                        aria-current={this.isActiveRecord() ? "page" : undefined}
                     />
                 );
             });

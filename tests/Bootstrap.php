@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
 use Gdn;
+use Nette\Loaders\RobotLoader;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -18,18 +19,20 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
-use Vanilla\Contracts\AddonProviderInterface;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
@@ -58,9 +61,7 @@ class Bootstrap {
         if (!defined('CLIENT_NAME')) {
             define('CLIENT_NAME', 'vanilla');
         }
-
     }
-
 
     /**
      * Run the bootstrap and set the global environment.
@@ -73,6 +74,7 @@ class Bootstrap {
             $this->initializeAddons($container);
         }
         $this->setGlobals($container);
+        \Logger::setLogger(null);
     }
 
     /**
@@ -161,7 +163,6 @@ class Bootstrap {
                 ],
                 PATH_ROOT.'/tests/cache/bootstrap'
             ])
-            ->addAlias(AddonProviderInterface::class)
             ->addAlias('AddonManager')
             ->addCall('registerAutoloader')
 
@@ -187,6 +188,10 @@ class Bootstrap {
             ->rule(\Vanilla\Logger::class)
             ->setShared(true)
             ->addAlias(LoggerInterface::class)
+            ->addCall('addLogger', [new Reference(TestLogger::class)])
+
+            ->rule(TestLogger::class)
+            ->setShared(true)
 
             ->rule(LoggerAwareInterface::class)
             ->addCall('setLogger')
@@ -196,6 +201,14 @@ class Bootstrap {
             ->addAlias(EventListenerConfigInterface::class)
             ->addAlias(EventDispatcherInterface::class)
             ->addAlias(ListenerProviderInterface::class)
+            ->addCall("addListenerMethod", [\Vanilla\Logging\ResourceEventLogger::class, "logResourceEvent"])
+            ->setShared(true)
+
+            ->rule(\Vanilla\Logging\ResourceEventLogger::class)
+            ->addCall("includeAction", [
+                \Vanilla\Dashboard\Events\UserEvent::class,
+                '*',
+            ])
             ->setShared(true)
 
             ->rule(InjectableInterface::class)
@@ -271,8 +284,8 @@ class Bootstrap {
             ->setShared(true)
 
             // File base theme api provider
-            ->rule(\Vanilla\Models\ThemeModel::class)
-            ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+            ->rule(\Vanilla\Theme\ThemeService::class)
+            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
 
             ->rule(SSOModel::class)
             ->setShared(true)
@@ -322,6 +335,9 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\OpenGraphParser::class)])
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
+
+            ->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(ForumBreadcrumbProvider::class)])
 
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')
@@ -408,7 +424,7 @@ class Bootstrap {
                 /* @var Addon $addon */
                 if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
                     $bootstrapPath = $addon->path($bootstrapPath);
-                    include_once $bootstrapPath;
+                    include $bootstrapPath;
                 }
             }
 
@@ -544,4 +560,33 @@ class Bootstrap {
 
         return PATH_ROOT."/conf/{$host}{$path}.php";
     }
+
+    /**
+     * Register an autoloader that loads all classes.
+     */
+    public static function registerAutoloader(): void {
+        $loader = new RobotLoader();
+        $loader->addDirectory(PATH_APPLICATIONS, PATH_PLUGINS);
+
+        $excluded = [
+            'Mustache',
+            'mustache',
+            'sitehub',
+            'lithecompiler',
+            'lithestyleguide',
+            'NBBC',
+            'Warnings',
+            'NBBC',
+            'CustomCSS',
+            'Online'
+        ];
+        foreach ($excluded as $subdir) {
+            $loader->excludeDirectory(PATH_PLUGINS.'/'.$subdir);
+        }
+
+        // And set caching to the 'temp' directory
+        $loader->setTempDirectory(PATH_ROOT.'/tests/cache/autoloader');
+        $loader->register();
+    }
 }
+

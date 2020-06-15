@@ -197,6 +197,32 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
+    public function attachmentProvider(): array {
+        return $this->makeDataProvider('getAttachments', 'attachments');
+    }
+
+    /**
+     * Test heading parsing of the format against fixtures.
+     *
+     * @param string $input
+     * @param array $expectedOutput
+     *
+     * @dataProvider attachmentProvider
+     */
+    public function testParseAttachments(string $input, array $expectedOutput) {
+        $format = $this->prepareFormatter();
+        $headings = $format->parseAttachments($input);
+        $this->assertEquals(
+            json_encode($expectedOutput, JSON_PRETTY_PRINT),
+            json_encode($headings, JSON_PRETTY_PRINT)
+        );
+    }
+
+    /**
+     * PHPUnit data provider.
+     *
+     * @return array
+     */
     public function mentionsProvider(): array {
         return $this->makeDataProvider('getMentions', 'Mentions');
     }

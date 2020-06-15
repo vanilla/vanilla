@@ -15,7 +15,7 @@ use Garden\Web\Exception\ForbiddenException;
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-    use TestPutFieldTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -25,6 +25,7 @@ class DiscussionsTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/discussions';
+        $this->resourceName = 'discussion';
 
         $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
 

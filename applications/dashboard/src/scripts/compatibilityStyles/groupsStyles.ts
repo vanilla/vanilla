@@ -8,19 +8,20 @@
 import {
     absolutePosition,
     colorOut,
-    importantColorOut,
+    margins,
+    negativeUnit,
     paddings,
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, percent } from "csx";
+import { calc, important, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
 
 export const groupVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("groups");
 
     const banner = makeThemeVars("banner", {
@@ -99,11 +100,17 @@ export const groupsCSS = () => {
         top: unit(vars.banner.height - vars.logo.height / 2),
         background: "transparent",
         zIndex: 1,
-        $nest: {
-            "&:hover .ChangePicture": {
-                opacity: 1,
-            },
-        },
+    });
+
+    cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
+        position: "relative",
+        top: "auto",
+        float: "none",
+        marginBottom: 0,
+    });
+
+    cssOut(`.Group-Header.NoBanner`, {
+        alignItems: "center",
     });
 
     cssOut(`.Groups .DataTable .Item td, .DataTable .Item td`, {
@@ -111,7 +118,6 @@ export const groupsCSS = () => {
         ...paddings({
             ...layoutVars.cell.paddings,
         }),
-        backgroundColor: "transparent",
     });
 
     cssOut(`.Groups .DataTable .Item:first-child td, .DataTable .Item:first-child td`, {
@@ -120,15 +126,7 @@ export const groupsCSS = () => {
 
     cssOut(`.GroupOptions`, {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
-    });
-
-    cssOut(`.PhotoWrap:hover a.ChangePicture`, {
-        opacity: 0,
-        backgroundColor: importantColorOut(globalVars.mainColors.bg.fade(0.5)),
-        color: colorOut(globalVars.mainColors.fg),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        marginLeft: "auto",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
@@ -162,22 +160,9 @@ export const groupsCSS = () => {
         },
     );
 
-    cssOut(
-        `.Group-Box .PageControls .H`,
-        {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            margin: "auto",
-        },
-        mediaQueries.xs({
-            position: "relative",
-            top: "auto",
-            left: "auto",
-            right: "auto",
-        }),
-    );
+    cssOut(`.Group-Box .PageControls .H`, {
+        margin: 0,
+    });
 
     cssOut(`.Group-Box.Group-MembersPreview .H`, {
         position: "relative",
@@ -196,4 +181,144 @@ export const groupsCSS = () => {
     cssOut(`.Event-Title`, {
         marginTop: unit(75),
     });
+
+    cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
+    cssOut(`body.Groups .Group-Content .Meta .MItem`, {
+        ...metaItemStyle(),
+    });
+
+    cssOut(
+        `
+        body.Groups .NavButton.Handle.GroupOptionsTitle .Sprite
+    `,
+        {
+            marginRight: negativeUnit(2),
+            transform: translateX(`5px`),
+        },
+    );
+
+    cssOut(`body.Groups .StructuredForm .Buttons-Confirm`, {
+        textAlign: "left",
+    });
+
+    // Group Box
+    cssOut(`.Group-Box .Item:not(tr)`, {
+        display: "flex",
+        flexDirection: "row-reverse",
+        width: percent(100),
+        alignItems: "center",
+    });
+
+    cssOut(`.Group-Box .ItemContent`, {
+        flexGrow: 1,
+    });
+
+    cssOut(`.Groups .DataList .Item > .PhotoWrap`, {
+        ...absolutePosition.topLeft(13, 8),
+        float: "none",
+    });
+
+    cssOut(`.Groups .DataList .ItemContent`, {
+        order: 11,
+    });
+
+    cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
+        paddingLeft: unit(58),
+    });
+
+    cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
+        paddingLeft: unit(0),
+        paddingRight: unit(70),
+    });
+
+    cssOut(`.Group-Box .Item .Options .Buttons`, {
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
+    });
+
+    cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
+        marginRight: unit(4),
+    });
+
+    cssOut(`.DataList .Item.Event.event .DateTile`, {
+        order: 2,
+    });
+
+    cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
+        order: 1,
+        $nest: {
+            [`& .ToggleFlyout.OptionsMenu`]: {
+                display: "flex",
+                alignItems: "center",
+            },
+        },
+    });
+
+    cssOut(
+        `.Group-Box .PageControls .Button-Controls`,
+        mediaQueries.aboveMobile({
+            ...absolutePosition.middleRightOfParent(),
+        }),
+    );
+
+    cssOut(`.Group-Box`, {
+        marginBottom: unit(36),
+    });
+
+    cssOut(`.Group-Header-Actions`, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: percent(100),
+        ...margins({
+            vertical: unit(globalVars.gutter.size),
+        }),
+    });
+    cssOut(
+        `
+        .Group-Header-Actions .Group-Buttons,
+        .Group-Header-Actions .ButtonGroup,
+    `,
+        {
+            position: "relative",
+            top: "auto",
+        },
+    );
+
+    cssOut(
+        `.Section-Group .Group-Box .H,
+        .Section-Group .Group-Box .EmptyMessage`,
+        {
+            textAlign: "left",
+        },
+        mediaQueries.tabletDown({
+            textAlign: "left",
+        }),
+        mediaQueries.mobileDown({
+            marginBottom: unit(6),
+        }),
+    );
+
+    cssOut(`.Section-Group .Group-Title`, {
+        fontSize: globalVars.fonts.size.title,
+    });
+
+    cssOut(`.Section-Group .Group-Box .H`, {
+        fontSize: globalVars.fonts.size.subTitle,
+    });
+
+    cssOut(
+        `
+        .Button-Controls.Button-Controls
+    `,
+        mediaQueries.mobileDown({
+            display: "block",
+            $nest: {
+                [`& .Button`]: {
+                    marginRight: "auto",
+                },
+            },
+        }),
+    );
 };

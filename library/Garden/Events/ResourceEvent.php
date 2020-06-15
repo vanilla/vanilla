@@ -6,25 +6,30 @@
 
 namespace Garden\Events;
 
+use Vanilla\Events\EventAction;
+
 /**
  * An event affecting a specific resource.
  */
 abstract class ResourceEvent {
 
     /** A resource has been removed. */
-    public const ACTION_DELETE = "delete";
+    public const ACTION_DELETE = EventAction::DELETE;
 
     /** A resource has been created. */
-    public const ACTION_INSERT = "insert";
+    public const ACTION_INSERT = EventAction::ADD;
 
     /** An existing resource has been updated. */
-    public const ACTION_UPDATE = "update";
+    public const ACTION_UPDATE = EventAction::UPDATE;
 
     /** @var string */
     protected $action;
 
     /** @var array */
     protected $payload;
+
+    /** @var array */
+    protected $sender;
 
     /** @var string */
     protected $type;
@@ -34,10 +39,12 @@ abstract class ResourceEvent {
      *
      * @param string $action
      * @param array $payload
+     * @param array $sender
      */
-    public function __construct(string $action, array $payload) {
+    public function __construct(string $action, array $payload, ?array $sender = null) {
         $this->action = $action;
         $this->payload = $payload;
+        $this->sender = $sender;
         $this->type = $this->typeFromClass();
     }
 
@@ -60,6 +67,15 @@ abstract class ResourceEvent {
     }
 
     /**
+     * Get the entity responsible for triggering the event, if available.
+     *
+     * @return array|null
+     */
+    public function getSender(): ?array {
+        return $this->sender;
+    }
+
+    /**
      * Get the event type.
      *
      * @return string
@@ -69,16 +85,23 @@ abstract class ResourceEvent {
     }
 
     /**
+     * Get the full name of the event.
+     *
+     * @return string
+     */
+    public function getFullEventName(): string {
+        return $this->getType().'_'.$this->getAction();
+    }
+
+    /**
      * Derive the event type from the current class name.
      *
      * @return string
      */
     private function typeFromClass(): string {
-        $class = get_called_class();
-        if (($namespaceEnd = strrpos($class, '\\')) !== false) {
-            $baseName = substr($class, $namespaceEnd + 1);
-        } else {
-            $baseName = $class;
+        $baseName = get_called_class();
+        if (($namespaceEnd = strrpos($baseName, '\\')) !== false) {
+            $baseName = substr($baseName, $namespaceEnd + 1);
         }
         $type = lcfirst(preg_replace('/Event$/', '', $baseName));
         return $type;

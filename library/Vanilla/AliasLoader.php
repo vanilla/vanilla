@@ -26,6 +26,8 @@ class AliasLoader {
         return [
             \Vanilla\Web\Asset\LegacyAssetModel::class => ['AssetModel'],
             \Vanilla\Dashboard\Models\BannerImageModel::class => ['HeroImagePlugin'],
+            \Vanilla\Dashboard\Events\UserEvent::class => ["Vanilla\Community\Events\UserEvent"],
+            \Vanilla\Theme\ThemeService::class => ["Vanilla\Models\ThemeModel"],
         ];
     }
 }

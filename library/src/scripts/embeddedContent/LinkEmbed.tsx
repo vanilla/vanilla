@@ -38,6 +38,7 @@ export function LinkEmbed(props: IProps) {
                     to={url}
                     rel="nofollow noreferrer ugc"
                     tabIndex={props.inEditor ? -1 : 0}
+                    aria-label={name}
                 >
                     <article className="embedText-body embedLink-body">
                         {linkImage}

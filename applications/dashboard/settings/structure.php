@@ -8,7 +8,8 @@
  * @since 2.0
  */
 
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Theme\ThemeCache;
+use Vanilla\Theme\ThemeServiceHelper;
 
 if (!defined('APPLICATION')) {
     exit();
@@ -133,6 +134,19 @@ if ($SystemUserID) {
     if (!$SysUser || val('Deleted', $SysUser) || val('Admin', $SysUser) != 2) {
         $SystemUserID = false;
         removeFromConfig('Garden.SystemUserID');
+    }
+
+    // Make sure our profile image respects SSL settings.
+    $profileUrl = $SysUser->Photo ?? '';
+    $ownSiteHttp = 'http://'.\Gdn::request()->getHostAndPort();
+    if ($profileUrl && strpos($profileUrl, $ownSiteHttp) === 0 && \Gdn::config('Garden.AllowSSL')) {
+        \Gdn::sql()->update(
+            'User',
+            [
+                'Photo' => preg_replace("/^http/", "https", $profileUrl),
+            ],
+            [ 'UserID' => $SystemUserID]
+        )->put();
     }
 }
 
@@ -261,7 +275,7 @@ $Construct->table('UserAuthenticationProvider')
 $Construct->table('UserAuthenticationNonce')
     ->column('Nonce', 'varchar(100)', false, 'primary')
     ->column('Token', 'varchar(128)', false)
-    ->column('Timestamp', 'timestamp', false, 'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationToken')
@@ -271,7 +285,7 @@ $Construct->table('UserAuthenticationToken')
     ->column('TokenSecret', 'varchar(64)', false)
     ->column('TokenType', ['request', 'access'], false)
     ->column('Authorized', 'tinyint(1)', false)
-    ->column('Timestamp', 'timestamp', false ,'index')
+    ->column('Timestamp', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'], 'index')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
@@ -826,6 +840,9 @@ $Construct
     ->column('ThumbWidth', 'usmallint', null)
     ->column('ThumbHeight', 'usmallint', null)
     ->column('ThumbPath', 'varchar(255)', null)
+
+    // Lowercase to match new schemas.
+    ->column('foreignUrl', 'varchar(255)', true, 'unique')
     ->set(false, false);
 
 // Merge backup.
@@ -1032,7 +1049,13 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
 // Save current theme value into the visible themes. This way existing sites will continue to see them even if they get hidden.
 
 /**
- * @var ThemeModelHelper $themeHelper
+ * @var ThemeServiceHelper $themeHelper
  */
-$themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+$themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
 $themeHelper->saveCurrentThemeToVisible();
+
+
+// Clear out the theme cache in case any file based themes were updated.
+/** @var ThemeCache $themeCache */
+$themeCache = Gdn::getContainer()->get(ThemeCache::class);
+$themeCache->clear();

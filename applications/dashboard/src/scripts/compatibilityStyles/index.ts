@@ -11,7 +11,16 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    borders,
+    importantUnit,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -36,11 +45,14 @@ import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
 import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
+import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
 import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import { logDebugConditionnal } from "@vanilla/utils";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -93,7 +105,6 @@ compatibilityStyles = useThemeCache(() => {
     );
 
     cssOut(`.DataTable .Item td, .Item .Poll .PollOption`, {
-        background: bg,
         color: fg,
     });
 
@@ -102,10 +113,6 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".Box h4", { color: fg });
-
-    cssOut(`.CategoryBox > .OptionsMenu`, {
-        marginRight: unit(layoutVars.cell.paddings.horizontal),
-    });
 
     const panelSelectors = `
         .About a,
@@ -193,11 +200,17 @@ compatibilityStyles = useThemeCache(() => {
         width: calc(`100% + ${unit(horizontalPadding)}`),
     });
 
-    cssOut(`.DataList .Item`, {
-        borderTop: singleBorder(),
-        borderBottom: singleBorder(),
-        ...paddings(resultVars.spacing.padding),
-    });
+    cssOut(
+        `
+        .DataList .Item,
+        .DataList .Empty,
+    `,
+        {
+            borderTop: singleBorder(),
+            borderBottom: singleBorder(),
+            ...paddings(resultVars.spacing.padding),
+        },
+    );
 
     cssOut(`.DataList .Item + .Item`, {
         borderTop: "none",
@@ -264,7 +277,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(vars.gutter.size * 2),
+        marginTop: unit(layoutVars.main.topSpacing - vars.gutter.size),
     });
 
     cssOut(`.Content .PageControls`, {
@@ -287,18 +300,8 @@ compatibilityStyles = useThemeCache(() => {
         opacity: 1,
     });
 
-    cssOut(
-        `
-        .Container a.UserLink,
-        .Container a.UserLink.BlockTitle
-    `,
-        {
-            fontWeight: vars.fonts.weights.bold,
-        },
-    );
-
     cssOut(".Panel > * + *", {
-        marginTop: unit(vars.gutter.size),
+        marginTop: unit(24),
     });
 
     cssOut(`.Panel > .PhotoWrapLarge`, {
@@ -328,8 +331,16 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.HasNew`, {
-        backgroundColor: colorOut(vars.mainColors.primary),
-        color: colorOut(vars.mainColors.primaryContrast),
+        backgroundColor: colorOut(vars.mainColors.primaryContrast),
+        color: colorOut(vars.mainColors.primary),
+        ...borders({
+            radius: 2,
+            color: vars.mainColors.primary,
+        }),
+        ...paddings({
+            vertical: 3,
+            horizontal: 6,
+        }),
     });
 
     cssOut(`.Item.Read`, {
@@ -342,6 +353,26 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
 
+    cssOut(`.DataList .Item .Options .OptionsMenu`, {
+        order: 10, // we want it last
+    });
+
+    cssOut(`.Breadcrumbs`, {
+        ...paddings({
+            vertical: vars.gutter.half,
+        }),
+    });
+
+    cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(dropDownVariables().item.colors.fg) });
+
+    cssOut(`.HomepageTitle, .pageNotFoundTitle`, {
+        ...fonts({
+            size: vars.fonts.size.largeTitle,
+            weight: vars.fonts.weights.bold,
+        }),
+    });
+
+    blockColumnCSS();
     buttonCSS();
     flyoutCSS();
     textLinkCSS();
@@ -358,7 +389,6 @@ compatibilityStyles = useThemeCache(() => {
     ideaCSS();
     tableCSS();
     discussionCSS();
-
     searchPageCSS();
     groupsCSS();
     profilePageCSS();
@@ -399,7 +429,7 @@ export const camelCaseToDash = (str: string) => {
     return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 };
 
-export const nestedWorkaround = (selector: string, nestedObject) => {
+export const nestedWorkaround = (selector: string, nestedObject, debug?: boolean) => {
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
 
@@ -433,6 +463,7 @@ export const nestedWorkaround = (selector: string, nestedObject) => {
                 }
             }
         });
+        logDebugConditionnal(debug, rawStyles);
         cssRaw(rawStyles);
     }
 };

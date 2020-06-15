@@ -111,11 +111,11 @@ class PostController extends VanillaController {
      *
      * @param int $categoryID Unique ID of the category to add the discussion to.
      */
-    public function discussion($categoryUrlCode = '') {
+    public function discussion($categoryID = '') {
         // Override CategoryID if categories are disabled
         $useCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         if (!$useCategories) {
-            $categoryUrlCode = '';
+            $categoryID = '';
         }
 
         // Setup head
@@ -136,8 +136,8 @@ class PostController extends VanillaController {
         if (isset($this->Discussion)) {
             $this->CategoryID = $this->Discussion->CategoryID;
             $category = CategoryModel::categories($this->CategoryID);
-        } elseif ($categoryUrlCode != '') {
-            $category = CategoryModel::categories($categoryUrlCode);
+        } elseif ($categoryID != '') {
+            $category = CategoryModel::categories($categoryID);
 
             if ($category) {
                 $this->CategoryID = val('CategoryID', $category);
@@ -455,8 +455,9 @@ class PostController extends VanillaController {
         // Verify we can add to the category content
         $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
 
-        if (c('Garden.ForceInputFormatter')) {
-            $this->Form->removeFormValue('Format');
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            $format = Gdn::config('Garden.InputFormatter', '');
+            $this->Form->setFormValue('Format', $format);
         }
 
         $this->setData('_CancelUrl', discussionUrl($this->data('Discussion')));
@@ -987,8 +988,9 @@ class PostController extends VanillaController {
         // Normalize the edit data.
         $this->applyFormatCompatibility($this->Comment, 'Body', 'Format');
 
-        if (c('Garden.ForceInputFormatter')) {
-            $this->Form->removeFormValue('Format');
+        if (Gdn::config('Garden.ForceInputFormatter')) {
+            $format = Gdn::config('Garden.InputFormatter', '');
+            $this->Form->setFormValue('Format', $format);
         }
 
         $this->View = 'editcomment';

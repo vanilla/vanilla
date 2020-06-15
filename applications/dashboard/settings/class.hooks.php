@@ -295,8 +295,8 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if ($mobileTheme) {
-            $isDistinctMobileTheme = $mobileTheme !== $desktopTheme;
-            $hasMobileThemeOptions = $isDistinctMobileTheme && count($mobileTheme->getInfoValue('options', [])) > 0;
+            $isDistinctMobileTheme = $mobileTheme !== $desktopTheme && $mobileTheme->getInfoValue('isMobile');
+            $hasMobileThemeOptions = $isDistinctMobileTheme && (count($mobileTheme->getInfoValue('options', [])) > 0);
         }
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
@@ -695,7 +695,7 @@ class DashboardHooks extends Gdn_Plugin {
             // no leak via the Referer field.
             $deliveryType = $sender->getDeliveryType($deliveryMethod);
             if (!$isApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
-                $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
+                $url = \Vanilla\Utility\UrlUtils::replaceQuery(Gdn::request()->getUri(), ['sso' => null]);
                 redirectTo($url);
             }
         }

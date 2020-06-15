@@ -12,6 +12,9 @@ use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
+/**
+ * Utility methods useful for greating API endpoints.
+ */
 class ApiUtils {
 
     /**
@@ -157,16 +160,17 @@ class ApiUtils {
         if (!empty($argsStr)) {
             $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
+        $url = \Gdn::request()->getSimpleUrl($url);
         return $url;
     }
 
     /**
      * Convert query parameters to filters. Useful to fill a where clause ;)
      *
-     * @throws \Exception If something goes wrong. Example, the field processor is not callable.
      * @param Schema $schema
      * @param array $query
      * @return array
+     * @throws \Exception If something goes wrong. Example, the field processor is not callable.
      */
     public static function queryToFilters(Schema $schema, array $query) {
         $filters = [];
@@ -194,5 +198,23 @@ class ApiUtils {
         }
 
         return $filters;
+    }
+
+    /**
+     * Parse a `Link` header into a list of page links.
+     *
+     * @param string $link The link header to parse.
+     * @return array|null Returns an array in the form `[rel => url]` or **null** if the header is malformed.
+     */
+    public static function parsePageHeader(string $link): ?array {
+        if (preg_match_all('`<([^>]+)>;\s*rel="([^"]+)"`', $link, $m, PREG_SET_ORDER)) {
+            $result = [];
+            foreach ($m as $r) {
+                $result[$r[2]] = $r[1];
+            }
+            return $result;
+        } else {
+            return null;
+        }
     }
 }

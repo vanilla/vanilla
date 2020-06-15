@@ -9,10 +9,13 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\Http\HttpClient;
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 
 class InternalClient extends HttpClient {
+
+    const DEFAULT_USER_ID = 2;
 
     /**
      * @var Container The container used to construct request objects.
@@ -22,7 +25,7 @@ class InternalClient extends HttpClient {
     /**
      * @var int
      */
-    private $userID;
+    private $userID = self::DEFAULT_USER_ID;
 
     /**
      * @var string
@@ -44,6 +47,18 @@ class InternalClient extends HttpClient {
         parent::__construct($baseUrl);
         $this->throwExceptions = true;
         $this->container = $container;
+
+        // Add a middleware to ensure objects are properly serialized.
+        $this->addMiddleware(function (HttpRequest $request, callable $next): HttpResponse {
+            /** @var HttpResponse $response */
+            $response = $next($request);
+            if (stripos($response->getHeader('Content-Type'), 'application/json') !== false) {
+                if ($response->getBody()) {
+                    $response->setBody(json_decode($response->getRawBody(), true));
+                }
+            }
+            return $response;
+        });
     }
 
     /**

@@ -23,6 +23,7 @@ import {
     EMPTY_FONTS,
     isLightColor,
     negativeUnit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
@@ -227,9 +228,9 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const signIn = makeThemeVars("signIn", {
         fg: colors.fg,
-        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.1, true),
+        bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.1, inverse: true }),
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.2, inverse: true }),
         },
     });
 
@@ -253,7 +254,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const bottomRow = makeThemeVars("bottomRow", {
-        bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
+        bg: modifyColorBasedOnLightness({ color: colors.bg, weight: 0.1 }).desaturate(0.2, true),
     });
 
     // Note that the logo defined here is the last fallback. If set through the dashboard, it will overwrite these values.
@@ -810,7 +811,7 @@ export const titleBarClasses = useThemeCache(() => {
         $nest: {
             ".titleBar-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.fg, 1)),
+                backgroundColor: colorOut(modifyColorBasedOnLightness({ color: vars.colors.fg, weight: 1 })),
                 borderRadius: px(vars.button.borderRadius),
             },
         },
@@ -973,6 +974,12 @@ export const titleBarClasses = useThemeCache(() => {
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
+    const titleBarContainer = style("titleBarContainer", {
+        ...paddings({
+            horizontal: globalVars.gutter.half,
+        }),
+    });
+
     return {
         root,
         bg1,
@@ -1019,6 +1026,7 @@ export const titleBarClasses = useThemeCache(() => {
         overlay,
         swoop,
         signInIconOffset,
+        titleBarContainer,
     };
 });
 

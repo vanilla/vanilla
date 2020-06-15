@@ -8,12 +8,16 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
+use Gdn;
 use Gdn_Session;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Formatting\FormatService;
 
 /**
  * A class for gathering particular data about the site.
@@ -51,11 +55,14 @@ class SiteMeta implements \JsonSerializable {
     private $localeKey;
 
 
-    /** @var ThemeModel */
-    private $themeModel;
+    /** @var ThemeService */
+    private $themeService;
 
     /** @var string */
     private $activeThemeKey;
+
+    /** @var int $activeThemeRevisionID */
+    private $activeThemeRevisionID;
 
     /** @var string */
     private $mobileThemeKey;
@@ -108,6 +115,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var string */
+    private $reCaptchaKey = '';
+
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * SiteMeta constructor.
      *
@@ -116,8 +129,9 @@ class SiteMeta implements \JsonSerializable {
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param ThemeFeatures $themeFeatures
-     * @param ThemeModel $themeModel
+     * @param ThemeService $themeService
      * @param Gdn_Session $session
+     * @param FormatService $formatService
      */
     public function __construct(
         RequestInterface $request,
@@ -125,10 +139,13 @@ class SiteMeta implements \JsonSerializable {
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
         ThemeFeatures $themeFeatures,
-        ThemeModel $themeModel,
-        Gdn_Session $session
+        ThemeService $themeService,
+        Gdn_Session $session,
+        FormatService $formatService
     ) {
         $this->host = $request->getHost();
+
+        $this->formatService = $formatService;
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
         // But never with a trailing slash.
@@ -145,7 +162,7 @@ class SiteMeta implements \JsonSerializable {
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
-        $this->siteTitle = $config->get('Garden.Title', "");
+        $this->siteTitle = $this->formatService->renderPlainText($config->get('Garden.Title', ""), HtmlFormat::FORMAT_KEY);
 
         $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
 
@@ -167,14 +184,15 @@ class SiteMeta implements \JsonSerializable {
         $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
 
         // Theming
-        $currentTheme = $themeModel->getCurrentTheme();
-        $currentThemeAddon = $themeModel->getCurrentThemeAddon();
+        $currentTheme = $themeService->getCurrentTheme();
+        $currentThemeAddon = $themeService->getCurrentThemeAddon();
 
-        $this->activeThemeKey = $currentTheme['themeID'];
+        $this->activeThemeKey = $currentTheme->getThemeID();
+        $this->activeThemeRevisionID = $currentTheme->getRevisionID() ?? null;
         $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
-        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeModel::FALLBACK_THEME_KEY);
-        $this->themePreview =  $themeModel->getPreviewTheme();
+        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeService::FALLBACK_THEME_KEY);
+        $this->themePreview =  $themeService->getPreviewTheme();
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
@@ -191,6 +209,8 @@ class SiteMeta implements \JsonSerializable {
         $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
 
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
+
+        $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", '');
     }
 
     /**
@@ -238,6 +258,7 @@ class SiteMeta implements \JsonSerializable {
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'siteSection' => $this->currentSiteSection,
             'themePreview' => $this->themePreview,
+            'reCaptchaKey' => $this->reCaptchaKey,
         ];
     }
 
@@ -309,6 +330,13 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getActiveThemeKey(): string {
         return $this->activeThemeKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActiveThemeRevisionID(): ?int {
+        return $this->activeThemeRevisionID;
     }
 
     /**

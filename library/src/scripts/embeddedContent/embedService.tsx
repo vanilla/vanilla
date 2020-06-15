@@ -16,6 +16,7 @@ import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
+import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
 import { onContent, t } from "@library/utility/appUtils";
 import { logWarning } from "@vanilla/utils";
 import React, { useContext } from "react";
@@ -91,9 +92,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
 
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
-        if (inEditor) {
-            ensureEmbedDescription();
-        }
+        ensureEmbedDescription();
 
         data = {
             ...data,
@@ -162,6 +161,7 @@ registerEmbed("twitter", TwitterEmbed);
 registerEmbed("vimeo", VideoEmbed);
 registerEmbed("wistia", VideoEmbed);
 registerEmbed("youtube", VideoEmbed);
+registerEmbed("panopto", PanoptoEmbed);
 registerEmbed("image", ImageEmbed);
 
 // This is specifically required because of some legacy formats that don't render

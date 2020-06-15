@@ -29,18 +29,12 @@
         $(document).delegate(".Hijack, .js-hijack", "click", handleHijackClick);
         $(document).delegate(".ButtonGroup > .Handle", "click", handleButtonHandleClick);
         $(document).delegate(".ToggleFlyout", "click", handleToggleFlyoutClick);
-        $(document).delegate(".ToggleFlyout a, .Dropdown a", "mouseup", handleToggleFlyoutMouseUp);
+        $(document).delegate(".ToggleFlyout a", "mouseup", handleToggleFlyoutMouseUp);
+        $(document).delegate(document, "click", closeAllFlyouts);
         $(document).delegate(".mobileFlyoutOverlay", "click", function (e) {
-            e.preventDefault();
             e.stopPropagation();
             closeAllFlyouts();
         });
-        $(document).delegate(".Flyout, .Dropdown", "click", function (e) {
-            e.stopPropagation();
-        });
-        $(document).on("click", function (e) {
-            closeAllFlyouts();
-        })
     });
 
     /**

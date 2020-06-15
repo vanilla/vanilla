@@ -14,7 +14,7 @@ import { mountReact } from "@vanilla/react-utils";
  *
  * @param containerSelector - The CSS selector or the HTML Element to render into.
  */
-export default function mountEditor(containerSelector: string | Element) {
+export default function mountEditor(containerSelector: string | Element, descriptionID?: string) {
     const container = ensureHtmlElement(containerSelector);
     const bodybox = container.closest("form")!.querySelector(".BodyBox");
 
@@ -26,7 +26,7 @@ export default function mountEditor(containerSelector: string | Element) {
 
     if (initialFormat === "Rich" || initialFormat === "rich") {
         mountReact(
-            <ForumEditor legacyTextArea={bodybox as HTMLInputElement} />,
+            <ForumEditor legacyTextArea={bodybox as HTMLInputElement} descriptionID={descriptionID ?? undefined} />,
             container,
             () => {
                 container.classList.remove("isDisabled");

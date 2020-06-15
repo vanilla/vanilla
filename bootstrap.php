@@ -5,13 +5,14 @@ use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
-use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
+use Vanilla\Models\Model;
+use Vanilla\Permissions;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
@@ -103,7 +104,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
-    ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager
@@ -129,11 +129,11 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('ThemeManager')
 
     // File base theme api provider
-    ->rule(\Vanilla\Models\ThemeModel::class)
+    ->rule(\Vanilla\Theme\ThemeService::class)
         ->setShared(true)
-        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Theme\FsThemeProvider::class)])
 
-    ->rule(\Vanilla\Models\ThemeSectionModel::class)
+    ->rule(\Vanilla\Theme\ThemeSectionModel::class)
     ->setShared(true)
 
     ->rule(ThemeFeatures::class)
@@ -141,6 +141,10 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
     // Logger
+    ->rule(\Vanilla\Logging\LogDecorator::class)
+    ->setShared(true)
+    ->setConstructorArgs(['logger' => new Reference(\Vanilla\Logger::class)])
+
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
     ->addAlias(\Psr\Log\LoggerInterface::class)
@@ -153,6 +157,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
     ->addAlias(\Psr\EventDispatcher\EventDispatcherInterface::class)
     ->addAlias(\Psr\EventDispatcher\ListenerProviderInterface::class)
+    ->addCall("addListenerMethod", [\Vanilla\Logging\ResourceEventLogger::class, "logResourceEvent"])
+    ->setShared(true)
+
+    ->rule(\Vanilla\Logging\ResourceEventLogger::class)
+    ->addCall("includeAction", [
+        \Vanilla\Dashboard\Events\UserEvent::class,
+        '*',
+    ])
     ->setShared(true)
 
     // Locale
@@ -238,6 +250,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\VanillaWhitelistContentSecurityPolicyProvider::class)])
     ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
@@ -251,6 +264,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     })])
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
@@ -276,6 +290,18 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
     ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
 
+    ->rule(\Vanilla\Web\APIExpandMiddleware::class)
+    ->setConstructorArgs([
+        "/api/v2/",
+        ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
+    ])
+
+    ->rule(\Vanilla\OpenAPIBuilder::class)
+    ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
+
+    ->rule('@apiexpand-filter')
+    ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
+
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
@@ -291,6 +317,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
     ->rule('Gdn_Model')
+    ->setShared(true)
+
+    ->rule(Model::class)
     ->setShared(true)
 
     ->rule(Contracts\Models\UserProviderInterface::class)
@@ -529,7 +558,7 @@ $dic->call(function (
 
 // Send out cookie headers.
 register_shutdown_function(function () use ($dic) {
-    $dic->call(function(Garden\Web\Cookie $cookie) {
+    $dic->call(function (Garden\Web\Cookie $cookie) {
         $cookie->flush();
     });
 });
@@ -574,3 +603,10 @@ register_shutdown_function(function () use ($dic) {
     // Trigger SchedulerDispatch event
     $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
 });
+
+// Construct the logger earlier so that its dependencies are satisfied.
+$log = $dic->get(\Vanilla\Logging\LogDecorator::class);
+// Replace the logger interface with the decorator.
+$dic->rule(\Vanilla\Logging\LogDecorator::class)
+    ->addAlias(\Psr\Log\LoggerInterface::class);
+Logger::setLogger(null);

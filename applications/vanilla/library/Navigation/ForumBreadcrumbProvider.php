@@ -11,6 +11,7 @@ use Garden\StaticCacheTranslationTrait;
 use Vanilla\Contracts\RecordInterface;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbProviderInterface;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Breadcrumb provider for the forum application.
@@ -22,11 +23,18 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
     /** @var \CategoryCollection */
     private $categoryCollection;
 
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
     /**
+     * DI.
+     *
      * @param \CategoryCollection $categoryCollection
+     * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(\CategoryCollection $categoryCollection) {
+    public function __construct(\CategoryCollection $categoryCollection, SiteSectionModel $siteSectionModel) {
         $this->categoryCollection = $categoryCollection;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -36,10 +44,22 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
         $ancestors = $this->categoryCollection->getAncestors($record->getRecordID());
 
         $crumbs = [
-            new Breadcrumb(self::t('Community'), \Gdn::request()->url('/')),
+            new Breadcrumb(self::t('Home'), \Gdn::request()->url('/', true)),
         ];
         foreach ($ancestors as $ancestor) {
-            $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor));
+            if ($ancestor['CategoryID'] === -1) {
+                // If we actually get the root category, we don't want to see the "synthetic" root.
+                // We actually just want the categories page.
+
+                // However, if the homepage is categories, we don't want to duplicate that either.
+                if ($this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] === 'categories') {
+                    continue;
+                };
+
+                $crumbs[] = new Breadcrumb(t('Categories'), url('/categories', true));
+            } else {
+                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor, '', true));
+            }
         }
         return $crumbs;
     }

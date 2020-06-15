@@ -38,6 +38,7 @@ export const loadingRectangeClass = useThemeCache((height: string | number, widt
     const vars = loadingRectangeVariables();
     return style({
         display: "block",
+        borderRadius: 2,
         background: colorOut(vars.colors.bg),
         height: unit(height),
         width: unit(width),
@@ -52,5 +53,16 @@ export const loadingSpacerClass = useThemeCache((height: string | number) => {
         display: "block",
         height: unit(height),
         width: percent(100),
+    });
+});
+
+export const loadingCircleClass = useThemeCache((height: string | number) => {
+    const vars = loadingRectangeVariables();
+    return style({
+        height: unit(50),
+        width: unit(50),
+        background: colorOut(vars.colors.bg),
+        margin: 20,
+        borderRadius: 50,
     });
 });

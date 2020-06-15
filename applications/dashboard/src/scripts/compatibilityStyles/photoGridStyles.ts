@@ -29,7 +29,10 @@ export const photoGridCSS = () => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        marginLeft: importantUnit(-vars.spacer.default),
+        ...margins({
+            vertical: importantUnit(-vars.spacer.default),
+            left: importantUnit(-vars.spacer.default),
+        }),
         width: important(calc(`100% + ${unit(vars.spacer.default * 2)}`)),
     });
 

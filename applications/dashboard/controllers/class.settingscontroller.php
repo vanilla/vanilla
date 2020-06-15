@@ -8,9 +8,9 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
-use Vanilla\Models\ThemeModelHelper;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
 
 /**
  * Handles /settings endpoint.
@@ -613,7 +613,7 @@ class SettingsController extends DashboardController {
         // Page setup
         $this->title(t('Ban Rules'));
 
-        list($offset, $limit) = offsetLimit($page, 20);
+        [$offset, $limit] = offsetLimit($page, 20);
 
         $banModel = $this->getBanModel();
 
@@ -1241,6 +1241,7 @@ class SettingsController extends DashboardController {
 
         Gdn_Theme::section('DashboardHome');
         $this->setData('IsWidePage', true);
+        $this->CssClass .= " dashboard";
 
         $this->render('index');
     }
@@ -2206,11 +2207,12 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            /** @var ThemeModelHelper $themeHelper */
-            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            /** @var ThemeServiceHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
+            /** @var FsThemeProvider $themeProvider */
             $themeProvider = Gdn::getContainer()->get(FsThemeProvider::class);
-            $themeInfo = $themeHelper->setSessionPreviewTheme($themeName, $themeProvider);
-            $this->fireEvent('PreviewTheme', ['ThemeInfo' => $themeInfo]);
+            $theme = $themeProvider->getTheme($themeName);
+            $themeHelper->setSessionPreviewTheme($theme);
 
             redirectTo('/');
         } else {
@@ -2232,8 +2234,8 @@ class SettingsController extends DashboardController {
         $isMobile = false;
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            /** @var ThemeModelHelper $themeHelper */
-            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            /** @var ThemeServiceHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
             $themeHelper->cancelSessionPreviewTheme();
         }
 

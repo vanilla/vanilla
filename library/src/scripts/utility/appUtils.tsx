@@ -8,6 +8,8 @@
 import gdn from "@library/gdn";
 import { PromiseOrNormalCallback } from "@vanilla/utils";
 import isUrl from "validator/lib/isURL";
+import { ensureScript } from "@vanilla/dom-utils";
+import { sprintf } from "sprintf-js";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
@@ -89,7 +91,8 @@ interface ISiteSection {
     sectionGroup: string;
     sectionID: string;
     name: string;
-    apps: { [key: string]: boolean };
+    apps: Record<string, boolean>;
+    attributes: Record<string, any>;
 }
 
 /**
@@ -252,4 +255,33 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
 export function makeProfileUrl(username: string) {
     const userPath = `/profile/${encodeURIComponent(username)}`;
     return formatUrl(userPath, true);
+}
+
+interface IRecaptcha {
+    execute: (string) => string;
+}
+
+/**
+ * Ensure that we have loaded the rec
+ */
+export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
+    const siteKey = getMeta("reCaptchaKey");
+    if (!siteKey) {
+        return null;
+    }
+    await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
+
+    return { execute: siteKey => window.grecaptcha.execute(siteKey) };
+}
+
+/**
+ * Translation helper for accessible labels, because <Translate/> doesn't return as string
+ * @param template - the template for the string (must be translated ahead of time)
+ * @param variable - the variable to insert in the template
+ */
+export function accessibleLabel(template: string, variable?: string[]) {
+    if (!variable) {
+        return undefined;
+    }
+    return sprintf(template, variable);
 }

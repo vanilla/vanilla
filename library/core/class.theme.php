@@ -58,7 +58,10 @@ class Gdn_Theme {
      * @return string
      */
     public static function breadcrumbs($data, $homeLink = true, $options = []) {
-        $format = '<a href="{Url,html}" itemprop="item"><span itemprop="name">{Name,html}</span></a>';
+        // Format breadcrumb that is part of breadcrumb structured data.
+        $format = '<a itemprop="item" href="{Url,html}"><span itemprop="name">{Name,html}</span></a>';
+        // Format the home link which is not part of breadcrumb structured data.
+        $baseFormat = '<a href="{Url,html}"><span>{Name,html}</span></a>';
 
         $result = '';
 
@@ -92,6 +95,7 @@ class Gdn_Theme {
         $dataCount = 0;
         $homeLinkFound = false;
         $position = 1;
+        $displayStructuredData = false;
 
         foreach ($data as $row) {
             $dataCount++;
@@ -106,6 +110,7 @@ class Gdn_Theme {
             if ($count > 0) {
                 $result .= '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">';
                 $result .= '<meta itemprop="position" content="'.$position++.'" />';
+                $displayStructuredData = true;
             }
 
             $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
@@ -114,18 +119,14 @@ class Gdn_Theme {
                 $cssClass .= ' Last';
             }
 
-            $label = '<span class="'.$cssClass.'">'.formatString($format, $row).'</span> ';
+            $label = '<span class="'.$cssClass.'">'.(($count === 0) ? formatString($baseFormat, $row) : formatString($format, $row).'</span>').'</span>';
             $result = concatSep('<span class="Crumb">'.t('Breadcrumbs Crumb', '›').'</span> ', $result, $label);
 
             $count++;
         }
 
-        // Close the stack.
-        for ($count--; $count > 0; $count--) {
-            $result .= '</span>';
-        }
-
-        $result = '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">'.$result.'</span>';
+        // Display as BreadcrumbList if there is structured data.
+        $result = '<span class="Breadcrumbs" '.(($displayStructuredData) ? 'itemscope itemtype="http://schema.org/BreadcrumbList"' : '').'>'.$result.'</span>';
         return $result;
     }
 
@@ -463,6 +464,10 @@ class Gdn_Theme {
                     $result = "<!-- Error: $name doesn't exist -->";
                 }
             } else {
+                if (!Gdn::controller()) {
+                    return "<!-- Error: Could not render module without a Gdn_Controller instance. -->";
+                }
+
                 $module = new $name(Gdn::controller(), '');
                 $module->Visible = true;
 

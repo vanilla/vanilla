@@ -12,10 +12,18 @@ export interface ISelectLookupProps extends ISelectOneProps {
     suggestions: ILoadable<any>;
 }
 
+interface IState {
+    hasFocus: boolean;
+}
+
 /**
  * Form component for searching/selecting a category.
  */
-export class SelectLookup extends React.Component<ISelectLookupProps> {
+export class SelectLookup extends React.Component<ISelectLookupProps, IState> {
+    public state = {
+        hasFocus: false,
+    };
+
     public static defaultProps: Partial<ISelectLookupProps> = {
         suggestions: {
             status: LoadStatus.PENDING,

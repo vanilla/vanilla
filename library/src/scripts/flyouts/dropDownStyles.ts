@@ -116,48 +116,58 @@ export const dropDownClasses = useThemeCache(() => {
         listStyle: "none",
     });
 
-    const contents = style("contents", {
-        position: "absolute",
-        minWidth: unit(vars.sizing.widths.default),
-        backgroundColor: colorOut(vars.contents.bg),
-        color: colorOut(vars.contents.fg),
-        overflow: "auto",
-        ...borders(vars.contents.border),
-        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
-        $nest: {
-            "&&": {
-                zIndex: 3,
-                ...borders(vars.contents.border),
-            },
-            "&.isMedium": {
-                width: unit(vars.sizing.widths.medium),
-            },
-            "&.isParentWidth": {
-                minWidth: "initial",
-                left: 0,
-                right: 0,
-            },
-            "&.isOwnWidth": {
-                width: "initial",
-            },
-            "&.isRightAligned": {
-                right: 0,
-                top: 0,
-            },
-            "& .frame": {
-                boxShadow: "none",
-            },
-            "&.noMinWidth": {
-                minWidth: 0,
-            },
-            "&.hasVerticalPadding": {
-                ...paddings({
-                    vertical: 12,
-                    horizontal: important(0),
-                }),
+    const contents = style(
+        "contents",
+        {
+            position: "absolute",
+            minWidth: unit(vars.sizing.widths.default),
+            backgroundColor: colorOut(vars.contents.bg),
+            color: colorOut(vars.contents.fg),
+            overflow: "auto",
+            ...borders(vars.contents.border),
+            ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
+            $nest: {
+                "&&": {
+                    zIndex: 3,
+                    ...borders(vars.contents.border),
+                },
+                "&.isMedium": {
+                    width: unit(vars.sizing.widths.medium),
+                },
+                "&.isParentWidth": {
+                    minWidth: "initial",
+                    left: 0,
+                    right: 0,
+                },
+                "&.isOwnWidth": {
+                    width: "initial",
+                },
+                "&.isRightAligned": {
+                    right: 0,
+                    top: 0,
+                },
+                "& .frame": {
+                    boxShadow: "none",
+                },
+                "&.noMinWidth": {
+                    minWidth: 0,
+                },
+                "&.hasVerticalPadding": {
+                    ...paddings({
+                        vertical: 12,
+                        horizontal: important(0),
+                    }),
+                },
             },
         },
-    } as NestedCSSProperties);
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&.isOwnWidth": {
+                    width: percent(100),
+                },
+            },
+        }),
+    );
 
     const asModal = style("asModal", {
         $nest: {
@@ -397,6 +407,9 @@ export const dropDownClasses = useThemeCache(() => {
 
     const check = style("check", {
         color: colorOut(globalVars.mainColors.primary),
+
+        /// Check to fix icon alignment.
+        transform: `translateX(4px)`,
     });
 
     const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;

@@ -6,11 +6,14 @@
 
 namespace Vanilla\Web\ContentSecurityPolicy;
 
+use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
+
 /**
  * Embeds domains whitelist content security policy provider
  */
 class EmbedWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
     const EMBED_WHITELIST = [
+        'https://developers.panopto.com',
         'https://embed-cdn.gettyimages.com',
         'https://s.imgur.com',
         'https://platform.instagram.com',

@@ -44,18 +44,18 @@ export function useFormGroup(): IGroupContext {
 }
 
 export function DashboardFormGroup(props: IProps) {
-    const LiTag = (props.tag || "li") as "li";
+    const Tag = (props.tag || "li") as "li";
     const inputID = useUniqueID("formGroup-");
     const labelID = inputID + "-label";
 
     return (
-        <LiTag className={classNames("form-group", props.isIndependant && "row")}>
+        <Tag className={classNames("form-group", props.isIndependant && "row")}>
             <FormGroupContext.Provider
                 value={{ inputID, labelID, labelType: props.labelType || DashboardLabelType.STANDARD }}
             >
                 <DashboardFormLabel {...props} />
                 {props.children}
             </FormGroupContext.Provider>
-        </LiTag>
+        </Tag>
     );
 }

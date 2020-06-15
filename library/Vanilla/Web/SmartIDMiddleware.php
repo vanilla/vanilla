@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Garden\BasePathTrait;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
@@ -17,13 +18,11 @@ use Garden\Web\RequestInterface;
  * This middleware replaces smart ID expressions in the request with their IDs and passes on the middleware.
  */
 class SmartIDMiddleware {
-    const SMART = '$';
-    private const FULL_SMART_REGEX = '`^\$([^:]+)\.([^:]+:.+)$`';
+    use BasePathTrait;
 
-    /**
-     * @var string The base path to match in order to apply smart IDs.
-     */
-    private $basePath = '/';
+    const SMART = '$';
+
+    private const FULL_SMART_REGEX = '`^\$([^:]+)\.([^:]+:.+)$`';
 
     /**
      * @var \Gdn_SQLDriver
@@ -131,7 +130,7 @@ class SmartIDMiddleware {
      * @return mixed Returns the response of the inner middleware.
      */
     public function __invoke(RequestInterface $request, callable $next) {
-        if (strcasecmp(substr($request->getPath(), 0, strlen($this->basePath)), $this->basePath) === 0) {
+        if ($this->inBasePath($request->getPath())) {
             $this->replaceQuery($request);
             $this->replaceBody($request);
             $this->replacePath($request);
@@ -285,26 +284,6 @@ class SmartIDMiddleware {
             $result = $resolver($this, $pk, strtolower($column), $value);
         }
         return $result;
-    }
-
-    /**
-     * Get the base path.
-     *
-     * @return string Returns the basePath.
-     */
-    public function getBasePath(): string {
-        return $this->basePath;
-    }
-
-    /**
-     * Set the base path.
-     *
-     * @param string $basePath The new value.
-     * @return $this
-     */
-    public function setBasePath(string $basePath) {
-        $this->basePath = $basePath;
-        return $this;
     }
 
     /**

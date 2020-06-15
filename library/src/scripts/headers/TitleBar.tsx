@@ -34,6 +34,8 @@ import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import WidgetContainer from "@library/layout/components/WidgetContainer";
+import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
@@ -122,116 +124,117 @@ export default function TitleBar(_props: IProps) {
                 )}
             </div>
             <Container fullGutter>
-                <div className={classNames(classes.bar, { isHome: showSubNav })}>
-                    {isCompact &&
-                        (props.useMobileBackButton ? (
-                            <BackLink
-                                hideIfNoHistory={true}
-                                className={classes.leftFlexBasis}
-                                linkClassName={classes.button}
-                            />
-                        ) : (
-                            <FlexSpacer className="pageHeading-leftSpacer" />
-                        ))}
-                    {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
-                        <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
-                            <span
-                                className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
-                                ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
-                            >
-                                <HeaderLogo
-                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                    logoClassName="titleBar-logo"
-                                    logoType={LogoType.DESKTOP}
+                <div className={classes.titleBarContainer}>
+                    <div className={classNames(classes.bar, { isHome: showSubNav })}>
+                        {isCompact &&
+                            (props.useMobileBackButton ? (
+                                <BackLink
+                                    hideIfNoHistory={true}
+                                    className={classes.leftFlexBasis}
+                                    linkClassName={classes.button}
                                 />
-                            </span>
-                        </animated.div>
-                    )}
-                    {!isCompact && !isDesktopLogoCentered && (
-                        <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
-                    )}
-                    {!isSearchOpen && !isCompact && (
-                        <TitleBarNav
-                            isCentered={vars.navAlignment.alignment === "center"}
-                            containerRef={
-                                vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
-                                    ? collisionSourceRef
-                                    : undefined
-                            }
-                            className={classes.nav}
-                            linkClassName={classes.topElement}
-                            linkContentClassName="titleBar-navLinkContent"
-                            afterNode={
-                                !isCompact &&
-                                isDesktopLogoCentered && (
-                                    <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
-                                )
-                            }
-                        />
-                    )}
-                    {isCompact && (
-                        <>
-                            <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
-                            {!isSearchOpen && (
-                                <>
-                                    {isMobileLogoCentered && <FlexSpacer actualSpacer />}
-                                    <div
-                                        className={classNames(
-                                            isMobileLogoCentered && classes.logoCenterer,
-                                            logoClasses.mobileLogo,
-                                        )}
-                                    >
-                                        <animated.span {...logoProps}>
-                                            <HeaderLogo
-                                                className={classes.logoContainer}
-                                                logoClassName="titleBar-logo"
-                                                logoType={LogoType.MOBILE}
-                                            />
-                                        </animated.span>
-                                    </div>
-                                </>
-                            )}
-                        </>
-                    )}
-                    {!isCompact && !isDesktopLogoCentered && (
-                        <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
-                    )}
-                    <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
-                        {!isSearchOpen && (
-                            <div className={classes.extraMeBoxIcons}>
-                                {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                    return <ComponentName key={index} />;
-                                })}
-                            </div>
+                            ) : (
+                                <FlexSpacer className="pageHeading-leftSpacer" />
+                            ))}
+                        {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
+                            <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
+                                <span
+                                    className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
+                                    ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
+                                >
+                                    <HeaderLogo
+                                        className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                        logoClassName="titleBar-logo"
+                                        logoType={LogoType.DESKTOP}
+                                    />
+                                </span>
+                            </animated.div>
                         )}
-                        <CompactSearch
-                            className={classNames(classes.compactSearch, {
-                                isCentered: isSearchOpen,
-                            })}
-                            focusOnMount
-                            open={isSearchOpen}
-                            onSearchButtonClick={() => {
-                                if (pages.search) {
-                                    pages.search.preload();
+                        {!isCompact && !isDesktopLogoCentered && (
+                            <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
+                        )}
+                        {!isSearchOpen && !isCompact && (
+                            <TitleBarNav
+                                isCentered={vars.navAlignment.alignment === "center"}
+                                containerRef={
+                                    vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                        ? collisionSourceRef
+                                        : undefined
                                 }
-                                setIsSearchOpen(true);
-                            }}
-                            onCloseSearch={() => {
-                                setIsSearchOpen(false);
-                            }}
-                            cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
-                            cancelContentClassName="meBox-buttonContent"
-                            buttonClass={classNames(classes.button, {
-                                [classes.buttonOffset]: !isCompact && isGuest,
-                            })}
-                            showingSuggestions={isShowingSuggestions}
-                            onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                            onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                            buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
-                            clearButtonClass={classes.clearButtonClass}
-                        />
-                        {meBox}
-                    </ConditionalWrap>
+                                className={classes.nav}
+                                linkClassName={classes.topElement}
+                                afterNode={
+                                    !isCompact &&
+                                    isDesktopLogoCentered && (
+                                        <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
+                                    )
+                                }
+                            />
+                        )}
+                        {isCompact && (
+                            <>
+                                <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
+                                {!isSearchOpen && (
+                                    <>
+                                        {isMobileLogoCentered && <FlexSpacer actualSpacer />}
+                                        <div
+                                            className={classNames(
+                                                isMobileLogoCentered && classes.logoCenterer,
+                                                logoClasses.mobileLogo,
+                                            )}
+                                        >
+                                            <animated.span {...logoProps}>
+                                                <HeaderLogo
+                                                    className={classes.logoContainer}
+                                                    logoClassName="titleBar-logo"
+                                                    logoType={LogoType.MOBILE}
+                                                />
+                                            </animated.span>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {!isCompact && !isDesktopLogoCentered && (
+                            <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
+                        )}
+                        <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
+                            {!isSearchOpen && (
+                                <div className={classes.extraMeBoxIcons}>
+                                    {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                        return <ComponentName key={index} />;
+                                    })}
+                                </div>
+                            )}
+                            <CompactSearch
+                                className={classNames(classes.compactSearch, {
+                                    isCentered: isSearchOpen,
+                                })}
+                                focusOnMount
+                                open={isSearchOpen}
+                                onSearchButtonClick={() => {
+                                    if (pages.search) {
+                                        pages.search.preload();
+                                    }
+                                    setIsSearchOpen(true);
+                                }}
+                                onCloseSearch={() => {
+                                    setIsSearchOpen(false);
+                                }}
+                                cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
+                                cancelContentClassName="meBox-buttonContent"
+                                buttonClass={classNames(classes.button, {
+                                    [classes.buttonOffset]: !isCompact && isGuest,
+                                })}
+                                showingSuggestions={isShowingSuggestions}
+                                onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                                onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
+                                clearButtonClass={classes.clearButtonClass}
+                            />
+                            {meBox}
+                        </ConditionalWrap>
+                    </div>
                 </div>
             </Container>
         </HashOffsetReporter>
@@ -390,14 +393,14 @@ function DesktopMeBox() {
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSPARENT}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
-                    to={`/entry/signin?target=${window.location.href}`}
+                    to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSLUCID}
                     linkClassName={classNames(classes.register, classes.guestButton)}
-                    to={`/entry/register?target=${window.location.href}`}
+                    to={`/entry/register?target=${encodeURIComponent(window.location.href)}`}
                 >
                     {t("Register")}
                 </TitleBarNavItem>
@@ -426,7 +429,7 @@ function MobileMeBox() {
         return (
             <SmartLink
                 className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
-                to={`/entry/signin?target=${window.location.href}`}
+                to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
             >
                 <SignInIcon className={"titleBar-signInIcon"} />
             </SmartLink>

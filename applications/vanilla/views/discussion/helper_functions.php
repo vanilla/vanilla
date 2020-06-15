@@ -7,6 +7,7 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+use Vanilla\Utility\HtmlUtils;
 
 
 if (!function_exists('formatBody')) :
@@ -38,14 +39,18 @@ if (!function_exists('writeBookmarkLink')) :
         }
 
         $discussion = Gdn::controller()->data('Discussion');
+        $isBookmarked = $discussion->Bookmarked == '1';
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
+
+        $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+
         echo anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            'Hijack Bookmark'.($isBookmarked ? ' Bookmarked' : ''),
+            ['title' => $title, 'aria-label' => $accessibleLabel]
         );
     }
 endif;
@@ -425,7 +430,7 @@ if (!function_exists('WriteAdminCheck')):
         if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use')) {
             return;
         }
-        echo '<span class="AdminCheck"><input type="checkbox" name="Toggle"></span>';
+        echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="Toggle"></span>';
     }
 endif;
 
@@ -560,7 +565,7 @@ if (!function_exists('writeCommentOptions')) :
                     $controller->CheckedComments = $session->getAttribute('CheckedComments', []);
                 }
                 $itemSelected = inSubArray($id, $controller->CheckedComments);
-                echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
+                echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
             }
         }
     }

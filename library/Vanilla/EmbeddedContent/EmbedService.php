@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
 use Garden\Schema\ValidationException;
+use League\Uri\Http;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
@@ -15,6 +16,8 @@ use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\CodePenEmbedFactory;
@@ -37,6 +40,7 @@ use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
+use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\RequestValidator;
 
 /**
@@ -177,6 +181,9 @@ class EmbedService implements EmbedCreatorInterface {
             // YouTube
             ->registerFactory($dic->get(YouTubeEmbedFactory::class))
             ->registerEmbed(YouTubeEmbed::class, YouTubeEmbed::TYPE)
+            // Panopto
+            ->registerFactory($dic->get(PanoptoEmbedFactory::class))
+            ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
             // Scrape-able Embeds
             ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)
@@ -240,6 +247,9 @@ class EmbedService implements EmbedCreatorInterface {
         // @see https://github.com/vanilla/dev-inter-ops/issues/23
         // We've had some situations where the site gets in an infinite loop requesting itself.
         $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+
+        // Normalize the encoding on the URL.
+        $url = (string)UrlUtils::normalizeEncoding(Http::createFromString($url));
 
         // Check the cache first.
         if (!$force) {

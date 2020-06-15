@@ -13,7 +13,7 @@ use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\AddonManager;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 
 /**
  * Utility functions for container configuration.
@@ -22,12 +22,16 @@ class ContainerUtils {
     /**
      * Lazily load a config value for some container initialization
      *
-     * @param string $configKey The config key to load.
-     *
+     * @param string $key The config key to load.
+     * @param mixed $defaultValue
      * @return ReferenceInterface A reference for use in the container initialization.
      */
-    public static function config(string $configKey): ReferenceInterface {
-        return new Reference([ConfigurationInterface::class, $configKey]);
+    public static function config(string $key, $defaultValue = false): ReferenceInterface {
+        return new Callback(function (ContainerInterface $dic) use ($key, $defaultValue) {
+            /** @var ConfigurationInterface $config */
+            $config = $dic->get(ConfigurationInterface::class);
+            return $config->get($key, $defaultValue);
+        });
     }
 
     /**
@@ -49,9 +53,9 @@ class ContainerUtils {
      */
     public static function currentTheme(): ReferenceInterface {
         return new Callback(function (ContainerInterface $dic) {
-            /** @type ThemeModel $themeModel */
-            $themeModel = $dic->get(ThemeModel::class);
-            return $themeModel->getCurrentThemeAddon();
+            /** @type ThemeService $themeService */
+            $themeService = $dic->get(ThemeService::class);
+            return $themeService->getCurrentThemeAddon();
         });
     }
 

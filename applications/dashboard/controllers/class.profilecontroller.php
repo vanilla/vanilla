@@ -364,10 +364,12 @@ class ProfileController extends Gdn_Controller {
      */
     public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
-
+        
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);
         $settings = [];
+
+        $this->buildProfile();
 
         // Set up form
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -769,14 +771,15 @@ class ProfileController extends Gdn_Controller {
                 Logger::event(
                     'password_change',
                     Logger::INFO,
-                    '{InsertName} changed password.'
+                    '{InsertName} changed password.',
+                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             } else {
                 Logger::event(
                     'password_change_failure',
                     Logger::INFO,
                     '{InsertName} failed to change password.',
-                    ['Error' => $this->Form->errorString()]
+                    ['Error' => $this->Form->errorString(), Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }

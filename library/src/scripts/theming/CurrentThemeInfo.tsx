@@ -22,11 +22,12 @@ interface IProps {
     theme: ITheme;
     editButton?: React.ReactNode;
     copyButton?: React.ReactNode;
+    revisionHistoryButton?: React.ReactNode;
 }
 
 export default function CurrentThemeInfo(props: IProps) {
     const classes = currentThemeClasses();
-    const { theme, copyButton, editButton } = props;
+    const { theme, copyButton, editButton, revisionHistoryButton } = props;
     const { info } = theme.preview;
     return (
         <React.Fragment>
@@ -41,7 +42,7 @@ export default function CurrentThemeInfo(props: IProps) {
                             <div key={i} className={classes.description}>
                                 <p>
                                     <strong>{key === "Description" ? "" : `${key}:`}</strong>{" "}
-                                    {value.type === "date" ? <DateTime timestamp={value.info} /> : value.info}
+                                    {value.type === "date" ? <DateTime timestamp={value.value} /> : value.value}
                                 </p>
                             </div>
                         ))}
@@ -49,6 +50,7 @@ export default function CurrentThemeInfo(props: IProps) {
                 <div className={classes.themeActionButtons}>
                     {editButton}
                     {copyButton}
+                    {revisionHistoryButton}
                 </div>
             </section>
         </React.Fragment>

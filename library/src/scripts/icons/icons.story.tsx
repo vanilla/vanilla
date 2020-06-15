@@ -40,7 +40,8 @@ import {
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
+import { ColorHelper, color } from "csx";
 
 const story = storiesOf("Components", module);
 
@@ -318,6 +319,21 @@ story.add("Icons", () => {
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`RevisionStatusPublishedIcon`}>
                     <RevisionStatusPublishedIcon />
+                </StoryTileAndTextCompact>
+            </StoryTiles>
+            <StoryHeading>New Post Menu</StoryHeading>
+            <StoryTiles>
+                <StoryTileAndTextCompact backgroundColor={color("#ccc")} text={`NewPostMenuIcon`}>
+                    <CommonIcons.NewPostMenuIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
+                    <CommonIcons.NewDiscussionIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewIdeaIcon`}>
+                    <CommonIcons.NewIdeaIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`NewPollIcon`}>
+                    <CommonIcons.NewPollIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>

@@ -88,7 +88,36 @@ class NotificationsApiTest extends AbstractAPIv2Test {
      * Test PATCH /notifications.
      */
     public function testPatchIndex() {
-        $this->assertTrue(true);
+        $ids = [];
+        for ($i = 0; $i < 3; $i++) {
+            $ids[] = $this->addNotification();
+            $ids[] = $this->addNotification();
+        }
+
+        $notifications = array_column(
+            $this->api()->get("/notifications")->getBody(),
+            null,
+            'notificationID'
+        );
+
+        // Make sure the notifications were added and are not read.
+        foreach ($ids as $id) {
+            $this->assertArrayHasKey($id, $notifications);
+            $this->assertFalse($notifications[$id]['read']);
+        }
+
+        // Flag ALL notifications as read.
+        $r = $this->api()->patch("/notifications", ["read" => true]);
+
+        $patched = array_column(
+            $this->api()->get("/notifications")->getBody(),
+            null,
+            'notificationID'
+        );
+
+        foreach ($patched as $notification) {
+            $this->assertTrue($notification['read']);
+        }
     }
 
     /**
@@ -108,6 +137,7 @@ class NotificationsApiTest extends AbstractAPIv2Test {
         // Flag the notification as read.
         $patchResponse = $this->api()->patch("/notifications/{$id}", ["read" => true]);
         $this->assertEquals($patchResponse->getStatusCode(), 200);
+        $this->assertTrue($patchResponse['read']);
 
         // Get the updated notification.
         $updatedGetResponse = $this->api()->get("/notifications/{$id}");

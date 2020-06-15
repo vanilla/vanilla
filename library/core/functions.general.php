@@ -693,27 +693,6 @@ if (!function_exists('deprecated')) {
     }
 }
 
-if (!function_exists('explodeTrim')) {
-    /**
-     * Split a string by a string and do some trimming to clean up faulty user input.
-     *
-     * @param string $delimiter The boundary string.
-     * @param string $string The input string.
-     * @param bool $implode Whether or not to re-implode the string before returning.
-     * @return array|string Returns the exploded string as an array or a string if {@link $implode} is true.
-     */
-    function explodeTrim($delimiter, $string, $implode = false) {
-        $arr = explode($delimiter, $string);
-        $arr = array_map('trim', $arr);
-        $arr = array_filter($arr);
-        if ($implode) {
-            return implode($delimiter, $arr);
-        } else {
-            return $arr;
-        }
-    }
-}
-
 if (!function_exists('domGetContent')) {
     /**
      * Search a DOM for a selector and return the contents.
@@ -1479,6 +1458,11 @@ if (!function_exists('betterRandomString')) {
         } elseif (function_exists('mcrypt_create_iv')) {
             // @codeCoverageIgnoreStart
             $randomChars = unpack('C*', mcrypt_create_iv($length));
+            $cryptoStrong = true;
+            // @codeCoverageIgnoreEnd
+        } elseif (function_exists("random_bytes")) {
+            // @codeCoverageIgnoreStart
+            $randomChars = unpack("C*", random_bytes($length));
             $cryptoStrong = true;
             // @codeCoverageIgnoreEnd
         } else {

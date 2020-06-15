@@ -109,6 +109,13 @@ interface RequestInterface {
     public function getBody();
 
     /**
+     * Get the raw request body of the request.
+     *
+     * @return string
+     */
+    public function getRawBody(): string;
+
+    /**
      * Set the body of the message.
      *
      * @param string|array $body The new body of the message.

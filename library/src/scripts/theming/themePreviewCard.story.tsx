@@ -39,15 +39,23 @@ story.add("Preview Card", () => {
 
                 <StoryHeading depth={1}>Preview card (Colored)</StoryHeading>
 
-                <ThemePreviewCard globalPrimary={"#985E6D"} noActions isActiveTheme={true} />
+                <ThemePreviewCard
+                    preview={{ variables: { globalPrimary: "#985E6D" } }}
+                    noActions
+                    isActiveTheme={true}
+                />
 
                 <StoryHeading depth={1}>Preview card (Dark Mode)</StoryHeading>
                 <ThemePreviewCard
-                    globalBg={"#0e0f19"}
-                    globalPrimary={"#3ebdff"}
-                    globalFg={"#fff"}
-                    titleBarBg={"#0e0f19"}
-                    titleBarFg={"#fff"}
+                    preview={{
+                        variables: {
+                            globalBg: "#0e0f19",
+                            globalPrimary: "#3ebdff",
+                            globalFg: "#fff",
+                            titleBarBg: "#0e0f19",
+                            titleBarFg: "#fff",
+                        },
+                    }}
                     noActions
                     isActiveTheme={true}
                 />

@@ -98,6 +98,15 @@ interface FormatInterface {
     public function parseImageUrls(string $content): array;
 
     /**
+     * Parse image data from post content.
+     *
+     * @param string $content
+     *
+     * @return array
+     */
+    public function parseImages(string $content): array;
+
+    /**
      * Parse out a list of usernames mentioned in the post contents.
      *
      * @param string $content The raw content to parse.

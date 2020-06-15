@@ -291,7 +291,9 @@
             border-bottom: $component_border;
             padding-top: $component-base_padding;
             padding-bottom: $component-base_padding;
-            background: $component_bg;
+            @if ($staticVariables) {
+                background: $component_bg;
+            }
         }
 
         td:first-child {

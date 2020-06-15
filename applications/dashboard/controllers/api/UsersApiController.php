@@ -474,14 +474,7 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
-            'userID:a?' => [
-                'description' => 'One or more user IDs to lookup.',
-                'items' => ['type' => 'integer'],
-                'style' => 'form',
-                'x-filter' => [
-                    'field' => 'u.UserID',
-                ],
-            ],
+            'userID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'u.UserID']),
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
@@ -493,7 +486,7 @@ class UsersApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ]
-        ], ['UserIndex', 'in'])->setDescription('List users.');
+        ], ['UserIndex', 'in']);
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
@@ -853,13 +846,13 @@ class UsersApiController extends AbstractApiController {
         // The image is going to be squared off. Go with the larger dimension.
         $size = $height >= $width ? $height : $width;
 
-        $destination = ProfileController::AVATAR_FOLDER.'/'.$this->generateUploadPath($ext, true);
+        $destination = $photo->generatePersistedUploadPath(ProfileController::AVATAR_FOLDER);
 
         // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
-        $this->savePhoto($photo, $destination, $size, 'p', true);
+        $this->savePhoto($photo, $size, 'p', true);
 
         // Resize and save the thumbnail.
-        $this->savePhoto($photo, $destination, $thumbSize, 'n');
+        $this->savePhoto($photo, $thumbSize, 'n');
 
         return $destination;
     }
@@ -868,22 +861,14 @@ class UsersApiController extends AbstractApiController {
      * Save a photo upload.
      *
      * @param UploadedFile $upload An instance of an uploaded file.
-     * @param string $destination The path, relative to the uploads directory, to save the images into.
      * @param int $size Maximum size, in pixels, for the photo.
      * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
      * @param bool $copy Should the upload be saved by copying, instead of moving?
-     * @throws Exception if there was an error encountered when saving the upload.
-     * @return array|bool
      */
-    private function savePhoto(UploadedFile $upload, $destination, $size, $prefix = '', $copy = false) {
-        $this->imageResizer->resize(
-            $upload->getFile(),
-            null,
+    private function savePhoto(UploadedFile $upload, $size, $prefix = '', $copy = false) {
+        $upload->setImageConstraints(
             ['crop' => true, 'height' => $size, 'width' => $size]
-        );
-
-        $result = $this->saveUpload($upload, $destination, "{$prefix}%s", $copy);
-        return $result;
+        )->persistUpload($copy, ProfileController::AVATAR_FOLDER, "{$prefix}%s");
     }
 
     /**

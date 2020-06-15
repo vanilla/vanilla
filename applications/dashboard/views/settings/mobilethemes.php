@@ -94,7 +94,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
         echo '</div>';
         echo '<div class="media-description Description"><p class="description">'.$this->data('EnabledTheme.Description', '').'</p>';
 
-        if ($this->data('EnabledTheme.Options')) {
+        if ($this->data('EnabledTheme.Options') && $this->data('EnabledTheme.isMobile')) {
             $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
                 anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
 

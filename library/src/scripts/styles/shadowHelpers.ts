@@ -55,7 +55,15 @@ export const shadowVariables = useThemeCache(() => {
         opacity: 0.5,
     });
 
-    return { widget, widgetHover, dropDown, modal };
+    const floatingButton: IShadowSizing = makeVariables("floatingButton", {
+        horizontalOffset: 0,
+        verticalOffset: 5,
+        blur: 10,
+        spread: 0,
+        opacity: 0.5,
+    });
+
+    return { widget, widgetHover, dropDown, modal, floatingButton };
 });
 
 export const shadowHelper = useThemeCache(() => {
@@ -83,6 +91,15 @@ export const shadowHelper = useThemeCache(() => {
 
     const dropDown = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.dropDown;
+        return {
+            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
+                opacity,
+            )}`,
+        };
+    };
+
+    const floatingButton = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.floatingButton;
         return {
             boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
                 opacity,
@@ -120,7 +137,7 @@ export const shadowHelper = useThemeCache(() => {
         };
     };
 
-    return { embed, embedHover, dropDown, modal, contrast, makeShadow };
+    return { embed, embedHover, dropDown, modal, contrast, makeShadow, floatingButton };
 });
 
 export const shadowOrBorderBasedOnLightness = (

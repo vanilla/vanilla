@@ -16,6 +16,12 @@ use Gdn_Session as SessionInterface;
  */
 class CacheControlMiddleware {
 
+    /** @var string Disable auto-vary for sessioned users. */
+    const META_NO_VARY = 'noVary';
+
+    /** @var string Maximum cache age. */
+    const MAX_CACHE = 'public, max-age=31536000';
+
     /** @var string Standard Cache-Control header string for public, cacheable content. */
     const PUBLIC_CACHE = 'public, max-age=120';
 
@@ -75,7 +81,7 @@ class CacheControlMiddleware {
             );
         }
 
-        if ($response->getHeader('Cache-Control') !== self::NO_CACHE) {
+        if ($response->getHeader('Cache-Control') !== self::NO_CACHE && !$response->getMeta(self::META_NO_VARY)) {
             // Unless we have NO_CACHE set make sure to set the vary header.
             $response->setHeader('Vary', self::VARY_COOKIE);
         }

@@ -5,18 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    debugHelper,
-    ISimpleBorderStyle,
-    paddings,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, unit, userSelect } from "@library/styles/styleHelpers";
 import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, px } from "csx";
+import { important, percent, px } from "csx";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -75,6 +67,13 @@ export const tokensClasses = useThemeCache(() => {
                     },
                     ".tokens__input": {
                         flexGrow: 1,
+                        display: important("inline-flex"),
+                        alignItems: "center",
+                        justifyContent: "stretch",
+                        ...margins({
+                            vertical: 0,
+                        }),
+                        minHeight: unit(vars.token.minHeight),
                     },
                     input: {
                         width: percent(100),
@@ -99,6 +98,9 @@ export const tokensClasses = useThemeCache(() => {
                 paddingLeft: px(6),
                 fontWeight: globalVars.fonts.weights.normal,
                 fontSize: globalVars.fonts.size.small,
+            },
+            "& .tokens--is-disabled": {
+                opacity: formElVars.disabled.opacity,
             },
             "& .tokens-clear": {
                 height: unit(globalVars.icon.sizes.default),
@@ -133,5 +135,13 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    return { root, removeIcon, inputWrap };
+    const withIndicator = style("withIndicator", {
+        $nest: {
+            "& .inputText.inputText": {
+                fontSize: "inherit",
+            },
+        },
+    });
+
+    return { root, removeIcon, inputWrap, withIndicator };
 });

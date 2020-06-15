@@ -88,6 +88,8 @@ export function margins(spacing: ISpacing) {
  * Extend an item container outward to compensate for item paddings.
  * Usually used in a grid.
  *
+ * If you use this function, make sure the parent is set to 100% width with over flow hidden.
+ *
  * @param itemPaddingX A single unit of padding of a horizontal side of the item.
  */
 export function extendItemContainer(itemPaddingX: number): NestedCSSProperties {

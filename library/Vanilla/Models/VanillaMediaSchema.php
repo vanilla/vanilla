@@ -8,6 +8,8 @@
 namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
+use Vanilla\ApiUtils;
+use Vanilla\ImageResizer;
 
 /**
  * Schema to validate shape of some media upload metadata.
@@ -38,11 +40,40 @@ class VanillaMediaSchema extends Schema {
                 'insertUserID:i', // The user that created the media item.
                 'foreignType:s|n', // Table the media is linked to.
                 'foreignID:i|n', // The ID of the table
+                'foreignUrl:s?'
             ];
 
             $fields = array_merge($fields, $ownDBFields);
         }
 
         parent::__construct($this->parseInternal($fields));
+    }
+
+    /**
+     * Normalize a media DB row into a format that matches this schema.
+     *
+     * @param array $row
+     * @return array
+     */
+    public static function normalizeFromDbRecord(array $row): array {
+        $row['foreignID'] = $row['ForeignID'] ?? null;
+        $row['foreignType'] = $row['ForeignTable'] ?? null;
+
+        if (array_key_exists('Path', $row)) {
+            $parsed = \Gdn_Upload::parse($row['Path']);
+            $row['url'] = $parsed['Url'];
+
+            $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
+            if (in_array($ext, array_keys(ImageResizer::getExtType()))) {
+                $row['height'] = $row['ImageHeight'] ?? null;
+                $row['width'] = $row['ImageWidth'] ?? null;
+            }
+        } else {
+            $row['url'] = null;
+        }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($row);
+        $schema = new VanillaMediaSchema(true);
+        return $schema->validate($schemaRecord);
     }
 }

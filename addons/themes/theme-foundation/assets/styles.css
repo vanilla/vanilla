@@ -1,90 +1,94 @@
+/*
+ * These styles apply ONLY to the header and footer assets.
+ */
+
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .footer {
-  background: #f5f5f6;
-  color: #555A62;
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 18px 0;
+    background: #f5f5f6;
+    color: #555a62;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 18px 0;
 }
 
 .footer-wrap {
-  padding-left: 18px;
-  padding-right: 18px;
-  max-width: 1236px;
-  margin: 0 auto;
+    padding-left: 18px;
+    padding-right: 18px;
+    max-width: 1236px;
+    margin: 0 auto;
 }
 
 .footer a {
-  color: #0291DB;
+    color: #0291db;
 }
 .footer a:hover {
-  color: #0276b3;
+    color: #0276b3;
 }
 
 .footer-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  margin: -3px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: -3px;
 }
 
 .footer-col {
-  padding: 0 3px;
+    padding: 0 3px;
 }
 
 .footer-col-copyRight {
-  justify-content: flex-start;
+    justify-content: flex-start;
 }
 
 .footer-col-logo {
-  justify-content: flex-end;
+    justify-content: flex-end;
 }
 
 .footer-col-copyRight,
 .footer-col-logo {
-  flex: 1;
-  display: flex;
+    flex: 1;
+    display: flex;
 }
 
 .logo {
-  width: 120px;
-  height: 28px;
-  opacity: 0.6;
+    width: 120px;
+    height: 28px;
+    opacity: 0.6;
 }
 
 @media screen and (max-width: 768px) {
-  .footer-row {
-    display: block;
-  }
+    .footer-row {
+        display: block;
+    }
 
-  .footer-col {
-    width: 100%;
-    text-align: center;
-    margin: 6px 0;
-  }
+    .footer-col {
+        width: 100%;
+        text-align: center;
+        margin: 6px 0;
+    }
 
-  .footer-col:first-child {
-    margin-top: 0;
-  }
+    .footer-col:first-child {
+        margin-top: 0;
+    }
 
-  .footer-col:last-child {
-    margin-bottom: 0;
-  }
+    .footer-col:last-child {
+        margin-bottom: 0;
+    }
 
-  .footer-col-copyRight,
-.footer-col-logo {
-    justify-content: center;
-  }
+    .footer-col-copyRight,
+    .footer-col-logo {
+        justify-content: center;
+    }
 
-  .logo {
-    margin: 0 auto;
-  }
+    .logo {
+        margin: 0 auto;
+    }
 }
 
 /*# sourceMappingURL=styles.css.map */

@@ -24,6 +24,8 @@ class MemcachedWithLocalTest extends MemcachedTest {
      */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
-        self::$memcached->setStoreDefault(\Gdn_Cache::FEATURE_LOCAL, true);
+        if (self::$memcached !== null) {
+            self::$memcached->setStoreDefault(\Gdn_Cache::FEATURE_LOCAL, true);
+        }
     }
 }

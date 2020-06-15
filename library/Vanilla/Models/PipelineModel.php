@@ -119,4 +119,28 @@ class PipelineModel extends Model implements InjectableInterface {
         });
         return $result;
     }
+
+    /**
+     * Delete resource rows.
+     *
+     * @param array $where Conditions to restrict the deletion.
+     * @param array $options Options for the delete query.
+     *    - limit (int): Limit on the results to be deleted.
+     * @throws Exception If an error is encountered while performing the query.
+     * @return bool True.
+     */
+    public function delete(array $where, array $options = []): bool {
+        $databaseOperation = new Operation();
+        $databaseOperation->setType(Operation::TYPE_DELETE);
+        $databaseOperation->setCaller($this);
+        $databaseOperation->setWhere($where);
+        $databaseOperation->setOptions($options);
+        $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
+            return parent::delete(
+                $databaseOperation->getWhere(),
+                $databaseOperation->getOptions()
+            );
+        });
+        return $result;
+    }
 }

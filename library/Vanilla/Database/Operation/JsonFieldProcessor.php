@@ -49,6 +49,8 @@ class JsonFieldProcessor implements Processor {
         } elseif ($operation->getType() === Operation::TYPE_SELECT) {
             $result = $stack($operation);
             return $this->unpackFields($result);
+        } else {
+            return $stack($operation);
         }
     }
 

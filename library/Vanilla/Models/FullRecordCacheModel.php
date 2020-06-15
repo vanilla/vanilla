@@ -20,11 +20,12 @@ class FullRecordCacheModel extends PipelineModel {
      * Model constructor.
      *
      * @param string $table Database table associated with this resource.
+     * @param \Gdn_Cache $cache The cache instance.
      * @param array|null $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $table, ?array $defaultCacheOptions = []) {
+    public function __construct(string $table, \Gdn_Cache $cache, ?array $defaultCacheOptions = []) {
         parent::__construct($table);
-        $this->modelCache = ModelCache::fromModel($this, $defaultCacheOptions);
+        $this->modelCache = new ModelCache($this->getTable(), $cache, $defaultCacheOptions);
         $this->addPipelineProcessor($this->modelCache->createInvalidationProcessor());
     }
 

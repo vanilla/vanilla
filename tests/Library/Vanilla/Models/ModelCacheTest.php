@@ -59,10 +59,7 @@ class ModelCacheTest extends TestCase {
         });
 
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $this->modelCache = ModelCache::fromModel($this->model);
-
-        // Apply a specific cache.
-        $this->modelCache->setCache(new \Gdn_Dirtycache());
+        $this->modelCache = new ModelCache($this->model->getTable(), new \Gdn_Dirtycache());
     }
 
     /**
@@ -129,8 +126,7 @@ class ModelCacheTest extends TestCase {
      */
     public function testFullRecordCacheModelInvalidation() {
         /** @var FullRecordCacheModel $model */
-        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model']);
-        $model->getModelCache()->setCache(new \Gdn_Dirtycache());
+        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model', new \Gdn_Dirtycache()]);
         $this->model = $model;
 
         $fooID = $this->insertOne('foo');
@@ -170,12 +166,11 @@ class ModelCacheTest extends TestCase {
         $this->runWithConfig([
             'Feature.'.ModelCache::DISABLE_FEATURE_FLAG.'.Enabled' => true,
         ], function () {
-            $this->modelCache = ModelCache::fromModel($this->model);
             $mockCache = $this->createMock(\Gdn_Dirtycache::class);
             $mockCache
                 ->expects($this->never())
                 ->method($this->anything());
-            $this->modelCache->setCache($mockCache);
+            $this->modelCache = new ModelCache($this->model->getTable(), $mockCache);
             $this->testAutoInvalidation();
         });
         FeatureFlagHelper::clearCache();

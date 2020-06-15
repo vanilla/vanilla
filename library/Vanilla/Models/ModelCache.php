@@ -30,7 +30,7 @@ class ModelCache implements InjectableInterface {
     const DISABLE_FEATURE_FLAG = "DisableNewModelCaching";
 
     /** @var string */
-    private $namespace;
+    private $cacheNameSpace;
 
     /** @var number */
     private $defaultCacheOptions;
@@ -45,37 +45,17 @@ class ModelCache implements InjectableInterface {
     private $isFeatureDisabled;
 
     /**
-     * Create a cache from a model.
-     *
-     * @param Model $model The model to create from.
-     * @param array|null $defaultCacheOptions Default options to apply for storing cache values.
-     *
-     * @return ModelCache
-     */
-    public static function fromModel(Model $model, ?array $defaultCacheOptions = []): ModelCache {
-        $cache = \Gdn::getContainer()->getArgs(ModelCache::class, [$model->getTable(), $defaultCacheOptions]);
-        return $cache;
-    }
-
-    /**
      * Constructor.
      *
-     * @param string $namespace
+     * @param string $cacheNameSpace Namespace to use in the cache.
+     * @param \Gdn_Cache $cache The cache instance.
      * @param array|null $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $namespace, ?array $defaultCacheOptions = []) {
-        $this->namespace = $namespace;
+    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, ?array $defaultCacheOptions = []) {
+        $this->cache = $cache;
+        $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
-    }
-
-    /**
-     * Dependency Injection.
-     *
-     * @param \Gdn_Cache $cache
-     */
-    public function setDependencies(\Gdn_Cache $cache) {
-        $this->cache = $cache;
     }
 
     /**
@@ -86,7 +66,7 @@ class ModelCache implements InjectableInterface {
      * @return string
      */
     public function createCacheKey(array $keyArgs): string {
-        $key = $this->namespace . '-' . $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
+        $key = $this->cacheNameSpace . '-' . $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
         return $key;
     }
 
@@ -154,7 +134,7 @@ class ModelCache implements InjectableInterface {
         }
 
         if ($this->incrementingKey === null) {
-            $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->namespace;
+            $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
             $result = $this->cache->get($incrementKeyCacheKey);
 
             if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
@@ -183,7 +163,7 @@ class ModelCache implements InjectableInterface {
             $newKey = 0;
         }
 
-        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->namespace;
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
         $this->incrementingKey = $newKey;
         $this->cache->store($incrementKeyCacheKey, $newKey);
     }

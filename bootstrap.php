@@ -11,6 +11,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
+use Vanilla\Models\Model;
 use Vanilla\Permissions;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
@@ -316,6 +317,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
     ->rule('Gdn_Model')
+    ->setShared(true)
+
+    ->rule(Model::class)
     ->setShared(true)
 
     ->rule(Contracts\Models\UserProviderInterface::class)

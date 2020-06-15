@@ -7,29 +7,19 @@
 
 namespace VanillaTests\Library\Core\Cache;
 
-use Cache\IntegrationTests\SimpleCacheTest;
 use Vanilla\Cache\ValidatingCacheCacheAdapter;
 
 /**
  * Integration tests for `Gdn_DirtyCache`.
  */
 class DirtyCacheTest extends SimpleCacheTest {
-    protected const SKIP_TTL = 'Gdn_DirtyCache doesn\'t support TTL';
-
     /**
      * {@inheritDoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
 
-        $this->skippedTests = [
-            'testSetTtl' => self::SKIP_TTL,
-            'testSetExpiredTtl' => self::SKIP_TTL,
-            'testSetMultipleTtl' => self::SKIP_TTL,
-            'testSetMultipleExpiredTtl' => self::SKIP_TTL,
-            'testSetInvalidTtl' => self::SKIP_TTL,
-            'testSetMultipleInvalidTtl' => self::SKIP_TTL,
-        ];
+        $this->skippedTests = self::SKIP_TTL;
     }
 
     /**

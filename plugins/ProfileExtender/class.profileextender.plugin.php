@@ -577,15 +577,15 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $i = 0;
         foreach ($fields as $slug => $fieldData) {
             // Add this field to the output
-            $columnNames[] = val('Label', $fieldData, $slug);
+            if (!strtolower($slug) === 'location') {
+                $columnNames[] = val('Label', $fieldData, $slug);
 
-            // Add this field to the query.
-            $quoted = Gdn::sql()->quote("Profile.$slug");
-            if (strcasecmp($slug, 'location')) {
-                Gdn::sql()
-                    ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
-                    ->select('a' . $i . '.Value', '', $slug);
-                $i++;
+                // Add this field to the query.
+                $quoted = Gdn::sql()->quote("Profile.$slug");
+                    Gdn::sql()
+                        ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
+                        ->select('a' . $i . '.Value', '', $slug);
+                    $i++;
             }
         }
 

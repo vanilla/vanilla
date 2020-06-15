@@ -14,7 +14,7 @@ use DOMDocument;
  * Class for stripping images and truncating text from a Dom.
  *
  */
- class DomUtils {
+class DomUtils {
 
     /**
      * Remove embeds from the dom.

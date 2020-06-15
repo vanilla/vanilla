@@ -249,6 +249,11 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
     document.removeEventListener("X-DOMContentReady", callback);
 }
 
+export function triggerContentLoaded() {
+    const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
+    document.dispatchEvent(contentEvent);
+}
+
 /**
  * Make a URL to a user's profile.
  */

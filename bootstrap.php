@@ -503,13 +503,6 @@ $dic->call(function (
     }
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
-    // Construct the logger earlier so that its dependencies are satisfied.
-    $log = $dic->get(\Vanilla\Logging\LogDecorator::class);
-    // Replace the logger interface with the decorator.
-    $dic->rule(\Vanilla\Logging\LogDecorator::class)
-        ->addAlias(\Psr\Log\LoggerInterface::class);
-    Logger::setLogger(null);
-
     // Load the configurations for enabled addons.
     foreach ($addonManager->getEnabled() as $addon) {
         /* @var Addon $addon */
@@ -610,3 +603,10 @@ register_shutdown_function(function () use ($dic) {
     // Trigger SchedulerDispatch event
     $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
 });
+
+// Construct the logger earlier so that its dependencies are satisfied.
+$log = $dic->get(\Vanilla\Logging\LogDecorator::class);
+// Replace the logger interface with the decorator.
+$dic->rule(\Vanilla\Logging\LogDecorator::class)
+    ->addAlias(\Psr\Log\LoggerInterface::class);
+Logger::setLogger(null);

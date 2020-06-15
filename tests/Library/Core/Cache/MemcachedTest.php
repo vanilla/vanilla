@@ -27,8 +27,8 @@ class MemcachedTest extends SimpleCacheTest {
         if (!empty($host)) {
             self::container()->call(function (
                 ConfigurationInterface $config
-            ) {
-                $config->saveToConfig('Cache.Memcached.Store', ['memcached:11211'], false);
+            ) use ($host) {
+                $config->saveToConfig('Cache.Memcached.Store', [$host], false);
                 $config->saveToConfig('Cache.Memcached.Option.' . \Memcached::OPT_COMPRESSION, true, false);
                 $config->saveToConfig('Cache.Memcached.Option.' . \Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT, false);
                 $config->saveToConfig('Cache.Memcached.Option.' . \Memcached::OPT_LIBKETAMA_COMPATIBLE, true, false);

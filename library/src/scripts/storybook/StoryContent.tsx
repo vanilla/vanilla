@@ -7,7 +7,8 @@
 import React, { useEffect } from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { clearUniqueIDCache } from "@library/utility/idUtils";
-import { DeviceProvider } from "@library/layout/DeviceContext";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/layoutStyles";
 
 export interface IStoryHeadingProps {
     depth?: number;
@@ -26,8 +27,8 @@ export function StoryContent(props: IStoryHeadingProps) {
 
     const classes = storyBookClasses();
     return (
-        <DeviceProvider>
+        <LayoutProvider>
             <div className={classes.content}>{props.children}</div>
-        </DeviceProvider>
+        </LayoutProvider>
     );
 }

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { onContent, getMeta, onReady } from "@library/utility/appUtils";
+import { getMeta, onContent, onReady } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -22,12 +22,14 @@ import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
-import { createBrowserHistory, History } from "history";
-import { applySharedPortalContext, mountPortal } from "@vanilla/react-utils";
+import { createBrowserHistory } from "history";
+import { applySharedPortalContext } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
 import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/layoutStyles";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -45,7 +47,7 @@ Router.addRoutes([
 applySharedPortalContext(props => {
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            {props.children}
+            <LayoutProvider type={LayoutTypes.LEGACY}>{props.children}</LayoutProvider>
         </AppContext>
     );
 });

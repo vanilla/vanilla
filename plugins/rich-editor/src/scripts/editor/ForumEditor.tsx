@@ -13,10 +13,10 @@ import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
 import { Provider } from "react-redux";
-import { DeviceProvider } from "@library/layout/DeviceContext";
-import { useUniqueID } from "@library/utility/idUtils";
 import { hasPermission } from "@library/features/users/Permission";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/layoutStyles";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
@@ -34,7 +34,7 @@ export function ForumEditor(props: IProps) {
     const [hasFocus, setHasFocus] = useState(false);
     return (
         <Provider store={store}>
-            <DeviceProvider>
+            <LayoutProvider>
                 <Editor
                     isPrimaryEditor={true}
                     legacyMode={true}
@@ -58,7 +58,7 @@ export function ForumEditor(props: IProps) {
                         <EditorEmbedBar />
                     </div>
                 </Editor>
-            </DeviceProvider>
+            </LayoutProvider>
         </Provider>
     );
 }

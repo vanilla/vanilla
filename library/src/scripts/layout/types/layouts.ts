@@ -1,7 +1,14 @@
 import { threeColumnLayout } from "@library/layout/types/threeColumn";
+import { LayoutTypes } from "@library/layout/layoutStyles";
 
-export const getLayouts = (props: { gutter; globalVars; forcedVars }) => {
+export const getLayouts = () => {
+    const variables = {
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout(),
+    };
+
     return {
-        threeColumns: threeColumnLayout(props),
+        mediaQueries: (currentType: LayoutTypes) => {
+            variables[currentType].mediaQueries();
+        },
     };
 };

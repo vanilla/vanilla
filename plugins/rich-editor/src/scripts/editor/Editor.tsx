@@ -6,8 +6,8 @@
 import React, { useState, useMemo } from "react";
 import { IEditorProps, EditorContext } from "@rich-editor/editor/context";
 import Quill from "quill/core";
-import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { EditorContentContextProvider } from "@rich-editor/editor/contentContext";
+import { useLayout } from "@library/layout/LayoutContext";
 
 /**
  * The editor root.
@@ -18,7 +18,7 @@ import { EditorContentContextProvider } from "@rich-editor/editor/contentContext
  */
 export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
-    const device = useDevice();
+    const { isCompact } = useLayout();
 
     return (
         <EditorContext.Provider
@@ -27,7 +27,7 @@ export const Editor = (props: IEditorProps) => {
                 onFocus: props.onFocus,
                 quill,
                 setQuillInstance,
-                isMobile: device.isMobile,
+                isMobile: isCompact,
             }}
         >
             <EditorContentContextProvider quill={quill}>{props.children}</EditorContentContextProvider>

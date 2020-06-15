@@ -9,7 +9,6 @@ import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
@@ -22,6 +21,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useComponentDebug } from "@vanilla/react-utils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     action?: React.ReactNode;
@@ -40,7 +40,7 @@ interface IProps {
  * A component representing a single crumb in a breadcrumb component.
  */
 export default function Banner(props: IProps) {
-    const device = useDevice();
+    const { isCompact } = useLayout();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
 
@@ -80,10 +80,7 @@ export default function Banner(props: IProps) {
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
-    const hideButton =
-        device === Devices.MOBILE ||
-        device === Devices.XS ||
-        bannerVariables().presets.button.preset === ButtonPreset.HIDE;
+    const hideButton = isCompact || bannerVariables().presets.button.preset === ButtonPreset.HIDE;
 
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>

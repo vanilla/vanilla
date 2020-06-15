@@ -13,7 +13,6 @@ import { buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
@@ -26,6 +25,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { SettingsIcon } from "@library/icons/titleBar";
+import { ILayoutProps, withLayout } from "@library/layout/LayoutContext";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -121,7 +121,7 @@ export class NotificationsContents extends React.Component<IProps> {
 }
 
 // For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IOwnProps extends INotificationsProps, IDeviceProps {
+interface IOwnProps extends INotificationsProps, ILayoutProps {
     className?: string;
     userSlug: string;
 }
@@ -184,4 +184,4 @@ function mapStateToProps(state: INotificationsStoreState) {
 }
 
 // Connect Redux to the React component.
-export default connect(mapStateToProps, mapDispatchToProps)(withDevice(NotificationsContents));
+export default connect(mapStateToProps, mapDispatchToProps)(withLayout(NotificationsContents));

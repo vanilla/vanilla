@@ -11,10 +11,10 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -71,13 +71,13 @@ export interface IState {
 export default function DropDown(props: IDropDownProps) {
     const ownID = useUniqueID("dropDown");
     const id = props.id || ownID;
-    const device = useDevice();
+    const { isCompact } = useLayout();
 
     const { title } = props;
     const mobileTitle = props.mobileTitle ?? title;
     const classes = dropDownClasses();
     const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
-    const openAsModal = props.openAsModal || device === Devices.MOBILE || device === Devices.XS;
+    const openAsModal = props.openAsModal || isCompact;
     const ownButtonRef = useRef<HTMLButtonElement>(null);
     const openDirection = resolveOpenDirection(props, props.buttonRef || ownButtonRef);
 

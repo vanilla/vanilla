@@ -8,7 +8,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { modalClasses } from "@library/modal/modalStyles";
@@ -20,6 +19,7 @@ import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
 import { actionBarClasses } from "@library/headers/ActionBarStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     callToActionTitle?: string;
@@ -46,8 +46,8 @@ interface IProps {
  * Implement editor header component
  */
 export function ActionBar(props: IProps) {
-    const device = useDevice();
-    const showMobileDropDown = (device === Devices.MOBILE || device === Devices.XS) && props.mobileDropDownTitle;
+    const { isCompact } = useLayout();
+    const showMobileDropDown = isCompact && props.mobileDropDownTitle;
     const restoreRef = useRef<HTMLLIElement | null>(null);
     const restoreSize = useMeasure(restoreRef);
     const backRef = useRef<HTMLLIElement | null>(null);

@@ -11,7 +11,6 @@ import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 
 interface IProps extends INotificationsProps {
     countUnread: number;

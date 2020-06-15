@@ -10,12 +10,12 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
 import Banner from "@library/banner/Banner";
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
+import { LayoutProvider } from "@library/layout/LayoutContext";
 
 export default {
     title: "Banner",
@@ -30,14 +30,14 @@ function StoryBanner(props: { title: string; forceSearchOpen?: boolean; isConten
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <DeviceProvider>
+                <LayoutProvider>
                     <Banner
                         forceSearchOpen={props.forceSearchOpen}
                         isContentBanner={props.isContentBanner}
                         title={props.title}
                         description="This is a description. They're pretty great, you should try one sometime."
                     />
-                </DeviceProvider>
+                </LayoutProvider>
             </SearchContext.Provider>
         </MemoryRouter>
     );

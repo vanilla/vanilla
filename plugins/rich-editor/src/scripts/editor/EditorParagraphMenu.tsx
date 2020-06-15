@@ -6,13 +6,13 @@
 
 import React from "react";
 import { useEditor } from "@rich-editor/editor/context";
-import { useDevice } from "@library/layout/DeviceContext";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export function EditorParagraphMenu() {
     const { isLoading, quill } = useEditor();
-    const device = useDevice();
-    if (!quill || isLoading || device.isMobile) {
+    const { isCompact } = useLayout();
+    if (!quill || isLoading || isCompact) {
         return null;
     } else {
         return <ParagraphMenusBarToggle />;

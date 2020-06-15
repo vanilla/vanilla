@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 import getStore from "@library/redux/getStore";
@@ -22,6 +21,7 @@ import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
+import { LayoutProvider } from "@library/layout/LayoutContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -59,7 +59,7 @@ export function AppContext(props: IProps) {
                                         <SearchFilterContextProvider>
                                             <TitleBarDeviceProvider>
                                                 <BannerContextProviderNoHistory>
-                                                    <DeviceProvider>{props.children}</DeviceProvider>
+                                                    {props.children}
                                                 </BannerContextProviderNoHistory>
                                             </TitleBarDeviceProvider>
                                         </SearchFilterContextProvider>

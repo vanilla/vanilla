@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author Dani M. <dani.m@vanillaforums.com>
  * @author Isis Graziatto <isis.g@vanillaforums.com>
@@ -16,6 +15,10 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
+/**
+ * Class DomUtilsTest
+ * @package VanillaTests\Library\Vanilla\Utility
+ */
 class DomUtilsTest extends MinimalContainerTestCase {
     use HtmlNormalizeTrait;
     use AssertsFixtureRenderingTrait;
@@ -65,7 +68,6 @@ class DomUtilsTest extends MinimalContainerTestCase {
      * Test striping images with fix expected
      *
      * @param string $html
-     * @param string $expected
      * @dataProvider provideStripImagesFixedTests
      */
     public function testStripImagesFixed(string $html): void {
@@ -99,6 +101,11 @@ class DomUtilsTest extends MinimalContainerTestCase {
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 
+    /**
+     * Provide tests for `testStripImagesFixed()`.
+     *
+     * @return array
+     */
     public function provideStripImagesFixedTests(): array {
         $r = [
             'no strip' => ['a b c'],
@@ -110,6 +117,11 @@ class DomUtilsTest extends MinimalContainerTestCase {
         return $r;
     }
 
+    /**
+     * Provide tests for `testStripImages()`.
+     *
+     * @return array
+     */
     public function provideStripImagesTests(): array {
         $r = $this->createProviderFromDirectory('domutils/strip-images');
 
@@ -126,6 +138,8 @@ class DomUtilsTest extends MinimalContainerTestCase {
     }
 
     /**
+     * Returns tests providers from directory
+     *
      * @param string $subdir
      * @return array
      */
@@ -146,6 +160,7 @@ class DomUtilsTest extends MinimalContainerTestCase {
 
     /**
      * Provide tests for `TestTruncateWords()`.
+     *
      * @return array
      */
     public function provideTrimWordsTests(): array {
@@ -173,6 +188,7 @@ class DomUtilsTest extends MinimalContainerTestCase {
 
     /**
      * Provide tests for `TestStripEmbeds()`.
+     *
      * @return array
      */
     public function provideStripEmbedsTests(): array {

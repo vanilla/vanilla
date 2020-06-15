@@ -121,8 +121,8 @@ class Theme implements \JsonSerializable {
         // Trim off the active theme option key.
         foreach ($addonAssets as $addonAssetKey => $addonAsset) {
             preg_match($optionAssetRegex, $addonAssetKey, $matches);
-            if (isset($matches[0])) {
-                $addonAssets[$matches[0]] = $addonAsset;
+            if (isset($matches[1])) {
+                $addonAssets[$matches[1]] = $addonAsset;
             }
         }
 

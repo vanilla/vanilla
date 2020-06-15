@@ -21,9 +21,9 @@ class FullRecordCacheModel extends PipelineModel {
      *
      * @param string $table Database table associated with this resource.
      * @param \Gdn_Cache $cache The cache instance.
-     * @param array|null $defaultCacheOptions Default options to apply for storing cache values.
+     * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $table, \Gdn_Cache $cache, ?array $defaultCacheOptions = []) {
+    public function __construct(string $table, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
         parent::__construct($table);
         $this->modelCache = new ModelCache($this->getTable(), $cache, $defaultCacheOptions);
         $this->addPipelineProcessor($this->modelCache->createInvalidationProcessor());
@@ -38,10 +38,11 @@ class FullRecordCacheModel extends PipelineModel {
      *    - orderDirection (string): Sort direction for the order fields.
      *    - limit (int): Limit on the total results returned.
      *    - offset (int): Row offset before capturing the result.
-     * @param array|null $cacheOptions Options for the cache storage.
+     *    - cacheOptions (array): Feature options from `Gdn_Cache::FEATURE_*`.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
-    public function get(array $where = [], array $options = [], ?array $cacheOptions = []): array {
+    public function get(array $where = [], array $options = []): array {
+        $cacheOptions = $options['cacheOptions'] ?? [];
         return $this->modelCache->getCachedOrHydrate(
             [
                 'where' => $where,
@@ -50,7 +51,8 @@ class FullRecordCacheModel extends PipelineModel {
             ],
             function () use ($where, $options) {
                 return parent::get($where, $options);
-            }
+            },
+            $cacheOptions
         );
     }
 
@@ -59,12 +61,5 @@ class FullRecordCacheModel extends PipelineModel {
      */
     public function getAll() {
         return $this->get();
-    }
-
-    /**
-     * @return ModelCache
-     */
-    public function getModelCache(): ModelCache {
-        return $this->modelCache;
     }
 }

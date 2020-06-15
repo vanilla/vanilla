@@ -49,10 +49,10 @@ class ModelCache implements InjectableInterface {
      *
      * @param string $cacheNameSpace Namespace to use in the cache.
      * @param \Gdn_Cache $cache The cache instance.
-     * @param array|null $defaultCacheOptions Default options to apply for storing cache values.
+     * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, ?array $defaultCacheOptions = []) {
-        $this->cache = $cache;
+    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
+        $this->setCache($cache);
         $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
@@ -77,11 +77,11 @@ class ModelCache implements InjectableInterface {
      *
      * @param array $keyArgs The arguments to build the cache key.
      * @param callable $hydrate A callable to hydrate the cache.
-     * @param array|null $cacheOptions Options for the cache storage.
+     * @param array $cacheOptions Options for the cache storage.
      *
      * @return mixed
      */
-    public function getCachedOrHydrate(array $keyArgs, callable $hydrate, ?array $cacheOptions = []) {
+    public function getCachedOrHydrate(array $keyArgs, callable $hydrate, array $cacheOptions = []) {
         if ($this->isFeatureDisabled) {
             return $hydrate();
         }

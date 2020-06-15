@@ -23,6 +23,11 @@ abstract class Gdn_Cache {
     /** @var string Type of cache this this: one of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL. */
     protected $cacheType;
 
+    /**
+     * @var null The current cache config.
+     */
+    private $activeConfig = null;
+
     /** @var array Memory copy of store containers. */
     protected static $stores = [];
 
@@ -527,7 +532,10 @@ abstract class Gdn_Cache {
      *
      * @return boolean true on success of false on failure.
      */
-    abstract public function flush();
+    public function flush() {
+        self::$localCache = [];
+        return true;
+    }
 
     /**
      * Try and get a cache key or fallback to a query or callback.
@@ -707,33 +715,32 @@ abstract class Gdn_Cache {
         return val($option, $activeOptions, $default);
     }
 
-    /*
+    /**
      * Get the value of a store-specific config
      *
      * The option keys are generic and cross-cache, but are always
      * stored under $Configuration['Cache'][ActiveCacheName]['Config'][*].
      *
-     * @param string|integer $Key The config key to retrieve
-     * @return mixed The value associated with the given config key
+     * @param string|int $key The config key to retrieve.
+     * @param mixed $default The default value if the key isn't found.
+     * @return mixed The value associated with the given config key.
      */
     public function config($key = null, $default = null) {
-        static $activeConfig = null;
-
-        if (is_null($activeConfig)) {
+        if (is_null($this->activeConfig)) {
             $activeCacheShortName = ucfirst($this->activeCache());
             $configKey = "Cache.{$activeCacheShortName}.Config";
-            $activeConfig = c($configKey, []);
+            $this->activeConfig = c($configKey, []);
         }
 
         if (is_null($key)) {
-            return $activeConfig;
+            return $this->activeConfig;
         }
 
-        if (!array_key_exists($key, $activeConfig)) {
+        if (!array_key_exists($key, $this->activeConfig)) {
             return $default;
         }
 
-        return val($key, $activeConfig, $default);
+        return val($key, $this->activeConfig, $default);
     }
 
     /**
@@ -757,6 +764,12 @@ abstract class Gdn_Cache {
         return self::$localCache[$key];
     }
 
+    /**
+     * Set a value in the local cache array.
+     *
+     * @param string|array|int $key
+     * @param mixed $value
+     */
     protected function localSet($key, $value = null) {
         if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) {
             return;
@@ -765,7 +778,13 @@ abstract class Gdn_Cache {
         if (!is_array($key)) {
             $key = [$key => $value];
         }
-        self::$localCache = array_merge(self::$localCache, $key);
+        foreach ($key as $k => $v) {
+            if (is_object($v)) {
+                self::$localCache[$k] = clone $v;
+            } else {
+                self::$localCache[$k] = $v;
+            }
+        }
     }
 
     /**

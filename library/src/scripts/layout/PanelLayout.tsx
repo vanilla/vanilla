@@ -5,7 +5,7 @@
 
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { panelLayoutClasses } from "@library/layout/layoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";

@@ -11,7 +11,7 @@ import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
 import { paddings } from "@library/styles/styleHelpersSpacing";
 import { TextAlignLastProperty, TextAlignProperty } from "csstype";
 import { percent } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("dataList", forcedVars);

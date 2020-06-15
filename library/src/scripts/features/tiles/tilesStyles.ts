@@ -7,7 +7,7 @@
 import { unit, EMPTY_SPACING, paddings, extendItemContainer } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";

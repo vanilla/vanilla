@@ -6,7 +6,7 @@
 import React from "react";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {

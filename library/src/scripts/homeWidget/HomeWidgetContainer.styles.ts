@@ -5,7 +5,7 @@
 
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";

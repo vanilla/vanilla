@@ -6,7 +6,7 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { negative, unit, colorOut, allLinkStates } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";

@@ -5,7 +5,7 @@
  */
 
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { borders, colorOut, margins, sticky, unit } from "@library/styles/styleHelpers";

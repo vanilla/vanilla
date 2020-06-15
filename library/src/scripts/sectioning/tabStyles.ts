@@ -18,7 +18,7 @@ import {
     singleBorder,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote } from "csx";

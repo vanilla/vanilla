@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, translateX } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();

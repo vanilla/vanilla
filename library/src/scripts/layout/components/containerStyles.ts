@@ -5,7 +5,7 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";

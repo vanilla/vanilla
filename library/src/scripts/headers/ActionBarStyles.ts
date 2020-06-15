@@ -8,7 +8,7 @@ import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { unit, colorOut } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { margins } from "@library/styles/styleHelpers";
 import { em, percent, px } from "csx";
 

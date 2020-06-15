@@ -21,7 +21,7 @@ import { important, percent, px } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";

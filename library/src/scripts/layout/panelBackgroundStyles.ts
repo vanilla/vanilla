@@ -6,7 +6,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { calc, color, percent, px } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 

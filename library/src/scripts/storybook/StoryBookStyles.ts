@@ -19,7 +19,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { iconVariables } from "@library/icons/iconStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();

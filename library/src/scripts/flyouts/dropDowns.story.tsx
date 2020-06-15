@@ -16,7 +16,7 @@ import { FlyoutType } from "@library/flyouts/DropDown";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownMessages";
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 const story = storiesOf("Components", module);
 

@@ -22,7 +22,7 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent, rgba } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 
 export const notUserContent = "u-notUserContent";

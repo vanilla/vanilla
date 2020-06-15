@@ -6,7 +6,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { unit, srOnly, negativeUnit, margins, pointerEvents } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, important, percent } from "csx";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";

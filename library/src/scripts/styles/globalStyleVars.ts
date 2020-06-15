@@ -204,10 +204,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         meta: 1.5,
     });
 
-    const panelWidth = 216;
-    const panel = makeThemeVars("panelWidth", {
-        width: panelWidth,
-        paddedWidth: panelWidth + gutter.size * 2,
+    // Default widths - Start
+    const defaultPanelWidth = 216;
+    const panel = makeThemeVars("panel", {
+        width: defaultPanelWidth,
+        // paddedWidth: defaultPanelWidth + gutter.size * 2,
     });
 
     const middleColumnWidth = 672;
@@ -217,12 +218,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnInit.width,
-        paddedWidth: middleColumnInit.width + gutter.size * 2,
+        // paddedWidth: middleColumnInit.width + gutter.size * 2,
     });
 
-    const content = makeThemeVars("content", {
-        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
-    });
+    const contentWidth = () => {
+        // return middleColumn.width + gutter.size * 2 + (panel.width + gutter.size) * 2 + gutter.size * 4;
+        return middleColumn.width + 2 * panel.width + gutter.size * 16;
+    };
+    // Default widths - End
 
     const fontsInit0 = makeThemeVars("fonts", {
         size: {
@@ -478,7 +481,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         meta,
         gutter,
         panel,
-        content,
+        middleColumn,
+        contentWidth,
         fonts,
         spacer,
         lineHeights,

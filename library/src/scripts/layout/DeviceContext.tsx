@@ -5,23 +5,24 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { LayoutTypes, layoutVariables } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { calc } from "csx";
 
-export enum Devices {
-    XS = "xs",
-    MOBILE = "mobile",
-    TABLET = "tablet",
-    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
-    DESKTOP = "desktop",
-}
+export const Devices = ThreeColumnLayoutDevices; // temp
 
 export interface IDeviceProps {
-    device: Devices;
+    device: ThreeColumnLayoutDevices;
+    isMobile: boolean;
 }
 
-const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
+const DeviceContext = React.createContext<IDeviceProps>({
+    device: ThreeColumnLayoutDevices.DESKTOP,
+    isMobile: false,
+});
+
 export default DeviceContext;
 
 export function useDevice() {
@@ -34,34 +35,45 @@ interface IProps {
 }
 
 export function DeviceProvider(props: IProps) {
+    const layoutVars = layoutVariables().types.threeColumns; // hard coded for compatibility
+
     const calculateDevice = useCallback(() => {
-        const breakpoints = layoutVariables().panelLayoutBreakPoints;
+        const breakpoints = layoutVars.breakPoints;
         const width = document.body.clientWidth;
         if (width <= breakpoints.xs) {
-            return Devices.XS;
+            return layoutVars.Devices.XS;
         } else if (width <= breakpoints.oneColumn) {
-            return Devices.MOBILE;
+            return layoutVars.Devices.MOBILE;
         } else if (width <= breakpoints.twoColumn) {
-            return Devices.TABLET;
+            return layoutVars.Devices.TABLET;
         } else if (width <= breakpoints.noBleed) {
-            return Devices.NO_BLEED;
+            return layoutVars.Devices.NO_BLEED;
         } else {
-            return Devices.DESKTOP;
+            return layoutVars.Devices.DESKTOP;
         }
     }, []);
-    const [device, setDevice] = useState<Devices>(calculateDevice());
+
+    const currentDevice = calculateDevice();
+    const [deviceInfo, setDeviceInfo] = useState<IDeviceProps>({
+        device: currentDevice,
+        isMobile: currentDevice === Devices.MOBILE || currentDevice === Devices.XS,
+    });
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
-            setDevice(calculateDevice);
+            const currentDevice = calculateDevice();
+            setDeviceInfo({
+                device: currentDevice,
+                isMobile: currentDevice === Devices.MOBILE || currentDevice === Devices.XS,
+            });
         }, 100);
         window.addEventListener("resize", throttledUpdate);
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [calculateDevice, setDevice]);
+    }, [calculateDevice, setDeviceInfo]);
 
-    return <DeviceContext.Provider value={device}>{props.children}</DeviceContext.Provider>;
+    return <DeviceContext.Provider value={deviceInfo}>{props.children}</DeviceContext.Provider>;
 }
 
 /**

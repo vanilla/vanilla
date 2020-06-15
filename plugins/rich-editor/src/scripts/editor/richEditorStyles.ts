@@ -25,7 +25,7 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();

@@ -20,7 +20,7 @@ import {
 import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonGlobalVariables, buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";

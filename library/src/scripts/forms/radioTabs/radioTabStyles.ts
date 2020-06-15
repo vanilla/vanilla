@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { colorOut, unit, fonts, paddings, negative, srOnly, IFont, borderRadii } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";

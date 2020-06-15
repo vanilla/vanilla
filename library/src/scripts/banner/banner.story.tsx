@@ -13,7 +13,7 @@ import Banner from "@library/banner/Banner";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
 

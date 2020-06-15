@@ -10,7 +10,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { SearchBarPresets } from "@library/banner/bannerStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";

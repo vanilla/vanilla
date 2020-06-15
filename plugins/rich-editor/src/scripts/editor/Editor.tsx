@@ -19,7 +19,6 @@ import { EditorContentContextProvider } from "@rich-editor/editor/contentContext
 export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const device = useDevice();
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
 
     return (
         <EditorContext.Provider
@@ -28,7 +27,7 @@ export const Editor = (props: IEditorProps) => {
                 onFocus: props.onFocus,
                 quill,
                 setQuillInstance,
-                isMobile,
+                isMobile: device.isMobile,
             }}
         >
             <EditorContentContextProvider quill={quill}>{props.children}</EditorContentContextProvider>

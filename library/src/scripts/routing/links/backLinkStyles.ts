@@ -9,7 +9,7 @@ import { absolutePosition, colorOut, margins, negative, srOnly, unit, userSelect
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { media } from "typestyle";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 

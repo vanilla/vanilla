@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { allLinkStates, margins, paddings, unit } from "@library/styles/styleHelpers";
 
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { TextDecorationProperty } from "csstype";
 
 export const panelListVariables = useThemeCache(() => {

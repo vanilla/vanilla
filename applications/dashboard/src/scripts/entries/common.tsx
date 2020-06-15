@@ -10,7 +10,6 @@ import Toast from "@library/features/toaster/Toast";
 import { ThemePreviewToast } from "@library/features/toaster/themePreview/ThemePreviewToast";
 import { themePreviewToastReducer } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { AppContext } from "@library/AppContext";
 import { mountPortal } from "@vanilla/react-utils";
 
 const PREVIEW_CONTAINER = "previewContainer";

@@ -24,7 +24,6 @@ import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compati
 import { inputVariables, inputMixin } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { mixinTextLinkNoDefaultLinkAppearance } from "@dashboard/compatibilityStyles/textLinkStyles";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 
 export const inputCSS = () => {
     wrapSelects();

@@ -4,9 +4,7 @@
  * @license Proprietary
  */
 
-import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";

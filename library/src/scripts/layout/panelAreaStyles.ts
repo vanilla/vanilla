@@ -7,7 +7,7 @@
 import { color, percent, calc, linearGradient, ColorHelper, translateY } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses, panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { paddings, unit, colorOut, ColorValues } from "@library/styles/styleHelpers";

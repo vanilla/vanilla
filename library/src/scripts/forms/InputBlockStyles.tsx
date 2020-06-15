@@ -7,7 +7,7 @@
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { colorOut, IBorderRadiusValue, pointerEvents, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty, StandardLonghandPropertiesFallback } from "csstype";

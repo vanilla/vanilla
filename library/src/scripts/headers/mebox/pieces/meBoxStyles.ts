@@ -9,7 +9,7 @@ import { allButtonStates, colorOut, debugHelper, flexHelper, unit } from "@libra
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();

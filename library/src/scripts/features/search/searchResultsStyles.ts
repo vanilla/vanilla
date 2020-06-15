@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {

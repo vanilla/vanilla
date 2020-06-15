@@ -13,8 +13,8 @@ import { configure, addDecorator, addParameters } from '@storybook/react';
 import { checkA11y, withA11y } from '@storybook/addon-a11y';
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { unit } from '@library/styles/styleHelpers';
-import { layoutVariables } from '@library/layout/panelLayoutStyles';
 import 'storybook-chromatic';
+import {layoutVariables} from "@vanilla/library/src/scripts/layout/layoutStyles";
 const { applyStoryContext } = require('../../library/src/scripts/storybookConfig');
 
 addParameters({

@@ -10,7 +10,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { calc, percent, translateX, viewWidth } from "csx";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 

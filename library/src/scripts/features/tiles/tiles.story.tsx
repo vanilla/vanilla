@@ -8,7 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import Tiles, { TileAlignment } from "./Tiles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import Container from "@library/layout/components/Container";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 

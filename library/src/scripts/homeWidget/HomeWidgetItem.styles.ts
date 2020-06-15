@@ -22,7 +22,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, ColorHelper } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export enum HomeWidgetItemContentType {

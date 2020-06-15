@@ -11,7 +11,7 @@ import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonG
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,

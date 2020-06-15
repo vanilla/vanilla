@@ -9,7 +9,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { t } from "@vanilla/i18n/src";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {

@@ -60,17 +60,31 @@ class CacheCacheAdapter implements CacheInterface {
      */
     public function set($key, $value, $ttl = null) {
         $options = [];
-        if ($ttl !== null) {
-            $options[\Gdn_Cache::FEATURE_EXPIRY] = $this->ttlToSeconds($ttl);
+        if (is_int($ttl) || (is_object($ttl) && $ttl instanceof \DateInterval)) {
+            $secs = $this->ttlToSeconds($ttl);
+            // An already expired TTL should remove the item.
+            if ($secs <= 0) {
+                $this->delete($key);
+                return true;
+            }
+            $options[\Gdn_Cache::FEATURE_EXPIRY] = $secs;
+        } elseif (!is_null($ttl)) {
+            throw new InvalidArgumentException("The TTL must be an integer or a DateInterval.", 500);
         }
-        return $this->cache->store($key, $value, $ttl);
+        return $this->cache->store($key, $value, $options);
     }
 
     /**
      * {@inheritdoc}
      */
     public function delete($key) {
-        return $this->cache->remove($key);
+        // Gdn_Cache returns `false` if the item isn't removed while `CacheInterface` only wants false on error.
+        try {
+            $this->cache->remove($key);
+            return true;
+        } catch (\Exception $ex) {
+            return false;
+        }
     }
 
     /**

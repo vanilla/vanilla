@@ -576,10 +576,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         $i = 0;
         foreach ($fields as $slug => $fieldData) {
-            // Add this field to the output
+            // Don't overwrite Location data (it's always stored in the user table, never the userMeta table).
             if (strtolower($slug) === 'location') {
                 continue;
             }
+            // Add this field to the output
                 $columnNames[] = val('Label', $fieldData, $slug);
 
                 // Add this field to the query.

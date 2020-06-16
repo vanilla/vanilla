@@ -14,7 +14,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { useLayout } from "@library/layout/LayoutContext";
-import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
+import { ILayoutMediaQueryFunction, LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -130,7 +130,7 @@ export const modalClasses = useThemeCache(() => {
         borderBottomRightRadius: 0,
         maxWidth: 400,
         $nest: {
-            [`& .${dropDownClasses({ mediaQueries: ILayoutMediaQueryFunction }).action}`]: {
+            [`& .${dropDownClasses({ mediaQueries }).action}`]: {
                 fontWeight: globalVars.fonts.weights.normal,
             },
         },
@@ -250,11 +250,13 @@ export const modalClasses = useThemeCache(() => {
                 },
             },
         },
-                mediaQueries({
+        mediaQueries({
             [LayoutTypes.THREE_COLUMNS]: {
                 oneColumnDown: {
-            height: unit(titleBarVars.sizing.mobile.height),
-            minHeight: unit(titleBarVars.sizing.mobile.height),
+                    height: unit(titleBarVars.sizing.mobile.height),
+                    minHeight: unit(titleBarVars.sizing.mobile.height),
+                },
+            },
         }),
     );
 

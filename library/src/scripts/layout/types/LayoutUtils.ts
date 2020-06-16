@@ -1,14 +1,29 @@
-import { IThreeColumnLayoutMediaQueries, threeColumnLayout } from "@library/layout/types/threeColumn";
-import { IOneColumnLayoutMediaQueries, oneColumnLayout } from "@library/layout/types/oneColumn";
-import { IOneColumnNarrowLayoutMediaQueries, oneColumnNarrowLayout } from "@library/layout/types/oneColumnNarrow";
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+import {
+    IThreeColumnLayoutMediaQueries,
+    threeColumnLayout,
+    ThreeColumnLayoutDevices,
+} from "@library/layout/types/threeColumn";
+import { IOneColumnLayoutMediaQueries, oneColumnLayout, OneColumnLayoutDevices } from "@library/layout/types/oneColumn";
+import {
+    IOneColumnNarrowLayoutMediaQueries,
+    oneColumnNarrowLayout,
+    OneColumnNarrowLayoutDevices,
+} from "@library/layout/types/oneColumnNarrow";
 import { useLayout } from "@library/layout/LayoutContext";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { ILegacyLayoutMediaQueries, legacyLayout, LegacyLayoutDevices } from "@library/layout/types/legacy";
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
     ONE_COLUMN = "one column", // Single column, but full width of page
     NARROW = "one column narrow", // Single column, but narrower than default
+    LEGACY = "legacy", // Legacy layout used on the Forum pages. The media queries are also used for older components. Newer ones should use the context
 }
 
 export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
@@ -17,7 +32,14 @@ export interface IAllLayoutMediaQueries {
     [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueries;
     [LayoutTypes.ONE_COLUMN]?: IOneColumnLayoutMediaQueries;
     [LayoutTypes.NARROW]?: IOneColumnNarrowLayoutMediaQueries;
+    [LayoutTypes.LEGACY]?: ILegacyLayoutMediaQueries;
 }
+
+export type IAllLayoutDevices =
+    | OneColumnLayoutDevices
+    | OneColumnNarrowLayoutDevices
+    | ThreeColumnLayoutDevices
+    | LegacyLayoutDevices;
 
 export const allLayoutVariables = () => {
     const mediaQueriesByType = {};
@@ -25,6 +47,7 @@ export const allLayoutVariables = () => {
         [LayoutTypes.THREE_COLUMNS]: threeColumnLayout(),
         [LayoutTypes.ONE_COLUMN]: oneColumnLayout(),
         [LayoutTypes.NARROW]: oneColumnNarrowLayout(),
+        [LayoutTypes.LEGACY]: legacyLayout(),
     };
 
     Object.keys(LayoutTypes).forEach(layoutName => {

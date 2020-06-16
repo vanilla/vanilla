@@ -8,7 +8,6 @@ import React from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import { useLayout } from "@library/layout/LayoutContext";
-import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 
 interface IProps {
     className?: string;

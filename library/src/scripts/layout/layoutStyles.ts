@@ -16,6 +16,7 @@ import { sticky, unit } from "@library/styles/styleHelpers";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
 import { allLayoutVariables, LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -64,14 +65,10 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         gutter,
         spacing,
         layouts: allLayoutVariables(),
-        // /*
-        //  * @deprecated You should get the media queries through "layouts" declared above
-        //  */
-        // mediaQueries: threeColumnLayout().mediaQueries() ?? {
-        //     oneColumnDown: (styles: NestedCSSProperties) => {
-        //         return {};
-        //     },
-        // },
+        /*
+         * @deprecated You should get the media queries through "layouts" declared above
+         */
+        mediaQueries: legacyLayout().mediaQueries(),
     };
 });
 

@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { px } from "csx";
@@ -19,7 +24,7 @@ export interface IOneColumnLayoutMediaQueries {
 }
 
 export const oneColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
-    const globalVars = globalVariables();
+    const globalVars = globalVariables(forcedVars);
     const Devices = OneColumnLayoutDevices;
 
     // Important variables that will be used to calculate other variables

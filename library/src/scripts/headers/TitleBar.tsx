@@ -25,7 +25,6 @@ import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { LayoutProvider, LayoutTypes } from "@library/layout/LayoutContext";
 import { useBannerContext } from "@library/banner/BannerContext";
 import { SignInIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonTypes";

@@ -9,9 +9,9 @@ import { colorOut, fonts, importantUnit, margins, unit } from "@library/styles/s
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { calc, important, percent, translateY } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export const forumCategoriesVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumCategories");
@@ -24,7 +24,7 @@ export const forumCategoriesVariables = useThemeCache(() => {
 
 export const categoriesCSS = () => {
     const globalVars = globalVariables();
-    const layoutVars = forumLayoutVariables();
+    const layoutVars = legacyLayout();
     const vars = forumCategoriesVariables();
 
     // Category list

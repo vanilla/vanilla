@@ -19,7 +19,7 @@ import { calc, important, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export const groupVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("groups");
@@ -41,7 +41,7 @@ export const groupVariables = useThemeCache(() => {
 export const groupsCSS = () => {
     const vars = groupVariables();
     const globalVars = globalVariables();
-    const layoutVars = forumLayoutVariables();
+    const layoutVars = legacyLayout();
     const mediaQueries = layoutVars.mediaQueries();
 
     cssOut(`.Group-Banner`, {

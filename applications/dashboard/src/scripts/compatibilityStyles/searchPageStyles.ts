@@ -8,7 +8,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { allLinkStates, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { percent } from "csx";
@@ -17,10 +16,11 @@ import { important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
-    const layoutVars = forumLayoutVariables();
+    const layoutVars = legacyLayout();
     const formElementVars = formElementsVariables();
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {

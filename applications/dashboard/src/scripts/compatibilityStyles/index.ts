@@ -11,16 +11,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { fonts } from "@library/styles/styleHelpersTypography";
-import {
-    absolutePosition,
-    borders,
-    importantUnit,
-    margins,
-    negative,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
+import { borders, importantUnit, margins, negative, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
@@ -34,7 +25,7 @@ import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { forumMetaCSS } from "@dashboard/compatibilityStyles/forumMetaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
 import { fontCSS, forumFontsVariables } from "./fontStyles";
-import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { forumLayoutCSS } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
@@ -53,13 +44,14 @@ import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodSty
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export let compatibilityStyles: () => void;
 compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
-    const layoutVars = forumLayoutVariables();
+    const layoutVars = legacyLayout();
     const mainColors = vars.mainColors;
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);

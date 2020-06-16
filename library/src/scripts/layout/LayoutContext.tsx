@@ -9,9 +9,13 @@ import { layoutClasses } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { threeColumnLayout, ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
-import { OneColumnLayoutDevices } from "@library/layout/types/oneColumn";
-import { OneColumnNarrowLayoutDevices } from "@library/layout/types/oneColumnNarrow";
-import { LayoutTypes, layoutVarsForCurrentLayout, ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
+
+import {
+    LayoutTypes,
+    layoutVarsForCurrentLayout,
+    ILayoutMediaQueryFunction,
+    IAllLayoutDevices,
+} from "@library/layout/types/LayoutUtils";
 
 export interface ILayoutProps {
     type: LayoutTypes;
@@ -23,7 +27,7 @@ export interface ILayoutProps {
     currentLayoutVariables: any;
     mediaQueries: ILayoutMediaQueryFunction;
     contentWidth: () => number;
-    calculateDevice: () => OneColumnLayoutDevices | OneColumnNarrowLayoutDevices | ThreeColumnLayoutDevices;
+    calculateDevice: () => IAllLayoutDevices;
     layoutSpecificStyles: (style) => any | undefined;
 }
 

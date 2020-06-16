@@ -5,17 +5,15 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
-import { calc, percent, px } from "csx";
+import { calc, percent, px, viewHeight } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { unit } from "@library/styles/styleHelpers";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { LayoutTypes } from "@library/layout/types/LayoutUtils";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { unit } from "@library/styles/styleHelpers";
 
-export enum ThreeColumnLayoutDevices {
+export enum LegacyLayoutDevices {
     XS = "xs",
     MOBILE = "mobile",
     TABLET = "tablet",
@@ -23,7 +21,7 @@ export enum ThreeColumnLayoutDevices {
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
 }
 
-export interface IThreeColumnLayoutMediaQueries {
+export interface ILegacyLayoutMediaQueries {
     noBleed?: NestedCSSProperties;
     oneColumn?: NestedCSSProperties;
     oneColumnDown?: NestedCSSProperties;
@@ -34,13 +32,12 @@ export interface IThreeColumnLayoutMediaQueries {
     xs?: NestedCSSProperties;
 }
 
-export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
+export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
-    const layoutVars = layoutVariables();
-    const Devices = ThreeColumnLayoutDevices;
+    const Devices = LegacyLayoutDevices;
 
     // Important variables that will be used to calculate other variables
-    const makeThemeVars = variableFactory("threeColumnLayout", forcedVars);
+    const makeThemeVars = variableFactory("forumLayout", forcedVars);
 
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         ...globalVars.foundationalWidths,
@@ -52,14 +49,6 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const panelPaddedWidth = () => {
         return panel.width + globalVars.constants.fullGutter;
-    };
-
-    const middleColumn = makeThemeVars("middleColumn", {
-        width: globalVars.middleColumn.width,
-    });
-
-    const middleColumnPaddedWidth = () => {
-        return middleColumn.width + globalVars.constants.fullGutter;
     };
 
     const contentWidth = () => {
@@ -112,6 +101,16 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
             );
         };
 
+        // Alias
+        const tabletDown = (styles: NestedCSSProperties) => {
+            return twoColumnsDown(styles);
+        };
+
+        // Alias
+        const tablet = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return twoColumns(styles, useMinWidth);
+        };
+
         const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
@@ -149,14 +148,42 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
             );
         };
 
+        const mobile = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            return media(
+                {
+                    maxWidth: px(foundationalWidths.breakPoints.twoColumns),
+                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.xs + 1) : undefined,
+                },
+                styles,
+            );
+        };
+
+        const aboveMobile = (styles: NestedCSSProperties) => {
+            return media(
+                {
+                    minWidth: px(foundationalWidths.breakPoints.twoColumns + 1),
+                },
+                styles,
+            );
+        };
+
+        const mobileDown = (styles: NestedCSSProperties) => {
+            return mobile(styles, false);
+        };
+
         return {
             noBleed,
             noBleedDown,
             twoColumnsDown,
+            tabletDown,
             twoColumns,
+            tablet,
             oneColumn,
             oneColumnDown,
             aboveOneColumn,
+            mobile,
+            mobileDown,
+            aboveMobile,
             xs,
         };
     };
@@ -186,71 +213,35 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
         return currentDevice === ThreeColumnLayoutDevices.XS || currentDevice === ThreeColumnLayoutDevices.MOBILE;
     };
 
-    const offset = panelBackgroundVariables().config.render
-        ? layoutVars.spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
-        : 0;
+    const gutter = makeThemeVars("gutter", {
+        ...globalVars.gutter,
+        mainGutterOffset: 60 - globalVars.gutter.size,
+    });
 
-    const layoutSpecificStyles = style => {
-        const myMediaQueries = mediaQueries();
-        const middleColumnMaxWidth = style("middleColumnMaxWidth", {
-            $nest: {
-                "&.hasAdjacentPanel": {
-                    flexBasis: calc(`100% - ${unit(panelPaddedWidth())}`),
-                    maxWidth: calc(`100% - ${unit(panelPaddedWidth())}`),
-                    ...myMediaQueries.oneColumnDown({
-                        flexBasis: percent(100),
-                        maxWidth: percent(100),
-                    }),
-                },
-                "&.hasTwoAdjacentPanels": {
-                    flexBasis: calc(`100% - ${unit(panelPaddedWidth() * 2)}`),
-                    maxWidth: calc(`100% - ${unit(panelPaddedWidth() * 2)}`),
-                    ...myMediaQueries.oneColumnDown({
-                        flexBasis: percent(100),
-                        maxWidth: percent(100),
-                    }),
-                },
-            },
-        });
+    const main = makeThemeVars("main", {
+        width: calc(`100% - ${unit(panelPaddedWidth() + gutter.mainGutterOffset)}`),
+        topSpacing: 40,
+    });
 
-        const leftColumn = style("leftColumn", {
-            position: "relative",
-            width: unit(panelPaddedWidth()),
-            flexBasis: unit(panelPaddedWidth()),
-            minWidth: unit(panelPaddedWidth()),
-            paddingRight: unit(offset),
-        });
-
-        const rightColumn = style("rightColumn", {
-            position: "relative",
-            width: unit(panelPaddedWidth()),
-            flexBasis: unit(panelPaddedWidth()),
-            minWidth: unit(panelPaddedWidth()),
-            overflow: "initial",
-            paddingLeft: unit(offset),
-        });
-
-        return {
-            leftColumn,
-            rightColumn,
-            middleColumnMaxWidth,
-        };
-    };
+    const cell = makeThemeVars("cell", {
+        paddings: {
+            horizontal: 8,
+            vertical: 12,
+        },
+    });
 
     return {
-        type: LayoutTypes.THREE_COLUMNS,
+        type: LayoutTypes.LEGACY,
         Devices,
-        foundationalWidths,
-        panel,
-        panelPaddedWidth,
-        middleColumn,
-        middleColumnPaddedWidth,
-        contentWidth,
         breakPoints,
         mediaQueries,
         calculateDevice,
         isFullWidth,
         isCompact,
-        layoutSpecificStyles,
+        contentWidth,
+        panelPaddedWidth,
+        gutter,
+        main,
+        cell,
     };
 });

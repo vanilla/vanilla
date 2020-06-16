@@ -28,7 +28,8 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
 import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
-import { LayoutProvider, LayoutTypes } from "@library/layout/LayoutContext";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -46,7 +47,7 @@ Router.addRoutes([
 applySharedPortalContext(props => {
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            {props.children}
+            <LayoutProvider type={LayoutTypes.LEGACY}>{props.children}</LayoutProvider>
         </AppContext>
     );
 });

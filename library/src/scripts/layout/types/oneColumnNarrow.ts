@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { px } from "csx";
@@ -19,7 +24,7 @@ export const oneColumnNarrowLayout = useThemeCache((forcedVars?: IThemeVariables
     const Devices = OneColumnNarrowLayoutDevices;
 
     // Important variables that will be used to calculate other variables
-    const makeThemeVars = variableFactory("layoutOneNarrowColumn", forcedVars);
+    const makeThemeVars = variableFactory("narrowOneColumnLayout", forcedVars);
 
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         width: 900,

@@ -7,11 +7,12 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { percent } from "csx";
-import { paddings } from "@library/styles/styleHelpers";
+import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { LayoutTypes } from "@library/layout/LayoutContext";
 import isEmpty from "lodash/isEmpty";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -51,13 +52,26 @@ export const containerVariables = useThemeCache(() => {
     };
 });
 
-// export function containerMainMediaQueries() {
-//     const vars = containerVariables();
-//     const { mediaQueries } = vars;
-//     return mediaQueries.oneColumnDown({
-//         ...paddings(vars.spacing.mobile.padding),
-//     });
-// }
+export const containerMainStyles = (contentWidth: number | string) => {
+    return {
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        boxSizing: "border-box",
+        width: percent(100),
+        maxWidth: unit(contentWidth),
+        marginLeft: "auto",
+        marginRight: "auto",
+        ...paddings(layoutVariables().spacing.padding),
+    } as NestedCSSProperties;
+};
+
+export function containerMainMediaQueries(mediaQueries) {
+    const vars = containerVariables();
+    return mediaQueries.oneColumnDown({
+        ...paddings(vars.spacing.mobile.padding),
+    });
+}
 
 export const containerClasses = useThemeCache((currentLayoutVariables, mediaQueries) => {
     const style = styleFactory("container");

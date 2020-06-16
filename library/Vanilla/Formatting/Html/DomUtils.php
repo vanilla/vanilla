@@ -28,13 +28,13 @@ final class DomUtils {
         $xpath = new \DomXPath($dom);
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
-            $xpathDivQuery = $xpath->query("//div[@data-embedjson]");
+            $xpathTagsQuery = $xpath->query("//div[@data-embedjson] | //video");
             $dataClassItem = $xpathQuery->item(0);
-            $dataDivItem = $xpathDivQuery->item(0);
+            $dataTagsItem = $xpathTagsQuery->item(0);
             if ($dataClassItem) {
                 $dataClassItem->parentNode->removeChild($dataClassItem);
-            } elseif ($dataDivItem) {
-                $dataDivItem->parentNode->removeChild($dataDivItem);
+            } elseif ($dataTagsItem) {
+                $dataTagsItem->parentNode->removeChild($dataTagsItem);
             }
         }
     }

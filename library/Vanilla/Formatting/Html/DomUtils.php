@@ -61,9 +61,9 @@ final class DomUtils {
      * @param DOMDocument $dom
      * @param int $wordCount Number of words to truncate to
      */
-    public static function trimWords(DOMDocument $dom, int $wordCount): void {
+    public static function trimWords(DOMDocument $dom, int $wordCount = 100): void {
         $wordCounter = $wordCount;
-        self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount = 100);
+        self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount);
     }
 
     /**

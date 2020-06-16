@@ -15,13 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\ExpectErrorTrait;
+use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Some basic tests for the `DiscussionModel`.
  */
 class DiscussionModelTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait, TestDiscussionModelTrait;
+    use SiteTestTrait, ExpectErrorTrait, TestDiscussionModelTrait, SetupTraitsTrait;
 
     /** @var DiscussionEvent */
     private $lastEvent;
@@ -53,7 +54,7 @@ class DiscussionModelTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->setupTestDiscussionModelTrait();
+        $this->setupTestTraits();
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
         $this->backupSession();
@@ -73,6 +74,7 @@ class DiscussionModelTest extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->restoreSession();
+        $this->tearDownTestTraits();
     }
 
     /**

@@ -230,6 +230,7 @@ class ArrayUtilsTest extends TestCase {
         $this->expectExceptionMessage("Unexpected type in path.");
         ArrayUtils::setByPath("Bingo.", "foo.bar.baz", $array);
     }
+
     /**
      * Calling `ArrayUtils::walkRecursiveArray()` without an array is an exception.
      */

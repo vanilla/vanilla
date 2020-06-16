@@ -604,9 +604,11 @@ register_shutdown_function(function () use ($dic) {
     $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
 });
 
-// Construct the logger earlier so that its dependencies are satisfied.
-$log = $dic->get(\Vanilla\Logging\LogDecorator::class);
-// Replace the logger interface with the decorator.
-$dic->rule(\Vanilla\Logging\LogDecorator::class)
-    ->addAlias(\Psr\Log\LoggerInterface::class);
+// Add the log decorator.
+ContainerUtils::replace(
+    $dic,
+    \Psr\Log\LoggerInterface::class,
+    \Vanilla\Logging\LogDecorator::class,
+    true
+);
 Logger::setLogger(null);

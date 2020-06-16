@@ -8,12 +8,12 @@
 namespace Vanilla\Utility;
 
 use Garden\Container\Callback;
-use Garden\Container\Reference;
+use Garden\Container\Container;
 use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\AddonManager;
 use Vanilla\Theme\ThemeService;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * Utility functions for container configuration.
@@ -67,9 +67,32 @@ class ContainerUtils {
     public static function cacheBuster(): ReferenceInterface {
         return new Callback(
             function (ContainerInterface $dic) {
-                $cacheBuster = $dic->get(\Vanilla\Web\Asset\DeploymentCacheBuster::class);
+                $cacheBuster = $dic->get(DeploymentCacheBuster::class);
                 return $cacheBuster->value();
             }
         );
+    }
+
+    /**
+     * Replace container instance of a class, if present, and optionally add it as an alias for its replacement.
+     *
+     * @param Container $container
+     * @param string $target
+     * @param string $replacement
+     */
+    public static function replace(
+        Container $container,
+        string $target,
+        string $replacement,
+        bool $addAlias = false
+    ): void {
+        if ($container->hasInstance($target)) {
+            $new = $container->get($replacement);
+            $container->setInstance($target, $new);
+        }
+        if ($addAlias) {
+            $container->rule($replacement)
+                ->addAlias($target);
+        }
     }
 }

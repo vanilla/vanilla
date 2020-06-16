@@ -270,4 +270,46 @@ EOT;
         ];
         return $r;
     }
+
+    /**
+     * Test the various legacy order Bys.
+     *
+     * @param string $expected
+     * @param mixed $params
+     * @dataProvider provideOrderBys
+     */
+    public function testLegacyOrderBys($expected, ...$params): void {
+        $actual = $this->sql->from('t')->orderBy(...$params)->getSelect();
+
+        if (!empty($expected)) {
+            $expected = "\norder by $expected";
+        }
+
+        $sql = <<<EOT
+select *
+from `GDN_t` `t`$expected
+EOT;
+        $this->assertSame($sql, $actual);
+    }
+
+    /**
+     * Provide order by tests.
+     *
+     * @return array
+     */
+    public function provideOrderBys(): array {
+        $r = [
+            'column' => ['`a` asc', 'a'],
+            '-column' => ['`a` desc', '-a'],
+            'csv' => ['`a` asc, `b` desc', ['a', '-b']],
+
+            'column dir' => ['`a` desc', 'a', 'desc'],
+            'a, b' => ['`a` asc, `b` desc', 'a, b', 'desc'],
+            'a => desc' => ['`a` desc', ['a' => 'desc']],
+
+            "''" => ['', ''],
+            '[]' => ['', []],
+        ];
+        return $r;
+    }
 }

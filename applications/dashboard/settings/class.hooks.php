@@ -81,6 +81,9 @@ class DashboardHooks extends Gdn_Plugin {
             ->addCall('addProvider', [new Reference(LogCounterProvider::class)])
             ->addCall('addProvider', [new Reference(RoleCounterProvider::class)])
         ;
+
+        $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
+        $mf->addModel('user', UserModel::class, 'u');
     }
 
     /**

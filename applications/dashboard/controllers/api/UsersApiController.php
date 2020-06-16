@@ -485,6 +485,9 @@ class UsersApiController extends AbstractApiController {
                 'default' => 30,
                 'minimum' => 1,
                 'maximum' => 100,
+            ],
+            'sort:s?' => [
+                'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
             ]
         ], ['UserIndex', 'in']);
         $out = $this->schema([':a' => $this->userSchema()], 'out');
@@ -494,7 +497,7 @@ class UsersApiController extends AbstractApiController {
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
+        $rows = $this->userModel->search($where, $query['sort'] ?? '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
             $row = $this->normalizeOutput($row);

@@ -1,0 +1,62 @@
+<?php
+/**
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+namespace VanillaTests\Models;
+
+use DiscussionModel;
+
+/**
+ * Useful methods for testing a discussion model.
+ */
+trait TestDiscussionModelTrait {
+    /**
+     * @var \DiscussionModel
+     */
+    private $discussionModel;
+
+    /**
+     * Instantiate a fresh model for each
+     */
+    protected function setupTestDiscussionModelTrait() {
+        $this->discussionModel = $this->container()->get(DiscussionModel::class);
+    }
+
+    /**
+     * Create a test record.
+     *
+     * @param array $override
+     *
+     * @return array
+     */
+    public function newDiscussion(array $override): array {
+        static $i = 1;
+
+        $r = $override + [
+                'Name' => "How do I test $i?",
+                'CategoryID' => 1,
+                'Body' => "Foo $i.",
+                'Format' => 'Text',
+            ];
+
+        return $r;
+    }
+
+    /**
+     * Insert test records and return them.
+     *
+     * @param int $count
+     * @param array $overrides An array of row overrides.
+     * @return array
+     */
+    private function insertDiscussions(int $count, array $overrides = []): array {
+        for ($i = 0; $i < $count; $i++) {
+            $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));
+        }
+        $rows = $this->discussionModel->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
+        return $rows;
+    }
+}

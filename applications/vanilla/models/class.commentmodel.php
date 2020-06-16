@@ -24,7 +24,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface, \Vanilla\Contracts\Models\CrawlableInterface {
 
     use \Vanilla\FloodControlTrait;
 
@@ -1763,5 +1763,17 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         }
 
         return parent::editContentTimeout($comment, $timeLeft);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/comments?sort=-commentID',
+            'commentID'
+        );
+        return $r;
     }
 }

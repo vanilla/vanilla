@@ -582,14 +582,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 continue;
             }
             // Add this field to the output
-                $columnNames[] = val('Label', $fieldData, $slug);
+            $columnNames[] = val('Label', $fieldData, $slug);
 
-                // Add this field to the query.
-                $quoted = Gdn::sql()->quote("Profile.$slug");
-                    Gdn::sql()
-                        ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
-                        ->select('a' . $i . '.Value', '', $slug);
-                    $i++;
+            // Add this field to the query.
+            $quoted = Gdn::sql()->quote("Profile.$slug");
+            Gdn::sql()
+                ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
+                ->select('a' . $i . '.Value', '', $slug);
+            $i++;
         }
 
         // Get our user data.

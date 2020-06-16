@@ -4066,6 +4066,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         // Remove comments in moderation queue
         $this->getDelete('Log', ['RecordUserID' => $userID, 'Operation' => 'Pending'], $content);
 
+        // Remove media.
+        $this->getDelete('Media', ['InsertUserID' => $userID], $content);
+
         // Clear out information on the user.
         $this->setField($userID, [
             'About' => null,

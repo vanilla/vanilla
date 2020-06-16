@@ -15,13 +15,16 @@ use DOMDocument;
  */
 final class DomUtils {
 
+    /** @var array */
+    const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
+
     /**
      * Remove embeds from the dom.
      *
      * @param DOMDocument $dom
      * @param array $embedClasses
      */
-    public static function stripEmbeds(DOMDocument $dom, array $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe']): void {
+    public static function stripEmbeds(DOMDocument $dom, array $embedClasses = self::EMBED_CLASSES): void {
         $xpath = new \DomXPath($dom);
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");

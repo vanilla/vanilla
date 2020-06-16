@@ -12,7 +12,6 @@ use DOMDocument;
 
 /**
  * Class for stripping images and truncating text from a Dom.
- *
  */
 final class DomUtils {
 
@@ -60,29 +59,30 @@ final class DomUtils {
      * @param int $wordCount Number of words to truncate to
      */
     public static function trimWords(DOMDocument $dom, int $wordCount): void {
-        self::truncateWordsRecursive($dom->documentElement, $wordCount);
+        $wordCounter = $wordCount;
+        self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount);
     }
 
     /**
      * Recursively truncate text while preserving html tags.
      *
      * @param mixed $element Dom element.
-     * @param int $limit Number of words to truncate to.
+     * @param int $wordCounter Counter of number of word to trucnate to.
+     * @param int $wordCount Number of words to truncate to.
      * @return int Return limit used to count remaining tags.
      */
-    private static function truncateWordsRecursive($element, int $limit): int {
-        $wordCount = $limit;
-        if ($limit > 0) {
+    private static function truncateWordsRecursive($element, int $wordCounter, int $wordCount): int {
+        if ($wordCounter > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
-                $limit -= str_word_count($element->data);
-                if ($limit < 0) {
+                $wordCounter -= str_word_count($element->data);
+                if ($wordCounter < 0) {
                     $element->nodeValue = implode(' ', array_slice(explode(' ', $element->data), 0, $wordCount));
                 }
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
-                    if ($limit > 0) {
-                        $limit = self::truncateWordsRecursive($element->childNodes->item($i), $limit);
+                    if ($wordCounter > 0) {
+                        $wordCounter = self::truncateWordsRecursive($element->childNodes->item($i), $wordCounter, $wordCount);
                     } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;
@@ -90,6 +90,6 @@ final class DomUtils {
                 }
             }
         }
-        return $limit;
+        return $wordCounter;
     }
 }

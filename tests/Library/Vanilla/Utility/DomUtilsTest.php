@@ -21,9 +21,6 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 class DomUtilsTest extends TestCase {
     use AssertsFixtureRenderingTrait;
 
-    /** @var array */
-    const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
-
     /**
      * Test truncating words.
      *
@@ -88,13 +85,12 @@ class DomUtilsTest extends TestCase {
      * @dataProvider provideStripEmbedsTests
      */
     public function testStripEmbeds(string $input, string $expected): void {
-        $embedClasses = self::EMBED_CLASSES;
         $dom = new HtmlDocument($input);
 
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($input, $dom->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
-        DomUtils::stripEmbeds($dom->getDom(), $embedClasses);
+        DomUtils::stripEmbeds($dom->getDom());
         $actual = $dom->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }

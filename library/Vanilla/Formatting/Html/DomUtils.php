@@ -16,7 +16,7 @@ use DOMDocument;
 final class DomUtils {
 
     /** @var array */
-    const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
+    private const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
 
     /**
      * Remove embeds from the dom.
@@ -63,7 +63,7 @@ final class DomUtils {
      */
     public static function trimWords(DOMDocument $dom, int $wordCount): void {
         $wordCounter = $wordCount;
-        self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount);
+        self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount = 100);
     }
 
     /**
@@ -77,7 +77,7 @@ final class DomUtils {
     private static function truncateWordsRecursive($element, int $wordCounter, int $wordCount): int {
         if ($wordCounter > 0) {
             // Nodetype text
-            if ($element->nodeType == 3) {
+            if ($element->nodeType == XML_TEXT_NODE) {
                 $wordCounter -= str_word_count($element->data);
                 if ($wordCounter < 0) {
                     $element->nodeValue = implode(' ', array_slice(explode(' ', $element->data), 0, $wordCount));

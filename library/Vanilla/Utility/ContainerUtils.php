@@ -79,6 +79,7 @@ class ContainerUtils {
      * @param Container $container
      * @param string $target
      * @param string $replacement
+     * @param bool $addAlias
      */
     public static function replace(
         Container $container,

@@ -12,6 +12,9 @@ use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
 
+/**
+ * Tests for the container utilities class.
+ */
 class ContainerUtilsTest extends TestCase {
 
     /** @var Container */

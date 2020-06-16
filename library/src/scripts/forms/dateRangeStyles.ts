@@ -14,7 +14,7 @@ import { layoutVariables } from "@library/layout/layoutStyles";
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("dateRange");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const mobileGutterSize =
         panelWidgetVariables().spacing.padding + containerVariables().spacing.mobile.padding.horizontal;

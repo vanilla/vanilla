@@ -361,7 +361,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const pushLeft = style("pushLeft", {
         marginRight: important("auto"),

@@ -96,7 +96,7 @@ export const searchResultsClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style(
         {

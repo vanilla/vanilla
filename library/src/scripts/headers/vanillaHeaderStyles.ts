@@ -149,7 +149,7 @@ export const titleBarClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const flex = flexHelper();
     const style = styleFactory("titleBar");
 
@@ -617,7 +617,7 @@ export const titleBarHomeClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const globalVars = globalVariables();
     const style = styleFactory("titleBarHome");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style({
         minHeight: vars.sizing.mobile.height * 2,

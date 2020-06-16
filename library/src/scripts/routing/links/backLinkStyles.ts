@@ -36,7 +36,7 @@ const backLinkVariables = useThemeCache(() => {
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const style = styleFactory("backLink");
     const titleBarVars = titleBarVariables();
     const vars = backLinkVariables();

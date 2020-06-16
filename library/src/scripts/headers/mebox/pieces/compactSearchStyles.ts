@@ -167,7 +167,7 @@ export const compactSearchClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style({
         $nest: {

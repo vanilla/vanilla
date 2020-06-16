@@ -7,8 +7,7 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { FULL_GUTTER, globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { getLayouts } from "@library/layout/types/layouts";
-import { LayoutTypes } from "@library/layout/LayoutContext";
+import { allLayoutVariables, LayoutTypes } from "@library/layout/LayoutContext";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
@@ -20,6 +19,7 @@ import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
 import { threeColumnLayout } from "@library/layout/types/threeColumn";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -64,20 +64,22 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const layouts = getLayouts();
     return {
         gutter,
         spacing,
-        layouts,
+        layouts: allLayoutVariables(),
         /*
          * @deprecated You should get the media queries through "layouts" declared above
          */
-        mediaQueries: threeColumnLayout().mediaQueries,
+        mediaQueries: threeColumnLayout().mediaQueries() ?? {
+            oneColumnDown: (styles: NestedCSSProperties) => {
+                return {};
+            },
+        },
     };
 });
 
-// This class shouldn't be used directly, either get it from the layout context or from layoutClassesForCurrentLayout()
-const layoutClasses = (props: { type?: LayoutTypes }) => {
+export const layoutClasses = (props: { type?: LayoutTypes }) => {
     const { type = LayoutTypes.THREE_COLUMNS } = props;
     const vars = layoutVariables();
     const globalVars = globalVariables();
@@ -94,11 +96,9 @@ const layoutClasses = (props: { type?: LayoutTypes }) => {
         width: percent(100),
     });
 
-    console.log("undefined?: ", LayoutTypes);
-
     const root = style(
         {
-            ...margins(layoutTypeVariables.spacing.margin),
+            ...margins(vars.spacing.margin),
             width: percent(100),
             $nest: {
                 [`&.noBreadcrumbs > .${main}`]: {
@@ -111,30 +111,37 @@ const layoutClasses = (props: { type?: LayoutTypes }) => {
                         },
                     }),
                 },
-                "&.isOneCol": {
-                    width: unit(layoutTypeVariables.middleColumnPaddedWidth()),
-                    maxWidth: percent(100),
-                    margin: "auto",
-                    ...vars.mediaQueries.oneColumnDown({
-                        width: percent(100),
-                    }),
-                },
+                // "&.isOneCol": {
+                //     width: unit(layoutTypeVariables.middleColumnPaddedWidth()),
+                //     maxWidth: percent(100),
+                //     margin: "auto",
+                //     ...mediaQueries({
+                //         [LayoutTypes.THREE_COLUMNS]: {
+                //             oneColumnDown: {
+                //                 width: percent(100),
+                //             },
+                //         },
+                //     }),
+                // },
                 "&.hasTopPadding": {
-                    paddingTop: unit(layoutTypeVariables.spacing.extraPadding.top),
+                    paddingTop: unit(vars.spacing.extraPadding.top),
                 },
                 "&.hasTopPadding.noBreadcrumbs": {
-                    paddingTop: unit(layoutTypeVariables.spacing.extraPadding.mobile.noBreadcrumbs.top),
+                    paddingTop: unit(vars.spacing.extraPadding.mobile.noBreadcrumbs.top),
                 },
                 "&.hasLargePadding": {
-                    ...paddings(layoutTypeVariables.spacing.largePadding),
+                    ...paddings(vars.spacing.largePadding),
                 },
             },
         },
-
-        vars.mediaQueries.oneColumnDown({
-            $nest: {
-                "&.hasTopPadding.noBreadcrumbs": {
-                    paddingTop: unit(layoutTypeVariables.spacing.extraPadding.mobile.noBreadcrumbs.top),
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    $nest: {
+                        "&.hasTopPadding.noBreadcrumbs": {
+                            paddingTop: unit(vars.spacing.extraPadding.mobile.noBreadcrumbs.top),
+                        },
+                    },
                 },
             },
         }),
@@ -176,56 +183,21 @@ const layoutClasses = (props: { type?: LayoutTypes }) => {
         padding: 0,
     });
 
-    const offset = panelBackgroundVariables().config.render
-        ? layoutTypeVariables.spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
-        : 0;
-
-    const leftColumn = style("leftColumn", {
-        position: "relative",
-        width: unit(layoutTypeVariables.panelPaddedWidth()),
-        flexBasis: unit(layoutTypeVariables.panelPaddedWidth()),
-        minWidth: unit(layoutTypeVariables.panelPaddedWidth()),
-        paddingRight: unit(offset),
-    });
-
-    const rightColumn = style("rightColumn", {
-        position: "relative",
-        width: unit(layoutTypeVariables.panelPaddedWidth()),
-        flexBasis: unit(layoutTypeVariables.panelPaddedWidth()),
-        minWidth: unit(layoutTypeVariables.panelPaddedWidth()),
-        overflow: "initial",
-        paddingLeft: unit(offset),
-    });
-
-    const middleColumn = style("middleColumn", {
-        justifyContent: "space-between",
-        flexGrow: 1,
-        width: percent(100),
-        maxWidth: percent(100),
-        paddingBottom: unit(layoutTypeVariables.spacing.extraPadding.bottom),
-        ...vars.mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
-    });
-
-    const middleColumnMaxWidth = style("middleColumnMaxWidth", {
-        $nest: {
-            "&.hasAdjacentPanel": {
-                flexBasis: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth())}`),
-                maxWidth: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth())}`),
-                ...vars.mediaQueries.oneColumnDown({
-                    flexBasis: percent(100),
-                    maxWidth: percent(100),
-                }),
-            },
-            "&.hasTwoAdjacentPanels": {
-                flexBasis: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth() * 2)}`),
-                maxWidth: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth() * 2)}`),
-                ...vars.mediaQueries.oneColumnDown({
-                    flexBasis: percent(100),
-                    maxWidth: percent(100),
-                }),
-            },
+    const middleColumn = style(
+        "middleColumn",
+        {
+            justifyContent: "space-between",
+            flexGrow: 1,
+            width: percent(100),
+            maxWidth: percent(100),
+            paddingBottom: unit(vars.spacing.extraPadding.bottom),
         },
-    });
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: paddings({ left: important(0), right: important(0) }),
+            },
+        }),
+    );
 
     const breadcrumbs = style("breadcrumbs", {});
 
@@ -236,11 +208,15 @@ const layoutClasses = (props: { type?: LayoutTypes }) => {
             height: percent(100),
             $unique: true,
         },
-        vars.mediaQueries.oneColumnDown({
-            position: "relative",
-            top: "auto",
-            left: "auto",
-            bottom: "auto",
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    position: "relative",
+                    top: "auto",
+                    left: "auto",
+                    bottom: "auto",
+                },
+            },
         }),
     );
 
@@ -260,26 +236,11 @@ const layoutClasses = (props: { type?: LayoutTypes }) => {
         main,
         container,
         fullWidth,
-        leftColumn,
-        rightColumn,
         middleColumn,
-        middleColumnMaxWidth,
         panel,
         isSticky,
         breadcrumbs,
         breadcrumbsContainer,
+        ...(layoutTypeVariables["layoutSpecificStyles"] ? layoutTypeVariables["layoutSpecificStyles"](style) : {}),
     };
-};
-
-export const layoutClassesForCurrentLayout = (props: { type: LayoutTypes }) => {
-    const { type = LayoutTypes.THREE_COLUMNS } = props;
-    switch (type) {
-        case LayoutTypes.ONE_COLUMN_NARROW:
-        case LayoutTypes.TWO_COLUMNS:
-        case LayoutTypes.LEGACY:
-            return layoutClasses({ type });
-        default:
-            // Catch any invalid types into this one
-            return layoutClasses({ type: LayoutTypes.THREE_COLUMNS });
-    }
 };

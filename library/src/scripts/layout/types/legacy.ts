@@ -24,7 +24,7 @@ export interface ILegacyLayoutMediaQueries {
     xs?: NestedCSSProperties;
 }
 
-export const LegacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
+export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables();
     const Devices = LegacyLayoutDevices;
 

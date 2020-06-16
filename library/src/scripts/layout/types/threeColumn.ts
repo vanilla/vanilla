@@ -1,9 +1,14 @@
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
-import { px } from "csx";
+import { calc, percent, px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { unit } from "@library/styles/styleHelpers";
+import { LayoutTypes } from "@library/layout/LayoutContext";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export enum ThreeColumnLayoutDevices {
     XS = "xs",
@@ -26,6 +31,7 @@ export interface IThreeColumnLayoutMediaQueries {
 
 export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables();
+    const layoutVars = layoutVariables();
     const Devices = ThreeColumnLayoutDevices;
 
     // Important variables that will be used to calculate other variables
@@ -175,6 +181,57 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
         return currentDevice === ThreeColumnLayoutDevices.XS || currentDevice === ThreeColumnLayoutDevices.MOBILE;
     };
 
+    const offset = panelBackgroundVariables().config.render
+        ? layoutVars.spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
+        : 0;
+
+    const layoutSpecificStyles = style => {
+        const myMediaQueries = mediaQueries();
+        const middleColumnMaxWidth = style("middleColumnMaxWidth", {
+            $nest: {
+                "&.hasAdjacentPanel": {
+                    flexBasis: calc(`100% - ${unit(panelPaddedWidth())}`),
+                    maxWidth: calc(`100% - ${unit(panelPaddedWidth())}`),
+                    ...myMediaQueries.oneColumnDown({
+                        flexBasis: percent(100),
+                        maxWidth: percent(100),
+                    }),
+                },
+                "&.hasTwoAdjacentPanels": {
+                    flexBasis: calc(`100% - ${unit(panelPaddedWidth() * 2)}`),
+                    maxWidth: calc(`100% - ${unit(panelPaddedWidth() * 2)}`),
+                    ...myMediaQueries.oneColumnDown({
+                        flexBasis: percent(100),
+                        maxWidth: percent(100),
+                    }),
+                },
+            },
+        });
+
+        const leftColumn = style("leftColumn", {
+            position: "relative",
+            width: unit(panelPaddedWidth()),
+            flexBasis: unit(panelPaddedWidth()),
+            minWidth: unit(panelPaddedWidth()),
+            paddingRight: unit(offset),
+        });
+
+        const rightColumn = style("rightColumn", {
+            position: "relative",
+            width: unit(panelPaddedWidth()),
+            flexBasis: unit(panelPaddedWidth()),
+            minWidth: unit(panelPaddedWidth()),
+            overflow: "initial",
+            paddingLeft: unit(offset),
+        });
+
+        return {
+            leftColumn,
+            rightColumn,
+            middleColumnMaxWidth,
+        };
+    };
+
     return {
         Devices,
         foundationalWidths,
@@ -188,5 +245,6 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
         calculateDevice,
         isFullWidth,
         isCompact,
+        layoutSpecificStyles,
     };
 });

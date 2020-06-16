@@ -22,7 +22,7 @@ export const panelWidgetVariables = useThemeCache(() => {
 
 export const panelWidgetClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const style = styleFactory("panelWidget");
     const vars = panelWidgetVariables();
 

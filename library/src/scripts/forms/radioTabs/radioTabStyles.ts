@@ -86,7 +86,7 @@ export const radioTabsVariables = useThemeCache(() => {
 export const radioTabClasses = useThemeCache(() => {
     const vars = radioTabsVariables();
     const style = styleFactory("radioTab");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const formElementVariables = formElementsVariables();
 
     const root = style({

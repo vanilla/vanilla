@@ -478,7 +478,7 @@ export const bannerClasses = useThemeCache(
         const style = styleFactory(altName ?? "banner");
         const formElementVars = formElementsVariables();
         const globalVars = globalVariables();
-        const mediaQueries = layoutVariables().mediaQueries();
+        const mediaQueries = layoutVariables().mediaQueries;
 
         const isCentered = vars.options.alignment === "center";
 
@@ -771,11 +771,9 @@ export const bannerClasses = useThemeCache(
                     minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
                 },
             ),
-            layoutVariables()
-                .mediaQueries()
-                .oneColumnDown({
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
-                }),
+            layoutVariables().mediaQueries.oneColumnDown({
+                minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
+            }),
             media(
                 { maxWidth: 500 },
                 {

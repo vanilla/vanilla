@@ -62,6 +62,7 @@ export const containerVariables = useThemeCache(() => {
 export const containerClasses = useThemeCache((currentLayoutVariables, mediaQueries) => {
     const style = styleFactory("container");
     const isLoading = isEmpty(currentLayoutVariables);
+    const variables = containerVariables();
     const root = style({
         display: "flex",
         flexDirection: "column",
@@ -71,21 +72,13 @@ export const containerClasses = useThemeCache((currentLayoutVariables, mediaQuer
         maxWidth: isLoading ? undefined : currentLayoutVariables.contentWidth(),
         marginLeft: "auto",
         marginRight: "auto",
-        ...(isLoading ? {} : paddings(currentLayoutVariables.spacing.padding)),
+        ...paddings(variables.spacing.padding),
         ...mediaQueries({
             [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: paddings(currentLayoutVariables.mobile),
+                oneColumnDown: paddings(variables.spacing.mobile.padding),
             },
         }),
     });
-
-    const fullGutter = style(
-        "fullGutter",
-        // { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
-        // mediaQueries.oneColumnDown({
-        //     ...paddings(vars.spacing.paddingFullMobile),
-        // }),
-    );
 
     return { root };
 });

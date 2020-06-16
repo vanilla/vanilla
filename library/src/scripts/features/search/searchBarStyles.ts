@@ -96,7 +96,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
     const vars = searchBarVariables();
     const titleBarVars = titleBarVariables();
     const formElementVars = formElementsVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const style = styleFactory("searchBar");
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();

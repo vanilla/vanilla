@@ -47,7 +47,6 @@ interface IViewAll {
 export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
     const makeVars = variableFactory("homeWidgetContainer");
     const globalVars = globalVariables();
-    // const layoutVars = layoutVariables();
     const { currentLayoutVariables } = useLayout();
 
     let options = makeVars(
@@ -149,7 +148,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
         },
     });
 
-    const mobileMediaQuery = layoutVariables().mediaQueries().oneColumnDown;
+    const mobileMediaQuery = layoutVariables().mediaQueries.oneColumnDown;
 
     return { options, spacing, itemSpacing, title, grid, gridItem, mobileMediaQuery };
 });
@@ -177,15 +176,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const verticalContainer = style("verticalContainer", {
         ...paddings(vars.spacing.padding),
-    });
-
-    const container = style("container", {
-        $nest: {
-            "&&": {
-                maxWidth: unit(vars.options.maxWidth),
-                margin: "0 auto",
-            },
-        },
     });
 
     const content = style("content", contentMixin);
@@ -315,7 +305,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         root,
         separator,
         verticalContainer,
-        container,
         content,
         borderedContent,
         viewAllContent,

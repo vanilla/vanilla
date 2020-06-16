@@ -84,7 +84,7 @@ export const modalClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = modalVariables();
     const style = styleFactory("modal");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const shadows = shadowHelper();
     const titleBarVars = titleBarVariables();
 

@@ -41,7 +41,7 @@ export const panelListVariables = useThemeCache(() => {
 export const panelListClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = panelListVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const style = styleFactory("panelList");
 
     const root = style({

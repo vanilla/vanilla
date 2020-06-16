@@ -15,9 +15,8 @@ import { NestedCSSSelectors } from "typestyle/lib/types";
 
 export const panelAreaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
     const vars = layoutVariables();
-    const mediaQueries = vars.mediaQueries();
+    const mediaQueries = vars.mediaQueries;
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses();
 

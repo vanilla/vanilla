@@ -16,7 +16,7 @@ import { nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilitySt
 export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) => {
     const style = styleFactory("buttonTabs");
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const formElementVariables = formElementsVariables();
 
     const root = style({

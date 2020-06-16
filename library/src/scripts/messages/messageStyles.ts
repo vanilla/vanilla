@@ -102,7 +102,7 @@ export const messagesClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const shadows = shadowHelper();
 
     const hasIcon = style("hasIcon", {});

@@ -29,7 +29,7 @@ export const NavLinksPlaceholder = React.memo(function NavLinksPlaceholder(props
     );
 
     return (
-        <Container fullGutter className={props.className}>
+        <Container requiresPadding className={props.className}>
             <nav className={classNames(classes.linksWithHeadings)}>
                 <Heading
                     title={props.title}
@@ -57,11 +57,7 @@ function SingleNavLinksPlaceholder(props: { itemCount: number }) {
     const classes = navLinksClasses();
     return (
         <div className={classes.root}>
-            <LoadingRectange
-                className={classes.title}
-                height={24}
-                width={random(30, 75, false) + "%"}
-            ></LoadingRectange>
+            <LoadingRectange className={classes.title} height={24} width={random(30, 75, false) + "%"} />
             <div className={classes.items}>
                 {Array.from(Array(props.itemCount)).map((_, i) => {
                     return (

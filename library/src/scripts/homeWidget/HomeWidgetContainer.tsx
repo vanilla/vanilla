@@ -68,7 +68,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 
     return (
         <div className={classes.root}>
-            <Container fullGutter>
+            <Container requiresPadding>
                 <div className={classes.container}>
                     {options.borderType === "navLinks" && (
                         <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>

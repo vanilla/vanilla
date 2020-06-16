@@ -2,7 +2,6 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 export enum OneColumnNarrowLayoutDevices {
@@ -16,7 +15,6 @@ export interface IOneColumnNarrowLayoutMediaQueries {
 }
 
 export const oneColumnNarrowLayout = useThemeCache((forcedVars?: IThemeVariables) => {
-    const globalVars = globalVariables();
     const Devices = OneColumnNarrowLayoutDevices;
 
     // Important variables that will be used to calculate other variables

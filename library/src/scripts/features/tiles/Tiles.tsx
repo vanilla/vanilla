@@ -48,7 +48,7 @@ export default function Tiles(props: IProps) {
     const classes = tilesClasses(optionOverrides);
 
     return (
-        <Container fullGutter>
+        <Container requiresPadding>
             {items.length === 0 ? (
                 <div className={classNames(className, "isEmpty", classes.root)}>
                     <Paragraph>{props.emptyMessage}</Paragraph>

@@ -32,7 +32,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style({
         position: "relative",

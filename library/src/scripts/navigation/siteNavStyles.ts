@@ -49,7 +49,7 @@ export const siteNavVariables = useThemeCache(() => {
 export const siteNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const style = styleFactory("siteNav");
 
@@ -81,7 +81,7 @@ export const siteNavClasses = useThemeCache(() => {
 export const siteNavNodeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const style = styleFactory("siteNavNode");
 

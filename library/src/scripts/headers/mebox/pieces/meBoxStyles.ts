@@ -16,7 +16,7 @@ export const meBoxClasses = useThemeCache(() => {
     const formVars = formElementsVariables();
     const titleBarVars = titleBarVariables();
     const debug = debugHelper("meBox");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const flex = flexHelper();
     const style = styleFactory("meBox");
 

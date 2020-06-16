@@ -17,9 +17,9 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent, translateX } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { forumLayoutVariables } from "./forumLayoutStyles";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 
 export const groupVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("groups");

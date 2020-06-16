@@ -72,7 +72,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             const sectionTitleID = uniqueIDFromPrefix("navLinksSectionTitle");
 
             return (
-                <Container fullGutter narrow>
+                <Container requiresPadding>
                     <section
                         aria-labelledby={sectionTitleID}
                         className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}

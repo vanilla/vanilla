@@ -55,7 +55,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
     const style = styleFactory("dataList");
     const vars = dataListVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutMediaQueries ?? layoutVariables().mediaQueries();
+    const mediaQueries = layoutMediaQueries ?? layoutVariables().mediaQueries;
 
     const root = style({});
 

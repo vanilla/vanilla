@@ -76,7 +76,7 @@ export const tabsVariables = useThemeCache(() => {
 export const tabStandardClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const style = styleFactory(TabsTypes.STANDARD);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
@@ -220,7 +220,7 @@ export const tabBrowseClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const globalVars = globalVariables();
     const style = styleFactory(TabsTypes.BROWSE);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const horizontalPadding = 12;
     const verticalPadding = globalVars.gutter.size / 2;

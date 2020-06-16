@@ -109,7 +109,7 @@ export const dropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style({
         position: "relative",
@@ -462,7 +462,7 @@ export const dropDownClasses = useThemeCache(() => {
 export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProperties => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     return {
         ...buttonResetMixin(),

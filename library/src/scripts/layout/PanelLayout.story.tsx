@@ -5,15 +5,15 @@
 
 import React from "react";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
-import { LayoutTypes, layoutVariables } from "@library/layout/layoutStyles";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import { LayoutProvider } from "@library/layout/LayoutContext";
+import { threeColumnLayout } from "@library/layout/types/threeColumn";
 
 export default {
     title: "PanelLayout",
     parameters: {
         chromatic: {
-            viewports: Object.values(layoutVariables().types.threeColumns.breakpoints),
+            viewports: Object.values(threeColumnLayout().breakPoints),
         },
     },
 };

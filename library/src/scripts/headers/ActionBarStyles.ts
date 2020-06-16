@@ -15,7 +15,7 @@ import { em, percent, px } from "csx";
 export const actionBarClasses = useThemeCache(() => {
     const style = styleFactory("actionBar");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
     const globalVars = globalVariables();
 
     const items = style(

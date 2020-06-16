@@ -76,7 +76,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
     const globalVars = globalVariables();
     const vars = tilesVariables(optionOverrides);
     const style = styleFactory("tiles");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries;
 
     const root = style(
         {

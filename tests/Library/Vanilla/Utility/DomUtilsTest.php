@@ -19,7 +19,6 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
  * Class for testing dom utility functions.
  */
 class DomUtilsTest extends TestCase {
-    use HtmlNormalizeTrait;
     use AssertsFixtureRenderingTrait;
 
     /** @var array */

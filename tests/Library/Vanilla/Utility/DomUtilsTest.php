@@ -8,18 +8,18 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\DomUtils;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
-use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
 /**
  * Class DomUtilsTest
  * @package VanillaTests\Library\Vanilla\Utility
  */
-class DomUtilsTest extends MinimalContainerTestCase {
+class DomUtilsTest extends TestCase {
     use HtmlNormalizeTrait;
     use AssertsFixtureRenderingTrait;
 

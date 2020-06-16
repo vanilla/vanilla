@@ -144,7 +144,7 @@ abstract class AbstractAPIv2Test extends TestCase {
         $pagingTestUrl = $resourceUrl.(strpos($resourceUrl, '?') === false ? '?' : '&').'limit=1';
         $resourcePath = parse_url($resourceUrl, PHP_URL_PATH);
 
-        $result = $this->api()->get($pagingTestUrl);
+        $result = $this->api()->get($pagingTestUrl, ['pinOrder' => 'mixed']);
         $link = $result->getHeader('Link');
         $this->assertNotEmpty($link);
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="first"/', $link) === 1);

@@ -303,4 +303,57 @@ final class ArrayUtils {
 
         return $arr;
     }
+
+    /**
+     * Return a function that can be used to sort a dataset by one or more keys.
+     *
+     * Consider a dataset that looks something like this:
+     *
+     * ```
+     * $data = [
+     *     ['score' => 0, 'date' => '2010-05-02', ...],
+     *     ...
+     * ]
+     * ```
+     *
+     * I can sort this dataset by score (descending), then date with the following code:
+     *
+     * ```
+     * usort($data, ArrayUtils::datasetSortCallback('-score', 'date'));
+     * ```
+     *
+     * Note that string comparisons are case-insensitive to emulate common database collations.
+     *
+     * @param string $keys The keys to sort by.
+     * @return callable Returns a function that can be passed to `usort`.
+     */
+    public static function sortCallback(string ...$keys): callable {
+        $sortKeys = [];
+        foreach ($keys as $key) {
+            if ($key[0] === '-') {
+                $sortKeys[substr($key, 1)] = -1;
+            } else {
+                $sortKeys[$key] = 1;
+            }
+        }
+
+        return function ($a, $b) use ($sortKeys): int {
+            foreach ($sortKeys as $key => $dir) {
+                $va = $a[$key];
+                $vb = $b[$key];
+
+                if (is_string($va) && is_string($vb)) {
+                    // Emulate case insensitive database collations.
+                    $s = strcasecmp($va, $vb);
+                } else {
+                    $s = $va <=> $vb;
+                }
+
+                if ($s !== 0) {
+                    return $dir * $s;
+                }
+            }
+            return 0;
+        };
+    }
 }

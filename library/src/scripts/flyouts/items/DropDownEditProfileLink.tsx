@@ -25,7 +25,7 @@ export function DropDownEditProfileLink() {
             }
         >
             <DropDownItemSeparator />
-            <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />;
+            <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
         </Permission>
     );
 }

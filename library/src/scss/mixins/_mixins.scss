@@ -4,18 +4,4 @@
  * @license GPL-2.0-only
  */
 
-@import "mixin.absolute";
-@import "mixin.backLink";
-@import "mixin.bg";
-@import "mixin.disabled";
-@import "mixin.flex";
-@import "mixin.formElements";
-@import "mixin.iconButton";
-@import "mixin.listStyles";
-@import "mixin.objectFit";
-@import "mixin.sassToCss";
-@import "mixin.spinnerLoader";
-@import "mixin.text";
-@import "mixin.transitions";
-@import "mixin.utilities";
-@import "mixin.shadows";
+@import "~@vanilla/theme-core/scss/mixins/mixins";

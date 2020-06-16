@@ -473,6 +473,9 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
+            'sort:s?' => [
+                'enum' => ApiUtils::sortEnum('dateLastComment', 'dateInserted', 'discussionID'),
+            ],
             'insertUserID:i?' => [
                 'description' => 'Filter by author.',
                 'x-filter' => [
@@ -502,19 +505,20 @@ class DiscussionsApiController extends AbstractApiController {
             $query['pinOrder'] = 'mixed';
         }
 
-        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
+        $pinned = $query['pinned'] ?? null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
-            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();
         } else {
             $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort'] ?? '');
             if ($pinOrder == 'first') {
-                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
-                $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, $query['sort'] ?? '')->resultArray();
+                $discussions = $this->discussionModel->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)->resultArray();
                 $rows = array_merge($announcements, $discussions);
             } else {
                 $where['Announce'] = 'all';
-                $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+                $rows = $this->discussionModel->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)->resultArray();
             }
         }
 

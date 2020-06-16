@@ -849,9 +849,11 @@ class Gdn_Format {
         // Strip  Right-To-Left override.
         $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
         if (unicodeRegexSupport()) {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+            $regex =
+                "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\{\}\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+            $regex =
+                "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\{\}\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = FormatUtil::replaceButProtectCodeBlocks(

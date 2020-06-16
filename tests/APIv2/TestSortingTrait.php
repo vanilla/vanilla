@@ -34,7 +34,6 @@ trait TestSortingTrait {
             /* @var AbstractResourceTest $this */
             $actual = $this->api()->get($this->indexUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
             static::assertSorted($actual, $field);
-            usort($expected, ArrayUtils::sortCallback($field));
         }
     }
 

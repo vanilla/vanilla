@@ -7,7 +7,7 @@
 import { Optionalize } from "@library/@types/utils";
 import { layoutClasses, layoutVariables } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
     IThreeColumnLayoutMediaQueries,
     threeColumnLayout,
@@ -20,6 +20,7 @@ import {
     OneColumnNarrowLayoutDevices,
 } from "@library/layout/types/oneColumnNarrow";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { useThemeCacheID } from "@library/styles/styleUtils";
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default
@@ -53,22 +54,16 @@ export interface ILayoutProps {
 const filterQueriesByType = mediaQueriesByType => {
     return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
         const { type = LayoutTypes.THREE_COLUMNS } = useLayout();
-        // console.log("");
-        // console.log("mediaQueriesByLayout: ", mediaQueriesByLayout);
 
         Object.keys(mediaQueriesByLayout).forEach(layoutName => {
-            // console.log("layoutName: ", layoutName);
             if (layoutName === type) {
                 // Check if we're in the correct layout before applying
                 const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
                 const stylesForLayout = mediaQueriesByLayout[layoutName];
-                // console.log("mediaQueriesForLayout: ", mediaQueriesForLayout);
-                // console.log("stylesForLayout: ", stylesForLayout);
 
                 if (mediaQueriesForLayout) {
                     Object.keys(mediaQueriesForLayout).forEach(queryName => {
                         mediaQueriesForLayout[queryName] = stylesForLayout;
-                        // console.log("mediaQueriesForLayout[queryName]: ", mediaQueriesForLayout[queryName]);
                         return mediaQueriesForLayout[queryName];
                     });
                 }
@@ -84,21 +79,13 @@ export const allLayoutVariables = () => {
         [LayoutTypes.THREE_COLUMNS]: threeColumnLayout(),
         [LayoutTypes.ONE_COLUMN]: oneColumnLayout(),
         [LayoutTypes.NARROW]: oneColumnNarrowLayout(),
-        // [LayoutTypes.LEGACY]: legacyLayout(),
     };
-
-    // console.log("");
-    // console.log("types: ", types);
 
     Object.keys(LayoutTypes).forEach(layoutName => {
         const enumKey = LayoutTypes[layoutName];
         const layoutData = types[enumKey];
-        // console.log("layoutData: ", layouries();
         mediaQueriesByType[enumKey] = layoutData.mediaQueries();
-        // console.log("mediaQueriesByType: ", mediaQueriesByType);
     });
-
-    // console.log("mediaQueriesByType: ", mediaQueriesByType);
 
     return {
         mediaQueries: filterQueriesByType(mediaQueriesByType),
@@ -127,12 +114,13 @@ export function useLayout() {
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
     const currentLayoutVars = layoutVarsForCurrentLayout({ type });
+    const { cacheID } = useThemeCacheID();
 
     const calculateDevice = useCallback(() => {
         return currentLayoutVars.calculateDevice();
     }, []);
 
-    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({} as ILayoutProps);
+    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({} as ILayoutProps); // Can't get variables here
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
@@ -155,7 +143,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [calculateDevice, setDeviceInfo]);
+    }, [calculateDevice, setDeviceInfo, cacheID]);
 
     return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
 }

@@ -30,14 +30,12 @@ function StoryBanner(props: { title: string; forceSearchOpen?: boolean; isConten
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <LayoutProvider>
-                    <Banner
-                        forceSearchOpen={props.forceSearchOpen}
-                        isContentBanner={props.isContentBanner}
-                        title={props.title}
-                        description="This is a description. They're pretty great, you should try one sometime."
-                    />
-                </LayoutProvider>
+                <Banner
+                    forceSearchOpen={props.forceSearchOpen}
+                    isContentBanner={props.isContentBanner}
+                    title={props.title}
+                    description="This is a description. They're pretty great, you should try one sometime."
+                />
             </SearchContext.Provider>
         </MemoryRouter>
     );

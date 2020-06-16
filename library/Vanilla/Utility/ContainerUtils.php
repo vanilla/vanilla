@@ -74,12 +74,18 @@ class ContainerUtils {
     }
 
     /**
-     * Replace container instance of a class, if present, and optionally add it as an alias for its replacement.
+     * Replace one type of object in the container with another type of object. Existing shared instances will be
+     * overwritten. Optionally, an alias may be created from the original type to the new type.
      *
-     * @param Container $container
-     * @param string $target
-     * @param string $replacement
-     * @param bool $addAlias
+     * Sometimes an object has limitations or shortcomings that could be resolved by something like a decorator, where
+     * a drop-in replacement wraps existing functionality in enhancements or customizations. This method could configure
+     * a container to use the decorator, replacing stored instances and ensuring new requests to the container would
+     * receive the decorator instead of the original class.
+     *
+     * @param Container $container Container to configure.
+     * @param string $target Container rule to target for replacement. Shared instances will be overwritten.
+     * @param string $replacement Container rule used to determine what will be replace the target in the container.
+     * @param bool $addAlias Should an alias from the target rule be made to the replacement?
      */
     public static function replace(
         Container $container,

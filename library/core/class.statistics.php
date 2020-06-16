@@ -818,11 +818,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
             ) {
                 $cacheKey = "QueryCache.Analytics.CountViews";
 
-                // Increment. If not success, create key.
-                $incremented = Gdn::cache()->increment($cacheKey);
-                if ($incremented === Gdn_Cache::CACHEOP_FAILURE) {
-                    Gdn::cache()->store($cacheKey, 1);
-                }
+                // Increment.
+                $incremented = Gdn::cache()->increment($cacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
                 // Get current cache value
                 $views = Gdn::cache()->get($cacheKey);
@@ -830,11 +827,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 if ($viewType == 'embed') {
                     $embedCacheKey = "QueryCache.Analytics.CountEmbedViews";
 
-                    // Increment. If not success, create key.
-                    $embedIncremented = Gdn::cache()->increment($embedCacheKey);
-                    if ($embedIncremented === Gdn_Cache::CACHEOP_FAILURE) {
-                        Gdn::cache()->store($embedCacheKey, 1);
-                    }
+                    // Increment.
+                    $embedIncremented = Gdn::cache()->increment($embedCacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
                     // Get current cache value
                     $embedViews = Gdn::cache()->get($embedCacheKey);

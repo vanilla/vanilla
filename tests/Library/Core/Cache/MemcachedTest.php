@@ -76,4 +76,11 @@ class MemcachedTest extends SimpleCacheTest {
     public function createSimpleCache() {
         return new ValidatingCacheCacheAdapter(self::$memcached);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function createLegacyCache(): \Gdn_Cache {
+        return self::$memcached;
+    }
 }

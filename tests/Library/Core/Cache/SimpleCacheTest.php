@@ -34,4 +34,38 @@ abstract class SimpleCacheTest extends \Cache\IntegrationTests\SimpleCacheTest {
         'testDeleteMultipleInvalidKeys' => self::MSG_VALIDATE,
         'testDeleteMultipleNoIterable' => self::MSG_VALIDATE,
     ];
+
+    /**
+     * Create a legacy cache object for testing.
+     *
+     * @return \Gdn_Cache
+     */
+    protected abstract function createLegacyCache(): \Gdn_Cache;
+
+    /**
+     * Test a basic increment.
+     */
+    public function testIncrement(): void {
+        $cache = $this->createLegacyCache();
+
+        $this->assertFalse($cache->exists('aa'));
+        $val = $cache->increment('aa', 1, [\Gdn_Cache::FEATURE_INITIAL => 5]);
+        $this->assertSame(5, $val);
+        $val2 = $cache->get('aa');
+        $this->assertSame($val, $val2);
+        $this->assertSame($val + 2, $cache->increment('aa', 2));
+    }
+
+    /**
+     * Test a basic decrement.
+     */
+    public function testDecrement(): void {
+        $cache = $this->createLegacyCache();
+
+        $this->assertFalse($cache->exists('aa'));
+        $val = $cache->decrement('aa', 1, [\Gdn_Cache::FEATURE_INITIAL => 5]);
+        $this->assertSame(5, $val);
+        $val2 = $cache->decrement('aa', 2);
+        $this->assertSame($val - 2, $val2);
+    }
 }

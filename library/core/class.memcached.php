@@ -748,12 +748,12 @@ class Gdn_Memcached extends Gdn_Cache {
         $initial = !is_null($initial) ? $initial : 0;
         $expiry = !is_null($expiry) ? $expiry : 0;
 
-        $tryBinary = $this->option(Memcached::OPT_BINARY_PROTOCOL, false) & $requireBinary;
+        $tryBinary = $this->option(Memcached::OPT_BINARY_PROTOCOL, false) && $requireBinary;
         $realKey = $this->makeKey($key, $finalOptions);
         switch ($tryBinary) {
             case false:
                 $incremented = $this->memcache->increment($realKey, $amount);
-                if ($incremented === false && $initial) {
+                if ($incremented === false) {
                     $incremented = $this->memcache->set($realKey, $initial);
                     if ($incremented) {
                         $incremented = $initial;
@@ -799,7 +799,7 @@ class Gdn_Memcached extends Gdn_Cache {
         switch ($tryBinary) {
             case false:
                 $decremented = $this->memcache->decrement($realKey, $amount);
-                if (is_null($decremented) && $initial) {
+                if ($decremented === false) {
                     $decremented = $this->memcache->set($realKey, $initial);
                     if ($decremented) {
                         $decremented = $initial;

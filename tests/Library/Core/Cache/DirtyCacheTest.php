@@ -26,7 +26,14 @@ class DirtyCacheTest extends SimpleCacheTest {
      * @inheritDoc
      */
     public function createSimpleCache() {
-        $cache = new ValidatingCacheCacheAdapter(new \Gdn_Dirtycache());
+        $cache = new ValidatingCacheCacheAdapter($this->createLegacyCache());
         return $cache;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function createLegacyCache(): \Gdn_Cache {
+        return new \Gdn_Dirtycache();
     }
 }

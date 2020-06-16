@@ -14,7 +14,7 @@ use DOMDocument;
  * Class for stripping images and truncating text from a Dom.
  *
  */
-class DomUtils {
+final class DomUtils {
 
     /**
      * Remove embeds from the dom.
@@ -22,7 +22,7 @@ class DomUtils {
      * @param DOMDocument $dom
      * @param array $embedClasses
      */
-    public static function stripEmbeds(DOMDocument $dom, array $embedClasses): void {
+    public static function stripEmbeds(DOMDocument $dom, array $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe']): void {
         $xpath = new \DomXPath($dom);
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
@@ -60,7 +60,7 @@ class DomUtils {
      * @param int $wordCount Number of words to truncate to
      */
     public static function trimWords(DOMDocument $dom, int $wordCount): void {
-        (new self)->truncateWordsRecursive($dom->documentElement, $wordCount);
+        self::truncateWordsRecursive($dom->documentElement, $wordCount);
     }
 
     /**
@@ -70,7 +70,7 @@ class DomUtils {
      * @param int $limit Number of words to truncate to.
      * @return int Return limit used to count remaining tags.
      */
-    private function truncateWordsRecursive($element, int $limit): int {
+    static function truncateWordsRecursive($element, int $limit): int {
         $wordCount = $limit;
         if ($limit > 0) {
             // Nodetype text
@@ -82,7 +82,7 @@ class DomUtils {
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
                     if ($limit > 0) {
-                        $limit = $this->truncateWordsRecursive($element->childNodes->item($i), $limit);
+                        $limit = self::truncateWordsRecursive($element->childNodes->item($i), $limit);
                     } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;

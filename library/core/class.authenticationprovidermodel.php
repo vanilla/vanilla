@@ -23,6 +23,8 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     /** Database mapping. */
     const COLUMN_NAME = 'Name';
 
+    const ALL_CACHE_KEY = 'AuthenticationProviders-All';
+
     /**
      * @var array The default authentication provider.
      */
@@ -76,19 +78,37 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @return array|null|type
      */
     public function getProviders() {
-        $this->SQL
-            ->select('uap.*')
-            ->from('UserAuthenticationProvider uap');
-
         if (Gdn::session()->isValid()) {
-            $userID = Gdn::session()->UserID;
-
             $this->SQL
-                ->select('ua.ForeignUserKey', '', 'UniqueID')
-                ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $userID", 'left');
+                ->select('uap.*')
+                ->from('UserAuthenticationProvider uap');
+
+            if (Gdn::session()->isValid()) {
+                $userID = Gdn::session()->UserID;
+
+                $this->SQL
+                    ->select('ua.ForeignUserKey', '', 'UniqueID')
+                    ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $userID", 'left');
+            }
+
+            $data = $this->SQL->get()->resultArray();
+        } else {
+            $cache = Gdn::cache();
+
+            $data = $cache->get(self::ALL_CACHE_KEY);
+            if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+                $data = $this->SQL
+                    ->select('uap.*')
+                    ->from('UserAuthenticationProvider uap')
+                    ->get()
+                    ->resultArray()
+                ;
+                $cache->store(self::ALL_CACHE_KEY, $data, [
+                    Gdn_Cache::FEATURE_EXPIRY => 120, // 2 minute expiry.
+                ]);
+            }
         }
 
-        $data = $this->SQL->get()->resultArray();
         $data = Gdn_DataSet::index($data, ['AuthenticationKey']);
         foreach ($data as &$row) {
             self::calculate($row);

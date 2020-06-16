@@ -21,7 +21,7 @@ class ModelTest extends TestCase {
     /**
      * @var Model
      */
-    private $model;
+    protected $model;
 
     /**
      * Install the site and set up a test table.

@@ -15,13 +15,10 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
     private $resultItems;
 
     /** @var int */
-    private $resultCount;
-
-    /** @var int */
     private $totalCount;
 
     /** @var int */
-    private $currentPage;
+    private $offset;
 
     /** @var int */
     private $limit;
@@ -30,16 +27,14 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
      * Constructor.
      *
      * @param SearchResultItem[] $resultItems
-     * @param int $resultCount
      * @param int $totalCount
-     * @param int $currentPage
+     * @param int $offset
      * @param int $limit
      */
-    public function __construct(array $resultItems, int $resultCount, int $totalCount, int $currentPage, int $limit) {
+    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit) {
         $this->resultItems = $resultItems;
-        $this->resultCount = $resultCount;
         $this->totalCount = $totalCount;
-        $this->currentPage = $currentPage;
+        $this->offset = $offset;
         $this->limit = $limit;
     }
 
@@ -68,7 +63,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
      * @return int
      */
     public function getResultCount(): int {
-        return $this->resultCount;
+        return count($this->resultItems);
     }
 
     /**
@@ -81,8 +76,8 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
     /**
      * @return int
      */
-    public function getCurrentPage(): int {
-        return $this->currentPage;
+    public function getOffset(): int {
+        return $this->offset;
     }
 
     /**

@@ -21,10 +21,10 @@ class SearchService {
     /**
      * Register an active driver.
      *
-     * @param SearchDriverInterface $driver The driver.
+     * @param AbstractSearchDriver $driver The driver.
      * @param int $priority The highest priority number becomes the active driver.
      */
-    public function registerActiveDriver(SearchDriverInterface $driver, int $priority = 0) {
+    public function registerActiveDriver(AbstractSearchDriver $driver, int $priority = 0) {
         $this->drivers[] = [
             'priority' => $priority,
             'driver' => $driver,
@@ -37,9 +37,9 @@ class SearchService {
     /**
      * Get the active search driver.
      *
-     * @return SearchDriverInterface
+     * @return AbstractSearchDriver
      */
-    public function getActiveDriver(): SearchDriverInterface {
+    public function getActiveDriver(): AbstractSearchDriver {
         $driver = end($this->drivers)['driver'];
         if (!$driver) {
             throw new ServerException('Could not find active driver');

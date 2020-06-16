@@ -69,9 +69,10 @@ class SearchResultItem implements \JsonSerializable {
     protected function fullSchema(): Schema {
         if ($this->schema === null) {
             $schema = Schema::parse([
-                'recordType:s?',
-                'recordID:s?',
-                'name:s?',
+                'recordType:s',
+                'type:s',
+                'recordID:s',
+                'name:s',
                 'url' => [
                     'type' => 'string',
                     'format' => 'uri',
@@ -88,5 +89,40 @@ class SearchResultItem implements \JsonSerializable {
         }
 
         return $this->schema;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRecordType(): string {
+        return $this->data['recordType'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string {
+        return $this->data['type'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getRecordID(): string {
+        return $this->data['recordID'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return $this->data['name'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string {
+        return $this->data['url'];
     }
 }

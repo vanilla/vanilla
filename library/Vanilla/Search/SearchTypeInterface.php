@@ -43,9 +43,9 @@ interface SearchTypeInterface {
      *
      * @param array $recordIDs
      *
-     * @return array
+     * @return SearchResultItem[]
      */
-    public function getDocuments(array $recordIDs): array;
+    public function getResultItems(array $recordIDs): array;
 
     /**
      * Get supported filters for the type.

@@ -70,7 +70,7 @@ final class DomUtils {
      * @param int $limit Number of words to truncate to.
      * @return int Return limit used to count remaining tags.
      */
-    static function truncateWordsRecursive($element, int $limit): int {
+    private static function truncateWordsRecursive($element, int $limit): int {
         $wordCount = $limit;
         if ($limit > 0) {
             // Nodetype text

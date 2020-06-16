@@ -13,7 +13,6 @@ use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\DomUtils;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
-use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
 /**
  * Class for testing dom utility functions.

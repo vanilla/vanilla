@@ -70,7 +70,7 @@ export default function PanelLayout(props: IProps) {
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const { currentDevice, isCompact, layoutClasses } = useLayout();
+    const { currentDevice, isCompact, Devices, layoutClasses } = useLayout();
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
     const measuredPanelTop = sidePanelMeasure.top;
@@ -85,9 +85,9 @@ export default function PanelLayout(props: IProps) {
     ]);
 
     // Calculate some rendering variables.
-    const isTablet = device === Devices.TABLET;
-    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-    const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
+    const isTablet = currentDevice === Devices.TABLET;
+    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(currentDevice); // This compoment doesn't care about the no bleed, it's the same as desktop
+    const shouldRenderLeftPanel: boolean = !isCompact && (!!childComponents.leftTop || !!childComponents.leftBottom);
     const shouldRenderRightPanel: boolean = isFullWidth || (isTablet && !shouldRenderLeftPanel);
 
     // Determine the classes we want to display.
@@ -126,7 +126,7 @@ export default function PanelLayout(props: IProps) {
                     ref={panelRef}
                     className={classNames(layoutClasses.container, props.growMiddleBottom ? inheritHeightClass() : "")}
                 >
-                    {!isMobile && shouldRenderLeftPanel && (
+                    {!isCompact && shouldRenderLeftPanel && (
                         <Panel
                             className={classNames(layoutClasses.leftColumn, offsetClass, panelOffsetClass, {
                                 [layoutClasses.isSticky]: isFixed,
@@ -206,7 +206,7 @@ interface IContainerProps {
 
 export function Panel(props: IContainerProps) {
     const Tag = (props.tag as "div") || "div";
-    const classes = panelLayoutClasses();
+    const { layoutClasses } = useLayout();
     return (
         <Tag
             className={classNames(layoutClasses.panel, props.className)}
@@ -221,7 +221,7 @@ export function Panel(props: IContainerProps) {
 export function PanelOverflow(
     props: IContainerProps & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
 ) {
-    const classes = panelAreaClasses();
+    const { layoutClasses } = useLayout();
     const panelVars = panelBackgroundVariables();
     const color =
         panelVars.config.render && !!props.isLeft && props.renderLeftPanelBackground
@@ -240,7 +240,7 @@ export function PanelOverflow(
 
 export function PanelArea(props: IContainerProps) {
     const Tag = (props.tag as "div") || "div";
-    const classes = panelAreaClasses();
+    const { layoutClasses } = useLayout();
     return (
         <Tag ref={props.innerRef} className={classNames(layoutClasses.root, props.className)}>
             {props.children}
@@ -250,7 +250,7 @@ export function PanelArea(props: IContainerProps) {
 
 export function PanelAreaHorizontalPadding(props: IContainerProps) {
     const Tag = props.tag || "div";
-    const classes = panelAreaClasses();
+    const { layoutClasses } = useLayout();
     return (
         <Tag className={classNames(layoutClasses.root, props.className, "hasNoVerticalPadding")}>{props.children}</Tag>
     );
@@ -258,21 +258,15 @@ export function PanelAreaHorizontalPadding(props: IContainerProps) {
 
 export function PanelWidget(props: IContainerProps) {
     const classes = panelWidgetClasses();
-    return <div className={classNames(layoutClasses.root, props.className)}>{props.children}</div>;
+    return <div className={classNames(classes.root, props.className)}>{props.children}</div>;
 }
 
 export function PanelWidgetVerticalPadding(props: IContainerProps) {
     const classes = panelWidgetClasses();
-    return (
-        <div className={classNames(layoutClasses.root, "hasNoHorizontalPadding", props.className)}>
-            {props.children}
-        </div>
-    );
+    return <div className={classNames(classes.root, "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
 
 export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     const classes = panelWidgetClasses();
-    return (
-        <div className={classNames(layoutClasses.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>
-    );
+    return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }

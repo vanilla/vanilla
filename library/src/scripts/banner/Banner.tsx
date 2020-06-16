@@ -8,7 +8,6 @@ import React, { useEffect } from "react";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
@@ -22,6 +21,7 @@ import { visibility } from "@library/styles/styleHelpersVisibility";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useComponentDebug } from "@vanilla/react-utils";
 import { useLayout } from "@library/layout/LayoutContext";
+import Container from "@library/layout/components/Container";
 
 interface IProps {
     action?: React.ReactNode;

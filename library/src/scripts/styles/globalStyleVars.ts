@@ -30,6 +30,8 @@ export enum GlobalPreset {
     LIGHT = "light",
 }
 
+export const FULL_GUTTER = 48;
+
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -45,7 +47,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const constants = makeThemeVars("constants", {
         stateColorEmphasis: 0.15,
-        fullGutter: 48,
+        fullGutter: FULL_GUTTER,
         states: {
             hover: {
                 stateEmphasis: 0.08,
@@ -204,28 +206,37 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         meta: 1.5,
     });
 
-    // Default widths - Start
-    const defaultPanelWidth = 216;
+    // These globals are here because the layout system was created based on a 3 column layout
+    // These variables are used as a starting off point and as a base, but each layout can define
+    // its own variables. These are the globals from which the rest is calculated.
+    const foundationalWidths = makeThemeVars("foundationalWidths", {
+        panelWidth: 216,
+        middleColumnWidth: 672,
+        minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
+        // narrowContentWidth: 900, // For home page widgets, narrower than full width
+        breakPoints: {
+            // Other break points are calculated
+            twoColumns: 1200,
+            xs: 500,
+        },
+    });
+
     const panel = makeThemeVars("panel", {
-        width: defaultPanelWidth,
+        width: foundationalWidths.panelWidth,
         // paddedWidth: defaultPanelWidth + gutter.size * 2,
     });
 
-    const middleColumnWidth = 672;
     const middleColumnInit = makeThemeVars("middleColumn", {
-        width: middleColumnWidth,
+        width: foundationalWidths.middleColumnWidth,
     });
 
     const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnInit.width,
-        // paddedWidth: middleColumnInit.width + gutter.size * 2,
     });
 
     const contentWidth = () => {
-        // return middleColumn.width + gutter.size * 2 + (panel.width + gutter.size) * 2 + gutter.size * 4;
         return middleColumn.width + 2 * panel.width + gutter.size * 16;
     };
-    // Default widths - End
 
     const fontsInit0 = makeThemeVars("fonts", {
         size: {
@@ -503,6 +514,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         constants,
         getRatioBasedOnBackgroundDarkness,
         buttonPreset,
+        foundationalWidths,
     };
 });
 

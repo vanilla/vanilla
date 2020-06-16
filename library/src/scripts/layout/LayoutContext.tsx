@@ -5,20 +5,47 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutClasses, LayoutTypes, layoutVariables } from "@library/layout/layoutStyles";
+import { layoutClassesForCurrentLayout, layoutVariables } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { IThreeColumnLayoutMediaQueries, ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { ILegacyLayoutMediaQueries } from "@library/layout/types/legacy";
+import { IOneColumnLayoutMediaQueries } from "@library/layout/types/oneColumn";
+import { IOneColumnNarrowLayoutMediaQueries } from "@library/layout/types/oneColumnNarrow";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
-type IAllDevices = ThreeColumnLayoutDevices;
+// export type IAnyMediaQuery =
+//     | ILegacyLayoutMediaQueries
+//     | IOneColumnLayoutMediaQueries
+//     | IOneColumnNarrowLayoutMediaQueries
+//     | IThreeColumnLayoutMediaQueries
+//     | undefined;
+
+export enum LayoutTypes {
+    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default
+    ONE_COLUMN = "one column",
+    ONE_COLUMN_NARROW = "one column narrow", // Single column, but narrower than normal
+    TWO_COLUMNS = "two columns", // Two column layout
+    LEGACY = "legacy", // Legacy forum layout
+}
+
+export interface IAllLayoutMediaQueries {
+    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueries;
+    [LayoutTypes.ONE_COLUMN]?: IOneColumnLayoutMediaQueries;
+    [LayoutTypes.ONE_COLUMN_NARROW]?: IOneColumnNarrowLayoutMediaQueries;
+    [LayoutTypes.LEGACY]?: ILegacyLayoutMediaQueries;
+}
 
 export interface ILayoutProps {
     type: LayoutTypes;
-    currentDevice: IAllDevices;
-    Devices: any; // Enum
-    isCompact: boolean;
-    isFullWidth: boolean;
-    layoutClasses: object;
+    currentDevice: string;
+    Devices: any;
+    isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
+    isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
+    layoutClasses: any;
+    currentLayoutVariables: any;
+    mediaQueries: (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
 }
 
 const LayoutContext = React.createContext<ILayoutProps>({
@@ -28,6 +55,10 @@ const LayoutContext = React.createContext<ILayoutProps>({
     isCompact: false,
     isFullWidth: false,
     layoutClasses: {},
+    currentLayoutVariables: {},
+    mediaQueries: (styles: IAllLayoutMediaQueries) => {
+        return {} as NestedCSSProperties;
+    },
 });
 
 export default LayoutContext;
@@ -39,7 +70,7 @@ export function useLayout() {
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
     const layoutVars = layoutVariables();
-    const currentLayoutVars = layoutVars.types[type];
+    const currentLayoutVars = layoutVars.layouts.types[type];
 
     const calculateDevice = useCallback(() => {
         return currentLayoutVars.calculateDevice();
@@ -52,7 +83,9 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         Devices: currentLayoutVars.Devices,
         isCompact: currentLayoutVars.isCompact(currentDevice),
         isFullWidth: currentLayoutVars.isFullWidth(currentDevice),
-        layoutClasses: layoutClasses({ type }),
+        layoutClasses: layoutClassesForCurrentLayout({ type }),
+        currentLayoutVariables: currentLayoutVars,
+        mediaQueries: currentLayoutVars.mediaQueries(),
     });
 
     useEffect(() => {
@@ -64,7 +97,9 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
                 Devices: currentLayoutVars.Devices,
                 isCompact: currentLayoutVars.isCompact(currentDevice),
                 isFullWidth: currentLayoutVars.isFullWidth(currentDevice),
-                layoutClasses: layoutClasses({ type }),
+                layoutClasses: layoutClassesForCurrentLayout({ type }),
+                currentLayoutVariables: currentLayoutVars,
+                mediaQueries: currentLayoutVars.mediaQueries(),
             });
         }, 100);
         window.addEventListener("resize", throttledUpdate);

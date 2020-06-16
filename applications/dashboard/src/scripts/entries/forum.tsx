@@ -28,8 +28,7 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
 import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
-import { LayoutProvider } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/layoutStyles";
+import { LayoutProvider, LayoutTypes } from "@library/layout/LayoutContext";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);

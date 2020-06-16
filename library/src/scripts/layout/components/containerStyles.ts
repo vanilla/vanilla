@@ -6,11 +6,12 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { percent, color } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
+import { percent } from "csx";
+import { paddings } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { LayoutTypes } from "@library/layout/LayoutContext";
+import isEmpty from "lodash/isEmpty";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -40,64 +41,51 @@ export const containerVariables = useThemeCache(() => {
         },
     });
 
-    const sizing = makeThemeVars("sizes", {
-        full: vars.contentSizes.full,
-        narrowContentSize: vars.contentSizes.narrow,
-    });
-
     const colors = makeThemeVars("colors", {
         bg: globalVars.mainColors.bg,
     });
 
     return {
-        sizing,
         colors,
         spacing,
     };
 });
 
-export const containerMainStyles = (): NestedCSSProperties => {
-    const globalVars = globalVariables();
-    const vars = containerVariables();
-    return {
+// export function containerMainMediaQueries() {
+//     const vars = containerVariables();
+//     const { mediaQueries } = vars;
+//     return mediaQueries.oneColumnDown({
+//         ...paddings(vars.spacing.mobile.padding),
+//     });
+// }
+
+export const containerClasses = useThemeCache((currentLayoutVariables, mediaQueries) => {
+    const style = styleFactory("container");
+    const isLoading = isEmpty(currentLayoutVariables);
+    const root = style({
         display: "flex",
         flexDirection: "column",
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: globalVars.content.width,
+        maxWidth: isLoading ? undefined : currentLayoutVariables.contentWidth(),
         marginLeft: "auto",
         marginRight: "auto",
-        ...paddings(vars.spacing.padding),
-        $nest: {
-            "&.isNarrow": {
-                maxWidth: vars.sizing.narrowContentSize,
+        ...(isLoading ? {} : paddings(currentLayoutVariables.spacing.padding)),
+        ...mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: paddings(currentLayoutVariables.mobile),
             },
-        },
-    };
-};
-
-export function containerMainMediaQueries() {
-    const mediaQueries = layoutVariables().mediaQueries();
-    const vars = containerVariables();
-    return mediaQueries.oneColumnDown({
-        ...paddings(vars.spacing.mobile.padding),
+        }),
     });
-}
-
-export const containerClasses = useThemeCache(() => {
-    const style = styleFactory("container");
-    const mediaQueries = layoutVariables().mediaQueries();
-    const vars = containerVariables();
-    const root = style(containerMainStyles(), containerMainMediaQueries());
 
     const fullGutter = style(
         "fullGutter",
-        { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
-        mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.paddingFullMobile),
-        }),
+        // { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
+        // mediaQueries.oneColumnDown({
+        //     ...paddings(vars.spacing.paddingFullMobile),
+        // }),
     );
 
-    return { root, fullGutter };
+    return { root };
 });

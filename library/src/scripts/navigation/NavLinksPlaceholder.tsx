@@ -29,7 +29,7 @@ export const NavLinksPlaceholder = React.memo(function NavLinksPlaceholder(props
     );
 
     return (
-        <Container fullGutter narrow className={props.className}>
+        <Container fullGutter className={props.className}>
             <nav className={classNames(classes.linksWithHeadings)}>
                 <Heading
                     title={props.title}

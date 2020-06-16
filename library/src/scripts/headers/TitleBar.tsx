@@ -34,8 +34,6 @@ import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import WidgetContainer from "@library/layout/components/WidgetContainer";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.

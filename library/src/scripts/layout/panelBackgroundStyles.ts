@@ -6,9 +6,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { calc, color, percent, px } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export const panelBackgroundVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelBackground");
@@ -26,22 +26,22 @@ export const panelBackgroundVariables = useThemeCache(() => {
 
 export const panelBackgroundClasses = useThemeCache(() => {
     const style = styleFactory("panelBackground");
-
     const vars = panelBackgroundVariables();
-    const layoutVars = layoutVariables();
     const widgetVars = panelWidgetVariables();
     const globalVars = globalVariables();
+    const { currentLayoutVariables } = useLayout();
 
     const root = style({
         position: "absolute",
         left: 0,
         height: percent(100),
-
-        width: calc(`50% - ${unit(layoutVars.middleColumn.paddedWidth / 2 + globalVars.gutter.size * 2 - 20)}`),
+        width: calc(
+            `50% - ${unit(currentLayoutVariables.middleColumn.paddedWidth() / 2 + globalVars.gutter.size * 2 - 20)}`,
+        ),
         minWidth: unit(
-            layoutVars.panel.paddedWidth +
-                layoutVars.gutter.full -
-                layoutVars.panelLayoutSpacing.withPanelBackground.gutter,
+            currentLayoutVariables.panel.paddedWidth +
+                currentLayoutVariables.gutter.full -
+                currentLayoutVariables.panelLayoutSpacing.withPanelBackground.gutter,
         ),
         backgroundColor: colorOut(vars.colors.backgroundColor),
         zIndex: 0,

@@ -12,10 +12,10 @@ import { color, linearGradient } from "csx";
 import Banner from "@library/banner/Banner";
 import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
 import { LayoutProvider } from "@library/layout/LayoutContext";
+import { threeColumnLayout } from "@library/layout/types/threeColumn";
 
 export default {
     title: "Banner",
@@ -382,7 +382,12 @@ export const LogoAndRightImage = storyWithConfig(
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1400, globalVariables().content.width, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+            viewports: [
+                1400,
+                globalVariables().contentWidth(),
+                threeColumnLayout().foundationalWidths.breakPoints.twoColumns,
+                400,
+            ],
         },
     },
 };
@@ -400,9 +405,7 @@ export const ImageAsElementWide = storyWithConfig(
                         color: color("#efefef"),
                     },
                 },
-                content: {
-                    width: 1350,
-                },
+                contentWidth: 1350,
             },
             banner: {
                 options: {
@@ -685,7 +688,7 @@ export const unifiedBorder = storyWithConfig(
 (ImageAsElementWide as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1450, 1350, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+            viewports: [1450, 1350, threeColumnLayout().breakPoints.oneColumn, 400],
         },
     },
 };

@@ -758,7 +758,7 @@ export const bannerClasses = useThemeCache(
             {
                 alignSelf: "stretch",
                 maxWidth: makeImageMinWidth(
-                    globalVars.content.width,
+                    globalVars.contentWidth(),
                     containerVariables().spacing.paddingFull.horizontal * 2,
                 ),
                 flexGrow: 1,
@@ -766,7 +766,7 @@ export const bannerClasses = useThemeCache(
                 overflow: "hidden",
             },
             media(
-                { maxWidth: globalVars.content.width },
+                { maxWidth: globalVars.contentWidth() },
                 {
                     minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
                 },

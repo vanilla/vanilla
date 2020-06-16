@@ -26,6 +26,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
@@ -46,7 +47,8 @@ interface IViewAll {
 export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
     const makeVars = variableFactory("homeWidgetContainer");
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
+    // const layoutVars = layoutVariables();
+    const { currentLayoutVariables } = useLayout();
 
     let options = makeVars(
         "options",
@@ -58,7 +60,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
                 ...EMPTY_BACKGROUND,
             },
             borderType: BorderType.NONE as BorderType | "navLinks",
-            maxWidth: globalVars.content.width,
+            // maxWidth: globalVars.contentWidth(),
             viewAll: {
                 to: undefined as string | undefined,
                 position: "bottom" as "top" | "bottom",
@@ -75,7 +77,7 @@ export const homeWidgetContainerVariables = useThemeCache((optionOverrides?: IHo
             ...options,
             borderType:
                 options.innerBackground.color || options.innerBackground.image ? BorderType.SHADOW : BorderType.NONE,
-            maxWidth: options.maxColumnCount <= 2 ? layoutVars.contentSizes.narrow : options.maxWidth,
+            maxWidth: currentLayoutVariables.contentWidth(),
         },
         optionOverrides,
     );

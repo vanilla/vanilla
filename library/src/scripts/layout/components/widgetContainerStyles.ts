@@ -11,17 +11,16 @@ import { containerVariables } from "@library/layout/components/containerStyles";
 
 export const widgetContainerClasses = useThemeCache(() => {
     const style = styleFactory("widgetContainerClasses");
-    const vars = containerVariables();
 
     const root = style({
         position: "relative",
-        maxWidth: percent(100),
+        // maxWidth: percent(100),
         margin: "auto",
-        $nest: {
-            "&.isNarrow": {
-                maxWidth: vars.sizing.narrowContentSize,
-            },
-        },
+        // $nest: {
+        //     "&.isNarrow": {
+        //         maxWidth: vars.sizing.narrowContentSize,
+        //     },
+        // },
     });
 
     return {

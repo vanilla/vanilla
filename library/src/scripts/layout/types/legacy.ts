@@ -5,7 +5,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
-export enum ThreeColumnLayoutDevices {
+export enum LegacyLayoutDevices {
     XS = "xs",
     MOBILE = "mobile",
     TABLET = "tablet",
@@ -13,7 +13,7 @@ export enum ThreeColumnLayoutDevices {
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
 }
 
-export interface IThreeColumnLayoutMediaQueries {
+export interface ILegacyLayoutMediaQueries {
     noBleed?: NestedCSSProperties;
     oneColumn?: NestedCSSProperties;
     oneColumnDown?: NestedCSSProperties;
@@ -24,12 +24,12 @@ export interface IThreeColumnLayoutMediaQueries {
     xs?: NestedCSSProperties;
 }
 
-export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
+export const LegacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables();
-    const Devices = ThreeColumnLayoutDevices;
+    const Devices = LegacyLayoutDevices;
 
     // Important variables that will be used to calculate other variables
-    const makeThemeVars = variableFactory("layoutThreeColumn", forcedVars);
+    const makeThemeVars = variableFactory("layoutLegacy", forcedVars);
 
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         ...globalVars.foundationalWidths,
@@ -166,13 +166,11 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
     };
 
     const isFullWidth = currentDevice => {
-        return (
-            currentDevice === ThreeColumnLayoutDevices.DESKTOP || currentDevice === ThreeColumnLayoutDevices.NO_BLEED
-        );
+        return currentDevice === LegacyLayoutDevices.DESKTOP || currentDevice === LegacyLayoutDevices.NO_BLEED;
     };
 
     const isCompact = currentDevice => {
-        return currentDevice === ThreeColumnLayoutDevices.XS || currentDevice === ThreeColumnLayoutDevices.MOBILE;
+        return currentDevice === LegacyLayoutDevices.XS || currentDevice === LegacyLayoutDevices.MOBILE;
     };
 
     return {

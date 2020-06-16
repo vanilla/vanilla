@@ -4,41 +4,34 @@
  * @license GPL-2.0-only
  */
 
-import { calc, percent, viewHeight } from "csx";
-import { cssRule, media } from "typestyle";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, paddings, sticky, unit } from "@library/styles/styleHelpers";
-import { important } from "csx/lib/strings";
-import { panelListClasses } from "@library/layout/panelListStyles";
-import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { FULL_GUTTER, globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { getLayouts } from "@library/layout/types/layouts";
+import { LayoutTypes } from "@library/layout/LayoutContext";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-
-export enum LayoutTypes {
-    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents
-    ONE_COLUMN_NARROW = "one column narrow", // Single column, but narrower than normal
-    TWO_COLUMNS = "two columns", // Two column layout
-    LEGACY = "legacy", // Legacy forum layout
-}
+import { panelAreaClasses } from "@library/layout/panelAreaStyles";
+import { panelListClasses } from "@library/layout/panelListStyles";
+import { calc, percent, viewHeight } from "csx";
+import { margins, paddings } from "@library/styles/styleHelpersSpacing";
+import { sticky, unit } from "@library/styles/styleHelpers";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { important } from "csx/lib/strings";
+import { cssRule } from "typestyle";
+import { threeColumnLayout } from "@library/layout/types/threeColumn";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const makeThemeVars = variableFactory("layouts", forcedVars);
 
-    const colors = makeThemeVars("colors", {
-        leftColumnBg: globalVars.mainColors.bg,
-    });
+    const fullGutter = globalVars ? globalVars.constants.fullGutter : FULL_GUTTER;
 
     const gutter = makeThemeVars("gutter", {
-        full: globalVars.constants.fullGutter, // 48
-        size: globalVars.constants.fullGutter / 2, // 24
-        halfSize: globalVars.constants.fullGutter / 4, // 12
-        quarterSize: globalVars.constants.fullGutter / 8, // 6
+        full: fullGutter, // 48
+        size: fullGutter / 2, // 24
+        halfSize: fullGutter / 4, // 12
+        quarterSize: fullGutter / 8, // 6
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -72,35 +65,25 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const layouts = getLayouts();
-
     return {
-        colors,
         gutter,
         spacing,
-        types,
+        layouts,
+        /*
+         * @deprecated You should get the media queries through "layouts" declared above
+         */
+        mediaQueries: threeColumnLayout().mediaQueries,
     };
 });
 
-export const layoutClasses = (props: { type: LayoutTypes }) => {
+// This class shouldn't be used directly, either get it from the layout context or from layoutClassesForCurrentLayout()
+const layoutClasses = (props: { type?: LayoutTypes }) => {
     const { type = LayoutTypes.THREE_COLUMNS } = props;
-    switch (type) {
-        case LayoutTypes.ONE_COLUMN_NARROW:
-        case LayoutTypes.TWO_COLUMNS:
-        case LayoutTypes.LEGACY:
-            return generateLayoutClasses({ type });
-        default:
-            // Catch any invalid types into this one
-            return generateLayoutClasses({ type: LayoutTypes.THREE_COLUMNS });
-    }
-};
-
-const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
-    const { type = LayoutTypes.THREE_COLUMNS } = props;
-    const globalVars = globalVariables();
     const vars = layoutVariables();
+    const globalVars = globalVariables();
 
-    const layoutTypeVariables = vars.types[type];
-    const mediaQueries = layoutTypeVariables.mediaQueries(type);
+    const layoutTypeVariables = vars.layouts.types[type];
+    const mediaQueries = vars.layouts.mediaQueries;
 
     const style = styleFactory("layout" + camelCaseToDash(type.replace(/\s+/g, "")));
     const classesPanelArea = panelAreaClasses();
@@ -111,6 +94,8 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
         width: percent(100),
     });
 
+    console.log("undefined?: ", LayoutTypes);
+
     const root = style(
         {
             ...margins(layoutTypeVariables.spacing.margin),
@@ -118,15 +103,19 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
             $nest: {
                 [`&.noBreadcrumbs > .${main}`]: {
                     paddingTop: unit(globalVars.gutter.size),
-                    ...mediaQueries.oneColumnDown({
-                        paddingTop: 0,
+                    ...mediaQueries({
+                        [LayoutTypes.THREE_COLUMNS]: {
+                            oneColumnDown: {
+                                paddingTop: 0,
+                            },
+                        },
                     }),
                 },
                 "&.isOneCol": {
                     width: unit(layoutTypeVariables.middleColumnPaddedWidth()),
                     maxWidth: percent(100),
                     margin: "auto",
-                    ...mediaQueries.oneColumnDown({
+                    ...vars.mediaQueries.oneColumnDown({
                         width: percent(100),
                     }),
                 },
@@ -142,7 +131,7 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
             },
         },
 
-        mediaQueries.oneColumnDown({
+        vars.mediaQueries.oneColumnDown({
             $nest: {
                 "&.hasTopPadding.noBreadcrumbs": {
                     paddingTop: unit(layoutTypeVariables.spacing.extraPadding.mobile.noBreadcrumbs.top),
@@ -214,7 +203,7 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
         width: percent(100),
         maxWidth: percent(100),
         paddingBottom: unit(layoutTypeVariables.spacing.extraPadding.bottom),
-        ...mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
+        ...vars.mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
     });
 
     const middleColumnMaxWidth = style("middleColumnMaxWidth", {
@@ -222,7 +211,7 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
             "&.hasAdjacentPanel": {
                 flexBasis: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth())}`),
                 maxWidth: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth())}`),
-                ...mediaQueries.oneColumnDown({
+                ...vars.mediaQueries.oneColumnDown({
                     flexBasis: percent(100),
                     maxWidth: percent(100),
                 }),
@@ -230,7 +219,7 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
             "&.hasTwoAdjacentPanels": {
                 flexBasis: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth() * 2)}`),
                 maxWidth: calc(`100% - ${unit(layoutTypeVariables.panelPaddedWidth() * 2)}`),
-                ...mediaQueries.oneColumnDown({
+                ...vars.mediaQueries.oneColumnDown({
                     flexBasis: percent(100),
                     maxWidth: percent(100),
                 }),
@@ -247,7 +236,7 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
             height: percent(100),
             $unique: true,
         },
-        mediaQueries(LayoutTypes.THREE_COLUMNS).oneColumnDown({
+        vars.mediaQueries.oneColumnDown({
             position: "relative",
             top: "auto",
             left: "auto",
@@ -280,4 +269,17 @@ const generateLayoutClasses = useThemeCache((props: { type?: LayoutTypes }) => {
         breadcrumbs,
         breadcrumbsContainer,
     };
-});
+};
+
+export const layoutClassesForCurrentLayout = (props: { type: LayoutTypes }) => {
+    const { type = LayoutTypes.THREE_COLUMNS } = props;
+    switch (type) {
+        case LayoutTypes.ONE_COLUMN_NARROW:
+        case LayoutTypes.TWO_COLUMNS:
+        case LayoutTypes.LEGACY:
+            return layoutClasses({ type });
+        default:
+            // Catch any invalid types into this one
+            return layoutClasses({ type: LayoutTypes.THREE_COLUMNS });
+    }
+};

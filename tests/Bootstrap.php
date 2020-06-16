@@ -20,6 +20,7 @@ use Psr\SimpleCache\CacheInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
@@ -119,7 +120,8 @@ class Bootstrap {
             ->addAlias('Cache')
 
             ->rule(CacheInterface::class)
-            ->setAliasOf(\CacheCacheAdapter::class)
+            ->setShared(true)
+            ->setClass(CacheCacheAdapter::class)
 
             // Configuration
             ->rule(ConfigurationInterface::class)

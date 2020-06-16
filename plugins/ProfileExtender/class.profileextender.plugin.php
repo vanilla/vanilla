@@ -574,16 +574,21 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 ->leftJoin('Rank ra', 'ra.RankID = u.RankID');
         }
 
+        $lowerCaseColumnNames =  array_map('strtolower', $columnNames);
         $i = 0;
         foreach ($fields as $slug => $fieldData) {
+            // Don't overwrite data if there's already a column with the same name.
+            if (in_array(strtolower($slug), $lowerCaseColumnNames)) {
+                continue;
+            }
             // Add this field to the output
             $columnNames[] = val('Label', $fieldData, $slug);
 
             // Add this field to the query.
             $quoted = Gdn::sql()->quote("Profile.$slug");
             Gdn::sql()
-                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
-                ->select('a'.$i.'.Value', '', $slug);
+                ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
+                ->select('a' . $i . '.Value', '', $slug);
             $i++;
         }
 

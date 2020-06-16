@@ -9,6 +9,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemLink, { IDropDownItemLink } from "@library/flyouts/items/DropDownItemLink";
 import NumberFormatted from "@library/content/NumberFormatted";
 import classNames from "classnames";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IDropDownItemLink {
     count?: number;
@@ -28,7 +29,8 @@ export default class DropDownItemLinkWithCount extends React.Component<IProps> {
         const { name, children, count } = this.props;
         const linkContents = children ? children : name;
         const showCount = !!count && !(this.props.hideCountWhenZero && this.props.count === 0);
-        const classesDropDown = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classesDropDown = dropDownClasses({ mediaQueries });
         return (
             <DropDownItemLink {...this.props}>
                 <span className={classNames("dropDownItem-text", classesDropDown.text)}>{linkContents}</span>

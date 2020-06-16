@@ -16,6 +16,7 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Heading from "@library/layout/Heading";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     navItems: INavigationTreeItem[];
@@ -48,7 +49,8 @@ export function PanelNavItems(props: IProps) {
         }
     }, [isActive]);
 
-    const classes = dropDownClasses();
+    const { mediaQueries } = useLayout();
+    const classes = dropDownClasses({ mediaQueries });
     return (
         <>
             {props.nestedTitle && (

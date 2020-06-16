@@ -26,9 +26,5 @@ export function StoryContent(props: IStoryHeadingProps) {
     }, []);
 
     const classes = storyBookClasses();
-    return (
-        <LayoutProvider>
-            <div className={classes.content}>{props.children}</div>
-        </LayoutProvider>
-    );
+    return <div className={classes.content}>{props.children}</div>;
 }

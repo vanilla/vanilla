@@ -34,31 +34,29 @@ export function ForumEditor(props: IProps) {
     const [hasFocus, setHasFocus] = useState(false);
     return (
         <Provider store={store}>
-            <LayoutProvider>
-                <Editor
-                    isPrimaryEditor={true}
-                    legacyMode={true}
-                    allowUpload={hasPermission("uploads.add")}
-                    isLoading={false}
-                    onFocus={setHasFocus}
+            <Editor
+                isPrimaryEditor={true}
+                legacyMode={true}
+                allowUpload={hasPermission("uploads.add")}
+                isLoading={false}
+                onFocus={setHasFocus}
+            >
+                <div
+                    className={classNames(
+                        "richEditor-frame",
+                        "InputBox",
+                        classes.legacyFrame,
+                        classes.root,
+                        hasFocus && "focus-visible",
+                    )}
                 >
-                    <div
-                        className={classNames(
-                            "richEditor-frame",
-                            "InputBox",
-                            classes.legacyFrame,
-                            classes.root,
-                            hasFocus && "focus-visible",
-                        )}
-                    >
-                        {props.descriptionID && <EditorDescriptions id={props.descriptionID} />}
-                        <EditorContent legacyTextArea={props.legacyTextArea} />
-                        <EditorParagraphMenu />
-                        <EditorInlineMenus />
-                        <EditorEmbedBar />
-                    </div>
-                </Editor>
-            </LayoutProvider>
+                    {props.descriptionID && <EditorDescriptions id={props.descriptionID} />}
+                    <EditorContent legacyTextArea={props.legacyTextArea} />
+                    <EditorParagraphMenu />
+                    <EditorInlineMenus />
+                    <EditorEmbedBar />
+                </div>
+            </Editor>
         </Provider>
     );
 }

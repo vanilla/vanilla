@@ -7,6 +7,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export enum ThreeColumnLayoutDevices {
@@ -232,6 +233,7 @@ export const threeColumnLayout = useThemeCache((forcedVars?: IThemeVariables) =>
     };
 
     return {
+        type: LayoutTypes.THREE_COLUMNS,
         Devices,
         foundationalWidths,
         panel,

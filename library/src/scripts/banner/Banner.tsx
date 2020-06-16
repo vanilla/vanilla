@@ -16,12 +16,13 @@ import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarSty
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useComponentDebug } from "@vanilla/react-utils";
-import { LayoutProvider, LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutProvider, useLayout } from "@library/layout/LayoutContext";
 import Heading from "@library/layout/Heading";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import Container from "@library/layout/components/Container";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 interface IProps {
     action?: React.ReactNode;

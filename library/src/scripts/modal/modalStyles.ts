@@ -5,7 +5,6 @@
  */
 
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { borders, colorOut, margins, sticky, unit } from "@library/styles/styleHelpers";
@@ -14,6 +13,8 @@ import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { useLayout } from "@library/layout/LayoutContext";
+import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -84,7 +85,6 @@ export const modalClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = modalVariables();
     const style = styleFactory("modal");
-    const mediaQueries = layoutVariables().mediaQueries;
     const shadows = shadowHelper();
     const titleBarVars = titleBarVariables();
 
@@ -116,6 +116,8 @@ export const modalClasses = useThemeCache(() => {
         ...overlayMixin,
     });
 
+    const { mediaQueries } = useLayout();
+
     const sidePanelMixin: NestedCSSProperties = {
         left: unit(vars.dropDown.padding),
         width: calc(`100% - ${unit(vars.dropDown.padding)}`),
@@ -128,7 +130,7 @@ export const modalClasses = useThemeCache(() => {
         borderBottomRightRadius: 0,
         maxWidth: 400,
         $nest: {
-            [`& .${dropDownClasses().action}`]: {
+            [`& .${dropDownClasses({ mediaQueries: ILayoutMediaQueryFunction }).action}`]: {
                 fontWeight: globalVars.fonts.weights.normal,
             },
         },
@@ -248,7 +250,9 @@ export const modalClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
+                mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
             height: unit(titleBarVars.sizing.mobile.height),
             minHeight: unit(titleBarVars.sizing.mobile.height),
         }),

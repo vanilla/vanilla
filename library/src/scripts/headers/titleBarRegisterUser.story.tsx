@@ -98,7 +98,10 @@ story.add(
     },
     {
         chromatic: {
-            viewports: [layoutVariables().panelLayoutBreakPoints.noBleed, layoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [
+                layoutVariables().panelLayoutBreakPoints.noBleed,
+                layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.xs,
+            ],
         },
     },
 );

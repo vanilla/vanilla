@@ -46,7 +46,7 @@ Router.addRoutes([
 applySharedPortalContext(props => {
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            <LayoutProvider type={LayoutTypes.LEGACY}>{props.children}</LayoutProvider>
+            {props.children}
         </AppContext>
     );
 });

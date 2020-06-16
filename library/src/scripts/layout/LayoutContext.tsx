@@ -5,105 +5,42 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutClasses, layoutVariables } from "@library/layout/layoutStyles";
+import { layoutClasses } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import {
-    IThreeColumnLayoutMediaQueries,
-    threeColumnLayout,
-    ThreeColumnLayoutDevices,
-} from "@library/layout/types/threeColumn";
-import { IOneColumnLayoutMediaQueries, oneColumnLayout, OneColumnLayoutDevices } from "@library/layout/types/oneColumn";
-import {
-    IOneColumnNarrowLayoutMediaQueries,
-    oneColumnNarrowLayout,
-    OneColumnNarrowLayoutDevices,
-} from "@library/layout/types/oneColumnNarrow";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { useThemeCacheID } from "@library/styles/styleUtils";
-
-export enum LayoutTypes {
-    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default
-    ONE_COLUMN = "one column",
-    NARROW = "one column narrow", // Single column, but narrower than normal
-    // TWO_COLUMNS = "two columns", // Two column layout
-    // LEGACY = "legacy", // Legacy forum layout
-}
-
-export interface IAllLayoutMediaQueries {
-    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueries;
-    [LayoutTypes.ONE_COLUMN]?: IOneColumnLayoutMediaQueries;
-    [LayoutTypes.NARROW]?: IOneColumnNarrowLayoutMediaQueries;
-    // [LayoutTypes.LEGACY]?: ILegacyLayoutMediaQueries;
-}
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { threeColumnLayout, ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { OneColumnLayoutDevices } from "@library/layout/types/oneColumn";
+import { OneColumnNarrowLayoutDevices } from "@library/layout/types/oneColumnNarrow";
+import { LayoutTypes, layoutVarsForCurrentLayout, ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 
 export interface ILayoutProps {
-    type?: LayoutTypes;
-    currentDevice?: string;
-    Devices?: any;
-    isCompact?: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
-    isFullWidth?: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
-    layoutClasses?: any;
-    currentLayoutVariables?: any;
-    mediaQueries?: (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
-    contentWidth?: () => number;
-    calculateDevice?: () => OneColumnLayoutDevices | OneColumnNarrowLayoutDevices | ThreeColumnLayoutDevices;
-    layoutSpecificStyles?: (style) => any | undefined;
+    type: LayoutTypes;
+    currentDevice: string;
+    Devices: any;
+    isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
+    isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
+    layoutClasses: any;
+    currentLayoutVariables: any;
+    mediaQueries: ILayoutMediaQueryFunction;
+    contentWidth: () => number;
+    calculateDevice: () => OneColumnLayoutDevices | OneColumnNarrowLayoutDevices | ThreeColumnLayoutDevices;
+    layoutSpecificStyles: (style) => any | undefined;
 }
 
-const filterQueriesByType = mediaQueriesByType => {
-    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
-        const { type = LayoutTypes.THREE_COLUMNS } = useLayout();
-
-        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
-            if (layoutName === type) {
-                // Check if we're in the correct layout before applying
-                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
-                const stylesForLayout = mediaQueriesByLayout[layoutName];
-
-                if (mediaQueriesForLayout) {
-                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
-                        mediaQueriesForLayout[queryName] = stylesForLayout;
-                        return mediaQueriesForLayout[queryName];
-                    });
-                }
-            }
-        });
-        return {};
-    };
-};
-
-export const allLayoutVariables = () => {
-    const mediaQueriesByType = {};
-    const types = {
-        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout(),
-        [LayoutTypes.ONE_COLUMN]: oneColumnLayout(),
-        [LayoutTypes.NARROW]: oneColumnNarrowLayout(),
-    };
-
-    Object.keys(LayoutTypes).forEach(layoutName => {
-        const enumKey = LayoutTypes[layoutName];
-        const layoutData = types[enumKey];
-        mediaQueriesByType[enumKey] = layoutData.mediaQueries();
-    });
-
-    return {
-        mediaQueries: filterQueriesByType(mediaQueriesByType),
-        types,
-    };
-};
-
-export const layoutVarsForCurrentLayout = (props: { type: LayoutTypes }) => {
-    const { type = LayoutTypes.THREE_COLUMNS } = props;
-
-    if (layoutVariables().layouts.types[type]) {
-        return layoutVariables().layouts.types[type];
-    } else {
-        return layoutVariables().layouts.types[LayoutTypes.THREE_COLUMNS];
-    }
-};
-
-const LayoutContext = React.createContext<ILayoutProps>({});
+const defaultLayoutVars = layoutVarsForCurrentLayout({ type: LayoutTypes.THREE_COLUMNS });
+const LayoutContext = React.createContext<ILayoutProps>({
+    type: LayoutTypes.THREE_COLUMNS,
+    currentDevice: ThreeColumnLayoutDevices.DESKTOP,
+    Devices: defaultLayoutVars.Devices,
+    isCompact: defaultLayoutVars.isCompact(ThreeColumnLayoutDevices.DESKTOP),
+    isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
+    layoutClasses: layoutClasses({ type: LayoutTypes.THREE_COLUMNS }),
+    currentLayoutVariables: defaultLayoutVars,
+    mediaQueries: defaultLayoutVars.mediaQueries as ILayoutMediaQueryFunction,
+    contentWidth: defaultLayoutVars.contentWidth,
+    calculateDevice: defaultLayoutVars.calculateDevice,
+    layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+});
 
 export default LayoutContext;
 
@@ -114,19 +51,31 @@ export function useLayout() {
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
     const currentLayoutVars = layoutVarsForCurrentLayout({ type });
-    const { cacheID } = useThemeCacheID();
 
     const calculateDevice = useCallback(() => {
         return currentLayoutVars.calculateDevice();
     }, []);
 
-    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({} as ILayoutProps); // Can't get variables here
+    const defaultLayoutVars = threeColumnLayout();
+    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
+        type: LayoutTypes.THREE_COLUMNS,
+        currentDevice: ThreeColumnLayoutDevices.DESKTOP,
+        Devices: defaultLayoutVars.Devices,
+        isCompact: defaultLayoutVars.isCompact(ThreeColumnLayoutDevices.DESKTOP),
+        isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
+        layoutClasses: layoutClasses({ type: LayoutTypes.THREE_COLUMNS }),
+        currentLayoutVariables: defaultLayoutVars,
+        mediaQueries: defaultLayoutVars.mediaQueries,
+        contentWidth: defaultLayoutVars.contentWidth,
+        calculateDevice: defaultLayoutVars.calculateDevice,
+        layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+    } as ILayoutProps); // Can't get variables here
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
             const currentDevice = calculateDevice();
             setDeviceInfo({
-                type,
+                type: currentLayoutVars.type,
                 currentDevice: currentDevice,
                 Devices: currentLayoutVars.Devices,
                 isCompact: currentLayoutVars.isCompact(currentDevice),
@@ -143,7 +92,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [calculateDevice, setDeviceInfo, cacheID]);
+    }, [calculateDevice, setDeviceInfo]);
 
     return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
 }

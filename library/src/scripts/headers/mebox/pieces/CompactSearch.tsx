@@ -95,7 +95,7 @@ export function CompactSearch(props: ICompactSearchProps) {
     const classesTitleBar = titleBarClasses();
     const classes = compactSearchClasses();
     const classesSearchBar = searchBarClasses();
-    const classesDropDown = dropDownClasses();
+    const classesDropDown = dropDownClasses({ mediaQueries });
     return (
         <div
             ref={selfRef}

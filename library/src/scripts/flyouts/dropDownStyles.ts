@@ -22,8 +22,8 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent, rgba } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { IAllLayoutMediaQueries, ILayoutMediaQueryFunction, LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 export const notUserContent = "u-notUserContent";
 
@@ -104,17 +104,12 @@ export const dropDownVariables = useThemeCache(() => {
     };
 });
 
-export const dropDownClasses = useThemeCache(() => {
+export const dropDownClasses = useThemeCache((props: { mediaQueries: ILayoutMediaQueryFunction }) => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
-    const mediaQueries = layoutVariables().mediaQueries;
-
-    const root = style({
-        position: "relative",
-        listStyle: "none",
-    });
+    const { mediaQueries } = props;
 
     const contents = style(
         "contents",
@@ -160,14 +155,23 @@ export const dropDownClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
-            $nest: {
-                "&.isOwnWidth": {
-                    width: percent(100),
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    $nest: {
+                        "&.isOwnWidth": {
+                            width: percent(100),
+                        },
+                    },
                 },
             },
         }),
     );
+
+    const root = style({
+        position: "relative",
+        listStyle: "none",
+    });
 
     const asModal = style("asModal", {
         $nest: {
@@ -189,10 +193,14 @@ export const dropDownClasses = useThemeCache(() => {
             padding: 0,
             fontSize: unit(globalVars.fonts.size.medium),
         },
-        mediaQueries.oneColumnDown({
-            ...paddings({
-                vertical: 9,
-            }),
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        vertical: 9,
+                    }),
+                },
+            },
         }),
     );
 
@@ -243,7 +251,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const action = style("action", {
         $nest: {
-            "&&": actionMixin(),
+            "&&": actionMixin({ mediaQueries }),
         },
     });
 
@@ -350,10 +358,14 @@ export const dropDownClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
-            $nest: {
-                "&&": {
-                    minHeight: unit(vars.item.mobile.minHeight),
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    $nest: {
+                        "&&": {
+                            minHeight: unit(vars.item.mobile.minHeight),
+                        },
+                    },
                 },
             },
         }),
@@ -373,10 +385,14 @@ export const dropDownClasses = useThemeCache(() => {
                 horizontal: 0,
             }),
         },
-        mediaQueries.oneColumnDown({
-            ...paddings({
-                vertical: 0,
-            }),
+        mediaQueries({
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        vertical: 0,
+                    }),
+                },
+            },
         }),
     );
 
@@ -459,10 +475,13 @@ export const dropDownClasses = useThemeCache(() => {
 
 // Contents (button or link)
 // Replaces: .dropDownItem-button, .dropDownItem-link
-export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProperties => {
+export const actionMixin = (props: {
+    classBasedStates?: IStateSelectors;
+    mediaQueries: ILayoutMediaQueryFunction;
+}): NestedCSSProperties => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries;
+    const { mediaQueries, classBasedStates = {} } = props;
 
     return {
         ...buttonResetMixin(),
@@ -514,14 +533,18 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                         ? colorOut(globalVars.states.focus.contrast, true)
                         : undefined,
                 },
+                ...mediaQueries({
+                    [LayoutTypes.THREE_COLUMNS]: {
+                        oneColumnDown: {
+                            fontSize: unit(vars.item.mobile.fontSize),
+                            fontWeight: globalVars.fonts.weights.semiBold,
+                            minHeight: unit(vars.item.mobile.minHeight),
+                        },
+                    },
+                }),
             },
             undefined,
             classBasedStates,
         ),
-        ...mediaQueries.oneColumnDown({
-            fontSize: unit(vars.item.mobile.fontSize),
-            fontWeight: globalVars.fonts.weights.semiBold,
-            minHeight: unit(vars.item.mobile.minHeight),
-        }),
     };
 };

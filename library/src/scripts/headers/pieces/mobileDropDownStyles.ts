@@ -65,7 +65,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const frameVars = frameVariables();
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries;
+    const { mediaQueries } = useLayout();
     const flex = flexHelper();
     const style = styleFactory("mobileDropDown");
 

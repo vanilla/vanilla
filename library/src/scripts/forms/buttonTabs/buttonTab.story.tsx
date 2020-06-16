@@ -16,7 +16,7 @@ export default {
     title: "Radio Buttons as Buttons",
     parameters: {
         chromatic: {
-            viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [1450, layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.xs],
         },
     },
 };

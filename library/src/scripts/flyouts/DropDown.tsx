@@ -75,7 +75,8 @@ export default function DropDown(props: IDropDownProps) {
 
     const { title } = props;
     const mobileTitle = props.mobileTitle ?? title;
-    const classes = dropDownClasses();
+    const { mediaQueries } = useLayout();
+    const classes = dropDownClasses({ mediaQueries });
     const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
     const openAsModal = props.openAsModal || isCompact;
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -99,7 +100,7 @@ export default function DropDown(props: IDropDownProps) {
             toggleButtonClassName={props.toggleButtonClassName}
             isVisible={props.isVisible}
             onVisibilityChange={props.onVisibilityChange}
-            openAsModal={openAsModal}
+            openAsModal={!!openAsModal}
             initialFocusElement={props.initialFocusElement}
             tag={props.tag}
             contentID={contentID}

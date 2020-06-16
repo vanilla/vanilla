@@ -8,6 +8,7 @@ import React from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     className?: string;
@@ -19,7 +20,8 @@ interface IProps {
  */
 export default class DropDownItemMetas extends React.Component<IProps> {
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         return (
             <DropDownItem className={classNames(classes.metaItems, this.props.className)}>
                 {this.props.children}

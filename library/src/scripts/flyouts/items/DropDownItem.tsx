@@ -7,6 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IProps {
     children: React.ReactNode;
@@ -18,7 +19,8 @@ export interface IProps {
  */
 export default class DropDownItem extends React.Component<IProps> {
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         return <li className={classNames(this.props.className, classes.item)}>{this.props.children}</li>;
     }
 }

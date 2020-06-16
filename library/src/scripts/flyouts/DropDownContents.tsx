@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { TabHandler } from "@vanilla/dom-utils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IProps {
     id: string;
@@ -37,7 +38,8 @@ export default class DropDownContents extends React.Component<IProps> {
     private selfRef = React.createRef<HTMLDivElement>();
 
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         const asDropDownClasses = !this.props.openAsModal
             ? classNames("dropDown-contents", classes.contents, {
                   isMedium: this.props.size === DropDownContentSize.MEDIUM,

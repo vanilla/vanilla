@@ -10,6 +10,7 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     title: string;
@@ -24,7 +25,8 @@ interface IProps {
  */
 export default class DropDownSection extends React.Component<IProps> {
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         const sectionNavTitle = uniqueIDFromPrefix("sectionNavTitle");
         return (
             <>

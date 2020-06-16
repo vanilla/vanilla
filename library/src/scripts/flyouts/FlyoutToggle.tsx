@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { forceRenderStyles } from "typestyle";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -146,7 +147,8 @@ export default function FlyoutToggle(props: IProps) {
         callback: closeMenuHandler,
     });
 
-    const classes = dropDownClasses();
+    const { mediaQueries } = useLayout();
+    const classes = dropDownClasses({ mediaQueries });
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });

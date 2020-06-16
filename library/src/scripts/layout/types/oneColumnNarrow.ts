@@ -3,6 +3,7 @@ import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 export enum OneColumnNarrowLayoutDevices {
     XS = "xs",
@@ -68,6 +69,7 @@ export const oneColumnNarrowLayout = useThemeCache((forcedVars?: IThemeVariables
     };
 
     return {
+        type: LayoutTypes.NARROW,
         Devices,
         foundationalWidths,
         contentWidth,

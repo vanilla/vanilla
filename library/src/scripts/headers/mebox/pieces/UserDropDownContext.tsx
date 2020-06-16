@@ -39,7 +39,7 @@ function UserDropDownContents(props: IProps) {
         return found ? found.count : 0;
     };
 
-    const classesDropDown = dropDownClasses();
+    const classesDropDown = dropDownClasses({ mediaQueries });
     const classesFrameBody = frameBodyClasses();
 
     return (

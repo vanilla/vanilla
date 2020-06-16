@@ -7,6 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     className?: string;
@@ -17,7 +18,8 @@ interface IProps {
  */
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         return <li role="separator" className={classNames(this.props.className, classes.separator)} />;
     }
 }

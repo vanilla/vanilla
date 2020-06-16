@@ -64,7 +64,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     };
 
     const classes = selectBoxClasses();
-    const classesDropDown = dropDownClasses();
+    const classesDropDown = dropDownClasses({ mediaQueries });
     return (
         <div
             aria-describedby={"describedBy" in props ? props.describedBy : undefined}
@@ -126,7 +126,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
         );
     } else {
         const classes = selectBoxClasses();
-        const classesDropDown = dropDownClasses();
+        const classesDropDown = dropDownClasses({ mediaQueries });
         return (
             <DropDownItemButton
                 className={classNames({ isSelected: isSelected })}

@@ -12,6 +12,7 @@ import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/cor
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     title: string;
@@ -23,8 +24,8 @@ interface IProps {
 
 export function DropDownPanelNav(props: IProps) {
     const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([]);
-
-    const classes = dropDownClasses();
+    const { mediaQueries } = useLayout();
+    const classes = dropDownClasses({ mediaQueries });
 
     const popParentItem = () => {
         parentNavItems.pop();

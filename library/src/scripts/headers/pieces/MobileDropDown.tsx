@@ -51,7 +51,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const classes = mobileDropDownClasses();
+        const classes = mobiledropDownClasses({ mediaQueries });
         const { className, children, title, buttonClass } = this.props;
 
         const TitleButton = (props: { icon: React.ReactNode; onClick: React.MouseEventHandler }) => {

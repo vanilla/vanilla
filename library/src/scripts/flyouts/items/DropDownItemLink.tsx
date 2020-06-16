@@ -12,6 +12,7 @@ import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import React from "react";
 import { CheckIcon, DropDownMenuIcon, CheckCompactIcon } from "@library/icons/common";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
@@ -30,7 +31,8 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
     public render() {
         const { children, name, className, to } = this.props;
         const linkContents = children ? children : name;
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         return (
             <DropDownItem className={classNames(className, classes.item)}>
                 <SmartLink

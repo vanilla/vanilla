@@ -37,7 +37,7 @@ function UserDropDownContents(props: IProps) {
         return found ? found.count : 0;
     };
 
-    const classesDropDown = dropDownClasses();
+    const classesDropDown = dropDownClasses({ mediaQueries });
 
     return (
         <ul className={classNames(classesDropDown.verticalPadding, props.className)}>

@@ -7,7 +7,6 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { FULL_GUTTER, globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { allLayoutVariables, LayoutTypes } from "@library/layout/LayoutContext";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
@@ -16,8 +15,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
-import { threeColumnLayout } from "@library/layout/types/threeColumn";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { allLayoutVariables, LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -66,14 +64,14 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         gutter,
         spacing,
         layouts: allLayoutVariables(),
-        /*
-         * @deprecated You should get the media queries through "layouts" declared above
-         */
-        mediaQueries: threeColumnLayout().mediaQueries() ?? {
-            oneColumnDown: (styles: NestedCSSProperties) => {
-                return {};
-            },
-        },
+        // /*
+        //  * @deprecated You should get the media queries through "layouts" declared above
+        //  */
+        // mediaQueries: threeColumnLayout().mediaQueries() ?? {
+        //     oneColumnDown: (styles: NestedCSSProperties) => {
+        //         return {};
+        //     },
+        // },
     };
 });
 
@@ -146,7 +144,7 @@ export const layoutClasses = (props: { type?: LayoutTypes }) => {
             [`& > .${classesPanelArea.root}:first-child .${classesPanelList.root}`]: {
                 marginTop: unit(
                     (globalVars.fonts.size.title * globalVars.lineHeights.condensed) / 2 -
-                        globalVariables().fonts.size.medium / 2,
+                        globalVars.fonts.size.medium / 2,
                 ),
             },
         },

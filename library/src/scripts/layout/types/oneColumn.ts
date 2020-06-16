@@ -4,6 +4,7 @@ import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { LayoutTypes } from "@library/layout/types/LayoutUtils";
 
 export enum OneColumnLayoutDevices {
     XS = "xs",
@@ -98,6 +99,7 @@ export const oneColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     return {
+        type: LayoutTypes.ONE_COLUMN,
         Devices,
         foundationalWidths,
         contentWidth,

@@ -15,7 +15,7 @@ use VanillaTests\SiteTestTrait;
  * Test count updating around categories, discussions, and comments.
  */
 class CountsTest extends TestCase {
-    use SetupTraitsTrait, SiteTestTrait, TestCategoryModelTrait,TestDiscussionModelTrait, TestCommentModelTrait;
+    use SetupTraitsTrait, SiteTestTrait, TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
      * @var array

@@ -69,7 +69,7 @@ class SharedBootstrapTestCase extends TestCase {
     /**
      * Whether or not the container is "null".
      *
-     * @param $container
+     * @param ?Container $container
      *
      * @return bool
      */

@@ -214,7 +214,7 @@ compatibilityStyles = useThemeCache(() => {
             borderBottom: singleBorder(),
             ...paddings(resultVars.spacing.padding),
             ...margins(formVars.lists.spacing.margin),
-            backgroundColor: colorOut(formVars.lists.colors.bg),
+            backgroundColor: formVars.lists.colors.bg,
         },
     );
 
@@ -298,6 +298,10 @@ compatibilityStyles = useThemeCache(() => {
         fontWeight: vars.fonts.weights.bold,
     });
 
+    cssOut(`.DataList.Discussions .Item .Title`, {
+        width: `100%`,
+    });
+
     cssOut(`.DataList.Discussions .Item .Title a`, {
         textDecoration: important("none"),
     });
@@ -350,7 +354,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Item.Read`, {
-        // backgroundColor: colorOut(formVars.lists.colors.read),
+        backgroundColor: colorOut(formVars.lists.colors.read),
     });
 
     cssOut(".Bullet, .QuickSearch", {

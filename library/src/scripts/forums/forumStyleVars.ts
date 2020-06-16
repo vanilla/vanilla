@@ -6,6 +6,10 @@
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { color, ColorHelper } from "csx";
+import { ColorValues } from "@library/styles/styleHelpersColors";
+import { TLength } from "typestyle/lib/types";
+import { MarginProperty, MarginTopProperty } from "csstype";
 
 export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables();
@@ -23,15 +27,18 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 left: globalVars.gutter.half,
             },
             margin: {
-                top: "initial",
+                top: "initial" as MarginTopProperty<TLength>,
                 right: "initial",
                 bottom: "initial",
                 left: "initial",
             },
         },
         colors: {
-            bg: undefined,
-            read: { bg: undefined },
+            margin: undefined as MarginProperty<TLength> | undefined,
+            bg: undefined as ColorHelper | undefined,
+            read: {
+                bg: undefined,
+            },
         },
     });
 

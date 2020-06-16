@@ -83,6 +83,14 @@ export const discussionCSS = () => {
     );
 
     cssOut(
+        ".Meta.Meta-Discussion",
+
+        {
+            display: vars.meta.display,
+        },
+    );
+
+    cssOut(
         `
         .MessageList .ItemDiscussion .Item-Header.DiscussionHeader .PhotoWrap,
         .MessageList .ItemComment .Item-Header .PhotoWrap,

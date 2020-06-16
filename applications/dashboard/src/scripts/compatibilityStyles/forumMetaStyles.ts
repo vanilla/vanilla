@@ -190,6 +190,7 @@ export const forumMetaCSS = () => {
 
     mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
         overflow: "visible",
+        display: "block",
     });
 
     cssOut(`.Container .AuthorInfo .MItem`, {

@@ -16,8 +16,7 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
 /**
- * Class DomUtilsTest
- * @package VanillaTests\Library\Vanilla\Utility
+ * Class for testing dom utility functions.
  */
 class DomUtilsTest extends TestCase {
     use HtmlNormalizeTrait;
@@ -179,7 +178,7 @@ class DomUtilsTest extends TestCase {
             'heavily nested' => [
                 2,
                 '<div><div><div><div>this</div> is a word</div></div> <b>okay?</b></div>',
-                '<div><div><div><div>this</div> is</div></div></div>'
+                '<div><div><div><div>this </div> is</div></div></div>'
             ],
         ];
 

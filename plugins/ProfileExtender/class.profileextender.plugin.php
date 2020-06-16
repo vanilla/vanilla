@@ -574,10 +574,11 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 ->leftJoin('Rank ra', 'ra.RankID = u.RankID');
         }
 
+        $lowerCaseColumnNames =  array_map('strtolower', $columnNames);
         $i = 0;
         foreach ($fields as $slug => $fieldData) {
-            // Don't overwrite Location data (it's always stored in the user table, never the userMeta table).
-            if (strtolower($slug) === 'location') {
+            // Don't overwrite data if there's already a column with the same name.
+            if (in_array(strtolower($slug), $lowerCaseColumnNames)) {
                 continue;
             }
             // Add this field to the output

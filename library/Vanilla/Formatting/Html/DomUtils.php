@@ -28,7 +28,7 @@ final class DomUtils {
         $xpath = new \DomXPath($dom);
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
-            $xpathTagsQuery = $xpath->query("//div[@data-embedjson] | //video");
+            $xpathTagsQuery = $xpath->query("//div[@data-embedjson] | //video | //iframe");
             $dataClassItem = $xpathQuery->item(0);
             $dataTagsItem = $xpathTagsQuery->item(0);
             if ($dataClassItem) {

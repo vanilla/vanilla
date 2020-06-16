@@ -5,7 +5,6 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { unit } from "@library/styles/styleHelpers";
-import { LayoutTypes } from "@library/layout/LayoutContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";

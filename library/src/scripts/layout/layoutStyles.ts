@@ -11,11 +11,9 @@ import { allLayoutVariables, LayoutTypes } from "@library/layout/LayoutContext";
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { calc, percent, viewHeight } from "csx";
+import { percent, viewHeight } from "csx";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
 import { threeColumnLayout } from "@library/layout/types/threeColumn";
@@ -111,18 +109,6 @@ export const layoutClasses = (props: { type?: LayoutTypes }) => {
                         },
                     }),
                 },
-                // "&.isOneCol": {
-                //     width: unit(layoutTypeVariables.middleColumnPaddedWidth()),
-                //     maxWidth: percent(100),
-                //     margin: "auto",
-                //     ...mediaQueries({
-                //         [LayoutTypes.THREE_COLUMNS]: {
-                //             oneColumnDown: {
-                //                 width: percent(100),
-                //             },
-                //         },
-                //     }),
-                // },
                 "&.hasTopPadding": {
                     paddingTop: unit(vars.spacing.extraPadding.top),
                 },

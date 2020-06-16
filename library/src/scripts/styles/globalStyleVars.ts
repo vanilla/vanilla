@@ -339,6 +339,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         colors: {
             fg: mixBgAndFg(0.85),
         },
+        display: "block",
     });
 
     const states = makeThemeVars("states", {

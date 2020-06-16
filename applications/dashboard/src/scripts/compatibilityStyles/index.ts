@@ -204,13 +204,19 @@ compatibilityStyles = useThemeCache(() => {
         width: calc(`100% + ${unit(horizontalPadding)}`),
     });
 
-    cssOut(`.DataList .Item`, {
-        borderTop: singleBorder(),
-        borderBottom: singleBorder(),
-        ...margins(formVars.lists.spacing.margin),
-        ...paddings(formVars.lists.spacing.padding),
-        backgroundColor: colorOut(formVars.lists.colors.bg),
-    });
+    cssOut(
+        `
+        .DataList .Item,
+        .DataList .Empty,
+    `,
+        {
+            borderTop: singleBorder(),
+            borderBottom: singleBorder(),
+            ...paddings(resultVars.spacing.padding),
+            ...margins(formVars.lists.spacing.margin),
+            backgroundColor: formVars.lists.colors.bg,
+        },
+    );
 
     cssOut(`.DataList .Item + .Item`, {
         borderTop: "none",
@@ -292,6 +298,10 @@ compatibilityStyles = useThemeCache(() => {
         fontWeight: vars.fonts.weights.bold,
     });
 
+    cssOut(`.DataList.Discussions .Item .Title`, {
+        width: `100%`,
+    });
+
     cssOut(`.DataList.Discussions .Item .Title a`, {
         textDecoration: important("none"),
     });
@@ -344,7 +354,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Item.Read`, {
-        // backgroundColor: colorOut(formVars.lists.colors.read),
+        backgroundColor: colorOut(formVars.lists.colors.read),
     });
 
     cssOut(".Bullet, .QuickSearch", {

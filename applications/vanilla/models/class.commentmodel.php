@@ -154,24 +154,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     }
 
     /**
-     * Get categoryIDs for a group of comments.
-     *
-     * @param int[] $commentIDs
-     *
-     * @return array[] An array of ['CommentID' => int, 'CategoryID' => int]
-     */
-    public function getCategoryIDsForComments(array $commentIDs): array {
-        $result = $this->SQL
-            ->select(['c.CommentID', 'd.CategoryID'])
-            ->from('Comment c')
-            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->get()
-            ->resultArray();
-
-        return $result;
-    }
-
-    /**
      * Select the data for a single comment.
      *
      * @since 2.0.0

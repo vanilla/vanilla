@@ -270,12 +270,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
         ?bool $includeArchivedCategories = null
     ): array {
         $categoryFilter = [];
-        if ($includeArchivedCategories === false) {
+        if (!$includeArchivedCategories) {
             $categoryFilter['Archived'] = false;
         }
 
         $allPermissionCategories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
-        $allPermissionCategories[0] = true; // allow uncategorized too.
         $allPermissionCategoryIDs = array_keys($allPermissionCategories);
         $this->eventManager->fire('AllowedCategories', $this, ['CategoriesID' => &$allPermissionCategoryIDs]);
 
@@ -283,9 +282,6 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
         if ($followedCategories) {
             $allPermissionCategories = array_filter($allPermissionCategories, function ($category) {
-                if ($category === true) {
-                    return true;
-                }
                 return $category['Followed'];
             });
         }
@@ -301,6 +297,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             $resultIDs = array_intersect($allPermissionCategoryIDs, $resultIDs);
         } else {
             $resultIDs = $allPermissionCategoryIDs;
+        }
+
+        if (!empty($resultIDs)) {
+            // Make sure 0 (allowing other record types) makes it in.
+            $resultIDs[] = 0;
         }
 
         return $resultIDs;

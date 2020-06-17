@@ -73,9 +73,6 @@ class CommentSearchType extends DiscussionSearchType {
             ]);
             $results = $results->getData();
 
-            // Get all of the discussionIDs for the comments.
-            $categoryIDsByCommentIDs = array_column($this->commentModel->getCategoryIDsForComments($recordIDs), 'CategoryID', 'CommentID');
-
             $resultItems = array_map(function ($result) use ($categoryIDsByCommentIDs) {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'commentID',

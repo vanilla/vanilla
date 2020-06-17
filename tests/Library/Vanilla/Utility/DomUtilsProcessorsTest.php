@@ -13,6 +13,10 @@ use Vanilla\Formatting\Html\Processor\StripEmbedsProcessor;
 use Vanilla\Formatting\Html\Processor\StripImagesProcessor;
 use Vanilla\Formatting\Html\Processor\TrimWordsProcessor;
 
+/**
+ * Class DomUtilsProcessorsTest for testing DomUtils processors
+ * @package VanillaTests\Library\Vanilla\Utility
+ */
 class DomUtilsProcessorsTest extends DomUtilsTest {
 
 

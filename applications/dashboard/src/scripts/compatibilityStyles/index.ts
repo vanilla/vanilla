@@ -354,7 +354,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Item.Read`, {
-        backgroundColor: colorOut(formVars.lists.colors.read),
+        backgroundColor: colorOut(formVars.lists.colors.read.bg),
     });
 
     cssOut(".Bullet, .QuickSearch", {

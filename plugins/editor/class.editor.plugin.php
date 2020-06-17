@@ -8,8 +8,6 @@
  * @package editor
  */
 
-use Vanilla\Permissions;
-
 /**
  * Class EditorPlugin
  */

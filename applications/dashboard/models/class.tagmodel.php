@@ -550,6 +550,22 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Get tagIDs for given tag names.
+     *
+     * @param string[] $names Tag names.
+     *
+     *@return int[]
+     */
+    public function getTagIDsByName(array $names): array {
+        if (empty($names)) {
+            return [];
+        }
+        $result = $this->SQL->select('TagID')->from('Tag')->where('Name', $names)->get()->resultArray();
+        $ids = array_column($result, 'TagID');
+        return $ids;
+    }
+
+    /**
      * @deprecated
      *
      * @param Gdn_SQLDriver $sql

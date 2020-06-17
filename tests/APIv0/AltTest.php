@@ -36,6 +36,8 @@ class AltTest extends SharedBootstrapTestCase {
 
     /**
      * Test an ALT install with a valid update token.
+     *
+     * @large
      */
     public function testAltInstallWithUpdateToken() {
         $this->doAltInstallWithUpdateToken(true, 'xkcd', 'xkcd');
@@ -43,6 +45,8 @@ class AltTest extends SharedBootstrapTestCase {
 
     /**
      * Test an ALT install with no update token.
+     *
+     * @large
      */
     public function testAltInstallWithNoUpdateToken() {
         $this->expectException(\Exception::class);

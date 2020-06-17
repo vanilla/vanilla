@@ -328,6 +328,10 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
+            'sort:s?' => [
+                'enum' => ApiUtils::sortEnum('dateInserted', 'commentID'),
+                'default' => 'dateInserted',
+            ],
             'insertUserID:i?' => [
                 'description' => 'Filter by author.',
                 'x-filter' => [
@@ -346,7 +350,8 @@ class CommentsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc', 'DateInserted')->resultArray();
+        [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort']);
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, $orderDirection, $orderField)->resultArray();
         $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         // Expand associated rows.

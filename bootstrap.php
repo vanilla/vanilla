@@ -11,6 +11,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
+use Vanilla\Models\Model;
 use Vanilla\Permissions;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
@@ -318,6 +319,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Gdn_Model')
     ->setShared(true)
 
+    ->rule(Model::class)
+    ->setShared(true)
+
     ->rule(Contracts\Models\UserProviderInterface::class)
     ->setClass(UserModel::class)
 
@@ -499,13 +503,6 @@ $dic->call(function (
     }
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
-    // Construct the logger earlier so that its dependencies are satisfied.
-    $log = $dic->get(\Vanilla\Logging\LogDecorator::class);
-    // Replace the logger interface with the decorator.
-    $dic->rule(\Vanilla\Logging\LogDecorator::class)
-        ->addAlias(\Psr\Log\LoggerInterface::class);
-    Logger::setLogger(null);
-
     // Load the configurations for enabled addons.
     foreach ($addonManager->getEnabled() as $addon) {
         /* @var Addon $addon */
@@ -606,3 +603,11 @@ register_shutdown_function(function () use ($dic) {
     // Trigger SchedulerDispatch event
     $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
 });
+
+// Add the log decorator.
+ContainerUtils::replace(
+    $dic,
+    \Psr\Log\LoggerInterface::class,
+    \Vanilla\Logging\LogDecorator::class
+);
+Logger::setLogger(null);

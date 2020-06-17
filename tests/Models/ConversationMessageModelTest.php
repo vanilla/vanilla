@@ -28,14 +28,14 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass(): void {
+    public static function setUpBeforeClass(): void {
         self::baseSetupBeforeClass();
     }
 
     /**
      * Instantiate conversationModel & ConversationMessageModel.
      */
-    protected function setup(): void {
+    public function setUp(): void {
         $this->conversationModel = new ConversationModel();
         $this->conversationMessageModel = new ConversationMessageModel();
     }

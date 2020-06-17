@@ -222,8 +222,10 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @param string $pluginClass The name of the plugin class.
      */
-    private function callBootstrapEvents($pluginClass) {
+    public function callBootstrapEvents($pluginClass) {
         $instance = $this->container->get($pluginClass);
+        // Kludge: Force the plugin class as shared. This should be done in the EventManager eventually.
+        $this->container->setInstance($pluginClass, $instance);
 
         $this->events->fireClass($instance, 'container_init', $this->container);
     }

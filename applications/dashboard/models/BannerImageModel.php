@@ -98,12 +98,16 @@ class BannerImageModel {
             return c(self::DEFAULT_CONFIG_KEY);
         }
 
-        $category = \CategoryModel::instance()->getID($categoryID, DATASET_TYPE_ARRAY);
+        $category = \CategoryModel::categories($categoryID);
         $slug = $category['BannerImage'];
 
         if (!$slug) {
             $parentID = $category['ParentCategoryID'];
-            $slug = self::getBannerImageSlug($parentID);
+            if ($parentID == $categoryID) {
+                $slug = c(self::DEFAULT_CONFIG_KEY);
+            } else {
+                $slug = self::getBannerImageSlug($parentID);
+            }
         }
         return $slug;
     }

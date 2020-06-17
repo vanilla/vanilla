@@ -53,6 +53,20 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
+      - name: sort
+        in: query
+        description: Sort the results.
+        schema:
+          type: string
+          enum:
+            - dateInserted
+            - dateLastActive
+            - name
+            - userID
+            - -dateInserted
+            - -dateLastActive
+            - -name
+            - -userID
       - description: >
           Expand associated records using one or more valid field names. A
           value of "all" will expand all expandable fields.

@@ -60,4 +60,11 @@ class FeatureFlagHelper {
             throw new $exceptionClass(...$exceptionArguments);
         }
     }
+
+    /**
+     * Clear the cache on the feature flag helper.
+     */
+    public static function clearCache() {
+        self::$sCache = [];
+    }
 }

@@ -1022,4 +1022,19 @@ class Gdn_Model extends Gdn_Pluggable {
         $keyReleased = Gdn::cache()->remove($lockKey);
         return $keyReleased;
     }
+
+    /**
+     * Get the approximate total row count of the model's table.
+     *
+     * @return int
+     */
+    public function getTotalRowCount(): int {
+        $data = $this->Database->query(
+            'show table status like '.$this->Database->connection()->quote($this->Database->DatabasePrefix.$this->Name),
+            [],
+            ['ReturnType' => 'DataSet']
+        );
+
+        return $data->value('Rows', 0);
+    }
 }

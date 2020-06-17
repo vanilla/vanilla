@@ -18,7 +18,7 @@ class WebLinkingTest extends SharedBootstrapTestCase {
     /**
      * {@inheritdoc}
      */
-    protected function setUp(): void {
+    public function setUp(): void {
         $this->webLinking = new WebLinking();
     }
 

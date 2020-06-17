@@ -1,8 +1,7 @@
 {
-    "name": "@vanilla/theme-boilerplate",
+    "name": "@vanillaforums/theme-boilerplate",
     "version": "3.0.1",
     "description": "A boilerplate for Vanillaforums themes",
-    "private": true,
     "bin": {
         "boilerplate-install": "./setup/boilerplateInstall.js"
     },

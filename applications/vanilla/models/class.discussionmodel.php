@@ -27,7 +27,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface, \Vanilla\Contracts\Models\CrawlableInterface {
 
     use StaticInitializer;
 
@@ -914,7 +914,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function addFieldPrefix($fieldName, $prefix = 'd') {
         // Make sure there aren't any ambiguous discussion references.
         if (strpos($fieldName, '.') === false) {
-            $fieldName = $prefix.'.'.$fieldName;
+            $fieldName = ($fieldName[0] === '-' ? '-' : '').$prefix.'.'.ltrim($fieldName, '-');
         }
         return $fieldName;
     }
@@ -1303,14 +1303,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $wheres SQL conditions.
      * @param int $offset The number of records to skip.
      * @param int $limit The number of records to limit the query to.
-     * @return object SQL result.
+     * @param string|string[]|null $orderBy An array of column names for sorting.
+     * @return Gdn_DataSet SQL result.
      */
-    public function getAnnouncements($wheres = '', $offset = 0, $limit = false) {
-
+    public function getAnnouncements($wheres = '', $offset = 0, $limit = false, $orderBy = null) {
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
         if ($limit === false) {
-            c('Vanilla.Discussions.PerPage', 30);
+            $limit = c('Vanilla.Discussions.PerPage', 30);
         }
         $userID = $session->UserID > 0 ? $session->UserID : 0;
         $categoryID = val('d.CategoryID', $wheres, 0);
@@ -1391,10 +1391,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $this->SQL->limit($limit, $offset);
 
-        $orderBy = $this->getOrderBy();
-        foreach ($orderBy as $field => $direction) {
-            $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
-        }
+        $orderBy = $orderBy ?? $this->getOrderBy();
+        $this->SQL->orderByPrefix('d.', $orderBy);
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('beforeGetAnnouncements');
 
@@ -3913,5 +3911,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $categoryModel = new CategoryModel();
         $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
         unset($categoryModel);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/discussions?pinOrder=mixed&sort=-discussionID',
+            'discussionID'
+        );
+        return $r;
     }
 }

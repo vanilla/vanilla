@@ -662,7 +662,8 @@ abstract class Gdn_SQLDriver {
             $this->limit($limit, $offset);
         }
 
-        $result = $this->query($this->getSelect());
+        $sql = $this->getSelect();
+        $result = $this->query($sql);
         return $result;
     }
 
@@ -1427,9 +1428,9 @@ abstract class Gdn_SQLDriver {
         } elseif ($value !== null) {
             $this->_Options[$key] = $value;
             return $this;
-        } elseif (isset($this->_Options[$key]))
+        } elseif (isset($this->_Options[$key])) {
             return $this->_Options[$key];
-        else {
+        } else {
             return null;
         }
     }
@@ -1437,20 +1438,57 @@ abstract class Gdn_SQLDriver {
     /**
      * Adds to the $this->_OrderBys collection.
      *
-     * @param string $fields A string of fields to be ordered.
+     * This method supports many different formats for legacy reasons.
+     *
+     * The current best practice is:
+     *
+     * ```
+     * $sql->orderBy(['column1', '-column2', ...]); // prefix with "-" for descending
+     * $sql->orderBy('column1')
+     *     ->orderBy('-column2')
+     * ```
+     *
+     * Legacy versions include:
+     *
+     * ```
+     * $sql->orderBy('column', 'asc|desc');
+     * $sql->orderBy('column1 desc, column2', '');
+     * $sql->orderByy(['column1' => 'desc', 'column2' => 'asc']);
+     * ```
+     *
+     * @param string|array|null $fields A string of fields to be ordered.
      * @param string $direction The direction of the sort.
      * @return Gdn_SQLDriver $this
      */
     public function orderBy($fields, $direction = 'asc') {
+        $r = $this->orderByPrefix('', $fields, $direction);
+        return $r;
+    }
+
+    /**
+     * Order by a field or fields, adding a prefix to each fields.
+     *
+     * @param string $px
+     * @param string|array|null $fields
+     * @param string $direction
+     * @return $this
+     * @see Gdn_SQLDriver::orderBy()
+     */
+    public function orderByPrefix(string $px, $fields, $direction = 'asc') {
         if (!$fields) {
             return $this;
         }
 
-        $fields = explode(',', "$fields $direction");
+        if (!is_array($fields)) {
+            $fields = explode(',', "$fields $direction");
+        }
 
-        foreach ($fields as $parts) {
-            if (preg_match('`^(-)?([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
-                $field = $m[2];
+        foreach ($fields as $key => $parts) {
+            if (!is_numeric($key) && in_array($parts, ['asc', 'desc'], true)) {
+                // This is in the form: column => direction
+                $this->_OrderBys[] = $this->escapeFieldReference($key).' '.$parts;
+            } elseif (preg_match('`^(-)?([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
+                $field = $px.$m[2];
                 if (!empty($m[1])) {
                     $direction = 'desc';
                 } else {

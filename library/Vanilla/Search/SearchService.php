@@ -6,6 +6,7 @@
 
 namespace Vanilla\Search;
 
+use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\EmbeddedContent\FallbackEmbedFactory;
@@ -58,5 +59,16 @@ class SearchService {
     public function search(array $queryData, SearchOptions $options): SearchResults {
         $activeDriver = $this->getActiveDriver();
         return $activeDriver->search($queryData, $options);
+    }
+
+    /**
+     * Build the schema for the search.
+     *
+     * @return Schema
+     */
+    public function buildQuerySchema(): Schema {
+        return $this
+            ->getActiveDriver()
+            ->buildQuerySchema();
     }
 }

@@ -10,6 +10,8 @@ use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
+use Vanilla\Forum\Search\DiscussionSearchType;
+use Vanilla\Search\AbstractSearchDriver;
 
 Gdn::getContainer()
     ->rule(EmbedService::class)
@@ -31,4 +33,8 @@ Gdn::getContainer()
     )
     ->rule(\Vanilla\Navigation\BreadcrumbModel::class)
     ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
+
+    // Search.
+    ->rule(AbstractSearchDriver::class)
+    ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
 ;

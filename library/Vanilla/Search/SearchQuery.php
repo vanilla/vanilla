@@ -22,13 +22,10 @@ abstract class SearchQuery {
     /** @var array */
     private $queryData;
 
-    /** @var $isFiltered */
-    protected $isFiltered;
-
     /**
      * Create a query.
      *
-     * @param SearchTypeInterface[] $searchTypes The registered search types contributing to the query.
+     * @param AbstractSearchType[] $searchTypes The registered search types contributing to the query.
      * @param array $queryData The data making up the query.
      */
     public function __construct(array $searchTypes, array $queryData) {
@@ -70,11 +67,11 @@ abstract class SearchQuery {
      * Apply a query where some text is matched.
      *
      * @param string $text The text to search.
-     * @param string $fieldName A prefix before the search keywords. Eg. `name`
+     * @param string[] $fieldNames The fields to perform the search against. If empty, all fields will be searched.
      *
      * @return $this
      */
-    abstract public function whereText(string $text, string $fieldName = '');
+    abstract public function whereText(string $text, array $fieldNames = []);
 
     /**
      * Set filter values for some attribute.

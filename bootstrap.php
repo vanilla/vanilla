@@ -13,6 +13,9 @@ use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
 use Vanilla\Permissions;
+use Vanilla\Search\AbstractSearchDriver;
+use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
@@ -337,6 +340,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(SearchModel::class)
     ->setShared(true)
+
+
+    ->rule(SearchService::class)
+    ->setShared(true)
+    ->rule(AbstractSearchDriver::class)
+    ->setShared(true)
+    ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
 
     ->rule('Gdn_IPlugin')
     ->setShared(true)

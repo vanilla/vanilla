@@ -14,7 +14,7 @@ use Vanilla\Sphinx\Search\SphinxSearchQuery;
 /**
  * Search type for global parameters.
  */
-class GlobalSearchType implements SearchTypeInterface {
+class GlobalSearchType extends AbstractSearchType {
 
     /** @var \UserModel */
     private $userModel;
@@ -54,7 +54,7 @@ class GlobalSearchType implements SearchTypeInterface {
         ///
         /// Prepare data from the query.
         ///
-        $allTextQuery = $query->getQueryParameter('body');
+        $allTextQuery = $query->getQueryParameter('query');
         $name = $query->getQueryParameter('name');
         $insertUserIDs = $query->getQueryParameter('insertUserIDs', false);
         $insertUserNames = $query->getQueryParameter('insertUserNames', false);
@@ -71,11 +71,11 @@ class GlobalSearchType implements SearchTypeInterface {
         ///
 
         if ($name) {
-            $query->whereText($name, 'name');
+            $query->whereText($name, ['name']);
         }
 
         if ($allTextQuery) {
-            $query->whereText($allTextQuery, '(name, body)');
+            $query->whereText($allTextQuery);
         }
 
         if ($insertUserIDs) {
@@ -100,10 +100,14 @@ class GlobalSearchType implements SearchTypeInterface {
             'query:s?',
             'name:s?',
             'insertUserIDs:a?' => [
-                'type' => 'int'
+                'items' => [
+                    'type' => 'integer',
+                ],
             ],
             'insertUserNames:a?' => [
-                'type' => 'string'
+                'items' => [
+                    'type' => 'string',
+                ],
             ],
             'dateInserted:dt?',
         ]);

@@ -6,12 +6,14 @@
 
 namespace Vanilla\Search;
 
+use Garden\Schema\Schema;
+
 /**
  *
  */
 abstract class AbstractSearchDriver {
 
-    /** @var SearchTypeInterface[] */
+    /** @var AbstractSearchType[] */
     private $searchTypes = [];
 
     /**
@@ -25,6 +27,19 @@ abstract class AbstractSearchDriver {
     abstract public function search(array $queryData, SearchOptions $options): SearchResults;
 
     /**
+     * Get the schema for a query.
+     *
+     * @return Schema
+     */
+    public function buildQuerySchema(): Schema {
+        $querySchema = new Schema();
+        foreach ($this->searchTypes as $searchType) {
+            $querySchema = $querySchema->merge($searchType->getQuerySchema());
+        }
+        return $querySchema;
+    }
+
+    /**
      * Take a set of records that were returned and convert them into result items.
      *
      * @param array[] $records An array of records to be converted. They MUST HAVE recordID and type (mapping to a SearchTypeInterface::getType()).
@@ -36,11 +51,11 @@ abstract class AbstractSearchDriver {
         $recordsByType = [];
 
         foreach ($records as $record) {
-            $type = $records['type'] ?? null;
-            $id = $records['recordID'] ?? null;
+            $type = $record['type'] ?? null;
+            $id = $record['recordID'] ?? null;
 
             if (!is_string($type) || !is_numeric($id)) {
-                trigger_error(E_USER_NOTICE, 'Search record missing a valid recordType or recordID. ' . json_encode($records));
+                trigger_error('Search record missing a valid recordType or recordID. ' . json_encode($records), E_USER_NOTICE);
                 continue;
             }
 
@@ -57,7 +72,7 @@ abstract class AbstractSearchDriver {
         foreach ($recordsByType as $type => $recordSet) {
             $searchType = $this->findSearchTypeByType($type);
             if ($searchType === null) {
-                trigger_error(E_USER_NOTICE, 'Could not find registered search type for type: ' . $searchType);
+                trigger_error('Could not find registered search type for type: ' . $searchType, E_USER_NOTICE);
                 continue;
             }
             $recordIDs = array_column($recordSet, 'recordID');
@@ -88,9 +103,9 @@ abstract class AbstractSearchDriver {
      *
      * @param string $forType
      *
-     * @return SearchTypeInterface|null
+     * @return AbstractSearchType|null
      */
-    public function findSearchTypeByType(string $forType): ?SearchTypeInterface {
+    public function findSearchTypeByType(string $forType): ?AbstractSearchType {
         foreach ($this->searchTypes as $searchType) {
             if ($searchType->getType() === $forType) {
                 return $searchType;
@@ -101,7 +116,7 @@ abstract class AbstractSearchDriver {
     }
 
     /**
-     * @return SearchTypeInterface[]
+     * @return AbstractSearchType[]
      */
     public function getSearchTypes(): array {
         return $this->searchTypes;
@@ -110,9 +125,9 @@ abstract class AbstractSearchDriver {
     /**
      * Register a search type.
      *
-     * @param SearchTypeInterface $searchType
+     * @param AbstractSearchType $searchType
      */
-    public function registerSearchType(SearchTypeInterface $searchType) {
+    public function registerSearchType(AbstractSearchType $searchType) {
         $this->searchTypes[] = $searchType;
     }
 }

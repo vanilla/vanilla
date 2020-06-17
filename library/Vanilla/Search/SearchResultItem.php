@@ -16,7 +16,7 @@ use Vanilla\Utility\InstanceValidatorSchema;
 /**
  * Class to hold a search result.
  */
-class SearchResultItem implements \JsonSerializable {
+class SearchResultItem implements \JsonSerializable, \ArrayAccess {
 
     use JsonFilterTrait;
 
@@ -29,17 +29,10 @@ class SearchResultItem implements \JsonSerializable {
     /**
      * Constructor.
      *
-     * @param Data $data
+     * @param array $data
      */
-    public function __construct(Data $data) {
+    public function __construct(array $data) {
         $this->data = $this->fullSchema()->validate($data);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function jsonSerialize() {
-        return $this->jsonFilter($this->data);
     }
 
     /**
@@ -77,6 +70,7 @@ class SearchResultItem implements \JsonSerializable {
                     'type' => 'string',
                     'format' => 'uri',
                 ],
+                'dateInserted:dt',
                 'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
             ]);
 
@@ -124,5 +118,51 @@ class SearchResultItem implements \JsonSerializable {
      */
     public function getUrl(): string {
         return $this->data['url'];
+    }
+
+    ///
+    /// PHP Interfaces
+    ///
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return $this->jsonFilter($this->data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetExists($offset) {
+        return isset($this->data[$offset]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetGet($offset) {
+        return $this->data[$offset] ?? null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+            $this->data[] = $value;
+        } else {
+            $this->data[$offset] = $value;
+        }
+
+        $this->fullSchema()->validate($this->data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetUnset($offset) {
+        unset($this->data[$offset]);
+        $this->fullSchema()->validate($this->data);
     }
 }

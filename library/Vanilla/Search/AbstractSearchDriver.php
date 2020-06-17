@@ -87,7 +87,7 @@ abstract class AbstractSearchDriver {
         $orderedResultItems = [];
         foreach ($records as $record) {
             $type = $record['type'] ?? '';
-            $recordID = $records['recordID'] = '';
+            $recordID = $record['recordID'] ?? '';
             $key = $type.$recordID;
             $resultItemForKey = $resultsItemsByTypeAndID[$key] ?? null;
             if ($resultItemForKey !== null) {

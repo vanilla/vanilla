@@ -13,8 +13,6 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import Frame from "@library/layout/frame/Frame";
-import FrameBody from "@library/layout/frame/FrameBody";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
@@ -23,12 +21,14 @@ import React from "react";
 import { connect } from "react-redux";
 import gdn from "@library/gdn";
 import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
+import { useLayout } from "@library/layout/LayoutContext";
 
 /**
  * Implements User Drop down for header
  */
 function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
+    const { mediaQueries } = useLayout();
     const signOutUrl = gdn.meta.signOutUrl ?? `/entry/signout?target=${window.location.href}`;
     if (!userInfo) {
         return null;

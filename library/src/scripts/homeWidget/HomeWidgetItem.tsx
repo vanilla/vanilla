@@ -4,8 +4,6 @@
  */
 
 import React from "react";
-import { BorderType } from "@library/styles/styleHelpers";
-import { CsxBackgroundOptions } from "csx/lib/types";
 import {
     IHomeWidgetItemOptions,
     homeWidgetItemVariables,

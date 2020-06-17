@@ -17,6 +17,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { StandardNavLinksStory } from "@library/navigation/navLinksWithHeadings.story";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export default {
     title: "Home Widget",
@@ -48,7 +49,7 @@ export function ContainerWithImage() {
 ContainerWithImage.story = {
     parameters: {
         chromatic: {
-            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+            viewports: Object.values(legacyLayout().breakPoints),
         },
     },
 };
@@ -141,7 +142,7 @@ export function NotEnoughItems() {
 (NotEnoughItems as any).story = {
     parameters: {
         chromatic: {
-            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+            viewports: Object.values(legacyLayout().breakPoints),
         },
     },
 };
@@ -196,7 +197,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
 (ContainerBackgroundVariants as any).story = {
     parameters: {
         chromatic: {
-            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+            viewports: Object.values(legacyLayout().breakPoints),
         },
     },
 };

@@ -7,8 +7,6 @@
 import React, { useEffect } from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { clearUniqueIDCache } from "@library/utility/idUtils";
-import { LayoutProvider } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/layoutStyles";
 
 export interface IStoryHeadingProps {
     depth?: number;

@@ -5,35 +5,39 @@
 
 import {
     IThreeColumnLayoutMediaQueries,
+    IThreeColumnLayoutMediaQueryStyles,
     threeColumnLayout,
     ThreeColumnLayoutDevices,
 } from "@library/layout/types/threeColumn";
-import { IOneColumnLayoutMediaQueries, oneColumnLayout, OneColumnLayoutDevices } from "@library/layout/types/oneColumn";
+import {
+    IOneColumnLayoutMediaQueries,
+    IOneColumnLayoutMediaQueryStyles,
+    oneColumnLayout,
+    OneColumnLayoutDevices,
+} from "@library/layout/types/oneColumn";
 import {
     IOneColumnNarrowLayoutMediaQueries,
+    IOneColumnNarrowLayoutMediaQueryStyles,
     oneColumnNarrowLayout,
     OneColumnNarrowLayoutDevices,
 } from "@library/layout/types/oneColumnNarrow";
-import { useLayout } from "@library/layout/LayoutContext";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { ILegacyLayoutMediaQueries, legacyLayout, LegacyLayoutDevices } from "@library/layout/types/legacy";
+import {
+    ILegacyLayoutMediaQueries,
+    ILegacyLayoutMediaQueryStyles,
+    legacyLayout,
+    LegacyLayoutDevices,
+} from "@library/layout/types/legacy";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
-export enum LayoutTypes {
-    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
-    ONE_COLUMN = "one column", // Single column, but full width of page
-    NARROW = "one column narrow", // Single column, but narrower than default
-    LEGACY = "legacy", // Legacy layout used on the Forum pages. The media queries are also used for older components. Newer ones should use the context
+export interface IAllLayoutMediaQueries {
+    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
+    [LayoutTypes.ONE_COLUMN]?: IOneColumnLayoutMediaQueryStyles;
+    [LayoutTypes.NARROW]?: IOneColumnNarrowLayoutMediaQueryStyles;
+    [LayoutTypes.LEGACY]?: ILegacyLayoutMediaQueryStyles;
 }
 
 export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
-
-export interface IAllLayoutMediaQueries {
-    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueries;
-    [LayoutTypes.ONE_COLUMN]?: IOneColumnLayoutMediaQueries;
-    [LayoutTypes.NARROW]?: IOneColumnNarrowLayoutMediaQueries;
-    [LayoutTypes.LEGACY]?: ILegacyLayoutMediaQueries;
-}
 
 export type IAllLayoutDevices =
     | OneColumnLayoutDevices
@@ -41,10 +45,20 @@ export type IAllLayoutDevices =
     | ThreeColumnLayoutDevices
     | LegacyLayoutDevices;
 
-export const allLayoutVariables = () => {
+export const layoutVarsByLayoutType = (props: { type: LayoutTypes; layoutVariables }) => {
+    const { type = LayoutTypes.THREE_COLUMNS, layoutVariables } = props;
+    if (layoutVariables.layouts.types[type]) {
+        return layoutVariables.layouts.types[type];
+    } else {
+        return layoutVariables.layouts.types[LayoutTypes.THREE_COLUMNS];
+    }
+};
+
+export const allLayoutVariables = (props: { offset }) => {
+    const { offset } = props;
     const mediaQueriesByType = {};
     const types = {
-        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout(),
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout({ vars: { offset } }),
         [LayoutTypes.ONE_COLUMN]: oneColumnLayout(),
         [LayoutTypes.NARROW]: oneColumnNarrowLayout(),
         [LayoutTypes.LEGACY]: legacyLayout(),
@@ -57,39 +71,7 @@ export const allLayoutVariables = () => {
     });
 
     return {
-        mediaQueries: filterQueriesByType(mediaQueriesByType),
+        mediaQueries: mediaQueriesByType,
         types,
     };
-};
-
-const filterQueriesByType = mediaQueriesByType => {
-    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
-        const { type } = useLayout();
-
-        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
-            if (layoutName === type) {
-                // Check if we're in the correct layout before applying
-                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
-                const stylesForLayout = mediaQueriesByLayout[layoutName];
-
-                if (mediaQueriesForLayout) {
-                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
-                        mediaQueriesForLayout[queryName] = stylesForLayout;
-                        return mediaQueriesForLayout[queryName];
-                    });
-                }
-            }
-        });
-        return {};
-    };
-};
-
-export const layoutVarsForCurrentLayout = (props: { type: LayoutTypes }) => {
-    const { type = LayoutTypes.THREE_COLUMNS } = props;
-
-    if (layoutVariables().layouts.types[type]) {
-        return layoutVariables().layouts.types[type];
-    } else {
-        return layoutVariables().layouts.types[LayoutTypes.THREE_COLUMNS];
-    }
 };

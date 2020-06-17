@@ -9,18 +9,23 @@ import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export enum OneColumnLayoutDevices {
     XS = "xs",
     MOBILE = "mobile",
     DESKTOP = "desktop",
 }
-
-export interface IOneColumnLayoutMediaQueries {
-    xs?: NestedCSSProperties;
+export interface IOneColumnLayoutMediaQueryStyles {
     small?: NestedCSSProperties;
     smallDown?: NestedCSSProperties;
+    xs?: NestedCSSProperties;
+}
+
+export interface IOneColumnLayoutMediaQueries {
+    small: (styles: NestedCSSProperties, useMinWidth?: boolean) => NestedCSSProperties;
+    smallDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    xs: (styles: NestedCSSProperties) => NestedCSSProperties;
 }
 
 export const oneColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -48,7 +53,7 @@ export const oneColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         xs: foundationalWidths.breakPoints.xs,
     });
 
-    const mediaQueries = () => {
+    const mediaQueries = (): IOneColumnLayoutMediaQueries => {
         const small = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
@@ -81,7 +86,7 @@ export const oneColumnLayout = useThemeCache((forcedVars?: IThemeVariables) => {
             small,
             smallDown,
             xs,
-        };
+        } as IOneColumnLayoutMediaQueries;
     };
 
     const calculateDevice = () => {

@@ -5,11 +5,11 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
-import { calc, percent, px, viewHeight } from "csx";
+import { calc, px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
 import { unit } from "@library/styles/styleHelpers";
 
@@ -21,15 +21,36 @@ export enum LegacyLayoutDevices {
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
 }
 
-export interface ILegacyLayoutMediaQueries {
+export interface ILegacyLayoutMediaQueryStyles {
     noBleed?: NestedCSSProperties;
     oneColumn?: NestedCSSProperties;
+    mobile?: NestedCSSProperties;
     oneColumnDown?: NestedCSSProperties;
     aboveOneColumn?: NestedCSSProperties;
     twoColumns?: NestedCSSProperties;
+    tablet?: NestedCSSProperties;
+    tabletDown?: NestedCSSProperties;
     twoColumnsDown?: NestedCSSProperties;
+    mobileDown?: NestedCSSProperties;
     noBleedDown?: NestedCSSProperties;
     xs?: NestedCSSProperties;
+    aboveMobile?: NestedCSSProperties;
+}
+
+export interface ILegacyLayoutMediaQueries {
+    noBleed: (styles: NestedCSSProperties) => NestedCSSProperties;
+    oneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
+    mobile: (styles: NestedCSSProperties) => NestedCSSProperties;
+    oneColumnDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    aboveOneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
+    tabletDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    twoColumns: (styles: NestedCSSProperties) => NestedCSSProperties;
+    tablet: (styles: NestedCSSProperties) => NestedCSSProperties;
+    twoColumnsDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    mobileDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    noBleedDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    xs: (styles: NestedCSSProperties) => NestedCSSProperties;
+    aboveMobile: (styles: NestedCSSProperties) => NestedCSSProperties;
 }
 
 export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -62,7 +83,8 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         xs: foundationalWidths.breakPoints.xs,
     });
 
-    const mediaQueries = () => {
+    const mediaQueries = (): ILegacyLayoutMediaQueries => {
+        console.log("OY!");
         const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {

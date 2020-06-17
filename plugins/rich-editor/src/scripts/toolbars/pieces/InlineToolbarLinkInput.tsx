@@ -13,6 +13,7 @@ import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertLinkClasses } from "@rich-editor/toolbars/pieces/insertLinkClasses";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;
@@ -41,7 +42,8 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesInsertLink = insertLinkClasses();
-        const classesDropDown = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classesDropDown = dropDownClasses({ mediaQueries });
         return (
             <div
                 className={classNames(

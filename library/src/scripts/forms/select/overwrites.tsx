@@ -20,6 +20,7 @@ import { components } from "react-select";
 import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -48,7 +49,8 @@ export function OptionLoader(props: OptionProps<any>) {
  * @param props - menu props
  */
 export function Menu(props: MenuProps<any>) {
-    const classes = dropDownClasses();
+    const { mediaQueries } = useLayout();
+    const classes = dropDownClasses({ mediaQueries });
     return (
         <components.Menu
             {...props}

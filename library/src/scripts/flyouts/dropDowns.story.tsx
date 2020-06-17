@@ -17,6 +17,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownMessages";
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
 import { layoutVariables } from "@library/layout/layoutStyles";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 const story = storiesOf("Components", module);
 
@@ -62,7 +63,7 @@ story.add(
     {
         chromatic: {
             viewports: [
-                layoutVariables().panelLayoutBreakPoints.noBleed,
+                layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.noBleed,
                 layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.xs,
             ],
         },

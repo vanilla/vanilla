@@ -14,7 +14,7 @@ import {
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
-import { border, calc, color, em, important, percent, scale, translateX } from "csx";
+import { calc, em, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -196,14 +196,11 @@ export const storyBookClasses = useThemeCache(() => {
         flexWrap: "wrap",
         width: calc(`100% + ${unit(vars.gaps.tile * 8)}`),
         transform: translateX(`-${unit(vars.gaps.tile * 3.5)}`),
-        ...layoutVariables().mediaQueries.oneColumn(
-            {
-                display: "block",
-                width: percent(100),
-                transform: "none",
-            },
-            false,
-        ),
+        ...layoutVariables().mediaQueries.oneColumn({
+            display: "block",
+            width: percent(100),
+            transform: "none",
+        }),
     });
 
     const tile = style("tile", {

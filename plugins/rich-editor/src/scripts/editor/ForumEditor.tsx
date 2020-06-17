@@ -15,8 +15,6 @@ import classNames from "classnames";
 import { Provider } from "react-redux";
 import { hasPermission } from "@library/features/users/Permission";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { LayoutProvider } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/layoutStyles";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;

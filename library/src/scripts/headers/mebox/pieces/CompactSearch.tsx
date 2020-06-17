@@ -20,6 +20,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { useEscapeListener, useLastValue, useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -95,6 +96,7 @@ export function CompactSearch(props: ICompactSearchProps) {
     const classesTitleBar = titleBarClasses();
     const classes = compactSearchClasses();
     const classesSearchBar = searchBarClasses();
+    const { mediaQueries } = useLayout();
     const classesDropDown = dropDownClasses({ mediaQueries });
     return (
         <div

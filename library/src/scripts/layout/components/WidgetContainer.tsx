@@ -6,7 +6,6 @@
 
 import React from "react";
 import className from "classnames";
-import { widgetContainerClasses } from "@library/layout/components/widgetContainerStyles";
 
 export interface IContainer {
     className?: string;
@@ -24,9 +23,8 @@ export default class WidgetContainer extends React.Component<IContainer> {
 
     public render() {
         if (this.props.children) {
-            const classes = widgetContainerClasses();
             const Tag = this.props.tag || "div";
-            return <Tag className={className(this.props.className, classes.root)}>{this.props.children}</Tag>;
+            return <Tag className={className(this.props.className)}>{this.props.children}</Tag>;
         } else {
             return null;
         }

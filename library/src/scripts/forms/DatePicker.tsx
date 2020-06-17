@@ -18,6 +18,7 @@ import classNames from "classnames";
 import { formatDate, parseDate } from "react-day-picker/moment";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 import RelativePortal from "react-relative-portal";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -174,7 +175,8 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
      * Override for the date pickers flyouts.
      */
     private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         const contentsClasses = classNames("dropDown-contents", classes.contents, "isOwnWidth", {
             isRightAligned: this.props.alignment === "right",
         });

@@ -5,8 +5,8 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React, { useState, createRef, useEffect } from "react";
-import { MemoryRouter, Router } from "react-router";
+import React from "react";
+import { MemoryRouter } from "react-router";
 import TitleBar, { TitleBar as TitleBarStatic } from "@library/headers/TitleBar";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
@@ -21,6 +21,7 @@ import { DownTriangleIcon } from "@library/icons/common";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { StoryFullPage } from "@library/storybook/StoryFullPage";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -99,7 +100,7 @@ story.add(
     {
         chromatic: {
             viewports: [
-                layoutVariables().panelLayoutBreakPoints.noBleed,
+                layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.noBleed,
                 layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].breakpoints.xs,
             ],
         },

@@ -9,6 +9,12 @@ import { colorOut, fonts, importantUnit, IStateSelectors, paddings, unit } from 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { actionMixin } from "@library/flyouts/dropDownStyles";
+import { useLayout } from "@library/layout/LayoutContext";
+import { legacyLayout } from "@library/layout/types/legacy";
+import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
+import { threeColumnLayout } from "@library/layout/types/threeColumn";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
@@ -83,6 +89,7 @@ export const flyoutCSS = () => {
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {
     selector = trimTrailingCommas(selector);
-    const styles = actionMixin(classBasedStates);
+    const mediaQueries = layoutVariables().layouts[LayoutTypes.THREE_COLUMNS].mediaQueries;
+    const styles = actionMixin({ classBasedStates, mediaQueries });
     cssOut(selector, styles);
 }

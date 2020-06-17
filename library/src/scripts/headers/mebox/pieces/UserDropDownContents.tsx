@@ -20,6 +20,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
+import { useLayout } from "@library/layout/LayoutContext";
 
 /**
  * Implements User Drop down for header
@@ -28,6 +29,8 @@ function UserDropDownContents(props: IProps) {
     const { userInfo } = props;
     const signOutUrl = gdn.meta.signOutUrl ?? `/entry/signout?target=${window.location.href}`;
     const siteSection = getSiteSection();
+    const { mediaQueries } = useLayout();
+
     if (!userInfo) {
         return null;
     }

@@ -14,8 +14,8 @@ import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/ban
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
-import { LayoutProvider } from "@library/layout/LayoutContext";
 import { threeColumnLayout } from "@library/layout/types/threeColumn";
+import { legacyLayout } from "@library/layout/types/legacy";
 
 export default {
     title: "Banner",
@@ -380,12 +380,7 @@ export const LogoAndRightImage = storyWithConfig(
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {
-            viewports: [
-                1400,
-                globalVariables().contentWidth(),
-                threeColumnLayout().foundationalWidths.breakPoints.twoColumns,
-                400,
-            ],
+            viewports: [1400, globalVariables().contentWidth(), legacyLayout().breakPoints.twoColumn, 400],
         },
     },
 };
@@ -686,7 +681,7 @@ export const unifiedBorder = storyWithConfig(
 (ImageAsElementWide as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1450, 1350, threeColumnLayout().breakPoints.oneColumn, 400],
+            viewports: [1450, 1350, threeColumnLayout({}).breakPoints.oneColumn, 400],
         },
     },
 };

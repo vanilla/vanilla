@@ -23,7 +23,8 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent, rgba } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
-import { IAllLayoutMediaQueries, ILayoutMediaQueryFunction, LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export const notUserContent = "u-notUserContent";
 

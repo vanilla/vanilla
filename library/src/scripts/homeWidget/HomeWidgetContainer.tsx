@@ -14,7 +14,6 @@ import classNames from "classnames";
 import Heading from "@library/layout/Heading";
 import { BorderType } from "@library/styles/styleHelpers";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
 import Container from "@library/layout/components/Container";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
@@ -69,29 +68,27 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     return (
         <div className={classes.root}>
             <Container requiresPadding>
-                <div className={classes.container}>
-                    {options.borderType === "navLinks" && (
-                        <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>
-                    )}
-                    <div className={classes.verticalContainer}>
-                        <div className={classes.content}>
-                            <div className={classes.viewAllContainer}>
-                                {props.title && (
-                                    <Heading className={classes.title} renderAsDepth={1}>
-                                        {props.title}
-                                    </Heading>
-                                )}
-                                {options.viewAll.position === "top" && viewAllButton}
-                            </div>
-                            {!gridHasBorder && grid}
+                {options.borderType === "navLinks" && (
+                    <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>
+                )}
+                <div className={classes.verticalContainer}>
+                    <div className={classes.content}>
+                        <div className={classes.viewAllContainer}>
+                            {props.title && (
+                                <Heading className={classes.title} renderAsDepth={1}>
+                                    {props.title}
+                                </Heading>
+                            )}
+                            {options.viewAll.position === "top" && viewAllButton}
                         </div>
-                        {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
-                        {viewAllButton && options.viewAll.position === "bottom" && (
-                            <div className={classes.viewAllContent}>
-                                <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
-                            </div>
-                        )}
+                        {!gridHasBorder && grid}
                     </div>
+                    {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
+                    {viewAllButton && options.viewAll.position === "bottom" && (
+                        <div className={classes.viewAllContent}>
+                            <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
+                        </div>
+                    )}
                 </div>
             </Container>
         </div>

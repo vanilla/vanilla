@@ -17,6 +17,7 @@ import MentionSuggestion, {
 import ToolbarPositioner from "@rich-editor/toolbars/pieces/ToolbarPositioner";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -48,7 +49,8 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader, mentionSelection } = this.props;
-        const classesDropDown = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classesDropDown = dropDownClasses({ mediaQueries });
 
         const hasResults = mentionProps.length > 0 || showLoader;
         const classes = classNames(

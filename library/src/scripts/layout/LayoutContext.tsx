@@ -5,17 +5,18 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutClasses } from "@library/layout/layoutStyles";
+import { layoutClasses, layoutVariables } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { threeColumnLayout, ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
+import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
 
 import {
-    LayoutTypes,
-    layoutVarsForCurrentLayout,
-    ILayoutMediaQueryFunction,
     IAllLayoutDevices,
+    IAllLayoutMediaQueries,
+    ILayoutMediaQueryFunction,
+    layoutVarsByLayoutType,
 } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export interface ILayoutProps {
     type: LayoutTypes;
@@ -31,7 +32,45 @@ export interface ILayoutProps {
     layoutSpecificStyles: (style) => any | undefined;
 }
 
-const defaultLayoutVars = layoutVarsForCurrentLayout({ type: LayoutTypes.THREE_COLUMNS });
+const layoutVars = layoutVariables();
+
+const defaultLayoutVars = layoutVarsByLayoutType({
+    type: LayoutTypes.THREE_COLUMNS,
+    layoutVariables: layoutVars,
+});
+
+const filterQueriesByType = (mediaQueriesByType, type) => {
+    console.log("");
+    console.log("mediaQueriesByType: ", mediaQueriesByType);
+    console.log("type: ", type);
+
+    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
+        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
+            console.log("layoutName: ", layoutName);
+            if (layoutName === type) {
+                // Check if we're in the correct layout before applying
+                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
+                const stylesForLayout = mediaQueriesByLayout[layoutName];
+
+                console.log("mediaQueriesForLayout: ", mediaQueriesForLayout);
+                console.log("stylesForLayout: ", stylesForLayout);
+
+                if (mediaQueriesForLayout) {
+                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
+                        console.log("queryName: ", queryName);
+                        mediaQueriesForLayout[queryName] = stylesForLayout;
+                        console.log("mediaQueriesForLayout: ", mediaQueriesForLayout);
+                        const result = mediaQueriesForLayout[queryName];
+                        console.log("result: ", result);
+                        return result;
+                    });
+                }
+            }
+        });
+        return {};
+    };
+};
+
 const LayoutContext = React.createContext<ILayoutProps>({
     type: LayoutTypes.THREE_COLUMNS,
     currentDevice: ThreeColumnLayoutDevices.DESKTOP,
@@ -40,7 +79,10 @@ const LayoutContext = React.createContext<ILayoutProps>({
     isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
     layoutClasses: layoutClasses({ type: LayoutTypes.THREE_COLUMNS }),
     currentLayoutVariables: defaultLayoutVars,
-    mediaQueries: defaultLayoutVars.mediaQueries as ILayoutMediaQueryFunction,
+    mediaQueries: filterQueriesByType(
+        defaultLayoutVars.mediaQueries,
+        LayoutTypes.THREE_COLUMNS,
+    ) as ILayoutMediaQueryFunction,
     contentWidth: defaultLayoutVars.contentWidth,
     calculateDevice: defaultLayoutVars.calculateDevice,
     layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
@@ -54,13 +96,17 @@ export function useLayout() {
 
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
-    const currentLayoutVars = layoutVarsForCurrentLayout({ type });
+    const currentLayoutVars = layoutVarsByLayoutType({ type, layoutVariables: layoutVars });
 
     const calculateDevice = useCallback(() => {
         return currentLayoutVars.calculateDevice();
     }, []);
 
-    const defaultLayoutVars = threeColumnLayout();
+    const defaultLayoutVars = layoutVarsByLayoutType({
+        type: LayoutTypes.THREE_COLUMNS,
+        layoutVariables: layoutVars,
+    });
+
     const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
         type: LayoutTypes.THREE_COLUMNS,
         currentDevice: ThreeColumnLayoutDevices.DESKTOP,
@@ -69,7 +115,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
         layoutClasses: layoutClasses({ type: LayoutTypes.THREE_COLUMNS }),
         currentLayoutVariables: defaultLayoutVars,
-        mediaQueries: defaultLayoutVars.mediaQueries,
+        mediaQueries: filterQueriesByType(defaultLayoutVars.mediaQueries, LayoutTypes.THREE_COLUMNS),
         contentWidth: defaultLayoutVars.contentWidth,
         calculateDevice: defaultLayoutVars.calculateDevice,
         layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
@@ -86,7 +132,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
                 isFullWidth: currentLayoutVars.isFullWidth(currentDevice),
                 layoutClasses: layoutClasses({ type }),
                 currentLayoutVariables: currentLayoutVars,
-                mediaQueries: currentLayoutVars.mediaQueries as any,
+                mediaQueries: filterQueriesByType(currentLayoutVars.mediaQueries, currentLayoutVars.type),
                 contentWidth: currentLayoutVars.contentWidth,
                 calculateDevice: currentLayoutVars.calculateDevice,
                 layoutSpecificStyles: currentLayoutVars["layoutSpecificStyles"] ?? undefined,

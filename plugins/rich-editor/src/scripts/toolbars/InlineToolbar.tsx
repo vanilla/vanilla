@@ -21,6 +21,7 @@ import ToolbarContainer from "@rich-editor/toolbars/pieces/ToolbarContainer";
 import InlineToolbarMenuItems from "@rich-editor/toolbars/pieces/InlineToolbarMenuItems";
 import InlineToolbarLinkInput from "@rich-editor/toolbars/pieces/InlineToolbarLinkInput";
 import { FocusWatcher } from "@vanilla/dom-utils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IWithEditorProps {}
 
@@ -77,7 +78,8 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const classes = dropDownClasses();
+        const { mediaQueries } = useLayout();
+        const classes = dropDownClasses({ mediaQueries });
         const { activeFormats } = this.props;
         const alertMessage = this.isFormatMenuVisible ? (
             <span aria-live="assertive" role="alert" className="sr-only">

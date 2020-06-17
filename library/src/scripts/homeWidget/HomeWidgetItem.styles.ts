@@ -79,7 +79,9 @@ export const homeWidgetItemVariables = useThemeCache((optionOverrides?: IHomeWid
     );
 
     const sizing = makeVars("sizing", {
-        minWidth: layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5, // Min width allows 4 items to fit.
+        // TODO: Fix
+        minWidth: "100%",
+        // minWidth: layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5, // Min width allows 4 items to fit.
     });
 
     const name = makeVars("name", {

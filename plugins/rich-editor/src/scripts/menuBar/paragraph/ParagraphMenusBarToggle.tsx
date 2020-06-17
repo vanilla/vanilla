@@ -35,6 +35,8 @@ import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap"
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { useLayout } from "@library/layout/LayoutContext";
+import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -131,6 +133,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         const menuActiveFormats = menuState(formatter, this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
         const label = t("Toggle Paragraph Format Menu");
+        const { mediaQueries } = useLayout();
         return (
             <div
                 id={this.componentID}
@@ -163,7 +166,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 </button>
                 <div
                     id={this.menuID}
-                    className={classNames(this.dropDownClasses, this.isMenuVisible ? "" : style(srOnly()))}
+                    className={classNames(
+                        this.dropDownClasses({ mediaQueries }),
+                        this.isMenuVisible ? "" : style(srOnly()),
+                    )}
                     style={this.toolbarStyles}
                     role="menu"
                 >
@@ -269,14 +275,14 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     /**
      * Get the classes for the toolbar.
      */
-    private get dropDownClasses(): string {
+    private dropDownClasses(props: { mediaQueries: ILayoutMediaQueryFunction }): string {
         if (!this.props.lastGoodSelection) {
             return "";
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
         const scrollBounds = this.quill.scroll.domNode.getBoundingClientRect();
         const classes = richEditorClasses(this.props.legacyMode);
-        const classesDropDown = dropDownClasses();
+        const classesDropDown = dropDownClasses(props);
 
         return classNames(
             classes.position,

@@ -8,16 +8,20 @@ import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
+import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 
 export enum OneColumnNarrowLayoutDevices {
     XS = "xs",
-    MOBILE = "mobile",
     DESKTOP = "desktop",
 }
 
-export interface IOneColumnNarrowLayoutMediaQueries {
+export interface IOneColumnNarrowLayoutMediaQueryStyles {
     xs?: NestedCSSProperties;
+}
+
+export interface IOneColumnNarrowLayoutMediaQueries {
+    xs: (styles: NestedCSSProperties) => NestedCSSProperties;
 }
 
 export const oneColumnNarrowLayout = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -41,7 +45,7 @@ export const oneColumnNarrowLayout = useThemeCache((forcedVars?: IThemeVariables
         xs: foundationalWidths.breakPoints.xs,
     });
 
-    const mediaQueries = () => {
+    const mediaQueries = (): IOneColumnNarrowLayoutMediaQueries => {
         const xs = (styles: NestedCSSProperties) => {
             return media(
                 {

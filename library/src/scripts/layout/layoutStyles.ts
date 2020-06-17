@@ -15,8 +15,15 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
-import { allLayoutVariables, LayoutTypes } from "@library/layout/types/LayoutUtils";
 import { legacyLayout } from "@library/layout/types/legacy";
+import {
+    allLayoutVariables,
+    IAllLayoutMediaQueries,
+    ILayoutMediaQueryFunction,
+} from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -61,10 +68,14 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const offset = panelBackgroundVariables().config.render
+        ? spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
+        : 0;
+
     return {
         gutter,
         spacing,
-        layouts: allLayoutVariables(),
+        layouts: allLayoutVariables({ offset }),
         /*
          * @deprecated You should get the media queries through "layouts" declared above
          */
@@ -76,9 +87,8 @@ export const layoutClasses = (props: { type?: LayoutTypes }) => {
     const { type = LayoutTypes.THREE_COLUMNS } = props;
     const vars = layoutVariables();
     const globalVars = globalVariables();
-
     const layoutTypeVariables = vars.layouts.types[type];
-    const mediaQueries = vars.layouts.mediaQueries;
+    const mediaQueries = (layoutTypeVariables.mediaQueries() as any) as ILayoutMediaQueryFunction;
 
     const style = styleFactory("layout" + camelCaseToDash(type.replace(/\s+/g, "")));
     const classesPanelArea = panelAreaClasses();

@@ -14,7 +14,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { useLayout } from "@library/layout/LayoutContext";
-import { ILayoutMediaQueryFunction, LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();

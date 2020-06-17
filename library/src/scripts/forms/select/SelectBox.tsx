@@ -14,6 +14,7 @@ import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useState, useRef } from "react";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ISelectBoxItem {
     value: string;
@@ -64,6 +65,7 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     };
 
     const classes = selectBoxClasses();
+    const { mediaQueries } = useLayout();
     const classesDropDown = dropDownClasses({ mediaQueries });
     return (
         <div
@@ -118,6 +120,7 @@ function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
 
 function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onClick: (item: ISelectBoxItem) => void }) {
     const { item, isSelected, onClick } = props;
+    const { mediaQueries } = useLayout();
     if ("url" in item) {
         return (
             <DropDownItemLink className={classNames({ isSelected: isSelected })} name={item.name} to={item.url || ""}>

@@ -60,12 +60,11 @@ export const mobileDropDownVariables = useThemeCache(() => {
     };
 });
 
-export const mobileDropDownClasses = useThemeCache(() => {
+export const mobileDropDownClasses = useThemeCache(mediaQueries => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const frameVars = frameVariables();
     const titleBarVars = titleBarVariables();
-    const { mediaQueries } = useLayout();
     const flex = flexHelper();
     const style = styleFactory("mobileDropDown");
 

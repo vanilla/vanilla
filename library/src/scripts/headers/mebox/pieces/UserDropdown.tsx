@@ -17,8 +17,8 @@ import classNames from "classnames";
 import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { useLayout } from "@library/layout/LayoutContext";
+import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 
 /**
  * Implements User Drop down for header
@@ -27,7 +27,6 @@ export function UserDropDown(props: IProps) {
     const ID = useMemo(() => uniqueIDFromPrefix("userDropDown"), []);
     const [isOpen, setOpen] = useState(false);
     const { checkCountData } = props;
-    const { mediaQueries } = useLayout();
 
     useEffect(() => {
         if (isOpen) {
@@ -40,7 +39,7 @@ export function UserDropDown(props: IProps) {
         return null;
     }
 
-    const classes = userdropDownClasses({ mediaQueries });
+    const classes = userDropDownClasses();
     const classesHeader = titleBarClasses();
 
     return (

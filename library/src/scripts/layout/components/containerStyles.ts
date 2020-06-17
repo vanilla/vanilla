@@ -11,7 +11,7 @@ import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import isEmpty from "lodash/isEmpty";
-import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const containerVariables = useThemeCache(() => {

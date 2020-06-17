@@ -22,7 +22,7 @@ import { visibility } from "@library/styles/styleHelpersVisibility";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import Container from "@library/layout/components/Container";
-import { LayoutTypes } from "@library/layout/types/LayoutUtils";
+import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 interface IProps {
     action?: React.ReactNode;

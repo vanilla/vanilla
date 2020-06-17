@@ -17,8 +17,7 @@ use Garden\Container\Container;
  * Class SharedBootstrapTestCase.
  */
 class SharedBootstrapTestCase extends TestCase {
-
-    use BootstrapTrait {
+    use SetupTraitsTrait, BootstrapTrait {
         setUpBeforeClass as bootstrapSetupBeforeClass;
         teardownAfterClass as bootstrapTeardownAfterClass;
     }
@@ -52,9 +51,25 @@ class SharedBootstrapTestCase extends TestCase {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->setupTestTraits();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->tearDownTestTraits();
+    }
+
+    /**
      * Whether or not the container is "null".
      *
-     * @param $container
+     * @param ?Container $container
      *
      * @return bool
      */

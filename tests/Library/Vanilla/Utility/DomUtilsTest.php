@@ -11,6 +11,7 @@ namespace VanillaTests\Library\Vanilla\Utility;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\DomUtils;
+use Vanilla\Formatting\Html\Processor\StripImagesProcessor;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 
@@ -54,6 +55,7 @@ class DomUtilsTest extends TestCase {
         $this->assertHtmlStringEqualsHtmlString($input, $dom->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
         DomUtils::stripImages($dom->getDom());
+
         $actual = $dom->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }

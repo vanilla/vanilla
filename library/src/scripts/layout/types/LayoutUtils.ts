@@ -22,13 +22,9 @@ import {
     OneColumnNarrowLayoutDevices,
 } from "@library/layout/types/oneColumnNarrow";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import {
-    ILegacyLayoutMediaQueries,
-    ILegacyLayoutMediaQueryStyles,
-    legacyLayout,
-    LegacyLayoutDevices,
-} from "@library/layout/types/legacy";
+import { ILegacyLayoutMediaQueryStyles, legacyLayout, LegacyLayoutDevices } from "@library/layout/types/legacy";
 import { LayoutTypes } from "@library/layout/types/LayoutTypes";
+import { panelListVariables } from "@library/layout/panelListStyles";
 
 export interface IAllLayoutMediaQueries {
     [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
@@ -54,11 +50,11 @@ export const layoutVarsByLayoutType = (props: { type: LayoutTypes; layoutVariabl
     }
 };
 
-export const allLayoutVariables = (props: { offset }) => {
-    const { offset } = props;
+export const allLayoutVariables = () => {
     const mediaQueriesByType = {};
+    const { offset } = panelListVariables();
     const types = {
-        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout({ vars: { offset } }),
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayout({ vars: { offset: offset.default } }),
         [LayoutTypes.ONE_COLUMN]: oneColumnLayout(),
         [LayoutTypes.NARROW]: oneColumnNarrowLayout(),
         [LayoutTypes.LEGACY]: legacyLayout(),

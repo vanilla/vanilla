@@ -7,11 +7,11 @@
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { color, em, percent } from "csx";
-import { margins, paddings, unit } from "@library/styles/styleHelpers";
+import { unit } from "@library/styles/styleHelpers";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");

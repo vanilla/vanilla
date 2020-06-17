@@ -10,7 +10,6 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LayoutTypes } from "@library/layout/types/LayoutTypes";
-import { ThreeColumnLayoutDevices } from "@library/layout/types/threeColumn";
 import { unit } from "@library/styles/styleHelpers";
 
 export enum LegacyLayoutDevices {
@@ -27,10 +26,10 @@ export interface ILegacyLayoutMediaQueryStyles {
     mobile?: NestedCSSProperties;
     oneColumnDown?: NestedCSSProperties;
     aboveOneColumn?: NestedCSSProperties;
-    twoColumns?: NestedCSSProperties;
+    twoColumnss?: NestedCSSProperties;
     tablet?: NestedCSSProperties;
     tabletDown?: NestedCSSProperties;
-    twoColumnsDown?: NestedCSSProperties;
+    twoColumnssDown?: NestedCSSProperties;
     mobileDown?: NestedCSSProperties;
     noBleedDown?: NestedCSSProperties;
     xs?: NestedCSSProperties;
@@ -78,18 +77,17 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const breakPoints = makeThemeVars("breakPoints", {
         noBleed: contentWidth(),
-        twoColumn: foundationalWidths.breakPoints.twoColumns,
+        twoColumns: foundationalWidths.breakPoints.twoColumns,
         oneColumn: foundationalWidths.minimalMiddleColumnWidth + panelPaddedWidth(),
         xs: foundationalWidths.breakPoints.xs,
     });
 
     const mediaQueries = (): ILegacyLayoutMediaQueries => {
-        console.log("OY!");
         const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
                     maxWidth: px(breakPoints.noBleed),
-                    minWidth: useMinWidth ? px(breakPoints.twoColumn + 1) : undefined,
+                    minWidth: useMinWidth ? px(breakPoints.twoColumns + 1) : undefined,
                 },
                 styles,
             );
@@ -107,7 +105,7 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         const twoColumnsDown = (styles: NestedCSSProperties) => {
             return media(
                 {
-                    maxWidth: px(breakPoints.twoColumn),
+                    maxWidth: px(breakPoints.twoColumns),
                 },
                 styles,
             );
@@ -116,7 +114,7 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(breakPoints.twoColumn),
+                    maxWidth: px(breakPoints.twoColumns),
                     minWidth: useMinWidth ? px(breakPoints.oneColumn + 1) : undefined,
                 },
                 styles,
@@ -173,7 +171,7 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         const mobile = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.twoColumns),
+                    maxWidth: px(breakPoints.twoColumns),
                     minWidth: useMinWidth ? px(foundationalWidths.breakPoints.xs + 1) : undefined,
                 },
                 styles,
@@ -216,7 +214,7 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
             return Devices.XS;
         } else if (width <= breakPoints.oneColumn) {
             return Devices.MOBILE;
-        } else if (width <= breakPoints.twoColumn) {
+        } else if (width <= breakPoints.twoColumns) {
             return Devices.TABLET;
         } else if (width <= breakPoints.noBleed) {
             return Devices.NO_BLEED;
@@ -226,13 +224,11 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     const isFullWidth = currentDevice => {
-        return (
-            currentDevice === ThreeColumnLayoutDevices.DESKTOP || currentDevice === ThreeColumnLayoutDevices.NO_BLEED
-        );
+        return currentDevice === LegacyLayoutDevices.DESKTOP || currentDevice === LegacyLayoutDevices.NO_BLEED;
     };
 
     const isCompact = currentDevice => {
-        return currentDevice === ThreeColumnLayoutDevices.XS || currentDevice === ThreeColumnLayoutDevices.MOBILE;
+        return currentDevice === LegacyLayoutDevices.XS || currentDevice === LegacyLayoutDevices.MOBILE;
     };
 
     const gutter = makeThemeVars("gutter", {
@@ -240,8 +236,13 @@ export const legacyLayout = useThemeCache((forcedVars?: IThemeVariables) => {
         mainGutterOffset: 60 - globalVars.gutter.size,
     });
 
+    console.log("panelPaddedWidth: ", panelPaddedWidth);
+    console.log("panelPaddedWidth(): ", panelPaddedWidth());
+    console.log("gutter.mainGutterOffset: ", gutter.mainGutterOffset);
+    console.log("panelPaddedWidth() + gutter.mainGutterOffset): ", panelPaddedWidth() + gutter.mainGutterOffset);
+
     const main = makeThemeVars("main", {
-        width: calc(`100% - ${unit(panelPaddedWidth() + gutter.mainGutterOffset)}`),
+        // width: calc(`100% - ${unit(panelPaddedWidth() + gutter.mainGutterOffset)}`),
         topSpacing: 40,
     });
 

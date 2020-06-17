@@ -5,7 +5,6 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { titleBarVariables } from "@library/headers/titleBarStyles";

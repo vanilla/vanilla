@@ -9,8 +9,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
 import { paddings } from "@library/styles/styleHelpersSpacing";
-import { TextAlignLastProperty, TextAlignProperty } from "csstype";
-import { percent } from "csx";
+import { TextAlignProperty } from "csstype";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) => {

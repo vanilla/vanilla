@@ -11,7 +11,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, important, percent } from "csx";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { buttonVariables } from "@library/forms/buttonStyles";
-import { nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles";
+import { nestedWorkaround } from "@dashboard/compatibilityStyles";
 
 export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) => {
     const style = styleFactory("buttonTabs");

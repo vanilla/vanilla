@@ -24,7 +24,7 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
 
     const itemSpacing = themeVars("itemSpacing", {
         paddingOneColumn: 14,
-        paddingTwoColumns: 24,
+        paddingtwoColumnss: 24,
         paddingThreeColumns: 14,
         paddingFourColumns: 14,
     });
@@ -48,12 +48,12 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
     const { columns } = options;
 
     const sizing = themeVars("sizing", {
-        containerWidthTwoColumns: itemSpacing.paddingTwoColumns * 4 + 384 * 2,
+        containerWidthtwoColumnss: itemSpacing.paddingtwoColumnss * 4 + 384 * 2,
         containerWidthThreeColumns: itemSpacing.paddingThreeColumns * 6 + 260 * 3,
         containerWidthFourColumns: itemSpacing.paddingFourColumns * 8 + 260 * 4,
     });
 
-    let calculatedMaxWidth = sizing.containerWidthTwoColumns;
+    let calculatedMaxWidth = sizing.containerWidthtwoColumnss;
     switch (columns) {
         case 3:
             calculatedMaxWidth = sizing.containerWidthThreeColumns;
@@ -95,12 +95,12 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
     let columnCount = vars.options.columns;
     let width: CSSPercentage = "50%";
     let additionnalMediaQueries = [] as NestedCSSProperties[];
-    let itemPadding = vars.itemSpacing.paddingTwoColumns;
+    let itemPadding = vars.itemSpacing.paddingtwoColumnss;
     switch (columnCount) {
         case 3:
             width = globalVars.utility["percentage.third"];
             additionnalMediaQueries.push(
-                mediaQueries.twoColumns({
+                mediaQueries.twoColumnss({
                     width: percent(50),
                 }),
             );
@@ -109,7 +109,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
         case 4:
             width = "25%";
             additionnalMediaQueries.push(
-                mediaQueries.twoColumns({
+                mediaQueries.twoColumnss({
                     width: percent(50),
                 }),
             );

@@ -285,3 +285,12 @@ export function accessibleLabel(template: string, variable?: string[]) {
     }
     return sprintf(template, variable);
 }
+
+/**
+ * Convert camel case to dashes
+ *
+ * @param str - The string to covnert
+ */
+export const camelCaseToDash = (str: string) => {
+    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+};

@@ -9,6 +9,7 @@ import { useThemeCache, styleFactory, variableFactory } from "@library/styles/st
 import { calc, color, percent, px } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { useLayout } from "@library/layout/LayoutContext";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const panelBackgroundVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelBackground");
@@ -21,7 +22,9 @@ export const panelBackgroundVariables = useThemeCache(() => {
         backgroundColor: color("#f4f6f9"),
     });
 
-    return { config, colors };
+    const spacing = layoutVariables().spacing;
+    const offset = config.render ? spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2 : 0;
+    return { config, colors, offset };
 });
 
 export const panelBackgroundClasses = useThemeCache(() => {

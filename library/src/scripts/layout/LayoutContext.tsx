@@ -32,11 +32,9 @@ export interface ILayoutProps {
     layoutSpecificStyles: (style) => any | undefined;
 }
 
-const layoutVars = layoutVariables();
-
 const defaultLayoutVars = layoutVarsByLayoutType({
     type: LayoutTypes.THREE_COLUMNS,
-    layoutVariables: layoutVars,
+    layoutVariables: layoutVariables(),
 });
 
 const filterQueriesByType = (mediaQueriesByType, type) => {
@@ -96,16 +94,10 @@ export function useLayout() {
 
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
+    const layoutVars = layoutVariables();
     const currentLayoutVars = layoutVarsByLayoutType({ type, layoutVariables: layoutVars });
 
-    const calculateDevice = useCallback(() => {
-        return currentLayoutVars.calculateDevice();
-    }, []);
-
-    const defaultLayoutVars = layoutVarsByLayoutType({
-        type: LayoutTypes.THREE_COLUMNS,
-        layoutVariables: layoutVars,
-    });
+    const defaultLayoutVars = layoutVars.layouts.types[LayoutTypes.THREE_COLUMNS];
 
     const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
         type: LayoutTypes.THREE_COLUMNS,
@@ -119,11 +111,11 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         contentWidth: defaultLayoutVars.contentWidth,
         calculateDevice: defaultLayoutVars.calculateDevice,
         layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
-    } as ILayoutProps); // Can't get variables here
+    });
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
-            const currentDevice = calculateDevice();
+            const currentDevice = currentLayoutVars.calculateDevice;
             setDeviceInfo({
                 type: currentLayoutVars.type,
                 currentDevice: currentDevice,
@@ -142,7 +134,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [calculateDevice, setDeviceInfo]);
+    }, [currentLayoutVars, setDeviceInfo]);
 
     return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
 }

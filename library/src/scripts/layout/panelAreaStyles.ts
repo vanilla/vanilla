@@ -4,19 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, calc, linearGradient, ColorHelper, translateY } from "csx";
+import { color, percent, calc, linearGradient, ColorHelper } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { panelWidgetClasses, panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { paddings, unit, colorOut, ColorValues } from "@library/styles/styleHelpers";
-import { NestedCSSSelectors } from "typestyle/lib/types";
+import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
+import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
 
-export const panelAreaClasses = useThemeCache(() => {
+export const panelAreaClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
-    const vars = layoutVariables();
-    const mediaQueries = vars.mediaQueries;
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses();
 

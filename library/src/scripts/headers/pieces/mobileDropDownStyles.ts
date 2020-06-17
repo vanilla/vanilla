@@ -16,9 +16,8 @@ import {
     fonts,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { border, calc, percent, px, translateX } from "csx";
+import { calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 

@@ -9,17 +9,12 @@ import { colorOut, fonts, importantUnit, IStateSelectors, paddings, unit } from 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
 import { actionMixin } from "@library/flyouts/dropDownStyles";
-import { useLayout } from "@library/layout/LayoutContext";
-import { legacyLayout } from "@library/layout/types/legacy";
-import { ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
-import { threeColumnLayout } from "@library/layout/types/threeColumn";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { LayoutTypes } from "@library/layout/types/LayoutTypes";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
 
     // Dropdown hover/focus colors:

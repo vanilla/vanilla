@@ -7,28 +7,25 @@
 import { percent } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, margins, paddings, unit } from "@library/styles/styleHelpers";
-
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { TextDecorationProperty } from "csstype";
+import { allLinkStates, unit } from "@library/styles/styleHelpers";
 
 export const panelListVariables = useThemeCache(() => {
-    const globalVals = globalVariables();
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("panelList");
 
     const title = makeThemeVars("title", {
-        fontSize: globalVals.fonts.size.large,
+        fontSize: globalVars.fonts.size.large,
     });
     const offset = makeThemeVars("offset", {
         default: 12,
     });
     const link = makeThemeVars("link", {
-        fontSize: globalVals.fonts.size.medium,
+        fontSize: globalVars.fonts.size.medium,
         hover: {
-            color: globalVals.links.colors.default,
+            color: globalVars.links.colors.default,
         },
         focus: {
-            color: globalVals.links.colors.focus,
+            color: globalVars.links.colors.focus,
         },
     });
     return {
@@ -38,10 +35,9 @@ export const panelListVariables = useThemeCache(() => {
     };
 });
 
-export const panelListClasses = useThemeCache(() => {
+export const panelListClasses = useThemeCache((props: { mediaQueries }) => {
     const globalVars = globalVariables();
-    const vars = panelListVariables();
-    const mediaQueries = layoutVariables().mediaQueries;
+    const panelVars = panelListVariables();
     const style = styleFactory("panelList");
 
     const root = style({
@@ -50,14 +46,14 @@ export const panelListClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        fontSize: unit(vars.title.fontSize),
-        marginBottom: unit(vars.offset.default),
+        fontSize: unit(panelVars.title.fontSize),
+        marginBottom: unit(panelVars.offset.default),
     });
 
     const item = style("item", {
         $nest: {
             "& + &": {
-                marginTop: unit(vars.offset.default),
+                marginTop: unit(panelVars.offset.default),
             },
         },
     });
@@ -66,7 +62,7 @@ export const panelListClasses = useThemeCache(() => {
         display: "block",
         position: "relative",
         width: percent(100),
-        fontSize: unit(vars.link.fontSize),
+        fontSize: unit(panelVars.link.fontSize),
         color: "inherit",
         ...allLinkStates({
             allStates: {

@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { percent, translateX } from "csx";
+import { percent } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";

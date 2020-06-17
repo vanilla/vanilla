@@ -37,7 +37,7 @@ export const tileVariables = useThemeCache(() => {
     });
 
     const spacing = themeVars("spacing", {
-        twoColumns: 24,
+        twoColumnss: 24,
         threeColumns: 9,
         fourColumns: 17,
         color: globalVars.mainColors.primary as ColorHelper,
@@ -85,7 +85,7 @@ export const tileVariables = useThemeCache(() => {
         bgHover: globalVars.mainColors.bg,
         bgImage: undefined as string | undefined,
         bgImageHover: undefined as string | undefined,
-        twoColumnsMinHeight: 0,
+        twoColumnssMinHeight: 0,
         threeColumnsMinHeight: 0,
         fourColumnsMinHeight: 0,
     });
@@ -128,7 +128,7 @@ export const tileClasses = useThemeCache(() => {
 
         switch (columns) {
             case 2:
-                minHeight = vars.link.twoColumnsMinHeight;
+                minHeight = vars.link.twoColumnssMinHeight;
                 break;
             case 3:
                 minHeight = vars.link.threeColumnsMinHeight;

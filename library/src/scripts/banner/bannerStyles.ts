@@ -553,7 +553,7 @@ export const bannerClasses = useThemeCache(
                     ...backgroundHelper(finalVars),
                 },
                 finalTabletUrl &&
-                    mediaQueries.twoColumnsDown(backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl })),
+                    mediaQueries.twoColumnssDown(backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl })),
                 finalMobileUrl &&
                     mediaQueries.oneColumnDown(backgroundHelper({ ...vars.outerBackground, image: finalMobileUrl })),
             );

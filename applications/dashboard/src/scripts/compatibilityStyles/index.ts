@@ -6,7 +6,7 @@
  */
 
 import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { cssRaw, cssRule, media } from "typestyle";
+import { cssRaw, cssRule } from "typestyle";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
@@ -45,6 +45,7 @@ import { suggestedTextStyleHelper } from "@library/features/search/suggestedText
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { legacyLayout } from "@library/layout/types/legacy";
+import { camelCaseToDash } from "@library/utility/appUtils";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -415,10 +416,6 @@ export const trimTrailingCommas = selector => {
 
 export const cssOut = (selector: string, ...objects: types.NestedCSSProperties[]) => {
     cssRule(trimTrailingCommas(selector), ...objects, { $unique: true });
-};
-
-export const camelCaseToDash = (str: string) => {
-    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 };
 
 export const nestedWorkaround = (selector: string, nestedObject, debug?: boolean) => {

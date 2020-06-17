@@ -11,7 +11,6 @@ import { HomeWidgetContainer, IHomeWidgetContainerProps } from "@library/homeWid
 import { style } from "typestyle";
 import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
 import { BorderType } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { color } from "csx";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";

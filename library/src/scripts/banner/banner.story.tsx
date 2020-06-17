@@ -380,7 +380,7 @@ export const LogoAndRightImage = storyWithConfig(
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1400, globalVariables().contentWidth(), legacyLayout().breakPoints.twoColumn, 400],
+            viewports: [1400, globalVariables().contentWidth(), legacyLayout().breakPoints.twoColumnss, 400],
         },
     },
 };

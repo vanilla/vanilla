@@ -10,8 +10,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { important, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { media } from "typestyle";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();

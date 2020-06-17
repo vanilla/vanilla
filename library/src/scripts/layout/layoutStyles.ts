@@ -7,23 +7,17 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { FULL_GUTTER, globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { panelListClasses } from "@library/layout/panelListStyles";
+import { panelListClasses, panelListVariables } from "@library/layout/panelListStyles";
 import { percent, viewHeight } from "csx";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { important } from "csx/lib/strings";
 import { cssRule } from "typestyle";
 import { legacyLayout } from "@library/layout/types/legacy";
-import {
-    allLayoutVariables,
-    IAllLayoutMediaQueries,
-    ILayoutMediaQueryFunction,
-} from "@library/layout/types/LayoutUtils";
+import { allLayoutVariables, ILayoutMediaQueryFunction } from "@library/layout/types/LayoutUtils";
 import { LayoutTypes } from "@library/layout/types/LayoutTypes";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { camelCaseToDash } from "@library/utility/appUtils";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -68,19 +62,17 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const offset = panelBackgroundVariables().config.render
-        ? spacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
-        : 0;
-
-    return {
+    const output = {
         gutter,
         spacing,
-        layouts: allLayoutVariables({ offset }),
+        layouts: allLayoutVariables(),
         /*
          * @deprecated You should get the media queries through "layouts" declared above
          */
         mediaQueries: legacyLayout().mediaQueries(),
     };
+
+    return output;
 });
 
 export const layoutClasses = (props: { type?: LayoutTypes }) => {
@@ -91,8 +83,13 @@ export const layoutClasses = (props: { type?: LayoutTypes }) => {
     const mediaQueries = (layoutTypeVariables.mediaQueries() as any) as ILayoutMediaQueryFunction;
 
     const style = styleFactory("layout" + camelCaseToDash(type.replace(/\s+/g, "")));
-    const classesPanelArea = panelAreaClasses();
-    const classesPanelList = panelListClasses();
+    const panelAreaVars = {
+        offset: panelListVariables().offset,
+        title: panelListVariables().title,
+        link: panelListVariables().link,
+    };
+    const classesPanelList = panelListClasses({ mediaQueries });
+    const classesPanelArea = panelAreaClasses(mediaQueries);
 
     const main = style("main", {
         minHeight: viewHeight(20),

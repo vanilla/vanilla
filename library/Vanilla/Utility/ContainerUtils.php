@@ -75,7 +75,7 @@ class ContainerUtils {
 
     /**
      * Replace one type of object in the container with another type of object. Existing shared instances will be
-     * overwritten. Optionally, an alias may be created from the original type to the new type.
+     * overwritten. An alias will be created from the original type to the new type.
      *
      * Sometimes an object has limitations or shortcomings that could be resolved by something like a decorator, where
      * a drop-in replacement wraps existing functionality in enhancements or customizations. This method could configure
@@ -85,21 +85,14 @@ class ContainerUtils {
      * @param Container $container Container to configure.
      * @param string $target Container rule to target for replacement. Shared instances will be overwritten.
      * @param string $replacement Container rule used to determine what will be replace the target in the container.
-     * @param bool $addAlias Should an alias from the target rule be made to the replacement?
      */
-    public static function replace(
-        Container $container,
-        string $target,
-        string $replacement,
-        bool $addAlias = false
-    ): void {
+    public static function replace(Container $container, string $target, string $replacement): void {
         if ($container->hasInstance($target)) {
             $new = $container->get($replacement);
             $container->setInstance($target, $new);
         }
-        if ($addAlias) {
-            $container->rule($replacement)
-                ->addAlias($target);
-        }
+
+        $container->rule($replacement)
+            ->addAlias($target);
     }
 }

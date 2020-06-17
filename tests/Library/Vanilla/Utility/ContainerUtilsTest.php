@@ -31,7 +31,7 @@ class ContainerUtilsTest extends TestCase {
     /**
      * Verify replacing instance, including an alias.
      */
-    public function testReplaceAlias(): void {
+    public function testReplace(): void {
         $this->container->rule(NewClass::class)->setShared(true);
 
         $original = $this->container->get(NewClass::class);
@@ -40,8 +40,7 @@ class ContainerUtilsTest extends TestCase {
         ContainerUtils::replace(
             $this->container,
             NewClass::class,
-            ExtendsNewClass::class,
-            true
+            ExtendsNewClass::class
         );
 
         // Verify replacement.
@@ -52,31 +51,5 @@ class ContainerUtilsTest extends TestCase {
         $this->container->setInstance(NewClass::class, null);
         $aliased = $this->container->get(NewClass::class);
         $this->assertInstanceOf(ExtendsNewClass::class, $aliased);
-    }
-
-    /**
-     * Verify replacing instance, without an alias.
-     */
-    public function testReplaceWithoutAlias(): void {
-        $this->container->rule(NewClass::class)->setShared(true);
-
-        $original = $this->container->get(NewClass::class);
-        $this->assertInstanceOf(NewClass::class, $original);
-
-        ContainerUtils::replace(
-            $this->container,
-            NewClass::class,
-            ExtendsNewClass::class,
-            false
-        );
-
-        // Verify replacement.
-        $replacement = $this->container->get(NewClass::class);
-        $this->assertInstanceOf(ExtendsNewClass::class, $replacement);
-
-        // Verify no alias set.
-        $this->container->setInstance(NewClass::class, null);
-        $aliased = $this->container->get(NewClass::class);
-        $this->assertSame(NewClass::class, get_class($aliased));
     }
 }

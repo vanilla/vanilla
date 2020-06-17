@@ -48,10 +48,11 @@ interface SearchTypeInterface {
     public function getResultItems(array $recordIDs): array;
 
     /**
-     * Get supported filters for the type.
+     * Apply a search query to the engine.
+     *
+     * @param SearchQuery $query The search query.
      */
-    public function getFilters(): array;
-
+    public function applyToQuery(SearchQuery $query);
 
     /**
      * Get supported sorts for the type.
@@ -70,9 +71,9 @@ interface SearchTypeInterface {
      *
      * @param SearchQuery $query
      *
-     * @return SearchQuery
+     * @return void
      */
-    public function validateQuery(SearchQuery $query): SearchQuery;
+    public function validateQuery(SearchQuery $query): void;
 
 //    /**
 //     * Get a global identifier for across multiple sites.

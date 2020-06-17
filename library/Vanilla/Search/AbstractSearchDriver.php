@@ -15,33 +15,14 @@ abstract class AbstractSearchDriver {
     private $searchTypes = [];
 
     /**
-     * Build a query object.
-     *
-     * @param array $queryData
-     * @return SearchQuery
-     */
-    public function buildQuery(array $queryData): SearchQuery {
-        $typeSchemas = array_map(function (SearchTypeInterface $type) {
-            return $type->getQuerySchema();
-        }, $this->searchTypes);
-
-        $query = new SearchQuery($typeSchemas, $queryData);
-
-        foreach ($this->searchTypes as $searchType) {
-            $query = $searchType->validateQuery($query);
-        }
-
-        return $query;
-    }
-
-    /**
      * Perform a query.
      *
-     * @param SearchQuery $query
+     * @param array $queryData
+     * @param SearchOptions $options
      *
      * @return SearchResults
      */
-    abstract public function search(SearchQuery $query): SearchResults;
+    abstract public function search(array $queryData, SearchOptions $options): SearchResults;
 
     /**
      * Take a set of records that were returned and convert them into result items.

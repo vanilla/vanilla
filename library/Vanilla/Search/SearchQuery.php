@@ -11,9 +11,10 @@ use Garden\Schema\Schema;
 /**
  * A search query object.
  */
-class SearchQuery {
+abstract class SearchQuery {
 
-    const DEFAULT_LIMIT = 30;
+    const FILTER_OP_OR = 'or';
+    const FILTER_OP_AND = 'and';
 
     /** @var Schema */
     private $querySchema;
@@ -21,58 +22,74 @@ class SearchQuery {
     /** @var array */
     private $queryData;
 
-    /** @var int */
-    private $offset;
-
-    /** @var int */
-    private $limit;
+    /** @var $isFiltered */
+    protected $isFiltered;
 
     /**
      * Create a query.
      *
-     * @param Schema[] $partialSchemas
-     * @param array $queryData
-     * @param int $offset Offset for pagination.
-     * @param int $limit Limit for pagination.
+     * @param SearchTypeInterface[] $searchTypes The registered search types contributing to the query.
+     * @param array $queryData The data making up the query.
      */
-    public function __construct(array $partialSchemas, array $queryData, int $offset = 0, int $limit = self::DEFAULT_LIMIT) {
-        $this->offset = $offset;
-        $this->limit = $limit;
-        $querySchema = $this->baseSchema();
-        foreach ($partialSchemas as $partialSchema) {
-            $querySchema = $querySchema->merge($partialSchema);
+    public function __construct(array $searchTypes, array $queryData) {
+        $querySchema = new Schema();
+        foreach ($searchTypes as $searchType) {
+            $querySchema = $querySchema->merge($searchType->getQuerySchema());
         }
         $this->querySchema = $querySchema;
         $this->queryData = $this->querySchema->validate($queryData);
+
+        // Give each of the search types a chance to validate the query object.
+        foreach ($searchTypes as $searchType) {
+            $searchType->validateQuery($this);
+        }
+
+        // Give each of the search types a chance to validate the query object.
+        foreach ($searchTypes as $searchType) {
+            $searchType->applyToQuery($this);
+        }
     }
 
     /**
-     * @return Schema
+     * Get a specific query parameter.
+     *
+     * @param string $queryParam
+     * @param mixed $default
+     *
+     * @return mixed|null
      */
-    private function baseSchema() {
-        return Schema::parse([
-            'name:s?',
-        ]);
+    public function getQueryParameter(string $queryParam, $default = null) {
+        return $this->queryData[$queryParam] ?? $default;
     }
 
-    /**
-     * @return array
-     */
-    public function getQueryData(): array {
-        return $this->queryData;
-    }
+    ///
+    /// Abstract Query Functions
+    ///
 
     /**
-     * @return int
+     * Apply a query where some text is matched.
+     *
+     * @param string $text The text to search.
+     * @param string $fieldName A prefix before the search keywords. Eg. `name`
+     *
+     * @return $this
      */
-    public function getOffset(): int {
-        return $this->offset;
-    }
+    abstract public function whereText(string $text, string $fieldName = '');
 
     /**
-     * @return int
+     * Set filter values for some attribute.
+     *
+     * @param string $attribute
+     * @param array $values Values should be numeric
+     * @param bool $exclude Whether or not the values should be excluded.
+     * @param string $filterOp One of the AbstractSearchQuery::FILTER_OP_* constants.
+     *
+     * @return $this
      */
-    public function getLimit(): int {
-        return $this->limit;
-    }
+    abstract public function setFilter(
+        string $attribute,
+        array $values,
+        bool $exclude = false,
+        string $filterOp = SearchQuery::FILTER_OP_OR
+    );
 }

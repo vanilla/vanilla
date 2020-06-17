@@ -51,12 +51,12 @@ class SearchService {
      * Perform a query.
      *
      * @param array $queryData
+     * @param SearchOptions $options
      *
      * @return SearchResults
      */
-    public function search(array $queryData): SearchResults {
+    public function search(array $queryData, SearchOptions $options): SearchResults {
         $activeDriver = $this->getActiveDriver();
-        $query = $activeDriver->buildQuery($queryData);
-        return $activeDriver->search($query);
+        return $activeDriver->search($queryData, $options);
     }
 }

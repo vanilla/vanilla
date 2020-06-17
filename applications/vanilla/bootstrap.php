@@ -10,6 +10,7 @@ use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
+use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
 use Vanilla\Search\AbstractSearchDriver;
 
@@ -37,4 +38,6 @@ Gdn::getContainer()
     // Search.
     ->rule(AbstractSearchDriver::class)
     ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
+    ->addCall('registerSearchType', [new Reference(CommentSearchType::class)])
+
 ;

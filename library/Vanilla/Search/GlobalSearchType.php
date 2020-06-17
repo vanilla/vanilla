@@ -20,6 +20,15 @@ class GlobalSearchType extends AbstractSearchType {
     private $userModel;
 
     /**
+     * DI.
+     *
+     * @param \UserModel $userModel
+     */
+    public function __construct(\UserModel $userModel) {
+        $this->userModel = $userModel;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getKey(): string {
@@ -79,7 +88,7 @@ class GlobalSearchType extends AbstractSearchType {
         }
 
         if ($insertUserIDs) {
-            $query->setFilter('insertUserIDs', $insertUserIDs);
+            $query->setFilter('insertUserID', $insertUserIDs);
         }
 
         // TODO: Handle dates.
@@ -97,19 +106,29 @@ class GlobalSearchType extends AbstractSearchType {
      */
     public function getQuerySchema(): Schema {
         return Schema::parse([
-            'query:s?',
-            'name:s?',
+            'query:s?' => [
+                'x-search-scope' => true,
+            ],
+            'name:s?' => [
+                'x-search-scope' => true,
+            ],
             'insertUserIDs:a?' => [
                 'items' => [
                     'type' => 'integer',
                 ],
+                'style' => 'form',
+                'x-search-filter' => true,
             ],
             'insertUserNames:a?' => [
                 'items' => [
                     'type' => 'string',
                 ],
+                'style' => 'form',
+                'x-search-filter' => true,
             ],
-            'dateInserted:dt?',
+            'dateInserted:dt?' => [
+                'x-search-filter' => true,
+            ],
         ]);
     }
 

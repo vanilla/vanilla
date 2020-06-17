@@ -9,7 +9,7 @@ namespace Vanilla\Search;
 /**
  * Item to handle search results.
  */
-class SearchResults implements \IteratorAggregate, \JsonSerializable {
+class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable {
 
     /** @var SearchResultItem[] */
     private $resultItems;
@@ -36,20 +36,6 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
         $this->totalCount = $totalCount;
         $this->offset = $offset;
         $this->limit = $limit;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function jsonSerialize() {
-        return $this->resultItems;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIterator() {
-        return new \ArrayIterator($this->resultItems);
     }
 
     /**
@@ -85,5 +71,30 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable {
      */
     public function getLimit(): int {
         return $this->limit;
+    }
+
+    ///
+    /// PHP interfaces
+    ///
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return $this->resultItems;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->resultItems);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count() {
+        return count($this->resultItems);
     }
 }

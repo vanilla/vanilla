@@ -41,6 +41,9 @@ class SearchService {
      * @return AbstractSearchDriver
      */
     public function getActiveDriver(): AbstractSearchDriver {
+        if (empty($this->drivers)) {
+            throw new ServerException('No search service is registered');
+        }
         $driver = end($this->drivers)['driver'];
         if (!$driver) {
             throw new ServerException('Could not find active driver');

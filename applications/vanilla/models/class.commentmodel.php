@@ -154,6 +154,24 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     }
 
     /**
+     * Get categoryIDs for a group of comments.
+     *
+     * @param int[] $commentIDs
+     *
+     * @return array[] An array of ['CommentID' => int, 'CategoryID' => int]
+     */
+    public function getCategoryIDsForComments(array $commentIDs): array {
+        $result = $this->SQL
+            ->select(['c.CommentID', 'd.CategoryID'])
+            ->from('Comment c')
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+            ->get()
+            ->resultArray();
+
+        return $result;
+    }
+
+    /**
      * Select the data for a single comment.
      *
      * @since 2.0.0
@@ -163,9 +181,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function commentQuery($fireEvent = true, $join = true) {
         $this->SQL->select('c.*')
-//         ->select('du.Name', '', 'DeleteName')
-//         ->selectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
-//         ->join('User du', 'c.DeleteUserID = du.UserID', 'left');
+            ->select(['d.CategoryID', 'd.Name as DiscussionName'])
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
             ->from('Comment c');
 
         if ($join) {
@@ -232,7 +249,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         } else {
             // Fallback to the configured sort fields on the object.
             foreach ($this->_OrderBy as $defaultOrder) {
-                list($field, $dir) = $defaultOrder;
+                [$field, $dir] = $defaultOrder;
                 // Reset any potential table prefixes, if we have an alias.
                 if ($alias) {
                     $parts = explode('.', $field);
@@ -252,7 +269,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $where = $this->stripWherePrefixes($where);
-        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
+        [$where, $options] = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
 
         // Build up an inner select of comments to force late-loading.
         $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, 'c3');
@@ -516,7 +533,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         $query = $this->SQL
             ->select('c.*')
-            ->select('d.CategoryID')
+            ->select(['d.CategoryID', 'd.Name as DiscussionName'])
             ->from('Comment c')
             ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
             ->orderBy($orderBy[0][0], $order);
@@ -879,6 +896,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $result = Schema::parse([
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
+            'name:s?' => 'The name of the comment',
+            'categoryID:i?' => 'The ID of the category of the comment',
             'body:s' => 'The body of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
@@ -1034,7 +1053,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // Figure out the where clause based on the sort.
         foreach ($this->_OrderBy as $part) {
             //$Op = count($this->_OrderBy) == 1 || isset($PrevWhere) ? '=' : '';
-            list($expr, $value) = $this->_WhereFromOrderBy($part, $comment, '');
+            [$expr, $value] = $this->_WhereFromOrderBy($part, $comment, '');
 
             if (!isset($prevWhere)) {
                 $this->SQL->where($expr, $value);
@@ -1251,11 +1270,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         }
         $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
         if ($comment) {
-            $discussionID = $comment["DiscussionID"] ?? null;
-            if ($discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY)) {
-                $comment["Name"] = sprintf(t("Re: %s"), $discussion["Name"]);
-            }
-
             $commentEvent = $this->eventFromRow(
                 $comment,
                 $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE,
@@ -1276,7 +1290,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID"]);
-        $comment = $this->normalizeRow($row, true);
+        $comment = $this->normalizeRow($row);
         $comment = $this->schema()->validate($comment);
 
         if ($sender) {
@@ -1300,6 +1314,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function normalizeRow(array $row): array {
         $this->formatField($row, "Body", $row["Format"]);
+        $row['Name'] = sprintf(t('Re: %s'), $row['DiscussionName'] ?? t('Untitled'));
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes']);
         $scheme = new CamelCaseScheme();

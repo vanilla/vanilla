@@ -25,16 +25,16 @@ use Vanilla\Utility\ArrayUtils;
 class DiscussionSearchType extends AbstractSearchType {
 
     /** @var \DiscussionsApiController */
-    private $discussionsApi;
+    protected $discussionsApi;
 
     /** @var \CategoryModel */
-    private $categoryModel;
+    protected $categoryModel;
 
     /** @var \TagModel */
-    private $tagModel;
+    protected $tagModel;
 
     /** @var BreadcrumbModel */
-    private $breadcrumbModel;
+    protected $breadcrumbModel;
 
     /**
      * DI.
@@ -124,7 +124,12 @@ class DiscussionSearchType extends AbstractSearchType {
         $discussionID = $query->getQueryParameter('discussionID', null);
 
         // Always set.
-        $query->setFilter('CategoryID', $categoryIDs);
+        if (!empty($categoryIDs)) {
+            $query->setFilter('CategoryID', $categoryIDs);
+        } else {
+            // Only include non-category content.
+            $query->setFilter('CategoryID', [0]);
+        }
 
         // tags
         if (!empty($tagIDs)) {
@@ -133,12 +138,11 @@ class DiscussionSearchType extends AbstractSearchType {
 
         // discussionID
         if ($discussionID !== null) {
-            $query->setFilter('DiscussionID', $discussionID);
-
-            if ($query instanceof SphinxSearchQuery) {
-                // TODO: Figure out when we can actually do this.
-                $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
-            }
+            $query->setFilter('DiscussionID', [$discussionID]);
+        } elseif ($query instanceof SphinxSearchQuery) {
+            // TODO: Figure out the ideal time to do this.
+            // Make sure we don't get duplicate discussion results.
+//            $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
         }
     }
 
@@ -154,15 +158,26 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function getQuerySchema(): Schema {
         return $this->schemaWithTypes(Schema::parse([
-            'discussionID:i?',
-            'categoryID:i?',
-            'followedCategories:b?',
-            'includeChildCategories:b?',
-            'includeArchivedCategories:b?',
+            'discussionID:i?' => [
+                'x-search-scope' => true,
+            ],
+            'categoryID:i?' => [
+                'x-search-scope' => true,
+            ],
+            'followedCategories:b?' => [
+                'x-search-filter' => true,
+            ],
+            'includeChildCategories:b?' => [
+                'x-search-filter' => true,
+            ],
+            'includeArchivedCategories:b?' => [
+                'x-search-filter' => true,
+            ],
             'tags:a?' => [
                 'items' => [
                     'type' => 'string',
                 ],
+                'x-search-filter' => true,
             ],
             'tagOperator:s?' => [
                 'items' => [

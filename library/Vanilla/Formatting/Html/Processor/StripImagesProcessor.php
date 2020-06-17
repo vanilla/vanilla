@@ -17,6 +17,8 @@ use Vanilla\Formatting\Html\HtmlDocument;
 class StripImagesProcessor extends HtmlProcessor {
 
     /**
+     * Process the HTML document.
+     *
      * @return HtmlDocument
      */
     public function processDocument(): HtmlDocument {

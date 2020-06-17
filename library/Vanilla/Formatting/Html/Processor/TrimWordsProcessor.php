@@ -17,6 +17,8 @@ use Vanilla\Formatting\Html\HtmlDocument;
 class TrimWordsProcessor extends HtmlProcessor {
 
     /**
+     * Process Html document.
+     *
      * @return HtmlDocument
      */
     public function processDocument(): HtmlDocument {

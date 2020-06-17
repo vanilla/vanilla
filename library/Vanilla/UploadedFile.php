@@ -245,7 +245,11 @@ class UploadedFile {
             "width" => $width ?? 0,
         ];
 
-        if (\Gdn::config("ImageUpload.Limits.Enabled")) {
+        $session = \Gdn::session();
+        $hasCommunityManagePermission = $session->checkRankedPermission('Garden.Community.Manage');
+
+        //Bypass ImageUpload.Limits.Enabled if user has 'Garden.Community.Manage' permission or higher
+        if (\Gdn::config("ImageUpload.Limits.Enabled") && !$hasCommunityManagePermission) {
             if ($newWidth = filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
                 $options["width"] = $newWidth;
             }

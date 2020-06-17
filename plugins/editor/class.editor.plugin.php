@@ -8,6 +8,8 @@
  * @package editor
  */
 
+use Vanilla\Permissions;
+
 /**
  * Class EditorPlugin
  */
@@ -830,8 +832,12 @@ class EditorPlugin extends Gdn_Plugin {
                     $uploadType = 'image';
                 }
 
+                $session = Gdn::session();
+                $hasCommunityManagePermission = Gdn::session()->checkRankedPermission('Garden.Community.Manage');
+
                 // image dimensions are higher than limit, it needs resizing
-                if (c("ImageUpload.Limits.Enabled")) {
+                //Bypass ImageUpload.Limits.Enabled if user has 'Garden.Community.Manage' permission or higher
+                if (c("ImageUpload.Limits.Enabled") && !$hasCommunityManagePermission) {
                     if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
                         $imageResizer = new \Vanilla\ImageResizer();
                         $imageResizer->resize(

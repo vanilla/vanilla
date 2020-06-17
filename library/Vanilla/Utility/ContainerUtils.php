@@ -83,15 +83,15 @@ class ContainerUtils {
      * receive the decorator instead of the original class.
      *
      * @param Container $container Container to configure.
-     * @param string $target Container rule to target for replacement. Shared instances will be overwritten.
-     * @param string $replacement Container rule used to determine what will be replace the target in the container.
+     * @param string $old Container rule to target for replacement. Shared instances will be overwritten.
+     * @param string $new Container rule used to determine what will be replace the target in the container.
      */
-    public static function replace(Container $container, string $target, string $replacement): void {
-        if ($container->hasInstance($target)) {
-            $container->setInstance($target, null);
+    public static function replace(Container $container, string $old, string $new): void {
+        if ($container->hasInstance($old)) {
+            $container->setInstance($old, null);
         }
 
-        $container->rule($replacement)
-            ->addAlias($target);
+        $container->rule($new)
+            ->addAlias($old);
     }
 }

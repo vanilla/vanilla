@@ -73,16 +73,14 @@ class CommentSearchType extends DiscussionSearchType {
             ]);
             $results = $results->getData();
 
-            $resultItems = array_map(function ($result) use ($categoryIDsByCommentIDs) {
+            $resultItems = array_map(function ($result) {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'commentID',
                 ]);
                 $mapped['recordType'] = $this->getSearchGroup();
                 $mapped['type'] = $this->getType();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(
-                    new ForumCategoryRecordType(
-                        $categoryIDsByCommentIDs[$result['commentID']]
-                    )
+                    new ForumCategoryRecordType($mapped['categoryID'])
                 );
                 return new SearchResultItem($mapped);
             }, $results);

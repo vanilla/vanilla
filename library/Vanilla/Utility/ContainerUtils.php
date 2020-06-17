@@ -88,8 +88,7 @@ class ContainerUtils {
      */
     public static function replace(Container $container, string $target, string $replacement): void {
         if ($container->hasInstance($target)) {
-            $new = $container->get($replacement);
-            $container->setInstance($target, $new);
+            $container->setInstance($target, null);
         }
 
         $container->rule($replacement)

@@ -608,7 +608,6 @@ register_shutdown_function(function () use ($dic) {
 ContainerUtils::replace(
     $dic,
     \Psr\Log\LoggerInterface::class,
-    \Vanilla\Logging\LogDecorator::class,
-    true
+    \Vanilla\Logging\LogDecorator::class
 );
 Logger::setLogger(null);

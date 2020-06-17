@@ -53,12 +53,14 @@ import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodSty
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
+import { forumVariables } from "@library/forums/forumStyleVars";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export let compatibilityStyles: () => void;
 compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
+    const formVars = forumVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = colorOut(mainColors.fg);
@@ -167,6 +169,7 @@ compatibilityStyles = useThemeCache(() => {
         `,
         {
             color: fg,
+            fontSize: unit(vars.fonts.size.large),
         },
     );
 
@@ -194,6 +197,7 @@ compatibilityStyles = useThemeCache(() => {
 
     // Items
     const resultVars = searchResultsVariables();
+
     const horizontalPadding = resultVars.spacing.padding.left + resultVars.spacing.padding.right;
     cssOut(`.DataList, .Item-Header`, {
         marginLeft: unit(-resultVars.spacing.padding.left),
@@ -209,6 +213,8 @@ compatibilityStyles = useThemeCache(() => {
             borderTop: singleBorder(),
             borderBottom: singleBorder(),
             ...paddings(resultVars.spacing.padding),
+            ...margins(formVars.lists.spacing.margin),
+            backgroundColor: colorOut(formVars.lists.colors.bg),
         },
     );
 
@@ -292,6 +298,10 @@ compatibilityStyles = useThemeCache(() => {
         fontWeight: vars.fonts.weights.bold,
     });
 
+    cssOut(`.DataList.Discussions .Item .Title`, {
+        width: `100%`,
+    });
+
     cssOut(`.DataList.Discussions .Item .Title a`, {
         textDecoration: important("none"),
     });
@@ -344,7 +354,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Item.Read`, {
-        background: "none",
+        backgroundColor: colorOut(formVars.lists.colors.read.bg),
     });
 
     cssOut(".Bullet, .QuickSearch", {

@@ -17,8 +17,7 @@ paths:
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'
-      - description: |
-          Filter by discussion type.
+      - description: Filter by discussion type.
         in: query
         name: type
         schema:
@@ -58,8 +57,7 @@ paths:
           - first
           - mixed
       - $ref: '#/components/parameters/Page'
-      - description: |
-          Desired number of items per page.
+      - description: Desired number of items per page.
         in: query
         name: limit
         schema:
@@ -67,6 +65,18 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
+      - name: sort
+        description: Sort the results.
+        in: query
+        schema:
+          type: string
+          enum:
+            - dateLastComment
+            - dateInserted
+            - discussionID
+            - -dateLastComment
+            - -dateInserted
+            - -discussionID
       - description: |
           Filter by author.
         in: query

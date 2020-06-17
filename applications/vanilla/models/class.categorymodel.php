@@ -17,7 +17,7 @@ use Vanilla\SchemaFactory;
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model {
+class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\CrawlableInterface {
 
     /** Cache key. */
     const CACHE_KEY = 'Categories';
@@ -855,7 +855,8 @@ class CategoryModel extends Gdn_Model {
      */
     public function getRootCategoryForDisplay() {
         $category = self::categories(-1);
-        $category['Name'] = Gdn::config('Garden.Title');
+        $name =  Gdn::config('Garden.Title');
+        $category['Name'] = !empty($name) ? $name : 'Vanilla';
         $category['Url'] = Gdn::request()->getSimpleUrl('/categories');
         $category['UrlCode'] = '';
         return $category;
@@ -3811,5 +3812,18 @@ SQL;
                 return strcasecmp($a['Name'], $b['Name']);
             }
         });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/categories',
+            'categoryID'
+        );
+        $r['min'] = max($r['min'], 1); // kludge around root category
+        return $r;
     }
 }

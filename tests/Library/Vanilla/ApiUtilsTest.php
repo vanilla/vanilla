@@ -121,4 +121,21 @@ EOT;
 
         $this->assertNull($actual);
     }
+
+    /**
+     * Test a basic call of `ApiUtils::sortEnum()`.
+     */
+    public function testSortEnum(): void {
+        $r = ApiUtils::sortEnum('a', 'b');
+        $this->assertSame(['a', 'b', '-a', '-b'], $r);
+    }
+
+    /**
+     * You should be able to pass `"-$field"` to `ApiUtils::sortEnum()`.
+     */
+    public function testSortEnumException(): void {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('-a');
+        $r = ApiUtils::sortEnum('-a');
+    }
 }

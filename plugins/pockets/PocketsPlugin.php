@@ -567,10 +567,15 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param number|null $countHint
      */
     public function processPockets($sender, $location, $countHint = null) {
-        if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
+        $controller = $sender;
+        if ((!$controller instanceof Gdn_Controller)) {
+            $controller = Gdn::controller();
+        }
+
+        if ($controller->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return;
         }
-        if (Gdn::controller()->data('_NoMessages') && $location != 'Head' && $location !== 'AfterBanner') {
+        if ($controller->data('_NoMessages') && $location != 'Head' && $location !== 'AfterBanner') {
             return;
         }
 
@@ -592,13 +597,13 @@ class PocketsPlugin extends Gdn_Plugin {
         }
 
         $data['Count'] = $count;
-        $data['PageName'] = Pocket::pageName($sender);
+        $data['PageName'] = Pocket::pageName($controller);
 
         $locationOptions = val($location, $this->Locations, []);
 
         if ($this->ShowPocketLocations &&
             array_key_exists($location, $this->Locations) &&
-            checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
+            checkPermission('Plugins.Pockets.Manage') && $controller->MasterView != 'admin') {
             $locationName = val("Name", $this->Locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
@@ -606,7 +611,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 valr('Wrap.1', $locationOptions, '');
 
             if ($location == 'Foot' && strcasecmp($count, 'after') == 0) {
-                echo $this->testData($sender);
+                echo $this->testData($controller);
             }
         }
 

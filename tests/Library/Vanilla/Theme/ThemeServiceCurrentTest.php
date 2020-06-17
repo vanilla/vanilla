@@ -7,17 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Theme;
 
-use Vanilla\AddonManager;
+use Vanilla\Addon;
 use Vanilla\Theme\Asset\CssThemeAsset;
 use Vanilla\Theme\Asset\JsonThemeAsset;
+use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeAssetFactory;
-use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
-use VanillaTests\Fixtures\MockAddonManager;
-use VanillaTests\Fixtures\Theme\MockThemeProvider;
-use VanillaTests\MinimalContainerTestCase;
 
 /**
  * Tests for getting the current theme from the theme model.
@@ -97,6 +94,33 @@ class ThemeServiceCurrentTest extends MockThemeTestCase {
         /** @var ThemeFeatures $features */
         $features = self::container()->get(ThemeFeatures::class);
         $this->assertEquals(false, $features->useSharedMasterView());
+    }
+
+    /**
+     * Test theme options working.
+     *
+     * @param string $optionName
+     *
+     * @dataProvider provideOptions
+     */
+    public function testThemeOptionVariables(string $optionName) {
+        $this->setConfig('Garden.ThemeOptions.Styles.Value', $optionName);
+        $addon = new Addon('/tests/fixtures/addons/themes/theme-options');
+        $theme = Theme::fromAddon($addon);
+
+        /** @var JsonThemeAsset $variables */
+        $variables = $theme->getAsset('variables');
+        $this->assertTrue($variables->get($optionName, false));
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function provideOptions(): array {
+        return [
+            ['option1'],
+            ['option2'],
+        ];
     }
 
     /**

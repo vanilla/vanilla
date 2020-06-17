@@ -217,4 +217,22 @@ class ApiUtils {
             return null;
         }
     }
+
+    /**
+     * Takes an array of fields for a sort and adds their descending counterparts.
+     *
+     * @param string $fields The default sort fields.
+     * @return array
+     * @throws \InvalidArgumentException Throws an exception if you pass a field that begins with a dash.
+     */
+    public static function sortEnum(string ...$fields): array {
+        $desc = $fields;
+        foreach ($desc as &$field) {
+            if ($field[0] === '-') {
+                throw new \InvalidArgumentException("Default sort fields cannot begin with '-': $field", 400);
+            }
+            $field = '-'.$field;
+        }
+        return array_merge($fields, $desc);
+    }
 }

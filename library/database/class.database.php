@@ -214,7 +214,10 @@ class Gdn_Database {
                         throw new Exception(errorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
                     }
 
-                    throw new Exception(errorMessage('An error occurred while attempting to connect to the database', $this->ClassName, 'Connection', $ex->getMessage()), 500);
+                    throw new Exception(
+                        "An error occurred while attempting to connect to the database. dsn: $dsn, error: ".$dsn.$ex->getMessage(),
+                        500
+                    );
                 }
             }
         } while (true);

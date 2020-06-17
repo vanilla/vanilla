@@ -254,6 +254,59 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     }
 
     /**
+     * Get searchable category IDs.
+     *
+     * @param int $categoryID The root category ID.
+     * @param bool|null $followedCategories If set, include or exclude followed categories.
+     * @param bool|null $includeChildCategories Get child category IDs as well.
+     * @param bool|null $includeArchivedCategories If set include archived categories.
+     *
+     * @return int[] CategoryIDs.
+     */
+    public function getSearchCategoryIDs(
+        ?int $categoryID = null,
+        ?bool $followedCategories = null,
+        ?bool $includeChildCategories = null,
+        ?bool $includeArchivedCategories = null
+    ): array {
+        $categoryFilter = [];
+        if ($includeArchivedCategories === false) {
+            $categoryFilter['Archived'] = false;
+        }
+
+        $allPermissionCategories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
+        $allPermissionCategories[0] = true; // allow uncategorized too.
+        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
+        $this->eventManager->fire('AllowedCategories', $this, ['CategoriesID' => &$allPermissionCategoryIDs]);
+
+        $allPermissionCategories = array_intersect_key($allPermissionCategories, array_flip($allPermissionCategoryIDs));
+
+        if ($followedCategories) {
+            $allPermissionCategories = array_filter($allPermissionCategories, function ($category) {
+                if ($category === true) {
+                    return true;
+                }
+                return $category['Followed'];
+            });
+        }
+
+        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
+
+        if ($categoryID !== null) {
+            $resultIDs = [$categoryID];
+            if ($includeChildCategories) {
+                $subcategories = CategoryModel::getSubtree($categoryID);
+                $resultIDs = array_merge($resultIDs, array_column($subcategories, 'CategoryID'));
+            }
+            $resultIDs = array_intersect($allPermissionCategoryIDs, $resultIDs);
+        } else {
+            $resultIDs = $allPermissionCategoryIDs;
+        }
+
+        return $resultIDs;
+    }
+
+    /**
      * Get the per-category information for a user.
      *
      * @param int $userID

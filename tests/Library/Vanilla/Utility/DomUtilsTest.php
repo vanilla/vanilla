@@ -28,7 +28,7 @@ class DomUtilsTest extends TestCase {
      * @param string $expected
      * @dataProvider provideTrimWordsTests
      */
-    public function testTrimWords($wordCount, $html, $expected) {
+    public function testTrimWords(int $wordCount, string $html, string $expected) {
         $domDocument = new HtmlDocument($html);
 
         // This assertion tests against bugs in the HtmlDocument class itself.

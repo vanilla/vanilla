@@ -214,7 +214,7 @@ compatibilityStyles = useThemeCache(() => {
             borderBottom: singleBorder(),
             ...paddings(resultVars.spacing.padding),
             ...margins(formVars.lists.spacing.margin),
-            backgroundColor: formVars.lists.colors.bg,
+            backgroundColor: colorOut(formVars.lists.colors.bg),
         },
     );
 

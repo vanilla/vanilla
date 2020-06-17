@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Library\Core\Cache;
 
+use Psr\SimpleCache\CacheInterface;
+
 /**
  * Test our memcached adaptor with the local cache enabled.
  */
@@ -27,5 +29,16 @@ class MemcachedWithLocalTest extends MemcachedTest {
         if (self::$memcached !== null) {
             self::$memcached->setStoreDefault(\Gdn_Cache::FEATURE_LOCAL, true);
         }
+    }
+
+    /**
+     * The container should fulfill the cache.
+     *
+     * This is as close as we can get to testing the actual container integration.
+     */
+    public function testContainerIntegration(): void {
+        $this->container()->call(function (CacheInterface $cache) {
+            $this->assertNotNull($cache);
+        });
     }
 }

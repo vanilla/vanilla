@@ -566,9 +566,14 @@ class TagModel extends Gdn_Model {
     }
 
     /**
-     * @deprecated
+     * Deprecated sql generation.
      *
      * @param Gdn_SQLDriver $sql
+     * @param mixed $tag
+     * @param int $limit
+     * @param int $offset
+     * @param string $op
+     * @deprecated
      */
     public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
         deprecated('TagModel->setTagSql()', 'TagModel->getDiscussions()', '2018-06-19');

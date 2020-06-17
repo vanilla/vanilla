@@ -7,17 +7,10 @@
 
 namespace Vanilla\Forum\Search;
 
-use DiscussionReformat\CommentsApiController;
-use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
-use Vanilla\Adapters\SphinxClient;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Search\SearchQuery;
-use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
-use Vanilla\Sphinx\Search\SphinxSearchQuery;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -97,7 +90,6 @@ class CommentSearchType extends DiscussionSearchType {
                 return new SearchResultItem($mapped);
             }, $results);
             return $resultItems;
-
         } catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];

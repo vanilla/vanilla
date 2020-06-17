@@ -178,6 +178,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @access public
      *
      * @param bool $fireEvent Kludge to fix VanillaCommentReplies plugin.
+     * @param bool $join Whether or not to join in insertUser/updateUser information.
      */
     public function commentQuery($fireEvent = true, $join = true) {
         $this->SQL->select('c.*')

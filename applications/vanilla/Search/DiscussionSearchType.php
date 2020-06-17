@@ -99,7 +99,6 @@ class DiscussionSearchType extends AbstractSearchType {
                 return new SearchResultItem($mapped);
             }, $results);
             return $resultItems;
-
         } catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];
@@ -142,7 +141,7 @@ class DiscussionSearchType extends AbstractSearchType {
         } elseif ($query instanceof SphinxSearchQuery) {
             // TODO: Figure out the ideal time to do this.
             // Make sure we don't get duplicate discussion results.
-//            $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
+            // $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
         }
     }
 

@@ -17,6 +17,21 @@ use Vanilla\Formatting\Html\HtmlDocument;
 class TrimWordsProcessor extends HtmlProcessor {
 
     /**
+     * TrimWordsProcessor constructor.
+     * @param HtmlDocument $document
+     * @param int $wordCount
+     */
+    public function __construct(HtmlDocument $document, int $wordCount) {
+        parent::__construct($document);
+        $this->setWordCount($wordCount);
+    }
+
+    private function setWordCount(int $wordCount) {
+        $this->wordCount = $wordCount;
+        return $this;
+    }
+
+    /**
      * Process Html document.
      *
      * @return HtmlDocument
@@ -30,7 +45,7 @@ class TrimWordsProcessor extends HtmlProcessor {
      * Apply DomUtils::trimWords()
      */
     public function applyTrimWords() {
-        DomUtils::trimWords($this->document->getDom());
+        DomUtils::trimWords($this->document->getDom(), $this->wordCount);
         $this->document->getDom()->saveHTML();
     }
 }

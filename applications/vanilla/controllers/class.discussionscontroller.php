@@ -145,7 +145,7 @@ class DiscussionsController extends VanillaController {
             $followed = false;
         }
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
-        if ($this->enableFollowingFilter === true) {
+        if ($this->enableFollowingFilter) {
             $this->setData('Followed', $followed);
         }
 

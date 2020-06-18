@@ -60,18 +60,18 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
     /**
      * Test truncating words.
      *
-     * @param int $wordCount
+     * @param ?int $wordCount
      * @param string $html
      * @param string $expected
      * @dataProvider provideTrimWordsTests
      */
-    public function testTrimWords($wordCount, $html, $expected) {
+    public function testTrimWords($wordCount, $html, $expected): void {
         $domDocument = new HtmlDocument($html);
 
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($html, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
-        $trimWordsProcessor = new TrimWordsProcessor($domDocument, $wordCount);
+        $trimWordsProcessor = empty($wordCount) ? new TrimWordsProcessor($domDocument) : new TrimWordsProcessor($domDocument, $wordCount);
         $domDocument->applyProcessors([$trimWordsProcessor]);
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);

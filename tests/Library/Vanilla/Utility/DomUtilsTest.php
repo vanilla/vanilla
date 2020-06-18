@@ -23,19 +23,25 @@ class DomUtilsTest extends TestCase {
     /**
      * Test truncating words.
      *
-     * @param int $wordCount
+     * @param ?int $wordCount
      * @param string $html
      * @param string $expected
      * @dataProvider provideTrimWordsTests
      */
-    public function testTrimWords(int $wordCount, string $html, string $expected): void {
+    public function testTrimWords(?int $wordCount, string $html, string $expected): void {
         $domDocument = new HtmlDocument($html);
 
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($html, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
         $dom = $domDocument->getDom();
-        DomUtils::trimWords($dom, $wordCount);
+
+        if (empty($wordCount)) {
+            DomUtils::trimWords($dom);
+        } else {
+            DomUtils::trimWords($dom, $wordCount);
+        }
+
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -167,13 +173,30 @@ class DomUtilsTest extends TestCase {
             ],
             'Test2Words' => [2, 'One dollar', 'One dollar'],
             'Test5Words' => [4, 'One dollar and eighty-seven cents', 'One dollar and eighty-seven'],
-            'mixed nested' => [2, 'a <b>b</b> c', 'a <b>b</b>'],
-            "short html" => [4, 'a b', 'a b'],
-            'heavily nested' => [
+            'Mixed nested' => [2, 'a <b>b</b> c', 'a <b>b</b>'],
+            "Short html" => [4, 'a b', 'a b'],
+            'Heavily nested' => [
                 2,
                 '<div><div><div><div>this</div> is a word</div></div> <b>okay?</b></div>',
                 '<div><div><div><div>this </div> is</div></div></div>'
             ],
+            'Test default wordCount' => [   //100
+                null,
+                'Maecenas sed nisl maximus, commodo ante sit amet, elementum augue. In semper molestie odio eu gravida. '.
+                'Pellentesque accumsan, dolor vitae scelerisque varius, nisi neque tristique ligula, at molestie metus '.
+                'massa egestas enim. Aenean vel elit ipsum. Curabitur sit amet leo et urna pulvinar egestas in quis arcu. '.
+                'Mauris lacus tellus, dignissim eu facilisis id, vulputate a felis. Vestibulum ante ipsum primis in faucibus '.
+                'orci luctus et ultrices posuere cubilia curae; Curabitur gravida odio ut orci mattis suscipit. Integer quis '.
+                'massa porttitor, rhoncus leo volutpat, rutrum augue. In at massa non neque posuere pretium ut in ex. Ut elementum, '.
+                'tellus non vehicula',
+                'Maecenas sed nisl maximus, commodo ante sit amet, elementum augue. In semper molestie odio eu gravida. '.
+                'Pellentesque accumsan, dolor vitae scelerisque varius, nisi neque tristique ligula, at molestie metus '.
+                'massa egestas enim. Aenean vel elit ipsum. Curabitur sit amet leo et urna pulvinar egestas in quis arcu. '.
+                'Mauris lacus tellus, dignissim eu facilisis id, vulputate a felis. Vestibulum ante ipsum primis in faucibus '.
+                'orci luctus et ultrices posuere cubilia curae; Curabitur gravida odio ut orci mattis suscipit. Integer quis '.
+                'massa porttitor, rhoncus leo volutpat, rutrum augue. In at massa non neque posuere pretium ut in ex. Ut elementum, '.
+                'tellus non'
+            ]
         ];
 
         return $r;

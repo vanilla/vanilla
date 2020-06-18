@@ -8,13 +8,27 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\Schema\Schema;
+use PHPUnit\Framework\TestCase;
+use Vanilla\Schema\RangeExpression;
+use VanillaTests\BootstrapTrait;
+use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\ApiUtils;
 
 /**
  * Class ApiUtilsTest
  */
-class ApiUtilsTest extends SharedBootstrapTestCase {
+class ApiUtilsTest extends TestCase {
+
+    use BootstrapTrait, SetupTraitsTrait;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->setupTestTraits();
+    }
 
     /**
      * @param Schema $schema
@@ -137,5 +151,26 @@ EOT;
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('-a');
         $r = ApiUtils::sortEnum('-a');
+    }
+
+    /**
+     * Verify objects in a query will be converted to strings when building pagination headers.
+     */
+    public function testPagerUrlFormatStringify(): void {
+        $range = "1..10";
+        $schema = Schema::parse([
+            'range' => RangeExpression::createSchema([':int'])
+        ]);
+        $parameters = [
+            "limit" => 10,
+            "page" => 1,
+            "range" => RangeExpression::parse($range),
+        ];
+
+        $pagination = ApiUtils::morePagerInfo(100, "https://example.com/api/foo", $parameters, $schema);
+        $queryString = parse_url($pagination["urlFormat"], PHP_URL_QUERY);
+        parse_str($queryString, $query);
+        $this->assertArrayHasKey("range", $query, "Object lost when building query.");
+        $this->assertSame($range, $query["range"]);
     }
 }

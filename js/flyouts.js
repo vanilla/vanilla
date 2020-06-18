@@ -41,12 +41,12 @@
      * Workarounds for limitations of flyout's HTML structure.
      */
     function kludgeFlyoutHTML() {
-        var $handles = $(".ToggleFlyout, .editor-dropdown, .ButtonGroup");
+        var $handles = $(".ToggleFlyout:not([data-is-kludged]), .editor-dropdown:not([data-is-kludged]), .ButtonGroup:not([data-is-kludged])");
 
-        $handles.each(function() {
+        $handles.each(function () {
             $handles
                 .find(".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)")
-                .each(function() {
+                .each(function () {
                     $(this)
                         .attr("tabindex", "0")
                         .attr("role", "button")
@@ -55,15 +55,17 @@
                     $(this).accessibleFlyoutHandle(false);
                 });
 
-            $handles.find(".Flyout, .Dropdown").each(function() {
+            $handles.find(".Flyout, .Dropdown").each(function () {
                 $(this).accessibleFlyout(false);
 
                 $(this)
                     .find("a")
-                    .each(function() {
+                    .each(function () {
                         $(this).attr("tabindex", "0");
                     });
             });
+
+            $(this).attr("data-is-kludged", "true");
         });
 
         if (USE_NEW_FLYOUTS) {

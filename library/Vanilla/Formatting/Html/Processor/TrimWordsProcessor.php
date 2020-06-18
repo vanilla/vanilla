@@ -18,6 +18,7 @@ class TrimWordsProcessor extends HtmlProcessor {
 
     /**
      * TrimWordsProcessor constructor.
+     *
      * @param HtmlDocument $document
      * @param ?int $wordCount
      */
@@ -27,6 +28,8 @@ class TrimWordsProcessor extends HtmlProcessor {
     }
 
     /**
+     * Set wordCount
+     *
      * @param ?int $wordCount
      * @return $this
      */

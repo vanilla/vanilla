@@ -58,6 +58,11 @@ trait SiteTestTrait {
     protected $moderatorID;
 
     /**
+     * @var array
+     */
+    protected $roles;
+
+    /**
      * Get the names of addons to install.
      *
      * @return string[] Returns an array of addon names.
@@ -280,7 +285,8 @@ TEMPLATE;
      * @return int
      */
     protected function createUserFixture(string $role, string $sx): int {
-        static $roleIDs;
+        $roleIDs = $this->getRoles();
+
         if (!isset($roleIDs)) {
             $roleIDs = array_column(
                 static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
@@ -298,5 +304,22 @@ TEMPLATE;
             ],
         ]);
         return $row['userID'];
+    }
+
+    /**
+     * Return all of the roles, keyed by name.
+     *
+     * @return array
+     */
+    protected function getRoles(): array {
+        if ($this->roles === null) {
+            $roles = array_column(
+                static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
+                'RoleID',
+                'Name'
+            );
+            $this->roles = $roles;
+        }
+        return $this->roles;
     }
 }

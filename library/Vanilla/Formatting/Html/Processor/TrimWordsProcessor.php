@@ -46,6 +46,5 @@ class TrimWordsProcessor extends HtmlProcessor {
      */
     public function applyTrimWords() {
         DomUtils::trimWords($this->document->getDom(), $this->wordCount);
-        $this->document->getDom()->saveHTML();
     }
 }

@@ -31,6 +31,5 @@ class StripImagesProcessor extends HtmlProcessor {
      */
     private function applyStripImages() {
         DomUtils::stripImages($this->document->getDom());
-        $this->document->getDom()->saveHTML();
     }
 }

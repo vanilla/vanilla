@@ -31,6 +31,5 @@ class StripEmbedsProcessor extends HtmlProcessor {
      */
     public function applyStripEmbeds() {
         DomUtils::stripEmbeds($this->document->getDom());
-        $this->document->getDom()->saveHTML();
     }
 }

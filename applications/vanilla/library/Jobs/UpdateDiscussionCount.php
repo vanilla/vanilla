@@ -7,8 +7,8 @@
 namespace Vanilla\Library\Jobs;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
@@ -42,8 +42,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     private function messageSchema(): Schema {
         $schema = Schema::parse([
             "categoryID" => ["type" => "integer"],
-            "discussion:a|n?"
+            "discussion:a|n?",
         ]);
+
         return $schema;
     }
 
@@ -52,6 +53,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
      */
     public function run(): JobExecutionStatus {
         $this->categoryModel->updateDiscussionCount($this->categoryID, $this->discussion);
+
         return JobExecutionStatus::complete();
     }
 
@@ -59,28 +61,11 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Set job Message
      *
      * @param array $message
+     * @throws ValidationException
      */
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->categoryID = $message["categoryID"];
         $this->discussion = $message["discussion"];
-    }
-
-    /**
-     * Set job priority
-     *
-     * @param JobPriority $priority
-     * @return void
-     */
-    public function setPriority(JobPriority $priority) {
-    }
-
-    /**
-     * Set job execution delay
-     *
-     * @param int $seconds
-     * @return void
-     */
-    public function setDelay(int $seconds) {
     }
 }

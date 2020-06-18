@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -36,7 +36,10 @@ class ThrowableDriver implements DriverInterface {
      * @return JobExecutionStatus
      */
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
+        /** @noinspection PhpUndefinedFunctionInspection */
         nonExistentFunction();
+
+        return JobExecutionStatus::complete();
     }
 
     /**
@@ -46,7 +49,7 @@ class ThrowableDriver implements DriverInterface {
      */
     public function getSupportedInterfaces(): array {
         return [
-            LocalJobInterface::class
+            LocalJobInterface::class,
         ];
     }
 }

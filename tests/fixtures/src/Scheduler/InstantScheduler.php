@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
+use Exception;
 use Vanilla\Scheduler\DummyScheduler;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\TrackingSlipInterface;
@@ -23,11 +24,18 @@ class InstantScheduler extends DummyScheduler {
      * @param JobPriority|null $jobPriority
      * @param int|null $delay
      * @return TrackingSlipInterface
+     * @throws Exception On error.
      */
-    public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface {
+    public function addJob(
+        string $jobType,
+        $message = [],
+        JobPriority $jobPriority = null,
+        int $delay = null
+    ): TrackingSlipInterface {
         $result = parent::addJob($jobType, $message, $jobPriority, $delay);
         $this->dispatchAll();
         $this->trackingSlips = [];
+
         return $result;
     }
 }

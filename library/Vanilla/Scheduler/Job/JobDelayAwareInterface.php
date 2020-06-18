@@ -8,15 +8,15 @@
 namespace Vanilla\Scheduler\Job;
 
 /**
- * Interface JobTypeAwareInterface
+ * Interface JobDelayAwareInterface
  */
-interface JobTypeAwareInterface {
+interface JobDelayAwareInterface {
 
     /**
-     * Set Job Type
+     * Set job execution delay
      *
-     * @param string $jobType
-     * @return mixed
+     * @param int $seconds
+     * @return void
      */
-    public function setJobType(string $jobType);
+    public function setDelay(int $seconds);
 }

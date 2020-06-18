@@ -84,13 +84,34 @@ class LocalDriverSlip implements DriverSlipInterface {
     /**
      * Set Stack Execution Problem
      *
-     * @param string $msg
-     * @return bool
+     * @param string $errorMessage
+     * @return $this|DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $msg): bool {
+    public function setStackExecutionFailed(string $errorMessage): DriverSlipInterface {
         $this->status = JobExecutionStatus::stackExecutionError();
-        $this->errorMessage = $msg;
+        $this->errorMessage = $errorMessage;
 
-        return true;
+        return $this;
+    }
+
+    /**
+     * Set the job status
+     *
+     * @param JobExecutionStatus $status
+     * @return $this|DriverSlipInterface
+     */
+    public function setStatus(JobExecutionStatus $status): DriverSlipInterface {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get the Error Message (if exists)
+     *
+     * @return string|null
+     */
+    public function getErrorMessage(): ?string {
+        return $this->errorMessage;
     }
 }

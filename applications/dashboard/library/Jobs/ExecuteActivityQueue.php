@@ -5,7 +5,6 @@
  */
 
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 
 /**
  * Execute the activity queue.
@@ -29,6 +28,7 @@ class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
      */
     public function run(): JobExecutionStatus {
         $this->activityModel->saveQueue(true);
+
         return JobExecutionStatus::complete();
     }
 
@@ -40,21 +40,4 @@ class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
     public function setMessage(array $message) {
     }
 
-    /**
-     * Set job priority
-     *
-     * @param JobPriority $priority
-     * @return void
-     */
-    public function setPriority(JobPriority $priority) {
-    }
-
-    /**
-     * Set job execution delay
-     *
-     * @param int $seconds
-     * @return void
-     */
-    public function setDelay(int $seconds) {
-    }
 }

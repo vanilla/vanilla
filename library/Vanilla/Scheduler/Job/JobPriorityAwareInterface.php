@@ -8,15 +8,15 @@
 namespace Vanilla\Scheduler\Job;
 
 /**
- * Interface JobTypeAwareInterface
+ * Interface JobPriorityAwareInterface.
  */
-interface JobTypeAwareInterface {
+interface JobPriorityAwareInterface {
 
     /**
-     * Set Job Type
+     * Set job priority
      *
-     * @param string $jobType
-     * @return mixed
+     * @param JobPriority $priority
+     * @return void
      */
-    public function setJobType(string $jobType);
+    public function setPriority(JobPriority $priority);
 }

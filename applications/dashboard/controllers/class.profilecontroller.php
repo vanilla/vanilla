@@ -364,7 +364,7 @@ class ProfileController extends Gdn_Controller {
      */
     public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
-        
+
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);
         $settings = [];
@@ -907,7 +907,11 @@ class ProfileController extends Gdn_Controller {
 
                 $this->setRedirectTo(userUrl($this->User));
             }
-            $this->informMessage(t("Your settings have been saved."));
+            if ($upload->Exception) {
+                $this->Form->addError($upload->Exception);
+            } else {
+                $this->informMessage(t("Your settings have been saved."));
+            }
         }
 
         if (val('SideMenuModule', val('Panel', val('Assets', $this)))) {

@@ -6,6 +6,7 @@
 
 namespace Vanilla\Library\Jobs;
 
+use CategoryModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
@@ -16,7 +17,7 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
  */
 class UpdateDiscussionCount implements LocalJobInterface {
 
-    /** @var \CategoryModel */
+    /** @var CategoryModel */
     private $categoryModel;
 
     /** @var int */
@@ -28,9 +29,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     /**
      * Initial job setup.
      *
-     * @param \CategoryModel $categoryModel
+     * @param CategoryModel $categoryModel
      */
-    public function __construct(\CategoryModel $categoryModel) {
+    public function __construct(CategoryModel $categoryModel) {
         $this->categoryModel = $categoryModel;
     }
 
@@ -61,7 +62,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Set job Message
      *
      * @param array $message
-     * @throws ValidationException
+     * @throws ValidationException On error.
      */
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);

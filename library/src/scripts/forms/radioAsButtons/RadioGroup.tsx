@@ -9,20 +9,22 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
-import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtonsStyles";
+import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
     accessibleTitle: string;
-    children: JSX.Element;
+    children: JSX.Element | JSX.Element[];
     setData: (data: any) => void;
-    classes?: any;
+    classes?: any; // Overwritable base classes for component
+    buttonActiveClass?: string; // class that goes directly on the actual "button" element
+    buttonClass?: string; // class that goes directly on the actual "button" element
 }
 
 /**
  * Implement what looks like buttons, but what is semantically radio buttons.
  */
-export function RadioInputsAsButtonGroup(props: IProps) {
+export function RadioGroup(props: IProps) {
     const { className, accessibleTitle, children, setData, activeItem, classes = radioInputAsButtonClasses() } = props;
     const classesInputBlock = inputBlockClasses();
 

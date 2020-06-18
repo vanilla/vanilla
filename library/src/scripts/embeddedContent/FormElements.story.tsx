@@ -9,9 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import { t } from "@library/utility/appUtils";
-import RadioTab from "@library/forms/radioTabs/RadioTab";
 import InputBlock from "@library/forms/InputBlock";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import MultiUserInput from "@library/features/users/MultiUserInput";
@@ -102,17 +100,6 @@ story.add("Elements", () => {
             <StoryParagraph>
                 The state for this component needs to be managed by the parent. (Will not update here when you click)
             </StoryParagraph>
-            <RadioTabs
-                accessibleTitle={t("Search in:")}
-                groupName="advancedSearchDomain"
-                setData={doNothing}
-                activeItem={activeItem}
-                childClass="advancedSearchDomain-tab"
-            >
-                <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />
-                <RadioTab label={t("Tab B")} position="right" data={"Tab B"} />
-                <RadioTab label={t("Tab C")} position="right" data={"Tab C"} />
-            </RadioTabs>
             <StoryHeading>Tokens Input</StoryHeading>
             <MultiUserInput
                 onChange={handleUserChange}

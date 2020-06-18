@@ -1,18 +1,36 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, unit, fonts, paddings, negative, srOnly, IFont, borderRadii } from "@library/styles/styleHelpers";
-import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent } from "csx";
-import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
+import { userSelect } from "@library/styles/styleHelpersFeedback";
+import {
+    colorOut,
+    fonts,
+    IFont,
+    margins,
+    negative,
+    paddings,
+    srOnly,
+    unit,
+    negativeUnit,
+} from "@library/styles/styleHelpers";
+import { calc, percent } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
-export const radioTabsVariables = useThemeCache(() => {
+export interface IRadioInputAsButtonClasses {
+    root: string;
+    items: string;
+    item: string;
+    label: string;
+    input: string;
+}
+
+export const radioInputAsButtonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeVars = variableFactory("radioTabs");
 
@@ -83,52 +101,98 @@ export const radioTabsVariables = useThemeCache(() => {
     };
 });
 
-export const radioTabClasses = useThemeCache(() => {
-    const vars = radioTabsVariables();
+export const radioInputAsButtonClasses = useThemeCache(() => {
+    const vars = radioInputAsButtonVariables();
     const style = styleFactory("radioTab");
     const mediaQueries = layoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         display: "block",
     });
 
-    const items = style("items", {
-        display: "flex",
-        position: "relative",
-        alignItems: "center",
-        justifyContent: "center",
-    });
+    const items = style(
+        "items",
+        {
+            display: "flex",
+            position: "relative",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            ...margins({
+                horizontal: negativeUnit(globalVars.gutter.half),
+                vertical: negativeUnit(globalVars.gutter.half),
+            }),
+        },
+        mediaQueries.xs({
+            flexWrap: "wrap",
+            justifyContent: "stretch",
+            width: calc(`100% + ${unit(globalVars.gutter.size)}`),
+        }),
+    );
+    // display: "flex",
+    // position: "relative",
+    // alignItems: "center",
+    // justifyContent: "center",
+
+    //     const item = style(
+    //         "tab",
+    //         {
+    //             ...margins({
+    //                 all: globalVars.gutter.half,
+    //             }),
+    //         },
+    //         mediaQueries.xs({
+    //             display: "flex",
+    //             position: "relative",
+    //             alignItems: "center",
+    //             justifyContent: "stretch",
+    //             flexGrow: 1,
+    //         }),
+    //     );
+    //
+    // const item = style(
+    //     "item",
+    //     {
+    //         ...userSelect(),
+    //         position: "relative",
+    //         display: "inline-block",
+    //         flexGrow: 1,
+    //         $nest: {
+    //             "& + &": {
+    //                 marginLeft: unit(negative(vars.border.width)),
+    //             },
+    //             "&:hover, &:focus, &:active": {
+    //                 color: colorOut(vars.colors.state.fg),
+    //             },
+    //         },
+    //     },
+    //     mediaQueries.oneColumnDown({
+    //         flexGrow: 0,
+    //         $nest: {
+    //             label: {
+    //                 minHeight: unit(formElementVariables.sizing.height),
+    //                 lineHeight: unit(formElementVariables.sizing.height),
+    //             },
+    //         },
+    //     }),
+    // );
 
     const item = style(
         "item",
         {
-            ...userSelect(),
-            position: "relative",
-            display: "inline-block",
-            flexGrow: 1,
-            $nest: {
-                "& + &": {
-                    marginLeft: unit(negative(vars.border.width)),
-                },
-                "&:hover, &:focus, &:active": {
-                    color: colorOut(vars.colors.state.fg),
-                },
-            },
+            ...margins({
+                all: globalVars.gutter.half,
+            }),
         },
-        mediaQueries.oneColumnDown({
-            flexGrow: 0,
-            $nest: {
-                label: {
-                    minHeight: unit(formElementVariables.sizing.height),
-                    lineHeight: unit(formElementVariables.sizing.height),
-                },
-            },
+        mediaQueries.xs({
+            display: "flex",
+            position: "relative",
+            alignItems: "center",
+            justifyContent: "stretch",
+            flexGrow: 1,
         }),
     );
-
-    const leftTab = style("leftTab", borderRadii(vars.leftTab.radii));
-    const rightTab = style("rightTab", borderRadii(vars.rightTab.radii));
 
     const label = style("label", {
         ...userSelect(),
@@ -150,14 +214,14 @@ export const radioTabClasses = useThemeCache(() => {
     const input = style("input", {
         ...srOnly(),
         $nest: {
-            "&:hover, &:focus + .radioButtonsAsTabs-label": {
+            [`&:hover, &:focus + ${label}`]: {
                 borderColor: colorOut(vars.border.active.color),
                 zIndex: 1,
                 color: colorOut(vars.colors.state.fg),
             },
             "&:checked": {
                 $nest: {
-                    "& + .radioButtonsAsTabs-label": {
+                    [`& + .${label}`]: {
                         backgroundColor: colorOut(vars.colors.selected.bg),
                     },
                     "&:hover, &:focus": {
@@ -165,7 +229,7 @@ export const radioTabClasses = useThemeCache(() => {
                     },
                 },
             },
-            "&[disabled] + .radioButtonsAsTabs-label": {
+            [`&[disabled] + .${label}`]: {
                 opacity: formElementVariables.disabled.opacity,
             },
         },
@@ -177,7 +241,5 @@ export const radioTabClasses = useThemeCache(() => {
         item,
         label,
         input,
-        leftTab,
-        rightTab,
-    } as IRadioTabClasses;
+    } as IRadioInputAsButtonClasses;
 });

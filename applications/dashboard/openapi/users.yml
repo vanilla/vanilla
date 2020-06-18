@@ -38,6 +38,11 @@ paths:
         schema:
           format: date-filter
           type: string
+      - name: roleID
+        description: Filter by the role ID of a user.
+        in: query
+        schema:
+          type: integer
       - name: userID
         description: Filter by a range or CSV of user IDs.
         in: query

@@ -34,10 +34,7 @@ final class SqlUtils {
             }
 
             if (null !== $newDef = $structure->columns($name)) {
-                $newType = strtolower($newDef->Type ?? '');
-                if ($textTypes[$oldType] !== ($textTypes[$newType] ?? 0)) {
-                    $newDef->Type = $oldType;
-                }
+                $newDef->Type = $oldType;
             }
         }
     }

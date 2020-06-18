@@ -107,7 +107,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     });
 
     const inputAndButton = makeThemeVars("inputAndButton", {
-        borderRadius: compactSearchVars.inputAndButton.borderRadius,
+        borderRadius: compactSearchVars.borders.borderRadius,
     });
 
     // Main colors

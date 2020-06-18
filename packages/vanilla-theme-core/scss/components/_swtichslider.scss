@@ -34,6 +34,23 @@
         }
     }
 
+    .ActivateSlider {
+        width: auto;
+        min-width: 125px;
+    }
+
+    .ActivateSlider-Active {
+        .ActivateSlider-Button {
+            margin-left: $global-gutter_halfSize;
+        }
+    }
+
+    .ActivateSlider-InActive {
+        .ActivateSlider-Button {
+            margin-right: $global-gutter_halfSize;
+        }
+    }
+
     .ActivateSlider-Active .Button{
         background: $global-color_primary;
         color: $global-color_white;

@@ -7,6 +7,7 @@
 
 namespace Vanilla\EmbeddedContent;
 
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Asset\AssetPreloadModel;
 
 /**
@@ -64,19 +65,10 @@ class EmbedUtils {
      * @param array $data The data to modify.
      * @param array $modifications The mapping of 'newName' => 'oldName'.
      * @return array
+     *
+     * @deprecated Use ArrayUtils::remapProperties.
      */
     public static function remapProperties(array $data, array $modifications): array {
-        foreach ($modifications as $newName => $oldName) {
-            $hasExistingNewValue = valr($newName, $data, null);
-            if ($hasExistingNewValue !== null) {
-                continue;
-            }
-
-            $oldValue = valr($oldName, $data, null);
-            if ($oldValue !== null) {
-                setvalr($newName, $data, $oldValue);
-            }
-        }
-        return $data;
+        return ArrayUtils::remapProperties($data, $modifications);
     }
 }

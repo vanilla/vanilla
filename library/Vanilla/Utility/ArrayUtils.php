@@ -356,4 +356,26 @@ final class ArrayUtils {
             return 0;
         };
     }
+
+    /**
+     * Remap one data key into another if it doesn't exist.
+     *
+     * @param array $data The data to modify.
+     * @param array $modifications The mapping of 'newName' => 'oldName'.
+     * @return array
+     */
+    public static function remapProperties(array $data, array $modifications): array {
+        foreach ($modifications as $newName => $oldName) {
+            $hasExistingNewValue = valr($newName, $data, null);
+            if ($hasExistingNewValue !== null) {
+                continue;
+            }
+
+            $oldValue = valr($oldName, $data, null);
+            if ($oldValue !== null) {
+                setvalr($newName, $data, $oldValue);
+            }
+        }
+        return $data;
+    }
 }

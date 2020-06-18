@@ -611,10 +611,10 @@ class SphinxClient {
      * Set groupBy and groupFunc attributes
      *
      * @param string $attribute
-     * @param string $func
+     * @param int $func
      * @param string $groupSort
      */
-    public function setGroupBy(string $attribute, string $func, string $groupSort = "@group desc") {
+    public function setGroupBy(string $attribute, int $func, string $groupSort = "@group desc") {
         assert($func === self::GROUPBY_DAY
             || $func === self::GROUPBY_WEEK
             || $func === self::GROUPBY_MONTH

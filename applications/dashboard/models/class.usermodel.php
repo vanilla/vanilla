@@ -1204,12 +1204,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     /**
      * Add multi-dimensional user data to an array.
      *
-     * @param array $rows Results we need to associate user data with.
+     * @param array|iterable $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
-     * @param array $options Additional options. Passed to filter event.
-     *        [bool asFragments] - Expand as user fragments.
      */
-    public function expandUsers(array &$rows, array $columns) {
+    public function expandUsers(&$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;

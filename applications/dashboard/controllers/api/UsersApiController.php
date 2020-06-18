@@ -22,6 +22,7 @@ use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
+use Vanilla\Utility\SchemaUtils;
 
 /**
  * API Controller for the `/users` resource.
@@ -474,6 +475,9 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'roleID:i?' => [
+                'x-filter' => ['field' => 'roleID']
+            ],
             'userID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'u.UserID']),
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
@@ -489,7 +493,8 @@ class UsersApiController extends AbstractApiController {
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
             ]
-        ], ['UserIndex', 'in']);
+        ], ['UserIndex', 'in'])
+            ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]));
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);

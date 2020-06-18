@@ -9,7 +9,8 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
-import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsTab.styles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
@@ -25,11 +26,26 @@ interface IProps extends IRadioGroupProps {
  * Implement what looks like buttons, but what is semantically radio buttons.
  */
 export function RadioGroup(props: IProps) {
-    const { className, accessibleTitle, children, setData, activeItem, classes = radioInputAsButtonClasses() } = props;
+    const classesButtons = buttonClasses();
+    const {
+        className,
+        accessibleTitle,
+        children,
+        setData,
+        activeItem,
+        classes = radioInputAsButtonClasses(),
+        buttonActiveClass = classesButtons.primary,
+        buttonClass = classesButtons.standard,
+    } = props;
     const classesInputBlock = inputBlockClasses();
 
     return (
-        <RadioGroupProvider setData={setData} activeItem={activeItem}>
+        <RadioGroupProvider
+            setData={setData}
+            activeItem={activeItem}
+            buttonActiveClass={buttonActiveClass}
+            buttonClass={buttonClass}
+        >
             <fieldset className={classNames(classesInputBlock.root, classes.root, className)}>
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>
                 <div className={classes.items}>{children}</div>

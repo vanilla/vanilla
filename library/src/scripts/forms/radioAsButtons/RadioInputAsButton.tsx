@@ -6,14 +6,10 @@
 
 import * as React from "react";
 import { IRadioGroupProps, withRadioGroup } from "@library/forms/radioAsButtons/RadioGroupContext";
-import {
-    IRadioInputAsButtonClasses,
-    radioInputAsButtonClasses,
-} from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { radioInputAsButtonClasses } from "./radioInputAsTab.styles";
 
 export interface IBaseRadioProps {
     label: string;
@@ -26,6 +22,14 @@ export interface IBaseRadioProps {
     active?: boolean;
 }
 
+export interface IRadioInputAsButtonClasses {
+    root: string;
+    items: string;
+    item: string;
+    label: string;
+    input: string;
+}
+
 interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {}
 
 /**
@@ -34,8 +38,9 @@ interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {
 export function RadioInputAsButton(props: Omit<IRadioInputAsButtonInGroup, "classes">) {
     const { data, icon = null } = props;
     const activeItem = props["activeItem"];
+
     const classes = radioInputAsButtonClasses();
-    const classesButtons = buttonClasses();
+
     const onClick = event => {
         props.setData(props.data);
     };

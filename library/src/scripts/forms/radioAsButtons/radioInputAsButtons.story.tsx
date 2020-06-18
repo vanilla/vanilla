@@ -11,9 +11,10 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
+import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export default {
     title: "Radio Inputs as Buttons",
@@ -30,25 +31,26 @@ export function RadioInputsRenderedAsButtons(props: {
     disabled?: boolean;
     buttonClass?: string;
     buttonActiveClass?: string;
+    message?: string;
+    classes?: IRadioInputAsButtonClasses;
 }) {
-    const { title = "Standard", accessibleTitle = "Are you going?" } = props;
+    const { title = "Standard", accessibleTitle = "Are you going?", message = false, classes } = props;
     const [activeItem, setActiveItem] = useState("going");
     const setData = data => {
         setActiveItem(data);
     };
 
-    const classes = eventsClasses();
-
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
+            {message && <StoryParagraph>{message}</StoryParagraph>}
             <RadioGroup
                 activeItem={activeItem}
                 accessibleTitle={accessibleTitle}
                 setData={setData}
-                className={classes.attendanceSelector}
-                buttonActiveClass={buttonClasses().primary}
-                buttonClass={buttonClasses().standard}
+                classes={classes}
+                buttonClass={props.buttonClass}
+                buttonActiveClass={props.buttonActiveClass}
             >
                 <RadioInputAsButton disabled={props.disabled} label={t("Going")} data={EventAttendance.GOING} />
                 <RadioInputAsButton disabled={props.disabled} label={t("Maybe")} data={EventAttendance.MAYBE} />
@@ -64,7 +66,15 @@ export function RadioInputsRenderedAsButtons(props: {
 }
 
 export const LookingLikeTabs = storyWithConfig({}, () => (
-    <RadioInputsRenderedAsButtons title="Tab Style Buttons" buttonClass={""} buttonActiveClass={""} />
+    <RadioInputsRenderedAsButtons
+        title="Tab Style Buttons"
+        buttonClass={""}
+        buttonActiveClass={""}
+        classes={radioInputAsTabClasses()}
+        message={
+            "Please note that these only visually look like our tabs. They are NOT accessible or semantically tabs."
+        }
+    />
 ));
 
 export const Disabled = storyWithConfig({}, () => (

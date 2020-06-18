@@ -12,6 +12,8 @@ export interface IRadioGroupProps {
     setData: (data: any) => void;
     groupID?: string;
     activeItem?: string | number;
+    buttonActiveClass?: string;
+    buttonClass?: string;
 }
 
 const RadioGroupContext = React.createContext<IRadioGroupProps>({} as any);

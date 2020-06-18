@@ -2896,7 +2896,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $where = $filter;
             $keywords = val('Keywords', $filter, '');
             $optimize = val('Optimize', $filter);
-            unset($where['Keywords'], $where['Optimize']);
+            $roleID = $filter["roleID"] ?? null;
+            unset($where['Keywords'], $where['Optimize'], $where["roleID"]);
         } else {
             $keywords = $filter;
         }
@@ -2912,7 +2913,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } elseif (!empty($keywords)) {
+        } elseif (!empty($roleID) && !empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }
@@ -3027,18 +3028,20 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @return int
      */
     public function searchCount($filter = '') {
+        $roleID = false;
+
         if (is_array($filter)) {
             $where = $filter;
             $keywords = $where['Keywords'] ?? '';
-            unset($where['Keywords'], $where['Optimize']);
+            $roleID = $where["roleID"] ?? false;
+            unset($where['Keywords'], $where['Optimize'], $where["roleID"]);
         } else {
             $keywords = $filter;
         }
         $keywords = trim($keywords);
 
         // Check to see if the search exactly matches a role name.
-        $roleID = false;
-        if ($keywords !== "") {
+        if (empty($roleID) && $keywords !== "") {
             if (strtolower($keywords) == 'banned') {
                 $this->SQL->where('u.Banned >', 0);
             } else {

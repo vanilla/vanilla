@@ -685,4 +685,17 @@ class UsersTest extends AbstractResourceTest {
         ksort($registeredUser);
         $this->assertEquals($registration, $registeredUser);
     }
+
+    /**
+     * Test the users role filter.
+     */
+    public function testRoleFilter(): void {
+        $roleID = $this->getRoles()['Moderator'];
+
+        $users = $this->api()->get('/users', ['roleID' => $roleID])->getBody();
+        $this->assertNotEmpty($users);
+        foreach ($users as $user) {
+            $this->assertTrue(in_array($roleID, array_column($user['roles'], 'roleID')), 'The user does not satisfy the roleID filter.');
+        }
+    }
 }

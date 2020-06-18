@@ -97,7 +97,7 @@ class ApiUtils {
         $count = is_array($rows) ? count($rows) : $rows;
 
         return [
-            'page' => $query['page'] ?? 1,
+            'page' => $query['page'] ?: 1,
             'more' => $count === true || $count >= $query['limit'],
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
         ];

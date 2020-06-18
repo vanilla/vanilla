@@ -939,4 +939,15 @@ class DashboardHooks extends Gdn_Plugin {
 
         $args['Path'] = $localPath;
     }
+
+    /**
+     * Keep text fields their lengths when altering tables.
+     *
+     * @param \Gdn_DatabaseStructure $structure
+     */
+    public function gdn_mySQLStructure_beforeSet(\Gdn_DatabaseStructure $structure): void {
+        if (!\Vanilla\FeatureFlagHelper::featureEnabled(\Vanilla\Utility\SqlUtils::FEATURE_ALTER_TEXT_FIELD_LENGTHS)) {
+            \Vanilla\Utility\SqlUtils::keepTextFieldLengths($structure);
+        }
+    }
 }

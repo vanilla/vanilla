@@ -238,7 +238,6 @@ class MediaApiController extends AbstractApiController {
         $this->permission('Garden.Uploads.Add');
 
         //Bypass ImageUpload.Limits.Enabled if user has 'Garden.Community.Manage' permission or higher
-        //$bypassUploadLimits = $this->getSession()->checkRankedPermission('Garden.Community.Manage');
         $bypassUploadLimits = $this->getSession()->getPermissions()->hasRanked('Garden.Community.Manage');
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);

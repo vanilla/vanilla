@@ -8,14 +8,15 @@ import React from "react";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import TabContext from "@library/contexts/TabContext";
 import classNames from "classnames";
-import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
+import { radioInputAsButtonClasses, radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { IRadioInputAsButtonClasses } from "@library/forms/buttonTabs/ButtonTab";
 
 export interface IRadioTabsProps {
     accessibleTitle: string; // Describe what these buttons represent. Hidden from view, for screen readers
     setData: (data: any) => void;
-    activeTab?: string | number;
+    activeItem?: string | number;
     children: React.ReactNode;
     groupName?: string;
     className?: string;
@@ -53,7 +54,7 @@ export default class RadioTabs extends React.Component<IRadioTabsProps> {
                 value={{
                     groupID: this.groupID,
                     setData: this.props.setData,
-                    activeTab: this.props.activeTab || 0,
+                    activeItem: this.props.activeItem || 0,
                     childClass: this.props.childClass || "",
                 }}
             >

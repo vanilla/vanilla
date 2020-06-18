@@ -21,7 +21,6 @@ import Checkbox from "@library/forms/Checkbox";
 import StoryExampleDropDownSearch from "@library/flyouts/StoryExampleDropDownSearch";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import RadioButton from "@library/forms/RadioButton";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import "@library/forms/datePicker.scss";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
@@ -32,7 +31,7 @@ import { flexHelper } from "@library/styles/styleHelpers";
 const story = storiesOf("Forms/User Facing", module);
 
 story.add("Elements", () => {
-    let activeTab = "Tab A";
+    let activeItem = "Tab A";
 
     /**
      * Simple form setter.
@@ -107,7 +106,7 @@ story.add("Elements", () => {
                 accessibleTitle={t("Search in:")}
                 groupName="advancedSearchDomain"
                 setData={doNothing}
-                activeTab={activeTab}
+                activeItem={activeItem}
                 childClass="advancedSearchDomain-tab"
             >
                 <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />

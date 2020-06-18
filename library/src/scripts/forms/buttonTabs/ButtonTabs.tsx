@@ -19,7 +19,7 @@ export function ButtonTabs(props: IProps) {
             accessibleTitle={props.accessibleTitle}
             groupName={props.groupName ?? "radioButtonsAsButtons"}
             setData={props.setData}
-            activeTab={props.activeTab}
+            activeItem={props.activeItem}
             classes={buttonTabClasses()}
         >
             {props.children}

@@ -237,6 +237,9 @@ class MediaApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
 
+        //Bypass ImageUpload.Limits.Enabled if user has 'Garden.Community.Manage' permission or higher
+        $bypassUploadLimits = $this->getSession()->checkRankedPermission('Garden.Community.Manage');
+
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
             UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
@@ -252,7 +255,7 @@ class MediaApiController extends AbstractApiController {
         $body = $in->validate($body);
         $row = $this->mediaModel->saveUploadedFile(
             $body['file'],
-            ['foreignType' => 'embed', 'foreignID' => $this->getSession()->UserID ]
+            ['foreignType' => 'embed', 'foreignID' => $this->getSession()->UserID, 'bypassUploadLimits' => $bypassUploadLimits]
         );
         return $row;
     }

@@ -218,6 +218,10 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
             'Size' => $file->getSize(),
         ]);
 
+        if (in_array('bypassUploadLimits', $extraArgs)) {
+            $file->setBypassUploadLimits($extraArgs['bypassUploadLimits']);
+        }
+
         if ($file->getForeignUrl() !== null) {
             $media['foreignUrl'] = $file->getForeignUrl();
         }

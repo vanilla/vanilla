@@ -58,6 +58,8 @@ class UploadedFile {
     /** @var array Constraints for the image resizer. */
     private $imageConstraints;
 
+    /** @var bool Whether or not this file should bypass "ImageUpload.Limits.Enabled" config. */
+    private $bypassUploadLimits = false;
     /**
      * UploadedFile constructor.
      *
@@ -245,11 +247,7 @@ class UploadedFile {
             "width" => $width ?? 0,
         ];
 
-        $session = \Gdn::session();
-        $hasCommunityManagePermission = $session->checkRankedPermission('Garden.Community.Manage');
-
-        //Bypass ImageUpload.Limits.Enabled if user has 'Garden.Community.Manage' permission or higher
-        if (\Gdn::config("ImageUpload.Limits.Enabled") && !$hasCommunityManagePermission) {
+        if (\Gdn::config("ImageUpload.Limits.Enabled") && !$this->getBypassUploadLimits()) {
             if ($newWidth = filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
                 $options["width"] = $newWidth;
             }
@@ -300,6 +298,15 @@ class UploadedFile {
     }
 
     /**
+     * Get whether or not this file should bypass "ImageUpload.Limits.Enabled" config.
+     *
+     * @return bool
+     */
+    public function getBypassUploadLimits() {
+        return $this->bypassUploadLimits;
+    }
+
+    /**
      * Retrieve the file size.
      *
      * @return int|null The file size in bytes or null if unknown.
@@ -324,6 +331,16 @@ class UploadedFile {
      */
     public function getFile() {
         return $this->file;
+    }
+
+    /**
+     * Set whether or not this file should bypass "ImageUpload.Limits.Enabled" config.
+     *
+     * @param mixed $bypassLimits
+     * @return bool
+     */
+    public function setBypassUploadLimits($bypassLimits) {
+        return $this->bypassUploadLimits = (bool)$bypassLimits;
     }
 
     /**

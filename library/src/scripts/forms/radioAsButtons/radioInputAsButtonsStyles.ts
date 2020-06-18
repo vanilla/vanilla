@@ -1,89 +1,26 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, unit, fonts, paddings, negative, srOnly, IFont, borderRadii } from "@library/styles/styleHelpers";
-import { userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { userSelect } from "@library/styles/styleHelpersFeedback";
+import { colorOut, fonts, negative, paddings, srOnly, unit } from "@library/styles/styleHelpers";
 import { percent } from "csx";
-import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
+import { radioTabsVariables } from "@library/forms/radioTabs/radioTabStyles";
 
-export const radioTabsVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const makeVars = variableFactory("radioTabs");
+export interface IRadioInputAsButtonClasses {
+    root: string;
+    items: string;
+    item: string;
+    label: string;
+    input: string;
+}
 
-    const colors = makeVars("colors", {
-        bg: globalVars.mainColors.bg,
-        fg: globalVars.mainColors.fg,
-        state: {
-            border: {
-                color: globalVars.mixPrimaryAndBg(0.5),
-            },
-            fg: globalVars.mainColors.primary,
-        },
-        selected: {
-            bg: globalVars.mainColors.primary.desaturate(0.3).fade(0.05),
-            fg: globalVars.mainColors.fg,
-        },
-    });
-
-    const sizing = makeVars("sizing", {
-        minWidth: 93,
-        height: 24,
-    });
-
-    const font: IFont = makeVars("font", {
-        size: globalVars.fonts.size.small,
-        align: "center",
-        lineHeight: unit(sizing.height),
-    });
-
-    const spacing = makeVars("spacing", {
-        paddings: {
-            horizontal: 8,
-        },
-    });
-
-    const border = makeVars("border", {
-        width: globalVars.border.width,
-        color: globalVars.border.color,
-        radius: 0,
-        style: globalVars.border.style,
-        active: {
-            color: globalVars.mixPrimaryAndBg(0.5),
-        },
-    });
-
-    const leftTab = makeVars("leftTab", {
-        radii: {
-            left: 3,
-            right: 0,
-        },
-    });
-
-    const rightTab = makeVars("rightTab", {
-        radii: {
-            right: 3,
-            left: 0,
-        },
-    });
-
-    return {
-        colors,
-        sizing,
-        font,
-        spacing,
-        border,
-        leftTab,
-        rightTab,
-    };
-});
-
-export const radioTabClasses = useThemeCache(() => {
+export const radioInputAsButtonClasses = useThemeCache(() => {
     const vars = radioTabsVariables();
     const style = styleFactory("radioTab");
     const mediaQueries = layoutVariables().mediaQueries();
@@ -126,9 +63,6 @@ export const radioTabClasses = useThemeCache(() => {
             },
         }),
     );
-
-    const leftTab = style("leftTab", borderRadii(vars.leftTab.radii));
-    const rightTab = style("rightTab", borderRadii(vars.rightTab.radii));
 
     const label = style("label", {
         ...userSelect(),
@@ -177,7 +111,5 @@ export const radioTabClasses = useThemeCache(() => {
         item,
         label,
         input,
-        leftTab,
-        rightTab,
-    } as IRadioTabClasses;
+    } as IRadioInputAsButtonClasses;
 });

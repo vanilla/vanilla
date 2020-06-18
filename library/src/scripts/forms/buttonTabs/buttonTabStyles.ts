@@ -12,6 +12,7 @@ import { calc, important, percent } from "csx";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { buttonVariables } from "@library/forms/buttonStyles";
 import { nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles";
+import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 
 export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) => {
     const style = styleFactory("buttonTabs");
@@ -23,7 +24,7 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
         display: "block",
     });
 
-    const tabs = style(
+    const items = style(
         "tabs",
         {
             display: "flex",
@@ -42,7 +43,7 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
         }),
     );
 
-    const tab = style(
+    const item = style(
         "tab",
         {
             ...margins({
@@ -87,11 +88,11 @@ export const buttonTabClasses = useThemeCache((props?: { detached?: boolean }) =
 
     return {
         root,
-        tabs,
-        tab,
+        items,
+        item,
         label,
         input,
         leftTab,
         rightTab,
-    };
+    } as IRadioTabClasses;
 });

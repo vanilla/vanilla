@@ -24,13 +24,13 @@ export interface IRadioTabsProps {
 }
 
 export interface IRadioTabClasses {
-    root?: string;
-    tabs?: string;
-    tab?: string;
-    label?: string;
-    input?: string;
-    leftTab?: string;
-    rightTab?: string;
+    root: string;
+    items: string;
+    item: string;
+    label: string;
+    input: string;
+    leftTab: string;
+    rightTab: string;
 }
 
 /**
@@ -59,7 +59,7 @@ export default class RadioTabs extends React.Component<IRadioTabsProps> {
             >
                 <fieldset className={classNames(classesInputBlock.root, classes.root, this.props.className)}>
                     <ScreenReaderContent tag="legend">{this.props.accessibleTitle}</ScreenReaderContent>
-                    <div className={classes.tabs}>{this.props.children}</div>
+                    <div className={classes.items}>{this.props.children}</div>
                 </fieldset>
             </TabContext.Provider>
         );

@@ -7,31 +7,30 @@
 import React from "react";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-// import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtonStyles";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
-import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
+import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtonsStyles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
     accessibleTitle: string;
     children: JSX.Element;
     setData: (data: any) => void;
+    classes?: any;
 }
 
 /**
  * Implement what looks like buttons, but what is semantically radio buttons.
  */
 export function RadioInputsAsButtonGroup(props: IProps) {
-    const { className, accessibleTitle, children, setData, activeItem } = props;
-    const classes = radioTabClasses();
+    const { className, accessibleTitle, children, setData, activeItem, classes = radioInputAsButtonClasses() } = props;
     const classesInputBlock = inputBlockClasses();
 
     return (
         <RadioGroupProvider setData={setData} activeItem={activeItem}>
             <fieldset className={classNames(classesInputBlock.root, classes.root, className)}>
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>
-                <div className={classes.tabs}>{children}</div>
+                <div className={classes.items}>{children}</div>
             </fieldset>
         </RadioGroupProvider>
     );

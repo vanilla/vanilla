@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
@@ -13,7 +13,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {
-    title: "Radio Buttons as Buttons",
+    title: "Radio Buttons as Tabs",
     parameters: {
         chromatic: {
             viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
@@ -23,10 +23,15 @@ export default {
 
 export function RadioButtonsAsButtons(props: { title?: string; accessibleTitle?: string; disabled?: boolean }) {
     const { title = "Standard", accessibleTitle = "Are you going?" } = props;
+    const [activeItem, setActiveItem] = useState("going");
+    const setData = data => {
+        setActiveItem(data);
+    };
+
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
-            <ButtonTabs accessibleTitle={accessibleTitle} setData={selectedTab => {}}>
+            <ButtonTabs accessibleTitle={accessibleTitle} setData={setData} activeItem={activeItem}>
                 <ButtonTab disabled={props.disabled} label={t("Going")} data={"going"} />
                 <ButtonTab disabled={props.disabled} label={t("Maybe")} data={"maybe"} />
                 <ButtonTab disabled={props.disabled} label={t("Not going")} data={"Not Going"} />

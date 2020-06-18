@@ -10,30 +10,34 @@ import { ITabContext, withTabs } from "@library/contexts/TabContext";
 import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import { IRadioTabClasses } from "@library/forms/radioTabs/RadioTabs";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { IRadioGroupProps, withRadioGroup } from "@library/forms/radioAsButtons/RadioGroupContext";
+import { IRadioGroupProps } from "@library/forms/radioAsButtons/RadioGroupContext";
+import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsButtonsStyles";
+import { visibility } from "@library/styles/styleHelpersVisibility";
 
 export interface IBaseTabProps {
     label: string;
     data: string | number;
     className?: string;
     position?: "left" | "right";
-    classes?: IRadioTabClasses;
+    classes?: IRadioTabClasses | IRadioInputAsButtonClasses;
     customTabActiveClass?: string;
     customTabInactiveClass?: string;
     disabled?: boolean;
     isLoading?: boolean;
     icon?: JSX.Element;
     active: boolean;
+    labelClasses?: string;
 }
 
 export interface ITabProps extends IBaseTabProps, ITabContext {}
+export interface IButtonProps extends IBaseTabProps, IRadioGroupProps {}
 
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-function RadioAsButton(props: ITabProps | IRadioGroupProps) {
+function RadioAsButton(props: ITabProps | IButtonProps) {
     const classes = props.classes ?? radioTabClasses();
-    const { icon = null, active } = props;
+    const { icon = null, active, labelClasses } = props;
 
     const onClick = event => {
         props.setData(props.data);
@@ -54,11 +58,9 @@ function RadioAsButton(props: ITabProps | IRadioGroupProps) {
     };
 
     return (
-        <label
-            className={classNames("radioButtonsAsTabs-tab", props["childClass"] ?? false, props.className, classes.tab)}
-        >
+        <label className={classNames(props.className, classes.item)}>
             <input
-                className={classNames("radioButtonsAsTabs-input", "sr-only", classes.input)}
+                className={classNames(visibility().srOnly, classes.input)}
                 type="radio"
                 onClick={onClick}
                 onKeyDown={onKeyDown}
@@ -77,8 +79,7 @@ function RadioAsButton(props: ITabProps | IRadioGroupProps) {
                         [`${props.customTabActiveClass}`]: props.customTabActiveClass && active,
                         [`${props.customTabInactiveClass}`]: props.customTabInactiveClass && !active,
                     },
-                    props.position === "left" ? classes.leftTab : undefined,
-                    props.position === "right" ? classes.rightTab : undefined,
+                    labelClasses,
                 )}
             >
                 {props.isLoading ? (
@@ -95,4 +96,3 @@ function RadioAsButton(props: ITabProps | IRadioGroupProps) {
 }
 
 export default withTabs<ITabProps>(RadioAsButton);
-export const RadioAsButtonWithGroup = withRadioGroup<IRadioGroupProps>(RadioAsButton);

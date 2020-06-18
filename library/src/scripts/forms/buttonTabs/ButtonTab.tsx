@@ -6,11 +6,12 @@
 
 import * as React from "react";
 import { buttonTabClasses } from "@library/forms/buttonTabs/buttonTabStyles";
-import RadioTab, { ITabProps } from "@library/forms/radioTabs/RadioTab";
+import RadioTab from "@library/forms/radioTabs/RadioTab";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { withTabs } from "@library/contexts/TabContext";
+import { ITabProps } from "@library/forms/radioTabs/RadioAsButton";
 
-interface IProps extends Omit<ITabProps, "classes"> {}
+interface IProps extends Omit<ITabProps, "classes" | "active"> {}
 
 /**
  * Implement what looks like buttons, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
@@ -23,6 +24,7 @@ export function ButtonTab(props: IProps) {
             classes={buttonTabClasses()}
             customTabActiveClass={classes.primary}
             customTabInactiveClass={classes.standard}
+            active={props.activeItem !== undefined ? props.activeItem === props.data : false}
         />
     );
 }

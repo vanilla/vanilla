@@ -8,10 +8,9 @@ import React from "react";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import TabContext from "@library/contexts/TabContext";
 import classNames from "classnames";
-import { radioInputAsButtonClasses, radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
+import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { IRadioInputAsButtonClasses } from "@library/forms/buttonTabs/ButtonTab";
 
 export interface IRadioTabsProps {
     accessibleTitle: string; // Describe what these buttons represent. Hidden from view, for screen readers

@@ -10,11 +10,10 @@ import { t } from "@vanilla/i18n/src";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
-import { eventsClasses } from "@groups/events/ui/eventStyles";
 import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
+import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInputAsTab.styles";
 
 export default {
     title: "Radio Inputs as Buttons",

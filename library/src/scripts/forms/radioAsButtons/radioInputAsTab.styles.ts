@@ -7,17 +7,30 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { userSelect } from "@library/styles/styleHelpersFeedback";
-import { IFont, margins, srOnly, unit, negativeUnit } from "@library/styles/styleHelpers";
-import { calc, percent } from "csx";
+import {
+    IFont,
+    margins,
+    srOnly,
+    unit,
+    colorOut,
+    fonts,
+    paddings,
+    borderRadii,
+    negative,
+} from "@library/styles/styleHelpers";
+import { calc, important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { nestedWorkaround } from "@dashboard/compatibilityStyles";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { buttonVariables } from "@library/forms/buttonStyles";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const radioInputAsButtonVariables = useThemeCache(() => {
+export const radioInputAsTabVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const makeVars = variableFactory("radioInputAsButton");
+    const makeVars = variableFactory("radioInputAsTabs");
+
+    const sizing = makeVars("sizing", {
+        minWidth: 93,
+        height: 24,
+    });
 
     const colors = makeVars("colors", {
         bg: globalVars.mainColors.bg,
@@ -34,17 +47,6 @@ export const radioInputAsButtonVariables = useThemeCache(() => {
         },
     });
 
-    const sizing = makeVars("sizing", {
-        minWidth: 93,
-        height: 24,
-    });
-
-    const font: IFont = makeVars("font", {
-        size: globalVars.fonts.size.small,
-        align: "center",
-        lineHeight: unit(sizing.height),
-    });
-
     const spacing = makeVars("spacing", {
         paddings: {
             horizontal: 8,
@@ -59,6 +61,12 @@ export const radioInputAsButtonVariables = useThemeCache(() => {
         active: {
             color: globalVars.mixPrimaryAndBg(0.5),
         },
+    });
+
+    const font: IFont = makeVars("font", {
+        size: globalVars.fonts.size.small,
+        align: "center",
+        lineHeight: unit(sizing.height),
     });
 
     const leftTab = makeVars("leftTab", {
@@ -86,72 +94,108 @@ export const radioInputAsButtonVariables = useThemeCache(() => {
     };
 });
 
-export const radioInputAsButtonClasses = useThemeCache(() => {
-    const style = styleFactory("radioInputAsButton");
+export const radioInputAsTabClasses = useThemeCache(() => {
+    const style = styleFactory("radioInputAsTab");
     const mediaQueries = layoutVariables().mediaQueries();
-    const globalVars = globalVariables();
+    const vars = radioInputAsTabVariables();
+    const formElementVariables = formElementsVariables();
 
     const root = style({
         display: "block",
     });
 
-    const items = style(
-        "items",
-        {
-            display: "flex",
-            position: "relative",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            ...margins({
-                horizontal: negativeUnit(globalVars.gutter.half),
-                vertical: negativeUnit(globalVars.gutter.half),
-            }),
-        },
-        mediaQueries.xs({
-            flexWrap: "wrap",
-            justifyContent: "stretch",
-            width: calc(`100% + ${unit(globalVars.gutter.size)}`),
-        }),
-    );
+    const items = style("items", {
+        display: "flex",
+        position: "relative",
+        alignItems: "center",
+        justifyContent: "stretch",
+    });
 
     const item = style(
         "item",
         {
-            ...margins({
-                all: globalVars.gutter.half,
-            }),
-        },
-        mediaQueries.xs({
-            display: "flex",
+            ...userSelect(),
             position: "relative",
-            alignItems: "center",
-            justifyContent: "stretch",
+            display: "inline-flex",
             flexGrow: 1,
+            $nest: {
+                "& + &": {
+                    marginLeft: unit(negative(vars.border.width)),
+                },
+                "&:hover, &:focus, &:active": {
+                    color: colorOut(vars.colors.state.fg),
+                },
+            },
+        },
+        mediaQueries.oneColumnDown({
+            flexGrow: 0,
+            $nest: {
+                label: {
+                    minHeight: unit(formElementVariables.sizing.height),
+                    lineHeight: unit(formElementVariables.sizing.height),
+                },
+            },
         }),
     );
+
+    const leftTab = style("leftTab", borderRadii(vars.leftTab.radii));
+    const rightTab = style("rightTab", borderRadii(vars.rightTab.radii));
 
     const label = style("label", {
         ...userSelect(),
         display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
         position: "relative",
+        cursor: "pointer",
+        textAlign: "center",
+        justifyContent: "center",
+        width: percent(100),
+        minHeight: unit(vars.sizing.height),
+        minWidth: unit(vars.sizing.minWidth),
+        backgroundColor: colorOut(vars.colors.bg),
+        ...fonts(vars.font),
+        ...paddings(vars.spacing.paddings),
+        borderColor: colorOut(vars.border.color),
+        borderWidth: unit(vars.border.width),
+        borderStyle: vars.border.style,
     });
 
-    const labelStateStyles = generateButtonStyleProperties(buttonVariables().primary);
-    nestedWorkaround(`.${label}`, labelStateStyles.$nest);
-
-    const hiddenInputStates = generateButtonStyleProperties(buttonVariables().primary, false, ` + .${label}`);
     const input = style("input", {
         ...srOnly(),
+        $nest: {
+            [`
+                &:not([disabled]):hover + .${label},
+                &:not([disabled]):focus + .${label}
+            `]: {
+                borderColor: colorOut(vars.border.active.color),
+                zIndex: 1,
+                color: colorOut(vars.colors.state.fg),
+            },
+            [`&:not([disabled]):checked + .${label}`]: {
+                backgroundColor: colorOut(vars.colors.selected.bg),
+            },
+            [`&:not([disabled]):checked:hover + .${label}`]: {
+                color: colorOut(vars.colors.state.fg),
+            },
+            [`&:not([disabled]):checked:focus + .${label}`]: {
+                color: colorOut(vars.colors.state.fg),
+            },
+            [`&.focus-visible:not([disabled]):checked + .${label}`]: {
+                color: colorOut(vars.colors.state.fg),
+            },
+            [`&[disabled] + .${label}`]: {
+                opacity: formElementVariables.disabled.opacity,
+                cursor: important("default"),
+            },
+        },
     });
-    nestedWorkaround(`.${input}`, hiddenInputStates.$nest);
 
     return {
         root,
         items,
         item,
-        label,
         input,
+        label,
+        leftTab,
+        rightTab,
     } as IRadioInputAsButtonClasses;
 });

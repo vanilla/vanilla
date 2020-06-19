@@ -9,13 +9,11 @@ import { IRadioGroupProps, withRadioGroup } from "@library/forms/radioAsButtons/
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { radioInputAsButtonClasses } from "./radioInputAsTab.styles";
 
 export interface IBaseRadioProps {
     label: string;
     data: string | number;
     className?: string;
-    classes?: IRadioInputAsButtonClasses;
     disabled?: boolean;
     isLoading?: boolean;
     icon?: JSX.Element;
@@ -28,6 +26,8 @@ export interface IRadioInputAsButtonClasses {
     item: string;
     label: string;
     input: string;
+    leftTab?: string;
+    rightTab?: string;
 }
 
 interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {}
@@ -35,11 +35,12 @@ interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {
 /**
  * Implement what looks like buttons, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-export function RadioInputAsButton(props: Omit<IRadioInputAsButtonInGroup, "classes">) {
+export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
     const { data, icon = null } = props;
     const activeItem = props["activeItem"];
+    const classes = props["classes"] || { item: null, input: null, label: null };
 
-    const classes = radioInputAsButtonClasses();
+    console.log("clases: ", classes);
 
     const onClick = event => {
         props.setData(props.data);
@@ -60,6 +61,7 @@ export function RadioInputAsButton(props: Omit<IRadioInputAsButtonInGroup, "clas
     };
 
     const active = props.active ?? (activeItem !== undefined ? activeItem === data : false);
+    const disabled = props.disabled || props.isLoading;
 
     return (
         <label className={classNames(props.className, classes.item)}>
@@ -72,11 +74,11 @@ export function RadioInputAsButton(props: Omit<IRadioInputAsButtonInGroup, "clas
                 checked={active}
                 name={props.groupID}
                 value={props.label}
-                disabled={props.disabled}
+                disabled={disabled}
             />
             <span
                 className={classNames(
-                    { isDisabled: props.disabled },
+                    { isDisabled: props.disabled || props.isLoading },
                     classes.label,
                     active ? props["buttonActiveClass"] : props["buttonClass"],
                 )}

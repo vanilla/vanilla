@@ -10,7 +10,6 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
 import { buttonClasses } from "@library/forms/buttonStyles";
-import { radioInputAsButtonClasses } from "@library/forms/radioAsButtons/radioInputAsTab.styles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
@@ -33,7 +32,7 @@ export function RadioGroup(props: IProps) {
         children,
         setData,
         activeItem,
-        classes = radioInputAsButtonClasses(),
+        classes,
         buttonActiveClass = classesButtons.primary,
         buttonClass = classesButtons.standard,
     } = props;
@@ -45,6 +44,7 @@ export function RadioGroup(props: IProps) {
             activeItem={activeItem}
             buttonActiveClass={buttonActiveClass}
             buttonClass={buttonClass}
+            classes={classes}
         >
             <fieldset className={classNames(classesInputBlock.root, classes.root, className)}>
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>

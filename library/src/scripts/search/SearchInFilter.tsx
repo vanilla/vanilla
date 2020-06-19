@@ -27,7 +27,7 @@ interface IProps {
  */
 export function SearchInFilter(props: IProps) {
     const { filters = [], setData, endFilters = [], activeItem } = props;
-    if (filters.length + endFilters.length > 1) {
+    if ((filters.length + endFilters.length) <= 1) {
         return null; // no filters, or only 1 is not helpful
     }
     const classes = searchInFilterClasses();

@@ -16,7 +16,7 @@ export interface IBaseRadioProps {
     className?: string;
     disabled?: boolean;
     isLoading?: boolean;
-    icon?: JSX.Element;
+    icon?: React.ReactNode;
     active?: boolean;
 }
 

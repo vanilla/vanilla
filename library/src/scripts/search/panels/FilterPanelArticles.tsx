@@ -3,8 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
-import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import Permission from "@library/features/users/Permission";
@@ -14,23 +12,22 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { t } from "@vanilla/i18n/src";
+import { useSearchForm } from "@library/search/SearchFormContext";
+import { t } from "@vanilla/i18n";
 import React from "react";
-import { KnowledgeBaseInput } from "@knowledge/knowledge-bases/KnowledgeBaseInput";
-import { UnifySearchDomain, useSearchPageData } from "@knowledge/modules/search/unifySearchPageReducer";
+import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
+import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 
 /**
  * Implement search filter panel for articles
  */
 export function SearchFilterPanelArticles() {
-    const { form } = useSearchPageData();
-    const { updateForm, unifySearch } = useUnifySearchPageActions();
-    const { getFilterComponentsForDomain } = useSearchFilters();
+    const { form, updateForm, search, getFilterComponentsForDomain } = useSearchForm<IKnowledgeSearchTypes>();
 
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame handleSubmit={unifySearch}>
+        <FilterFrame handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
@@ -46,7 +43,7 @@ export function SearchFilterPanelArticles() {
                 onChange={(options: IComboBoxOption[]) => {
                     updateForm({ authors: options });
                 }}
-                value={form.authors}
+                value={form.authors ?? []}
             />
             <DateRange
                 onStartChange={(date: string) => {
@@ -60,15 +57,13 @@ export function SearchFilterPanelArticles() {
                 className={classesDateRange.root}
             />
             {getFilterComponentsForDomain(form.domain)}
-            {/* {form.domain === UnifySearchDomain.ARTICLES && (
-                <KnowledgeBaseInput
-                    className={classesInputBlock.root}
-                    onChange={(option: IComboBoxOption) => {
-                        updateForm({ kb: option });
-                    }}
-                    value={form.kb}
-                />
-            )} */}
+            <KnowledgeBaseInput
+                className={classesInputBlock.root}
+                onChange={(option: IComboBoxOption) => {
+                    updateForm({ knowledgeBaseOption: option });
+                }}
+                value={form.knowledgeBaseOption}
+            />
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}

@@ -3,39 +3,34 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import { t } from "@library/utility/appUtils";
-import { SearchDomain, useSearchPageData } from "@knowledge/modules/search/searchPageReducer";
-import { useSearchPageActions } from "@knowledge/modules/search/SearchPageActions";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import Checkbox from "@library/forms/Checkbox";
+import CheckboxGroup from "@library/forms/CheckboxGroup";
 import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import CheckboxGroup from "@library/forms/CheckboxGroup";
-import Checkbox from "@library/forms/Checkbox";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { useSearchForm } from "@library/search/SearchFormContext";
+import { t } from "@library/utility/appUtils";
+import React from "react";
 
-interface IProps {
-    handleSubmit: (data) => void;
-}
+interface IProps {}
 /**
  * Implement search filter panel for categories and groups
  */
-export function SearchFilterPanelCategoriesAndGroups(props) {
-    const { handleSubmit } = props;
-    const { form } = useSearchPageData();
-    const { updateForm } = useSearchPageActions();
+export function SearchFilterPanelCategoriesAndGroups(props: IProps) {
+    const { form, updateForm, search } = useSearchForm();
+
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame handleSubmit={handleSubmit}>
+        <FilterFrame handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
                     onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = event.target;
-                        updateForm({ title: value });
+                        updateForm({ name: value });
                     },
-                    value: form.title,
+                    value: form.name,
                 }}
             />
             <DateRange

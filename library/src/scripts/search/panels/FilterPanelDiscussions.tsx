@@ -3,38 +3,40 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchFilters } from "@library/contexts/SearchFilterContext";
-import DateRange from "@library/forms/DateRange";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import { t } from "@library/utility/appUtils";
-import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import MultiUserInput from "@library/features/users/MultiUserInput";
+import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
-import { useSearchPageData } from "@knowledge/modules/search/unifySearchPageReducer";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { useSearchForm } from "@library/search/SearchFormContext";
+import { t } from "@library/utility/appUtils";
+import React from "react";
+import Checkbox from "@library/forms/Checkbox";
+
+import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
+import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 
 /**
  * Implement search filter panel for discussions
  */
 export function SearchFilterPanelDiscussions() {
-    const { form } = useSearchPageData();
-    const { updateForm, unifySearch } = useUnifySearchPageActions();
+    const { form, updateForm, search } = useSearchForm<ICommunitySearchTypes>();
+
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
 
     return (
-        <FilterFrame handleSubmit={unifySearch}>
+        <FilterFrame handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
                     onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = event.target;
-                        updateForm({ title: value });
+                        updateForm({ name: value });
                     },
-                    value: form.title,
+                    value: form.name,
                 }}
             />
             <MultiUserInput
@@ -42,7 +44,7 @@ export function SearchFilterPanelDiscussions() {
                 onChange={(options: IComboBoxOption[]) => {
                     updateForm({ authors: options });
                 }}
-                value={form.authors}
+                value={form.authors ?? []}
             />
             <DateRange
                 onStartChange={(date: string) => {
@@ -54,6 +56,37 @@ export function SearchFilterPanelDiscussions() {
                 start={form.startDate}
                 end={form.endDate}
                 className={classesDateRange.root}
+            />
+            <CommunityCategoryInput
+                label={t("Category")}
+                onChange={option => {
+                    updateForm({ categoryOption: option });
+                }}
+                value={form.categoryOption}
+            />
+            <Checkbox
+                label={t("Search Subcategories")}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateForm({ includeChildCategories: event.target.checked || false });
+                }}
+                checked={form.includeChildCategories}
+                className={classesInputBlock.root}
+            />
+            <Checkbox
+                label={t("Search only followed Categories")}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateForm({ followedCategories: event.target.checked || false });
+                }}
+                checked={form.followedCategories}
+                className={classesInputBlock.root}
+            />
+            <Checkbox
+                label={t("Search archived")}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateForm({ includeArchivedCategories: event.target.checked || false });
+                }}
+                checked={form.includeArchivedCategories}
+                className={classesInputBlock.root}
             />
         </FilterFrame>
     );

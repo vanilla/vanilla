@@ -3,18 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { t } from "@vanilla/i18n/src";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import { useSearchFilters } from "@library/contexts/SearchFilterContext";
-import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import MultiUserInput from "@library/features/users/MultiUserInput";
 import DateRange from "@library/forms/DateRange";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import { useSearchPageData } from "@knowledge/modules/search/unifySearchPageReducer";
-import { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { useSearchForm } from "@library/search/SearchFormContext";
+import { t } from "@vanilla/i18n/src";
+import React from "react";
 
 interface IProps {}
 
@@ -22,20 +20,19 @@ interface IProps {}
  * Implement search filter panel for all types
  */
 export function FilterPanelAll(props: IProps) {
-    const { form } = useSearchPageData();
-    const { updateForm, unifySearch } = useUnifySearchPageActions();
+    const { form, updateForm, search } = useSearchForm();
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame title={t("Filter Results")} handleSubmit={unifySearch}>
+        <FilterFrame title={t("Filter Results")} handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
                     onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = event.target;
-                        updateForm({ title: value });
+                        updateForm({ name: value });
                     },
-                    value: form.title,
+                    value: form.name,
                 }}
             />
             <MultiUserInput

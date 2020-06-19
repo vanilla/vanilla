@@ -18,6 +18,7 @@ import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
+import { SearchContextProvider } from "@library/contexts/SearchContext";
 
 interface IProps {
     activeItem?: string;
@@ -74,10 +75,10 @@ export function SearchFilter(props: IProps) {
     const [data, setData] = useState(activeItem);
 
     return (
-        <>
+        <SearchContextProvider>
             {message && <StoryParagraph>{message}</StoryParagraph>}
             <SearchInFilter filters={filters} endFilters={endFilters} setData={setData} activeItem={data} />
-        </>
+        </SearchContextProvider>
     );
 }
 

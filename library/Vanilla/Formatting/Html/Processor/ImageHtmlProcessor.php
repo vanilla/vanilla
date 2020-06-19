@@ -43,4 +43,27 @@ class ImageHtmlProcessor extends HtmlProcessor {
 
         return $imageUrls;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getImages(): array {
+        $domImages = $this->queryXPath(self::EMBED_IMAGE_XPATH);
+
+        /** @var array[] $headings */
+        $images = [];
+
+        /** @var \DOMElement $domImage */
+        foreach ($domImages as $domImage) {
+            $src = $domImage->getAttribute('src');
+            if ($src) {
+                $images[] = [
+                    'url' => $src,
+                    'alt' => $domImage->getAttribute('alt') ?: t('Untitled'),
+                ];
+            }
+        }
+
+        return $images;
+    }
 }

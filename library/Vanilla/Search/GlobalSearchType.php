@@ -9,6 +9,8 @@ namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
 use Vanilla\Adapters\SphinxClient;
+use Vanilla\Adapters\SphinxClient as SphinxAdapter;
+use Vanilla\DateFilterSchema;
 use Vanilla\Sphinx\Search\SphinxSearchQuery;
 
 /**
@@ -75,6 +77,15 @@ class GlobalSearchType extends AbstractSearchType {
         }
         $dateInserted = $query->getQueryParameter('dateInserted');
 
+        /** @var $startDate \DateTimeImmutable|null */
+        $startDate = $dateInserted['date'][0] ?? null;
+
+        /** @var $endDate \DateTimeImmutable|null */
+        $endDate = $dateInserted['date'][1] ?? null;
+
+
+        $sort = $query->getQueryParameter('sort', 'relevance');
+
         ///
         /// Apply the query.
         ///
@@ -91,7 +102,26 @@ class GlobalSearchType extends AbstractSearchType {
             $query->setFilter('insertUserID', $insertUserIDs);
         }
 
-        // TODO: Handle dates.
+        if ($query instanceof SphinxSearchQuery) {
+            if ($startDate && $endDate) {
+                $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());
+            }
+
+            // Sorts
+            // title is used in sphinx instead of name.
+//            $sort = str_replace('name', 'title', $sort);
+            $sortField = ltrim($sort, '-');
+
+            if ($sortField === SearchQuery::SORT_RELEVANCE) {
+                $query->setSort(SearchQuery::SORT_RELEVANCE);
+            } elseif ($sortField === $sort) {
+                $query->setSort(SphinxAdapter::SORT_ATTR_ASC, $sortField);
+            } else {
+                $query->setSort(SphinxAdapter::SORT_ATTR_DESC, $sortField);
+            }
+        } else {
+            // TODO implement for mysql.
+        }
     }
 
     /**
@@ -126,8 +156,15 @@ class GlobalSearchType extends AbstractSearchType {
                 'style' => 'form',
                 'x-search-filter' => true,
             ],
-            'dateInserted:dt?' => [
+            'dateInserted?' => new DateFilterSchema([
                 'x-search-filter' => true,
+            ]),
+            "sort:s?" => [
+                "enum" => [
+                    "relevance",
+                    "dateInserted",
+                    "-dateInserted",
+                ],
             ],
         ]);
     }

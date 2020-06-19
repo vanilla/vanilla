@@ -1070,6 +1070,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $userID = $this->SQL->insert($this->Name, $fields);
 
         if ($userID) {
+            //force clear cache for that UserID
+            $this->clearCache($userID, ['user']);
+
             $user = $this->getID($userID);
             $userEvent = $this->eventFromRow(
                 (array)$user,

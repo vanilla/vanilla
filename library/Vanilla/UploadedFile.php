@@ -302,7 +302,7 @@ class UploadedFile {
      *
      * @return bool
      */
-    public function getBypassUploadLimits() {
+    public function getBypassUploadLimits(): bool {
         return $this->bypassUploadLimits;
     }
 
@@ -337,10 +337,11 @@ class UploadedFile {
      * Set whether or not this file should bypass "ImageUpload.Limits.Enabled" config.
      *
      * @param mixed $bypassLimits
-     * @return bool
+     * @return $this
      */
-    public function setBypassUploadLimits($bypassLimits) {
-        return $this->bypassUploadLimits = (bool)$bypassLimits;
+    public function setBypassUploadLimits($bypassLimits): self {
+        $this->bypassUploadLimits = (bool)$bypassLimits;
+        return $this;
     }
 
     /**

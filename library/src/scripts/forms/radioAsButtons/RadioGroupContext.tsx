@@ -8,7 +8,6 @@ import { Optionalize } from "@library/@types/utils";
 import React, { useEffect, useState } from "react";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
-import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export interface IRadioGroupProps {
     setData: (data: any) => void;
@@ -16,7 +15,7 @@ export interface IRadioGroupProps {
     activeItem?: string | number;
     buttonActiveClass?: string;
     buttonClass?: string;
-    classes?: IRadioInputAsButtonClasses;
+    classes: IRadioInputAsButtonClasses;
 }
 
 const RadioGroupContext = React.createContext<IRadioGroupProps>({} as any);
@@ -28,20 +27,14 @@ interface IProps extends IRadioGroupProps {
 
 export function RadioGroupProvider(props: IProps) {
     const [groupID, setGroupID] = useState(props.groupID);
-    const [classes, setClasses] = useState(props.classes);
 
     useEffect(() => {
         if (!groupID) {
             setGroupID(uniqueIDFromPrefix("radioGroup"));
         }
-        if (!classes) {
-            setClasses(radioInputAsButtonsClasses());
-        }
     }, []);
 
-    return (
-        <RadioGroupContext.Provider value={{ ...props, groupID, classes }}>{props.children}</RadioGroupContext.Provider>
-    );
+    return <RadioGroupContext.Provider value={{ ...props, groupID }}>{props.children}</RadioGroupContext.Provider>;
 }
 
 /**

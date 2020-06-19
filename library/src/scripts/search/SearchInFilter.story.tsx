@@ -47,11 +47,6 @@ const dummmyFilters: ISearchInButton[] = [
         icon: <TypeCategoriesAndGroups />,
         data: "categoriesAndGroups",
     },
-    {
-        label: t("Categories & Groups"),
-        icon: <TypeCategoriesAndGroups />,
-        data: "categoriesAndGroups",
-    },
 ];
 
 const dummmyEndFilters: ISearchInButton[] = [
@@ -79,10 +74,10 @@ export function SearchFilter(props: IProps) {
     const [data, setData] = useState(activeItem);
 
     return (
-        <SearchFilterContextProvider>
+        <>
             {message && <StoryParagraph>{message}</StoryParagraph>}
             <SearchInFilter filters={filters} endFilters={endFilters} setData={setData} activeItem={data} />
-        </SearchFilterContextProvider>
+        </>
     );
 }
 

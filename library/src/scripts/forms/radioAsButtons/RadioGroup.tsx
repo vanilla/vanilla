@@ -10,13 +10,13 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
 import { buttonClasses } from "@library/forms/buttonStyles";
+import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
     accessibleTitle: string;
     children: JSX.Element | JSX.Element[];
     setData: (data: any) => void;
-    classes?: any; // Overwritable base classes for component
     buttonActiveClass?: string; // class that goes directly on the actual "button" element
     buttonClass?: string; // class that goes directly on the actual "button" element
 }
@@ -32,11 +32,12 @@ export function RadioGroup(props: IProps) {
         children,
         setData,
         activeItem,
-        classes,
+        classes = radioInputAsButtonsClasses(),
         buttonActiveClass = classesButtons.primary,
         buttonClass = classesButtons.standard,
     } = props;
     const classesInputBlock = inputBlockClasses();
+    const rootClass = classes["root"] ?? "";
 
     return (
         <RadioGroupProvider
@@ -46,7 +47,7 @@ export function RadioGroup(props: IProps) {
             buttonClass={buttonClass}
             classes={classes}
         >
-            <fieldset className={classNames(classesInputBlock.root, classes.root, className)}>
+            <fieldset className={classNames(classesInputBlock.root, rootClass, className)}>
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>
                 <div className={classes.items}>{children}</div>
             </fieldset>

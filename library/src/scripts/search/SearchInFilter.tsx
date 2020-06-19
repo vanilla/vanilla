@@ -27,12 +27,12 @@ interface IProps {
  */
 export function SearchInFilter(props: IProps) {
     const { filters = [], setData, endFilters = [], activeItem } = props;
-    if (filters.length + endFilters.length > 1) {
-        return null; // no filters, or only 1 is not helpful
-    }
+    // if (filters.length + endFilters.length > 1) {
+    //     return null; // no filters, or only 1 is not helpful
+    // }
     const classes = searchInFilterClasses();
     return (
-        <RadioGroup accessibleTitle={t("Search in:")} setData={setData} activeItem={activeItem}>
+        <RadioGroup accessibleTitle={t("Search in:")} setData={setData} activeItem={activeItem} classes={classes}>
             <>
                 {filters.map((filter, i) => {
                     return <RadioInputAsButton key={i} {...filter} />;

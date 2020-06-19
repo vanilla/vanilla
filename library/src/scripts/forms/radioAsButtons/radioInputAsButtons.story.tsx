@@ -14,6 +14,7 @@ import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/r
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInputAsTab.styles";
+import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export default {
     title: "Radio Inputs as Buttons",
@@ -33,7 +34,12 @@ export function RadioInputsRenderedAsButtons(props: {
     message?: string;
     classes?: IRadioInputAsButtonClasses;
 }) {
-    const { title = "Standard", accessibleTitle = "Are you going?", message = false, classes } = props;
+    const {
+        title = "Standard",
+        accessibleTitle = "Are you going?",
+        message = false,
+        classes = radioInputAsButtonsClasses(),
+    } = props;
     const [activeItem, setActiveItem] = useState("going");
     const setData = data => {
         setActiveItem(data);

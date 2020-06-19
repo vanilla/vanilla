@@ -3,38 +3,34 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { t } from "@vanilla/i18n/src";
-import { SearchDomain, useSearchPageData } from "@knowledge/modules/search/searchPageReducer";
-import { useSearchPageActions } from "@knowledge/modules/search/SearchPageActions";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import MultiUserInput from "@library/features/users/MultiUserInput";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
-import DateRange from "@library/forms/DateRange";
-import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
+import { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
 import { useSearchFilters } from "@library/contexts/SearchFilterContext";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import MultiUserInput from "@library/features/users/MultiUserInput";
 import Permission from "@library/features/users/Permission";
 import Checkbox from "@library/forms/Checkbox";
+import DateRange from "@library/forms/DateRange";
+import { dateRangeClasses } from "@library/forms/dateRangeStyles";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { t } from "@vanilla/i18n/src";
+import React from "react";
+import { KnowledgeBaseInput } from "@knowledge/knowledge-bases/KnowledgeBaseInput";
+import { UnifySearchDomain, useSearchPageData } from "@knowledge/modules/search/unifySearchPageReducer";
 
-interface IProps {
-    handleSubmit: (data) => void;
-}
 /**
  * Implement search filter panel for articles
  */
-export function SearchFilterPanelArticles(props) {
-    const { handleSubmit } = props;
-    const { form, results } = useSearchPageData();
-    const { updateForm, search } = useSearchPageActions();
+export function SearchFilterPanelArticles() {
+    const { form } = useSearchPageData();
+    const { updateForm, unifySearch } = useUnifySearchPageActions();
     const { getFilterComponentsForDomain } = useSearchFilters();
 
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame handleSubmit={handleSubmit}>
+        <FilterFrame handleSubmit={unifySearch}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
@@ -64,7 +60,7 @@ export function SearchFilterPanelArticles(props) {
                 className={classesDateRange.root}
             />
             {getFilterComponentsForDomain(form.domain)}
-            {form.domain === SearchDomain.ARTICLES && (
+            {/* {form.domain === UnifySearchDomain.ARTICLES && (
                 <KnowledgeBaseInput
                     className={classesInputBlock.root}
                     onChange={(option: IComboBoxOption) => {
@@ -72,7 +68,7 @@ export function SearchFilterPanelArticles(props) {
                     }}
                     value={form.kb}
                 />
-            )}
+            )} */}
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}

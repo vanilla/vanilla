@@ -16,7 +16,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 export interface ISearchFilterPanel {
     title?: string;
     handleSubmit: (data) => void;
-    children: JSX.Element | JSX.Element[];
+    children: React.ReactNode;
     valid?: boolean;
 }
 

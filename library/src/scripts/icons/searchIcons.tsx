@@ -11,11 +11,11 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { SearchIcon } from "./titleBar";
 
-export function SearchFilterAll(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
+export function SearchFilterAllIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
     return <SearchIcon {...props} />;
 }
 
-export function TypeDiscussions(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -37,7 +37,7 @@ export function TypeDiscussions(props: { className?: string; "aria-hidden"?: are
     );
 }
 
-export function TypeArticles(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeArticlesIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -51,7 +51,7 @@ export function TypeArticles(props: { className?: string; "aria-hidden"?: areaHi
     );
 }
 
-export function TypeCategoriesAndGroups(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeCategoriesAndGroupsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -65,7 +65,7 @@ export function TypeCategoriesAndGroups(props: { className?: string; "aria-hidde
     );
 }
 
-export function TypeMember(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeMemberIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -79,7 +79,7 @@ export function TypeMember(props: { className?: string; "aria-hidden"?: areaHidd
     );
 }
 
-export function TypeCategories(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeCategoriesIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -93,7 +93,7 @@ export function TypeCategories(props: { className?: string; "aria-hidden"?: area
     );
 }
 
-export function TypeIdeas(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeIdeasIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -107,7 +107,7 @@ export function TypeIdeas(props: { className?: string; "aria-hidden"?: areaHidde
     );
 }
 
-export function TypePolls(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypePollsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg
@@ -121,7 +121,7 @@ export function TypePolls(props: { className?: string; "aria-hidden"?: areaHidde
     );
 }
 
-export function TypeQuestion(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeQuestionIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
         <svg

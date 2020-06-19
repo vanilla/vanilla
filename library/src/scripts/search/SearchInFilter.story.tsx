@@ -7,11 +7,11 @@ import * as React from "react";
 import { useState } from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import {
-    SearchFilterAll,
-    TypeArticles,
-    TypeCategoriesAndGroups,
-    TypeDiscussions,
-    TypeMember,
+    SearchFilterAllIcon,
+    TypeArticlesIcon,
+    TypeCategoriesAndGroupsIcon,
+    TypeDiscussionsIcon,
+    TypeMemberIcon,
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
@@ -19,8 +19,8 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 import SearchContext, { SearchContextProvider } from "@library/contexts/SearchContext";
-import {MemoryRouter} from "react-router";
-import {MockSearchData} from "@library/contexts/DummySearchContext";
+import { MemoryRouter } from "react-router";
+import { MockSearchData } from "@library/contexts/DummySearchContext";
 
 interface IProps {
     activeItem?: string;
@@ -32,22 +32,22 @@ interface IProps {
 const dummmyFilters: ISearchInButton[] = [
     {
         label: t("All Content"),
-        icon: <SearchFilterAll />,
+        icon: <SearchFilterAllIcon />,
         data: "all",
     },
     {
         label: t("Discussions"),
-        icon: <TypeDiscussions />,
+        icon: <TypeDiscussionsIcon />,
         data: "discussions",
     },
     {
         label: t("Articles"),
-        icon: <TypeArticles />,
+        icon: <TypeArticlesIcon />,
         data: "articles",
     },
     {
         label: t("Categories & Groups"),
-        icon: <TypeCategoriesAndGroups />,
+        icon: <TypeCategoriesAndGroupsIcon />,
         data: "categoriesAndGroups",
     },
 ];
@@ -55,7 +55,7 @@ const dummmyFilters: ISearchInButton[] = [
 const dummmyEndFilters: ISearchInButton[] = [
     {
         label: t("Members"),
-        icon: <TypeMember />,
+        icon: <TypeMemberIcon />,
         data: "members",
     },
 ];

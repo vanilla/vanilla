@@ -342,39 +342,39 @@ story.add("Icons", () => {
             <StoryHeading>Search Icons</StoryHeading>
 
             <StoryTileAndTextCompact text={`SearchFilterAll`}>
-                <SearchIcons.SearchFilterAll />
+                <SearchIcons.SearchFilterAllIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeDiscussions`}>
-                <SearchIcons.TypeDiscussions />
+                <SearchIcons.TypeDiscussionsIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeArticles`}>
-                <SearchIcons.TypeArticles />
+                <SearchIcons.TypeArticlesIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeCategoriesAndGroups`}>
-                <SearchIcons.TypeCategoriesAndGroups />
+                <SearchIcons.TypeCategoriesAndGroupsIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeMember`}>
-                <SearchIcons.TypeMember />
+                <SearchIcons.TypeMemberIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeCategories`}>
-                <SearchIcons.TypeCategories />
+                <SearchIcons.TypeCategoriesIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeIdeas`}>
-                <SearchIcons.TypeIdeas />
+                <SearchIcons.TypeIdeasIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypePolls`}>
-                <SearchIcons.TypePolls />
+                <SearchIcons.TypePollsIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeQuestion`}>
-                <SearchIcons.TypeQuestion />
+                <SearchIcons.TypeQuestionIcon />
             </StoryTileAndTextCompact>
         </StoryContent>
     );

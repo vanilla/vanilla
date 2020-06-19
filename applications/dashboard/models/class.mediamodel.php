@@ -204,6 +204,12 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * @inheritdoc
      */
     public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array {
+        $extraArgs += [ // set default for $extraArgs['bypassUploadLimits']
+            'bypassUploadLimits' => false,
+        ];
+
+        $file->setBypassUploadLimits($extraArgs['bypassUploadLimits']);
+
         // Casen extra args for the DB.
         if (isset($extraArgs['foreignID'])) {
             $extraArgs['ForeignID'] = $extraArgs['foreignID'];
@@ -217,10 +223,6 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
             'Type' => $file->getClientMediaType(),
             'Size' => $file->getSize(),
         ]);
-
-        if (in_array('bypassUploadLimits', $extraArgs)) {
-            $file->setBypassUploadLimits($extraArgs['bypassUploadLimits']);
-        }
 
         if ($file->getForeignUrl() !== null) {
             $media['foreignUrl'] = $file->getForeignUrl();

@@ -90,8 +90,8 @@ class UploadedFile {
         $this->setError($error);
         $this->setClientFileName($clientFileName);
         $this->setClientMediaType($clientMediaType);
-        $this->setMaxImageHeight(filter_var(\Gdn::config("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT));
-        $this->setMaxImageWidth(filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT));
+        $this->setMaxImageHeight(\Gdn::config("ImageUpload.Limits.Height", false));
+        $this->setMaxImageWidth(\Gdn::config("ImageUpload.Limits.Width", false));
 
         if ($this->getError() === UPLOAD_ERR_OK) {
             $this->setFile($file);
@@ -328,7 +328,7 @@ class UploadedFile {
     /**
      * Get max image upload height
      *
-     * @return int|null
+     * @return ?int
      */
     public function getMaxImageHeight(): ?int {
         return $this->maxImageHeight;
@@ -337,7 +337,7 @@ class UploadedFile {
     /**
      * Get max image upload width
      *
-     * @return int|null
+     * @return ?int
      */
     public function getMaxImageWidth(): ?int {
         return $this->maxImageWidth;

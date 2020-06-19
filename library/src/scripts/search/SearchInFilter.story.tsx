@@ -1,7 +1,6 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
@@ -18,6 +17,7 @@ import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
+import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
     activeItem?: string;
@@ -79,10 +79,10 @@ export function SearchFilter(props: IProps) {
     const [data, setData] = useState(activeItem);
 
     return (
-        <>
+        <SearchFilterContextProvider>
             {message && <StoryParagraph>{message}</StoryParagraph>}
             <SearchInFilter filters={filters} endFilters={endFilters} setData={setData} activeItem={data} />
-        </>
+        </SearchFilterContextProvider>
     );
 }
 

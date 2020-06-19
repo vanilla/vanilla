@@ -155,8 +155,9 @@ export function SearchFormContextProvider(props: IProps) {
             query: query.query,
         };
 
-        const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), currentDomain.getAllowedFields()];
-        for (const [key, value] of Object.entries(form)) {
+        const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
+
+        for (const [key, value] of Object.entries(query)) {
             if (allowedFields.includes(key)) {
                 filterQuery[key] = value;
             }
@@ -178,14 +179,12 @@ export function SearchFormContextProvider(props: IProps) {
 
     const search = async () => {
         const { form } = state;
-        console.log(JSON.stringify(form, null, 4));
         dispatch(SearchActions.performSearchACs.started(form));
 
         try {
             const query = buildQuery(form);
-            console.log(JSON.stringify(query, null, 4));
             const response = await apiv2.get("/search", {
-                params: buildQuery(form),
+                params: query,
             });
             dispatch(
                 SearchActions.performSearchACs.done({

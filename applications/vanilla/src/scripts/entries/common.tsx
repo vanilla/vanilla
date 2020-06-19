@@ -26,10 +26,14 @@ onReady(() => {
             ];
         },
         transformFormToQuery: (form: ISearchForm<ICommunitySearchTypes>) => {
-            if (form.categoryOption) {
-                form.categoryID = form.categoryOption.value as number;
+            const query = {
+                ...form,
+            };
+
+            if (query.categoryOption) {
+                query.categoryID = query.categoryOption.value as number;
             }
-            return form;
+            return query;
         },
         getRecordTypes: () => {
             return ["discussion"];

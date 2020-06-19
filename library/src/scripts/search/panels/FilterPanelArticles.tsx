@@ -63,16 +63,16 @@ export function SearchFilterPanelArticles(props) {
                 end={form.endDate}
                 className={classesDateRange.root}
             />
-            {/*{getFilterComponentsForDomain(form.domain)}*/}
-            {/*{form.domain === SearchDomain.ARTICLES && (*/}
-            {/*    <KnowledgeBaseInput*/}
-            {/*        className={classesInputBlock.root}*/}
-            {/*        onChange={(option: IComboBoxOption) => {*/}
-            {/*            updateForm({ kb: option });*/}
-            {/*        }}*/}
-            {/*        value={form.kb}*/}
-            {/*    />*/}
-            {/*)}*/}
+            {getFilterComponentsForDomain(form.domain)}
+            {form.domain === SearchDomain.ARTICLES && (
+                <KnowledgeBaseInput
+                    className={classesInputBlock.root}
+                    onChange={(option: IComboBoxOption) => {
+                        updateForm({ kb: option });
+                    }}
+                    value={form.kb}
+                />
+            )}
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}

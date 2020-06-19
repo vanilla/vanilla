@@ -18,7 +18,9 @@ import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
-import { SearchContextProvider } from "@library/contexts/SearchContext";
+import SearchContext, { SearchContextProvider } from "@library/contexts/SearchContext";
+import {MemoryRouter} from "react-router";
+import {MockSearchData} from "@library/contexts/DummySearchContext";
 
 interface IProps {
     activeItem?: string;
@@ -75,10 +77,12 @@ export function SearchFilter(props: IProps) {
     const [data, setData] = useState(activeItem);
 
     return (
-        <SearchContextProvider>
-            {message && <StoryParagraph>{message}</StoryParagraph>}
-            <SearchInFilter filters={filters} endFilters={endFilters} setData={setData} activeItem={data} />
-        </SearchContextProvider>
+        <MemoryRouter>
+            <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
+                {message && <StoryParagraph>{message}</StoryParagraph>}
+                <SearchInFilter filters={filters} endFilters={endFilters} setData={setData} activeItem={data} />
+            </SearchContext.Provider>
+        </MemoryRouter>
     );
 }
 

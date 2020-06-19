@@ -16,7 +16,7 @@ export interface ISearchInButton {
 }
 
 interface IProps {
-    activeItem?: any;
+    activeItem?: string; // same type as data
     setData: (data: string) => void;
     filters: ISearchInButton[];
     endFilters?: ISearchInButton[]; // At the end, separated by vertical line

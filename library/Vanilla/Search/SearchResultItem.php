@@ -72,6 +72,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 ],
                 'dateInserted:dt',
                 'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
+                "insertUserID:i"
             ]);
 
             $extra = $this->extraSchema();

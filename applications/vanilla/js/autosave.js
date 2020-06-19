@@ -19,7 +19,9 @@ jQuery(document).ready(function($) {
             ];
             if (!defaultValues.includes(currentVal)) {
                 lastVal = currentVal;
-                $(options.button).click();
+                window.requestAnimationFrame(function () {
+                    $(options.button).click();
+                });
             }
         };
 

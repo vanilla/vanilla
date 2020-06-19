@@ -36,9 +36,9 @@ export function SearchFilterPanelArticles() {
                 inputProps={{
                     onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = event.target;
-                        updateForm({ title: value });
+                        updateForm({ name: value });
                     },
-                    value: form.title,
+                    value: form.name,
                 }}
             />
             <MultiUserInput

@@ -4,22 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { colorOut, IBorderRadiusValue, pointerEvents, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
-import { OverflowProperty, ResizeProperty, StandardLonghandPropertiesFallback } from "csstype";
+import { OverflowProperty, ResizeProperty } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
-
-export const inputBlockVariables = useThemeCache(() => {
-    const vars = globalVariables();
-    const varsLayouts = layoutVariables();
-    const mixBgAndFg = vars.mixBgAndFg;
-    const makeThemeVars = variableFactory("formElements");
-});
 
 export const inputBlockClasses = useThemeCache(() => {
     const style = styleFactory("inputBlock");

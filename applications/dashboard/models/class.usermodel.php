@@ -5316,6 +5316,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * Delete cached data for user.
      *
      * @param int|null $userID The user to clear the cache for.
+     * @param ?string $cacheTypesToClear
      * @return bool Returns **true** if the cache was cleared or **false** otherwise.
      */
     public function clearCache($userID, $cacheTypesToClear = null) {

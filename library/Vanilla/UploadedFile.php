@@ -60,6 +60,19 @@ class UploadedFile {
 
     /** @var bool Whether or not this file should bypass "ImageUpload.Limits.Enabled" config. */
     private $bypassUploadLimits = false;
+
+    /** @var ?int Max image upload height */
+    private $maxImageHeight;
+
+    /** @var ?int Max image upload width */
+    private $maxImageWidth;
+
+    /** @var int Max image upload height if $bypassUploadLimits === true */
+    private const MAX_IMAGE_HEIGHT = 3000;
+
+    /** @var int Max image upload width if $bypassUploadLimits === true */
+    private const MAX_IMAGE_WIDTH = 3000;
+
     /**
      * UploadedFile constructor.
      *
@@ -77,6 +90,8 @@ class UploadedFile {
         $this->setError($error);
         $this->setClientFileName($clientFileName);
         $this->setClientMediaType($clientMediaType);
+        $this->setMaxImageHeight(filter_var(\Gdn::config("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT));
+        $this->setMaxImageWidth(filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT));
 
         if ($this->getError() === UPLOAD_ERR_OK) {
             $this->setFile($file);
@@ -247,12 +262,16 @@ class UploadedFile {
             "width" => $width ?? 0,
         ];
 
-        if (\Gdn::config("ImageUpload.Limits.Enabled") && !$this->getBypassUploadLimits()) {
-            if ($newWidth = filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
-                $options["width"] = $newWidth;
+        if (\Gdn::config("ImageUpload.Limits.Enabled")) {
+            $maxImageHeight = $this->getBypassUploadLimits() ? self::MAX_IMAGE_HEIGHT : $this->getMaxImageHeight();
+            $maxImageWidth = $this->getBypassUploadLimits() ? self::MAX_IMAGE_WIDTH : $this->getMaxImageWidth();
+
+            if ($maxImageWidth) {
+                $options["width"] = $maxImageWidth;
             }
-            if ($newHeight = filter_var(\Gdn::config("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT)) {
-                $options["height"] = $newHeight;
+
+            if ($maxImageHeight) {
+                $options["height"] = $maxImageHeight;
             }
         }
 
@@ -304,6 +323,24 @@ class UploadedFile {
      */
     public function getBypassUploadLimits(): bool {
         return $this->bypassUploadLimits;
+    }
+
+    /**
+     * Get max image upload height
+     *
+     * @return int|null
+     */
+    public function getMaxImageHeight(): ?int {
+        return $this->maxImageHeight;
+    }
+
+    /**
+     * Get max image upload width
+     *
+     * @return int|null
+     */
+    public function getMaxImageWidth(): ?int {
+        return $this->maxImageWidth;
     }
 
     /**
@@ -469,6 +506,26 @@ class UploadedFile {
      */
     public function setClientWidth(?int $clientWidth): void {
         $this->clientWidth = $clientWidth;
+    }
+
+    /**
+     * Set max image upload height
+     * @param ?int $maxImageHeight
+     * @return UploadedFile
+     */
+    public function setMaxImageHeight($maxImageHeight): self {
+        $this->maxImageHeight = $maxImageHeight;
+        return $this;
+    }
+
+    /**
+     * Set max image upload height
+     * @param ?int $maxImageWidth
+     * @return UploadedFile
+     */
+    public function setMaxImageWidth($maxImageWidth): self {
+        $this->maxImageWidth = $maxImageWidth;
+        return $this;
     }
 
     /**

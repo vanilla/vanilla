@@ -1214,13 +1214,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         reset($rows);
-        $single = is_string(key($rows));
+        $single = !($rows instanceof Traversable) && is_string(key($rows));
 
         $userIDs = [];
 
-        $extractUserIDs = function(array $row) use ($columns, &$userIDs) {
+        $extractUserIDs = function($row) use ($columns, &$userIDs) {
             foreach ($columns as $key) {
-                if (array_key_exists($key, $row)) {
+                if ($row[$key] ?? false) {
                     $id = $row[$key];
                     $userIDs[$id] = true;
                 }
@@ -1237,10 +1237,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
         $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
 
-        $populate = function(array &$row) use ($users, $columns) {
+        $populate = function(&$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
-                $id = val($key, $row);
+                $id = $row[$key] ?? null;
                 $user = null;
                 if (is_numeric($id)) {
                     // Massage the data, before injecting it into the results.
@@ -1262,7 +1262,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 }
                 $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
                 $user =  UserFragmentSchema::normalizeUserFragment($user);
-                setValue($destination, $row, $user);
+                $row[$destination] = $user;
             }
         };
 

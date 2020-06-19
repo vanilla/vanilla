@@ -108,8 +108,6 @@ class GlobalSearchType extends AbstractSearchType {
             }
 
             // Sorts
-            // title is used in sphinx instead of name.
-//            $sort = str_replace('name', 'title', $sort);
             $sortField = ltrim($sort, '-');
 
             if ($sortField === SearchQuery::SORT_RELEVANCE) {

@@ -40,8 +40,6 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
     const activeItem = props["activeItem"];
     const classes = props["classes"] || { item: null, input: null, label: null };
 
-    console.log("clases: ", classes);
-
     const onClick = event => {
         props.setData(props.data);
     };

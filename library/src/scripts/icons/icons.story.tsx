@@ -37,6 +37,8 @@ import {
     RevisionStatusPendingIcon,
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
+import * as SearchIcons from "@library/icons/searchIcons";
+
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
@@ -336,6 +338,44 @@ story.add("Icons", () => {
                     <CommonIcons.NewPollIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
+
+            <StoryHeading>Search Icons</StoryHeading>
+
+            <StoryTileAndTextCompact text={`SearchFilterAll`}>
+                <SearchIcons.SearchFilterAll />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeDiscussions`}>
+                <SearchIcons.TypeDiscussions />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeArticles`}>
+                <SearchIcons.TypeArticles />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeCategoriesAndGroups`}>
+                <SearchIcons.TypeCategoriesAndGroups />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeMember`}>
+                <SearchIcons.TypeMember />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeCategories`}>
+                <SearchIcons.TypeCategories />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeIdeas`}>
+                <SearchIcons.TypeIdeas />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypePolls`}>
+                <SearchIcons.TypePolls />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeQuestion`}>
+                <SearchIcons.TypeQuestion />
+            </StoryTileAndTextCompact>
         </StoryContent>
     );
 });

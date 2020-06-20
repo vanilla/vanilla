@@ -1182,7 +1182,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     $dateInserted = $fields['DateInserted'];
                 }
 
-                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) : $fields;
+                $commentData = $commentID ?
+                    array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) :
+                    $fields;
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', $commentData);
                 if ($spam) {
@@ -1497,8 +1499,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 $this->SQL->update('Discussion');
                 if (!$discussion['Sink'] && $data['DateLastComment']) {
                     $this->SQL->set('DateLastComment', $data['DateLastComment']);
-                } elseif (!$data['DateLastComment'])
+                } elseif (!$data['DateLastComment']) {
                     $this->SQL->set('DateLastComment', $discussion['DateInserted']);
+                }
 
                 $this->SQL
                     ->set('FirstCommentID', $data['FirstCommentID'])

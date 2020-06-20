@@ -20,6 +20,12 @@ class CountsTest extends TestCase {
     /**
      * @var array
      */
+    private $categories;
+
+
+    /**
+     * @var array
+     */
     private $discussions = [];
 
     /**
@@ -45,14 +51,33 @@ class CountsTest extends TestCase {
         $this->discussions = [];
         $this->comments = [];
 
-        // Insert some test records.
-        $discussions = $this->insertDiscussions(2);
-        $this->discussions += array_column($discussions, null, 'DiscussionID');
+        // Insert some category containers.
+        $parentCategories = $this->insertCategories(2, ['Name' => 'Parent Count %s', 'DisplayAs' => \CategoryModel::DISPLAY_NESTED]);
+        $this->categories += array_column($parentCategories, null, 'CategoryID');
 
-        // Insert some comments for each discussion.
-        foreach ($discussions as $discussion) {
-            $comments = $this->insertComments(5, ['DiscussionID' => $discussion['DiscussionID']]);
-            $this->comments += array_column($comments, null, 'CommentID');
+        foreach ($parentCategories as $category) {
+            $childCategories = $this->insertCategories(
+                2,
+                [
+                'Name' => 'Test Count %s',
+                'DisplayAs' => \CategoryModel::DISPLAY_DISCUSSIONS,
+                'ParentCategoryID' => $category['CategoryID'],
+                ]
+            );
+
+            $this->categories += array_column($childCategories, null, 'CategoryID');
+
+            foreach ($childCategories as $childCategory) {
+                // Insert some test discussions.
+                $discussions = $this->insertDiscussions(2, ['CategoryID' => $childCategory['CategoryID']]);
+                $this->discussions += array_column($discussions, null, 'DiscussionID');
+
+                // Insert some comments for each discussion.
+                foreach ($discussions as $discussion) {
+                    $comments = $this->insertComments(5, ['DiscussionID' => $discussion['DiscussionID']]);
+                    $this->comments += array_column($comments, null, 'CommentID');
+                }
+            }
         }
     }
 
@@ -63,6 +88,10 @@ class CountsTest extends TestCase {
         foreach ($this->discussions as $row) {
             $this->assertDiscussionCounts($row['DiscussionID']);
         }
+//
+//        foreach ($this->categories as $categoryID => $_) {
+//            $this->assertCategoryCounts($categoryID);
+//        }
     }
 
     /**
@@ -112,13 +141,49 @@ SQL
     }
 
     /**
+     * Assert that all of the cached aggregate data on the category table is correct.
+     *
+     * @param int $categoryID
+     */
+    public function assertCategoryCounts(int $categoryID): void {
+        $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($category);
+
+        $counts = $this->query(<<<SQL
+select
+    count(d.DiscussionID) as CountDiscussions,
+    sum(d.CountComments) as CountComments
+from GDN_Discussion d
+where d.CategoryID = :id
+SQL
+            , ['id' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+
+        if (empty($counts)) {
+            $counts = [
+                'CountDiscussions' => 0,
+                'CountComments' => 0
+            ];
+        } else {
+            $counts['CountComments'] = $counts['CountComments'] ?? 0;
+            // Get the last comment to fix the last discussion ID.
+//            if ($counts['LastCommentID'] !== null) {
+//                $lastComment = $this->sql->getWhere('Comment', ['CommentID' => $counts['LastCommentID']])->firstRow(DATASET_TYPE_ARRAY);
+//                $this->assertNotEmpty($lastComment);
+//                $counts['LastDiscussionID'] = $lastComment['DiscussionID'];
+//            }
+        }
+
+        $this->assertPartialArray($counts, $category, "categoryID: $categoryID, name: {$category['Name']}");
+    }
+
+    /**
      * Assert that the parts of an array that intersect match eachother.
      *
      * @param array $partial
      * @param array $full
      * @param string $message
      */
-    public static function assertPartialArray(array $partial, array $full, string $message = '') {
+    public static function assertPartialArray(array $partial, array $full, string $message = ''): void {
         $full = array_intersect_key($full, $partial);
         ksort($partial);
         ksort($full);

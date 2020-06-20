@@ -16,6 +16,8 @@ trait TestCategoryModelTrait {
      */
     private $categoryModel;
 
+    private static $categoryIndex = 1;
+
     /**
      * Instantiate a fresh model for each
      */
@@ -31,13 +33,18 @@ trait TestCategoryModelTrait {
      * @return array
      */
     public function newCategory(array $override): array {
-        static $i = 1;
+        $i = self::$categoryIndex++;
 
         $r = $override + [
-                'Name' => "Category $i?",
-                'UrlCode' => "cat-$i",
-                'Description' => "Foo $i.",
+                'Name' => "Category %s",
+                'UrlCode' => "cat-%s",
+                'Description' => "Foo %s.",
+                'DateInserted' => TestDate::mySqlDate(),
             ];
+
+        foreach (['Name', 'UrlCode', 'Description'] as $field) {
+            $r[$field] = sprintf($r[$field], $i);
+        }
 
         return $r;
     }
@@ -52,9 +59,13 @@ trait TestCategoryModelTrait {
     private function insertCategories(int $count, array $overrides = []): array {
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
-            $ids[] = $this->categoryModel->save($this->newCategory($overrides));
+            $id = $this->categoryModel->save($this->newCategory($overrides));
+            if ($id === false) {
+                throw new \Exception($this->categoryModel->Validation->resultsText(), 400);
+            }
+            $ids[] = $id;
         }
-        $rows = $this->categoryModel->getWhere(['CategoryID' => $ids, 'Announce' => 'All'])->resultArray();
+        $rows = $this->categoryModel->getWhere(['CategoryID' => $ids])->resultArray();
         TestCase::assertCount($count, $rows, "Not enough test categories were inserted.");
 
         return $rows;

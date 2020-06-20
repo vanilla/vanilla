@@ -40,11 +40,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /** Flag for aggregating discussion counts. */
     const AGGREGATE_DISCUSSION = 'discussion';
 
-    /** @var Constants for category display options. */
+    /* Constants for category display options. */
     const DISPLAY_FLAT = 'Flat';
     const DISPLAY_HEADING = 'Heading';
     const DISPLAY_DISCUSSIONS = 'Discussions';
-    const DISPLAY_NESTED = 'Nested';
+    const DISPLAY_NESTED = 'Categories';
 
     /**
      * @var CategoryModel $instance;

@@ -24,7 +24,6 @@ import { HashOffsetReporter, useScrollOffset } from "@library/layout/ScrollOffse
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import BackLink from "@library/routing/links/BackLink";
 import SmartLink from "@library/routing/links/SmartLink";
-import { usePageContext } from "@library/routing/PagesContext";
 import { LogoType } from "@library/theming/ThemeLogo";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -36,6 +35,7 @@ import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
 import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { SearchPageRoute } from "@library/search/SearchPageRoute";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
@@ -71,7 +71,7 @@ export default function TitleBar(_props: IProps) {
     const { bgProps, bg2Props, logoProps } = useScrollTransition();
     const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
 
-    const { pages } = usePageContext();
+    SearchPageRoute;
     const device = useTitleBarDevice();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);
@@ -213,9 +213,7 @@ export default function TitleBar(_props: IProps) {
                                 focusOnMount
                                 open={isSearchOpen}
                                 onSearchButtonClick={() => {
-                                    if (pages.search) {
-                                        pages.search.preload();
-                                    }
+                                    SearchPageRoute.preload();
                                     setIsSearchOpen(true);
                                 }}
                                 onCloseSearch={() => {

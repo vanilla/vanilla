@@ -21,9 +21,6 @@ export interface ISearchFormBase {
 
 export type ISearchForm<T extends object = {}> = ISearchFormBase & T & Record<string | number, any>;
 
-export const ALL_CONTENT_DOMAIN_NAME = "all_content";
-export const ALLOWED_GLOBAL_SEARCH_FIELDS = ["query", "name", "insertUserIDs", "dateInserted", "page"];
-
 export interface ISearchRequestQuery extends Omit<ISearchForm, "authors" | "startDate" | "endDate"> {
     dateInserted?: string;
     insertUserIDs?: number[];
@@ -39,7 +36,10 @@ export interface ISearchResult {
     score?: number;
     breadcrumbs: ICrumb[];
     status?: PublishStatus;
-
+    image?: {
+        url: string;
+        alt: string;
+    };
     dateInserted: string;
     insertUserID: number;
     insertUser: IUserFragment;

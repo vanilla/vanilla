@@ -1,17 +1,16 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
-import { searchFormFilterClasses } from "@knowledge/modules/search/searchFormFilterStyles";
+import Button from "@library/forms/Button";
 import Frame from "@library/layout/frame/Frame";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import { t } from "@library/utility/appUtils";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import Button from "@library/forms/Button";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
+import React from "react";
 
 export interface ISearchFilterPanel {
     title?: string;

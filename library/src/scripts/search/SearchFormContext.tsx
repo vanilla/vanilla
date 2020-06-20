@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,14 +9,8 @@ import SimplePagerModel from "@library/navigation/SimplePagerModel";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/searchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
-import {
-    ALLOWED_GLOBAL_SEARCH_FIELDS,
-    ISearchForm,
-    ISearchRequestQuery,
-    ISearchResults,
-    ISearchFormBase,
-    ALL_CONTENT_DOMAIN_NAME,
-} from "@library/search/searchTypes";
+import { ISearchForm, ISearchRequestQuery, ISearchResults, ISearchFormBase } from "@library/search/searchTypes";
+import { ALLOWED_GLOBAL_SEARCH_FIELDS, ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
 import { ILoadable } from "@vanilla/library/src/scripts/@types/api/core";
 import React, { useCallback, useContext, useReducer } from "react";
@@ -171,7 +165,7 @@ export function SearchFormContextProvider(props: IProps) {
                 form.authors && form.authors.length ? form.authors.map(author => author.value as number) : undefined,
             dateInserted,
             recordTypes: currentDomain.getRecordTypes(),
-            expand: ["insertUser", "breadcrumbs"],
+            expand: ["insertUser", "breadcrumbs", "image", "excerpt"],
         };
 
         return finalQuery;
@@ -190,7 +184,10 @@ export function SearchFormContextProvider(props: IProps) {
                 SearchActions.performSearchACs.done({
                     params: form,
                     result: {
-                        results: response.data,
+                        results: response.data.map(item => {
+                            item.body = item.excerpt;
+                            return item;
+                        }),
                         pagination: SimplePagerModel.parseLinkHeader(response.headers["link"], "page"),
                     },
                 }),

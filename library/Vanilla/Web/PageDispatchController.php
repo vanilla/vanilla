@@ -27,6 +27,9 @@ class PageDispatchController implements CustomExceptionHandler {
     /** @var Container */
     private $container;
 
+    /** @var CustomExceptionHandler|null */
+    private $altExceptionHandler = null;
+
     /**
      * Dependency Injection.
      * It's generally an antipattern to inject the container, but this is a dispatcher.
@@ -36,7 +39,6 @@ class PageDispatchController implements CustomExceptionHandler {
     public function __construct(Container $container) {
         $this->container = $container;
     }
-
 
     /**
      * Instantiate a page class and set it as the active instance.
@@ -70,10 +72,25 @@ class PageDispatchController implements CustomExceptionHandler {
     }
 
     /**
+     * @param CustomExceptionHandler|null $altExceptionHandler
+     */
+    protected function setAltExceptionHandler(?CustomExceptionHandler $altExceptionHandler): void {
+        $this->altExceptionHandler = $altExceptionHandler;
+    }
+
+    protected function buildRedirect() {
+
+    }
+
+    /**
      * Forward the call onto our active page if we have one.
      * @inheritdoc
      */
     public function hasExceptionHandler(\Throwable $e): bool {
+        if ($this->altExceptionHandler) {
+            return $this->altExceptionHandler->hasExceptionHandler($e);
+        }
+
         if ($this->activePage) {
             return $this->activePage->hasExceptionHandler($e);
         }
@@ -85,6 +102,10 @@ class PageDispatchController implements CustomExceptionHandler {
      * @inheritdoc
      */
     public function handleException(\Throwable $e): Data {
+        if ($this->altExceptionHandler) {
+            return $this->altExceptionHandler->handleException($e);
+        }
+
         return $this->activePage->handleException($e);
     }
 }

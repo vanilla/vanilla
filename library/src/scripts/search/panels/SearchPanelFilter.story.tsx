@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -7,9 +7,9 @@ import * as React from "react";
 import { SearchFilterAllIcon } from "@library/icons/searchIcons";
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { SearchFilterPanelArticles } from "@library/search/panels/FilterPanelArticles";
+import { SearchFilterPanelArticles } from "@knowledge/search/SearchFilterPanelArticles";
 import { SearchFilterPanelCategoriesAndGroups } from "@library/search/panels/FilterPanelCategoriesAndGroups";
-import { SearchFilterPanelDiscussions } from "@library/search/panels/FilterPanelDiscussions";
+import { SearchFilterPanelDiscussions } from "@vanilla/addon-vanilla/search/FilterPanelDiscussions";
 
 interface IProps {
     message?: string;

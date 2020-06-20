@@ -9,6 +9,8 @@ namespace Vanilla\Theme;
 
 use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Controllers\SearchRootController;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Class to hold information about a theme and it's configuration options.
@@ -30,6 +32,7 @@ class ThemeFeatures implements \JsonSerializable {
         'DataDrivenTheme' => false,
         'DisableKludgedVars' => false,
         'NewEventsPage' => false,
+        SearchRootController::ENABLE_FLAG => false,
     ];
 
     /**
@@ -78,9 +81,26 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['SharedMasterView'] = true;
             $themeValues['NewFlyouts'] = true;
             $themeValues['NewEventsPage'] = true;
+            $themeValues[SearchRootController::ENABLE_FLAG] = true;
+        }
+
+        if (FeatureFlagHelper::featureEnabled(SearchRootController::ENABLE_FLAG)) {
+            $themeValues[SearchRootController::ENABLE_FLAG] = true;
         }
 
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
+    }
+
+    /**
+     * Get a theme feature.
+     *
+     * @param string $featureName The name of the feature.
+     *
+     * @return bool
+     */
+    public function get(string $featureName): bool {
+        $result = $this->allFeatures()[$featureName] ?? false;
+        return (bool) $result;
     }
 
     /**

@@ -3,11 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { produce } from "immer";
-import { ISearchForm, ISearchResults, ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchTypes";
-import { reducerWithInitialState, reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { SearchActions } from "@library/search/searchActions";
+import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
+import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
+import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { produce } from "immer";
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 
 export interface ISearchState {
     form: ISearchForm;

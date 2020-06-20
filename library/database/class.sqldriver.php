@@ -1708,6 +1708,21 @@ abstract class Gdn_SQLDriver {
         return $result;
     }
 
+    /**
+     * Generate the UPDATE statement for this object.
+     *
+     * @return string
+     * @throws Exception Throws an exception when the SET OR FROM data is empty.
+     */
+    public function getUpdateSql(): string {
+        if (count($this->_Sets) == 0 || !isset($this->_Froms[0])) {
+            throw new Exception("Cannot generate UPDATE statement with missing clauses.", 400);
+        }
+
+        $sql = $this->getUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
+        return $sql;
+    }
+
     public function query($sql, $type = 'select') {
         $queryOptions = ['Type' => $type, 'Slave' => val('Slave', $this->_Options, null)];
 
@@ -1975,12 +1990,17 @@ abstract class Gdn_SQLDriver {
         foreach ($field as $f => $v) {
             if ($v instanceof DateTimeImmutable) {
                 $v = $v->format(MYSQL_DATE_FORMAT);
-            } elseif (is_array($v) || is_object($v)) {
+            } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiteral)) {
                 throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
             }
 
             $escapedName = $this->escapeFieldReference($f, true);
-            if (in_array(substr($f, -1), ['+', '-'], true)) {
+            if (is_object($v) && $v instanceof \Vanilla\Database\SetLiteral) {
+                $expr = $v->toSql($this, $escapedName);
+                if (!empty($expr)) {
+                    $this->_Sets[$escapedName] = $expr;
+                }
+            } elseif (in_array(substr($f, -1), ['+', '-'], true)) {
                 // This is an increment/decrement.
                 $op = substr($f, -1);
                 $f = substr($f, 0, -1);

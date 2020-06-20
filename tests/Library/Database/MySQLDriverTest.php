@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Database\Increment;
 use Vanilla\Schema\RangeExpression;
 use VanillaTests\SiteTestTrait;
 
@@ -311,5 +312,44 @@ EOT;
             '[]' => ['', []],
         ];
         return $r;
+    }
+
+    /**
+     * Test the `Increment` value.
+     *
+     * @param int $increment
+     * @param string $expected
+     * @dataProvider incrementTests
+     */
+    public function testIncrement(int $increment, string $expected): void {
+        $sql = $this->sql->update('test')->set('a', new Increment($increment))->getUpdateSql();
+        $expected = <<<SQL
+update `GDN_test` `test`
+set `a` = `a` $expected
+SQL;
+        $this->assertSame($expected, $sql);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function incrementTests(): array {
+        $r = [
+            [1, '+1'],
+            [-1, '-1'],
+        ];
+
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * An increment of zero shouldn't add a SET clause.
+     */
+    public function testIncrementEmpty(): void {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot generate UPDATE statement with missing clauses.');
+        $sql = $this->sql->update('test', ['a' => new Increment(0)])->getUpdateSql();
     }
 }

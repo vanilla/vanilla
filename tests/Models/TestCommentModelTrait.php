@@ -39,6 +39,7 @@ trait TestCommentModelTrait {
                 'DiscussionID' => 1,
                 'Body' => "Foo $i.",
                 'Format' => 'Text',
+                'DateInserted' => TestDate::mySqlDate(),
             ];
 
         return $r;

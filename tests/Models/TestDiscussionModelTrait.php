@@ -41,6 +41,7 @@ trait TestDiscussionModelTrait {
                 'CategoryID' => 1,
                 'Body' => "Foo $i.",
                 'Format' => 'Text',
+                'DateInserted' => TestDate::mySqlDate(),
             ];
 
         return $r;

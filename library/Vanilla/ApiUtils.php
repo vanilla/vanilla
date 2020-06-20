@@ -150,7 +150,12 @@ class ApiUtils {
         $args = [];
         foreach ($query as $key => $value) {
             if ($key !== 'page' && (!isset($properties[$key]['default']) || $value != $properties[$key]['default'])) {
-                $args[$key] = $value;
+                if (is_object($value) && method_exists($value, "__toString")) {
+                    // If we can stringify, do it.
+                    $args[$key] = (string)$value;
+                } else {
+                    $args[$key] = $value;
+                }
             }
         }
         $argsStr = http_build_query($args);

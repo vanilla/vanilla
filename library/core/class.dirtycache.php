@@ -110,10 +110,16 @@ class Gdn_Dirtycache extends Gdn_Cache {
      * {@inheritDoc}
      */
     public function increment($key, $amount = 1, $options = []) {
+        $options += [
+            self::FEATURE_INITIAL => 0
+        ];
+
         if (array_key_exists($key, $this->cache)) {
             $result = $this->cache[$key] += $amount;
+        } elseif ($options[self::FEATURE_INITIAL] != 0) {
+            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL];
         } else {
-            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL] ?? 0;
+            $result = self::CACHEOP_FAILURE;
         }
         return $result;
     }
@@ -122,10 +128,16 @@ class Gdn_Dirtycache extends Gdn_Cache {
      * {@inheritDoc}
      */
     public function decrement($key, $amount = 1, $options = []) {
+        $options += [
+            self::FEATURE_INITIAL => 0
+        ];
+
         if (array_key_exists($key, $this->cache)) {
             $result = $this->cache[$key] -= $amount;
+        } elseif ($options[self::FEATURE_INITIAL] != 0) {
+            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL];
         } else {
-            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL] ?? 0;
+            $result = self::CACHEOP_FAILURE;
         }
         return $result;
     }

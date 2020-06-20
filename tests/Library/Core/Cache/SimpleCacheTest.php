@@ -34,6 +34,15 @@ abstract class SimpleCacheTest extends \Cache\IntegrationTests\SimpleCacheTest {
         'testDeleteMultipleInvalidKeys' => self::MSG_VALIDATE,
         'testDeleteMultipleNoIterable' => self::MSG_VALIDATE,
     ];
+    /**
+     * @var \Gdn_Cache
+     */
+    protected $legacyCache;
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->legacyCache = $this->createLegacyCache();
+    }
 
     /**
      * Create a legacy cache object for testing.
@@ -46,7 +55,7 @@ abstract class SimpleCacheTest extends \Cache\IntegrationTests\SimpleCacheTest {
      * Test a basic increment.
      */
     public function testIncrement(): void {
-        $cache = $this->createLegacyCache();
+        $cache = $this->legacyCache;
 
         $this->assertFalse($cache->exists('aa'));
         $val = $cache->increment('aa', 1, [\Gdn_Cache::FEATURE_INITIAL => 5]);
@@ -60,12 +69,41 @@ abstract class SimpleCacheTest extends \Cache\IntegrationTests\SimpleCacheTest {
      * Test a basic decrement.
      */
     public function testDecrement(): void {
-        $cache = $this->createLegacyCache();
+        $cache = $this->legacyCache;
 
         $this->assertFalse($cache->exists('aa'));
         $val = $cache->decrement('aa', 1, [\Gdn_Cache::FEATURE_INITIAL => 5]);
         $this->assertSame(5, $val);
         $val2 = $cache->decrement('aa', 2);
         $this->assertSame($val - 2, $val2);
+    }
+
+    /**
+     * Test the legacy increment/decrement behavior..
+     *
+     * This test replicates a legacy behavior of our cache where you MUST pass `\Gdn_Cache::Feature_INITIAL != 0` or
+     * else the functions will return false if the cache key does not exist. Ideally, this would not be the case, but
+     * it's safer to keep the legacy behavior intact.
+     */
+    public function testIncrementDecrementNoInitial(): void {
+        $cache = $this->legacyCache;
+
+        $this->assertFalse($cache->exists(__FUNCTION__));
+        $this->assertFalse($cache->increment(__FUNCTION__));
+        $this->assertFalse($cache->increment(__FUNCTION__));
+
+        $this->assertFalse($cache->decrement(__FUNCTION__));
+        $this->assertFalse($cache->decrement(__FUNCTION__));
+    }
+
+    /**
+     * Test `Gdn_Cache::incrementFrom()`.
+     */
+    public function testIncrementFrom(): void {
+        $this->assertFalse($this->legacyCache->exists(__FUNCTION__));
+        for ($i = 0; $i < 3; $i++) {
+            $val = $this->legacyCache->incrementFrom(__FUNCTION__, 1, 0);
+            $this->assertSame($i, $val);
+        }
     }
 }

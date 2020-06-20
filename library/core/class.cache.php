@@ -496,6 +496,28 @@ abstract class Gdn_Cache {
     abstract public function increment($key, $amount = 1, $options = []);
 
     /**
+     * Increment a the value at a key.
+     *
+     * This is a convenience method that provides the options as defined parameters rather than an options array.
+     * It will also always try and set an initial value, even if its 0.
+     *
+     * @param string $key
+     * @param int $amount
+     * @param int $initial
+     * @param int $ttl
+     * @return int
+     */
+    public function incrementFrom(string $key, int $amount, int $initial = 1, $ttl = 0): int {
+        $result = $this->increment($key, $amount, [self::FEATURE_INITIAL => $initial, self::FEATURE_EXPIRY => $ttl]);
+
+        if (self::CACHEOP_FAILURE === $result) {
+            $this->store($key, $initial, [self::FEATURE_EXPIRY => $ttl]);
+            $result = $initial;
+        }
+        return $result;
+    }
+
+    /**
      * Decrement the value of the provided key by {@link $Amount}.
      *
      * This will fail if the key does not already exist. Cannot take the value

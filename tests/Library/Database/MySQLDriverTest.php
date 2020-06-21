@@ -8,7 +8,8 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
-use Vanilla\Database\Increment;
+use Vanilla\Database\SetLiterals\Increment;
+use Vanilla\Database\SetLiterals\MinMax;
 use Vanilla\Schema\RangeExpression;
 use VanillaTests\SiteTestTrait;
 
@@ -351,5 +352,35 @@ SQL;
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot generate UPDATE statement with missing clauses.');
         $sql = $this->sql->update('test', ['a' => new Increment(0)])->getUpdateSql();
+    }
+
+    /**
+     * Test min/max literals.
+     *
+     * @param string $op
+     * @param string $expected
+     * @dataProvider minMaxTests
+     */
+    public function testMinMax(string $op = MinMax::OP_MIN, string $expected = '<') {
+        $dt = new \DateTime('2020-06-20', new \DateTimeZone('UTC'));
+
+        $sql = $this->sql->update('test')->set('a', new MinMax($op, $dt))->getUpdateSql();
+        $expected = <<<SQL
+update `GDN_test` `test`
+set `a` = case when `a` is null or '2020-06-20 00:00:00' $expected `a` then '2020-06-20 00:00:00' else `a` end
+SQL;
+        $this->assertSame($expected, $sql);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function minMaxTests(): array {
+        return [
+            MinMax::OP_MIN => [MinMax::OP_MIN, '<'],
+            MinMax::OP_MAX => [MinMax::OP_MAX, '>'],
+        ];
     }
 }

@@ -1809,7 +1809,12 @@ abstract class Gdn_SQLDriver {
      * @return string
      */
     public function quote($value, $type = PDO::PARAM_STR): string {
-        return $this->Database->connection()->quote($value, $type);
+        if ($value instanceof \DateTimeInterface) {
+             $value = gmdate(MYSQL_DATE_FORMAT, $value->getTimestamp());
+        }
+        $r = $this->Database->connection()->quote($value, $type);
+
+        return $r;
     }
 
     /**
@@ -1990,12 +1995,12 @@ abstract class Gdn_SQLDriver {
         foreach ($field as $f => $v) {
             if ($v instanceof DateTimeImmutable) {
                 $v = $v->format(MYSQL_DATE_FORMAT);
-            } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiteral)) {
+            } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiterals\SetLiteral)) {
                 throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
             }
 
             $escapedName = $this->escapeFieldReference($f, true);
-            if (is_object($v) && $v instanceof \Vanilla\Database\SetLiteral) {
+            if (is_object($v) && $v instanceof \Vanilla\Database\SetLiterals\SetLiteral) {
                 $expr = $v->toSql($this, $escapedName);
                 if (!empty($expr)) {
                     $this->_Sets[$escapedName] = $expr;

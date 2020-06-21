@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Database;
+namespace Vanilla\Database\SetLiterals;
 
 /**
  * A base class for specifying literal SQL expressions.

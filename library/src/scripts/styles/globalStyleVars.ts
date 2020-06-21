@@ -328,10 +328,10 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         text: {
             size: fonts.size.small,
             color: elementaryColors.lowContrast,
-            margin: 4,
             lineHeight: lineHeights.base,
         } as IFont,
         spacing: {
+            horizontalMargin: 4,
             verticalMargin: 12,
             default: gutter.quarter,
         },

@@ -232,7 +232,7 @@ export const forumMetaCSS = () => {
     });
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
-        marginLeft: unit(negative(globalVars.meta.text.margin)),
+        marginLeft: unit(negative(globalVars.meta.spacing.horizontalMargin)),
     });
 
     const linkColors = clickableItemStates();

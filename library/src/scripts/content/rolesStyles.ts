@@ -19,7 +19,7 @@ export const rolesClasses = useThemeCache(() => {
         }),
         $nest: {
             "&&": {
-                fontSize: metaVars.text.fontSize,
+                fontSize: metaVars.text.size,
                 lineHeight: globalVars.lineHeights.condensed,
             },
         },

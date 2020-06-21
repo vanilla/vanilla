@@ -15,6 +15,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { SearchBarPresets } from "@library/banner/bannerStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import {inputClasses} from "@library/forms/inputStyles";
 
 export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -169,6 +170,7 @@ export const compactSearchClasses = useThemeCache(() => {
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
     const mediaQueries = layoutVariables().mediaQueries();
+    inputClasses().applyInputCSSRules();
 
     const root = style({
         $nest: {

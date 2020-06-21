@@ -15,7 +15,7 @@ import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioI
 interface IProps extends IRadioGroupProps {
     className?: string;
     accessibleTitle: string;
-    children: JSX.Element | JSX.Element[];
+    children: React.ReactNode;
     setData: (data: any) => void;
     buttonActiveClass?: string; // class that goes directly on the actual "button" element
     buttonClass?: string; // class that goes directly on the actual "button" element

@@ -11,7 +11,6 @@ import {
     allButtonStates,
     borders,
     colorOut,
-    offsetLightness,
     flexHelper,
     modifyColorBasedOnLightness,
     unit,
@@ -23,11 +22,12 @@ import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@lib
 import { calc, ColorHelper, percent, px, quote, rgba, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import {BackgroundColorProperty, ColorProperty} from "csstype";
 
-export const titleBarVariables = useThemeCache(() => {
+export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const makeThemeVars = variableFactory("titleBar");
+    const makeThemeVars = variableFactory("vanillaHeader");
 
     const sizing = makeThemeVars("sizing", {
         height: 48,
@@ -144,9 +144,9 @@ export const titleBarVariables = useThemeCache(() => {
     };
 });
 
-export const titleBarClasses = useThemeCache(() => {
+export const vanillaHeaderClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const vars = titleBarVariables();
+    const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
     const mediaQueries = layoutVariables().mediaQueries();
@@ -216,7 +216,7 @@ export const titleBarClasses = useThemeCache(() => {
                     justifyContent: "space-between",
                 },
             },
-        },
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
@@ -595,7 +595,7 @@ export const titleBarClasses = useThemeCache(() => {
 });
 
 export const titleBarLogoClasses = useThemeCache(() => {
-    const vars = titleBarVariables();
+    const vars = vanillaHeaderVariables();
     const style = styleFactory("titleBarLogo");
     const logoFrame = style("logoFrame", { display: "inline-flex" });
 
@@ -614,7 +614,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
 });
 
 export const titleBarHomeClasses = useThemeCache(() => {
-    const vars = titleBarVariables();
+    const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
     const style = styleFactory("titleBarHome");
     const mediaQueries = layoutVariables().mediaQueries();

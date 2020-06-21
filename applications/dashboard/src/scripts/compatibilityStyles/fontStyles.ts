@@ -64,7 +64,7 @@ export const fontCSS = () => {
 
     cssOut(`.Meta .MItem`, {
         ...fonts({
-            size: globalVars.meta.text.fontSize,
+            size: globalVars.meta.text.size,
             color: globalVars.meta.text.color,
         }),
     });

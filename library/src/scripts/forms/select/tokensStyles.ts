@@ -15,7 +15,7 @@ export const tokensVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("tokens");
 
     const token = {
-        fontSize: globalVars.meta.text.fontSize,
+        fontSize: globalVars.meta.text.size,
         bg: globalVars.mixBgAndFg(0.1),
         textShadow: `${globalVars.mainColors.bg} 0 0 1px`,
         minHeight: 26,

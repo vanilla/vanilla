@@ -53,7 +53,7 @@ export const forumMetaCSS = () => {
     `,
         {
             color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.fontSize),
+            fontSize: unit(globalVars.meta.text.size),
         },
     );
 

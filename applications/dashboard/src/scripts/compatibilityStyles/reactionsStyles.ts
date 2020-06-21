@@ -33,7 +33,7 @@ export const reactionsCSS = () => {
         .MessageList .Reactions .ReactButton
     `,
         {
-            fontSize: unit(vars.meta.text.fontSize),
+            fontSize: unit(vars.meta.text.size),
             margin: unit(vars.meta.spacing.default),
             textDecoration: "none",
         },

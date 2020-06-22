@@ -136,6 +136,10 @@ export const searchResultsClasses = useThemeCache(() => {
         position: "relative",
         display: "block",
         userSelect: "none",
+        borderBottom: singleBorder({
+            color: vars.separator.fg,
+            width: vars.separator.width,
+        }) as BorderBottomProperty<TLength>,
     });
 
     const result = style("result", {
@@ -178,20 +182,14 @@ export const searchResultClasses = useThemeCache(() => {
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
             color: colorOut(vars.title.fonts.color),
-            borderBottom: singleBorder({
-                color: vars.separator.fg,
-                width: vars.separator.width,
-            }) as BorderBottomProperty<TLength>,
-            $nest: {
-                "&.hasIcon": {
-                    width: calc(`100% - ${unit(vars.icon.size + vars.spacing.padding.left)}`),
-                },
-            },
         },
         mediaQueries.compact({
             flexWrap: "wrap",
         }),
     );
+
+    const mediaWidth = vars.mediaElement.width + vars.spacing.padding.left;
+    const iconWidth = vars.icon.size + vars.spacing.padding.left;
 
     const main = style(
         "main",
@@ -200,7 +198,13 @@ export const searchResultClasses = useThemeCache(() => {
             width: percent(100),
             $nest: {
                 "&.hasMedia": {
-                    width: calc(`100% - ${unit(vars.mediaElement.width + vars.spacing.padding.left)}`),
+                    width: calc(`100% - ${unit(mediaWidth)}`),
+                },
+                "&.hasIcon": {
+                    width: calc(`100% - ${unit(iconWidth)}`),
+                },
+                "&.hasMedia.hasIcon": {
+                    width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
                 },
             },
         },
@@ -280,8 +284,7 @@ export const searchResultClasses = useThemeCache(() => {
         borderRadius: "50%",
         width: unit(vars.icon.size),
         height: unit(vars.icon.size),
-        marginTop: unit(vars.spacing.padding.top),
-        marginLeft: unit(vars.spacing.padding.left),
+        marginRight: unit(vars.spacing.padding.left),
     });
 
     return {

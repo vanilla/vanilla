@@ -29,7 +29,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         fullGutter: globalVars.constants.fullGutter,
-        panelWidth: 216,
+        panelWidth: globalVars.panel.width,
         middleColumnWidth: 700,
         minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
@@ -199,11 +199,29 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         panel,
         middleColumn,
         contentSizes,
+        globalContentWidth,
         mediaQueries,
         panelLayoutSpacing,
         panelLayoutBreakPoints,
     };
 });
+
+export interface IPanelLayoutClasses {
+    root: string,
+    content: string,
+    top: string,
+    main: string,
+    container: string,
+    fullWidth: string,
+    leftColumn: string,
+    rightColumn: string,
+    middleColumn: string,
+    middleColumnMaxWidth: string,
+    panel: string,
+    isSticky: string,
+    breadcrumbs: string,
+    breadcrumbsContainer: string,
+}
 
 export const panelLayoutClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -227,14 +245,6 @@ export const panelLayoutClasses = useThemeCache(() => {
                     paddingTop: unit(globalVars.gutter.size),
                     ...mediaQueries.oneColumnDown({
                         paddingTop: 0,
-                    }),
-                },
-                "&.isOneCol": {
-                    width: unit(vars.middleColumn.paddedWidth),
-                    maxWidth: percent(100),
-                    margin: "auto",
-                    ...mediaQueries.oneColumnDown({
-                        width: percent(100),
                     }),
                 },
                 "&.hasTopPadding": {
@@ -385,5 +395,5 @@ export const panelLayoutClasses = useThemeCache(() => {
         isSticky,
         breadcrumbs,
         breadcrumbsContainer,
-    };
+    } as IPanelLayoutClasses;
 });

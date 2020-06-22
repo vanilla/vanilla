@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { SearchPageResults } from "@library/search/SearchPageResults";
 import { LoadStatus } from "@library/@types/api/core";
 import SearchBar from "@library/features/search/SearchBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
@@ -15,11 +14,16 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import PanelLayout, { Panel, PanelWidget } from "@library/layout/PanelLayout";
+import { PanelWidget } from "@library/layout/PanelLayout";
+import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
+import { SearchPageResults } from "@library/search/SearchPageResults";
+import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
 import { typographyClasses } from "@library/styles/typographyStyles";
+// This new page must have our base reset in place.
+import "@library/theming/reset";
 import { t } from "@library/utility/appUtils";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
@@ -30,11 +34,6 @@ import qs from "qs";
 import * as React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
-
-// This new page must have our base reset in place.
-import "@library/theming/reset";
-import { SearchPagination } from "@library/search/SearchPagination";
-import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
 
 interface IProps {
     placeholder?: string;
@@ -79,7 +78,7 @@ function SearchPage(props: IProps) {
             <Banner isContentBanner />
             <Container>
                 <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
-                <PanelLayout
+                <TwoColumnLayout
                     className="hasLargePadding"
                     middleTop={
                         <>
@@ -137,11 +136,7 @@ function SearchPage(props: IProps) {
                             )}
                         </>
                     }
-                    middleBottom={
-                        <>
-                            <SearchPageResults />
-                        </>
-                    }
+                    middleBottom={<SearchPageResults />}
                     rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>

@@ -8,6 +8,7 @@ import Button from "@library/forms/Button";
 import classNames from "classnames";
 import * as React from "react";
 import { simplePagerClasses } from "@library/navigation/simplePagerStyles";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     onNextClick?: React.MouseEventHandler;
@@ -23,7 +24,7 @@ export function SearchPagination(props: IProps) {
     const isSingle = (onNextClick && !onPreviousClick) || (!onNextClick && onPreviousClick);
     const classes = simplePagerClasses();
     return (
-        <div className={classNames("simplePager", classes.root)}>
+        <ConditionalWrap className={classes.root} condition={onPreviousClick || onNextClick}>
             {onPreviousClick && (
                 <Button className={classNames(classes.button, { isSingle })} onClick={onPreviousClick}>
                     {t("Previous")}
@@ -34,6 +35,6 @@ export function SearchPagination(props: IProps) {
                     {t("Next")}
                 </Button>
             )}
-        </div>
+        </ConditionalWrap>
     );
 }

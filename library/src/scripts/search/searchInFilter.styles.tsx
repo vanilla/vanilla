@@ -3,17 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { IThemeVariables } from "@library/theming/themeReducer";
-import { margins } from "@library/styles/styleHelpersSpacing";
-import { calc, percent, translate, translateX } from "csx";
-import { borders, colorOut, negativeUnit, srOnly, unit } from "@library/styles/styleHelpers";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { WidthProperty } from "csstype";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { nestedWorkaround } from "@dashboard/compatibilityStyles";
 import { buttonVariables } from "@library/forms/buttonStyles";
-import { cssOut, nestedWorkaround } from "@dashboard/compatibilityStyles";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, negativeUnit, unit } from "@library/styles/styleHelpers";
+import { margins } from "@library/styles/styleHelpersSpacing";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { calc, translate } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchInFilterVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
@@ -37,7 +36,7 @@ export const searchInFilterVariables = useThemeCache((forcedVars?: IThemeVariabl
 });
 
 export const searchInFilterClasses = useThemeCache(() => {
-    const style = styleFactory("searchIn");
+    const style = styleFactory("searchInFilter");
     const globalVars = globalVariables();
     const vars = searchInFilterVariables();
 

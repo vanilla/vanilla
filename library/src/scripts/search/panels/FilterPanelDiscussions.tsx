@@ -96,7 +96,7 @@ export function SearchFilterPanelDiscussions() {
 
             {/* Do we have a tag input in React? */}
 
-            {/* Hard coded for now */}
+            {/* Hard coded temporarily */}
             <PostTypeFilter types={[{
                 label: t("Discussions"),
             },{

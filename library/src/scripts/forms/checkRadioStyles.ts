@@ -15,7 +15,7 @@ import {
     unit,
     userSelect,
     margins,
-    paddings,
+    paddings, fonts,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -113,6 +113,9 @@ export const checkRadioClasses = useThemeCache(() => {
         cursor: "pointer",
         ...userSelect(),
         width: calc(`100% - ${unit(vars.sizing.width)}`),
+        ...fonts({
+            weight: globalVars.fonts.weights.semiBold,
+        })
     });
 
     const labelNote = style("labelNote", {

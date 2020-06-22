@@ -36,8 +36,9 @@ export class SelectLookup extends React.Component<ISelectLookupProps, IState> {
         if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
             options = suggestions.data.map(suggestion => {
                 let parentLabel;
-                if (suggestion.data && suggestion.data.breadcrumbs && suggestion.data.breadcrumbs.length > 1) {
-                    parentLabel = suggestion.data.breadcrumbs[suggestion.data.breadcrumbs.length - 2].name;
+                const crumbLength = suggestion.breadcrumbs?.length ?? 0;
+                if (crumbLength > 1) {
+                    parentLabel = suggestion.breadcrumbs[crumbLength - 2].name;
                 }
 
                 return {

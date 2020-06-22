@@ -149,6 +149,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                 ? selectOverrides.NoOptionsMessage
                 : selectOverrides.NullComponent,
             LoadingIndicator: selectOverrides.NullComponent,
+            DropdownIndicator: selectOverrides.DropdownIndicator,
         };
 
         if (!this.props.showIndicator) {

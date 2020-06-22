@@ -17,7 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
-import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
+import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 
@@ -123,10 +123,10 @@ export function NoOptionsMessage(props: OptionProps<any>) {
 }
 
 export function NullComponent() {
-    return null;
+    return <></>;
 }
 
-interface ISelectOptionOverwrite extends OptionProps<any>, IComboBoxOption {}
+type ISelectOptionOverwrite = OptionProps<any> & IComboBoxOption;
 
 /**
  * Overwrite for the menuOption component in React Select
@@ -149,8 +149,10 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 <span className="suggestedTextInput-head">
                     <span className="suggestedTextInput-title">
                         {props.children}
-                        {props.data.parentLabel && (
-                            <span className={"suggestedTextInput-parentTag"}>{` - ${props.data.parentLabel}`}</span>
+                        {props.data?.data?.parentLabel && (
+                            <span
+                                className={"suggestedTextInput-parentTag"}
+                            >{` - ${props.data.data.parentLabel}`}</span>
                         )}
                     </span>
                     {(isSelected || value === selectProps.value?.value) && (
@@ -182,11 +184,12 @@ export function ValueContainer(props: ValueContainerProps<any>) {
  */
 export function DropdownIndicator(props) {
     const { innerProps } = props;
+    const Component: React.ComponentType = components.DropdownIndicator as any;
     return (
-        <components.DropdownIndicator {...props}>
+        <Component {...props}>
             <div {...innerProps}>
                 <DownTriangleIcon className={selectOneClasses().chevron} />
             </div>
-        </components.DropdownIndicator>
+        </Component>
     );
 }

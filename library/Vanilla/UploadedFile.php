@@ -314,6 +314,7 @@ class UploadedFile {
 
     /**
      * Get max image upload height
+     * If $this->maxImageHeight is set to NO_IMAGE_DIMENSIONS_LIMIT, fallback to return MAX_IMAGE_HEIGHT
      *
      * @return ?int
      */
@@ -330,6 +331,7 @@ class UploadedFile {
 
     /**
      * Get max image upload width
+     * If $this->maxImageHeight is set to NO_IMAGE_DIMENSIONS_LIMIT, fallback to return MAX_IMAGE_HEIGHT
      *
      * @return ?int
      */
@@ -500,6 +502,8 @@ class UploadedFile {
 
     /**
      * Set max image upload height
+     * $maxImageHeight should an int greater or equal to 0, or null
+     *
      * @param ?int $maxImageHeight
      * @return UploadedFile
      */
@@ -513,6 +517,8 @@ class UploadedFile {
 
     /**
      * Set max image upload height
+     * $maxImageWidth should an int greater or equal to 0, or null
+     *
      * @param ?int $maxImageWidth
      * @return UploadedFile
      */

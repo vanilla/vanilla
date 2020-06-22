@@ -17,10 +17,11 @@ use Vanilla\Utility\ArrayUtils;
  * Basic model class.
  */
 class Model implements InjectableInterface {
-    const OPT_LIMIT = "limit";
-    const OPT_OFFSET = "offset";
-    const OPT_SELECT = "select";
-    const OPT_ORDER = 'order';
+    public const OPT_LIMIT = "limit";
+    public const OPT_OFFSET = "offset";
+    public const OPT_SELECT = "select";
+    public const OPT_ORDER = 'order';
+    public const OPT_MODE = 'mode';
 
     /** @var \Gdn_Database */
     private $database;

@@ -26,8 +26,8 @@ export function SearchPageResultsLoader(props: IProps) {
                                 <LoadingSpacer height={5} width={400} />
                                 <div style={{ display: "flex", flexDirection: "row" }}>
                                     <LoadingRectange height={20} width={150} style={{ marginRight: 10 }} />
-                                    <LoadingRectange height={20} width={100} style={{ marginRight: 10 }} />
-                                    <LoadingRectange height={20} width={150} style={{ marginRight: 10 }} />
+                                    <LoadingRectange height={20} width={80} style={{ marginRight: 10 }} />
+                                    <LoadingRectange height={20} width={120} style={{ marginRight: 10 }} />
                                 </div>
                             </div>
                         </div>

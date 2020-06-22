@@ -9,7 +9,6 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
-import { IFieldError } from "@library/@types/api/core";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 
@@ -40,6 +39,8 @@ export interface IInputBlockProps extends IOptionalComponentID {
     baseClass?: InputTextBlockBaseClass;
     legacyMode?: boolean;
     noMargin?: boolean;
+    grid?: boolean;
+    tight?: boolean;
 }
 
 interface IState {
@@ -96,6 +97,8 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                         classesInputBlock.inputWrap,
                         this.props.wrapClassName,
                         [classesInputBlock.fieldsetGroup],
+                        {[classesInputBlock.grid] : this.props.grid},
+                        {[classesInputBlock.tight] : this.props.tight},
                         { noMargin: this.props.noMargin },
                     )}
                 >

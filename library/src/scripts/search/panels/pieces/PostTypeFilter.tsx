@@ -21,7 +21,7 @@ export function PostTypeFilter(props: IProps) {
     }
 
     return (
-        <CheckboxGroup label={"What to Search"}>
+        <CheckboxGroup label={"What to Search"} grid={true} tight={true}>
             {props.types.map((type) => {
                 return <Checkbox {...type}/>
             })}

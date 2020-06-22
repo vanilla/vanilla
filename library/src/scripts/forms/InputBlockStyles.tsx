@@ -5,13 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import {colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
+import {NestedCSSProperties} from "typestyle/lib/types";
+import {checkRadioClasses} from "@library/forms/checkRadioStyles";
 
 export const inputBlockClasses = useThemeCache(() => {
     const style = styleFactory("inputBlock");
@@ -99,7 +101,7 @@ export const inputBlockClasses = useThemeCache(() => {
         display: "block",
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.medium),
-        marginBottom: unit(formElementVars.spacing.margin / 2),
+        marginBottom: unit(formElementVars.spacing.margin),
     });
 
     const sectionTitle = style("sectionTitle", {
@@ -123,6 +125,32 @@ export const inputBlockClasses = useThemeCache(() => {
         });
     };
 
+    const related = style("related", {
+        marginTop: unit(globalVars.gutter.size),
+    });
+
+    const grid = style("grid", {
+        display: "flex",
+        flexWrap: "wrap",
+        $nest: {
+            [`& .${checkRadioClasses().root}`]: {
+                width: percent(50),
+                alignItems: "flex-start",
+            },
+            [`&.${fieldsetGroup}`]: {
+                marginTop: unit(9),
+            }
+        }
+    } as NestedCSSProperties);
+
+    const tight = style("tight", {
+        $nest: {
+            [`&&&`]: {
+                marginTop: negativeUnit(9),
+            }
+        }
+    });
+
     return {
         root,
         inputText,
@@ -136,5 +164,8 @@ export const inputBlockClasses = useThemeCache(() => {
         sectionTitle,
         fieldsetGroup,
         multiLine,
+        related,
+        grid,
+        tight,
     };
 });

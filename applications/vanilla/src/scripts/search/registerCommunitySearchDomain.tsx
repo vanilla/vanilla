@@ -8,9 +8,9 @@ import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/S
 import { TypeDiscussionsIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { ISearchForm } from "@vanilla/library/src/scripts/search/searchTypes";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
-import { SearchFilterPanelDiscussions } from "@vanilla/addon-vanilla/search/FilterPanelDiscussions";
 import { t } from "@vanilla/i18n";
 import { onReady } from "@vanilla/library/src/scripts/utility/appUtils";
+import {SearchFilterPanelDiscussions} from "@library/search/panels/FilterPanelDiscussions";
 
 export function registerCommunitySearchDomain() {
     onReady(() => {

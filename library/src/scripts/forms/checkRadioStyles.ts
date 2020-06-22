@@ -11,7 +11,6 @@ import {
     colorOut,
     defaultTransition,
     disabledInput,
-    flexHelper,
     srOnly,
     unit,
     userSelect,
@@ -21,9 +20,8 @@ import {
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { em, important, percent, px } from "csx";
+import {calc, em, important, percent, px} from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import {inputBlockClasses} from "@library/forms/InputBlockStyles";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -111,9 +109,10 @@ export const checkRadioClasses = useThemeCache(() => {
     // .checkbox-label
     const label = style("label", {
         lineHeight: unit(vars.sizing.width),
-        marginLeft: unit(8),
+        paddingLeft: unit(8),
         cursor: "pointer",
         ...userSelect(),
+        width: calc(`100% - ${unit(vars.sizing.width)}`),
     });
 
     const labelNote = style("labelNote", {
@@ -134,6 +133,7 @@ export const checkRadioClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.sizing.width),
         height: unit(vars.sizing.width),
+        flexBasis: unit(vars.sizing.width),
         verticalAlign: "middle",
         cursor: "pointer",
         backgroundColor: colorOut(vars.main.bg),
@@ -207,11 +207,10 @@ export const checkRadioClasses = useThemeCache(() => {
         display: important("flex"),
         flexWrap: "wrap",
         alignItems: "center",
-        whiteSpace: "nowrap",
         outline: 0,
         ...paddings(vars.spacing),
         $nest: {
-            [`&&&.${inputBlockClasses().root}`]: {
+            [`&&`]: {
                 margin: 0,
             },
             [`&.isHorizontal.isHorizontal.isHorizontal`]: margins({
@@ -226,10 +225,6 @@ export const checkRadioClasses = useThemeCache(() => {
             },
         },
     } as NestedCSSProperties);
-
-    const group = style("group", {
-        // marginTop: unit(globalVars.spacer.size / 2),
-    });
 
     const grid = style("grid", {
         display: "flex",
@@ -253,9 +248,6 @@ export const checkRadioClasses = useThemeCache(() => {
                     right: unit(globalVars.gutter.half),
                 }),
             },
-            [`.${label}`]: {
-                whiteSpace: "normal",
-            },
         },
     } as NestedCSSProperties);
 
@@ -269,7 +261,6 @@ export const checkRadioClasses = useThemeCache(() => {
         disk,
         diskIcon,
         input,
-        group,
         grid,
         isDashboard,
     };

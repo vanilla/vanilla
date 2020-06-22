@@ -18,6 +18,8 @@ import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCatego
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import {PostTypeFilter} from "@library/search/panels/pieces/PostTypeFilter";
 import MultiUserInput from "@library/features/users/MultiUserInput";
+import classNames from "classnames";
+import CheckboxGroup from "@library/forms/CheckboxGroup";
 
 /**
  * Implement search filter panel for discussions
@@ -65,30 +67,32 @@ export function SearchFilterPanelDiscussions() {
                 }}
                 value={form.categoryOption}
             />
-            <Checkbox
-                label={t("Search Subcategories")}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    updateForm({ includeChildCategories: event.target.checked || false });
-                }}
-                checked={form.includeChildCategories}
-                className={classesInputBlock.root}
-            />
-            <Checkbox
-                label={t("Search only followed Categories")}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    updateForm({ followedCategories: event.target.checked || false });
-                }}
-                checked={form.followedCategories}
-                className={classesInputBlock.root}
-            />
-            <Checkbox
-                label={t("Search archived")}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    updateForm({ includeArchivedCategories: event.target.checked || false });
-                }}
-                checked={form.includeArchivedCategories}
-                className={classesInputBlock.root}
-            />
+            <CheckboxGroup tight={true}>
+                <Checkbox
+                    label={t("Search Subcategories")}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        updateForm({ includeChildCategories: event.target.checked || false });
+                    }}
+                    checked={form.includeChildCategories}
+                    className={classesInputBlock.root}
+                />
+                <Checkbox
+                    label={t("Search only followed Categories")}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        updateForm({ followedCategories: event.target.checked || false });
+                    }}
+                    checked={form.followedCategories}
+                    className={classesInputBlock.root}
+                />
+                <Checkbox
+                    label={t("Search archived")}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        updateForm({ includeArchivedCategories: event.target.checked || false });
+                    }}
+                    checked={form.includeArchivedCategories}
+                    className={classesInputBlock.root}
+                />
+            </CheckboxGroup>
 
             {/* Do we have a tag input in React? */}
 

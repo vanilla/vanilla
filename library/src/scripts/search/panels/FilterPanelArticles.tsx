@@ -3,27 +3,28 @@
  * @license GPL-2.0-only
  */
 
-import Checkbox from "@library/forms/Checkbox";
-import CheckboxGroup from "@library/forms/CheckboxGroup";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import MultiUserInput from "@library/features/users/MultiUserInput";
 import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchFormContext";
-import { t } from "@library/utility/appUtils";
+import { t } from "@vanilla/i18n/src";
 import React from "react";
-import {PostTypeFilter} from "@library/search/panels/pieces/PostTypeFilter";
 
 interface IProps {}
-/**
- * Implement search filter panel for categories and groups
- */
-export function SearchFilterPanelCategoriesAndGroups(props: IProps) {
-    const { form, updateForm, search } = useSearchForm();
 
+/**
+ * Implement search filter panel for all types
+ */
+export function FilterPanelAll(props: IProps) {
+    const { form, updateForm, search } = useSearchForm();
+    const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame handleSubmit={search}>
+        <FilterFrame title={t("Filter Results")} handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
@@ -33,6 +34,13 @@ export function SearchFilterPanelCategoriesAndGroups(props: IProps) {
                     },
                     value: form.name,
                 }}
+            />
+            <MultiUserInput
+                className={classesInputBlock.root}
+                onChange={(options: IComboBoxOption[]) => {
+                    updateForm({ authors: options });
+                }}
+                value={form.authors ?? []}
             />
             <DateRange
                 onStartChange={(date: string) => {
@@ -46,7 +54,7 @@ export function SearchFilterPanelCategoriesAndGroups(props: IProps) {
                 className={classesDateRange.root}
             />
 
-            <PostTypeFilter types={[]}/>
+
         </FilterFrame>
     );
 }

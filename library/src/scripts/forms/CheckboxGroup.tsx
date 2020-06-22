@@ -5,18 +5,16 @@
  */
 
 import React from "react";
-import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
-import classNames from "classnames";
+import {inputBlockClasses} from "@library/forms/InputBlockStyles";
 
 export interface ICheckboxGroup extends IInputBlockProps {}
 
-export default class CheckboxGroup extends React.Component<ICheckboxGroup> {
-    public render() {
-        return (
-            <InputBlock {...this.props} legend={true}>
-                {this.props.children}
-            </InputBlock>
-        );
-    }
+export default function CheckboxGroup(props: ICheckboxGroup){
+    const classes = inputBlockClasses();
+    return (
+        <InputBlock {...props} legend={true}>
+            {props.children}
+        </InputBlock>
+    );
 }

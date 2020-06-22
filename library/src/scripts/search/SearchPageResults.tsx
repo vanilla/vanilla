@@ -17,7 +17,7 @@ import { hashString } from "@vanilla/utils";
 import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { ISearchResult } from "@library/search/searchTypes";
 import { useLastValue } from "@vanilla/react-utils";
-import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
+import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 
 interface IProps {}
 
@@ -43,7 +43,8 @@ export function SearchPageResults(props: IProps) {
     switch (results.status) {
         case LoadStatus.PENDING:
         case LoadStatus.LOADING:
-            return <Loader />;
+            // return <Loader />;
+            return <SearchPageResultsLoader count={10} />;
         case LoadStatus.ERROR:
             return <KbErrorMessages apiError={results.error} />;
         case LoadStatus.SUCCESS:

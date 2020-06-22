@@ -17,6 +17,7 @@ import Checkbox from "@library/forms/Checkbox";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import {PostTypeFilter} from "@library/search/panels/pieces/PostTypeFilter";
+import MultiUserInput from "@library/features/users/MultiUserInput";
 
 /**
  * Implement search filter panel for discussions

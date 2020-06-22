@@ -43,7 +43,7 @@ export function SearchPageResults(props: IProps) {
         case LoadStatus.LOADING:
             return <SearchPageResultsLoader count={10} />;
         case LoadStatus.ERROR:
-            return <CoreErrorMessages apiError={results.error} />;
+            return <CoreErrorMessages error={results.error} />;
         case LoadStatus.SUCCESS:
             const { next, prev } = results.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;

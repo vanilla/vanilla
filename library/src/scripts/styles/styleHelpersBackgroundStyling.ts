@@ -14,7 +14,7 @@ import {
     OpacityProperty,
     PositionProperty,
 } from "csstype";
-import {important, percent, px, quote, url, viewHeight, viewWidth} from "csx";
+import { important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
@@ -93,7 +93,7 @@ export const objectFitWithFallback = () => {
                 position: important("relative"),
                 objectFit: "cover" as ObjectFitProperty,
                 objectPosition: "center",
-                height: important(<number>percent(100)),
+                height: important(percent(100).toString()),
             },
         },
     } as NestedCSSProperties;

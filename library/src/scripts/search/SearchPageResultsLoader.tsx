@@ -14,7 +14,7 @@ export function SearchPageResultsLoader(props: IProps) {
     const { count } = props;
     return (
         <div>
-            {Array.from(new Array(props.count)).map((_, i) => {
+            {Array.from(new Array(count)).map((_, i) => {
                 return (
                     <div key={i}>
                         <LoadingRectange height={1} width={780} />

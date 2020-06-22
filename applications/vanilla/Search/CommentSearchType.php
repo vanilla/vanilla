@@ -10,6 +10,7 @@ namespace Vanilla\Forum\Search;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 
@@ -89,5 +90,55 @@ class CommentSearchType extends DiscussionSearchType {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];
         }
+    }
+
+    public function generateSql(MysqlSearchQuery $query): string {
+        /** @var \Gdn_SQLDriver $db */
+        $db = $query->getDB();
+        $db->reset();
+
+        $categoryIDs = $this->getCategoryIDs($query);
+
+        $db->reset();
+
+        // Build base query
+        $db->from('Comment c')
+            ->select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID, c.Score')
+            ->select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
+            ->select('c.DateInserted')
+            ->select('null as `Type`')
+            ->select('c.InsertUserID as UserID')
+            ->select("'Comment'", '', 'RecordType')
+            ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+            ->orderBy('c.DateInserted', 'desc')
+        ;
+
+        $terms = $query->get('query', false);
+        if ($terms) {
+            $terms = $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
+            $db->where("c.Body like", $terms, false, false);
+        }
+
+        if ($users = $query->get('users', false)) {
+            $author = array_column($users, 'UserID');
+            $db->where('d.InsertUserID', $author);
+        }
+
+        if ($discussionID = $query->get('discussionid', false)) {
+            $db->where('d.DiscussionID', $discussionID);
+        }
+
+        if (!empty($categoryIDs)) {
+            $db->whereIn('d.CategoryID', $categoryIDs);
+        }
+
+        $limit = $query->get('limit', 100);
+        $offset = $query->get('offset', 0);
+        $db->limit($limit + $offset);
+
+        $sql = $db->getSelect();
+        $db->reset();
+
+        return $sql;
     }
 }

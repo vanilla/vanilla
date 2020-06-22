@@ -344,6 +344,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(SearchService::class)
     ->setShared(true)
+    ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
     ->rule(AbstractSearchDriver::class)
     ->setShared(true)
     ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])

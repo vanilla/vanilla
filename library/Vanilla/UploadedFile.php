@@ -319,7 +319,7 @@ class UploadedFile {
      * @return ?int
      */
     public function getMaxImageHeight(): ?int {
-        switch($this->maxImageHeight) {
+        switch ($this->maxImageHeight) {
             case null:
                 return \Gdn::config("ImageUpload.Limits.Height");
             case self::NO_IMAGE_DIMENSIONS_LIMIT:
@@ -336,7 +336,7 @@ class UploadedFile {
      * @return ?int
      */
     public function getMaxImageWidth(): ?int {
-        switch($this->maxImageWidth) {
+        switch ($this->maxImageWidth) {
             case null:
                 return \Gdn::config("ImageUpload.Limits.Width");
             case self::NO_IMAGE_DIMENSIONS_LIMIT:

@@ -209,7 +209,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
         ];
 
         // Bypass values set in ImageUpload.Limits config
-        if($extraArgs['bypassUploadLimits']) {
+        if ($extraArgs['bypassUploadLimits']) {
             $file->setMaxImageHeight(UploadedFile::NO_IMAGE_DIMENSIONS_LIMIT);
             $file->setMaxImageWidth(UploadedFile::NO_IMAGE_DIMENSIONS_LIMIT);
         }

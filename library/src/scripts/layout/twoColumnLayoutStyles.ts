@@ -12,11 +12,13 @@ import { unit } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import {IPanelLayoutClasses, layoutVariables, panelLayoutClasses} from "@library/layout/panelLayoutStyles";
+import {panelWidgetVariables} from "@library/layout/panelWidgetStyles";
 
 export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const panelLayoutVars = layoutVariables();
     const makeThemeVars = variableFactory("twoColumnLayout", forcedVars);
+    const fullPadding = panelWidgetVariables().spacing.padding * 2;
 
     const {gutter, globalContentWidth } = panelLayoutVars;
     const {fullGutter} = panelLayoutVars.foundationalWidths;
@@ -33,11 +35,11 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
 
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + gutter.size * 2,
+        paddedWidth: foundationalWidths.panelWidth + fullPadding * 2,
     });
 
     const mainColumnPaddedWidth = globalContentWidth - gutter.size - panel.paddedWidth;
-    const mainColumnWidth = mainColumnPaddedWidth - gutter.size * 2;
+    const mainColumnWidth = mainColumnPaddedWidth - fullPadding * 2;
 
     const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", panelLayoutVars.panelLayoutSpacing);
 

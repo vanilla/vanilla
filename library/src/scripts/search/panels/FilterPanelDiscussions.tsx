@@ -4,7 +4,6 @@
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import MultiUserInput from "@library/features/users/MultiUserInput";
 import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
@@ -17,6 +16,7 @@ import Checkbox from "@library/forms/Checkbox";
 
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
+import {PostTypeFilter} from "@library/search/panels/pieces/PostTypeFilter";
 
 /**
  * Implement search filter panel for discussions
@@ -88,6 +88,21 @@ export function SearchFilterPanelDiscussions() {
                 checked={form.includeArchivedCategories}
                 className={classesInputBlock.root}
             />
+
+            {/* Do we have a tag input in React? */}
+
+            {/* Hard coded for now */}
+            <PostTypeFilter types={[{
+                label: t("Discussions"),
+            },{
+                label: t("Questions"),
+            },{
+                label: t("Polls"),
+            },{
+                label: t("Ideas"),
+            }
+            ]}/>
+
         </FilterFrame>
     );
 }

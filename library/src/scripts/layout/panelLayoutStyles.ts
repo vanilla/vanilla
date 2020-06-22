@@ -47,17 +47,19 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         quarterSize: foundationalWidths.fullGutter / 8, // 6
     });
 
+    const fullPadding = panelWidgetVariables().spacing.padding * 2;
+
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + gutter.full,
+        paddedWidth: foundationalWidths.panelWidth + fullPadding,
     });
 
     const middleColumn = makeThemeVars("middleColumn", {
         width: foundationalWidths.middleColumnWidth,
-        paddedWidth: foundationalWidths.middleColumnWidth + gutter.full,
+        paddedWidth: foundationalWidths.middleColumnWidth + fullPadding,
     });
 
-    const globalContentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size;
+    const globalContentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + fullPadding;
 
     const contentSizes = makeThemeVars("content", {
         full: globalContentWidth,

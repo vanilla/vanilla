@@ -78,6 +78,7 @@ export const tokensClasses = useThemeCache(() => {
                     input: {
                         width: percent(100),
                         minWidth: unit(45),
+                        minHeight: 0,
                     },
                 },
             },

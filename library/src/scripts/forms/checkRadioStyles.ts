@@ -23,6 +23,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import {inputBlockClasses} from "@library/forms/InputBlockStyles";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -80,7 +81,12 @@ export const checkRadioVariables = useThemeCache(() => {
     });
 
     const sizing = themeVars("sizing", {
-        width: 16,
+        width: 18,
+    });
+
+    const spacing = themeVars("spacing", {
+        horizontal: 6,
+        vertical: 9,
     });
 
     return {
@@ -90,6 +96,7 @@ export const checkRadioVariables = useThemeCache(() => {
         radioButton,
         labelNote,
         sizing,
+        spacing,
     };
 });
 
@@ -154,7 +161,7 @@ export const checkRadioClasses = useThemeCache(() => {
         borderRadius: percent(50),
     });
 
-    const diskIcon = style({
+    const diskIcon = style("diskIcon",{
         display: "none",
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,
@@ -202,9 +209,10 @@ export const checkRadioClasses = useThemeCache(() => {
         alignItems: "center",
         whiteSpace: "nowrap",
         outline: 0,
+        ...paddings(vars.spacing),
         $nest: {
-            [`& + &`]: {
-                marginTop: px(globalVars.spacer.size / 2),
+            [`&&&.${inputBlockClasses().root}`]: {
+                margin: 0,
             },
             [`&.isHorizontal.isHorizontal.isHorizontal`]: margins({
                 all: 0,
@@ -217,10 +225,10 @@ export const checkRadioClasses = useThemeCache(() => {
                 }),
             },
         },
-    });
+    } as NestedCSSProperties);
 
     const group = style("group", {
-        marginTop: unit(globalVars.spacer.size / 2),
+        // marginTop: unit(globalVars.spacer.size / 2),
     });
 
     const grid = style("grid", {
@@ -249,7 +257,7 @@ export const checkRadioClasses = useThemeCache(() => {
                 whiteSpace: "normal",
             },
         },
-    });
+    } as NestedCSSProperties);
 
     return {
         root,

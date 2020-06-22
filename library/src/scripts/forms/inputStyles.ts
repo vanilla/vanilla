@@ -104,6 +104,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
                 width: important(`100%`),
                 overflow: "hidden",
                 lineHeight: undefined,
+                minHeight: 0,
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
                 ...borders({

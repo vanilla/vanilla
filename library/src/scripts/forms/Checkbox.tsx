@@ -12,7 +12,7 @@ import { t } from "@library/utility/appUtils";
 import { srOnly, visibility } from "@library/styles/styleHelpers";
 import { ToolTip } from "@library/toolTip/ToolTip";
 
-interface IProps extends IOptionalComponentID {
+export interface ICheckbox extends IOptionalComponentID {
     id?: string;
     className?: string;
     checked?: boolean;
@@ -26,7 +26,7 @@ interface IProps extends IOptionalComponentID {
     excludeFromICheck?: boolean;
 }
 
-export default function CheckBox(props: IProps) {
+export default function CheckBox(props: ICheckbox) {
     const labelID = useUniqueID("checkbox_label");
     const classes = checkRadioClasses();
 

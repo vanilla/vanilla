@@ -22,15 +22,15 @@ export default {
 const dummySortData: ISearchSort = {
     options: [
         {
-            value: "",
+            value: "1",
             name: t("Last Updated"),
         },
         {
-            value: "",
+            value: "2",
             name: t("Date Created"),
         },
         {
-            value: "",
+            value: "3",
             name: t("Last Commented"),
         },
     ] as ISelectBoxItem[],
@@ -53,13 +53,13 @@ function SearchMiscellaneousComponents(props: IProps) {
 }
 
 export const NoSort = storyWithConfig({}, () => (
-    <SearchMiscellaneousComponents sort={undefined} pages={dummyPages} message={"No sort, only pagination info"} />
+    <SearchMiscellaneousComponents sort={{options: []}} pages={dummyPages} message={"No sort, only pagination info"} />
 ));
 export const NoPaginationInfo = storyWithConfig({}, () => (
     <SearchMiscellaneousComponents message={"No pagination info, only sort"} sort={dummySortData} />
 ));
 export const NoRender = storyWithConfig({}, () => (
-    <SearchMiscellaneousComponents message={"Does not render, no data"} />
+    <SearchMiscellaneousComponents message={"Does not render, no data"} sort={{options: []}} />
 ));
 export const BigTotal = storyWithConfig({}, () => (
     <SearchMiscellaneousComponents

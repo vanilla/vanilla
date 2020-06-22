@@ -62,8 +62,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexGrow: 1,
         margin: 0,
         textOverflow: "ellipsis",
-        width: calc(`100% - ${formElVars.sizing.height}`),
-        flexBasis: calc(`100% - ${formElVars.sizing.height}`),
+        width: calc(`100% - ${unit(formElVars.sizing.height)}`),
+        flexBasis: calc(`100% - ${unit(formElVars.sizing.height)}`),
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
     });

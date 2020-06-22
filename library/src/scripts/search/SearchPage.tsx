@@ -14,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import { PanelWidget } from "@library/layout/PanelLayout";
+import {PanelWidget, PanelWidgetHorizontalPadding} from "@library/layout/PanelLayout";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
@@ -126,9 +126,9 @@ function SearchPage(props: IProps) {
                                     })}
                                 />
                             </PanelWidget>
-                            <PanelWidget>
+                            <PanelWidgetHorizontalPadding>
                                 <SortAndPaginationInfo pages={results.data?.pagination} sort={{ options: [] }} />
-                            </PanelWidget>
+                            </PanelWidgetHorizontalPadding>
                             {isMobile && (
                                 <PanelWidget>
                                     <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>

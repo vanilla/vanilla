@@ -8,6 +8,7 @@ import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { resultPaginationInfoClasses } from "@library/result/ResultPaginationInfo.styles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Translate from "@library/content/Translate";
+import {numberFormattedForTranslations} from "@library/content/NumberFormatted";
 
 interface IProps {
     pages?: ILinkPages;
@@ -19,7 +20,7 @@ export function ResultPaginationInfo(props: IProps) {
         return null;
     }
 
-    const { total, currentPage, limit } = pages;
+    const { total = 0, currentPage, limit } = pages;
 
     let resultStart = (currentPage - 1) * limit + 1;
     let resultEnd = Math.min(resultStart + limit, total) - 1;
@@ -32,7 +33,13 @@ export function ResultPaginationInfo(props: IProps) {
                 <Translate source={"Result(s) <0/> to <1/> of <2/>"} c0={resultStart} c1={resultEnd} c2={total} />
             </ScreenReaderContent>
             <span aria-hidden={true}>
-                <Translate source={"<0/>-<1/> of <2/>"} c0={resultStart} c1={resultEnd} c2={total} />
+                <Translate source={"<0/>-<1/> of <2/>"} c0={numberFormattedForTranslations({
+                    value: resultStart,
+                })} c1={numberFormattedForTranslations({
+                    value: resultEnd,
+                })} c2={numberFormattedForTranslations({
+                    value: total,
+                })} />
             </span>
         </div>
     );

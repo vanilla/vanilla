@@ -9,7 +9,6 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { t } from "@library/utility/appUtils";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
@@ -20,6 +19,15 @@ import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { bannerClasses } from "@library/banner/bannerStyles";
+import {
+    TypeAllIcon, TypeArticlesIcon, TypeCategoriesAndGroupsIcon,
+    TypeCategoriesIcon,
+    TypeDiscussionsIcon,
+    TypeIdeasIcon, TypeMemberIcon,
+    TypePollsIcon,
+    TypeQuestionIcon
+} from "@library/icons/searchIcons";
+import {t} from "@vanilla/i18n/src";
 
 const story = storiesOf("Search", module);
 
@@ -83,6 +91,7 @@ story.add("Search Components", () => {
                             />
                         ),
                         attachments: [{ name: "My File", type: AttachmentType.WORD }],
+                        icon: <TypeDiscussionsIcon/>,
                     },
                     {
                         name: "Example search result",
@@ -100,6 +109,7 @@ story.add("Search Components", () => {
                                 type={"Article"}
                             />
                         ),
+                        icon: <TypeQuestionIcon/>,
                     },
                     {
                         name: "Example search result",
@@ -107,6 +117,8 @@ story.add("Search Components", () => {
                         url: "#",
                         excerpt:
                             "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+
+                        icon: <TypePollsIcon/>,
                     },
                     {
                         name: "Example search result",
@@ -121,6 +133,7 @@ story.add("Search Components", () => {
                                 type={"Article"}
                             />
                         ),
+                        icon: <TypeIdeasIcon/>
                     },
                     {
                         name: "Example search result",
@@ -137,6 +150,75 @@ story.add("Search Components", () => {
                                 type={"Article"}
                             />
                         ),
+                        icon: <TypeCategoriesIcon/>
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                        "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                        <ResultMeta
+                            dateUpdated={"2016-07-25 17:51:15"}
+                            updateUser={dummyUserFragment}
+                            crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                            status={PublishStatus.PUBLISHED}
+                            type={"Article"}
+                        />
+                        ),
+                        icon: <TypeMemberIcon/>
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                        "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                        <ResultMeta
+                            dateUpdated={"2016-07-25 17:51:15"}
+                            updateUser={dummyUserFragment}
+                            crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                            status={PublishStatus.PUBLISHED}
+                            type={"Article"}
+                        />
+                        ),
+                        icon: <TypeCategoriesAndGroupsIcon/>
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                        "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                        <ResultMeta
+                            dateUpdated={"2016-07-25 17:51:15"}
+                            updateUser={dummyUserFragment}
+                            crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                            status={PublishStatus.PUBLISHED}
+                            type={"Article"}
+                        />
+                        ),
+                        icon: <TypeArticlesIcon/>
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                        "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                        <ResultMeta
+                            dateUpdated={"2016-07-25 17:51:15"}
+                            updateUser={dummyUserFragment}
+                            crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                            status={PublishStatus.PUBLISHED}
+                            type={"Article"}
+                        />
+                        ),
+                        icon: <TypeAllIcon/>
                     },
                 ]}
             />

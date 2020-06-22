@@ -27,7 +27,7 @@ export default class SimplePager extends React.Component<IProps> {
         const classes = simplePagerClasses();
 
         return (
-            <ConditionalWrap className={classes.root} condition={prev || next}>
+            <ConditionalWrap className={classes.root} condition={!!prev || !!next}>
                 {prev && (
                     <>
                         <LinkAsButton className={classNames(classes.button, { isSingle })} to={this.makeUrl(prev)}>

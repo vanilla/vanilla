@@ -8,9 +8,9 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {
-    colorOut,
+    colorOut, EMPTY_FONTS,
     fonts,
-    margins,
+    margins, negativeUnit,
     objectFitWithFallback,
     paddings,
     singleBorder,
@@ -20,6 +20,9 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import {BorderBottomProperty} from "csstype";
+import {NestedCSSProperties, TLength} from "typestyle/lib/types";
+import {buttonVariables} from "@library/forms/buttonStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -31,7 +34,7 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const title = makeThemeVars("title", {
         fonts: {
-            color: globalVars.mainColors.fg,
+            color: undefined,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
@@ -47,6 +50,12 @@ export const searchResultsVariables = useThemeCache(() => {
         border: {
             color: globalVars.mixBgAndFg(0.1),
         },
+    });
+
+    const icon = makeThemeVars("icon", {
+        size: 26,
+        bg: colorOut(globalVars.mixBgAndFg(.1)),
+
     });
 
     const separator = makeThemeVars("separatort", {
@@ -79,6 +88,7 @@ export const searchResultsVariables = useThemeCache(() => {
         return { compact };
     };
 
+
     return {
         colors,
         title,
@@ -86,6 +96,7 @@ export const searchResultsVariables = useThemeCache(() => {
         image,
         separator,
         spacing,
+        icon,
         mediaElement,
         breakPoints,
         mediaQueries,
@@ -106,7 +117,8 @@ export const searchResultsClasses = useThemeCache(() => {
                 color: vars.separator.fg,
                 width: vars.separator.width,
             }),
-        },
+            marginTop: negativeUnit(globalVars.gutter.half),
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             borderTop: 0,
         }),
@@ -128,7 +140,8 @@ export const searchResultsClasses = useThemeCache(() => {
 
     const result = style("result", {
         position: "relative",
-        display: "block",
+        display: "flex",
+        alignItems: "flex-start",
         width: percent(100),
     });
 
@@ -143,7 +156,7 @@ export const searchResultsClasses = useThemeCache(() => {
 export const searchResultClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("searchResults");
+    const style = styleFactory("searchResult");
     const mediaQueries = vars.mediaQueries();
     const metaVars = metasVariables();
 
@@ -156,39 +169,24 @@ export const searchResultClasses = useThemeCache(() => {
         paddingRight: unit(24),
     });
 
-    const linkColors = clickableItemStates()["$nest"];
     const root = style(
         {
             display: "flex",
             alignItems: "stretch",
             justifyContent: "space-between",
+            width: percent(100),
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
             color: colorOut(vars.title.fonts.color),
             borderBottom: singleBorder({
                 color: vars.separator.fg,
                 width: vars.separator.width,
-            }) as any,
+            }) as BorderBottomProperty<TLength>,
             $nest: {
-                [`&:hover .${title}`]: {
-                    ...linkColors!["&&:hover"],
-                },
-                [`&:focus .${title}`]: {
-                    ...linkColors!["&&:focus"],
-                },
-                [`&.focus-visible .${title}`]: {
-                    ...linkColors!["&&:focus-visible"],
-                },
-                [`&:active .${title}`]: {
-                    ...linkColors!["&&:active"],
-                },
-                [`&:visited .${title}`]: {
-                    ...linkColors!["&&:visited"],
-                },
-                "&:not(.focus-visible)": {
-                    outline: 0,
-                },
-            },
+                "&.hasIcon": {
+                    width: calc(`100% - ${unit(vars.icon.size + vars.spacing.padding.left)}`),
+                }
+            }
         },
         mediaQueries.compact({
             flexWrap: "wrap",
@@ -263,6 +261,29 @@ export const searchResultClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.excerpt,
     });
 
+    const linkColors = clickableItemStates();
+    const link = style("link", {
+        color: colorOut(globalVars.mainColors.fg),
+        $nest: linkColors.$nest,
+    });
+
+    const afterExcerptLink = style("afterExcerptLink", {
+        ...fonts(globalVars.meta.text),
+        $nest: linkColors.$nest,
+    });
+
+    const iconWrap = style("iconWrap", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: colorOut(vars.icon.bg),
+        borderRadius: "50%",
+        width: unit(vars.icon.size),
+        height: unit(vars.icon.size),
+        marginTop: unit(vars.spacing.padding.top),
+        marginLeft: unit(vars.spacing.padding.left),
+    });
+
     return {
         root,
         main,
@@ -272,5 +293,8 @@ export const searchResultClasses = useThemeCache(() => {
         attachments,
         metas,
         excerpt,
+        afterExcerptLink,
+        link,
+        iconWrap,
     };
 });

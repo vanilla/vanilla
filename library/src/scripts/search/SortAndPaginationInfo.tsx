@@ -17,7 +17,7 @@ import { ResultPaginationInfo } from "@library/result/ResultPaginationInfo";
 export interface ISearchSort extends Omit<IExternalLabelledProps, "describedBy" | "widthOfParent" | "describedBy: "> {}
 
 export interface ISearchSortAndPages {
-    sort?: ISearchSort;
+    sort: ISearchSort;
     pages?: ILinkPages;
 }
 
@@ -25,15 +25,17 @@ export function SortAndPaginationInfo(props: ISearchSortAndPages) {
     const { sort, pages } = props;
     const classes = searchMiscellaneousComponentsClasses();
     const sortID = useUniqueID("sortBy");
-    if (!sort && !pages) {
+
+    if (sort.options.length === 0 && !pages) {
         return null;
     }
+
 
     let content = <ResultPaginationInfo pages={props.pages} />;
 
     return (
         <div className={classes.sortAndPagination}>
-            {sort && (
+            {sort.options.length > 0 && (
                 <label className={classes.sort}>
                     <span id={sortID} className={classes.sortLabel}>{`${t("Sort By")}: `}</span>
                     <SelectBox
@@ -45,7 +47,7 @@ export function SortAndPaginationInfo(props: ISearchSortAndPages) {
                     />
                 </label>
             )}
-            {content}
+            {pages && content}
         </div>
     );
 }

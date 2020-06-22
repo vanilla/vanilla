@@ -24,7 +24,7 @@ export function SearchPagination(props: IProps) {
     const isSingle = (onNextClick && !onPreviousClick) || (!onNextClick && onPreviousClick);
     const classes = simplePagerClasses();
     return (
-        <ConditionalWrap className={classes.root} condition={onPreviousClick || onNextClick}>
+        <ConditionalWrap className={classes.root} condition={!!onPreviousClick || !!onNextClick}>
             {onPreviousClick && (
                 <Button className={classNames(classes.button, { isSingle })} onClick={onPreviousClick}>
                     {t("Previous")}

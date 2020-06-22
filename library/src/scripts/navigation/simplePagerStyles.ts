@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "@library/styles/styleHelpers";
+import {margins, unit} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
@@ -17,8 +17,9 @@ export const simplePagerVariables = useThemeCache(() => {
     });
 
     const spacing = themeVars("spacing", {
-        outerMargin: 10,
-        innerMargin: 8,
+        top: 32,
+        bottom: 26,
+        button: 8,
     });
 
     return {
@@ -30,16 +31,20 @@ export const simplePagerVariables = useThemeCache(() => {
 export const simplePagerClasses = useThemeCache(() => {
     const vars = simplePagerVariables();
     const style = styleFactory("simplePager");
+    const {spacing} = vars;
 
     const root = style({
         alignItems: "center",
         display: "flex",
         justifyContent: "center",
-        margin: `${unit(vars.spacing.outerMargin)} 0`,
+        ...margins({
+            top: spacing.top - spacing.button,
+            bottom: spacing.bottom -  spacing.button,
+        }),
     });
 
     const button = style("button", {
-        margin: unit(vars.spacing.innerMargin),
+        margin: unit(vars.spacing.button),
         minWidth: unit(vars.sizing.minWidth),
         $nest: {
             "&.isSingle": {

@@ -142,7 +142,6 @@ function SearchPage(props: IProps) {
                     }
                     middleBottom={<>
                         <SearchPageResults />
-                        <SearchPagination/>
                     </>}
                     rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
                 />

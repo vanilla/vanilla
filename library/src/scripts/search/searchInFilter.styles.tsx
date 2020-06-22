@@ -10,7 +10,6 @@ import {margins} from "@library/styles/styleHelpersSpacing";
 import {calc, percent, translate, translateX} from "csx";
 import {borders, colorOut, negativeUnit, srOnly, unit} from "@library/styles/styleHelpers";
 import {NestedCSSProperties, TLength} from "typestyle/lib/types";
-import {WidthProperty} from "csstype";
 import {generateButtonStyleProperties} from "@library/forms/styleHelperButtonGenerator";
 import {buttonVariables} from "@library/forms/buttonStyles";
 import {cssOut, nestedWorkaround} from "@dashboard/compatibilityStyles";
@@ -37,7 +36,7 @@ export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariable
 });
 
 export const searchInFilterClasses = useThemeCache(() => {
-    const style = styleFactory("searchIn");
+    const style = styleFactory("searchInFilter");
     const globalVars = globalVariables();
     const vars = searchInFilterVariables();
 

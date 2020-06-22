@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styleUtils";
-import {fonts, unit} from "@library/styles/styleHelpers";
+import {fonts, margins, unit} from "@library/styles/styleHelpers";
 
 export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("searchComponents");
@@ -13,7 +13,7 @@ export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
 });
 
 export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
-    const style = styleFactory("searchIn");
+    const style = styleFactory("searchMiscellaneousComponents");
     const globalVars = globalVariables();
     const vars = searchMiscellaneousComponentsVariables();
 
@@ -24,7 +24,13 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
     });
 
     const sort = style("sort", {
-        marginRight: unit(globalVars.gutter.size),
+        display: "flex",
+        ...margins({
+            all: 0,
+            right: globalVars.gutter.size,
+        }),
+        flexGrow: 1,
+
     });
 
     const pagination = style("pagination", {
@@ -32,7 +38,13 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         ...fonts(globalVars.meta.text),
     });
 
-    const sortLabel = style("sortLabel", {});
+    const sortLabel = style("sortLabel", {
+        alignSelf: "center",
+        marginRight: unit(6),
+        ...fonts({
+            color: globalVars.meta.text.color,
+        })
+    });
 
     return {
         sortAndPagination,

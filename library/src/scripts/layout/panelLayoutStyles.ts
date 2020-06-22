@@ -199,6 +199,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         panel,
         middleColumn,
         contentSizes,
+        globalContentWidth,
         mediaQueries,
         panelLayoutSpacing,
         panelLayoutBreakPoints,

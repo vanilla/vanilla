@@ -79,18 +79,26 @@ class PipelineModel extends Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
-     * @param string $mode Operation mode (force || default).
+     * @param array $options Operation mode (force || default).
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
+    public function insert(array $set, $options = []) {
+        if (is_string($options)) {
+            deprecated("String options are deprecated.");
+            $options = [self::OPT_MODE => $options];
+        }
+        $options += [
+            self::OPT_MODE => Operation::MODE_DEFAULT,
+        ];
+
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_INSERT);
         $databaseOperation->setCaller($this);
         $databaseOperation->setSet($set);
-        $databaseOperation->setMode($mode);
+        $databaseOperation->setOptions($options);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
-            return parent::insert($databaseOperation->getSet());
+            return parent::insert($databaseOperation->getSet(), $databaseOperation->getOptions());
         });
         return $result;
     }
@@ -100,17 +108,26 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
-     * @param string $mode Operation mode (force || default).
+     * @param array $options Update options.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
+    public function update(array $set, array $where, $options = []): bool {
+        if (is_string($options)) {
+            deprecated("String options are deprecated.");
+            $options = [Operation::OPTION_MODE => $options];
+        }
+        $options += [
+            'mode' => Operation::MODE_DEFAULT,
+        ];
+
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_UPDATE);
         $databaseOperation->setCaller($this);
+        $databaseOperation->setOptions($options);
         $databaseOperation->setSet($set);
         $databaseOperation->setWhere($where);
-        $databaseOperation->setMode($mode);
+        $databaseOperation->setMode($options['mode']);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::update(
                 $databaseOperation->getSet(),

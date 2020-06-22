@@ -25,6 +25,8 @@ import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { StorySmallContent } from "@library/storybook/StorySmallContent";
 import { FormToggle } from "@library/forms/FormToggle";
 import { flexHelper } from "@library/styles/styleHelpers";
+import {cssOut} from "@dashboard/compatibilityStyles";
+import {suggestedTextStyleHelper} from "@library/features/search/suggestedTextStyles";
 
 const story = storiesOf("Forms/User Facing", module);
 
@@ -42,6 +44,8 @@ story.add("Elements", () => {
     // To avoid clashing with other components also using these radio buttons, you need to generate a unique ID for the group.
 
     const radioButtonGroup1 = uniqueIDFromPrefix("radioButtonGroupA");
+
+    cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper().option);
 
     return (
         <StoryContent>

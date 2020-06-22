@@ -11,8 +11,9 @@ import { percent } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
-export const suggestedTextStyleHelper = useThemeCache((overwrites = {}) => {
+export const suggestedTextStyleHelper = useThemeCache((overwrite?: {forDashboard?: boolean}) => {
     const globalVars = globalVariables();
+    const {forDashboard = false} = overwrite || {};
     // The styles have been split here so they can be exported to the compatibility styles.
     const option = {
         ...buttonResetMixin(),
@@ -23,7 +24,7 @@ export const suggestedTextStyleHelper = useThemeCache((overwrites = {}) => {
         }),
         ...fonts({
             color: globalVars.mainColors.fg,
-            size: globalVars.fonts.size.large,
+            size: forDashboard ? globalVars.fonts.size.medium : globalVars.fonts.size.large,
         }),
         textAlign: "left",
         display: "block",

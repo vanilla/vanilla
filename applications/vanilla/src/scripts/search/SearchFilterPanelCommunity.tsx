@@ -16,15 +16,14 @@ import Checkbox from "@library/forms/Checkbox";
 
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
-import {PostTypeFilter} from "@library/search/panels/pieces/PostTypeFilter";
 import MultiUserInput from "@library/features/users/MultiUserInput";
-import classNames from "classnames";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
+import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 
 /**
  * Implement search filter panel for discussions
  */
-export function SearchFilterPanelDiscussions() {
+export function SearchFilterPanelCommunity() {
     const { form, updateForm, search } = useSearchForm<ICommunitySearchTypes>();
 
     const classesInputBlock = inputBlockClasses();
@@ -95,19 +94,9 @@ export function SearchFilterPanelDiscussions() {
             </CheckboxGroup>
 
             {/* Do we have a tag input in React? */}
+            {/* No API to get the data from yet. */}
 
-            {/* Hard coded temporarily */}
-            <PostTypeFilter types={[{
-                label: t("Discussions"),
-            },{
-                label: t("Questions"),
-            },{
-                label: t("Polls"),
-            },{
-                label: t("Ideas"),
-            }
-            ]}/>
-
+            <CommunityPostTypeFilter />
         </FilterFrame>
     );
 }

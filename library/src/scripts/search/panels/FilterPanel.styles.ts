@@ -43,6 +43,7 @@ export const filterPanelClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 border: 0,
+                marginTop: unit(globalVars.gutter.size),
                 ...paddings({
                     horizontal: 0,
                 })

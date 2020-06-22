@@ -198,6 +198,11 @@
                                 {if $Category}
                                     <h2 class="H HomepageTitle">{$Category.Name|strip_tags}{follow_button}</h2>
                                     <p class="P PageDescription">{$Category.Description|strip_tags}</p>
+                                {elseif inSection(["DiscussionList"])}
+                                    <h2 class="H HomepageTitle">{$Title}</h2>
+                                    {if $_Description}
+                                        <p class="P PageDescription">{$_Description}</p>
+                                    {/if}
                                 {else}
                                     {if {homepage_title} !== ""}
                                         <h2 class="H HomepageTitle">{homepage_title}</h2>

@@ -551,6 +551,11 @@ export const buttonLoaderClasses = useThemeCache(() => {
             padding: unit(4),
             height: percent(100),
             width: percent(100),
+            $nest: {
+                [`& + .suggestedTextInput-parentTag`]: {
+                    display: "none",
+                }
+            }
         }),
     );
 

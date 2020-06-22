@@ -126,12 +126,16 @@ export function NullComponent() {
     return null;
 }
 
+interface ISelectOptionOverwrite extends OptionProps<any>, IComboBoxOption{
+    isParentCategory?: string;
+}
+
 /**
  * Overwrite for the menuOption component in React Select
  * @param props
  */
-export function SelectOption(props: OptionProps<any> & IComboBoxOption) {
-    const { isSelected, isFocused, selectProps, value } = props;
+export function SelectOption(props: ISelectOptionOverwrite) {
+    const { isSelected, isFocused, selectProps, value, isParentCategory } = props;
     const placeholder = {};
 
     return (
@@ -145,7 +149,15 @@ export function SelectOption(props: OptionProps<any> & IComboBoxOption) {
                 })}
             >
                 <span className="suggestedTextInput-head">
-                    <span className="suggestedTextInput-title">{props.children}</span>
+                    <span className="suggestedTextInput-title">
+                        {props.children}
+                        {
+                            isParentCategory &&
+                            <span className={"suggestedTextInput-parentTag"}>
+                                {` - ${t("Parent")}`}
+                            </span>
+                        }
+                    </span>
                     {(isSelected || value === selectProps.value?.value) && (
                         <CheckCompactIcon className={selectOneClasses().checkIcon} />
                     )}

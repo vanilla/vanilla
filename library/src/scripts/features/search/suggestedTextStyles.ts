@@ -18,16 +18,23 @@ export const suggestedTextStyleHelper = useThemeCache((overwrites = {}) => {
         ...buttonResetMixin(),
         width: percent(100),
         ...paddings({
-            vertical: 9,
+            vertical: 6,
             horizontal: 12,
         }),
         ...fonts({
-            size: globalVars.fonts.size.medium,
+            color: globalVars.mainColors.fg,
+            size: globalVars.fonts.size.large,
         }),
         textAlign: "left",
         display: "block",
         color: "inherit",
         $nest: {
+            "& .suggestedTextInput-parentTag": {
+                ...fonts({
+                    ...globalVars.meta.text,
+                    lineHeight: "inherit",
+                }),
+            },
             "&:hover, &:focus, &.isFocused": {
                 color: "inherit",
                 backgroundColor: globalVars.states.hover.highlight.toString(),

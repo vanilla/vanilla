@@ -238,10 +238,9 @@ export const iconVariables = useThemeCache(() => {
         height: 26,
     });
     const typeQuestion = themeVars("TypeQuestion", {
-        width: 15.528,
-        height: 12.658,
+        width: 26,
+        height: 26,
     });
-
 
     return {
         standard,

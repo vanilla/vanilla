@@ -8,9 +8,11 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {
-    colorOut, EMPTY_FONTS,
+    colorOut,
+    EMPTY_FONTS,
     fonts,
-    margins, negativeUnit,
+    margins,
+    negativeUnit,
     objectFitWithFallback,
     paddings,
     singleBorder,
@@ -20,9 +22,9 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { calc, percent, px } from "csx";
 import { media } from "typestyle";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import {BorderBottomProperty} from "csstype";
-import {NestedCSSProperties, TLength} from "typestyle/lib/types";
-import {buttonVariables} from "@library/forms/buttonStyles";
+import { BorderBottomProperty } from "csstype";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { buttonVariables } from "@library/forms/buttonStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -54,8 +56,7 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const icon = makeThemeVars("icon", {
         size: 26,
-        bg: colorOut(globalVars.mixBgAndFg(.1)),
-
+        bg: colorOut(globalVars.mixBgAndFg(0.1)),
     });
 
     const separator = makeThemeVars("separatort", {
@@ -87,7 +88,6 @@ export const searchResultsVariables = useThemeCache(() => {
 
         return { compact };
     };
-
 
     return {
         colors,
@@ -185,8 +185,8 @@ export const searchResultClasses = useThemeCache(() => {
             $nest: {
                 "&.hasIcon": {
                     width: calc(`100% - ${unit(vars.icon.size + vars.spacing.padding.left)}`),
-                }
-            }
+                },
+            },
         },
         mediaQueries.compact({
             flexWrap: "wrap",

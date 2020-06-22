@@ -10,7 +10,7 @@ import { ISearchForm } from "@vanilla/library/src/scripts/search/searchTypes";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import { t } from "@vanilla/i18n";
 import { onReady } from "@vanilla/library/src/scripts/utility/appUtils";
-import {SearchFilterPanelDiscussions} from "@library/search/panels/FilterPanelDiscussions";
+import { SearchFilterPanelDiscussions } from "@library/search/panels/FilterPanelDiscussions";
 
 export function registerCommunitySearchDomain() {
     onReady(() => {
@@ -48,6 +48,20 @@ export function registerCommunitySearchDomain() {
                     includeArchivedCategories: false,
                 };
             },
+        });
+
+        SearchFormContextProvider.addSubType({
+            label: t("Discussions"),
+            icon: <TypeDiscussionsIcon />,
+            recordType: "discussion",
+            type: "discussion",
+        });
+
+        SearchFormContextProvider.addSubType({
+            label: t("Comment"),
+            icon: <TypeDiscussionsIcon />,
+            recordType: "comment",
+            type: "comment",
         });
     });
 }

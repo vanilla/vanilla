@@ -20,7 +20,7 @@ export default class CategorySuggestionActions extends ReduxActions {
                 return [];
             }
 
-            const params = { query };
+            const params = { query, expand: ["breadcrumbs"] };
             const response = await this.api.get("/categories/search", { params });
             return response.data;
         })({ query });

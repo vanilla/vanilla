@@ -18,6 +18,7 @@ import classNames from "classnames";
 import { formatDate, parseDate } from "react-day-picker/moment";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 import RelativePortal from "react-relative-portal";
+import "react-day-picker/lib/style.css";
 
 interface IProps {
     value: string; // ISO formatted date

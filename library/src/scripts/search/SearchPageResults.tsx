@@ -12,7 +12,7 @@ import Loader from "@library/loaders/Loader";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm, SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
 import { hashString } from "@vanilla/utils";
 import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { ISearchResult } from "@library/search/searchTypes";
@@ -78,17 +78,23 @@ export function SearchPageResults(props: IProps) {
  */
 function mapResult(searchResult: ISearchResult): IResult {
     const crumbs = searchResult.breadcrumbs || [];
+
+    const icon = SearchFormContextProvider.getSubType(searchResult.type)?.icon;
+
     return {
         name: searchResult.name,
         excerpt: searchResult.body,
+        icon,
         meta: (
-            <ResultMeta
-                status={searchResult.status}
-                type={searchResult.recordType}
-                updateUser={searchResult.insertUser!}
-                dateUpdated={searchResult.dateInserted}
-                crumbs={crumbs}
-            />
+            <>
+                <ResultMeta
+                    status={searchResult.status}
+                    type={searchResult.recordType}
+                    updateUser={searchResult.insertUser!}
+                    dateUpdated={searchResult.dateInserted}
+                    crumbs={crumbs}
+                />
+            </>
         ),
         image: searchResult.image?.url,
         url: searchResult.url,

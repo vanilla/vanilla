@@ -13,9 +13,8 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { searchResultClasses, searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
-import {ICrumb} from "@library/navigation/Breadcrumbs";
-import {TypeQuestionIcon} from "@library/icons/searchIcons";
-
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { TypeQuestionIcon } from "@library/icons/searchIcons";
 
 export interface IResult {
     name: string;
@@ -28,25 +27,14 @@ export interface IResult {
     attachments?: IAttachmentIcon[];
     location: ICrumb[] | string[];
     afterExcerpt?: React.ReactNode; // Likely SearchLink
-    icon?: JSX.Element;
+    icon?: React.ReactNode;
 }
 
 /**
  * Generates search result list. Note that this template is used in other contexts, such as the flat category list
  */
-export default function Result(props:IResult) {
-    const {
-        name,
-        className,
-        meta,
-        url,
-        excerpt,
-        image,
-        headingLevel = 2,
-        attachments,
-        afterExcerpt,
-        icon,
-    } = props;
+export default function Result(props: IResult) {
+    const { name, className, meta, url, excerpt, image, headingLevel = 2, attachments, afterExcerpt, icon } = props;
 
     const hasAttachments = attachments && attachments.length > 0;
     const showImage = image && !hasAttachments;
@@ -79,20 +67,16 @@ export default function Result(props:IResult) {
         <li className={classNames(classesSearchResults.item, className)}>
             <article className={classNames(classesSearchResults.result)}>
                 {icon && <div className={classes.iconWrap}>{icon}</div>}
-                <div className={classNames(classes.root, {"hasIcon": !!icon})}>
+                <div className={classNames(classes.root, { hasIcon: !!icon })}>
                     <div className={classNames(classes.main, { hasMedia: !!media })}>
                         <SmartLink to={url} tabIndex={0} className={classes.link}>
-                            <HeadingTag className={classes.title}>
-                                {name}
-                            </HeadingTag>
+                            <HeadingTag className={classes.title}>{name}</HeadingTag>
                         </SmartLink>
                         {meta && <div className={classes.metas}>{meta}</div>}
                         {!!excerpt && (
                             <Paragraph className={classes.excerpt}>
                                 <>
-                                    <TruncatedText maxCharCount={160}>
-                                        {excerpt}
-                                    </TruncatedText>
+                                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
                                     {afterExcerpt}
                                 </>
                             </Paragraph>
@@ -103,5 +87,4 @@ export default function Result(props:IResult) {
             </article>
         </li>
     );
-
 }

@@ -262,3 +262,21 @@ SearchFormContextProvider.pluggableDomains = [] as ISearchDomain[];
 SearchFormContextProvider.addPluggableDomain = (domain: ISearchDomain) => {
     SearchFormContextProvider.pluggableDomains.push(domain);
 };
+
+interface ISearchSubType {
+    recordType: string;
+    icon: React.ReactNode;
+    type: string;
+    label: string;
+}
+
+SearchFormContextProvider.subTypes = {} as Record<string, ISearchSubType>;
+SearchFormContextProvider.addSubType = (subType: ISearchSubType) => {
+    SearchFormContextProvider.subTypes[subType.type] = subType;
+};
+SearchFormContextProvider.getSubTypes = (): ISearchSubType[] => {
+    return Object.values(SearchFormContextProvider.subTypes);
+};
+SearchFormContextProvider.getSubType = (type: string): ISearchSubType | null => {
+    return SearchFormContextProvider.subTypes[type] ?? null;
+};

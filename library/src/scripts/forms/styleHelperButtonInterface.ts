@@ -7,7 +7,7 @@
 import { IBorderStyles } from "@library/styles/styleHelpersBorders";
 import { IFont } from "@library/styles/styleHelpersTypography";
 import { ColorValues } from "@library/styles/styleHelpersColors";
-import { TLength } from "typestyle/lib/types";
+import {NestedCSSProperties, NestedCSSSelectors, TLength} from "typestyle/lib/types";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
@@ -71,4 +71,5 @@ export interface IButtonType {
         borders?: IBorderStyles;
         fonts?: IFont;
     };
+    extraNested?: NestedCSSSelectors; // special case CSS
 }

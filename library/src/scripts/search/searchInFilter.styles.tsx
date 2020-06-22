@@ -8,7 +8,7 @@ import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styl
 import {IThemeVariables} from "@library/theming/themeReducer";
 import {margins} from "@library/styles/styleHelpersSpacing";
 import {calc, percent, translate, translateX} from "csx";
-import {colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
+import {borders, colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
 import {NestedCSSProperties, TLength} from "typestyle/lib/types";
 import {WidthProperty} from "csstype";
 
@@ -16,10 +16,9 @@ export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariable
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
     const vars = globalVariables();
 
-    const border = makeThemeVars("border", {
-        ...vars.border,
-        radius: "50%",
-    })
+    const sizing = makeThemeVars("sizing", {
+        height: 32,
+    });
 
     const spacing = makeThemeVars("spacing", {
         margin: {
@@ -28,8 +27,9 @@ export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariable
         },
     });
 
+
     return {
-        border,
+        sizing,
         spacing,
     };
 });
@@ -60,8 +60,10 @@ export const searchInFilterClasses = useThemeCache(() => {
         flexShrink: 1,
         ...margins(vars.spacing.margin),
     });
-    const label = style("label", {});
     const input = style("input", {});
+    const label = style("label", {
+    });
+
 
     const separator = style("separator", {
         display: "inline-flex",
@@ -73,6 +75,11 @@ export const searchInFilterClasses = useThemeCache(() => {
         })
     });
 
+    const iconWrap = style("iconWrap", {
+        width: unit(globalVars.icon.sizes.default),
+        height: unit(globalVars.icon.sizes.default),
+    });
+
     return {
         root,
         items,
@@ -80,5 +87,6 @@ export const searchInFilterClasses = useThemeCache(() => {
         label,
         input,
         separator,
+        iconWrap,
     };
 });

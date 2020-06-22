@@ -53,7 +53,7 @@ function SearchMiscellaneousComponents(props: IProps) {
     );
 }
 
-export const NoSort = storyWithConfig({}, () => <SearchMiscellaneousComponents sort={[]} message={"No sort, only pagination info"}/>);
-export const NoPaginationInfo = storyWithConfig({}, () => <SearchMiscellaneousComponents paginationInfo={[]} message={"No pagination info, only sort"} />);
-export const NoRender = storyWithConfig({}, () => <SearchMiscellaneousComponents message={"Does not render, no data"} paginationInfo={[]} sort={[]} />);
+export const NoSort = storyWithConfig({}, () => <SearchMiscellaneousComponents sort={undefined} message={"No sort, only pagination info"}/>);
+export const NoPaginationInfo = storyWithConfig({}, () => <SearchMiscellaneousComponents paginationInfo={undefined} message={"No pagination info, only sort"} />);
+export const NoRender = storyWithConfig({}, () => <SearchMiscellaneousComponents message={"Does not render, no data"} paginationInfo={undefined} sort={undefined} />);
 export const BigTotal = storyWithConfig({}, () => <SearchMiscellaneousComponents message={"Big total"} paginationInfo={{...dummyPaginationData, total: 9595959595}} sort={dummySortData} />);

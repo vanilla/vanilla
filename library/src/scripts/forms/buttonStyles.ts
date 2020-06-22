@@ -13,6 +13,7 @@ import {
     userSelect,
     spinnerLoaderAnimationProperties,
     offsetLightness,
+    borders,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -281,11 +282,70 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const radioPresetInit = makeThemeVars("radio", {
+        sizing: {
+            minHeight: formElementsVariables().sizing.height - 4,
+        },
+        borders: {
+            ...globalVars.border,
+        },
+        state: {
+            colors: {
+                fg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+            }
+        },
+        //special case
+        active: {
+            color: colorOut(globalVars.mixBgAndFg(.1)),
+        }
+    });
+
+
+    const radio: IButtonType = makeThemeVars("radio", {
+        name: ButtonTypes.RADIO,
+        preset: { style: ButtonPreset.ADVANCED },
+        colors: {
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg,
+        },
+        padding: {
+            horizontal: 16,
+        },
+        borders: {
+            ...radioPresetInit.borders,
+            radius: radioPresetInit.sizing.minHeight / 2,
+        },
+        state: radioPresetInit.state,
+        sizing: {
+            minHeight: radioPresetInit.sizing.minHeight,
+        },
+        extraNested: {
+            ["&.isActive"]: {
+                borderColor: colorOut(radioPresetInit.active.color),
+                backgroundColor: colorOut(radioPresetInit.active.color),
+            },
+            [`
+                &:hover, &:focus, &:active, &.focus-visible,
+                &.isActive:hover, &.isActive:focus, &.isActive:active, &.isActive.focus-visible
+            `]: {
+                color: colorOut(radioPresetInit.state.colors.fg),
+                ...borders({
+                    ...radioPresetInit.borders,
+                    ...radioPresetInit.state.borders
+                }),
+            }
+        }
+    });
+
     return {
         standard,
         primary,
         transparent,
         translucid,
+        radio,
     };
 });
 
@@ -300,21 +360,22 @@ export const buttonSizing = (
 ) => {
     const buttonGlobals = buttonGlobalVariables();
     const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
+    const height = minHeight ?? formElementVars.sizing.minHeight;
 
     const paddingOffsets = paddingOffsetBasedOnBorderRadius({
         radius: borderRadius,
         extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
-        height: buttonGlobals.sizing.minHeight,
+        height,
     });
 
     return {
-        minHeight: unit(minHeight ? minHeight : formElementVars.sizing.minHeight),
+        minHeight: unit(height),
         minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
         padding: `0px ${px(paddingHorizontal + paddingOffsets.right ?? 0)} 0px ${px(
             paddingHorizontal + paddingOffsets.left ?? 0,
         )}`,
-        lineHeight: unit(formElementVars.sizing.height - borderWidth * 2),
+        lineHeight: unit(height - borderWidth * 2),
     };
 };
 
@@ -352,6 +413,7 @@ export const buttonClasses = useThemeCache(() => {
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,
         textPrimary: buttonUtilityClasses().buttonAsTextPrimary,
+        radio: generateButtonClass(vars.radio),
         custom: "",
     };
 });

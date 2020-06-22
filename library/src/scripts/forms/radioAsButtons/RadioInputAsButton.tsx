@@ -28,6 +28,7 @@ export interface IRadioInputAsButtonClasses {
     input: string;
     leftTab?: string;
     rightTab?: string;
+    iconWrap?: string;
 }
 
 interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {}
@@ -36,7 +37,7 @@ interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {
  * Implement what looks like buttons, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
 export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
-    const { data, icon = null } = props;
+    const { data, icon } = props;
     const activeItem = props["activeItem"];
     const classes = props["classes"] || { item: null, input: null, label: null };
 
@@ -78,14 +79,14 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
                 className={classNames(
                     { isDisabled: props.disabled || props.isLoading },
                     classes.label,
-                    active ? props["buttonActiveClass"] : props["buttonClass"],
+                    active ? classNames(props["buttonActiveClass"], "isActive") : props["buttonClass"],
                 )}
             >
                 {props.isLoading ? (
                     <ButtonLoader />
                 ) : (
                     <>
-                        {icon}
+                        {icon && <span aria-hidden={true} className={classes["iconWrap"] ?? undefined}>{icon}</span>}
                         {props.label}
                     </>
                 )}

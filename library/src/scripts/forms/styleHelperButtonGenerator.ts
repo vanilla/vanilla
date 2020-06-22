@@ -22,6 +22,7 @@ import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
+import {ButtonTypes} from "@library/forms/buttonTypes";
 
 export const generateButtonStyleProperties = (
     buttonTypeVars: IButtonType,
@@ -150,6 +151,7 @@ export const generateButtonStyleProperties = (
                 : buttonGlobals.padding.horizontal,
             formElVars,
             borderVars.radius,
+        buttonTypeVars.name === ButtonTypes.RADIO
         ),
         display: "inline-flex",
         alignItems: "center",
@@ -223,6 +225,7 @@ export const generateButtonStyleProperties = (
             "&[disabled]": {
                 opacity: formElVars.disabled.opacity,
             },
+            ...(buttonTypeVars.extraNested ?? {}),
         },
     };
 

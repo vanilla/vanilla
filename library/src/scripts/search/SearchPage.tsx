@@ -1,3 +1,4 @@
+
 /**
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -130,9 +131,9 @@ function SearchPage(props: IProps) {
                                 <SortAndPaginationInfo pages={results.data?.pagination} sort={{ options: [] }} />
                             </PanelWidgetHorizontalPadding>
                             {isMobile && (
-                                <PanelWidget>
+                                <PanelWidgetHorizontalPadding>
                                     <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
-                                </PanelWidget>
+                                </PanelWidgetHorizontalPadding>
                             )}
                         </>
                     }

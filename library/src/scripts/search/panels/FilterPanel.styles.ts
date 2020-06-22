@@ -4,14 +4,14 @@
  */
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import {fonts, paddings, unit} from "@library/styles/styleHelpers";
+import {fonts, paddings, srOnly, unit} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import {twoColumnLayoutVariables} from "@library/layout/twoColumnLayoutStyles";
 
 export const filterPanelClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("filterPanel");
-
-
+    const mediaQueries = twoColumnLayoutVariables().mediaQueries();
 
     const header = style("header", {
         marginBottom: unit(globalVars.gutter.size * 1.5),
@@ -24,7 +24,9 @@ export const filterPanelClasses = useThemeCache(() => {
                 })
             }
         }
-    });
+    }, mediaQueries.oneColumnDown({
+        ...srOnly(),
+    }));
 
     const body = style("body", {
 

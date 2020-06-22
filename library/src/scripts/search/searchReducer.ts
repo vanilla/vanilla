@@ -36,6 +36,11 @@ export const searchReducer = produce(
                 ...payload,
             };
 
+            if (!("page" in payload)) {
+                // Reset the page when switching some other filter.
+                nextState.form.page = 1;
+            }
+
             return nextState;
         })
         .case(SearchActions.performSearchACs.started, (nextState, payload) => {

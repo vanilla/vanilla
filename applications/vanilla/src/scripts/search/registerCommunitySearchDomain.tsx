@@ -10,7 +10,9 @@ import { ISearchForm } from "@vanilla/library/src/scripts/search/searchTypes";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import { t } from "@vanilla/i18n";
 import { onReady } from "@vanilla/library/src/scripts/utility/appUtils";
-import { SearchFilterPanelDiscussions } from "@library/search/panels/FilterPanelDiscussions";
+import flatten from "lodash/flatten";
+import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
+import { SearchFilterPanelCommunity } from "@vanilla/addon-vanilla/search/SearchFilterPanelCommunity";
 
 export function registerCommunitySearchDomain() {
     onReady(() => {
@@ -40,12 +42,13 @@ export function registerCommunitySearchDomain() {
             getRecordTypes: () => {
                 return ["discussion"];
             },
-            PanelComponent: SearchFilterPanelDiscussions,
+            PanelComponent: SearchFilterPanelCommunity,
             getDefaultFormValues: () => {
                 return {
                     followedCategories: false,
                     includeChildCategories: false,
                     includeArchivedCategories: false,
+                    types: flatten(CommunityPostTypeFilter.postTypes.map(type => type.values)),
                 };
             },
         });

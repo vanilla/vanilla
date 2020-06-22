@@ -72,7 +72,7 @@ export function SearchFilterPanelCommunity() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ includeChildCategories: event.target.checked || false });
                     }}
-                    checked={form.includeChildCategories}
+                    checked={form.includeChildCategories ?? false}
                     className={classesInputBlock.root}
                 />
                 <Checkbox
@@ -80,7 +80,7 @@ export function SearchFilterPanelCommunity() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ followedCategories: event.target.checked || false });
                     }}
-                    checked={form.followedCategories}
+                    checked={form.followedCategories ?? false}
                     className={classesInputBlock.root}
                 />
                 <Checkbox
@@ -88,7 +88,7 @@ export function SearchFilterPanelCommunity() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ includeArchivedCategories: event.target.checked || false });
                     }}
-                    checked={form.includeArchivedCategories}
+                    checked={form.includeArchivedCategories ?? false}
                     className={classesInputBlock.root}
                 />
             </CheckboxGroup>

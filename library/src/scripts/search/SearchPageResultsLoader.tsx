@@ -17,14 +17,19 @@ export function SearchPageResultsLoader(props: IProps) {
             {Array.from(new Array(count)).map((_, i) => {
                 return (
                     <div key={i}>
-                        <LoadingRectange height={1} width={780} />
-                        <LoadingSpacer height={10} width={780} />
+                        <LoadingRectange height={1} width={"100%"} />
+                        <LoadingSpacer height={10} width={"100%"} />
                         <div style={{ display: "flex", flexDirection: "row" }}>
                             <LoadingRectange height={25} width={25} style={{ marginRight: 10, borderRadius: "50%" }} />
                             <div>
                                 <LoadingRectange height={20} width={150} />
-                                <LoadingSpacer height={5} width={400} />
-                                <div style={{ display: "flex", flexDirection: "row" }}>
+                                <LoadingSpacer height={5} width={"100%"} />
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "row",
+                                    }}
+                                >
                                     <LoadingRectange height={20} width={150} style={{ marginRight: 10 }} />
                                     <LoadingRectange height={20} width={80} style={{ marginRight: 10 }} />
                                     <LoadingRectange height={20} width={120} style={{ marginRight: 10 }} />

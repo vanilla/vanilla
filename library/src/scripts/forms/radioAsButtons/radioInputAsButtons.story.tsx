@@ -9,7 +9,6 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { EventAttendance } from "@groups/events/state/eventsTypes";
 import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
@@ -57,12 +56,12 @@ export function RadioInputsRenderedAsButtons(props: {
                 buttonClass={props.buttonClass}
                 buttonActiveClass={props.buttonActiveClass}
             >
-                <RadioInputAsButton disabled={props.disabled} label={t("Going")} data={EventAttendance.GOING} />
-                <RadioInputAsButton disabled={props.disabled} label={t("Maybe")} data={EventAttendance.MAYBE} />
+                <RadioInputAsButton disabled={props.disabled} label={t("Going")} data={"going"} />
+                <RadioInputAsButton disabled={props.disabled} label={t("Maybe")} data={"maybe"} />
                 <RadioInputAsButton
                     disabled={props.disabled}
                     label={t("Not going")}
-                    data={EventAttendance.NOT_GOING}
+                    data={"not going"}
                     className={"isLast"}
                 />
             </RadioGroup>

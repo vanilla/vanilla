@@ -43,7 +43,6 @@ export function SearchPageResults(props: IProps) {
     switch (results.status) {
         case LoadStatus.PENDING:
         case LoadStatus.LOADING:
-            // return <Loader />;
             return <SearchPageResultsLoader count={10} />;
         case LoadStatus.ERROR:
             return <KbErrorMessages apiError={results.error} />;

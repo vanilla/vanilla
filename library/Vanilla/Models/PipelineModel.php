@@ -115,10 +115,10 @@ class PipelineModel extends Model implements InjectableInterface {
     public function update(array $set, array $where, $options = []): bool {
         if (is_string($options)) {
             deprecated("String options are deprecated.");
-            $options = [Operation::OPTION_MODE => $options];
+            $options = [self::OPT_MODE => $options];
         }
         $options += [
-            'mode' => Operation::MODE_DEFAULT,
+            self::OPT_MODE => Operation::MODE_DEFAULT,
         ];
 
         $databaseOperation = new Operation();
@@ -127,7 +127,6 @@ class PipelineModel extends Model implements InjectableInterface {
         $databaseOperation->setOptions($options);
         $databaseOperation->setSet($set);
         $databaseOperation->setWhere($where);
-        $databaseOperation->setMode($options['mode']);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::update(
                 $databaseOperation->getSet(),

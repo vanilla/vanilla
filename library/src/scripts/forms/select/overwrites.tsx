@@ -17,7 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
-import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
+import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 
@@ -126,7 +126,7 @@ export function NullComponent() {
     return null;
 }
 
-interface ISelectOptionOverwrite extends OptionProps<any>, Omit<IComboBoxOption, "data"> {}
+interface ISelectOptionOverwrite extends OptionProps<any>, IComboBoxOption {}
 
 /**
  * Overwrite for the menuOption component in React Select
@@ -149,12 +149,9 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 <span className="suggestedTextInput-head">
                     <span className="suggestedTextInput-title">
                         {props.children}
-                        {
-                            isParentCategory &&
-                            <span className={"suggestedTextInput-parentTag"}>
-                                {` - ${t("Parent")}`}
-                            </span>
-                        }
+                        {props.data.parentLabel && (
+                            <span className={"suggestedTextInput-parentTag"}>{` - ${props.data.parentLabel}`}</span>
+                        )}
                     </span>
                     {(isSelected || value === selectProps.value?.value) && (
                         <CheckCompactIcon className={selectOneClasses().checkIcon} />

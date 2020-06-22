@@ -46,7 +46,7 @@ export function TypeArticlesIcon(props: { className?: string; "aria-hidden"?: ar
     );
 }
 
-export function TypeCategoriesAndGroupsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function TypeCategoriesAndGroupsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType, title?: string; }) {
     const classes = iconClasses();
     return (
         <svg
@@ -55,7 +55,7 @@ export function TypeCategoriesAndGroupsIcon(props: { className?: string; "aria-h
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 15.122 16.416"
         >
-            <title>{t("Categories & Groups")}</title>
+            <title>{props.title ?? t("Categories & Groups")}</title>
             <path d="M3.283,13.983l7.534,4.073L18.2,13.725l-3.218-1.77c-.687.34-1.727.9-2.578,1.362a15.322,15.322,0,0,1-1.664.813c-.1,0-3-1.457-4.217-2.164Z" transform="translate(-3.078 -1.64)"
                   style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}
             />

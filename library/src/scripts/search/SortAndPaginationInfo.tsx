@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 import {searchMiscellaneousComponentsClasses} from "@library/search/searchMiscellaneousComponents.styles";
-import SelectBox, {IExternalLabelledProps, ISelfLabelledProps} from "@library/forms/select/SelectBox";
+import SelectBox, {IExternalLabelledProps} from "@library/forms/select/SelectBox";
 import * as React from "react";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Translate from "@library/content/Translate";
@@ -14,7 +14,7 @@ import {
     numberFormattedForTranslations
 } from "@library/content/NumberFormatted";
 
-export interface ISearchSort extends Omit<IExternalLabelledProps, "describedBy" | "widthOfParent"> {}
+export interface ISearchSort extends Omit<IExternalLabelledProps, "describedBy" | "widthOfParent" | "describedBy: "> {}
 
 export interface ISearchPaginationInfo {
     resultStart: number;
@@ -23,7 +23,7 @@ export interface ISearchPaginationInfo {
 }
 
 export interface ISearchSortAndPaginationInfo {
-    sort?: ISelfLabelledProps,
+    sort?: ISearchSort,
     paginationInfo?: ISearchPaginationInfo,
 }
 

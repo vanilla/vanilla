@@ -46,7 +46,7 @@ export function formatNumberText(props: {value: number}){
 export function decomposedNumberFormatted(props: IProps) {
     const formattedNumber = formatNumberText({value: props.value});
     const { fullValue, modified} = formattedNumber;
-    const Tag = modified ? `abbr` : `span`;
+    const Tag = (modified ? `abbr` : `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);
     const title = props.title || fullValue;
 

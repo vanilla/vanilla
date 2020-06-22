@@ -448,7 +448,8 @@ $dic->call(function (
     Container $dic,
     Gdn_Configuration $config,
     \Vanilla\AddonManager $addonManager,
-    \Garden\EventManager $eventManager
+    \Garden\EventManager $eventManager,
+    Gdn_Request $request // remove later
 ) {
 
     // Load default baseline Garden configurations.
@@ -456,8 +457,6 @@ $dic->call(function (
 
     // Load installation-specific configuration so that we know what apps are enabled.
     $config->load($config->defaultPath(), 'Configuration', true);
-
-    $request = $dic->get(\Gdn_Request::class);
 
     /**
      * Bootstrap Early

@@ -9,6 +9,9 @@ import { IRadioGroupProps, withRadioGroup } from "@library/forms/radioAsButtons/
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import {LiveMessage} from "react-aria-live";
+import {sprintf} from "sprintf-js";
 
 export interface IBaseRadioProps {
     label: string;
@@ -26,6 +29,7 @@ export interface IRadioInputAsButtonClasses {
     item: string;
     label: string;
     input: string;
+    labelWrap?: string;
     leftTab?: string;
     rightTab?: string;
     iconWrap?: string;
@@ -87,10 +91,13 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
                 ) : (
                     <>
                         {icon && <span aria-hidden={true} className={classes["iconWrap"] ?? undefined}>{icon}</span>}
-                        {props.label}
+                        <ConditionalWrap condition={!!icon} className={classes["labelWrap"]}>
+                            {props.label}
+                        </ConditionalWrap>
                     </>
                 )}
             </span>
+            {active && <LiveMessage clearOnUnmount={true} message={sprintf('Search for: "%s"', props.label)} aria-live="polite" />}
         </label>
     );
 }

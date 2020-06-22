@@ -8,9 +8,12 @@ import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styl
 import {IThemeVariables} from "@library/theming/themeReducer";
 import {margins} from "@library/styles/styleHelpersSpacing";
 import {calc, percent, translate, translateX} from "csx";
-import {borders, colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
+import {borders, colorOut, negativeUnit, srOnly, unit} from "@library/styles/styleHelpers";
 import {NestedCSSProperties, TLength} from "typestyle/lib/types";
 import {WidthProperty} from "csstype";
+import {generateButtonStyleProperties} from "@library/forms/styleHelperButtonGenerator";
+import {buttonVariables} from "@library/forms/buttonStyles";
+import {cssOut, nestedWorkaround} from "@dashboard/compatibilityStyles";
 
 export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariables) => {
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
@@ -26,7 +29,6 @@ export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariable
             horizontal: 12,
         },
     });
-
 
     return {
         sizing,
@@ -60,10 +62,17 @@ export const searchInFilterClasses = useThemeCache(() => {
         flexShrink: 1,
         ...margins(vars.spacing.margin),
     });
-    const input = style("input", {});
-    const label = style("label", {
-    });
 
+    const label = style("label", {});
+    const input = style("input", {});
+
+    // Style "button"
+    const labelStateStyles = generateButtonStyleProperties(buttonVariables().radio);
+    nestedWorkaround(`.${label}`, labelStateStyles.$nest);
+
+    // Style states on actual radio button
+    const hiddenInputStates = generateButtonStyleProperties(buttonVariables().radio, false, ` + .${label}`);
+    nestedWorkaround(`.${input}`, hiddenInputStates.$nest);
 
     const separator = style("separator", {
         display: "inline-flex",
@@ -75,9 +84,12 @@ export const searchInFilterClasses = useThemeCache(() => {
         })
     });
 
+    const labelWrap = style("labelWrap", {
+        marginLeft: unit(9),
+    });
+
     const iconWrap = style("iconWrap", {
-        width: unit(globalVars.icon.sizes.default),
-        height: unit(globalVars.icon.sizes.default),
+        display: "inline-flex",
     });
 
     return {
@@ -88,5 +100,6 @@ export const searchInFilterClasses = useThemeCache(() => {
         input,
         separator,
         iconWrap,
+        labelWrap,
     };
 });

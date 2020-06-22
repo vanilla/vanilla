@@ -11,8 +11,9 @@ import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { SearchIcon } from "./titleBar";
 import {t} from "@vanilla/i18n/src";
 
-export function SearchFilterAllIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
-    return <SearchIcon {...props} />;
+export function TypeAllIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
+    const classes = iconClasses();
+    return <SearchIcon {...props} className={classNames(classes.typeAll, props.className)} />;
 }
 
 export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
@@ -20,12 +21,12 @@ export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?:
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeDiscussions, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 25"
+            viewBox="0 0 18.869 15.804"
         >
             <title>{t("Discussions")}</title>
-            <path d="M18.911,8.991a7.505,7.505,0,0,0-3.346-1.476c-.607-2.508-3.854-4.13-6.544-4.13h0c-3.8,0-6.952,2.446-6.952,5.572a4.9,4.9,0,0,0,1.453,3.417l-.484,1.97a.772.772,0,0,0,1.092.875l2.242-1.106a8.26,8.26,0,0,0,.894.235,5.372,5.372,0,0,0,1.8,2.522A7.875,7.875,0,0,0,13.986,18.5a8.459,8.459,0,0,0,2.649-.417l2.242,1.106.608-2.845a4.93,4.93,0,0,0,1.453-3.417A5.038,5.038,0,0,0,18.911,8.991ZM6.321,13.018l-2.533,1.51.764-2.4a4.184,4.184,0,0,1-1.49-3.168c0-2.652,2.546-4.58,5.959-4.58s5.362,1.986,5.362,2.98c0,.007.017.022.024.032-.141-.006-.278-.033-.421-.033A7.878,7.878,0,0,0,9.061,8.99a5.04,5.04,0,0,0-2.027,3.94c0,.134.013.265.024.4C6.831,13.238,6.616,13.129,6.321,13.018Zm12.361,2.729-.106.1-.4,1.886L16.7,17.011l-.2.07a7.417,7.417,0,0,1-2.515.43,6.883,6.883,0,0,1-4.3-1.415A4.073,4.073,0,0,1,8.027,12.93,4.069,4.069,0,0,1,9.682,9.765a6.878,6.878,0,0,1,4.3-1.414,6.871,6.871,0,0,1,4.3,1.415,4.066,4.066,0,0,1,1.655,3.164A3.925,3.925,0,0,1,18.682,15.747Z" style={{fill: "currentColor"}}/>
+            <path d="M18.911,8.991a7.516,7.516,0,0,0-3.346-1.476c-.607-2.508-3.854-4.13-6.544-4.13h0c-3.8,0-6.952,2.446-6.952,5.572a4.9,4.9,0,0,0,1.453,3.417l-.484,1.97a.772.772,0,0,0,1.092.875l2.242-1.106a8.334,8.334,0,0,0,.894.235,5.371,5.371,0,0,0,1.8,2.522,7.876,7.876,0,0,0,4.92,1.63,8.447,8.447,0,0,0,2.649-.417l2.242,1.106.608-2.845a4.932,4.932,0,0,0,1.453-3.417A5.038,5.038,0,0,0,18.911,8.991ZM6.321,13.018l-2.533,1.51.764-2.4A4.184,4.184,0,0,1,3.062,8.96c0-2.652,2.546-4.58,5.959-4.58s5.362,1.986,5.362,2.98c0,.007.017.022.024.032-.141-.006-.278-.033-.421-.033A7.877,7.877,0,0,0,9.061,8.99a5.038,5.038,0,0,0-2.027,3.94c0,.134.013.265.024.4C6.831,13.238,6.616,13.129,6.321,13.018Zm12.361,2.729-.106.1-.4,1.886L16.7,17.011l-.2.07a7.4,7.4,0,0,1-2.515.43,6.881,6.881,0,0,1-4.3-1.415A4.073,4.073,0,0,1,8.027,12.93,4.068,4.068,0,0,1,9.682,9.765a6.88,6.88,0,0,1,4.3-1.414,6.867,6.867,0,0,1,4.3,1.415,4.066,4.066,0,0,1,1.655,3.164A3.923,3.923,0,0,1,18.682,15.747Z" transform="translate(-2.069 -3.385)" style={{fill: "currentColor"}}/>
         </svg>
     );
 }
@@ -35,12 +36,12 @@ export function TypeArticlesIcon(props: { className?: string; "aria-hidden"?: ar
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeArticles, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 22 22"
+            viewBox="0 0 14.666 14.666"
         >
             <title>{t("Articles")}</title>
-            <path d="M17.417,3.667a.916.916,0,0,1,.916.916V17.417a.916.916,0,0,1-.916.916H4.583a.916.916,0,0,1-.916-.916V4.583a.916.916,0,0,1,.916-.916Zm0,.916H4.583V17.417H17.417ZM12.833,13.75v.917H6.417V13.75Zm2.75-1.833v.916H6.417v-.916ZM11,6.417V11H6.417V6.417Zm4.583,3.666V11H11.917v-.917Zm-5.5-2.75H7.333v2.75h2.75Zm5.5.917v.917H11.917V8.25Zm0-1.833v.916H11.917V6.417Z" style={{fill: "currentColor", fillRule: "evenodd"}}/>
+            <path d="M17.417,3.667a.916.916,0,0,1,.916.916h0V17.417a.916.916,0,0,1-.916.916H4.583a.916.916,0,0,1-.916-.916h0V4.583a.916.916,0,0,1,.916-.916Zm0,.916H4.583V17.417H17.417ZM12.833,13.75v.917H6.417V13.75Zm2.75-1.833v.916H6.417v-.916ZM11,6.417V11H6.417V6.417Zm4.583,3.666V11H11.917v-.917Zm-5.5-2.75H7.333v2.75h2.75Zm5.5.917v.917H11.917V8.25Zm0-1.833v.916H11.917V6.417Z" transform="translate(-3.667 -3.667)" style={{fill: "currentColor", fillRule: "evenodd"}}/>
         </svg>
     );
 }
@@ -50,14 +51,20 @@ export function TypeCategoriesAndGroupsIcon(props: { className?: string; "aria-h
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeCategoriesAndGroups, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
+            viewBox="0 0 15.122 16.416"
         >
             <title>{t("Categories & Groups")}</title>
-            <path d="M3.283,13.983l7.534,4.073L18.2,13.725l-3.218-1.77c-.687.34-1.727.9-2.578,1.362a15.278,15.278,0,0,1-1.664.813c-.1,0-3-1.457-4.217-2.164Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
-            <path d="M14.653,7.952S10.844,10,10.749,10L6.811,7.974c-.886.487-3.548,1.989-3.733,2.076l7.739,4.186L18.2,9.9Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
-            <path d="M10.687,1.64,3.3,5.973l7.385,4.06L18.2,5.7Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
+            <path d="M3.283,13.983l7.534,4.073L18.2,13.725l-3.218-1.77c-.687.34-1.727.9-2.578,1.362a15.322,15.322,0,0,1-1.664.813c-.1,0-3-1.457-4.217-2.164Z" transform="translate(-3.078 -1.64)"
+                  style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}
+            />
+            <path d="M14.653,7.952S10.844,10,10.749,10L6.811,7.974c-.886.487-3.548,1.989-3.733,2.076l7.739,4.186L18.2,9.9Z" transform="translate(-3.078 -1.64)"
+                  style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}
+            />
+            <path d="M10.687,1.64,3.3,5.973l7.385,4.06L18.2,5.7Z" transform="translate(-3.078 -1.64)"
+                  style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}
+            />
         </svg>
     );
 }
@@ -67,7 +74,7 @@ export function TypeMemberIcon(props: { className?: string; "aria-hidden"?: area
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeMember, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
         >
@@ -78,19 +85,8 @@ export function TypeMemberIcon(props: { className?: string; "aria-hidden"?: area
 }
 
 export function TypeCategoriesIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
     return (
-        <svg
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-        >
-            <title>{t("Categories")}</title>
-            <path d="M3.283,13.983l7.534,4.073L18.2,13.725l-3.218-1.77c-.687.34-1.727.9-2.578,1.362a15.278,15.278,0,0,1-1.664.813c-.1,0-3-1.457-4.217-2.164Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
-            <path d="M14.653,7.952S10.844,10,10.749,10L6.811,7.974c-.886.487-3.548,1.989-3.733,2.076l7.739,4.186L18.2,9.9Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
-            <path d="M10.687,1.64,3.3,5.973l7.385,4.06L18.2,5.7Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "0.833px"}}/>
-        </svg>
+        <TypeCategoriesAndGroupsIcon {...props} title={t("Categories")}/>
     );
 }
 
@@ -99,7 +95,7 @@ export function TypeIdeasIcon(props: { className?: string; "aria-hidden"?: areaH
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeIdeasIcon, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18.444 16.791"
         >
@@ -115,7 +111,7 @@ export function TypePollsIcon(props: { className?: string; "aria-hidden"?: areaH
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typePollsIcon, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 26 26"
         >
@@ -135,12 +131,14 @@ export function TypeQuestionIcon(props: { className?: string; "aria-hidden"?: ar
     return (
         <svg
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            className={classNames(classes.standard, props.className)}
+            className={classNames(classes.typeQuestion, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 26 26"
+            viewBox="0 0 15.528 12.658"
         >
             <title>{t("Question")}</title>
-            <path d="M13,6.7c-4.26,0-7.764,2.613-7.764,5.926l0,.214a4.724,4.724,0,0,0,1.426,3.069l.026.026-.025.106-.05.174c-.023.08-.05.167-.087.276l-.373,1.09c-.058.178-.1.314-.136.443L6,18.1c-.155.588-.174.865.184,1.12.316.225.567.161,1.016-.088l.234-.136c.085-.051.174-.108.283-.18l.976-.655c.176-.115.3-.191.417-.26l.148-.082L9.3,17.8l-.153-.073A7.91,7.91,0,0,0,13,18.549c4.26,0,7.764-2.613,7.764-5.926S17.259,6.7,13,6.7ZM13,7.78c3.718,0,6.68,2.209,6.68,4.843S16.718,17.466,13,17.466a6.831,6.831,0,0,1-3.37-.713c-.3-.149-.542-.081-.946.143l-.114.064c-.148.086-.288.173-.493.31l-.87.583.384-1.121c.026-.08.048-.149.068-.216l.037-.132c.142-.513.175-.76-.037-1.01l-.054-.057a3.717,3.717,0,0,1-1.286-2.694C6.32,9.989,9.282,7.78,13,7.78Z" style={{fill: "currentColor", fillRule: "evenodd"}}/>
+            <path d="M13,6.7c-4.26,0-7.764,2.613-7.764,5.926v.214a4.724,4.724,0,0,0,1.426,3.069l.026.026-.025.106-.05.174c-.023.08-.05.167-.087.276l-.373,1.09c-.058.178-.1.314-.136.443L6,18.1c-.155.588-.174.865.184,1.12.316.225.567.161,1.016-.088L7.434,19c.085-.051.174-.108.283-.18l.976-.655c.176-.115.3-.191.417-.26l.148-.082L9.3,17.8l-.153-.073A7.908,7.908,0,0,0,13,18.549c4.26,0,7.764-2.613,7.764-5.926S17.259,6.7,13,6.7Zm0,1.08c3.718,0,6.68,2.209,6.68,4.843S16.718,17.466,13,17.466a6.828,6.828,0,0,1-3.37-.713c-.3-.149-.542-.081-.946.143l-.114.064c-.148.086-.288.173-.493.31l-.87.583.384-1.121c.026-.08.048-.149.068-.216l.037-.132c.142-.513.175-.76-.037-1.01l-.054-.057a3.717,3.717,0,0,1-1.286-2.694C6.32,9.989,9.282,7.78,13,7.78Z" transform="translate(-5.236 -6.7)"
+                  style={{fill: "currentColor", fillRule: "evenodd"}}
+            />
         </svg>
     );
 }

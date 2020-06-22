@@ -206,6 +206,43 @@ export const iconVariables = useThemeCache(() => {
         height: 16,
     });
 
+    // Search Types
+    const typeAll = themeVars("typeAll", {
+        width: 13,
+        height: 13,
+    });
+    const typeDiscussions = themeVars("typeDiscussions", {
+        width: 18.869,
+        height: 15.804,
+    });
+    const typeArticles = themeVars("typeArticles", {
+        width: 14.666,
+        height: 14.666,
+    });
+    const typeCategoriesAndGroups = themeVars("TypeCategoriesAndGroups", {
+        width: 15,
+        height: 16.28,
+    });
+
+    const typeMember = themeVars("TypeMember", {
+        width: 20,
+        height: 20,
+    });
+
+    const typeIdeasIcon = themeVars("TypeIdeasIcon", {
+        width: 18.444,
+        height: 16.791,
+    });
+    const typePollsIcon = themeVars("TypePollsIcon", {
+        width: 26,
+        height: 26,
+    });
+    const typeQuestion = themeVars("TypeQuestion", {
+        width: 15.528,
+        height: 12.658,
+    });
+
+
     return {
         standard,
         newFolder,
@@ -234,6 +271,14 @@ export const iconVariables = useThemeCache(() => {
         documentation,
         bookmarkIcon,
         newPostMenuIcon,
+        typeAll,
+        typeDiscussions,
+        typeArticles,
+        typeCategoriesAndGroups,
+        typeMember,
+        typeIdeasIcon,
+        typePollsIcon,
+        typeQuestion,
     };
 });
 
@@ -490,6 +535,40 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.standard.height),
     });
 
+    // Search types
+    const typeAll = style("typeAll", {
+        width: unit(vars.typeAll.width),
+        height: unit(vars.typeAll.height),
+    });
+    const typeDiscussions = style("typeDiscussions", {
+        width: unit(vars.typeDiscussions.width),
+        height: unit(vars.typeDiscussions.height),
+    });
+    const typeArticles = style("typeArticles", {
+        width: unit(vars.typeArticles.width),
+        height: unit(vars.typeArticles.height),
+    });
+    const typeCategoriesAndGroups = style("TypeCategoriesAndGroups", {
+        width: unit(vars.typeCategoriesAndGroups.width),
+        height: unit(vars.typeCategoriesAndGroups.height),
+    });
+    const typeMember = style("TypeMember", {
+        width: unit(vars.typeMember.width),
+        height: unit(vars.typeMember.height),
+    });
+    const typeIdeasIcon = style("TypeIdeasIcon", {
+        width: unit(vars.typeIdeasIcon.width),
+        height: unit(vars.typeIdeasIcon.height),
+    });
+    const typePollsIcon = style("TypePollsIcon", {
+        width: unit(vars.typePollsIcon.width),
+        height: unit(vars.typePollsIcon.height),
+    });
+    const typeQuestion = style("TypeQuestion", {
+        width: unit(vars.typeQuestion.width),
+        height: unit(vars.typeQuestion.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -527,5 +606,13 @@ export const iconClasses = useThemeCache(() => {
         bookmark,
         newPostMenuIcon,
         itemFlyout,
+        typeAll,
+        typeDiscussions,
+        typeArticles,
+        typeCategoriesAndGroups,
+        typeMember,
+        typeIdeasIcon,
+        typePollsIcon,
+        typeQuestion,
     };
 });

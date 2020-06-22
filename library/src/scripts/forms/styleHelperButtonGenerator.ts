@@ -4,23 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import {
-    buttonGlobalVariables,
-    ButtonPreset,
-    buttonResetMixin,
-    buttonSizing,
-    buttonVariables,
-} from "@library/forms/buttonStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders, EMPTY_BORDER } from "@library/styles/styleHelpersBorders";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { EMPTY_FONTS, fonts } from "@library/styles/styleHelpersTypography";
-import { styleFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import {buttonGlobalVariables, ButtonPreset, buttonResetMixin, buttonSizing,} from "@library/forms/buttonStyles";
+import {formElementsVariables} from "@library/forms/formElementStyles";
+import {IButtonType} from "@library/forms/styleHelperButtonInterface";
+import {borders, EMPTY_BORDER} from "@library/styles/styleHelpersBorders";
+import {colorOut} from "@library/styles/styleHelpersColors";
+import {EMPTY_FONTS, fonts} from "@library/styles/styleHelpersTypography";
+import {styleFactory} from "@library/styles/styleUtils";
+import {percent} from "csx";
 import merge from "lodash/merge";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import {NestedCSSProperties} from "typestyle/lib/types";
+import {globalVariables} from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
 import {ButtonTypes} from "@library/forms/buttonTypes";
 
@@ -33,7 +27,7 @@ export const generateButtonStyleProperties = (
     const formElVars = formElementsVariables();
     const buttonGlobals = buttonGlobalVariables();
     const zIndex = setZIndexOnState ? 1 : undefined;
-    const buttonDimensions = buttonTypeVars.sizing || false;
+    const buttonDimensions = buttonTypeVars.sizing || {};
 
     const state = buttonTypeVars.state ?? {};
     const colors = buttonTypeVars.colors ?? {
@@ -77,7 +71,7 @@ export const generateButtonStyleProperties = (
     const borderVars = {
         ...EMPTY_BORDER,
         ...buttonGlobals.border,
-        ...buttonTypeVars.borders,
+        ...(buttonTypeVars.borders ?? {})
     };
 
     let defaultBorder = borders(borderVars) as NestedCSSProperties;
@@ -121,6 +115,12 @@ export const generateButtonStyleProperties = (
 
     const fontVars = { ...EMPTY_FONTS, ...buttonGlobals.font, ...buttonTypeVars.fonts };
 
+    const paddingHorizontal = buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined ? buttonTypeVars.padding.horizontal : buttonGlobals.padding.horizontal;
+    const fontSize = buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined ? buttonTypeVars.fonts.size : buttonGlobals.font.size;
+
+    const {minHeight, minWidth} = buttonDimensions;
+    const {skipDynamicPadding = false} = buttonTypeVars;
+
     const result: NestedCSSProperties = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
@@ -130,28 +130,22 @@ export const generateButtonStyleProperties = (
         backgroundColor: colorOut(backgroundColor),
         ...fonts({
             ...fontVars,
-            size: buttonGlobals.font.size,
+            size: fontSize,
             color: fontColor,
             weight: fontVars.weight ?? undefined,
         }),
         ["-webkit-font-smoothing" as any]: "antialiased",
         ...defaultBorder,
         ...buttonSizing(
-            buttonDimensions && buttonDimensions.minHeight !== undefined
-                ? buttonDimensions.minHeight
-                : buttonGlobals.sizing.minHeight,
-            buttonDimensions && buttonDimensions.minWidth !== undefined
-                ? buttonDimensions.minWidth
-                : buttonGlobals.sizing.minWidth,
-            buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined
-                ? buttonTypeVars.fonts.size
-                : buttonGlobals.font.size,
-            buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined
-                ? buttonTypeVars.padding.horizontal
-                : buttonGlobals.padding.horizontal,
-            formElVars,
-            borderVars.radius,
-        buttonTypeVars.name === ButtonTypes.RADIO
+            {
+                minHeight,
+                minWidth,
+                fontSize,
+                paddingHorizontal,
+                formElementVars: formElVars,
+                borderRadius: borderVars["radius"] ?? undefined,
+                skipDynamicPadding,
+            }
         ),
         display: "inline-flex",
         alignItems: "center",

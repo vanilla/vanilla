@@ -342,7 +342,7 @@ story.add("Icons", () => {
             <StoryHeading>Search Icons</StoryHeading>
 
             <StoryTileAndTextCompact text={`SearchFilterAll`}>
-                <SearchIcons.SearchFilterAllIcon />
+                <SearchIcons.TypeAllIcon />
             </StoryTileAndTextCompact>
 
             <StoryTileAndTextCompact text={`TypeDiscussions`}>

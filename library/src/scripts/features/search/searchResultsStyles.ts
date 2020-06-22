@@ -220,6 +220,7 @@ export const searchResultClasses = useThemeCache(() => {
         {
             position: "relative",
             width: unit(vars.mediaElement.width),
+            overflow: "hidden",
         },
         mediaQueries.compact({
             width: percent(100),

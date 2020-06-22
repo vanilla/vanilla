@@ -4,7 +4,7 @@
  */
 
 import apiv2 from "@library/apiv2";
-import { SearchFilterAllIcon } from "@library/icons/searchIcons";
+import { TypeAllIcon } from "@library/icons/searchIcons";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/searchActions";
@@ -89,7 +89,7 @@ export function SearchFormContextProvider(props: IProps) {
     const ALL_CONTENT_DOMAIN: ISearchDomain = {
         key: ALL_CONTENT_DOMAIN_NAME,
         name: t("All Content"),
-        icon: <SearchFilterAllIcon />,
+        icon: <TypeAllIcon />,
         PanelComponent: FilterPanelAll,
         getAllowedFields: () => {
             return ALLOWED_GLOBAL_SEARCH_FIELDS;

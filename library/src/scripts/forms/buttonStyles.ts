@@ -13,7 +13,6 @@ import {
     userSelect,
     spinnerLoaderAnimationProperties,
     offsetLightness,
-    borders,
 } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -282,12 +281,18 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const radioPresetInit = makeThemeVars("radio", {
+    const radioPresetInit1 = makeThemeVars("radio", {
         sizing: {
             minHeight: formElementsVariables().sizing.height - 4,
         },
+    });
+
+
+    const radioPresetInit2 = makeThemeVars("radio", {
+        ...radioPresetInit1,
         borders: {
             ...globalVars.border,
+            radius: radioPresetInit1.sizing.minHeight/2
         },
         state: {
             colors: {
@@ -295,6 +300,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             },
             borders: {
                 color: globalVars.mainColors.primary,
+                radius: radioPresetInit1.sizing.minHeight/2
             }
         },
         //special case
@@ -312,32 +318,20 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg: globalVars.mainColors.bg,
         },
         padding: {
-            horizontal: 16,
+            horizontal: 12,
         },
-        borders: {
-            ...radioPresetInit.borders,
-            radius: radioPresetInit.sizing.minHeight / 2,
-        },
-        state: radioPresetInit.state,
+        borders: radioPresetInit2.borders,
+        state: radioPresetInit2.state,
         sizing: {
-            minHeight: radioPresetInit.sizing.minHeight,
+            minHeight: radioPresetInit2.sizing.minHeight,
         },
         extraNested: {
             ["&.isActive"]: {
-                borderColor: colorOut(radioPresetInit.active.color),
-                backgroundColor: colorOut(radioPresetInit.active.color),
+                borderColor: colorOut(radioPresetInit2.active.color),
+                backgroundColor: colorOut(radioPresetInit2.active.color),
             },
-            [`
-                &:hover, &:focus, &:active, &.focus-visible,
-                &.isActive:hover, &.isActive:focus, &.isActive:active, &.isActive.focus-visible
-            `]: {
-                color: colorOut(radioPresetInit.state.colors.fg),
-                ...borders({
-                    ...radioPresetInit.borders,
-                    ...radioPresetInit.state.borders
-                }),
-            }
-        }
+        },
+        skipDynamicPadding: true,
     });
 
     return {
@@ -349,24 +343,39 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const buttonSizing = (
+export const buttonSizing = (props: {
     minHeight,
     minWidth,
     fontSize,
     paddingHorizontal,
     formElementVars,
     borderRadius,
+    skipDynamicPadding,
     debug?: boolean,
-) => {
+}) => {
     const buttonGlobals = buttonGlobalVariables();
+    const {
+        minHeight = buttonGlobals.sizing.minHeight,
+        minWidth = buttonGlobals.sizing.minWidth,
+        fontSize = buttonGlobals.font.size,
+        paddingHorizontal = buttonGlobals.padding.horizontal,
+        formElementVars,
+        borderRadius,
+        skipDynamicPadding,
+        debug = false,
+    } = props;
+
     const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
     const height = minHeight ?? formElementVars.sizing.minHeight;
 
-    const paddingOffsets = paddingOffsetBasedOnBorderRadius({
+    const paddingOffsets = !skipDynamicPadding ? paddingOffsetBasedOnBorderRadius({
         radius: borderRadius,
         extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
         height,
-    });
+    }) : {
+        right: 0,
+        left: 0,
+    };
 
     return {
         minHeight: unit(height),

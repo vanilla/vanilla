@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { SearchFilterAllIcon } from "@library/icons/searchIcons";
+import { TypeAllIcon } from "@library/icons/searchIcons";
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { SearchFilterPanelArticles } from "@knowledge/search/SearchFilterPanelArticles";
@@ -26,7 +26,7 @@ export function SearchPanelFilter(props: IProps) {
     return (
         <div style={{ width: "500px", margin: "auto" }}>
             <StoryHeading>Search Panel Filter - All</StoryHeading>
-            <SearchFilterAllIcon />
+            <TypeAllIcon />
 
             <StoryHeading>Search Panel Filter - Articles</StoryHeading>
             <SearchFilterPanelArticles />

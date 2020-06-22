@@ -71,5 +71,6 @@ export interface IButtonType {
         borders?: IBorderStyles;
         fonts?: IFont;
     };
+    skipDynamicPadding?: boolean,
     extraNested?: NestedCSSSelectors; // special case CSS
 }

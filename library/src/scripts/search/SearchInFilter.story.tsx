@@ -7,7 +7,7 @@ import * as React from "react";
 import { useState } from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import {
-    SearchFilterAllIcon,
+    TypeAllIcon,
     TypeArticlesIcon,
     TypeCategoriesAndGroupsIcon,
     TypeDiscussionsIcon,
@@ -31,7 +31,7 @@ interface IProps {
 const dummmyFilters: ISearchInButton[] = [
     {
         label: t("All Content"),
-        icon: <SearchFilterAllIcon />,
+        icon: <TypeAllIcon />,
         data: "all",
     },
     {

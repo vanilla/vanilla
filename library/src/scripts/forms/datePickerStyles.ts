@@ -4,15 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { calc, percent, translateX, viewWidth } from "csx";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();

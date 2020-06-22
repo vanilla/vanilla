@@ -4,8 +4,8 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styleUtils";
-import {fonts, unit} from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { fonts, unit } from "@library/styles/styleHelpers";
 
 export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("searchComponents");
@@ -27,17 +27,11 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         marginRight: unit(globalVars.gutter.size),
     });
 
-    const pagination = style("pagination", {
-        marginLeft: "auto",
-        ...fonts(globalVars.meta.text),
-    });
-
     const sortLabel = style("sortLabel", {});
 
     return {
         sortAndPagination,
         sort,
         sortLabel,
-        pagination,
     };
 });

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { SearchActions } from "@library/search/searchActions";
+import { SearchActions } from "@library/search/SearchActions";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";

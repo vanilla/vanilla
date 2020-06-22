@@ -118,6 +118,7 @@ class ApiUtils {
             'pageCount' => static::pageCount($totalCount, $query['limit']),
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
             'totalCount' => $totalCount, // For regenerating with different URL.
+            'limit' => $query['limit'],
         ];
     }
 

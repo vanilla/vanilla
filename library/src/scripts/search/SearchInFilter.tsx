@@ -8,7 +8,7 @@ import React from "react";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
 import { searchInFilterClasses } from "@library/search/searchInFilter.styles";
-import {buttonClasses} from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
 
 export interface ISearchInButton {
     label: string;
@@ -37,7 +37,8 @@ export function SearchInFilter(props: IProps) {
         <RadioGroup
             accessibleTitle={t("Search in:")}
             setData={setData}
-            activeItem={activeItem} classes={classes}
+            activeItem={activeItem}
+            classes={classes}
             buttonClass={buttonClass}
             buttonActiveClass={buttonClass}
         >

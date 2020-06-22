@@ -14,13 +14,31 @@ import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
 import { hashString } from "@vanilla/utils";
-import React from "react";
+import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { ISearchResult } from "@library/search/searchTypes";
+import { useLastValue } from "@vanilla/react-utils";
+import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
 
 interface IProps {}
 
 export function SearchPageResults(props: IProps) {
-    const { search, updateForm, results, form } = useSearchForm();
+    const { search, updateForm, results, form } = useSearchForm<{}>();
+
+    const page = form.page ?? 1;
+    const lastPage = useLastValue(page);
+    useEffect(() => {
+        if (results.data && page !== lastPage) {
+            search();
+        }
+    }, [lastPage, page, search, results]);
+
+    const status = results.status;
+    const lastStatus = useLastValue(status);
+    useLayoutEffect(() => {
+        if (lastStatus === LoadStatus.SUCCESS && status === LoadStatus.LOADING) {
+            window.scrollTo({ top: 0 });
+        }
+    }, [status, lastStatus]);
 
     switch (results.status) {
         case LoadStatus.PENDING:
@@ -36,13 +54,11 @@ export function SearchPageResults(props: IProps) {
             if (next) {
                 paginationNextClick = e => {
                     updateForm({ page: next });
-                    void search();
                 };
             }
             if (prev) {
                 paginationPreviousClick = e => {
                     updateForm({ page: prev });
-                    void search();
                 };
             }
             return (

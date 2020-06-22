@@ -12,6 +12,7 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
+use Vanilla\InjectableInterface;
 
 /**
  * A controller used for mapping from the the dispatcher to individual page components.
@@ -19,7 +20,7 @@ use Garden\Web\Data;
  * @see \Garden\Web\Dispatcher
  * @see \Vanilla\Web\Page
  */
-class PageDispatchController implements CustomExceptionHandler {
+class PageDispatchController implements CustomExceptionHandler, InjectableInterface {
 
     /** @var Page The active page. */
     private $activePage;
@@ -36,7 +37,7 @@ class PageDispatchController implements CustomExceptionHandler {
      *
      * @param Container $container The container object for locating and creating page classes.
      */
-    public function __construct(Container $container) {
+    public function setDependencies(Container $container) {
         $this->container = $container;
     }
 

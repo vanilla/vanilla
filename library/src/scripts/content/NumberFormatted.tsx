@@ -23,8 +23,8 @@ function stripTrailingZeros(value: string) {
     }
 }
 
-export function formatNumberText(props: {value: number}){
-    const {value } = props;
+export function formatNumberText(props: { value: number }) {
+    const { value } = props;
     numeral.localeData("en");
     const initialValue = numeral(value);
     const compactValue = stripTrailingZeros(initialValue.format("0a.0"));
@@ -35,17 +35,15 @@ export function formatNumberText(props: {value: number}){
         compactValue,
         fullValue,
         modified,
-    }
+    };
 }
-
-
 
 /**
  * If you're building a translated stirng, it can be helpful to get the same data as "NumberFormatted" but decomposed
  */
 export function decomposedNumberFormatted(props: IProps) {
-    const formattedNumber = formatNumberText({value: props.value});
-    const { fullValue, modified} = formattedNumber;
+    const formattedNumber = formatNumberText({ value: props.value });
+    const { fullValue, modified } = formattedNumber;
     const Tag = (modified ? `abbr` : `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);
     const title = props.title || fullValue;
@@ -56,26 +54,22 @@ export function decomposedNumberFormatted(props: IProps) {
         attributes: {
             className,
             title,
-        }
-    }
+        },
+    };
 }
-
 
 /**
  * A component to format numbers to plug into <Translate/>. The <NumberFormatted/> below does not play well with the component <Translate/>
  */
-export function numberFormattedForTranslations(props:IProps) {
-    const {Tag, attributes, compactValue} = decomposedNumberFormatted(props);
+export function numberFormattedForTranslations(props: IProps) {
+    const { Tag, attributes, compactValue } = decomposedNumberFormatted(props);
     return <Tag {...attributes}>{compactValue}</Tag>;
 }
-
 
 /**
  * A component to format numbers. The react number format supports localization. The way we'll pass in the options are TBD.
  */
-export default function NumberFormatted(props:IProps) {
-    const {compactValue, Tag, attributes} = decomposedNumberFormatted(props);
-    return (
-        <Tag {...attributes}>{compactValue}</Tag>
-    );
+export default function NumberFormatted(props: IProps) {
+    const { compactValue, Tag, attributes } = decomposedNumberFormatted(props);
+    return <Tag {...attributes}>{compactValue}</Tag>;
 }

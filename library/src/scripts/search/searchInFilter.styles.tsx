@@ -4,18 +4,18 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styleUtils";
-import {IThemeVariables} from "@library/theming/themeReducer";
-import {margins} from "@library/styles/styleHelpersSpacing";
-import {calc, percent, translate, translateX} from "csx";
-import {borders, colorOut, negativeUnit, srOnly, unit} from "@library/styles/styleHelpers";
-import {NestedCSSProperties, TLength} from "typestyle/lib/types";
-import {WidthProperty} from "csstype";
-import {generateButtonStyleProperties} from "@library/forms/styleHelperButtonGenerator";
-import {buttonVariables} from "@library/forms/buttonStyles";
-import {cssOut, nestedWorkaround} from "@dashboard/compatibilityStyles";
+import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { margins } from "@library/styles/styleHelpersSpacing";
+import { calc, percent, translate, translateX } from "csx";
+import { borders, colorOut, negativeUnit, srOnly, unit } from "@library/styles/styleHelpers";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { WidthProperty } from "csstype";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { buttonVariables } from "@library/forms/buttonStyles";
+import { cssOut, nestedWorkaround } from "@dashboard/compatibilityStyles";
 
-export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariables) => {
+export const searchInFilterVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
     const vars = globalVariables();
 
@@ -81,7 +81,7 @@ export const searchInFilterClasses = useThemeCache(() => {
         backgroundColor: colorOut(globalVars.border.color),
         ...margins({
             horizontal: vars.spacing.margin.horizontal,
-        })
+        }),
     });
 
     const labelWrap = style("labelWrap", {

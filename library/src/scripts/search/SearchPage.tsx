@@ -15,7 +15,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import PanelLayout, {Panel, PanelWidget} from "@library/layout/PanelLayout";
+import PanelLayout, { Panel, PanelWidget } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
@@ -33,9 +33,8 @@ import { useLocation } from "react-router";
 
 // This new page must have our base reset in place.
 import "@library/theming/reset";
-import {SearchPagination} from "@library/search/SearchPagination";
-import {SortAndPaginationInfo} from "@library/search/SortAndPaginationInfo";
-import {dummyPaginationData, dummySortData} from "@library/search/SearchMiscellaneousComponents.story";
+import { SearchPagination } from "@library/search/SearchPagination";
+import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
 
 interface IProps {
     placeholder?: string;
@@ -127,10 +126,9 @@ function SearchPage(props: IProps) {
                                         };
                                     })}
                                 />
-
                             </PanelWidget>
                             <PanelWidget>
-                                <SortAndPaginationInfo paginationInfo={dummyPaginationData} sort={dummySortData} />
+                                <SortAndPaginationInfo pages={results.data?.pagination} sort={{ options: [] }} />
                             </PanelWidget>
                             {isMobile && (
                                 <PanelWidget>
@@ -139,10 +137,11 @@ function SearchPage(props: IProps) {
                             )}
                         </>
                     }
-                    middleBottom={<>
-                        <SearchPageResults />
-                        <SearchPagination/>
-                    </>}
+                    middleBottom={
+                        <>
+                            <SearchPageResults />
+                        </>
+                    }
                     rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>

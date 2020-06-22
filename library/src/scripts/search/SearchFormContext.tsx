@@ -7,7 +7,7 @@ import apiv2 from "@library/apiv2";
 import { TypeAllIcon } from "@library/icons/searchIcons";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
-import { SearchActions } from "@library/search/searchActions";
+import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
 import { ISearchForm, ISearchRequestQuery, ISearchResults, ISearchFormBase } from "@library/search/searchTypes";
 import { ALLOWED_GLOBAL_SEARCH_FIELDS, ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
@@ -188,7 +188,7 @@ export function SearchFormContextProvider(props: IProps) {
                             item.body = item.excerpt;
                             return item;
                         }),
-                        pagination: SimplePagerModel.parseLinkHeader(response.headers["link"], "page"),
+                        pagination: SimplePagerModel.parseHeaders(response.headers),
                     },
                 }),
             );

@@ -14,10 +14,22 @@ import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { forumVariables } from "@library/forums/forumStyleVars";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
 };
+
+export const linkSelectors = `
+    .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .Username,
+    .MessageList .ItemDiscussion .Username,
+    .AuthorInfo .MItem.RoleTracker a:not(.Tag),
+    .MItem > a:not(.Tag),
+`;
 
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
@@ -44,17 +56,6 @@ export const forumMetaCSS = () => {
             fontSize: unit(globalVars.meta.text.fontSize),
         },
     );
-
-    const linkSelectors = `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        .AuthorInfo .MItem.RoleTracker a:not(.Tag),
-        .MItem > a:not(.Tag),
-        `;
 
     cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
         padding: 0,
@@ -189,6 +190,7 @@ export const forumMetaCSS = () => {
 
     mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
         overflow: "visible",
+        display: "block",
     });
 
     cssOut(`.Container .AuthorInfo .MItem`, {

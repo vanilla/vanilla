@@ -10,21 +10,21 @@ import Translate from "@library/content/Translate";
 import {t} from "@vanilla/i18n/src";
 import classNames from "classnames";
 import {useUniqueID} from "@library/utility/idUtils";
-import NumberFormatted, {
-    decomposedNumberFormatted,
-    formatNumberText,
+import {
     numberFormattedForTranslations
 } from "@library/content/NumberFormatted";
 
 export interface ISearchSort extends Omit<IExternalLabelledProps, "describedBy" | "widthOfParent"> {}
 
+export interface ISearchPaginationInfo {
+    resultStart: number;
+    resultEnd: number;
+    total: number;
+}
+
 export interface ISearchSortAndPaginationInfo {
     sort?: ISelfLabelledProps,
-    paginationInfo?: {
-        resultStart: number;
-        resultEnd: number;
-        total: number;
-    }
+    paginationInfo?: ISearchPaginationInfo,
 }
 
 
@@ -36,12 +36,12 @@ export function SortAndPaginationInfo(props: ISearchSortAndPaginationInfo) {
     const classes = searchMiscellaneousComponentsClasses();
     const sortID = useUniqueID("sortBy");
 
-    let PaginationInfoComponent = null;
+    let content = null as null | JSX.Element;
     if (paginationInfo) {
         const resultStart = numberFormattedForTranslations({value: paginationInfo.resultStart});
         const resultEnd = numberFormattedForTranslations({value: paginationInfo.resultEnd});
         const total = numberFormattedForTranslations({value: paginationInfo.total});
-        PaginationInfoComponent = (
+        content = (
             <div className={classes.pagination}>
                 <ScreenReaderContent>
                     <Translate source={"Result(s) <0/> to <1/> of <2/>"} c0={paginationInfo.resultStart} c1={paginationInfo.resultEnd} c2={paginationInfo.total} />
@@ -67,6 +67,6 @@ export function SortAndPaginationInfo(props: ISearchSortAndPaginationInfo) {
                 />
             </label>
         )}
-        {PaginationInfoComponent}
+        {content}
     </div>;
 }

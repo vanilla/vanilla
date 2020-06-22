@@ -114,9 +114,6 @@ function SearchPage(props: IProps) {
                                     buttonBaseClass={ButtonTypes.PRIMARY}
                                     needsPageTitle={false}
                                 />
-                                <SortAndPaginationInfo paginationInfo={dummyPaginationData} sort={dummySortData} />
-                            </PanelWidget>
-                            <PanelWidget>
                                 <SearchInFilter
                                     setData={newDomain => {
                                         updateForm({ domain: newDomain });
@@ -130,6 +127,10 @@ function SearchPage(props: IProps) {
                                         };
                                     })}
                                 />
+
+                            </PanelWidget>
+                            <PanelWidget>
+                                <SortAndPaginationInfo paginationInfo={dummyPaginationData} sort={dummySortData} />
                             </PanelWidget>
                             {isMobile && (
                                 <PanelWidget>

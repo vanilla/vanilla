@@ -5,9 +5,15 @@
 
 import * as React from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import {ISearchSort, ISearchSortAndPaginationInfo, SortAndPaginationInfo} from "@library/search/SortAndPaginationInfo";
+import {
+    ISearchPaginationInfo,
+    ISearchSort,
+    ISearchSortAndPaginationInfo,
+    SortAndPaginationInfo
+} from "@library/search/SortAndPaginationInfo";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import {t} from "@vanilla/i18n/src";
+import {ISelectBoxItem} from "@library/forms/select/SelectBox";
 
 interface IProps extends ISearchSortAndPaginationInfo {
     message?: string;
@@ -28,10 +34,10 @@ export const dummySortData: ISearchSort = {
     },{
         value: "",
         name: t("Last Commented"),
-    }],
+    }] as ISelectBoxItem[],
 }
 
-export const dummyPaginationData = {
+export const dummyPaginationData: ISearchPaginationInfo = {
     resultStart: 31,
     resultEnd: 60,
     total: 66,

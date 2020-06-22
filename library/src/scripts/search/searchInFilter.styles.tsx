@@ -4,23 +4,74 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
+import {useThemeCache, styleFactory, variableFactory} from "@library/styles/styleUtils";
+import {IThemeVariables} from "@library/theming/themeReducer";
+import {margins} from "@library/styles/styleHelpersSpacing";
+import {calc, percent, translate, translateX} from "csx";
+import {colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
+import {NestedCSSProperties, TLength} from "typestyle/lib/types";
+import {WidthProperty} from "csstype";
 
-interface IProps extends IRadioInputAsButtonClasses {
-    separator: string;
-}
+export const searchInFilterVariables = useThemeCache((forcedVars?:IThemeVariables) => {
+    const makeThemeVars = variableFactory("searchInFilter", forcedVars);
+    const vars = globalVariables();
+
+    const border = makeThemeVars("border", {
+        ...vars.border,
+        radius: "50%",
+    })
+
+    const spacing = makeThemeVars("spacing", {
+        margin: {
+            vertical: 4,
+            horizontal: 12,
+        },
+    });
+
+    return {
+        border,
+        spacing,
+    };
+});
 
 export const searchInFilterClasses = useThemeCache(() => {
     const style = styleFactory("searchIn");
-    const vars = globalVariables();
+    const globalVars = globalVariables();
+    const vars = searchInFilterVariables();
 
-    const root = style({});
-    const items = style("items", {});
-    const item = style("item", {});
+    const root = style({
+        overflow: "hidden", // to truncate the extra margin
+    });
+
+    const items = style("items", {
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        ...margins({
+            horizontal: vars.spacing.margin.horizontal,
+            vertical: vars.spacing.margin.vertical + 7,
+        }),
+        width: calc(`100% + ${unit(2 * vars.spacing.margin.horizontal)}`),
+        transform: translate(negativeUnit(vars.spacing.margin.horizontal * 2)),
+    } as NestedCSSProperties);
+
+    const item = style("item", {
+        display: "inline-flex",
+        flexShrink: 1,
+        ...margins(vars.spacing.margin),
+    });
     const label = style("label", {});
     const input = style("input", {});
-    const separator = style("separator", {});
+
+    const separator = style("separator", {
+        display: "inline-flex",
+        height: unit(24),
+        width: unit(globalVars.border.width),
+        backgroundColor: colorOut(globalVars.border.color),
+        ...margins({
+            horizontal: vars.spacing.margin.horizontal,
+        })
+    });
 
     return {
         root,
@@ -29,5 +80,5 @@ export const searchInFilterClasses = useThemeCache(() => {
         label,
         input,
         separator,
-    } as IProps;
+    };
 });

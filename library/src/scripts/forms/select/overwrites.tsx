@@ -17,7 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
-import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
+import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 
@@ -126,16 +126,14 @@ export function NullComponent() {
     return null;
 }
 
-interface ISelectOptionOverwrite extends OptionProps<any>, IComboBoxOption{
-    isParentCategory?: string;
-}
+interface ISelectOptionOverwrite extends OptionProps<any>, Omit<IComboBoxOption, "data"> {}
 
 /**
  * Overwrite for the menuOption component in React Select
  * @param props
  */
 export function SelectOption(props: ISelectOptionOverwrite) {
-    const { isSelected, isFocused, selectProps, value, isParentCategory } = props;
+    const { isSelected, isFocused, selectProps, value } = props;
     const placeholder = {};
 
     return (
@@ -178,5 +176,20 @@ export function ValueContainer(props: ValueContainerProps<any>) {
             {...props}
             className={classNames("suggestedTextInput-valueContainer inputBlock-inputText inputText", props.className)}
         />
+    );
+}
+
+/**
+ * Overwrite for the DropdownIndicator component in React Select
+ * @param props - props of component
+ */
+export function DropdownIndicator(props) {
+    const { innerProps } = props;
+    return (
+        <components.DropdownIndicator {...props}>
+            <div {...innerProps}>
+                <DownTriangleIcon className={selectOneClasses().chevron} />
+            </div>
+        </components.DropdownIndicator>
     );
 }

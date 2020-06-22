@@ -14,7 +14,7 @@ const createAction = actionCreatorFactory("@@categorySuggestions");
 export default class CategorySuggestionActions extends ReduxActions {
     public static loadCategories = createAction.async<{ query: string }, ICategory[], IApiError>("GET");
 
-    private interalLoadCategories = (query: string) => {
+    private internalLoadCategories = (query: string) => {
         const apiThunk = bindThunkAction(CategorySuggestionActions.loadCategories, async () => {
             if (query === "") {
                 return [];
@@ -27,5 +27,5 @@ export default class CategorySuggestionActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public loadCategories = debounce(this.interalLoadCategories, 100);
+    public loadCategories = debounce(this.internalLoadCategories, 100);
 }

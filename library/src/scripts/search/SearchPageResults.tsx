@@ -3,21 +3,19 @@
  * @license Proprietary
  */
 
-import { IUnifySearchResponseBody } from "@knowledge/@types/api/unifySearch";
-import KbErrorMessages from "@knowledge/modules/common/KbErrorMessages";
-import { SearchPagination } from "@library/search/SearchPagination";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
-import Loader from "@library/loaders/Loader";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { useSearchForm, SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
-import { hashString } from "@vanilla/utils";
-import React, { useEffect, useRef, useLayoutEffect } from "react";
-import { ISearchResult } from "@library/search/searchTypes";
-import { useLastValue } from "@vanilla/react-utils";
 import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
+import { SearchPagination } from "@library/search/SearchPagination";
+import { ISearchResult } from "@library/search/searchTypes";
+import { SearchFormContextProvider, useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useLastValue } from "@vanilla/react-utils";
+import { hashString } from "@vanilla/utils";
+import React, { useEffect, useLayoutEffect } from "react";
+import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 
 interface IProps {}
 
@@ -45,7 +43,7 @@ export function SearchPageResults(props: IProps) {
         case LoadStatus.LOADING:
             return <SearchPageResultsLoader count={10} />;
         case LoadStatus.ERROR:
-            return <KbErrorMessages apiError={results.error} />;
+            return <CoreErrorMessages apiError={results.error} />;
         case LoadStatus.SUCCESS:
             const { next, prev } = results.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;

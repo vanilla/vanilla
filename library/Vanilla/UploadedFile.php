@@ -6,13 +6,11 @@
 
 namespace Vanilla;
 
-use Garden\Http\HttpClient;
 use Garden\SafeCurl\SafeCurl;
 use InvalidArgumentException;
 use RuntimeException;
 use Gdn_Upload;
 use Vanilla\Formatting\Quill\Nesting\InvalidNestingException;
-use Vanilla\Web\SafeCurlHttpHandler;
 
 /**
  * Value object representing a file uploaded through an HTTP request.

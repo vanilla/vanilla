@@ -257,10 +257,11 @@ class Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
+     * @param array $options An array of options to affect the insert.
      * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set) {
+    public function insert(array $set, array $options = []) {
         $set = $this->getWriteSchema()->validate($set);
         $result = $this->createSql()->insert($this->table, $set);
         if ($result === false) {
@@ -309,10 +310,11 @@ class Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
+     * @param array $options Options to control the update.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, array $options = []): bool {
         $set = $this->getWriteSchema()->validate($set, true);
         $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.

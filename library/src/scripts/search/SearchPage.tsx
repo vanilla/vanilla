@@ -36,6 +36,7 @@ import "@library/theming/reset";
 import {SearchPagination} from "@library/search/SearchPagination";
 import {SortAndPaginationInfo} from "@library/search/SortAndPaginationInfo";
 import {dummyPaginationData, dummySortData} from "@library/search/SearchMiscellaneousComponents.story";
+import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 
 interface IProps {
     placeholder?: string;
@@ -80,7 +81,7 @@ function SearchPage(props: IProps) {
             <Banner isContentBanner />
             <Container>
                 <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
-                <PanelLayout
+                <TwoColumnLayout
                     className="hasLargePadding"
                     middleTop={
                         <>

@@ -5,7 +5,7 @@
 
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import {IPanelLayoutClasses, panelLayoutClasses} from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
@@ -16,7 +16,7 @@ import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
 
-interface IProps {
+export interface IPanelLayoutProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: keyof JSX.IntrinsicElements;
@@ -31,6 +31,7 @@ interface IProps {
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
+    classes?: IPanelLayoutClasses;
 }
 
 /**
@@ -63,7 +64,7 @@ interface IProps {
  * | MiddleBottom |
  * | RightBottom  |
  */
-export default function PanelLayout(props: IProps) {
+export default function PanelLayout(props: IPanelLayoutProps) {
     const { topPadding, className, growMiddleBottom, isFixed, ...childComponents } = props;
 
     // Handle window resizes
@@ -91,7 +92,7 @@ export default function PanelLayout(props: IProps) {
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
     const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
     const shouldRenderRightPanel: boolean = isFullWidth || (isTablet && !shouldRenderLeftPanel);
-    const classes = panelLayoutClasses();
+    const classes = props.classes ?? panelLayoutClasses();
 
     // Determine the classes we want to display.
     const panelClasses = classNames(

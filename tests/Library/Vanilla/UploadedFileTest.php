@@ -9,13 +9,25 @@ namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
+use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
+use VanillaTests\BootstrapTrait;
 use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for uploaded files.
  */
-class UploadedFileTest extends SharedBootstrapTestCase {
+class UploadedFileTest extends TestCase {
+
+    use BootstrapTrait;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->setupBoostrapTrait();
+    }
 
     /**
      * Test that various internal IPs cannot be redirected too.
@@ -176,5 +188,73 @@ class UploadedFileTest extends SharedBootstrapTestCase {
         // Standard cleanup/moving procedures did not occur.
         $this->assertFileExists($file->getFile());
         $this->assertEquals($expectedSaveName, $file->getPersistedPath());
+    }
+
+    /**
+     * @param $expected
+     * @param $input
+     * @dataProvider provideDimensionsData
+     */
+    public function testGetMaxImageHeight($expected, $input) {
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageHeight($input);
+        $actual = $file->getMaxImageHeight();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function provideDimensionsData() {
+        $r = [
+            'test int positive' => [10, 10],
+            'test string positive' => [10, '10'],
+            'test 0 int' => [3000, 0],
+            'test 0 string' => [3000, '0'],
+        ];
+
+        return $r;
+    }
+
+    public function testGetMaxImageHeightConfig() {
+        $config = self::container()->get(\Gdn_Configuration::class);
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageHeight(null);
+        $actual = $file->getMaxImageHeight();
+
+        $this->assertEquals($config->get('ImageUpload.Limits.Height'), $actual);
+    }
+
+    /**
+     * @dataProvider provideBadDimensionsData
+     */
+    public function testBadGetMaxImageHeight($actual) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('height should be greater than or equal to 0.');
+
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageHeight($actual);
+    }
+
+    /**
+     * @dataProvider provideBadDimensionsData
+     */
+    public function testBadGetMaxImageWidth($actual) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('width should be greater than or equal to 0.');
+
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageWidth($actual);
+    }
+
+    public function provideBadDimensionsData() {
+        $r = [
+            'test int negative' => [-1],
+            'test string negative' => ['-1']
+        ];
+
+        return $r;
     }
 }

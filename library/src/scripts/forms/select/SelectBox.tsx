@@ -55,12 +55,13 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     const [ownValue, setOwnValue] = useState(firstValue);
     const { renderLeft = true } = props;
     const selectedOption = props.value || ownValue;
+    const [forceClosed, setForceClosed] = useState(false);
     const onChange = (value: ISelectBoxItem) => {
         const funct = props.onChange || setOwnValue;
         funct(value);
-        setImmediate(() => {
+        setTimeout(() => {
             buttonRef.current && buttonRef.current.focus();
-        });
+        }, 300);
     };
 
     const classes = selectBoxClasses();

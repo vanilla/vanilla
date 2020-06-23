@@ -45,6 +45,7 @@ export const visibility = useThemeCache(() => {
     return {
         onEmpty,
         displayNone,
+        srOnly: visuallyHidden,
         visuallyHidden,
     };
 });

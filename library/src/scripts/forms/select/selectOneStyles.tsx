@@ -28,6 +28,7 @@ export const selectOneClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const singleValueOffset = 26;
+    const rightSpacing = 6;
 
     const inputWrap = style("inputWrap", {
         $nest: {
@@ -45,13 +46,21 @@ export const selectOneClasses = useThemeCache(() => {
             "& .SelectOne__indicators": {
                 position: "absolute",
                 top: 0,
-                right: 6,
+                right: unit(rightSpacing),
                 bottom: 0,
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                width: unit(inputVariables().sizing.height),
             },
             "& .SelectOne__indicator-separator": {
                 display: "none",
             },
             "& .SelectOne__indicator": {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: unit(inputVariables().sizing.height / 2),
                 cursor: "pointer",
             },
             "& .SelectOne__single-value": {
@@ -63,7 +72,7 @@ export const selectOneClasses = useThemeCache(() => {
                 maxWidth: calc(`100% - ${unit(vars.padding.right)}`),
             },
             "& .SelectOne__value-container.inputText.inputText": {
-                paddingRight: unit(inputVariables().sizing.height),
+                paddingRight: unit(inputVariables().sizing.height + rightSpacing),
                 ...pointerEvents(), // sometimes this element blocks the click to focus the input.
             },
             "& .SelectOne__value-container > *": {
@@ -96,5 +105,7 @@ export const selectOneClasses = useThemeCache(() => {
         },
     });
 
-    return { inputWrap, checkIcon, checkBoxAfterInput };
+    const chevron = style("chevron", {});
+
+    return { inputWrap, checkIcon, checkBoxAfterInput, chevron };
 });

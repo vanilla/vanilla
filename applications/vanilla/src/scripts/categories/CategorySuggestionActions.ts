@@ -16,10 +16,6 @@ export default class CategorySuggestionActions extends ReduxActions {
 
     private internalLoadCategories = (query: string) => {
         const apiThunk = bindThunkAction(CategorySuggestionActions.loadCategories, async () => {
-            if (query === "") {
-                return [];
-            }
-
             const params = { query, expand: ["breadcrumbs"] };
             const response = await this.api.get("/categories/search", { params });
             return response.data;

@@ -62,14 +62,11 @@ class UploadedFile {
     /** @var ?int Max image upload width */
     private $maxImageWidth;
 
-    /** @var int Bypass values set in ImageUpload.Limits config even if ImageUpload.Limits is enabled */
-    const NO_IMAGE_DIMENSIONS_LIMIT = 0;
+    /** @var int Protection max image upload height */
+    public const MAX_IMAGE_HEIGHT = 3000;
 
-    /** @var int Protection max image upload height if $maxImageHeight is set to NO_IMAGE_DIMENSIONS_LIMIT */
-    private const MAX_IMAGE_HEIGHT = 3000;
-
-    /** @var int Protection max image upload width if $maxImageWidth is set to NO_IMAGE_DIMENSIONS_LIMIT */
-    private const MAX_IMAGE_WIDTH = 3000;
+    /** @var int Protection max image upload width */
+    public const MAX_IMAGE_WIDTH = 3000;
 
     /**
      * UploadedFile constructor.
@@ -314,36 +311,20 @@ class UploadedFile {
 
     /**
      * Get max image upload height
-     * If $this->maxImageHeight is set to NO_IMAGE_DIMENSIONS_LIMIT, fallback to return MAX_IMAGE_HEIGHT
      *
      * @return ?int
      */
     public function getMaxImageHeight(): ?int {
-        switch (true) {
-            case ($this->maxImageHeight === null):
-                return \Gdn::config("ImageUpload.Limits.Height");
-            case ($this->maxImageHeight === self::NO_IMAGE_DIMENSIONS_LIMIT):
-                return self::MAX_IMAGE_HEIGHT;
-            default:
-                return $this->maxImageHeight;
-        }
+        return $this->maxImageHeight;
     }
 
     /**
      * Get max image upload width
-     * If $this->maxImageHeight is set to NO_IMAGE_DIMENSIONS_LIMIT, fallback to return MAX_IMAGE_HEIGHT
      *
      * @return ?int
      */
     public function getMaxImageWidth(): ?int {
-        switch (true) {
-            case ($this->maxImageWidth === null):
-                return \Gdn::config("ImageUpload.Limits.Width");
-            case ($this->maxImageWidth === self::NO_IMAGE_DIMENSIONS_LIMIT):
-                return self::MAX_IMAGE_WIDTH;
-            default:
-                return $this->maxImageWidth;
-        }
+        return $this->maxImageWidth;
     }
 
     /**
@@ -511,7 +492,7 @@ class UploadedFile {
         if (is_int($maxImageHeight) && $maxImageHeight < 0) {
             throw new InvalidArgumentException('height should be greater than or equal to 0.');
         }
-        $this->maxImageHeight = $maxImageHeight;
+        $this->maxImageHeight = is_null($maxImageHeight) || $maxImageHeight >= self::MAX_IMAGE_HEIGHT ? self::MAX_IMAGE_HEIGHT : $maxImageHeight;
         return $this;
     }
 
@@ -526,7 +507,7 @@ class UploadedFile {
         if (is_int($maxImageWidth) && $maxImageWidth < 0) {
             throw new InvalidArgumentException('width should be greater than or equal to 0.');
         }
-        $this->maxImageWidth = $maxImageWidth;
+        $this->maxImageWidth = is_null($maxImageWidth) || $maxImageWidth >= self::MAX_IMAGE_WIDTH ? self::MAX_IMAGE_WIDTH : $maxImageWidth;
         return $this;
     }
 

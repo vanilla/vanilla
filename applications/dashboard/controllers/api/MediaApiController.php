@@ -48,6 +48,15 @@ class MediaApiController extends AbstractApiController {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var bool */
+    private $resizeImages;
+
+    /** @var ?int Max image upload height */
+    private $maxImageHeight;
+
+    /** @var ?int Max image upload width */
+    private $maxImageWidth;
+
     /**
      * DI.
      * @inheritdoc
@@ -57,6 +66,9 @@ class MediaApiController extends AbstractApiController {
         $this->embedService = $embedService;
         $this->imageResizer = $imageResizer;
         $this->config =  $config;
+        $this->resizeImages = $this->config->get('ImageUpload.Limits.Enabled');
+        $this->maxImageHeight = $this->config->get('ImageUpload.Limits.Height');
+        $this->maxImageWidth = $this->config->get('ImageUpload.Limits.Width');
     }
 
     /**
@@ -250,17 +262,25 @@ class MediaApiController extends AbstractApiController {
         ], 'in')->setDescription('Add a media item.');
 
         $body = $in->validate($body);
-        //Bypass ImageUpload.Limits if user has 'Garden.Community.Manage' permission or higher
-        $bypassUploadLimits = $this->getSession()->getPermissions()->hasRanked('Garden.Community.Manage');
+        $fileData = [
+            'foreignType' => 'embed',
+            'foreignID' => $this->getSession()->UserID
+        ];
 
-        $row = $this->mediaModel->saveUploadedFile(
-            $body['file'],
-            [
-                'foreignType' => 'embed',
-                'foreignID' => $this->getSession()->UserID,
-                'bypassUploadLimits' => $bypassUploadLimits
-            ]
-        );
+        if ($this->resizeImages) {
+            //Bypass ImageUpload.Limits if user has 'Garden.Community.Manage' permission or higher
+            $bypassUploadLimits = $this->getSession()->getPermissions()->hasRanked('Garden.Community.Manage');
+
+            if ($bypassUploadLimits) {
+                $fileData['maxImageHeight'] = MediaModel::NO_IMAGE_DIMENSIONS_LIMIT;
+                $fileData['maxImageWidth'] = MediaModel::NO_IMAGE_DIMENSIONS_LIMIT;
+            } else {
+                $fileData['maxImageHeight'] = $this->maxImageHeight;
+                $fileData['maxImageWidth'] = $this->maxImageWidth;
+            }
+        }
+
+        $row = $this->mediaModel->saveUploadedFile($body['file'], $fileData);
         return $row;
     }
 

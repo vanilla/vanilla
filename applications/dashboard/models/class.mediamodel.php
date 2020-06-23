@@ -18,6 +18,9 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /** @var Gdn_Upload */
     private $upload;
 
+    /** @var int Bypass values set in ImageUpload.Limits config even if ImageUpload.Limits is enabled */
+    const NO_IMAGE_DIMENSIONS_LIMIT = 0;
+
     /**
      * MediaModel constructor.
      */
@@ -204,14 +207,14 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * @inheritdoc
      */
     public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array {
-        $extraArgs += [ // set default for $extraArgs['bypassUploadLimits']
-            'bypassUploadLimits' => false,
-        ];
+        if ($extraArgs['maxImageHeight']) {
+            $maxImageHeight = $extraArgs['maxImageHeight'] === self::NO_IMAGE_DIMENSIONS_LIMIT ? $file::MAX_IMAGE_HEIGHT : $extraArgs['maxImageHeight'];
+            $file->setMaxImageHeight($maxImageHeight);
+        }
 
-        // Bypass values set in ImageUpload.Limits config
-        if ($extraArgs['bypassUploadLimits']) {
-            $file->setMaxImageHeight(UploadedFile::NO_IMAGE_DIMENSIONS_LIMIT);
-            $file->setMaxImageWidth(UploadedFile::NO_IMAGE_DIMENSIONS_LIMIT);
+        if ($extraArgs['maxImageWidth']) {
+            $maxImageWidth = $extraArgs['maxImageWidth'] === self::NO_IMAGE_DIMENSIONS_LIMIT ? $file::MAX_IMAGE_WIDTH : $extraArgs['maxImageWidth'];
+            $file->setMaxImageWidth($maxImageWidth);
         }
 
         // Casen extra args for the DB.

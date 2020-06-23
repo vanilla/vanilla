@@ -12,7 +12,6 @@ use Garden\SafeCurl\Exception\InvalidURLException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
 use VanillaTests\BootstrapTrait;
-use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for uploaded files.
@@ -191,6 +190,8 @@ class UploadedFileTest extends TestCase {
     }
 
     /**
+     * Test UploadedFile->getMaxImageHeight()
+     *
      * @param $expected
      * @param $input
      * @dataProvider provideDimensionsData
@@ -204,28 +205,41 @@ class UploadedFileTest extends TestCase {
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test UploadedFile->getMaxImageWidth()
+     *
+     * @param $expected
+     * @param $input
+     * @dataProvider provideDimensionsData
+     */
+    public function testGetMaxImageWidth($expected, $input) {
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageWidth($input);
+        $actual = $file->getMaxImageWidth();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Provides data for testGetMaxImageHeight() and testGetMaxImageWidth()
+     * @return array
+     */
     public function provideDimensionsData() {
         $r = [
             'test int positive' => [10, 10],
+            'test int greater than max' => [3000, 4000],
             'test string positive' => [10, '10'],
-            'test 0 int' => [3000, 0],
-            'test 0 string' => [3000, '0'],
+            'test 0 int' => [0, 0],
+            'test 0 string' => [0, '0'],
         ];
 
         return $r;
     }
 
-    public function testGetMaxImageHeightConfig() {
-        $config = self::container()->get(\Gdn_Configuration::class);
-        // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
-        $file->setMaxImageHeight(null);
-        $actual = $file->getMaxImageHeight();
-
-        $this->assertEquals($config->get('ImageUpload.Limits.Height'), $actual);
-    }
-
     /**
+     * Test UploadedFile->setMaxImageHeight() with bad values
+     *
      * @dataProvider provideBadDimensionsData
      */
     public function testBadGetMaxImageHeight($actual) {
@@ -238,6 +252,8 @@ class UploadedFileTest extends TestCase {
     }
 
     /**
+     * Test UploadedFile->setMaxImageWidth() with bad values
+     *
      * @dataProvider provideBadDimensionsData
      */
     public function testBadGetMaxImageWidth($actual) {

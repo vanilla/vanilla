@@ -14,7 +14,7 @@ trait TestCategoryModelTrait {
     /**
      * @var CategoryModel
      */
-    private $categoryModel;
+    protected $categoryModel;
 
     private static $categoryIndex = 1;
 
@@ -56,7 +56,7 @@ trait TestCategoryModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    private function insertCategories(int $count, array $overrides = []): array {
+    protected function insertCategories(int $count, array $overrides = []): array {
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $id = $this->categoryModel->save($this->newCategory($overrides));

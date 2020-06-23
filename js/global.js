@@ -620,9 +620,31 @@ jQuery(document).ready(function($) {
                     $target.addClass(item.Data);
                     break;
                 case 'Ajax':
+                    if (typeof item.Data === 'string') {
+                        ajax = {
+                            url: item.Data,
+                            reprocess: false,
+                            data: {}
+                        };
+                    } else {
+                        ajax = item.Data;
+                    }
+
                     $.ajax({
                         type: "POST",
-                        url: item.Data
+                        url: ajax.url,
+                        data: ajax.data,
+                        success: function (json) {
+                            if (!ajax.reprocess) {
+                                return;
+                            }
+                            if (json === null) {
+                                json = {};
+                            }
+
+                            var informed = gdn.inform(json);
+                            gdn.processTargets(json.Targets, $elem, $parent);
+                        }
                     });
                     break;
                 case 'Append':

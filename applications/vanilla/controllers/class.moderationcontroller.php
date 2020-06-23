@@ -9,10 +9,9 @@
  */
 
 /**
- * Handles content moderation via /modersation endpoint.
+ * Handles content moderation via /moderation endpoint.
  */
 class ModerationController extends VanillaController {
-
     /**
      * Looks at the user's attributes and form postback to see if any comments
      * have been checked for administration, and if so, puts an inform message on
@@ -291,6 +290,7 @@ class ModerationController extends VanillaController {
      * discussions (and has permission to do so).
      */
     public function confirmDiscussionDeletes() {
+        $startTime = time();
         $session = Gdn::session();
         $this->Form = new Gdn_Form();
         $discussionModel = new DiscussionModel();
@@ -299,7 +299,15 @@ class ModerationController extends VanillaController {
         $this->permission('Vanilla.Discussions.Delete', true, 'Category', 'any');
         $this->title(t('Confirm'));
 
-        $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+        $checkedDiscussions = $this->Request->post('discussionIDs', null);
+
+        if ($checkedDiscussions === null) {
+            $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+            $fork = true;
+        } else {
+            $fork = false;
+        }
+
         if (!is_array($checkedDiscussions)) {
             $checkedDiscussions = [];
         }
@@ -321,17 +329,37 @@ class ModerationController extends VanillaController {
         $countNotAllowed = $countCheckedDiscussions - count($allowedDiscussions);
         $this->setData('CountNotAllowed', $countNotAllowed);
 
-        if ($this->Form->authenticatedPostBack()) {
-            $discussionArray = ['discussionID' => $allowedDiscussions];
+        if ($this->Request->isAuthenticatedPostBack(true)) {
+            $checkedDiscussions = array_combine($allowedDiscussions, $allowedDiscussions);
             // Queue deleting discussions.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
-            foreach ($discussionArray['discussionID'] as $discussionID) {
+//            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+//            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
+            foreach ($allowedDiscussions as $discussionID) {
+                $discussionModel->deleteID($discussionID);
+                unset($checkedDiscussions[$discussionID]);
+                Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', array_values($checkedDiscussions));
                 $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
+
+                $ellapsedTime = time() - $startTime;
+                if ($ellapsedTime > 10) {
+                    break;
+                }
             }
-            // Clear selections
-            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
+            if (!empty($checkedDiscussions)) {
+                $this->jsonTarget('', [
+                    'url' => '/moderation/confirmdiscussiondeletes',
+                    'reprocess' => true,
+                    'data' => [
+                        'DeliveryType' => DELIVERY_TYPE_VIEW,
+                        'DeliveryMethod' => DELIVERY_METHOD_JSON,
+                        'discussionIDs' => array_values($checkedDiscussions),
+                        'fork' => false
+                    ]
+                ], 'Ajax');
+                $this->setFormSaved(false);
+            }
+
             ModerationController::informCheckedDiscussions($this, true);
         }
 

@@ -192,8 +192,8 @@ class UploadedFileTest extends TestCase {
     /**
      * Test UploadedFile->getMaxImageHeight()
      *
-     * @param $expected
-     * @param $input
+     * @param mixed $expected
+     * @param mixed $input
      * @dataProvider provideDimensionsData
      */
     public function testGetMaxImageHeight($expected, $input) {
@@ -208,8 +208,8 @@ class UploadedFileTest extends TestCase {
     /**
      * Test UploadedFile->getMaxImageWidth()
      *
-     * @param $expected
-     * @param $input
+     * @param mixed $expected
+     * @param mixed $input
      * @dataProvider provideDimensionsData
      */
     public function testGetMaxImageWidth($expected, $input) {
@@ -223,9 +223,10 @@ class UploadedFileTest extends TestCase {
 
     /**
      * Provides data for testGetMaxImageHeight() and testGetMaxImageWidth()
+     *
      * @return array
      */
-    public function provideDimensionsData() {
+    public function provideDimensionsData(): array {
         $r = [
             'test int positive' => [10, 10],
             'test int greater than max' => [3000, 4000],
@@ -265,7 +266,12 @@ class UploadedFileTest extends TestCase {
         $file->setMaxImageWidth($actual);
     }
 
-    public function provideBadDimensionsData() {
+    /**
+     * Provides data for testBadGetMaxImageHeight() and testBadGetMaxImageWidth()
+     *
+     * @return array
+     */
+    public function provideBadDimensionsData(): array {
         $r = [
             'test int negative' => [-1],
             'test string negative' => ['-1']

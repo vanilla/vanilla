@@ -108,6 +108,9 @@ export const metaItemStyle = useThemeCache(() => {
             "& &": {
                 margin: 0,
             },
+            "& .isDeleted, &.isDeleted": {
+                color: colorOut(vars.colors.deleted.fg),
+            },
         },
     } as NestedCSSProperties;
 });

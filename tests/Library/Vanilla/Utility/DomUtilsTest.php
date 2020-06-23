@@ -211,4 +211,50 @@ class DomUtilsTest extends TestCase {
         $r = $this->createProviderFromDirectory('domutils/strip-embeds');
         return $r;
     }
+
+    /**
+     * Test preg replace.
+     *
+     * @param int $expectedCount
+     * @param string $patternText
+     * @param string $input
+     * @param int $expected
+     * @dataProvider providePregReplaceCallbackTests
+     */
+    public function testPregReplaceCallback($expectedCount, string $patternText, string $input, string $expected): void {
+        $domDocument = new HtmlDocument($input);
+        $dom = $domDocument->getDom();
+        $pattern = ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'];
+        $count = DomUtils::pregReplaceCallback($dom, $pattern, function(array $matches): string {
+            return '***';
+        });
+        $actual = $domDocument->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+        $this->assertEquals($expectedCount, $count);
+    }
+
+    /**
+     * Provide tests for `TestPregReplaceCallback()`.
+     *
+     * @return array
+     */
+    public function providePregReplaceCallbackTests(): array {
+        $r = [
+            'Testtext' => [
+                1,
+                'forbiddenword', 'test forbiddenword','test ***'
+            ],
+            'Testtext2' => [
+                1,
+                'forbiddenword','test forbiddenword test forbiddenword', 'test *** test ***'
+            ],
+            'TestPTag' => [1, 'forbiddenword', '<p>test forbiddenword</p>', '<p>test ***</p>'],
+            'nested' => [1, 'blockedword', '<div><div><div><b>blockedword test</b></div></div></div>', '<div><div><div><b>*** test</b></div></div></div>'],
+            'Mixed nested' => [2, 'blocked word', 'a <b>test blocked word</b> test blocked word', 'a <b>test ***</b> test ***'],
+            'aria-label' => [2,'forbiddenword', '<button aria-label="forbiddenword content" onclick="myDialog.close()">forbiddenword content</button>',
+                '<button aria-label="*** content" onclick="myDialog.close()">*** content</button>'],
+            'alt' => [1,'forbiddenword','<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">','<img src="img_test.jpg" alt="*** image" width="100" height="100">']
+        ];
+        return $r;
+    }
 }

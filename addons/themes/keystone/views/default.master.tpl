@@ -63,7 +63,9 @@
     {if $ThemeOptions.Options.hasFeatureSearchbox}
         ThemeOptions-hasFeatureSearchbox
     {else}
-        hideHomepageTitle
+        {if !inSection(["DiscussionList"])}
+            hideHomepageTitle
+        {/if}
     {/if}
 
     {if $ThemeOptions.Options.panelToLeft}
@@ -198,6 +200,8 @@
                                 {if $Category}
                                     <h2 class="H HomepageTitle">{$Category.Name|strip_tags}{follow_button}</h2>
                                     <p class="P PageDescription">{$Category.Description|strip_tags}</p>
+                                {elseif $Subcommunity && inSection(["DiscussionList"])}
+                                    <h2 class="H HomepageTitle">{$Subcommunity.Name|strip_tags}</h2>
                                 {else}
                                     {if {homepage_title} !== ""}
                                         <h2 class="H HomepageTitle">{homepage_title}</h2>

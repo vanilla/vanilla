@@ -31,6 +31,9 @@ class DiscussionSearchType extends AbstractSearchType {
     /** @var \CategoryModel */
     protected $categoryModel;
 
+    /** @var \UserModel $userModel */
+    protected $userModel;
+
     /** @var \TagModel */
     protected $tagModel;
 
@@ -48,11 +51,13 @@ class DiscussionSearchType extends AbstractSearchType {
     public function __construct(
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
+        \UserModel $userModel,
         \TagModel $tagModel,
         BreadcrumbModel $breadcrumbModel
     ) {
         $this->discussionsApi = $discussionsApi;
         $this->categoryModel = $categoryModel;
+        $this->userModel = $userModel;
         $this->tagModel = $tagModel;
         $this->breadcrumbModel = $breadcrumbModel;
     }
@@ -167,14 +172,6 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function getQuerySchema(): Schema {
         return $this->schemaWithTypes(Schema::parse([
-            'query:s?' => [
-                'description' => 'Filter the records using the supplied terms.',
-                'x-search-filter' => true,
-            ],
-            'name:s?' => [
-                'description' => 'Filter the records by matching part of their name.',
-                'x-search-filter' => true,
-            ],
             'discussionID:i?' => [
                 'x-search-scope' => true,
             ],
@@ -188,18 +185,6 @@ class DiscussionSearchType extends AbstractSearchType {
                 'x-search-filter' => true,
             ],
             'includeArchivedCategories:b?' => [
-                'x-search-filter' => true,
-            ],
-            'insertUserIDs:a?' => [
-                'items' => ['type' => 'integer'],
-                'style' => 'form',
-                'description' => 'Filter the records by inserted userIDs.',
-                'x-search-filter' => true,
-            ],
-            'insertUserNames:a?' => [
-                'items' => ['type' => 'string'],
-                'style' => 'form',
-                'description' => 'Filter the records by inserted user names.',
                 'x-search-filter' => true,
             ],
             'tags:a?' => [
@@ -236,6 +221,12 @@ class DiscussionSearchType extends AbstractSearchType {
         $categoryIDs = $this->getCategoryIDs($query);
 
         if($categoryIDs === []) {
+            return '';
+        }
+
+        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+
+        if($userIDs === []) {
             return '';
         }
 
@@ -279,6 +270,10 @@ class DiscussionSearchType extends AbstractSearchType {
             $db->where('d.InsertUserID', $author);
         }
 
+        if (is_array($userIDs)) {
+            $db->where('d.InsertUserID', $userIDs);
+        }
+
         if ($discussionID = $query->get('discussionID', false)) {
             $db->where('d.DiscussionID', $discussionID);
         }
@@ -297,7 +292,7 @@ class DiscussionSearchType extends AbstractSearchType {
         return $sql;
     }
 
-    protected function getCategoryIDs(SearchQuery $query): array {
+    protected function getCategoryIDs(SearchQuery $query): ?array {
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
             $query->getQueryParameter('categoryID'),
             $query->getQueryParameter('followedCategories'),
@@ -305,5 +300,17 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('includeArchivedCategories')
         );
         return $categoryIDs;
+    }
+
+    protected function getUserIDs(array $userNames): ?array {
+        if (!empty($userNames)) {
+            $users = $this->userModel->getWhere([
+                'name' => $userNames,
+            ])->resultArray();
+            $userIDs = array_column($users, 'UserID');
+            return $userIDs;
+        } else {
+            return null;
+        }
     }
 }

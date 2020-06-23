@@ -38,7 +38,9 @@ class MysqlSearchQuery extends SearchQuery {
 
     public function getSql() {
         $sql = '';
-        if (count($this->sql) < 2) {
+        if (empty($this->sql)) {
+            ;
+        } elseif (count($this->sql) < 2) {
             $sql = reset($this->sql);
         } else {
             foreach ($this->sql as $subQuery) {
@@ -51,8 +53,6 @@ class MysqlSearchQuery extends SearchQuery {
             $sql .= ' LIMIT '.$limit;
             $sql .= ($offset > 0) ? ', '.$offset : '';
         }
-
-
         return $sql;
     }
 

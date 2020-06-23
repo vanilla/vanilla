@@ -33,10 +33,11 @@ class CommentSearchType extends DiscussionSearchType {
         \CommentModel $commentModel,
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
+        \UserModel $userModel,
         \TagModel $tagModel,
         BreadcrumbModel $breadcrumbModel
     ) {
-        parent::__construct($discussionsApi, $categoryModel, $tagModel, $breadcrumbModel);
+        parent::__construct($discussionsApi, $categoryModel, $userModel, $tagModel, $breadcrumbModel);
         $this->commentsApi = $commentsApi;
         $this->commentModel = $commentModel;
     }
@@ -113,6 +114,16 @@ class CommentSearchType extends DiscussionSearchType {
 
         $categoryIDs = $this->getCategoryIDs($query);
 
+        if($categoryIDs === []) {
+            return '';
+        }
+
+        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+
+        if($userIDs === []) {
+            return '';
+        }
+
         if (false !== $query->get('expandBody', null)) {
             $db->select('d.Body as body');
         }
@@ -143,7 +154,11 @@ class CommentSearchType extends DiscussionSearchType {
 
         if ($users = $query->get('users', false)) {
             $author = array_column($users, 'UserID');
-            $db->where('d.InsertUserID', $author);
+            $db->where('c.InsertUserID', $author);
+        }
+
+        if (is_array($userIDs)) {
+            $db->where('c.InsertUserID', $userIDs);
         }
 
         if ($discussionID = $query->get('discussionID', false)) {

@@ -46,7 +46,12 @@ class MysqlSearchDriver extends AbstractSearchDriver {
     public function search(array $queryData, SearchOptions $options): SearchResults {
         $query = new MysqlSearchQuery($this->getSearchTypes(), $queryData, $this->db);
 
-        $search = $this->db->query($query->getSql())->resultArray();
+        $sql = $query->getSql();
+        if (empty($sql)) {
+            $search = [];
+        } else {
+            $search = $this->db->query($sql)->resultArray();
+        }
 
         $search = $this->convertRecordsToResultItems($search);
         return new SearchResults(

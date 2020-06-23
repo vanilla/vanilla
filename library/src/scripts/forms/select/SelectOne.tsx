@@ -142,6 +142,9 @@ function useOverrideProps(props: ISelectOneProps) {
             ValueContainer: function CustomValueContainer(localProps) {
                 return <selectOverrides.ValueContainer {...localProps} className={inputClassName} />;
             },
+            DropdownIndicator: function CustomDropdownIndicator(localProps) {
+                return <selectOverrides.DropdownIndicator {...localProps} />;
+            },
             NoOptionsMessage: noOptionsMessage || selectOverrides.NoOptionsMessage,
             LoadingMessage: selectOverrides.OptionLoader,
         };

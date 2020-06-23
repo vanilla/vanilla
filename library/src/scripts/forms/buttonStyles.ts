@@ -281,40 +281,110 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const radioPresetInit1 = makeThemeVars("radio", {
+        sizing: {
+            minHeight: formElementsVariables().sizing.height - 4,
+        },
+    });
+
+    const radioPresetInit2 = makeThemeVars("radio", {
+        ...radioPresetInit1,
+        borders: {
+            ...globalVars.border,
+            radius: radioPresetInit1.sizing.minHeight / 2,
+        },
+        state: {
+            colors: {
+                fg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+                radius: radioPresetInit1.sizing.minHeight / 2,
+            },
+        },
+        //special case
+        active: {
+            color: colorOut(globalVars.mixBgAndFg(0.1)),
+        },
+    });
+
+    const radio: IButtonType = makeThemeVars("radio", {
+        name: ButtonTypes.RADIO,
+        preset: { style: ButtonPreset.ADVANCED },
+        colors: {
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg,
+        },
+        padding: {
+            horizontal: 12,
+        },
+        borders: radioPresetInit2.borders,
+        state: radioPresetInit2.state,
+        sizing: {
+            minHeight: radioPresetInit2.sizing.minHeight,
+        },
+        extraNested: {
+            ["&.isActive"]: {
+                borderColor: colorOut(radioPresetInit2.active.color),
+                backgroundColor: colorOut(radioPresetInit2.active.color),
+            },
+        },
+        skipDynamicPadding: true,
+    });
+
     return {
         standard,
         primary,
         transparent,
         translucid,
+        radio,
     };
 });
 
-export const buttonSizing = (
-    minHeight,
-    minWidth,
-    fontSize,
-    paddingHorizontal,
-    formElementVars,
-    borderRadius,
-    debug?: boolean,
-) => {
+export const buttonSizing = (props: {
+    minHeight;
+    minWidth;
+    fontSize;
+    paddingHorizontal;
+    formElementVars;
+    borderRadius;
+    skipDynamicPadding;
+    debug?: boolean;
+}) => {
     const buttonGlobals = buttonGlobalVariables();
-    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
+    const {
+        minHeight = buttonGlobals.sizing.minHeight,
+        minWidth = buttonGlobals.sizing.minWidth,
+        fontSize = buttonGlobals.font.size,
+        paddingHorizontal = buttonGlobals.padding.horizontal,
+        formElementVars,
+        borderRadius,
+        skipDynamicPadding,
+        debug = false,
+    } = props;
 
-    const paddingOffsets = paddingOffsetBasedOnBorderRadius({
-        radius: borderRadius,
-        extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
-        height: buttonGlobals.sizing.minHeight,
-    });
+    const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
+    const height = minHeight ?? formElementVars.sizing.minHeight;
+
+    const paddingOffsets = !skipDynamicPadding
+        ? paddingOffsetBasedOnBorderRadius({
+              radius: borderRadius,
+              extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
+              height,
+          })
+        : {
+              right: 0,
+              left: 0,
+          };
 
     return {
-        minHeight: unit(minHeight ? minHeight : formElementVars.sizing.minHeight),
+        minHeight: unit(height),
         minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
         padding: `0px ${px(paddingHorizontal + paddingOffsets.right ?? 0)} 0px ${px(
             paddingHorizontal + paddingOffsets.left ?? 0,
         )}`,
-        lineHeight: unit(formElementVars.sizing.height - borderWidth * 2),
+        lineHeight: unit(height - borderWidth * 2),
     };
 };
 
@@ -352,6 +422,7 @@ export const buttonClasses = useThemeCache(() => {
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,
         textPrimary: buttonUtilityClasses().buttonAsTextPrimary,
+        radio: generateButtonClass(vars.radio),
         custom: "",
     };
 });
@@ -480,6 +551,11 @@ export const buttonLoaderClasses = useThemeCache(() => {
             padding: unit(4),
             height: percent(100),
             width: percent(100),
+            $nest: {
+                [`& + .suggestedTextInput-parentTag`]: {
+                    display: "none",
+                },
+            },
         }),
     );
 

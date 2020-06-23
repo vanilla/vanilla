@@ -33,7 +33,6 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
         $this->session = $session;
     }
 
-
     /**
      * @inheritdoc
      */

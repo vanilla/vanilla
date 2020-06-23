@@ -14,7 +14,6 @@ import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { forumVariables } from "@library/forums/forumStyleVars";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
@@ -53,7 +52,7 @@ export const forumMetaCSS = () => {
     `,
         {
             color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.fontSize),
+            fontSize: unit(globalVars.meta.text.size),
         },
     );
 
@@ -232,7 +231,7 @@ export const forumMetaCSS = () => {
     });
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
-        marginLeft: unit(negative(globalVars.meta.text.margin)),
+        marginLeft: unit(negative(globalVars.meta.spacing.horizontalMargin)),
     });
 
     const linkColors = clickableItemStates();

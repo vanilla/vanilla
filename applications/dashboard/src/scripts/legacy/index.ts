@@ -14,7 +14,7 @@ import { escapeHTML } from "@vanilla/dom-utils";
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
 // Initialize legacy @mentions for all BodyBox elements.
-if ($.fn.atwho) {
+if (window.$ && window.$.fn.atwho) {
     onReady(() => initializeAtComplete(".BodyBox,.js-bodybox"));
     onContent(() => initializeAtComplete(".BodyBox,.js-bodybox"));
 

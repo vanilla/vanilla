@@ -55,7 +55,10 @@ export default function Hamburger(props: IProps) {
                 className={classNames(classes.root, props.className)}
                 onClick={toggleDrawer}
             >
-                <HamburgerIcon />
+                <>
+                    <HamburgerIcon />
+                    <ScreenReaderContent>{t("Menu")}</ScreenReaderContent>
+                </>
             </Button>
             <Modal scrollable isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
                 <Button

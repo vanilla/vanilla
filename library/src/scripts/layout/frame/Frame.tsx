@@ -17,6 +17,7 @@ interface IProps {
     footer?: React.ReactNode;
     canGrow?: boolean; // Use this when the parent has a fixed height we want to fill.
     bodyWrapClass?: string;
+    scrollable?: boolean;
 }
 
 /**
@@ -24,14 +25,22 @@ interface IProps {
  * since they often use similar components.
  */
 export default function Frame(props: IProps) {
+    const { scrollable = true } = props;
     const classes = frameClasses();
+
+    let content = props.body;
+    if (scrollable) {
+        content = (
+            <TouchScrollable>
+                <div className={classNames(classes.bodyWrap, props.bodyWrapClass)}>{content}</div>
+            </TouchScrollable>
+        );
+    }
 
     return (
         <section className={classNames("frame", props.className, classes.root, props.canGrow && inheritHeightClass())}>
             {props.header && <div className={classes.headerWrap}> {props.header}</div>}
-            <TouchScrollable>
-                <div className={classNames(classes.bodyWrap, props.bodyWrapClass)}>{props.body}</div>
-            </TouchScrollable>
+            {content}
             <div className={classes.footerWrap}>{props.footer}</div>
         </section>
     );

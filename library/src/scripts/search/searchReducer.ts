@@ -19,6 +19,7 @@ export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
     domain: ALL_CONTENT_DOMAIN_NAME,
     query: "",
     page: 1,
+    sort: "relevance",
 };
 
 export const INITIAL_SEARCH_STATE: ISearchState = {

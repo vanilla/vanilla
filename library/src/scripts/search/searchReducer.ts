@@ -42,6 +42,10 @@ export const searchReducer = produce(
                 nextState.form.page = 1;
             }
 
+            if ("domain" in payload) {
+                delete nextState.form.types;
+            }
+
             return nextState;
         })
         .case(SearchActions.performSearchACs.started, (nextState, payload) => {

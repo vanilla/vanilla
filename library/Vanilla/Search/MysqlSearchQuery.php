@@ -24,7 +24,6 @@ class MysqlSearchQuery extends SearchQuery {
      * @param array $searchTypes
      * @param array $queryData
      * @param \Gdn_Database $db
-     * @throws \Exception
      */
     public function __construct(array $searchTypes, array $queryData, \Gdn_Database $db) {
         $this->db = $db->sql();
@@ -32,14 +31,24 @@ class MysqlSearchQuery extends SearchQuery {
     }
 
     /**
-     * @inheritDoc
+     * Implement abstract method
+     *
+     * @param string $text
+     * @param array $fieldNames
+     * @return $this
      */
     public function whereText(string $text, array $fieldNames = []): self {
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * Implement abstract method
+     *
+     * @param string $attribute
+     * @param array $values
+     * @param bool $exclude
+     * @param string $filterOp
+     * @return $this
      */
     public function setFilter(
         string $attribute,

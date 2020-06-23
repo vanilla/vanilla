@@ -218,7 +218,6 @@ class DiscussionSearchType extends AbstractSearchType {
      *
      * @param MysqlSearchQuery $query
      * @return string
-     * @throws \Exception
      */
     public function generateSql(MysqlSearchQuery $query): string {
         /** @var \Gdn_SQLDriver $db */
@@ -299,6 +298,12 @@ class DiscussionSearchType extends AbstractSearchType {
         return $sql;
     }
 
+    /**
+     * Get category ids from DB if query has it as a filter
+     *
+     * @param SearchQuery $query
+     * @return array|null
+     */
     protected function getCategoryIDs(SearchQuery $query): ?array {
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
             $query->getQueryParameter('categoryID'),
@@ -309,6 +314,12 @@ class DiscussionSearchType extends AbstractSearchType {
         return $categoryIDs;
     }
 
+    /**
+     * Get user ids by their name if query has insertUserNames argument
+     *
+     * @param array $userNames
+     * @return array|null
+     */
     protected function getUserIDs(array $userNames): ?array {
         if (!empty($userNames)) {
             $users = $this->userModel->getWhere([

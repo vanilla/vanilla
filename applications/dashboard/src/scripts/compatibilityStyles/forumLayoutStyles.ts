@@ -20,7 +20,6 @@ export const forumLayoutVariables = useThemeCache(() => {
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
-        fullGutter: globalVars.constants.fullGutter,
         panelWidth: 220, // main calculated based on panel width
         breakPoints: {
             // Other break points are calculated
@@ -131,16 +130,13 @@ export const forumLayoutVariables = useThemeCache(() => {
     };
 
     const gutter = makeThemeVars("gutter", {
-        full: foundationalWidths.fullGutter, // 48
-        size: foundationalWidths.fullGutter / 2, // 24
-        halfSize: foundationalWidths.fullGutter / 4, // 12
-        quarterSize: foundationalWidths.fullGutter / 8, // 6
+        ...globalVars.gutter,
         mainGutterOffset: 60 - globalVars.gutter.size,
     });
 
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + gutter.full,
+        paddedWidth: foundationalWidths.panelWidth + gutter.bothSides,
     });
 
     const main = makeThemeVars("main", {

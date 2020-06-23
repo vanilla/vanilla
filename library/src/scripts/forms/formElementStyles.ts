@@ -57,7 +57,7 @@ export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables
     const errorSpacing = makeThemeVars("errorSpacing", {
         horizontalPadding: varsLayouts.gutter.size,
         verticalPadding: varsLayouts.gutter.size,
-        verticalMargin: varsLayouts.gutter.halfSize,
+        verticalMargin: varsLayouts.gutter.half,
     });
 
     const placeholder = makeThemeVars("placeholder", {

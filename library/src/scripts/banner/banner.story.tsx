@@ -382,7 +382,12 @@ export const LogoAndRightImage = storyWithConfig(
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1400, globalVariables().contentWidthPadding, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+            viewports: [
+                1400,
+                globalVariables().contentWidthPadding,
+                layoutVariables().panelLayoutBreakPoints.oneColumn,
+                400,
+            ],
         },
     },
 };
@@ -400,8 +405,8 @@ export const ImageAsElementWide = storyWithConfig(
                         color: color("#efefef"),
                     },
                 },
-                content: {
-                    width: 1350,
+                middleColumn: {
+                    width: 800,
                 },
             },
             banner: {

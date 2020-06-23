@@ -15,7 +15,7 @@ export const panelWidgetVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelWidget");
 
     const spacing = makeThemeVars("spacing", {
-        padding: globalVars.halfPadding,
+        padding: globalVars.gutter.size,
     });
 
     return { spacing };

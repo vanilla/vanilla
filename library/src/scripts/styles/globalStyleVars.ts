@@ -221,7 +221,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const panel = makeThemeVars("panelWidth", {
         width: panelInit.width,
-        paddedWidth: panelInit.width + gutter.size * 2,
+        paddedWidth: panelInit.width + gutter.bothSides,
     });
 
     const middleColumnWidth = 672;
@@ -231,7 +231,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnInit.width,
-        paddedWidth: middleColumnInit.width + gutter.size * 2,
+        paddedWidth: middleColumnInit.width + gutter.bothSides,
     });
 
     const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;

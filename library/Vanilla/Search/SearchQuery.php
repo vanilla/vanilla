@@ -89,4 +89,16 @@ abstract class SearchQuery {
         bool $exclude = false,
         string $filterOp = SearchQuery::FILTER_OP_OR
     );
+
+    /**
+     * Set string attribute to filter
+     *
+     * @param string $attribute
+     * @param string $value
+     * @param bool $exclude
+     *
+     * @return $this
+     */
+    abstract public function setFilterString(string $attribute, string $value, bool $exclude = false);
+
 }

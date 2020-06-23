@@ -265,12 +265,8 @@ class DomUtilsTest extends TestCase {
                 'forbiddenword',
                 '<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">',
                 '<img src="img_test.jpg" alt="*** image" width="100" height="100">'],
-
-        'emoji' => [
-            1,
-            '🤓','test 🤓', 'test ***'
-        ]
-         ];
+            'emoji' => [1, '🤓','test 🤓', 'test ***']
+        ];
         return $r;
     }
 }

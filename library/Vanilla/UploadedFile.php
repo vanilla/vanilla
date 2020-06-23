@@ -56,17 +56,19 @@ class UploadedFile {
     /** @var array Constraints for the image resizer. */
     private $imageConstraints;
 
-    /** @var ?int Max image upload height */
-    private $maxImageHeight;
+    /** @var int Max image upload height */
+    private $maxImageHeight = self::MAX_IMAGE_HEIGHT;
 
-    /** @var ?int Max image upload width */
-    private $maxImageWidth;
+    /** @var int Max image upload width */
+    private $maxImageWidth = self::MAX_IMAGE_WIDTH;
 
     /** @var int Protection max image upload height */
     public const MAX_IMAGE_HEIGHT = 3000;
 
     /** @var int Protection max image upload width */
     public const MAX_IMAGE_WIDTH = 3000;
+    /** @var bool */
+    private $sizeLimitsEnabled = null;
 
     /**
      * UploadedFile constructor.
@@ -255,7 +257,7 @@ class UploadedFile {
             "width" => $width ?? 0,
         ];
 
-        if (\Gdn::config("ImageUpload.Limits.Enabled")) {
+        if ($this->getSizeLimitsEnabled()) {
             $maxImageHeight = $this->getMaxImageHeight();
             $maxImageWidth = $this->getMaxImageWidth();
 
@@ -312,18 +314,18 @@ class UploadedFile {
     /**
      * Get max image upload height
      *
-     * @return ?int
+     * @return int
      */
-    public function getMaxImageHeight(): ?int {
+    public function getMaxImageHeight(): int {
         return $this->maxImageHeight;
     }
 
     /**
      * Get max image upload width
      *
-     * @return ?int
+     * @return int
      */
-    public function getMaxImageWidth(): ?int {
+    public function getMaxImageWidth(): int {
         return $this->maxImageWidth;
     }
 
@@ -485,14 +487,14 @@ class UploadedFile {
      * Set max image upload height
      * $maxImageHeight should an int greater or equal to 0, or null
      *
-     * @param ?int $maxImageHeight
+     * @param int $maxImageHeight
      * @return UploadedFile
      */
-    public function setMaxImageHeight(?int $maxImageHeight): self {
+    public function setMaxImageHeight(int $maxImageHeight): self {
         if (is_int($maxImageHeight) && $maxImageHeight < 0) {
             throw new InvalidArgumentException('height should be greater than or equal to 0.');
         }
-        $this->maxImageHeight = is_null($maxImageHeight) || $maxImageHeight >= self::MAX_IMAGE_HEIGHT ? self::MAX_IMAGE_HEIGHT : $maxImageHeight;
+        $this->maxImageHeight = $maxImageHeight;
         return $this;
     }
 
@@ -503,11 +505,11 @@ class UploadedFile {
      * @param ?int $maxImageWidth
      * @return UploadedFile
      */
-    public function setMaxImageWidth(?int $maxImageWidth): self {
-        if (is_int($maxImageWidth) && $maxImageWidth < 0) {
+    public function setMaxImageWidth(int $maxImageWidth): self {
+        if ($maxImageWidth < 0) {
             throw new InvalidArgumentException('width should be greater than or equal to 0.');
         }
-        $this->maxImageWidth = is_null($maxImageWidth) || $maxImageWidth >= self::MAX_IMAGE_WIDTH ? self::MAX_IMAGE_WIDTH : $maxImageWidth;
+        $this->maxImageWidth = $maxImageWidth;
         return $this;
     }
 
@@ -563,5 +565,31 @@ class UploadedFile {
      */
     public function setResolvedForeignUrl(?string $resolvedForeignUrl): void {
         $this->resolvedForeignUrl = $resolvedForeignUrl;
+    }
+
+    /**
+     * Whether or not size limits are enabled.
+     *
+     * @return bool
+     * @deprecated This method is subject to some refactoring. Please don't use it in new code.
+     */
+    public function getSizeLimitsEnabled(): bool {
+        if ($this->sizeLimitsEnabled === null) {
+            return (bool)\Gdn::config("ImageUpload.Limits.Enabled", false);
+        } else {
+            return $this->sizeLimitsEnabled;
+        }
+    }
+
+    /**
+     * Enable size limit enforcing on the upload.
+     *
+     * @param bool $sizeLimitsEnabled
+     * @return $this
+     * @deprecated This method is subject to some refactoring. Please don't use it in new code.
+     */
+    public function setSizeLimitsEnabled(?bool $sizeLimitsEnabled) {
+        $this->sizeLimitsEnabled = $sizeLimitsEnabled;
+        return $this;
     }
 }

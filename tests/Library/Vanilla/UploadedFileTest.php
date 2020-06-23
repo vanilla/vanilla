@@ -190,38 +190,6 @@ class UploadedFileTest extends TestCase {
     }
 
     /**
-     * Test UploadedFile->getMaxImageHeight()
-     *
-     * @param mixed $expected
-     * @param mixed $input
-     * @dataProvider provideDimensionsData
-     */
-    public function testGetMaxImageHeight($expected, $input) {
-        // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
-        $file->setMaxImageHeight($input);
-        $actual = $file->getMaxImageHeight();
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Test UploadedFile->getMaxImageWidth()
-     *
-     * @param mixed $expected
-     * @param mixed $input
-     * @dataProvider provideDimensionsData
-     */
-    public function testGetMaxImageWidth($expected, $input) {
-        // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
-        $file->setMaxImageWidth($input);
-        $actual = $file->getMaxImageWidth();
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
      * Provides data for testGetMaxImageHeight() and testGetMaxImageWidth()
      *
      * @return array

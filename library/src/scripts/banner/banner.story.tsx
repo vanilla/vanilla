@@ -382,7 +382,7 @@ export const LogoAndRightImage = storyWithConfig(
 (ImageAsElement as any).story = {
     parameters: {
         chromatic: {
-            viewports: [1400, globalVariables().content.width, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+            viewports: [1400, globalVariables().contentWidthPadding, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
         },
     },
 };

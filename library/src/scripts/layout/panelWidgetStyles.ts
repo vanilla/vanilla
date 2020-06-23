@@ -11,10 +11,11 @@ import { paddings } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const panelWidgetVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("panelWidget");
 
     const spacing = makeThemeVars("spacing", {
-        padding: 8,
+        padding: globalVars.halfPadding,
     });
 
     return { spacing };

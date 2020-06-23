@@ -191,31 +191,21 @@ export const searchResultClasses = useThemeCache(() => {
     const mediaWidth = vars.mediaElement.width + vars.spacing.padding.left;
     const iconWidth = vars.icon.size + vars.spacing.padding.left;
 
-    const main = style(
-        "main",
-        {
-            display: "block",
-            width: percent(100),
-            $nest: {
-                "&.hasMedia": {
-                    width: calc(`100% - ${unit(mediaWidth)}`),
-                },
-                "&.hasIcon": {
-                    width: calc(`100% - ${unit(iconWidth)}`),
-                },
-                "&.hasMedia.hasIcon": {
-                    width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
-                },
+    const main = style("main", {
+        display: "block",
+        width: percent(100),
+        $nest: {
+            "&.hasMedia": {
+                width: calc(`100% - ${unit(mediaWidth)}`),
+            },
+            "&.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+            "&.hasMedia.hasIcon": {
+                width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
             },
         },
-        mediaQueries.compact({
-            $nest: {
-                "&.hasMedia": {
-                    width: percent(100),
-                },
-            },
-        }),
-    );
+    });
 
     const mediaElement = style(
         "mediaElement",

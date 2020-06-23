@@ -11,10 +11,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, paddings, sticky, unit } from "@library/styles/styleHelpers";
 import { important } from "csx/lib/strings";
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
@@ -28,9 +26,6 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
-        fullGutter: globalVars.constants.fullGutter,
-        panelWidth: globalVars.panel.width,
-        middleColumnWidth: 700,
         minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
         breakPoints: {
@@ -40,37 +35,30 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const gutter = makeThemeVars("gutter", {
-        full: foundationalWidths.fullGutter, // 48
-        size: foundationalWidths.fullGutter / 2, // 24
-        halfSize: foundationalWidths.fullGutter / 4, // 12
-        quarterSize: foundationalWidths.fullGutter / 8, // 6
-    });
-
-    const fullPadding = panelWidgetVariables().spacing.padding * 2;
+    const gutter =  {
+        ...globalVars.gutter,
+    };
 
     const panel = makeThemeVars("panel", {
-        width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + fullPadding,
+        ...globalVars.panel,
     });
 
     const middleColumn = makeThemeVars("middleColumn", {
-        width: foundationalWidths.middleColumnWidth,
-        paddedWidth: foundationalWidths.middleColumnWidth + fullPadding,
+        ...globalVars.middleColumn,
     });
 
-    const globalContentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + fullPadding;
+    const contentWidth = globalVars.contentWidth;
 
     const contentSizes = makeThemeVars("content", {
-        full: globalContentWidth,
+        full: contentWidth,
         narrow:
-            foundationalWidths.narrowContentWidth < globalContentWidth
+            foundationalWidths.narrowContentWidth < contentWidth
                 ? foundationalWidths.narrowContentWidth
-                : globalContentWidth,
+                : contentWidth,
     });
 
     const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
-        noBleed: globalContentWidth,
+        noBleed: contentWidth,
         twoColumn: foundationalWidths.breakPoints.twoColumns,
         oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
         xs: foundationalWidths.breakPoints.xs,
@@ -82,7 +70,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bottom: 0,
         },
         padding: {
-            top: gutter.halfSize * 1.5,
+            top: gutter.size * 1.5,
         },
         extraPadding: {
             top: 32,
@@ -201,7 +189,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         panel,
         middleColumn,
         contentSizes,
-        globalContentWidth,
+        contentWidth,
         mediaQueries,
         panelLayoutSpacing,
         panelLayoutBreakPoints,
@@ -305,9 +293,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         padding: 0,
     });
 
-    const offset = panelBackgroundVariables().config.render
-        ? layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - panelWidgetVariables().spacing.padding * 2
-        : 0;
+    const offset = panelBackgroundVariables().config.render ? (layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - globalVars.gutter.half) : 0;
 
     const leftColumn = style("leftColumn", {
         position: "relative",

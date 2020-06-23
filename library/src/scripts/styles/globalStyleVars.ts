@@ -46,7 +46,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const constants = makeThemeVars("constants", {
         stateColorEmphasis: 0.15,
-        fullGutter: 48,
+        outerGutter: 24, // Will be split in 2 in CSS. Will switch to innerGutter on smaller screens
+        innerGutter: 16, // will be split in 2 in CSS
+        //[outerGutter][innerGutter][panel][innerGutter][content][innerGutter][panel][innerGutter][outerGutter]
         states: {
             hover: {
                 stateEmphasis: 0.08,
@@ -190,12 +192,19 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         dropDowns: border,
     });
 
-    const gutterSize = 16;
-    const gutter = makeThemeVars("gutter", {
-        size: gutterSize,
-        half: gutterSize / 2,
-        quarter: gutterSize / 4,
-    });
+    const gutter = {
+        bothSides: constants.innerGutter * 2,
+        size: constants.innerGutter,
+        half: constants.innerGutter / 2,
+        quarter: constants.innerGutter / 4,
+        full: constants.innerGutter * 2,
+    };
+
+    const outerGutter = {
+        bothSides: constants.outerGutter * 2,
+        size: constants.outerGutter,
+        half: constants.outerGutter / 2,
+    };
 
     const lineHeights = makeThemeVars("lineHeight", {
         base: 1.5,
@@ -206,9 +215,13 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const panelWidth = 216;
-    const panel = makeThemeVars("panelWidth", {
+    const panelInit = makeThemeVars("panelWidth", {
         width: panelWidth,
-        paddedWidth: panelWidth + gutter.size * 2,
+    });
+
+    const panel = makeThemeVars("panelWidth", {
+        width: panelInit.width,
+        paddedWidth: panelInit.width + gutter.size * 2,
     });
 
     const middleColumnWidth = 672;
@@ -221,9 +234,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         paddedWidth: middleColumnInit.width + gutter.size * 2,
     });
 
-    const content = makeThemeVars("content", {
-        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
-    });
+    const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
+    const contentWidthPadding = contentWidth + constants.outerGutter;
 
     const fontsInit0 = makeThemeVars("fonts", {
         size: {
@@ -477,11 +489,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         border,
         meta,
         gutter,
+        outerGutter,
         panel,
-        content,
+        middleColumn,
         fonts,
         spacer,
         lineHeights,
+        contentWidth,
+        contentWidthPadding,
         icon,
         buttonIcon,
         animation,

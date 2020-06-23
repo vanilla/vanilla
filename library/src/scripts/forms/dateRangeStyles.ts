@@ -16,8 +16,7 @@ export const dateRangeClasses = useThemeCache(() => {
     const style = styleFactory("dateRange");
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const mobileGutterSize =
-        panelWidgetVariables().spacing.padding + containerVariables().spacing.mobile.padding.horizontal;
+    const mobileGutterSize = globalVars.halfPadding + containerVariables().spacing.mobile.padding.horizontal;
 
     const input = style("input", {
         width: unit(136),

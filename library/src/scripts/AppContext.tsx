@@ -20,8 +20,9 @@ import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { BannerContextProvider, BannerContextProviderNoHistory } from "@library/banner/BannerContext";
+import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContext";
+import { TwoColumnLayoutDeviceProvider } from "@library/layout/TwoColumnLayoutDeviceContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -59,7 +60,11 @@ export function AppContext(props: IProps) {
                                         <SearchFormContextProvider>
                                             <TitleBarDeviceProvider>
                                                 <BannerContextProviderNoHistory>
-                                                    <DeviceProvider>{props.children}</DeviceProvider>
+                                                    <DeviceProvider>
+                                                        <TwoColumnLayoutDeviceProvider>
+                                                            {props.children}
+                                                        </TwoColumnLayoutDeviceProvider>
+                                                    </DeviceProvider>
                                                 </BannerContextProviderNoHistory>
                                             </TitleBarDeviceProvider>
                                         </SearchFormContextProvider>

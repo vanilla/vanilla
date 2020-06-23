@@ -12,40 +12,39 @@ import { unit } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { IPanelLayoutClasses, layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const panelLayoutVars = layoutVariables();
     const makeThemeVars = variableFactory("twoColumnLayout", forcedVars);
-    const fullPadding = panelWidgetVariables().spacing.padding * 2;
 
-    const { gutter, globalContentWidth } = panelLayoutVars;
-    const { fullGutter } = panelLayoutVars.foundationalWidths;
+    const { gutter, contentWidth } = panelLayoutVars;
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
-        fullGutter,
-        minimalMiddleColumnWidth: 600,
-        panelWidth: 343,
+        minimalMiddleColumnWidth: 500,
         breakPoints: {
             xs: panelLayoutVars.foundationalWidths.breakPoints.xs,
         }, // Other break point are calculated
     });
 
-    const panel = makeThemeVars("panel", {
-        width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + fullPadding * 2,
+    const panelInit = makeThemeVars("panel", {
+        width: 343,
     });
 
-    const mainColumnPaddedWidth = globalContentWidth - gutter.size - panel.paddedWidth;
-    const mainColumnWidth = mainColumnPaddedWidth - fullPadding * 2;
+    const panel = makeThemeVars("panel", {
+        width: panelInit.width,
+        paddedWidth: panelInit.width + gutter.bothSides,
+    });
+
+    const mainColumnPaddedWidth = contentWidth - panel.paddedWidth;
+    const mainColumnWidth = mainColumnPaddedWidth - gutter.bothSides;
 
     const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", panelLayoutVars.panelLayoutSpacing);
 
     const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
-        noBleed: globalContentWidth,
-        oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
+        noBleed: contentWidth,
+        oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth + globalVars.outerGutter.bothSides,
         xs: foundationalWidths.breakPoints.xs,
     });
 
@@ -72,8 +71,8 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.oneColumn),
-                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.xs + 1) : undefined,
+                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.oneColumn + 1) : undefined,
                 },
                 styles,
             );

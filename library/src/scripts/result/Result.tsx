@@ -66,9 +66,9 @@ export default function Result(props: IResult) {
     return (
         <li className={classNames(classesSearchResults.item, className)}>
             <article className={classNames(classesSearchResults.result)}>
-                <div className={classNames(classes.root, { hasIcon: !!icon })}>
+                <div className={classNames(classes.root)}>
                     {icon && <div className={classes.iconWrap}>{icon}</div>}
-                    <div className={classNames(classes.main, { hasMedia: !!media })}>
+                    <div className={classNames(classes.main, { hasMedia: !!media, hasIcon: !!icon })}>
                         <SmartLink to={url} tabIndex={0} className={classes.link}>
                             <HeadingTag className={classes.title}>{name}</HeadingTag>
                         </SmartLink>

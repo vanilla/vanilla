@@ -10,7 +10,6 @@ import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
@@ -34,6 +33,9 @@ import qs from "qs";
 import * as React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { TwoColumnDevices, useTwoColumnLayoutDevice } from "@library/layout/TwoColumnLayoutDeviceContext";
+import { twoColumnLayoutVariables } from "@library/layout/twoColumnLayoutStyles";
 
 interface IProps {
     placeholder?: string;
@@ -49,8 +51,11 @@ function SearchPage(props: IProps) {
         getCurrentDomain,
         getDefaultFormValues,
     } = useSearchForm<{}>();
-    const device = useDevice();
+
+    const device = useTwoColumnLayoutDevice();
+    const Devices = TwoColumnDevices;
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
+
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
 
@@ -142,7 +147,7 @@ function SearchPage(props: IProps) {
                         </>
                     }
                     middleBottom={<SearchPageResults />}
-                    rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
+                    rightTop={!isMobile && <PanelWidget>here{currentFilter}</PanelWidget>}
                 />
             </Container>
         </DocumentTitle>

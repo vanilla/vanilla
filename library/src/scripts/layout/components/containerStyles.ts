@@ -10,22 +10,19 @@ import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
-    const smallPadding = panelWidgetVariables().spacing.padding;
-
     let spacingInit = makeThemeVars("spacing", {
         padding: {
-            horizontal: vars.gutter.size,
+            horizontal: globalVars.outerGutter.size,
         },
         mobile: {
             padding: {
-                horizontal: smallPadding,
+                horizontal: globalVars.gutter.half,
             },
         },
     });
@@ -33,10 +30,10 @@ export const containerVariables = useThemeCache(() => {
     const spacing = makeThemeVars("spacing", {
         ...spacingInit,
         paddingFull: {
-            horizontal: vars.gutter.size + smallPadding,
+            horizontal: vars.gutter.size,
         },
         paddingFullMobile: {
-            horizontal: smallPadding * 2,
+            horizontal: globalVars.gutter.size,
         },
     });
 
@@ -65,7 +62,7 @@ export const containerMainStyles = (): NestedCSSProperties => {
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: globalVars.content.width,
+        maxWidth: globalVars.contentWidthPadding,
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),

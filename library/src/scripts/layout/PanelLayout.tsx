@@ -4,6 +4,7 @@
  */
 
 import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { TwoColumnDevices, useTwoColumnLayoutDevice } from "@library/layout/TwoColumnLayoutDeviceContext";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { IPanelLayoutClasses, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
@@ -15,6 +16,7 @@ import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
+import { twoColumnLayoutClasses } from "@library/layout/twoColumnLayoutStyles";
 
 export interface IPanelLayoutProps {
     className?: string;
@@ -31,7 +33,7 @@ export interface IPanelLayoutProps {
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
-    classes?: IPanelLayoutClasses;
+    isTwoColumnLayout?: boolean;
 }
 
 /**
@@ -65,14 +67,19 @@ export interface IPanelLayoutProps {
  * | RightBottom  |
  */
 export default function PanelLayout(props: IPanelLayoutProps) {
-    const { topPadding, className, growMiddleBottom, isFixed, ...childComponents } = props;
+    const { topPadding, className, growMiddleBottom, isFixed, isTwoColumnLayout, ...childComponents } = props;
 
     // Handle window resizes
 
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const device = useDevice();
+    const defaultDevices = useDevice();
+    const twoColumnDevices = useTwoColumnLayoutDevice();
+    const LayoutDevices = twoColumnDevices ? TwoColumnDevices : Devices;
+    const device = isTwoColumnLayout ? twoColumnDevices : defaultDevices;
+    const classes = isTwoColumnLayout ? twoColumnLayoutClasses() : panelLayoutClasses();
+
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
     const measuredPanelTop = sidePanelMeasure.top;
@@ -87,12 +94,24 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     ]);
 
     // Calculate some rendering variables.
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const isTablet = device === Devices.TABLET;
-    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-    const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
-    const shouldRenderRightPanel: boolean = isFullWidth || (isTablet && !shouldRenderLeftPanel);
-    const classes = props.classes ?? panelLayoutClasses();
+    const isMobile = device === LayoutDevices.MOBILE || device === LayoutDevices.XS;
+    const isTablet = isTwoColumnLayout ? false : device === Devices.TABLET;
+    const isFullWidth = [LayoutDevices.DESKTOP, LayoutDevices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+
+    const shouldRenderLeftPanel: boolean = isTwoColumnLayout
+        ? false
+        : !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
+
+    const shouldRenderRightPanel: boolean =
+        isFullWidth || ((!isTwoColumnLayout ? isTablet : !isMobile) && !shouldRenderLeftPanel);
+
+    // console.log("");
+    // console.log("device: ", device);
+    // console.log("isMobile: ", isMobile);
+    // console.log("isTablet: ", isTablet);
+    // console.log("isFullWidth: ", isFullWidth);
+    // console.log("shouldRenderLeftPanel: ", shouldRenderLeftPanel);
+    // console.log("shouldRenderRightPanel: ", shouldRenderRightPanel);
 
     // Determine the classes we want to display.
     const panelClasses = classNames(

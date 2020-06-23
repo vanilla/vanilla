@@ -4,10 +4,9 @@
  */
 import React from "react";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { twoColumnLayoutClasses } from "@library/layout/twoColumnLayoutStyles";
 
 interface IProps extends Omit<IPanelLayoutProps, "leftTop" | "leftBottom" | "renderLeftPanelBackground"> {}
 
 export default function TwoColumnLayout(props: IProps) {
-    return <PanelLayout {...props} classes={twoColumnLayoutClasses()} />;
+    return <PanelLayout {...props} isTwoColumnLayout={true} />;
 }

@@ -241,6 +241,7 @@ class UploadedFileTest extends TestCase {
     /**
      * Test UploadedFile->setMaxImageHeight() with bad values
      *
+     * @param mixed $actual
      * @dataProvider provideBadDimensionsData
      */
     public function testBadGetMaxImageHeight($actual) {
@@ -255,6 +256,7 @@ class UploadedFileTest extends TestCase {
     /**
      * Test UploadedFile->setMaxImageWidth() with bad values
      *
+     * @param mixed $actual
      * @dataProvider provideBadDimensionsData
      */
     public function testBadGetMaxImageWidth($actual) {

@@ -24,9 +24,9 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
     /**
      * PregReplaceCallbackProcessor constructor.
      *
-     * @param callable $callback
      * @param HtmlDocument $document
      * @param array $pattern
+     * @param callable $callback
      */
     public function __construct(HtmlDocument $document, array $pattern, callable $callback) {
         parent::__construct($document);

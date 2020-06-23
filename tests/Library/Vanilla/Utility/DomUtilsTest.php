@@ -225,7 +225,7 @@ class DomUtilsTest extends TestCase {
         $domDocument = new HtmlDocument($input);
         $dom = $domDocument->getDom();
         $pattern = ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'];
-        $count = DomUtils::pregReplaceCallback($dom, $pattern, function(array $matches): string {
+        $count = DomUtils::pregReplaceCallback($dom, $pattern, function (array $matches): string {
             return '***';
         });
         $actual = $domDocument->getInnerHtml();
@@ -253,7 +253,10 @@ class DomUtilsTest extends TestCase {
             'Mixed nested' => [2, 'blocked word', 'a <b>test blocked word</b> test blocked word', 'a <b>test ***</b> test ***'],
             'aria-label' => [2,'forbiddenword', '<button aria-label="forbiddenword content" onclick="myDialog.close()">forbiddenword content</button>',
                 '<button aria-label="*** content" onclick="myDialog.close()">*** content</button>'],
-            'alt' => [1,'forbiddenword','<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">','<img src="img_test.jpg" alt="*** image" width="100" height="100">']
+            'alt' => [1,
+                'forbiddenword',
+                '<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">',
+                '<img src="img_test.jpg" alt="*** image" width="100" height="100">']
         ];
         return $r;
     }

@@ -24,6 +24,7 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
     /**
      * PregReplaceCallbackProcessor constructor.
      *
+     * @param callable $callback
      * @param HtmlDocument $document
      * @param array $pattern
      */
@@ -47,7 +48,7 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
      * Apply DomUtils::pregReplaceCallback()
      */
     private function applyPregReplaceProcessor() {
-      DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback);
+        DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback);
     }
 
     /**
@@ -62,7 +63,9 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
     }
 
     /**
-     * @param $callback
+     * Set callback
+     *
+     * @param callable $callback
      * @return $this
      */
     private function setCallback($callback) {

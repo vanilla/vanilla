@@ -90,7 +90,7 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
     public function testPregReplaceCallback($expectedCount, string $patternText, string $input, string $expected): void {
         $domDocument = new HtmlDocument($input);
         $this->assertHtmlStringEqualsHtmlString($input, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
-        $pregReplaceCallbackProcessor = new PregReplaceCallbackProcessor($domDocument,['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'], function(array $matches): string {
+        $pregReplaceCallbackProcessor = new PregReplaceCallbackProcessor($domDocument, ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'], function(array $matches): string {
             return '***';
         });
         $domDocument->applyProcessors([$pregReplaceCallbackProcessor]);

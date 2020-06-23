@@ -59,10 +59,8 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
     const onChange = (value: ISelectBoxItem) => {
         const funct = props.onChange || setOwnValue;
         funct(value);
-        setForceClosed(true);
         setTimeout(() => {
             buttonRef.current && buttonRef.current.focus();
-            setForceClosed(false);
         }, 300);
     };
 
@@ -74,32 +72,30 @@ export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledP
             className={classNames("selectBox", props.className)}
         >
             {"label" in props && props.label && <span className=" sr-only">{props.label}</span>}
-            {forceClosed ? null : (
-                <DropDown
-                    key={selectedOption ? selectedOption.value : undefined}
-                    buttonRef={buttonRef}
-                    id={id}
-                    className={classNames(
-                        "selectBox-dropDown",
-                        "dropDownItem-verticalPadding",
-                        classesDropDown.verticalPadding,
-                        { [classes.offsetPadding]: props.offsetPadding },
-                    )}
-                    buttonContents={<SelectBoxButton activeItem={selectedOption} />}
-                    buttonClassName={classNames(props.buttonClassName, classes.toggle)}
-                    contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
-                    buttonBaseClass={props.buttonBaseClass}
-                    openAsModal={props.openAsModal}
-                    flyoutType={FlyoutType.LIST}
-                    renderLeft={renderLeft}
-                    horizontalOffset={true}
-                >
-                    {props.options.map((option, i) => {
-                        const isSelected = selectedOption && option.value === selectedOption.value;
-                        return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
-                    })}
-                </DropDown>
-            )}
+            <DropDown
+                key={selectedOption ? selectedOption.value : undefined}
+                buttonRef={buttonRef}
+                id={id}
+                className={classNames(
+                    "selectBox-dropDown",
+                    "dropDownItem-verticalPadding",
+                    classesDropDown.verticalPadding,
+                    { [classes.offsetPadding]: props.offsetPadding },
+                )}
+                buttonContents={<SelectBoxButton activeItem={selectedOption} />}
+                buttonClassName={classNames(props.buttonClassName, classes.toggle)}
+                contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
+                buttonBaseClass={props.buttonBaseClass}
+                openAsModal={props.openAsModal}
+                flyoutType={FlyoutType.LIST}
+                renderLeft={renderLeft}
+                horizontalOffset={true}
+            >
+                {props.options.map((option, i) => {
+                    const isSelected = selectedOption && option.value === selectedOption.value;
+                    return <SelectBoxItem key={i} item={option} isSelected={!!isSelected} onClick={onChange} />;
+                })}
+            </DropDown>
         </div>
     );
 }

@@ -131,20 +131,7 @@ function SearchPage(props: IProps) {
                                     pages={results.data?.pagination}
                                     sortValue={form.sort}
                                     onSortChange={newSort => updateForm({ sort: newSort })}
-                                    sortOptions={[
-                                        {
-                                            value: "relevance",
-                                            name: t("Relevance"),
-                                        },
-                                        {
-                                            value: "dateInserted",
-                                            name: t("Newest First"),
-                                        },
-                                        {
-                                            value: "-dateInserted",
-                                            name: t("Oldest First"),
-                                        },
-                                    ]}
+                                    sortOptions={[]}
                                 />
                             </PanelWidgetHorizontalPadding>
                             {isMobile && (

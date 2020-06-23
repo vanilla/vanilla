@@ -65,6 +65,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 'recordType:s',
                 'type:s',
                 'recordID:s',
+                'foreignID:s?',
                 'name:s',
                 'url' => [
                     'type' => 'string',
@@ -118,6 +119,13 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      */
     public function getUrl(): string {
         return $this->data['url'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getForeignID(): string {
+        return $this->data['foreignID'];
     }
 
     ///

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import {margins, unit} from "@library/styles/styleHelpers";
+import { margins, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
@@ -31,7 +31,7 @@ export const simplePagerVariables = useThemeCache(() => {
 export const simplePagerClasses = useThemeCache(() => {
     const vars = simplePagerVariables();
     const style = styleFactory("simplePager");
-    const {spacing} = vars;
+    const { spacing } = vars;
 
     const root = style({
         alignItems: "center",
@@ -39,7 +39,7 @@ export const simplePagerClasses = useThemeCache(() => {
         justifyContent: "center",
         ...margins({
             top: spacing.top - spacing.button,
-            bottom: spacing.bottom -  spacing.button,
+            bottom: spacing.bottom - spacing.button,
         }),
     });
 

@@ -7,7 +7,7 @@ import React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
-import {twoColumnLayoutVariables} from "@library/layout/twoColumnLayoutStyles";
+import { twoColumnLayoutVariables } from "@library/layout/twoColumnLayoutStyles";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 
 export default {
@@ -41,8 +41,6 @@ export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
         </DeviceProvider>
     );
 });
-
-
 
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (

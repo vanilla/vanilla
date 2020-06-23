@@ -78,9 +78,14 @@ export const inputMixinVars = (vars?: { sizing?: any; font?: any; colors?: any; 
 export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
     const variables = inputMixinVars(vars);
     const globalVars = globalVariables();
-    const { sizing, font = {
-        size: globalVars.fonts.size.large,
-    }, colors, border } = variables;
+    const {
+        sizing,
+        font = {
+            size: globalVars.fonts.size.large,
+        },
+        colors,
+        border,
+    } = variables;
 
     return {
         ...textInputSizingFromFixedHeight(sizing.height, font.size, border.width * 2),

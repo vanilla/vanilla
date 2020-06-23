@@ -11,8 +11,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import {IPanelLayoutClasses, layoutVariables, panelLayoutClasses} from "@library/layout/panelLayoutStyles";
-import {panelWidgetVariables} from "@library/layout/panelWidgetStyles";
+import { IPanelLayoutClasses, layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -20,8 +20,8 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
     const makeThemeVars = variableFactory("twoColumnLayout", forcedVars);
     const fullPadding = panelWidgetVariables().spacing.padding * 2;
 
-    const {gutter, globalContentWidth } = panelLayoutVars;
-    const {fullGutter} = panelLayoutVars.foundationalWidths;
+    const { gutter, globalContentWidth } = panelLayoutVars;
+    const { fullGutter } = panelLayoutVars.foundationalWidths;
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
@@ -116,7 +116,6 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         };
     };
 
-
     return {
         foundationalWidths,
         gutter,
@@ -155,7 +154,7 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
         },
     });
 
-    const leftColumn =  style("leftColumn", {});
+    const leftColumn = style("leftColumn", {});
 
     return {
         ...panelLayoutClasses(),

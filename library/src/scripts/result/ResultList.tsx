@@ -8,9 +8,9 @@ import React from "react";
 import classNames from "classnames";
 import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import Translate from "@library/content/Translate";
-import Result, {IResult} from "@library/result/Result";
+import Result, { IResult } from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
-import {t} from "@vanilla/i18n/src";
+import { t } from "@vanilla/i18n/src";
 
 interface IProps {
     className?: string;
@@ -25,15 +25,7 @@ interface IProps {
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
 export default function ResultList(props: IProps) {
-
-    const {
-        className,
-        searchTerm,
-        results,
-        result,
-        emptyMessage = t("No results found."),
-        headingLevel,
-    } = props;
+    const { className, searchTerm, results, result, emptyMessage = t("No results found."), headingLevel } = props;
 
     const hasResults = results && results.length > 0;
     let content;
@@ -46,9 +38,7 @@ export default function ResultList(props: IProps) {
         });
     } else if (searchTerm === undefined || searchTerm === "") {
         content = (
-            <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>
-                {emptyMessage}
-            </Paragraph>
+            <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>{emptyMessage}</Paragraph>
         );
     } else {
         content = (
@@ -61,5 +51,4 @@ export default function ResultList(props: IProps) {
     const Tag = hasResults ? `ul` : `div`;
 
     return <Tag className={classNames("searchResults", classes.root, className)}>{content}</Tag>;
-
 }

@@ -1,4 +1,3 @@
-
 /**
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -15,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import {PanelWidget, PanelWidgetHorizontalPadding} from "@library/layout/PanelLayout";
+import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";

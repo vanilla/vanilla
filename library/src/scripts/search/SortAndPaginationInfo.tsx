@@ -30,7 +30,6 @@ export function SortAndPaginationInfo(props: ISearchSortAndPages) {
         return null;
     }
 
-
     let content = <ResultPaginationInfo pages={props.pages} />;
 
     return (

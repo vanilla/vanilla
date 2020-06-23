@@ -15,12 +15,13 @@ import {
     unit,
     userSelect,
     margins,
-    paddings, fonts,
+    paddings,
+    fonts,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {calc, em, important, percent, px} from "csx";
+import { calc, em, important, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const checkRadioVariables = useThemeCache(() => {
@@ -115,7 +116,7 @@ export const checkRadioClasses = useThemeCache(() => {
         width: calc(`100% - ${unit(vars.sizing.width)}`),
         ...fonts({
             weight: globalVars.fonts.weights.semiBold,
-        })
+        }),
     });
 
     const labelNote = style("labelNote", {
@@ -164,7 +165,7 @@ export const checkRadioClasses = useThemeCache(() => {
         borderRadius: percent(50),
     });
 
-    const diskIcon = style("diskIcon",{
+    const diskIcon = style("diskIcon", {
         display: "none",
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,

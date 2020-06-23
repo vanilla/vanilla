@@ -6,9 +6,8 @@
 
 import React from "react";
 import SmartLink from "@library/routing/links/SmartLink";
-import {searchResultClasses} from "@library/features/search/searchResultsStyles";
+import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import classNames from "classnames";
-
 
 interface IProps {
     className?: string;
@@ -19,12 +18,12 @@ interface IProps {
 /**
  * Generates search result list. Note that this template is used in other contexts, such as the flat category list
  */
-export default function SearchLink(props:IProps) {
-    const {
-        label,
-        className,
-        url,
-    } = props;
+export default function SearchLink(props: IProps) {
+    const { label, className, url } = props;
 
-    return <SmartLink to={url} className={classNames(searchResultClasses().afterExcerptLink, className)}>{label}</SmartLink>
+    return (
+        <SmartLink to={url} className={classNames(searchResultClasses().afterExcerptLink, className)}>
+            {label}
+        </SmartLink>
+    );
 }

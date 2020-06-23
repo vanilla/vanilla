@@ -5,15 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {colorOut, negativeUnit, unit} from "@library/styles/styleHelpers";
+import { colorOut, negativeUnit, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
-import {NestedCSSProperties} from "typestyle/lib/types";
-import {checkRadioClasses} from "@library/forms/checkRadioStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 
 export const inputBlockClasses = useThemeCache(() => {
     const style = styleFactory("inputBlock");
@@ -139,16 +139,16 @@ export const inputBlockClasses = useThemeCache(() => {
             },
             [`&.${fieldsetGroup}`]: {
                 marginTop: unit(9),
-            }
-        }
+            },
+        },
     } as NestedCSSProperties);
 
     const tight = style("tight", {
         $nest: {
             [`&&&`]: {
                 marginTop: negativeUnit(9),
-            }
-        }
+            },
+        },
     });
 
     return {

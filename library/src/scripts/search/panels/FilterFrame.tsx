@@ -11,7 +11,7 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import React from "react";
-import {filterPanelClasses} from "@library/search/panels/FilterPanel.styles";
+import { filterPanelClasses } from "@library/search/panels/FilterPanel.styles";
 
 export interface ISearchFilterPanel {
     title?: string;
@@ -37,7 +37,14 @@ export function FilterFrame(props: ISearchFilterPanel) {
     return (
         <form onSubmit={onSubmit} aria-describedby={titleID}>
             <Frame
-                header={<FrameHeader titleID={titleID} title={title} className={classes.header} titleClass={classes.title} />}
+                header={
+                    <FrameHeader
+                        titleID={titleID}
+                        title={title}
+                        className={classes.header}
+                        titleClass={classes.title}
+                    />
+                }
                 body={<FrameBody className={classes.body}>{children}</FrameBody>}
                 footer={
                     <FrameFooter justifyRight={true} className={classes.footer}>

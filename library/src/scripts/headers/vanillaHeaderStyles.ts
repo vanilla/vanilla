@@ -22,7 +22,7 @@ import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@lib
 import { calc, ColorHelper, percent, px, quote, rgba, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import {BackgroundColorProperty, ColorProperty} from "csstype";
+import { BackgroundColorProperty, ColorProperty } from "csstype";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();

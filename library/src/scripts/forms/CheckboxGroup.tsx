@@ -6,11 +6,11 @@
 
 import React from "react";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
-import {inputBlockClasses} from "@library/forms/InputBlockStyles";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export interface ICheckboxGroup extends IInputBlockProps {}
 
-export default function CheckboxGroup(props: ICheckboxGroup){
+export default function CheckboxGroup(props: ICheckboxGroup) {
     const classes = inputBlockClasses();
     return (
         <InputBlock {...props} legend={true}>

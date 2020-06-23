@@ -287,12 +287,11 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-
     const radioPresetInit2 = makeThemeVars("radio", {
         ...radioPresetInit1,
         borders: {
             ...globalVars.border,
-            radius: radioPresetInit1.sizing.minHeight/2
+            radius: radioPresetInit1.sizing.minHeight / 2,
         },
         state: {
             colors: {
@@ -300,15 +299,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             },
             borders: {
                 color: globalVars.mainColors.primary,
-                radius: radioPresetInit1.sizing.minHeight/2
-            }
+                radius: radioPresetInit1.sizing.minHeight / 2,
+            },
         },
         //special case
         active: {
-            color: colorOut(globalVars.mixBgAndFg(.1)),
-        }
+            color: colorOut(globalVars.mixBgAndFg(0.1)),
+        },
     });
-
 
     const radio: IButtonType = makeThemeVars("radio", {
         name: ButtonTypes.RADIO,
@@ -344,14 +342,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 });
 
 export const buttonSizing = (props: {
-    minHeight,
-    minWidth,
-    fontSize,
-    paddingHorizontal,
-    formElementVars,
-    borderRadius,
-    skipDynamicPadding,
-    debug?: boolean,
+    minHeight;
+    minWidth;
+    fontSize;
+    paddingHorizontal;
+    formElementVars;
+    borderRadius;
+    skipDynamicPadding;
+    debug?: boolean;
 }) => {
     const buttonGlobals = buttonGlobalVariables();
     const {
@@ -368,14 +366,16 @@ export const buttonSizing = (props: {
     const borderWidth = formElementVars.borders ? formElementVars.borders : buttonGlobals.border.width;
     const height = minHeight ?? formElementVars.sizing.minHeight;
 
-    const paddingOffsets = !skipDynamicPadding ? paddingOffsetBasedOnBorderRadius({
-        radius: borderRadius,
-        extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
-        height,
-    }) : {
-        right: 0,
-        left: 0,
-    };
+    const paddingOffsets = !skipDynamicPadding
+        ? paddingOffsetBasedOnBorderRadius({
+              radius: borderRadius,
+              extraPadding: buttonGlobals.padding.fullBorderRadius.extraHorizontalPadding,
+              height,
+          })
+        : {
+              right: 0,
+              left: 0,
+          };
 
     return {
         minHeight: unit(height),
@@ -554,8 +554,8 @@ export const buttonLoaderClasses = useThemeCache(() => {
             $nest: {
                 [`& + .suggestedTextInput-parentTag`]: {
                     display: "none",
-                }
-            }
+                },
+            },
         }),
     );
 

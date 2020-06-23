@@ -97,8 +97,8 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                         classesInputBlock.inputWrap,
                         this.props.wrapClassName,
                         [classesInputBlock.fieldsetGroup],
-                        {[classesInputBlock.grid] : this.props.grid},
-                        {[classesInputBlock.tight] : this.props.tight},
+                        { [classesInputBlock.grid]: this.props.grid },
+                        { [classesInputBlock.tight]: this.props.tight },
                         { noMargin: this.props.noMargin },
                     )}
                 >

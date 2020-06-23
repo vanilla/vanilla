@@ -28,14 +28,10 @@ export function Container(props: IContainer) {
         const Tag = tag || "div";
         return (
             <Tag
-                className={classNames(
-                    classes.root,
-                    className,
-                    {
-                        [classes.fullGutter] : fullGutter,
-                        "isNarrow" : narrow,
-                    }
-                )}
+                className={classNames(classes.root, className, {
+                    [classes.fullGutter]: fullGutter,
+                    isNarrow: narrow,
+                })}
             >
                 {children}
             </Tag>

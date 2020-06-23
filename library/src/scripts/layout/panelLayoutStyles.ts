@@ -209,20 +209,20 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 });
 
 export interface IPanelLayoutClasses {
-    root: string,
-    content: string,
-    top: string,
-    main: string,
-    container: string,
-    fullWidth: string,
-    leftColumn: string,
-    rightColumn: string,
-    middleColumn: string,
-    middleColumnMaxWidth: string,
-    panel: string,
-    isSticky: string,
-    breadcrumbs: string,
-    breadcrumbsContainer: string,
+    root: string;
+    content: string;
+    top: string;
+    main: string;
+    container: string;
+    fullWidth: string;
+    leftColumn: string;
+    rightColumn: string;
+    middleColumn: string;
+    middleColumnMaxWidth: string;
+    panel: string;
+    isSticky: string;
+    breadcrumbs: string;
+    breadcrumbsContainer: string;
 }
 
 export const panelLayoutClasses = useThemeCache(() => {

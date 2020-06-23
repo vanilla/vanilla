@@ -10,8 +10,8 @@ import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import {LiveMessage} from "react-aria-live";
-import {sprintf} from "sprintf-js";
+import { LiveMessage } from "react-aria-live";
+import { sprintf } from "sprintf-js";
 
 export interface IBaseRadioProps {
     label: string;
@@ -90,14 +90,24 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
                     <ButtonLoader />
                 ) : (
                     <>
-                        {icon && <span aria-hidden={true} className={classes["iconWrap"] ?? undefined}>{icon}</span>}
+                        {icon && (
+                            <span aria-hidden={true} className={classes["iconWrap"] ?? undefined}>
+                                {icon}
+                            </span>
+                        )}
                         <ConditionalWrap condition={!!icon} className={classes["labelWrap"]}>
                             {props.label}
                         </ConditionalWrap>
                     </>
                 )}
             </span>
-            {active && <LiveMessage clearOnUnmount={true} message={sprintf('Search for: "%s"', props.label)} aria-live="polite" />}
+            {active && (
+                <LiveMessage
+                    clearOnUnmount={true}
+                    message={sprintf('Search for: "%s"', props.label)}
+                    aria-live="polite"
+                />
+            )}
         </label>
     );
 }

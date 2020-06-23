@@ -51,7 +51,16 @@ export class SelectLookup extends React.Component<ISelectLookupProps, IState> {
             });
         }
 
-        return <SelectOne {...this.props} options={options} onInputChange={this.onInputChange} />;
+        return (
+            <SelectOne
+                {...this.props}
+                options={options}
+                onMenuOpen={() => {
+                    this.onInputChange(this.props.value?.value.toString() ?? "");
+                }}
+                onInputChange={this.onInputChange}
+            />
+        );
     }
 
     /**

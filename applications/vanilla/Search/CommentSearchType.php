@@ -93,25 +93,47 @@ class CommentSearchType extends DiscussionSearchType {
     }
 
     public function generateSql(MysqlSearchQuery $query): string {
+        $types = $query->getQueryParameter('types');
+
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
+            // discussions are not the part of this search query request
+            // we don't need to do anything
+            return '';
+        }
+
+        $types = $query->getQueryParameter('recordTypes');
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
+            // discussions are not the part of this search query request
+            // we don't need to do anything
+            return '';
+        }
         /** @var \Gdn_SQLDriver $db */
         $db = $query->getDB();
         $db->reset();
 
         $categoryIDs = $this->getCategoryIDs($query);
 
+        if (false !== $query->get('expandBody', null)) {
+            $db->select('d.Body as body');
+        }
+
         $db->reset();
 
         // Build base query
         $db->from('Comment c')
-            ->select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID, c.Score')
+            ->select('c.CommentID as recordID, d.Name as Title, c.Format, d.CategoryID, c.Score')
             ->select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
             ->select('c.DateInserted')
-            ->select('null as `Type`')
+            ->select('null as `recordType`')
             ->select('c.InsertUserID as UserID')
-            ->select("'Comment'", '', 'RecordType')
+            ->select("'comment'", '', 'type')
             ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
             ->orderBy('c.DateInserted', 'desc')
         ;
+
+        if (false !== $query->get('expandBody', null)) {
+            $db->select('c.Body as body');
+        }
 
         $terms = $query->get('query', false);
         if ($terms) {
@@ -124,7 +146,7 @@ class CommentSearchType extends DiscussionSearchType {
             $db->where('d.InsertUserID', $author);
         }
 
-        if ($discussionID = $query->get('discussionid', false)) {
+        if ($discussionID = $query->get('discussionID', false)) {
             $db->where('d.DiscussionID', $discussionID);
         }
 
@@ -136,7 +158,7 @@ class CommentSearchType extends DiscussionSearchType {
         $offset = $query->get('offset', 0);
         $db->limit($limit + $offset);
 
-        $sql = $db->getSelect();
+        $sql = $db->getSelect(true);
         $db->reset();
 
         return $sql;

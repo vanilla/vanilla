@@ -45,12 +45,13 @@ class MysqlSearchQuery extends SearchQuery {
                 $sql .= empty($sql) ? '' : ' union all ';
                 $sql .= ' ( '.$subQuery.' ) ';
             }
+            $sql .= ' ORDER BY DateInserted DESC '.PHP_EOL;
+            $limit = $this->getQueryParameter('limit', 100);
+            $offset = $this->getQueryParameter('offset', 0);
+            $sql .= ' LIMIT '.$limit;
+            $sql .= ($offset > 0) ? ', '.$offset : '';
         }
-        $sql .= ' ORDER BY DateInserted DESC '.PHP_EOL;
-        $limit = $this->getQueryParameter('limit', 100);
-        $offset = $this->getQueryParameter('offset', 0);
-        $sql .= ' LIMIT '.$limit;
-        $sql .= ($offset > 0) ? ', '.$offset : '';
+
 
         return $sql;
     }
@@ -64,6 +65,8 @@ class MysqlSearchQuery extends SearchQuery {
     }
 
     public function addSql(string $sql) {
-        $this->sql[] = $sql;
+        if (!empty($sql)) {
+            $this->sql[] = $sql;
+        }
     }
 }

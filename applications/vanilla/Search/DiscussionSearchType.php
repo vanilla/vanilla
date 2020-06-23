@@ -111,7 +111,14 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function applyToQuery(SearchQuery $query) {
         $types = $query->getQueryParameter('types');
-        if ((count($types) > 0) && !in_array($this->getType(), $types)) {
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
+            // discussions are not the part of this search query request
+            // we don't need to do anything
+            return;
+        }
+
+        $types = $query->getQueryParameter('recordTypes');
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
             return;
@@ -144,7 +151,7 @@ class DiscussionSearchType extends AbstractSearchType {
                 $query->setFilter('Tags', $tagIDs, false, $tagOp);
             }
         } elseif ($query instanceof MysqlSearchQuery) {
-            $query->addSql($this->generateSql($query));
+             $query->addSql($this->generateSql($query));
         }
     }
 
@@ -160,6 +167,14 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function getQuerySchema(): Schema {
         return $this->schemaWithTypes(Schema::parse([
+            'query:s?' => [
+                'description' => 'Filter the records using the supplied terms.',
+                'x-search-filter' => true,
+            ],
+            'name:s?' => [
+                'description' => 'Filter the records by matching part of their name.',
+                'x-search-filter' => true,
+            ],
             'discussionID:i?' => [
                 'x-search-scope' => true,
             ],
@@ -173,6 +188,18 @@ class DiscussionSearchType extends AbstractSearchType {
                 'x-search-filter' => true,
             ],
             'includeArchivedCategories:b?' => [
+                'x-search-filter' => true,
+            ],
+            'insertUserIDs:a?' => [
+                'items' => ['type' => 'integer'],
+                'style' => 'form',
+                'description' => 'Filter the records by inserted userIDs.',
+                'x-search-filter' => true,
+            ],
+            'insertUserNames:a?' => [
+                'items' => ['type' => 'string'],
+                'style' => 'form',
+                'description' => 'Filter the records by inserted user names.',
                 'x-search-filter' => true,
             ],
             'tags:a?' => [
@@ -208,18 +235,25 @@ class DiscussionSearchType extends AbstractSearchType {
 
         $categoryIDs = $this->getCategoryIDs($query);
 
+        if($categoryIDs === []) {
+            return '';
+        }
+
         $db->reset();
 
         // Build base query
         $db->from('Discussion d')
-            ->select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID, d.Score')
+            ->select('d.DiscussionID as recordID, d.Name as Title, d.Format, d.CategoryID, d.Score')
             ->select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
             ->select('d.DateInserted')
-            ->select('d.Type')
+            ->select('d.Type as recordType')
             ->select('d.InsertUserID as UserID')
-            ->select("'Discussion'", '', 'RecordType')
+            ->select("'discussion'", '', 'type')
             ->orderBy('d.DateInserted', 'desc')
         ;
+        if (false !== $query->get('expandBody', null)) {
+            $db->select('d.Body as body');
+        }
 
         $terms = $query->get('query', false);
         if ($terms) {
@@ -240,7 +274,12 @@ class DiscussionSearchType extends AbstractSearchType {
             $db->where('d.InsertUserID', $author);
         }
 
-        if ($discussionID = $query->get('discussionid', false)) {
+        if ($users = $query->get('insertUserIds', false)) {
+            $author = array_column($users, 'UserID');
+            $db->where('d.InsertUserID', $author);
+        }
+
+        if ($discussionID = $query->get('discussionID', false)) {
             $db->where('d.DiscussionID', $discussionID);
         }
 
@@ -252,7 +291,7 @@ class DiscussionSearchType extends AbstractSearchType {
         $offset = $query->get('offset', 0);
         $db->limit($limit + $offset);
 
-        $sql = $db->getSelect();
+        $sql = $db->getSelect(true);
         $db->reset();
 
         return $sql;

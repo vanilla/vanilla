@@ -207,13 +207,22 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * @inheritdoc
      */
     public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array {
-        if (in_array('maxImageHeight', $extraArgs)) {
-            $maxImageHeight = $extraArgs['maxImageHeight'] === self::NO_IMAGE_DIMENSIONS_LIMIT ? $file::MAX_IMAGE_HEIGHT : $extraArgs['maxImageHeight'];
+        $extraArgs += [
+            'maxImageHeight' => self::NO_IMAGE_DIMENSIONS_LIMIT,
+            'maxImageWidth' => self::NO_IMAGE_DIMENSIONS_LIMIT,
+        ];
+
+        if ($extraArgs['maxImageHeight']) {
+            $maxImageHeight = $extraArgs['maxImageHeight'] === self::NO_IMAGE_DIMENSIONS_LIMIT ?
+                $file::MAX_IMAGE_HEIGHT :
+                $extraArgs['maxImageHeight'];
             $file->setMaxImageHeight($maxImageHeight);
         }
 
-        if (in_array('maxImageWidth', $extraArgs)) {
-            $maxImageWidth = $extraArgs['maxImageWidth'] === self::NO_IMAGE_DIMENSIONS_LIMIT ? $file::MAX_IMAGE_WIDTH : $extraArgs['maxImageWidth'];
+        if ($extraArgs['maxImageWidth']) {
+            $maxImageWidth = $extraArgs['maxImageWidth'] === self::NO_IMAGE_DIMENSIONS_LIMIT ?
+                $file::MAX_IMAGE_WIDTH :
+                $extraArgs['maxImageWidth'];
             $file->setMaxImageWidth($maxImageWidth);
         }
 

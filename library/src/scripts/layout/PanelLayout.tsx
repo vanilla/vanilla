@@ -105,14 +105,6 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     const shouldRenderRightPanel: boolean =
         isFullWidth || ((!isTwoColumnLayout ? isTablet : !isMobile) && !shouldRenderLeftPanel);
 
-    // console.log("");
-    // console.log("device: ", device);
-    // console.log("isMobile: ", isMobile);
-    // console.log("isTablet: ", isTablet);
-    // console.log("isFullWidth: ", isFullWidth);
-    // console.log("shouldRenderLeftPanel: ", shouldRenderLeftPanel);
-    // console.log("shouldRenderRightPanel: ", shouldRenderRightPanel);
-
     // Determine the classes we want to display.
     const panelClasses = classNames(
         classes.root,

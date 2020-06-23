@@ -248,10 +248,6 @@ class DomUtilsTest extends TestCase {
                 1,
                 'forbiddenword', '<p>test forbiddenword</p></p>','<p>test ***</p></p>'
             ],
-            'TestBrokenHtml2' => [
-                1,
-                'forbiddenword', '<p>test forbiddenword></p>','<p>test ***&gt;</p></p>'
-            ],
             'Testtext2' => [
                 1,
                 'forbiddenword','test forbiddenword test forbiddenword', 'test *** test ***'

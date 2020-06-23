@@ -37,6 +37,7 @@ export function FilterFrame(props: ISearchFilterPanel) {
     return (
         <form onSubmit={onSubmit} aria-describedby={titleID}>
             <Frame
+                scrollable={false}
                 header={
                     <FrameHeader
                         titleID={titleID}
@@ -45,7 +46,11 @@ export function FilterFrame(props: ISearchFilterPanel) {
                         titleClass={classes.title}
                     />
                 }
-                body={<FrameBody className={classes.body}>{children}</FrameBody>}
+                body={
+                    <FrameBody scrollable={false} className={classes.body}>
+                        {children}
+                    </FrameBody>
+                }
                 footer={
                     <FrameFooter justifyRight={true} className={classes.footer}>
                         <Button disabled={valid} submit={true}>

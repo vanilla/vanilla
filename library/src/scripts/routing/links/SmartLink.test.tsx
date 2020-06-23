@@ -21,7 +21,7 @@ function renderLocation(loc: LocationDescriptor, formatter: any) {
     return mount(
         <div>
             <MemoryRouter>
-                <LinkContextProvider linkContext={CONTEXT_BASE} urlFormatter={formatter}>
+                <LinkContextProvider linkContexts={[CONTEXT_BASE]} urlFormatter={formatter}>
                     <Route>
                         <SmartLink to={loc} />
                     </Route>

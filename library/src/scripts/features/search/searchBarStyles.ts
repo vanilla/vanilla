@@ -227,10 +227,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             }),
         } as NestedCSSProperties,
         meta: {
-            ...fonts({
-                ...globalVars.meta.text,
-                lineHeight: globalVars.meta.lineHeights.default,
-            }),
+            ...fonts(globalVars.meta.text),
         } as NestedCSSProperties,
         excerpt: {
             marginTop: unit(searchResultsVariables().excerpt.margin),

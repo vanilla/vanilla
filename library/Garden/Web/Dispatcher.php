@@ -63,6 +63,11 @@ class Dispatcher {
      * @return $this
      */
     public function addRoute(Route $route, $key = '') {
+        if (!$route->isEnabled()) {
+            // Return early. Route may have been disabled by some configuration.
+            return $this;
+        }
+
         if ($key !== '') {
             $this->routes[$key] = $route;
         } else {

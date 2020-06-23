@@ -180,7 +180,7 @@ export const inputCSS = () => {
         margin: 0,
         padding: unit(globalVars.meta.spacing.default),
         marginBottom: unit(verticalPadding),
-        lineHeight: unit(globalVars.meta.lineHeights.default),
+        lineHeight: unit(globalVars.meta.text.lineHeight),
         minHeight: unit(spaceWithoutPaddingInInput),
         ...borders({
             ...globalVars.borderType.formElements.default,
@@ -194,8 +194,8 @@ export const inputCSS = () => {
 
     // Text inside token
     cssOut("li.token-input-token.token-input-token p", {
-        fontSize: unit(globalVars.meta.text.fontSize),
-        lineHeight: unit(globalVars.meta.lineHeights.default),
+        fontSize: unit(globalVars.meta.text.size),
+        lineHeight: unit(globalVars.meta.text.lineHeight),
         color: colorOut(globalVars.mainColors.fg),
     });
 

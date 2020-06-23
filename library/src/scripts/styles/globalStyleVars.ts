@@ -15,6 +15,7 @@ import {
     getRatioBasedOnDarkness,
     fontFallbacks,
     monoFallbacks,
+    IFont,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
@@ -325,16 +326,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const meta = makeThemeVars("meta", {
         text: {
-            fontSize: fonts.size.small,
+            size: fonts.size.small,
             color: elementaryColors.lowContrast,
-            margin: 4,
-        },
+            lineHeight: lineHeights.base,
+        } as IFont,
         spacing: {
+            horizontalMargin: 4,
             verticalMargin: 12,
             default: gutter.quarter,
-        },
-        lineHeights: {
-            default: lineHeights.base,
         },
         colors: {
             fg: mixBgAndFg(0.85),

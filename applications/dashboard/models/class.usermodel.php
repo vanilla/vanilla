@@ -75,6 +75,15 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
     private const USERAUTHENTICATION_CACHE_EXPIRY = 60;
 
+    /** @var string cache type flag for user data */
+    const CACHE_TYPE_USER = 'user';
+
+    /** @var string cache type flag for roles data */
+    const CACHE_TYPE_ROLES = 'roles';
+
+    /** @var string cache type flag for permissions data */
+    const CACHE_TYPE_PERMISSIONS = 'permissions';
+
     /** @var EventManager */
     private $eventManager;
 
@@ -1070,6 +1079,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $userID = $this->SQL->insert($this->Name, $fields);
 
         if ($userID) {
+            //force clear cache for that UserID
+            $this->clearCache($userID, [self::CACHE_TYPE_USER]);
+
             $user = $this->getID($userID);
             $userEvent = $this->eventFromRow(
                 (array)$user,
@@ -2576,7 +2588,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
-                $this->clearCache($userID, ['user']);
+                $this->clearCache($userID, [self::CACHE_TYPE_USER]);
                 $this->EventArguments['UserID'] = $userID;
                 $this->fireEvent('AfterSave');
             } else {
@@ -2829,7 +2841,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             }
         }
 
-        $this->clearCache($UserID, ['roles', 'permissions']);
+        $this->clearCache($UserID, [self::CACHE_TYPE_ROLES, self::CACHE_TYPE_PERMISSIONS]);
 
         if ($RecordEvent) {
             $User = $this->getID($UserID);
@@ -4353,7 +4365,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Save the values back to the db
         $saveResult = $this->SQL->put('User', [$column => $values], ['UserID' => $userID]);
-        $this->clearCache($userID, ['user']);
+        $this->clearCache($userID, [self::CACHE_TYPE_USER]);
 
         return $saveResult;
     }
@@ -5180,7 +5192,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             ->put();
 
         if (in_array($property, ['Permissions'])) {
-            $this->clearCache($rowID, ['permissions']);
+            $this->clearCache($rowID, [self::CACHE_TYPE_PERMISSIONS]);
         } else {
             $this->updateUserCache($rowID, $property, $value);
         }
@@ -5304,6 +5316,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * Delete cached data for user.
      *
      * @param int|null $userID The user to clear the cache for.
+     * @param ?string $cacheTypesToClear
      * @return bool Returns **true** if the cache was cleared or **false** otherwise.
      */
     public function clearCache($userID, $cacheTypesToClear = null) {

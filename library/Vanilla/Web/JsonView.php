@@ -14,6 +14,11 @@ use Garden\Web\Data;
  * Class JsonView
  */
 class JsonView implements ViewInterface {
+
+    const CURRENT_PAGE_HEADER = 'x-app-page-current';
+    const TOTAL_COUNT_HEADER = 'x-app-page-result-count';
+    const LIMIT_HEADER = 'x-app-page-limit';
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +43,18 @@ class JsonView implements ViewInterface {
                 $links->addLink('last', str_replace('%s', $paging['pageCount'], $paging['urlFormat']));
             }
             $links->setHeader($data);
+
+            $data->setHeader(self::CURRENT_PAGE_HEADER, $paging['page']);
+
+            $totalCount = $paging['totalCount'] ?? null;
+            if ($totalCount !== null) {
+                $data->setHeader(self::TOTAL_COUNT_HEADER, $totalCount);
+            }
+
+            $limit = $paging['limit'] ?? null;
+            if ($limit !== null) {
+                $data->setHeader(self::LIMIT_HEADER, $limit);
+            }
         }
 
         echo $data->render();

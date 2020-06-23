@@ -15,14 +15,12 @@ interface IProps {
 /**
  * Facilitates wrapping conditionally a component
  */
-export default class ConditionalWrap extends React.Component<IProps> {
-    public render() {
-        const { condition, className, tag, children } = this.props;
-        const Tag = tag || "div";
-        if (condition) {
-            return <Tag className={className}>{children}</Tag>;
-        } else {
-            return <>{children}</>;
-        }
+export default function ConditionalWrap(props: IProps) {
+    const { condition, className, tag, children } = props;
+    const Tag = tag || "div";
+    if (condition) {
+        return <Tag className={className}>{children}</Tag>;
+    } else {
+        return <>{children}</>;
     }
 }

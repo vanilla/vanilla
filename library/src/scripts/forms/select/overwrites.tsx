@@ -17,7 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { components } from "react-select";
-import { CloseTinyIcon, CheckCompactIcon } from "@library/icons/common";
+import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 
@@ -123,14 +123,16 @@ export function NoOptionsMessage(props: OptionProps<any>) {
 }
 
 export function NullComponent() {
-    return null;
+    return <></>;
 }
+
+type ISelectOptionOverwrite = OptionProps<any> & IComboBoxOption;
 
 /**
  * Overwrite for the menuOption component in React Select
  * @param props
  */
-export function SelectOption(props: OptionProps<any> & IComboBoxOption) {
+export function SelectOption(props: ISelectOptionOverwrite) {
     const { isSelected, isFocused, selectProps, value } = props;
     const placeholder = {};
 
@@ -145,7 +147,14 @@ export function SelectOption(props: OptionProps<any> & IComboBoxOption) {
                 })}
             >
                 <span className="suggestedTextInput-head">
-                    <span className="suggestedTextInput-title">{props.children}</span>
+                    <span className="suggestedTextInput-title">
+                        {props.children}
+                        {props.data?.data?.parentLabel && (
+                            <span
+                                className={"suggestedTextInput-parentTag"}
+                            >{` - ${props.data.data.parentLabel}`}</span>
+                        )}
+                    </span>
                     {(isSelected || value === selectProps.value?.value) && (
                         <CheckCompactIcon className={selectOneClasses().checkIcon} />
                     )}
@@ -166,5 +175,21 @@ export function ValueContainer(props: ValueContainerProps<any>) {
             {...props}
             className={classNames("suggestedTextInput-valueContainer inputBlock-inputText inputText", props.className)}
         />
+    );
+}
+
+/**
+ * Overwrite for the DropdownIndicator component in React Select
+ * @param props - props of component
+ */
+export function DropdownIndicator(props) {
+    const { innerProps } = props;
+    const Component: React.ComponentType = components.DropdownIndicator as any;
+    return (
+        <Component {...props}>
+            <div {...innerProps}>
+                <DownTriangleIcon className={selectOneClasses().chevron} />
+            </div>
+        </Component>
     );
 }

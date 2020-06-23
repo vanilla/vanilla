@@ -38,7 +38,7 @@ export const bestOfCSS = () => {
     `,
         {
             color: colorOut(globalVars.links.colors.default),
-            fontSize: unit(globalVars.meta.text.fontSize),
+            fontSize: unit(globalVars.meta.text.size),
         },
     );
 

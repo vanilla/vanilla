@@ -35,9 +35,18 @@ export class SelectLookup extends React.Component<ISelectLookupProps, IState> {
         let options: IComboBoxOption[] | undefined;
         if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
             options = suggestions.data.map(suggestion => {
+                let parentLabel;
+                const crumbLength = suggestion.breadcrumbs?.length ?? 0;
+                if (crumbLength > 1) {
+                    parentLabel = suggestion.breadcrumbs[crumbLength - 2].name;
+                }
+
                 return {
                     value: suggestion.categoryID,
                     label: suggestion.name,
+                    data: {
+                        parentLabel,
+                    },
                 };
             });
         }

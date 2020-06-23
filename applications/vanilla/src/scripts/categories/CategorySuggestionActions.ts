@@ -14,18 +14,18 @@ const createAction = actionCreatorFactory("@@categorySuggestions");
 export default class CategorySuggestionActions extends ReduxActions {
     public static loadCategories = createAction.async<{ query: string }, ICategory[], IApiError>("GET");
 
-    private interalLoadCategories = (query: string) => {
+    private internalLoadCategories = (query: string) => {
         const apiThunk = bindThunkAction(CategorySuggestionActions.loadCategories, async () => {
             if (query === "") {
                 return [];
             }
 
-            const params = { query };
+            const params = { query, expand: ["breadcrumbs"] };
             const response = await this.api.get("/categories/search", { params });
             return response.data;
         })({ query });
         return this.dispatch(apiThunk);
     };
 
-    public loadCategories = debounce(this.interalLoadCategories, 100);
+    public loadCategories = debounce(this.internalLoadCategories, 100);
 }

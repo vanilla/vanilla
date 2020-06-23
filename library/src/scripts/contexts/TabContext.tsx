@@ -6,12 +6,13 @@
 
 import * as React from "react";
 import { Optionalize } from "@library/@types/utils";
+import RadioGroupContext, { IRadioGroupProps } from "@library/forms/radioAsButtons/RadioGroupContext";
 
 export interface ITabContext {
     setData: (data: any) => void;
     groupID: string;
-    activeTab: string | number;
     childClass: string;
+    activeItem?: string | number;
 }
 
 const TabContext = React.createContext<ITabContext>({} as any);
@@ -24,18 +25,17 @@ export default TabContext;
  */
 export function withTabs<T extends ITabContext = ITabContext>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithTabs extends React.Component<Optionalize<T, ITabContext>> {
-        public static displayName = `withTabs(${displayName})`;
-        public render() {
-            return (
-                <TabContext.Consumer>
-                    {context => {
-                        // https://github.com/Microsoft/TypeScript/issues/28938
-                        return <WrappedComponent {...context} {...(this.props as T)} />;
-                    }}
-                </TabContext.Consumer>
-            );
-        }
-    }
+    const ComponentWithTabs = (props: Optionalize<T, ITabContext>) => {
+        const { activeItem = 0 } = props;
+        return (
+            <TabContext.Consumer>
+                {context => {
+                    // https://github.com/Microsoft/TypeScript/issues/28938
+                    return <WrappedComponent {...context} {...(props as T)} />;
+                }}
+            </TabContext.Consumer>
+        );
+    };
+    ComponentWithTabs.displayName = `withTabs(${displayName})`;
     return ComponentWithTabs;
 }

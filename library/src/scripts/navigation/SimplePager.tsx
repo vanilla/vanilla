@@ -9,6 +9,7 @@ import { simplePagerClasses } from "@library/navigation/simplePagerStyles";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@library/utility/appUtils";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     url: string;
@@ -26,7 +27,7 @@ export default class SimplePager extends React.Component<IProps> {
         const classes = simplePagerClasses();
 
         return (
-            <div className={classNames("simplePager", classes.root)}>
+            <ConditionalWrap className={classes.root} condition={!!prev || !!next}>
                 {prev && (
                     <>
                         <LinkAsButton className={classNames(classes.button, { isSingle })} to={this.makeUrl(prev)}>
@@ -43,7 +44,7 @@ export default class SimplePager extends React.Component<IProps> {
                         <LinkMeta rel={"next"} url={this.makeUrl(next)} />
                     </>
                 )}
-            </div>
+            </ConditionalWrap>
         );
     }
 

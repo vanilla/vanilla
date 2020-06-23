@@ -40,7 +40,7 @@ export function registerCommunitySearchDomain() {
                 return query;
             },
             getRecordTypes: () => {
-                return ["discussion"];
+                return ["discussion", "comment"];
             },
             PanelComponent: SearchFilterPanelCommunity,
             getDefaultFormValues: () => {

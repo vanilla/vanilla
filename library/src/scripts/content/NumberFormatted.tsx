@@ -14,8 +14,12 @@ interface IProps {
     className?: string;
     title?: string;
 }
-
-function stripTrailingZeros(value: string) {
+/**
+ * Strip trailing 0s from a string.
+ *
+ * @param value
+ */
+function stripTrailingZeros(value: string): string {
     if (isNaN(Number(value))) {
         return value;
     } else {
@@ -23,18 +27,23 @@ function stripTrailingZeros(value: string) {
     }
 }
 
+/**
+ * Format a compact value of a number.
+ *
+ * @param props
+ */
 export function formatNumberText(props: { value: number }) {
     const { value } = props;
     numeral.localeData("en");
     const initialValue = numeral(value);
     const compactValue = stripTrailingZeros(initialValue.format("0a.0"));
     const fullValue = initialValue.format();
-    const modified = fullValue.toString() !== initialValue.value().toString();
+    const isModified = fullValue.toString() !== initialValue.value().toString();
 
     return {
         compactValue,
         fullValue,
-        modified,
+        isModified,
     };
 }
 
@@ -43,8 +52,8 @@ export function formatNumberText(props: { value: number }) {
  */
 export function decomposedNumberFormatted(props: IProps) {
     const formattedNumber = formatNumberText({ value: props.value });
-    const { fullValue, modified } = formattedNumber;
-    const Tag = (modified ? `abbr` : `span`) as "span";
+    const { fullValue, isModified } = formattedNumber;
+    const Tag = (isModified ? `abbr` : `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);
     const title = props.title || fullValue;
 

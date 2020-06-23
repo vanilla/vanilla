@@ -14,6 +14,9 @@ interface IProps {
     pages?: ILinkPages;
 }
 
+/**
+ * Component for displaying pagination information in a format like "11-20 of 563".
+ */
 export function ResultPaginationInfo(props: IProps) {
     const { pages } = props;
     if (!pages || pages.currentPage == null || pages.limit == null || pages.total == null) {
@@ -23,7 +26,7 @@ export function ResultPaginationInfo(props: IProps) {
     const { total = 0, currentPage, limit } = pages;
 
     let resultStart = (currentPage - 1) * limit + 1;
-    let resultEnd = Math.min(resultStart + limit, total) - 1;
+    let resultEnd = Math.min(resultStart + limit - 1, total);
 
     const classes = resultPaginationInfoClasses();
 

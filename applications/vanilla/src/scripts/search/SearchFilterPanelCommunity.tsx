@@ -13,7 +13,6 @@ import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import Checkbox from "@library/forms/Checkbox";
-
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import MultiUserInput from "@library/features/users/MultiUserInput";

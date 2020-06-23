@@ -7,7 +7,7 @@ import { ISearchForm, ISearchRequestQuery, ISearchResults } from "@library/searc
 import { IApiError } from "@vanilla/library/src/scripts/@types/api/core";
 import { actionCreatorFactory } from "typescript-fsa";
 
-const createAction = actionCreatorFactory("@@unifySearchPage");
+const createAction = actionCreatorFactory("@@search");
 
 export class SearchActions {
     public static performSearchACs = createAction.async<ISearchRequestQuery, ISearchResults, IApiError>("SEARCH");

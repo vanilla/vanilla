@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import Checkbox, { ICheckbox } from "@library/forms/Checkbox";
+import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { onReady, t } from "@library/utility/appUtils";
 import { useSearchForm } from "@library/search/SearchFormContext";
@@ -13,7 +13,18 @@ import flatten from "lodash/flatten";
 interface IProps {}
 
 /**
- * Implement search filter panel main component
+ * Implement search filter panel main component.
+ *
+ * - If there is only 1 type, it does not display.
+ * - IF there are multiple types, at least 1 must be selected.
+ *
+ * Other plugins can hook into this and add their own filters with
+ *
+ * @example
+ *    CommunityPostTypeFilter.addPostType({
+ *       label: t("Discussions"),
+ *       values: ["discussion", "comment"],
+ *   });
  */
 export function CommunityPostTypeFilter(props: IProps) {
     const { form, updateForm } = useSearchForm<{}>();

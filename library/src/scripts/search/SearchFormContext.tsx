@@ -103,10 +103,16 @@ export function SearchFormContextProvider(props: IProps) {
             return allTypes;
         },
         transformFormToQuery: (form: ISearchForm) => {
-            return form;
+            const query = { ...form };
+            if (query.sort === "relevance") {
+                delete query.sort;
+            }
+            return query;
         },
         getDefaultFormValues: () => {
-            return {};
+            return {
+                sort: "relevance",
+            };
         },
     };
 

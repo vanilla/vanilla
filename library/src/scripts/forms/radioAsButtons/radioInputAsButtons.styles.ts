@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { unit, srOnly, IFont, margins, negativeUnit } from "@library/styles/styleHelpers";
+import { unit, srOnly, margins, negativeUnit } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
@@ -15,7 +15,6 @@ import { nestedWorkaround } from "@dashboard/compatibilityStyles";
 import { calc } from "csx";
 
 export const radioInputAsButtonsClasses = useThemeCache(() => {
-    // const vars = radioInputAsButtonsVariables();
     const style = styleFactory("radioInputAsButtons");
     const mediaQueries = layoutVariables().mediaQueries();
     const globalVars = globalVariables();

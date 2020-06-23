@@ -18,6 +18,7 @@ export interface ISearchFormBase {
     endDate?: string;
     page: number;
     types?: string[];
+    sort: string;
 }
 
 export type ISearchForm<T extends object = {}> = ISearchFormBase & T & Record<string | number, any>;

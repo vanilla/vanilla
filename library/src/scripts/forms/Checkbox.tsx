@@ -4,15 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
-import { checkRadioClasses } from "./checkRadioStyles";
-import classNames from "classnames";
-import { t } from "@library/utility/appUtils";
-import { srOnly, visibility } from "@library/styles/styleHelpers";
+import { visibility } from "@library/styles/styleHelpers";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { t } from "@library/utility/appUtils";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React from "react";
+import { checkRadioClasses } from "./checkRadioStyles";
 
-export interface ICheckbox extends IOptionalComponentID {
+interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
     checked?: boolean;
@@ -26,7 +26,7 @@ export interface ICheckbox extends IOptionalComponentID {
     excludeFromICheck?: boolean;
 }
 
-export default function CheckBox(props: ICheckbox) {
+export default function CheckBox(props: IProps) {
     const labelID = useUniqueID("checkbox_label");
     const classes = checkRadioClasses();
 

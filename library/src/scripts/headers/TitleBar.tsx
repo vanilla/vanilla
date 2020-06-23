@@ -71,7 +71,6 @@ export default function TitleBar(_props: IProps) {
     const { bgProps, bg2Props, logoProps } = useScrollTransition();
     const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
 
-    SearchPageRoute;
     const device = useTitleBarDevice();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);

@@ -213,6 +213,13 @@ class DiscussionSearchType extends AbstractSearchType {
         }
     }
 
+    /**
+     * Generates prepares sql query string
+     *
+     * @param MysqlSearchQuery $query
+     * @return string
+     * @throws \Exception
+     */
     public function generateSql(MysqlSearchQuery $query): string {
         /** @var \Gdn_SQLDriver $db */
         $db = $query->getDB();
@@ -220,13 +227,13 @@ class DiscussionSearchType extends AbstractSearchType {
 
         $categoryIDs = $this->getCategoryIDs($query);
 
-        if($categoryIDs === []) {
+        if ($categoryIDs === []) {
             return '';
         }
 
         $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
 
-        if($userIDs === []) {
+        if ($userIDs === []) {
             return '';
         }
 

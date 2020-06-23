@@ -93,8 +93,15 @@ class CommentSearchType extends DiscussionSearchType {
         }
     }
 
+    /**
+     * Generates prepares sql query
+     *
+     * @param MysqlSearchQuery $query
+     * @return string
+     * @throws \Exception
+     */
     public function generateSql(MysqlSearchQuery $query): string {
-        $types = $query->getQueryParameter('types');
+        $types = $query->get('types');
 
         if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
             // discussions are not the part of this search query request
@@ -102,7 +109,7 @@ class CommentSearchType extends DiscussionSearchType {
             return '';
         }
 
-        $types = $query->getQueryParameter('recordTypes');
+        $types = $query->get('recordTypes');
         if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
@@ -114,13 +121,13 @@ class CommentSearchType extends DiscussionSearchType {
 
         $categoryIDs = $this->getCategoryIDs($query);
 
-        if($categoryIDs === []) {
+        if ($categoryIDs === []) {
             return '';
         }
 
         $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
 
-        if($userIDs === []) {
+        if ($userIDs === []) {
             return '';
         }
 

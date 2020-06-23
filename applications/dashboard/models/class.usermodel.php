@@ -1230,7 +1230,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         $userIDs = [];
 
-        $extractUserIDs = function($row) use ($columns, &$userIDs) {
+        $extractUserIDs = function ($row) use ($columns, &$userIDs) {
             foreach ($columns as $key) {
                 if ($row[$key] ?? false) {
                     $id = $row[$key];
@@ -1249,7 +1249,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
         $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
 
-        $populate = function(&$row) use ($users, $columns) {
+        $populate = function (&$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
                 $id = $row[$key] ?? null;

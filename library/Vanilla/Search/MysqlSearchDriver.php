@@ -8,8 +8,6 @@ namespace Vanilla\Search;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-use UserModel;
-
 
 /**
  * Mysql search driver.
@@ -27,8 +25,8 @@ class MysqlSearchDriver extends AbstractSearchDriver {
     /**
      * DI.
      *
-     * @param ConfigurationInterface $config
      * @param SearchRecordTypeProviderInterface $searchRecordProvider
+     * @param \Gdn_Database $db
      */
     public function __construct(SearchRecordTypeProviderInterface $searchRecordProvider, \Gdn_Database $db) {
         $this->searchTypeRecordProvider = $searchRecordProvider;

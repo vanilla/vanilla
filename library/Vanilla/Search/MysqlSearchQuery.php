@@ -18,15 +18,29 @@ class MysqlSearchQuery extends SearchQuery {
     /** @var array $sql */
     private $sql;
 
+    /**
+     * MysqlSearchQuery constructor.
+     *
+     * @param array $searchTypes
+     * @param array $queryData
+     * @param \Gdn_Database $db
+     * @throws \Exception
+     */
     public function __construct(array $searchTypes, array $queryData, \Gdn_Database $db) {
         $this->db = $db->sql();
         parent::__construct($searchTypes, $queryData);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function whereText(string $text, array $fieldNames = []): self {
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setFilter(
         string $attribute,
         array $values,
@@ -36,6 +50,9 @@ class MysqlSearchQuery extends SearchQuery {
         return $this;
     }
 
+    /**
+     * Generate sql union query
+     */
     public function getSql() {
         $sql = '';
         if (empty($this->sql)) {
@@ -56,14 +73,31 @@ class MysqlSearchQuery extends SearchQuery {
         return $sql;
     }
 
+    /**
+     * Get db driver
+     *
+     * @return \Gdn_SQLDriver
+     */
     public function getDB() {
         return $this->db;
     }
 
+    /**
+     * Get query parameter
+     *
+     * @param string $param
+     * @param null $default
+     * @return mixed|null
+     */
     public function get(string $param, $default = null) {
         return $this->getQueryParameter($param, $default);
     }
 
+    /**
+     * Add sql (one per particular SearchType)
+     *
+     * @param string $sql
+     */
     public function addSql(string $sql) {
         if (!empty($sql)) {
             $this->sql[] = $sql;

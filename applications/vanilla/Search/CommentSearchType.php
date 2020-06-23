@@ -98,7 +98,6 @@ class CommentSearchType extends DiscussionSearchType {
      *
      * @param MysqlSearchQuery $query
      * @return string
-     * @throws \Exception
      */
     public function generateSql(MysqlSearchQuery $query): string {
         $types = $query->get('types');

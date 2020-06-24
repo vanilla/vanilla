@@ -54,9 +54,9 @@ echo $this->Form->errors();
             </div>
             <div class="input-wrap">
                 <?php echo $this->Form->dropDown('CategoryID', $this->data('Categories'), ['IncludeNull' => t('All Categories')]); ?>
-            </div>
-            <div class="input-wrap no-label padded-top">
-                <?php echo $this->Form->checkBox('IncludeSubcategories', 'Include Subcategories'); ?>
+                <div class="no-label padded-top">
+                    <?php echo $this->Form->checkBox('IncludeSubcategories', 'Include Subcategories'); ?>
+                </div>
             </div>
         </li>
         <li class="form-group">

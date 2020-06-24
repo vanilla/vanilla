@@ -7,12 +7,21 @@
 
 namespace VanillaTests\Models;
 
-
+/**
+ * Verify discussion count routines.
+ */
 class DiscussionModelCountsTest extends CountsTest {
+
+    /**
+     * Assert counts for all known records is accurate.
+     */
     public function testSetupCounts() {
         $this->assertAllCounts();
     }
 
+    /**
+     * Verify counts after multiple discussions across different categories have been deleted.
+     */
     public function testDeleteMultipleDiscussions() {
         $toDelete = [];
         $cats = [];
@@ -24,7 +33,7 @@ class DiscussionModelCountsTest extends CountsTest {
             }
         }
 
-        $r = $this->discussionModel->deleteID($toDelete);
+        $this->discussionModel->deleteID($toDelete);
 
         foreach ($cats as $catID) {
             $this->assertCategoryCounts($catID);

@@ -6,13 +6,11 @@
 
 namespace Vanilla;
 
-use Garden\Http\HttpClient;
 use Garden\SafeCurl\SafeCurl;
 use InvalidArgumentException;
 use RuntimeException;
 use Gdn_Upload;
 use Vanilla\Formatting\Quill\Nesting\InvalidNestingException;
-use Vanilla\Web\SafeCurlHttpHandler;
 
 /**
  * Value object representing a file uploaded through an HTTP request.
@@ -57,6 +55,20 @@ class UploadedFile {
 
     /** @var array Constraints for the image resizer. */
     private $imageConstraints;
+
+    /** @var int Max image upload height */
+    private $maxImageHeight = self::MAX_IMAGE_HEIGHT;
+
+    /** @var int Max image upload width */
+    private $maxImageWidth = self::MAX_IMAGE_WIDTH;
+
+    /** @var int Protection max image upload height */
+    public const MAX_IMAGE_HEIGHT = 3000;
+
+    /** @var int Protection max image upload width */
+    public const MAX_IMAGE_WIDTH = 3000;
+    /** @var bool */
+    private $sizeLimitsEnabled = null;
 
     /**
      * UploadedFile constructor.
@@ -245,12 +257,16 @@ class UploadedFile {
             "width" => $width ?? 0,
         ];
 
-        if (\Gdn::config("ImageUpload.Limits.Enabled")) {
-            if ($newWidth = filter_var(\Gdn::config("ImageUpload.Limits.Width"), FILTER_VALIDATE_INT)) {
-                $options["width"] = $newWidth;
+        if ($this->getSizeLimitsEnabled()) {
+            $maxImageHeight = $this->getMaxImageHeight();
+            $maxImageWidth = $this->getMaxImageWidth();
+
+            if ($maxImageWidth) {
+                $options["width"] = $maxImageWidth;
             }
-            if ($newHeight = filter_var(\Gdn::config("ImageUpload.Limits.Height"), FILTER_VALIDATE_INT)) {
-                $options["height"] = $newHeight;
+
+            if ($maxImageHeight) {
+                $options["height"] = $maxImageHeight;
             }
         }
 
@@ -293,6 +309,24 @@ class UploadedFile {
         }
 
         $this->moved = true;
+    }
+
+    /**
+     * Get max image upload height
+     *
+     * @return int
+     */
+    public function getMaxImageHeight(): int {
+        return $this->maxImageHeight;
+    }
+
+    /**
+     * Get max image upload width
+     *
+     * @return int
+     */
+    public function getMaxImageWidth(): int {
+        return $this->maxImageWidth;
     }
 
     /**
@@ -450,6 +484,36 @@ class UploadedFile {
     }
 
     /**
+     * Set max image upload height
+     * $maxImageHeight should an int greater or equal to 0, or null
+     *
+     * @param int $maxImageHeight
+     * @return UploadedFile
+     */
+    public function setMaxImageHeight(int $maxImageHeight): self {
+        if (is_int($maxImageHeight) && $maxImageHeight < 0) {
+            throw new InvalidArgumentException('height should be greater than or equal to 0.');
+        }
+        $this->maxImageHeight = $maxImageHeight;
+        return $this;
+    }
+
+    /**
+     * Set max image upload height
+     * $maxImageWidth should an int greater or equal to 0, or null
+     *
+     * @param ?int $maxImageWidth
+     * @return UploadedFile
+     */
+    public function setMaxImageWidth(int $maxImageWidth): self {
+        if ($maxImageWidth < 0) {
+            throw new InvalidArgumentException('width should be greater than or equal to 0.');
+        }
+        $this->maxImageWidth = $maxImageWidth;
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getPersistedPath(): ?string {
@@ -501,5 +565,31 @@ class UploadedFile {
      */
     public function setResolvedForeignUrl(?string $resolvedForeignUrl): void {
         $this->resolvedForeignUrl = $resolvedForeignUrl;
+    }
+
+    /**
+     * Whether or not size limits are enabled.
+     *
+     * @return bool
+     * @deprecated This method is subject to some refactoring. Please don't use it in new code.
+     */
+    public function getSizeLimitsEnabled(): bool {
+        if ($this->sizeLimitsEnabled === null) {
+            return (bool)\Gdn::config("ImageUpload.Limits.Enabled", false);
+        } else {
+            return $this->sizeLimitsEnabled;
+        }
+    }
+
+    /**
+     * Enable size limit enforcing on the upload.
+     *
+     * @param bool $sizeLimitsEnabled
+     * @return $this
+     * @deprecated This method is subject to some refactoring. Please don't use it in new code.
+     */
+    public function setSizeLimitsEnabled(?bool $sizeLimitsEnabled) {
+        $this->sizeLimitsEnabled = $sizeLimitsEnabled;
+        return $this;
     }
 }

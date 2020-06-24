@@ -33,7 +33,7 @@ echo $form->errors();
     <div class="form-group">
         <?php
             $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
-            $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments.');
+            $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions.');
             echo $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
         ?>
     </div>

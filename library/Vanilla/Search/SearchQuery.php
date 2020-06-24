@@ -16,6 +16,8 @@ abstract class SearchQuery {
     const FILTER_OP_OR = 'or';
     const FILTER_OP_AND = 'and';
 
+    const SORT_RELEVANCE = 'relevance';
+
     /** @var Schema */
     private $querySchema;
 

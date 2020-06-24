@@ -15,7 +15,7 @@ import { BannerContextProvider } from "./banner/BannerContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
-    sectionRoot?: string;
+    sectionRoots?: string[];
     onRouteChange?: (history: History) => void;
 }
 
@@ -48,7 +48,9 @@ export function Router(props: IProps) {
     );
     if (!props.disableDynamicRouting) {
         routes = (
-            <LinkContextProvider linkContext={formatUrl(props.sectionRoot || "/", true)}>{routes}</LinkContextProvider>
+            <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map(root => formatUrl(root, true))}>
+                {routes}
+            </LinkContextProvider>
         );
     }
 

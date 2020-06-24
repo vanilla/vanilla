@@ -337,7 +337,7 @@ export const themeBuilderClasses = useThemeCache(() => {
         ...fonts({
             size: 12,
             color: globalVars.meta.text.color,
-            lineHeight: globalVars.meta.lineHeights.default,
+            lineHeight: globalVars.meta.text.lineHeight,
         }),
         padding: 0,
         ...margins({

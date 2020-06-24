@@ -43,7 +43,7 @@ export const searchPageCSS = () => {
         {
             textDecoration: "none",
             color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.fontSize),
+            fontSize: unit(globalVars.meta.text.size),
         },
     );
 
@@ -155,7 +155,7 @@ export const searchPageCSS = () => {
     cssOut(`#search-results .Item-Body .Meta > *`, metaItemStyle());
 
     cssOut(`#search-results .Meta-Body.Meta .Breadcrumbs a`, {
-        fontSize: unit(globalVars.meta.text.fontSize),
+        fontSize: unit(globalVars.meta.text.size),
         textTransform: "initial",
     });
 

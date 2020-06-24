@@ -11,7 +11,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { useContentTranslator } from "@vanilla/i18n";
 
 export interface IWithLinkContext {
-    linkContext: string;
+    linkContexts: string[];
     pushSmartLocation(location: LocationDescriptor);
     isDynamicNavigation(location: LocationDescriptor): boolean;
     makeHref(location: LocationDescriptor): string;
@@ -22,7 +22,7 @@ const defaultMakeHref = (location: LocationDescriptor) => {
     return formatUrl(stringUrl, true);
 };
 export const LinkContext = React.createContext<IWithLinkContext>({
-    linkContext: formatUrl("/"),
+    linkContexts: [formatUrl("/")],
     pushSmartLocation: location => {
         const href = defaultMakeHref(location);
         window.location.href = href;
@@ -34,7 +34,7 @@ export const LinkContext = React.createContext<IWithLinkContext>({
 });
 
 interface IProps extends RouteComponentProps<any> {
-    linkContext: string;
+    linkContexts: string[];
     children: React.ReactNode;
     urlFormatter?: (url: string, withDomain?: boolean) => string;
 }
@@ -59,7 +59,16 @@ export const LinkContextProvider = withRouter((props: IProps) => {
     const isDynamicNavigation = (href: string): boolean => {
         const link = new URL(href, window.location.href);
         const isCurrentPage = link.pathname === window.location.pathname;
-        return href.startsWith(props.linkContext) && !isCurrentPage;
+
+        let matchesContext = false;
+        for (const context of props.linkContexts) {
+            if (href.startsWith(context)) {
+                matchesContext = true;
+                break;
+            }
+        }
+
+        return matchesContext && !isCurrentPage;
     };
 
     const pushSmartLocation = (location: LocationDescriptor) => {
@@ -74,7 +83,7 @@ export const LinkContextProvider = withRouter((props: IProps) => {
     return (
         <LinkContext.Provider
             value={{
-                linkContext: props.linkContext,
+                linkContexts: props.linkContexts,
                 pushSmartLocation,
                 isDynamicNavigation,
                 makeHref,

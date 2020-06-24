@@ -115,6 +115,12 @@ fieldset {
     margin: 0;
     padding: 0;
     border: 0;
+    margin-inline-end: 0;
+    padding-block-start: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    padding-block-end: 0;
+    min-inline-size: 0;
 }
 
 body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {

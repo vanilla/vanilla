@@ -211,7 +211,10 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'query:s' => 'Category name filter.',
+            'query:s' => [
+                'description' => 'Category name filter.',
+                'minLength' => 0,
+            ],
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,

@@ -13,7 +13,6 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import PageContext from "@library/routing/PagesContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
@@ -73,29 +72,20 @@ story.add(
         });
 
         return (
-            <PageContext.Provider
-                value={{
-                    pages: {
-                        // search?: IPageLoader;
-                        // drafts?: IPageLoader;
-                    },
-                }}
-            >
-                <MemoryRouter>
-                    <Provider store={getStore(initialState, true)}>
-                        <TitleBarDeviceProvider>
-                            <StoryFullPage>
-                                <StoryHeading>Hamburger menu</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
-                                <StoryHeading>Big Logo</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
-                                <StoryHeading>Extra Navigation links</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
-                            </StoryFullPage>
-                        </TitleBarDeviceProvider>
-                    </Provider>
-                </MemoryRouter>
-            </PageContext.Provider>
+            <MemoryRouter>
+                <Provider store={getStore(initialState, true)}>
+                    <TitleBarDeviceProvider>
+                        <StoryFullPage>
+                            <StoryHeading>Hamburger menu</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Big Logo</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Extra Navigation links</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                        </StoryFullPage>
+                    </TitleBarDeviceProvider>
+                </Provider>
+            </MemoryRouter>
         );
     },
     {

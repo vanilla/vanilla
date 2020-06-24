@@ -47,7 +47,7 @@ export const dropDownVariables = useThemeCache(() => {
 
     const metas = makeThemeVars("metas", {
         font: {
-            size: globalVars.meta.text.fontSize,
+            size: globalVars.meta.text.size,
             color: globalVars.meta.text.color,
         },
         padding: {

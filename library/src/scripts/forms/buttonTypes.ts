@@ -5,6 +5,7 @@ export enum ButtonTypes {
     TRANSLUCID = "translucid",
     CUSTOM = "custom",
     RESET = "reset",
+    RADIO = "radioAsButton",
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",

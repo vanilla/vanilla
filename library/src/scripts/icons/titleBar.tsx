@@ -8,6 +8,7 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
+import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
@@ -137,15 +138,15 @@ export function SettingsIcon(props: { className?: string }) {
     );
 }
 
-export function SearchIcon(props: { className?: string }) {
+export function SearchIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const title = t("Search");
     const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 13.312 13.311"
-            className={classNames(classes.search, "icon-search", props.className)}
-            aria-hidden="true"
+            className={classNames(classes.search, props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
             <title>{title}</title>
             <path

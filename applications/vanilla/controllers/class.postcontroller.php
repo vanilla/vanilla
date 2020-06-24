@@ -540,7 +540,7 @@ class PostController extends VanillaController {
 
                 $Description = val('Description', $PageInfo, '');
                 $Images = val('Images', $PageInfo, []);
-                $LinkText = t('EmbededDiscussionLinkText', 'Read the full story here');
+                $LinkText = t('EmbededDiscussionLinkText', t('Read the full story here'));
 
                 if (!$Description && count($Images) == 0) {
                     $Body = formatString(

@@ -77,4 +77,33 @@ EOT;
 
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * Test disallowing spoilers within a quote.
+     */
+    public function testMarkdownCodeBlock() {
+        $md = <<<EOT
+```
+<ul>
+    <li>something</li>
+    <li>something else</li>
+    <li>another thing</li>
+<ul>
+```
+EOT;
+        $expected = <<<EOT
+<pre class="code codeBlock" spellcheck="false" tabindex="0">&lt;ul&gt;
+    &lt;li&gt;something&lt;/li&gt;
+    &lt;li&gt;something else&lt;/li&gt;
+    &lt;li&gt;another thing&lt;/li&gt;
+&lt;ul&gt;
+</pre>
+
+EOT;
+
+        $formatter = $this->prepareFormatter();
+        $actual = $formatter->renderHTML($md);
+
+        $this->assertEquals($expected, $actual);
+    }
 }

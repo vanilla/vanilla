@@ -695,6 +695,17 @@ jQuery(document).ready(function($) {
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
                     break;
+                case "closePopup":
+                    if (typeof $.popup === "function" && typeof $.popup.close === "function") {
+                        var popupID = $target.attr("id");
+                        if (popupID) {
+                            $.popup.close({
+                                popupId: popupID,
+                                sender: $("body").get(0)
+                            })
+                        }
+                    }
+                    break;
             }
         }
     };

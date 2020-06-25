@@ -12,6 +12,10 @@
  * Handles content moderation via /moderation endpoint.
  */
 class ModerationController extends VanillaController {
+
+    // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
+    private const MAX_TIME_BATCH_DELETE = 10;
+
     /**
      * Looks at the user's attributes and form postback to see if any comments
      * have been checked for administration, and if so, puts an inform message on
@@ -333,16 +337,18 @@ class ModerationController extends VanillaController {
             $checkedDiscussions = array_combine($allowedDiscussions, $allowedDiscussions);
             // Queue deleting discussions.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-//            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-//            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
             foreach ($allowedDiscussions as $discussionID) {
                 $discussionModel->deleteID($discussionID);
                 unset($checkedDiscussions[$discussionID]);
-                Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', array_values($checkedDiscussions));
+                Gdn::userModel()->saveAttribute(
+                    $session->UserID,
+                    'CheckedDiscussions',
+                    array_values($checkedDiscussions)
+                );
                 $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
 
-                $ellapsedTime = time() - $startTime;
-                if ($ellapsedTime > 10) {
+                $elapsedTime = time() - $startTime;
+                if ($elapsedTime > self::MAX_TIME_BATCH_DELETE) {
                     break;
                 }
             }
@@ -358,6 +364,9 @@ class ModerationController extends VanillaController {
                     ]
                 ], 'Ajax');
                 $this->setFormSaved(false);
+            } else {
+                $this->jsonTarget("!element", "", "closePopup");
+                $this->setFormSaved(true);
             }
 
             ModerationController::informCheckedDiscussions($this, true);

@@ -690,12 +690,10 @@
                         var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
                         if (multiline) {
                             var thisOpts = $.extend(markdownOpts, {
-                                prefix: '    ',
-                                opentag: '',
-                                closetag: '',
-                                opener: '',
-                                closer: ''
+                                opentag: '```\n',
+                                closetag: '\n```'
                             });
+
                             $(TextArea).insertRoundTag('', thisOpts);
                         } else {
                             $(TextArea).insertRoundTag('`', markdownOpts);

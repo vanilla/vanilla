@@ -7,6 +7,7 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
+use Vanilla\ApiUtils;
 
 /**
  * Interface for a search item.
@@ -99,6 +100,21 @@ abstract class AbstractSearchType {
                 'style' => 'form',
                 'description' => 'Restrict the search to the specified type(s) of records.',
             ],
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => 20,
+                'minimum' => 1,
+                'maximum' => 1000,
+            ],
+            'expandBody:b?' => [
+                'default' => true,
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
         ]));
     }
 

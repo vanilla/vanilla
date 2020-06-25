@@ -64,6 +64,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             $schema = Schema::parse([
                 'recordType:s',
                 'type:s',
+                'body:s?',
                 'recordID:s',
                 'name:s',
                 'url' => [

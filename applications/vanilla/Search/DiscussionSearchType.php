@@ -13,6 +13,7 @@ use Vanilla\Adapters\SphinxClient;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
@@ -29,6 +30,9 @@ class DiscussionSearchType extends AbstractSearchType {
 
     /** @var \CategoryModel */
     protected $categoryModel;
+
+    /** @var \UserModel $userModel */
+    protected $userModel;
 
     /** @var \TagModel */
     protected $tagModel;
@@ -47,11 +51,13 @@ class DiscussionSearchType extends AbstractSearchType {
     public function __construct(
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
+        \UserModel $userModel,
         \TagModel $tagModel,
         BreadcrumbModel $breadcrumbModel
     ) {
         $this->discussionsApi = $discussionsApi;
         $this->categoryModel = $categoryModel;
+        $this->userModel = $userModel;
         $this->tagModel = $tagModel;
         $this->breadcrumbModel = $breadcrumbModel;
     }
@@ -109,39 +115,48 @@ class DiscussionSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function applyToQuery(SearchQuery $query) {
-        // Notably includes 0 to still allow other normalized records if set.
-        $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
-            $query->getQueryParameter('categoryID'),
-            $query->getQueryParameter('followedCategories'),
-            $query->getQueryParameter('includeChildCategories'),
-            $query->getQueryParameter('includeArchivedCategories')
-        );
+        $types = $query->getQueryParameter('types');
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
+            // discussions are not the part of this search query request
+            // we don't need to do anything
+            return;
+        }
 
+        $types = $query->getQueryParameter('recordTypes');
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
+            // discussions are not the part of this search query request
+            // we don't need to do anything
+            return;
+        }
+        // Notably includes 0 to still allow other normalized records if set.
         $tagNames = $query->getQueryParameter('tags', []);
         $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
         $tagOp = $query->getQueryParameter('tagOperator', 'or');
-        $discussionID = $query->getQueryParameter('discussionID', null);
+        ;
 
-        // Always set.
-        if (!empty($categoryIDs)) {
-            $query->setFilter('CategoryID', $categoryIDs);
-        } else {
-            // Only include non-category content.
-            $query->setFilter('CategoryID', [0]);
-        }
-
-        // tags
-        if (!empty($tagIDs)) {
-            $query->setFilter('Tags', $tagIDs, false, $tagOp);
-        }
-
-        // discussionID
-        if ($discussionID !== null) {
-            $query->setFilter('DiscussionID', [$discussionID]);
-        } elseif ($query instanceof SphinxSearchQuery) {
+        if ($query instanceof SphinxSearchQuery) {
             // TODO: Figure out the ideal time to do this.
             // Make sure we don't get duplicate discussion results.
             // $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
+            // Always set.
+            // discussionID
+            if ($discussionID = $query->getQueryParameter('discussionID', false)) {
+                $query->setFilter('DiscussionID', [$discussionID]);
+            };
+            $categoryIDs = $this->getCategoryIDs($query);
+            if (!empty($categoryIDs)) {
+                $query->setFilter('CategoryID', $categoryIDs);
+            } else {
+                // Only include non-category content.
+                $query->setFilter('CategoryID', [0]);
+            }
+
+            // tags
+            if (!empty($tagIDs)) {
+                $query->setFilter('Tags', $tagIDs, false, $tagOp);
+            }
+        } elseif ($query instanceof MysqlSearchQuery) {
+             $query->addSql($this->generateSql($query));
         }
     }
 
@@ -195,6 +210,125 @@ class DiscussionSearchType extends AbstractSearchType {
         $categoryID = $query->getQueryParameter('categoryID', null);
         if ($categoryID !== null && !$this->categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View')) {
             throw new PermissionException('Vanilla.Discussions.View');
+        }
+    }
+
+    /**
+     * Generates prepares sql query string
+     *
+     * @param MysqlSearchQuery $query
+     * @return string
+     */
+    public function generateSql(MysqlSearchQuery $query): string {
+        /** @var \Gdn_SQLDriver $db */
+        $db = $query->getDB();
+        $db->reset();
+
+        $categoryIDs = $this->getCategoryIDs($query);
+
+        if ($categoryIDs === []) {
+            return '';
+        }
+
+        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+
+        if ($userIDs === []) {
+            return '';
+        }
+
+        $db->reset();
+
+        // Build base query
+        $db->from('Discussion d')
+            ->select('d.DiscussionID as recordID, d.Name as Title, d.Format, d.CategoryID, d.Score')
+            ->select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
+            ->select('d.DateInserted')
+            ->select('d.Type as recordType')
+            ->select('d.InsertUserID as UserID')
+            ->select("'discussion'", '', 'type')
+            ->orderBy('d.DateInserted', 'desc')
+        ;
+        if (false !== $query->get('expandBody', null)) {
+            $db->select('d.Body as body');
+        }
+
+        $terms = $query->get('query', false);
+        if ($terms) {
+            $terms = $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
+            $db->beginWhereGroup();
+            foreach (['d.Name', 'd.Body'] as $field) {
+                $db->orWhere("$field like", $terms, false, false);
+            }
+            $db->endWhereGroup();
+        }
+
+        if ($title = $query->get('title', false)) {
+            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $title).'%'));
+        }
+
+        if ($users = $query->get('users', false)) {
+            $author = array_column($users, 'UserID');
+            $db->where('d.InsertUserID', $author);
+        }
+
+        if ($users = $query->get('insertUserIds', false)) {
+            $author = array_column($users, 'UserID');
+            $db->where('d.InsertUserID', $author);
+        }
+
+        if (is_array($userIDs)) {
+            $db->where('d.InsertUserID', $userIDs);
+        }
+
+        if ($discussionID = $query->get('discussionID', false)) {
+            $db->where('d.DiscussionID', $discussionID);
+        }
+
+        if (!empty($categoryIDs)) {
+            $db->whereIn('d.CategoryID', $categoryIDs);
+        }
+
+        $limit = $query->get('limit', 100);
+        $offset = $query->get('offset', 0);
+        $db->limit($limit + $offset);
+
+        $sql = $db->getSelect(true);
+        $db->reset();
+
+        return $sql;
+    }
+
+    /**
+     * Get category ids from DB if query has it as a filter
+     *
+     * @param SearchQuery $query
+     * @return array|null
+     */
+    protected function getCategoryIDs(SearchQuery $query): ?array {
+        $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
+            $query->getQueryParameter('categoryID'),
+            $query->getQueryParameter('followedCategories'),
+            $query->getQueryParameter('includeChildCategories'),
+            $query->getQueryParameter('includeArchivedCategories')
+        );
+        return $categoryIDs;
+    }
+
+    /**
+     * Get user ids by their name if query has insertUserNames argument
+     *
+     * @param array $userNames
+     * @return array|null
+     */
+    protected function getUserIDs(array $userNames): ?array {
+        if (!empty($userNames)) {
+            $users = $this->userModel->getWhere([
+                'name' => $userNames,
+            ])->resultArray();
+            $userIDs = array_column($users, 'UserID');
+            return $userIDs;
+        } else {
+            return null;
         }
     }
 }

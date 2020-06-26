@@ -97,9 +97,11 @@ dashboardHeading({
             {{ form.toggle('CustomPermissions', 'This category has custom permissions.') }}
         </li>
     {% endif %}
+    {% if _PermissionFields is defined %}
+        {{ form.simple(_PermissionFields, []) }}
+    {% endif %}
 </ul>
 <div class="CategoryPermissions">
-
     {% if DiscussionTypes|length > 1 %}
         <div class="P DiscussionTypes form-group">
             <div class="label-wrap">
@@ -112,11 +114,6 @@ dashboardHeading({
             </div>
         </div>
     {% endif %}
-
-    {% if _PermissionFields is defined %}
-    {{ form.simple(_PermissionFields, []) }}
-    {% endif %}
-
     <div class="padded">{{ t('Check all permissions that apply for each role') }}</div>
     {{ form.checkBoxGridGroups(PermissionData, 'Permission') }}
 </div>

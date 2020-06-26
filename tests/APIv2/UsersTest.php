@@ -228,6 +228,7 @@ class UsersTest extends AbstractResourceTest {
             "dateLastActive" => null,
             "isAdmin" => false,
             "countUnreadNotifications" => 0,
+            "countUnreadConversations" => 0,
             "permissions" => [
                 "activity.view",
                 "discussions.view",
@@ -271,6 +272,7 @@ class UsersTest extends AbstractResourceTest {
             "dateLastActive" => $dateLastActive,
             "isAdmin" => true,
             "countUnreadNotifications" => 0,
+            "countUnreadConversations" => 0,
             "permissions" => [
                 "activity.delete",
                 "activity.view",

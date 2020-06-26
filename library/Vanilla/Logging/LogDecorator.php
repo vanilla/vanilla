@@ -44,6 +44,16 @@ class LogDecorator implements LoggerInterface {
     private $userModel;
 
     /**
+     * @var array
+     */
+    private $obscureKeys = [
+        'access_token',
+        'authorization',
+        '*password',
+        '*secret',
+    ];
+
+    /**
      * LogDecorator constructor.
      *
      * @param LoggerInterface $logger
@@ -83,6 +93,8 @@ class LogDecorator implements LoggerInterface {
         $this->addUsername(Logger::FIELD_USERID, Logger::FIELD_USERNAME, $context);
         $this->addUsername(Logger::FIELD_TARGET_USERID, Logger::FIELD_TARGET_USERNAME, $context);
 
+        $this->obscureContext($context);
+
         $this->logger->log($level, $message, $context);
     }
 
@@ -121,6 +133,15 @@ class LogDecorator implements LoggerInterface {
     }
 
     /**
+     * Add a pattern to remove.
+     *
+     * @param string $pattern
+     */
+    public function addObscureKey(string $pattern): void {
+        $this->obscureKeys[] = strtolower($pattern);
+    }
+
+    /**
      * Get the context defaults that will be added to every log entry.
      *
      * @return array
@@ -136,5 +157,20 @@ class LogDecorator implements LoggerInterface {
      */
     public function setContextOverrides(array $staticContextDefaults): void {
         $this->staticContextDefaults = $staticContextDefaults;
+    }
+
+    /**
+     * Clean sensitive data out of the log context.
+     *
+     * @param array $context The context to clean.
+     */
+    private function obscureContext(array &$context): void {
+        array_walk_recursive($context, function (&$value, $key) {
+            foreach ($this->obscureKeys as $pattern) {
+                if (fnmatch($pattern, strtolower($key))) {
+                    $value = '***';
+                }
+            }
+        });
     }
 }

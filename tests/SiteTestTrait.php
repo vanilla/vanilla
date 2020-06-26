@@ -7,6 +7,7 @@
 
 namespace VanillaTests;
 
+use Garden\Container\Container;
 use Garden\EventManager;
 use PHPUnit\Framework\AssertionFailedError;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -86,6 +87,15 @@ trait SiteTestTrait {
     }
 
     /**
+     * Configure the container before addons are started.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        return;
+    }
+
+    /**
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
     private static function setupBeforeClassSiteTestTrait(): void {
@@ -93,6 +103,7 @@ trait SiteTestTrait {
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
+        self::configureContainerBeforeStartup($dic);
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);

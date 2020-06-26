@@ -70,4 +70,12 @@ class LogDecoratorTest extends TestCase {
             'userid' => 123,
         ]);
     }
+
+    /**
+     * Test basic context cleaning.
+     */
+    public function testObscureContext(): void {
+        $this->log->info('foo', ['a' => ['ClientSecret' => 'a', 'Password' => 'b']]);
+        $this->assertLog(['a' => ['ClientSecret' => '***', 'Password' => '***']]);
+    }
 }

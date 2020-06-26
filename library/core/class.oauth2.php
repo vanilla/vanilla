@@ -787,7 +787,6 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
                 'code' => $code,
                 'client_id' => val('AssociationKey', $provider),
                 'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
-                'client_secret' => val('AssociationSecret', $provider),
                 'grant_type' => 'authorization_code',
                 'scope' => val('AcceptedScope', $provider)
             ];

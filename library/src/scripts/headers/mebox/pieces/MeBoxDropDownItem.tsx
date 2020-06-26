@@ -62,12 +62,16 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
             const authorCount = this.props.authors.length;
             if ("authors" in this.props && authorCount > 0) {
                 authors = this.props.authors!.map((user, index) => {
-                    return (
-                        <React.Fragment key={`meBoxAuthor-${index}`}>
-                            <strong>{user.name}</strong>
-                            {`${index < authorCount - 1 ? `, ` : ""}`}
-                        </React.Fragment>
-                    );
+                    if (user) {
+                        return (
+                            <React.Fragment key={`meBoxAuthor-${index}`}>
+                                <strong>{user.name}</strong>
+                                {`${index < authorCount - 1 ? `, ` : ""}`}
+                            </React.Fragment>
+                        );
+                    } else {
+                        return <></>;
+                    }
                 });
             }
         }

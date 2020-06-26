@@ -48,6 +48,7 @@ class FeatureFlagHelper {
      *
      * @param string $feature The config-friendly name of the feature.
      * @param string $exceptionClass The fully-qualified class name of the exception to throw.
+     * @psalm-param class-string<\Exception> $exceptionClass
      * @param array $exceptionArguments Any parameters to be passed to the exception class's constructor.
      * @deprecated 2.7 Use FeatureFlagHelper::ensureFeature instead.
      */
@@ -57,7 +58,6 @@ class FeatureFlagHelper {
             if ($exceptionClass === \Exception::class && empty($exceptionArguments)) {
                 $exceptionArguments = [t('This feature is not enabled.')];
             }
-            /** @psalm-suppress InvalidThrow */
             throw new $exceptionClass(...$exceptionArguments);
         }
     }

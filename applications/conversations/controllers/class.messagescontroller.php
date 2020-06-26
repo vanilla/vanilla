@@ -45,6 +45,14 @@ class MessagesController extends ConversationsController {
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
         }
+
+        /**
+         * The default Cache-Control header does not include no-store, which can cause issues (e.g. inaccurate unread
+         * status or new message counts) when users visit the conversation list via the browser's back button. The same
+         * check is performed here as in Gdn_Controller before the Cache-Control header is added, but this value
+         * includes the no-store specifier.
+         */
+        $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
     }
 
     /**

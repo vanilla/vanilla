@@ -36,6 +36,7 @@ class UserCounterProvider implements CounterProviderInterface {
             $counters[] = new Counter("Bookmarks", $user->CountBookmarks ?? 0);
             $counters[] = new Counter("Discussions", $user->CountDiscussions ?? 0);
             $counters[] = new Counter("UnreadDiscussions", $user->CountUnreadDiscussions ?? 0);
+            $counters[] = new Counter("UnreadConversations", $user->CountUnreadConversations ?? 0);
             $counters[] = new Counter("Drafts", $user->CountDrafts ?? 0);
         }
         return $counters;

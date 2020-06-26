@@ -269,10 +269,10 @@ class DateFilterSchema extends Schema {
     /**
      * If the parameter value is a valid date filter value, return an array of query conditions.
      *
-     * @throws Exception
      * @param string $field The name of the field in the filters.
      * @param mixed $dateData The decoded date data.
      * @return array
+     * @throws \InvalidArgumentException Throws an exception when the operator is invalid.
      */
     public static function dateFilterField($field, array $dateData) {
         $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
@@ -316,7 +316,7 @@ class DateFilterSchema extends Schema {
                 }
             }
         } else {
-            throw new Exception('Invalid data supplied to dateFilterField');
+            throw new \InvalidArgumentException('Invalid data supplied to dateFilterField');
         }
 
         return $result;

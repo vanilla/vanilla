@@ -8,6 +8,7 @@ namespace Vanilla\Web;
 
 use Garden\Http\CurlHandler;
 use Garden\SafeCurl\SafeCurl;
+use Garden\Http\HttpResponse;
 
 /**
  * HTTP handler interface utilizing SafeCurl.

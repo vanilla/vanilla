@@ -35,7 +35,7 @@ class DateTimeFormatter {
      *
      * @link http://us.php.net/manual/en/function.strftime.php
      *
-     * @param string|number $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
+     * @param string|int $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
      * @param bool $isHtml Whether or not to output this as an HTML string.
      * @param string $format The format string to use. Defaults to the application's default format.
      * @return string

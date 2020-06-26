@@ -3,6 +3,7 @@
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
+ * @psalm-suppress all
  */
 
 namespace Vanilla\Adapters;

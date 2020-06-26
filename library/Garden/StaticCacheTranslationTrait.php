@@ -25,7 +25,7 @@ trait StaticCacheTranslationTrait {
      * @param string $key Key to store
      * @param mixed $default Default value for the key if not defined
      *
-     * @return array
+     * @return string
      */
     protected static function f(string $key, $default) {
         return Gdn::translate($key, $default);

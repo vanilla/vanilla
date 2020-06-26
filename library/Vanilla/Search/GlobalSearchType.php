@@ -102,6 +102,7 @@ class GlobalSearchType extends AbstractSearchType {
             $query->setFilter('insertUserID', $insertUserIDs);
         }
 
+        /** @psalm-suppress UndefinedClass */
         if ($query instanceof SphinxSearchQuery) {
             if ($startDate && $endDate) {
                 $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());

@@ -31,7 +31,7 @@ import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import qs from "qs";
-import * as React from "react";
+import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
 

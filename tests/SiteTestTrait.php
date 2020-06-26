@@ -103,7 +103,7 @@ trait SiteTestTrait {
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
-        self::configureContainerBeforeStartup($dic);
+        static::configureContainerBeforeStartup($dic);
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);

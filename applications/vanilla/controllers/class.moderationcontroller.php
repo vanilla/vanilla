@@ -307,9 +307,6 @@ class ModerationController extends VanillaController {
 
         if ($checkedDiscussions === null) {
             $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
-            $fork = true;
-        } else {
-            $fork = false;
         }
 
         if (!is_array($checkedDiscussions)) {
@@ -322,7 +319,11 @@ class ModerationController extends VanillaController {
 
         // Check permissions on each discussion to make sure the user has permission to delete them
         $allowedDiscussions = [];
-        $discussionData = $discussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $discussionIDs)->get();
+        $discussionData = $discussionModel->SQL
+            ->select('DiscussionID, CategoryID')
+            ->from('Discussion')
+            ->whereIn('DiscussionID', $discussionIDs)
+            ->get();
         foreach ($discussionData->result() as $discussion) {
             $countCheckedDiscussions = $discussionData->numRows();
             if (CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.Delete')) {
@@ -345,7 +346,7 @@ class ModerationController extends VanillaController {
                     'CheckedDiscussions',
                     array_values($checkedDiscussions)
                 );
-                $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
+                $this->jsonTarget("#Discussion_$discussionID", ["remove" => true], 'SlideUp');
 
                 $elapsedTime = time() - $startTime;
                 if ($elapsedTime > self::MAX_TIME_BATCH_DELETE) {

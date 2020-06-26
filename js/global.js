@@ -678,7 +678,20 @@ jQuery(document).ready(function($) {
                     $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
-                    $target.slideUp('fast');
+                    let removeTarget = false;
+                    if (typeof item.Data === "object" && item.Data.remove !== "undefined") {
+                        removeTarget = !!item.Data.remove;
+                    }
+
+                    let slideUpComplete = (function (remove) {
+                        return function () {
+                            if (remove) {
+                                $(this).remove();
+                            }
+                        }
+                    })(removeTarget);
+
+                    $target.slideUp('fast', slideUpComplete);
                     break;
                 case 'SlideDown':
                     $target.slideDown('fast');

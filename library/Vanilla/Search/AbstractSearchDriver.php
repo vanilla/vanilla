@@ -78,7 +78,8 @@ abstract class AbstractSearchDriver {
             $recordIDs = array_column($recordSet, 'recordID');
             $resultItems = $searchType->getResultItems($recordIDs);
             foreach ($resultItems as $resultItem) {
-                $resultsItemsByTypeAndID[$resultItem->getType().$resultItem->getRecordID()] = $resultItem;
+                $id = $resultItem->getAltRecordID() ?? $resultItem->getRecordID();
+                $resultsItemsByTypeAndID[$resultItem->getType().$id] = $resultItem;
             }
         }
 

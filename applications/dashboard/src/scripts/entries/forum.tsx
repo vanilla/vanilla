@@ -17,7 +17,7 @@ import RecoverPasswordPage from "@dashboard/pages/RecoverPasswordPage";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
-import { addComponent } from "@library/utility/componentRegistry";
+import { addComponent, addPageComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
@@ -57,7 +57,7 @@ applySharedPortalContext(props => {
 });
 
 // Routing
-addComponent("App", () => <Router disableDynamicRouting />);
+addPageComponent(() => <Router disableDynamicRouting />);
 
 // The community is still very tied into the global.js and legacyAnalyticsTick.json.
 enableLegacyAnalyticsTick(true);

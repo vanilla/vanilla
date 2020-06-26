@@ -123,7 +123,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @return int
      */
-    public function getAltRecordID(): int {
+    public function getAltRecordID(): ?int {
         return $this->altRecordID;
     }
 

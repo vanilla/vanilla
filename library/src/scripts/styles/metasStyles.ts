@@ -61,7 +61,7 @@ export const metaContainerStyles = (overwrites?: any) => {
         width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
         overflow: "hidden",
         textAlign: "left",
-        fontSize: unit(globalVars.meta.text.fontSize),
+        fontSize: unit(globalVars.meta.text.size),
         ...margins({
             left: -vars.spacing.default,
             right: vars.spacing.default,
@@ -107,6 +107,9 @@ export const metaItemStyle = useThemeCache(() => {
         $nest: {
             "& &": {
                 margin: 0,
+            },
+            "& .isDeleted, &.isDeleted": {
+                color: colorOut(vars.colors.deleted.fg),
             },
         },
     } as NestedCSSProperties;

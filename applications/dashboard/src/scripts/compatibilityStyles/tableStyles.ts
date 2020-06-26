@@ -38,7 +38,7 @@ export const tableCSS = () => {
         `,
         {
             color: colorOut(vars.mainColors.fg),
-            fontSize: unit(vars.meta.text.fontSize),
+            fontSize: unit(vars.meta.text.size),
             textDecoration: important("none"),
         },
     );

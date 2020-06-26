@@ -37,6 +37,8 @@ import {
     RevisionStatusPendingIcon,
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
+import * as SearchIcons from "@library/icons/searchIcons";
+
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
@@ -336,6 +338,44 @@ story.add("Icons", () => {
                     <CommonIcons.NewPollIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
+
+            <StoryHeading>Search Icons</StoryHeading>
+
+            <StoryTileAndTextCompact text={`SearchFilterAll`}>
+                <SearchIcons.TypeAllIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeDiscussions`}>
+                <SearchIcons.TypeDiscussionsIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeArticles`}>
+                <SearchIcons.TypeArticlesIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeCategoriesAndGroups`}>
+                <SearchIcons.TypeCategoriesAndGroupsIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeMember`}>
+                <SearchIcons.TypeMemberIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeCategories`}>
+                <SearchIcons.TypeCategoriesIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeIdeas`}>
+                <SearchIcons.TypeIdeasIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypePolls`}>
+                <SearchIcons.TypePollsIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeQuestion`}>
+                <SearchIcons.TypeQuestionIcon />
+            </StoryTileAndTextCompact>
         </StoryContent>
     );
 });

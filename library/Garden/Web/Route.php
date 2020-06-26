@@ -8,6 +8,7 @@
 namespace Garden\Web;
 
 use Garden\MetaTrait;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * The base class for routes.
@@ -53,6 +54,26 @@ abstract class Route {
     ];
 
     private $defaults = [];
+
+    private $themeFeatureEnabled = true;
+
+    /**
+     * Whether or not the route is enabled.
+     *
+     * @return bool
+     */
+    public function isEnabled(): bool {
+        return $this->themeFeatureEnabled;
+    }
+
+    /**
+     * Apply a theme feature flag to a route. If the feature flag isn't enabled, the route will not activate.
+     *
+     * @param bool $themeFeatureEnabled
+     */
+    public function setThemeFeatureEnabled(bool $themeFeatureEnabled) {
+        $this->themeFeatureEnabled = $themeFeatureEnabled;
+    }
 
     /**
      * Get the conditions.

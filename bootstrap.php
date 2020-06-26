@@ -4,6 +4,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Controllers\SearchRootController;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -262,6 +263,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
     ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
+    ->addCall('addRoute', ['route' => new Reference('@new-search-route'), 'new-search'])
     ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
@@ -305,6 +307,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('@apiexpand-filter')
     ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
 
+    ->rule("@new-search-route")
+    ->setClass(\Garden\Web\ResourceRoute::class)
+    ->setConstructorArgs(['/search', '*\\%sSearchPageController'])
+    ->addCall('setThemeFeatureEnabled', [new Reference([ThemeFeatures::class, SearchRootController::ENABLE_FLAG])])
+    ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
+    ->addCall('setRootController', [SearchRootController::class])
+
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
@@ -344,6 +353,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(SearchService::class)
     ->setShared(true)
+    ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
     ->rule(AbstractSearchDriver::class)
     ->setShared(true)
     ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
@@ -447,6 +457,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Page::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])

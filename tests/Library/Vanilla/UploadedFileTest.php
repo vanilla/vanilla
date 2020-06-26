@@ -9,13 +9,24 @@ namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
+use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for uploaded files.
  */
-class UploadedFileTest extends SharedBootstrapTestCase {
+class UploadedFileTest extends TestCase {
+
+    use BootstrapTrait;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->setupBoostrapTrait();
+    }
 
     /**
      * Test that various internal IPs cannot be redirected too.
@@ -176,5 +187,66 @@ class UploadedFileTest extends SharedBootstrapTestCase {
         // Standard cleanup/moving procedures did not occur.
         $this->assertFileExists($file->getFile());
         $this->assertEquals($expectedSaveName, $file->getPersistedPath());
+    }
+
+    /**
+     * Provides data for testGetMaxImageHeight() and testGetMaxImageWidth()
+     *
+     * @return array
+     */
+    public function provideDimensionsData(): array {
+        $r = [
+            'test int positive' => [10, 10],
+            'test int greater than max' => [3000, 4000],
+            'test string positive' => [10, '10'],
+            'test 0 int' => [0, 0],
+            'test 0 string' => [0, '0'],
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Test UploadedFile->setMaxImageHeight() with bad values
+     *
+     * @param mixed $actual
+     * @dataProvider provideBadDimensionsData
+     */
+    public function testBadGetMaxImageHeight($actual) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('height should be greater than or equal to 0.');
+
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageHeight($actual);
+    }
+
+    /**
+     * Test UploadedFile->setMaxImageWidth() with bad values
+     *
+     * @param mixed $actual
+     * @dataProvider provideBadDimensionsData
+     */
+    public function testBadGetMaxImageWidth($actual) {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('width should be greater than or equal to 0.');
+
+        // Perform some tests related to saving uploads.
+        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file->setMaxImageWidth($actual);
+    }
+
+    /**
+     * Provides data for testBadGetMaxImageHeight() and testBadGetMaxImageWidth()
+     *
+     * @return array
+     */
+    public function provideBadDimensionsData(): array {
+        $r = [
+            'test int negative' => [-1],
+            'test string negative' => ['-1']
+        ];
+
+        return $r;
     }
 }

@@ -64,6 +64,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             $schema = Schema::parse([
                 'recordType:s',
                 'type:s',
+                'body:s?',
                 'recordID:s',
                 'foreignID:s?',
                 'name:s',
@@ -73,6 +74,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 ],
                 'dateInserted:dt',
                 'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
+                "insertUserID:i"
             ]);
 
             $extra = $this->extraSchema();

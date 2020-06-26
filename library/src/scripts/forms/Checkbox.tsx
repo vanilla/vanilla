@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
-import { checkRadioClasses } from "./checkRadioStyles";
-import classNames from "classnames";
-import { t } from "@library/utility/appUtils";
-import { srOnly, visibility } from "@library/styles/styleHelpers";
+import { visibility } from "@library/styles/styleHelpers";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { t } from "@library/utility/appUtils";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React from "react";
+import { checkRadioClasses } from "./checkRadioStyles";
 
 interface IProps extends IOptionalComponentID {
     id?: string;

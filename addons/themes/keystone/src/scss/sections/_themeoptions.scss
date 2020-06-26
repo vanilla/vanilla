@@ -52,6 +52,16 @@
     }
 }
 
+.hideContentDescription {
+
+    .MainContent {
+
+        .PageDescription {
+            display: none;
+        }
+    }
+}
+
 .ThemeOptions-hasHeroBanner {
     .BreadcrumbsBox {
         margin-left: 0;

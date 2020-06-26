@@ -48,6 +48,12 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+    - &run_php_static
+      run:
+        name: PHP Static Analysis
+        command: |
+          cd ~/workspace/repo
+          ./vendor/bin/psalm
 
 jobs:
     frontend_setup:
@@ -131,6 +137,12 @@ jobs:
             - core/checkout
             - *run_composer
             - *run_php_lint
+    php_72_static:
+      executor: core/php72
+      steps: &php_static_steps
+        - core/checkout
+        - *run_composer
+        - *run_php_static
     php_72_tests:
         executor: core/php72
         resource_class: large
@@ -198,6 +210,9 @@ jobs:
     php_73_lint:
         executor: core/php73
         steps: *php_lint_steps
+    php_73_static:
+      executor: core/php73
+      steps: *php_static_steps
     php_73_tests:
         executor: core/php73
         steps: *php_unit_test_steps

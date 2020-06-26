@@ -26,6 +26,9 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /** @var Data */
     private $data;
 
+    /** @var int */
+    private $altRecordID;
+
     /**
      * Constructor.
      *
@@ -33,6 +36,15 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      */
     public function __construct(array $data) {
         $this->data = $this->fullSchema()->validate($data);
+    }
+
+    /**
+     * Set an alternative recordID that may be used to identify the item.
+     *
+     * @param int $altRecordID
+     */
+    public function setAltRecordID(int $altRecordID): void {
+        $this->altRecordID = $altRecordID;
     }
 
     /**
@@ -65,7 +77,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 'recordType:s',
                 'type:s',
                 'body:s?',
-                'recordID:s',
+                'recordID:i',
                 'name:s',
                 'url' => [
                     'type' => 'string',
@@ -102,10 +114,17 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getRecordID(): string {
+    public function getRecordID(): int {
         return $this->data['recordID'];
+    }
+
+    /**
+     * @return int
+     */
+    public function getAltRecordID(): ?int {
+        return $this->altRecordID;
     }
 
     /**

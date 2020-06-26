@@ -32,7 +32,7 @@ export default class RouteHandler<GeneratorProps> {
         componentPromise: LoadFunction,
         public path: string | string[],
         url: (data: GeneratorProps) => string,
-        loadingComponent: React.ReactNode = Loader,
+        loadingComponent: React.ComponentType = Loader,
         key?: string,
     ) {
         this.loadable = Loadable({

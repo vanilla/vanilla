@@ -35,6 +35,7 @@ const makeMockGuestUser: IMe = {
     photoUrl: "",
     dateLastActive: "",
     countUnreadNotifications: 1,
+    countUnreadConversations: 1,
 };
 
 story.add(

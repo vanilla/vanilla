@@ -13,6 +13,8 @@
  */
 class ModerationController extends VanillaController {
 
+    use \Vanilla\Web\TwigRenderTrait;
+
     // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
     private const MAX_TIME_BATCH_DELETE = 10;
 
@@ -364,7 +366,14 @@ class ModerationController extends VanillaController {
                         'fork' => false
                     ]
                 ], 'Ajax');
+                $this->title("Deleting...");
                 $this->setFormSaved(false);
+                $this->jsonTarget(
+                    "#Popup .Content",
+                    $this->renderTwig('/applications/vanilla/views/moderation/loading.twig', $this->Data),
+                    "Html"
+                );
+                $this->View = "loading";
             } else {
                 $this->jsonTarget("!element", "", "closePopup");
                 $this->setFormSaved(true);

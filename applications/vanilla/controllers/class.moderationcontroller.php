@@ -366,14 +366,14 @@ class ModerationController extends VanillaController {
                         'fork' => false
                     ]
                 ], 'Ajax');
-                $this->title("Deleting...");
+                $this->title(t("Deleting..."));
                 $this->setFormSaved(false);
                 $this->jsonTarget(
                     "#Popup .Content",
-                    $this->renderTwig('/applications/vanilla/views/moderation/loading.twig', $this->Data),
+                    $this->renderTwig('/applications/vanilla/views/moderation/progress.twig', $this->Data),
                     "Html"
                 );
-                $this->View = "loading";
+                $this->View = "progress";
             } else {
                 $this->jsonTarget("!element", "", "closePopup");
                 $this->setFormSaved(true);

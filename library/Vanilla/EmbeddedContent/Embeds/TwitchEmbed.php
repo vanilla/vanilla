@@ -25,11 +25,13 @@ class TwitchEmbed extends AbstractEmbed {
      * @return string|null
      */
     private function frameSourceFromID(string $id, string $type): ?string {
+        $query = ['parent' => \Gdn::request()->getHost()];
         if ($type === "clip") {
-            return "https://clips.twitch.tv/embed?clip=".urlencode($id);
+            $query['clip'] = $id;
+            return "https://clips.twitch.tv/embed?".http_build_query($query);
         } else {
-            $query = http_build_query([$type => $id]);
-            return "https://player.twitch.tv/?" . $query;
+            $query[$type] = $id;
+            return "https://player.twitch.tv/?" .http_build_query($query);
         }
     }
 

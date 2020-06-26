@@ -114,4 +114,47 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
         $dataEmbed = new TwitchEmbed($embedData);
         $this->assertInstanceOf(TwitchEmbed::class, $dataEmbed);
     }
+
+    /**
+     * Verify generating Twitch video embed type and ID from a URL.
+     *
+     * @param string $url
+     * @param string|null $expectedID
+     * @dataProvider provideIDTestUrls
+     */
+    public function testIDFromUrl(string $url, ?string $expectedID): void {
+        $embed = $this->factory->createEmbedForUrl($url);
+        $data = $embed->jsonSerialize();
+        $this->assertSame($data["twitchID"], $expectedID);
+    }
+
+    /**
+     * Provide data for testing extracting an embed type and ID from a URL.
+     *
+     * @return array
+     */
+    public function provideIDTestUrls(): array {
+        return [
+            "Clip, short-form" => [
+                "https://clips.twitch.tv/KnottyOddFishShazBotstix",
+                "clip:KnottyOddFishShazBotstix",
+            ],
+            "Clip, long-form" => [
+                "https://www.twitch.tv/jerma985/clip/KnottyOddFishShazBotstix",
+                "clip:KnottyOddFishShazBotstix",
+            ],
+            "Channel" => [
+                "https://www.twitch.tv/jerma985",
+                "channel:jerma985",
+            ],
+            "Video" => [
+                "https://www.twitch.tv/videos/346728148",
+                "video:346728148",
+            ],
+            "Collection" => [
+                "https://www.twitch.tv/collections/myIbIFkZphQSbQ",
+                "collection:myIbIFkZphQSbQ",
+            ],
+        ];
+    }
 }

@@ -88,7 +88,7 @@ class ModelFactory implements ContainerInterface {
      *
      * @param string $ref On of the following: The record type (case insensitive), an alias, or the model class name.
      * @return string Returns the name of the record type.
-     * @throws NotFoundExceptionInterface Throws an exception when the ref isn't found.
+     * @throws NotFoundException Throws an exception when the ref isn't found.
      */
     public function getRecordType(string $ref): string {
         $r = $this->getRecordTypes()[$ref] ?? null;

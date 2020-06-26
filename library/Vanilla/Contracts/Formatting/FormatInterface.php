@@ -9,7 +9,6 @@ namespace Vanilla\Contracts\Formatting;
 
 use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Heading;
 
 /**
  * An interface for rendering, filtering, and parsing user content.

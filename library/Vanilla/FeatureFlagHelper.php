@@ -57,6 +57,7 @@ class FeatureFlagHelper {
             if ($exceptionClass === \Exception::class && empty($exceptionArguments)) {
                 $exceptionArguments = [t('This feature is not enabled.')];
             }
+            /** @psalm-suppress InvalidThrow */
             throw new $exceptionClass(...$exceptionArguments);
         }
     }

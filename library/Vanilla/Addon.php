@@ -223,7 +223,7 @@ class Addon {
      * Perform a glob from this addon's subdirectory.
      *
      * @param string $pattern The pattern to glob.
-     * @param string $dirs Just directories.
+     * @param bool $dirs Just directories.
      * @return array Returns an array of root-relative paths.
      * @see glob()
      */
@@ -286,6 +286,7 @@ class Addon {
         $oldType = null;
 
         // See which info array is defined.
+        /** @psalm-suppress UndefinedVariable */
         if (!empty($PluginInfo) && is_array($PluginInfo)) {
             $array = $PluginInfo;
             $type = static::TYPE_ADDON;

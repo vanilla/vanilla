@@ -118,7 +118,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
             return null;
         }
 
-        if ($host === "clips.twitch.tv" || preg_match("`/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
+        if ($host === "clips.twitch.tv" && preg_match("`/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
             return "clip:{$clipsMatch['clipID']}";
         } elseif (preg_match("`/(?<type>videos|collections)/(?<id>[^/]+)`", $path, $videosMatch)) {
             $type = $videosMatch["type"] === "videos" ? "video" : "collection";

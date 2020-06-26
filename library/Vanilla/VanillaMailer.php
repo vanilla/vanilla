@@ -19,7 +19,7 @@ class VanillaMailer extends \PHPMailer {
      * Either set or get the value of "throwExceptions".
      *
      * @param bool $newValue Whether this instance should throw exceptions or not
-     * @return The current value
+     * @return bool The current value
      */
     public function throwExceptions($newValue = null) {
         deprecated('throwExceptions', 'getThrowExceptions/setThrowExceptions');

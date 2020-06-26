@@ -32,7 +32,7 @@ class ModelCache implements InjectableInterface {
     /** @var string */
     private $cacheNameSpace;
 
-    /** @var number */
+    /** @var array */
     private $defaultCacheOptions;
 
     /** @var int */

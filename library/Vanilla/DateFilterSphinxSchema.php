@@ -17,7 +17,7 @@ class DateFilterSphinxSchema extends DateFilterSchema {
      *
      * @param mixed $dateData The decoded and validated date data.
      *
-     * @throws Exception If dateData structure is wrong throw exception.
+     * @throws \InvalidArgumentException If dateData structure is wrong throw exception.
      *
      * @return array Structure: DateTime startDate, DateTime endDate, Boolean inclusive
      */
@@ -67,7 +67,7 @@ class DateFilterSphinxSchema extends DateFilterSchema {
                 }
             }
         } else {
-            throw new Exception('Invalid data supplied to dateFilterRange');
+            throw new \InvalidArgumentException('Invalid data supplied to dateFilterRange');
         }
 
         return $result;

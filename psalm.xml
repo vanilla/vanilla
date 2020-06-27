@@ -10,6 +10,7 @@
     <projectFiles>
         <directory name="library/Garden" />
         <directory name="library/Vanilla" />
+        <directory name="library/core" />
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>

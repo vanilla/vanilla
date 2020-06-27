@@ -42,7 +42,7 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     public function set($key, $value, $ttl = null) {
         $options = [];
         if ($ttl !== null) {
-            $options[FEATURE_EXPIRY] = $ttl;
+            $options[Gdn_Cache::FEATURE_EXPIRY] = $ttl;
         }
         return $this->cacheObject->store($key, $value, $ttl);
     }
@@ -80,11 +80,11 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function deleteMultiple($keys) {
         $success = true;
-        foreach($values as $key) {
+        foreach ($keys as $key) {
             if ($this->delete($key) === false) {
                 $success = false;
                 break;

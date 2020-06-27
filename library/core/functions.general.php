@@ -2014,16 +2014,16 @@ if (!function_exists('walkAllRecursive')) {
             }
             foreach ($input as $key => &$val) {
                 if (is_array($val) || is_object($val)) {
-                    call_user_func_array($walker, [&$val, $callback, $key]);
+                    $walker($val, $callback, $key);
                 } else {
-                    call_user_func_array($callback, [&$val, $key, $parent]);
+                    $callback($val, $key, $parent);
                 }
             }
 
             $currentDepth--;
         };
 
-        call_user_func_array($walker, [&$input, $callback]);
+        $walker($input, $callback);
     }
 }
 

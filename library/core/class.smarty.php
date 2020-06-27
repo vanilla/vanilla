@@ -147,7 +147,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
      * Render the given view.
      *
      * @param string $path The path to the view's file.
-     * @param Controller $controller The controller that is rendering the view.
+     * @param Gdn_Controller $controller The controller that is rendering the view.
      */
     public function render($path, $controller) {
         $smarty = $this->smarty();
@@ -200,7 +200,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
     /**
      * See if the provided template causes any errors.
      *
-     * @param type $path Path of template file to test.
+     * @param string $path Path of template file to test.
      * @return boolean TRUE if template loads successfully.
      */
     public function testTemplate($path) {

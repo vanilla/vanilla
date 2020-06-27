@@ -63,7 +63,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * Gets the image size of a file.
      *
      * @param string $path The path to the file.
-     * @param string $filename The name of the file.
+     * @param string|false $filename The name of the file.
      * @return array An array of [width, height, image type].
      * @since 2.1
      */

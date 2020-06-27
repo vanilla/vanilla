@@ -135,7 +135,7 @@ class Gdn {
     /**
      * Get a configuration setting for the application.
      *
-     * @param string $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+     * @param string|false $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return Gdn_Configuration|mixed The configuration setting.
      */
@@ -516,7 +516,7 @@ class Gdn {
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      */
     public static function translate($code, $default = false) {

@@ -602,6 +602,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *  - Gdn_PluginManager::ACCESS_CLASSNAME
      * @param mixed $sender An object to pass to a new plugin instantiation.
      * @return Gdn_IPlugin The plugin instance.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      */
     public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null) {
         $className = null;
@@ -870,8 +872,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $className The name of the class throwing the event.
      * @param string $methodName The name of the event.
-     * @return callback|null
-     * @since 2.1
+     * @return callable|null
      */
     public function getCallback($className, $methodName) {
         $eventKey = "{$className}_{$methodName}_method";
@@ -1302,8 +1303,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @throws \Interop\Container\Exception\NotFoundException  No entry was found for this identifier.
-     * @throws \Interop\Container\Exception\ContainerException Error while retrieving the entry.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      *
      * @return mixed Entry.
      */

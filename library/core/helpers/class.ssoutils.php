@@ -62,7 +62,7 @@ class SsoUtils {
      * Get a state token to verify on a subsequent request.
      *
      * @param bool $forceNew Force a new token to be generated.
-     * @return A state token.
+     * @return string A state token.
      */
     public function getStateToken($forceNew = false) {
         if ($this->stateToken === null || $forceNew) {

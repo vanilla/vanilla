@@ -39,9 +39,10 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     protected $view;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @param object $sender
+     * @param object|string $sender
+     * @param string|false $applicationFolder
      */
     public function __construct($sender = '', $applicationFolder = false) {
         if (!$sender) {

@@ -263,7 +263,7 @@ if (!function_exists('buttonDropDown')) {
      *  - Text: The text of the link.
      *  - Url: The url of the link.
      * @param string|array $cssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
-     * @param string $label The text of the button.
+     * @param string|false $label The text of the button.
      * @since 2.1
      */
     function buttonDropDown($links, $cssClass = 'Button', $label = false) {
@@ -1216,7 +1216,7 @@ if (!function_exists('panelHeading')) {
      * Define default head tag for the side panel.
      *
      * @param string $content The content of the tag.
-     * @param string $attributes The attributes of the tag.
+     * @param array $attributes The attributes of the tag.
      * @return string The full tag.
      */
     function panelHeading($content, $attributes = []) {

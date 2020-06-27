@@ -1493,7 +1493,7 @@ if (!function_exists('reflectArgs')) {
     /**
      * Reflect the arguments on a callback and returns them as an associative array.
      *
-     * @param callback|ReflectionFunctionAbstract $callback A callback to the function.
+     * @param callable|ReflectionFunctionAbstract $callback A callback to the function.
      * @param array $args1 An array of arguments.
      * @param array $args2 An optional other array of arguments.
      * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().

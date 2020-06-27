@@ -45,8 +45,9 @@ class Gdn_Router extends Gdn_Pluggable {
 
     /**
      * Get an route that exactly matches a string.
+     *
      * @param string|int $route The route to search for.
-     * @param int $indexed If the route is a number then it will be looked up as an index.
+     * @param bool $indexed If the route is a number then it will be looked up as an index.
      *
      * @return array|bool A route or false if there is no matching route.
      */

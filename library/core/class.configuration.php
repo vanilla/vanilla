@@ -424,7 +424,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string $type 'file' or 'string'
      * @param string $identifier filename or string tag
-     * @return ConfigurationSource
+     * @return Gdn_ConfigurationSource
      */
     public function getSource($type, $identifier) {
         $sourceTag = "{$type}:{$identifier}";
@@ -444,7 +444,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *   $Configuration[$Group]['Database']['Host'] = $value
      * @param mixed $value The value of the configuration setting.
      * @param boolean $overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
-     * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::save().
+     * @param boolean $save Whether or not to queue the value up for the next call to Gdn_Config::save().
      */
     public function set($name, $value, $overwrite = true, $save = true) {
         // Make sure the config settings are in the right format
@@ -697,7 +697,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
      *
-     * @param type $data
+     * @param array $data
      */
     public function massImport($data) {
         if ($this->splitting) {

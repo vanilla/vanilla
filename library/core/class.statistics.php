@@ -43,13 +43,13 @@ class Gdn_Statistics extends Gdn_Pluggable {
     }
 
     /**
+     * Call the analytics server.
      *
-     *
-     * @param $method
-     * @param $requestParameters
+     * @param string $method
+     * @param array $requestParameters
      * @param bool $callback
      * @param bool $parseResponse
-     * @return array|bool|mixed|type
+     * @return array|bool|mixed
      * @throws Exception
      */
     public function analytics($method, $requestParameters, $callback = false, $parseResponse = true) {
@@ -123,7 +123,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      *
      * @param $method
      * @param $parameters
-     * @return array|bool|mixed|type
+     * @return array|bool|mixed
      */
     public function api($method, $parameters) {
         $apiResponse = $this->analytics($method, $parameters, false, false);
@@ -1082,7 +1082,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * THIS METHOD USES ALL SUPPLIED ARGUMENTS IN ITS SIGNATURE HASH ALGORITHM
      * ****
      *
-     * @param type $request Array of request parameters
+     * @param array $request Array of request parameters
      * @return boolean Status of verification check, or null if no VanillaID
      */
     protected function verifySignature($request) {

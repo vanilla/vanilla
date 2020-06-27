@@ -571,11 +571,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @param string $method HTTP method required by provider.
      * @param array $params Query string.
      * @param array $options Configuration options for the request (e.g. Content-Type).
-     *
-     * @return mixed.
-     *
-     * @throws Exception.
-     * @throws Gdn_UserException.
+     * @return mixed
+     * @throws Gdn_UserException Throws an exception if the server returns an error.
      */
     protected function api($uri, $method = 'GET', $params = [], $options = []) {
         $proxy = new ProxyRequest();
@@ -635,12 +632,10 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     /**
      * Create a controller to handle entry request.
      *
-     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $sender
      * @param string $code Retrieved from the response of the authentication provider, used to fetch an authentication token.
      * @param string $state Values passed by us and returned in the response of the authentication provider.
-     *
-     * @throws Exception.
-     * @throws Gdn_UserException.
+     * @throws Gdn_UserException Throws an exception if there was an error from the provider.
      */
     public function entryEndpoint($sender, $code, $state = '') {
         if ($error = $sender->Request->get('error')) {
@@ -985,10 +980,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @param string $key Needle.
      * @param array $arr Haystack.
      * @param string $context Context to make error messages clearer.
-     *
      * @return mixed Extracted value from array.
-     *
-     * @throws Exception.
+     * @throws \Exception Throws an exception if the key is missing from the array.
      */
     public static function requireVal($key, $arr, $context = null) {
         $result = val($key, $arr);

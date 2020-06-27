@@ -26,7 +26,7 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
 
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function get($key, $default = null) {
         $value = $this->cacheObject->get($key);
@@ -37,7 +37,7 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function set($key, $value, $ttl = null) {
         $options = [];
@@ -48,29 +48,29 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete($key) {
         return $this->cacheObject->remove($key);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMultiple($keys, $default = null) {
         $result = [];
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             $result[$key] = $this->get($key, $default);
         }
         return $result;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setMultiple($values, $ttl = null) {
         $success = true;
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             if ($this->set($key, $value, $ttl) === false) {
                 $success = false;
                 break;
@@ -94,7 +94,7 @@ class CacheCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function has($key) {
         return $this->cacheObject->exists($key);

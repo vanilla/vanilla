@@ -70,7 +70,6 @@ class ProxyRequest {
      *
      * @param boolean $loud
      * @param array $requestDefaults
-     * @return type
      */
     public function __construct($loud = false, $requestDefaults = null) {
         $this->Loud = $loud;
@@ -212,7 +211,7 @@ class ProxyRequest {
      * @param array $queryParams GET/POST parameters
      * @param array $files List of files to upload
      * @param array $extraHeaders Any additional headers to tack on
-     * @return type
+     * @return string|array
      */
     public function request($options = null, $queryParams = null, $files = null, $extraHeaders = null) {
 

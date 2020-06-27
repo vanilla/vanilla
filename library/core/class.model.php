@@ -446,11 +446,11 @@ class Gdn_Model extends Gdn_Pluggable {
 
 
     /**
-     *
+     * Update a record or records.
      *
      * @param array $fields
-     * @param array $where
-     * @param array $limit
+     * @param array|false $where
+     * @param int|false $limit
      * @return Gdn_Dataset
      */
     public function update($fields, $where = false, $limit = false) {
@@ -604,7 +604,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * Get the data from the model based on its primary key.
      *
      * @param mixed $iD The value of the primary key in the database.
-     * @param string $datasetType The format of the result dataset.
+     * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object
      *

@@ -344,11 +344,10 @@ class Gdn_Session {
     }
 
     /**
-     * Gets the currently authenticated user's attribute for the specified
-     * $attributeName.
+     * Gets the currently authenticated user's attribute for the specified $attributeName.
      *
-     * @param unknown_type $attributeName The name of the attribute to get.
-     * @param string $defaultValue The default value to return if the attribute does not exist.
+     * @param string $attributeName The name of the attribute to get.
+     * @param string|false $defaultValue The default value to return if the attribute does not exist.
      * @return mixed
      */
     public function getAttribute($attributeName, $defaultValue = false) {
@@ -359,7 +358,7 @@ class Gdn_Session {
     }
 
     /**
-     *
+     * Get all of the session attributes.
      *
      * @return array
      */
@@ -371,7 +370,7 @@ class Gdn_Session {
      * This is the singleton method that return the static
      * Configuration::Instance.
      *
-     * @return Session
+     * @return self
      */
     public static function getInstance() {
         if (!isset(self::$_Instance)) {
@@ -395,7 +394,7 @@ class Gdn_Session {
     /**
      * Authenticates the user with the provided Authenticator class.
      *
-     * @param int $userID The UserID to start the session with.
+     * @param int|false $userID The UserID to start the session with.
      * @param bool $setIdentity Whether or not to set the identity (cookie) or make this a one request session.
      * @param bool $persist If setting an identity, should we persist it beyond browser restart?
      */

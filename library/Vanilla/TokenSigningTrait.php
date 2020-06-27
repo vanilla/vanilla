@@ -133,7 +133,7 @@ trait TokenSigningTrait {
      * @param int $code The error code.
      * @param bool $throw Whether or not to throw an exception.
      * @return bool Returns **false**.
-     * @throws Exception Throws an exception if {@link $throw} is true.
+     * @throws \Exception Throws an exception if {@link $throw} is true.
      */
     private function tokenError($message, $code = 401, $throw = false) {
         if ($throw) {

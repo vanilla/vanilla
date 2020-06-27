@@ -75,7 +75,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     /**
      *
      *
-     * @return array|null|type
+     * @return array|null
      */
     public function getProviders() {
         if (Gdn::session()->isValid()) {

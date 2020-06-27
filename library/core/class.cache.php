@@ -201,7 +201,7 @@ abstract class Gdn_Cache {
      *
      * Return whether or not the current cache method is enabled.
      *
-     * @param type $forceEnable
+     * @param bool $forceEnable
      * @return bool status of active cache
      */
     public static function activeEnabled($forceEnable = false) {
@@ -222,7 +222,7 @@ abstract class Gdn_Cache {
      *
      * For FileCache, the folder. For Memcache, the server(s).
      *
-     * @param type $forceMethod
+     * @param string|null $forceMethod
      * @return mixed Active Store Location
      */
     public static function activeStore($forceMethod = null) {

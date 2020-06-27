@@ -551,7 +551,7 @@ class Gdn_Validation {
      *  - array: An array with the following keys:
      *    - Name: The name of the function used to validate.
      *    - Args: An argument to pass to the function after the value.
-     * @param string $customError A custom error message.
+     * @param string|false $customError A custom error message.
      * @return bool|string One of the following:
      *
      *  - **true**: The value passed validation.

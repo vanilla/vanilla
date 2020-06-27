@@ -24,28 +24,28 @@ class HeadModule extends Gdn_Module {
     const SORT_KEY = '_sort';
 
     /** @var array A collection of tags to be placed in the head. */
-    private $_Tags;
+    private $tags;
 
     /** @var array  A collection of strings to be placed in the head. */
-    private $_Strings;
+    private $strings;
 
     /** @var string The main text for the "title" tag in the head. */
-    protected $_Title;
+    protected $title;
 
     /** @var string A string to be concatenated with $this->_Title. */
-    protected $_Subtitle;
+    protected $subtitle;
 
     /** @var A string to be concatenated with $this->_Title if there is also a $this->_Subtitle string being concatenated. */
-    protected $_TitleDivider;
+    protected $titleDivider;
 
     /** @var bool  */
-    private $_FavIconSet = false;
+    private $faviconSet = false;
 
     /** @var bool  */
-    private $_TouchIconSet = false;
+    private $touchIconSet = false;
 
     /** @var bool  */
-    private $_MobileAddressBarColorSet = false;
+    private $mobileAddressBarColorSet = false;
 
     /** @var array JSON Linking Data */
     private $jsonLD = [];
@@ -55,17 +55,18 @@ class HeadModule extends Gdn_Module {
 
     /** @var Garden\EventManager */
     protected $eventManager;
+
     /**
-     *
+     * HeadModule constructor.
      *
      * @param string $sender
      */
     public function __construct($sender = '') {
-        $this->_Tags = [];
-        $this->_Strings = [];
-        $this->_Title = '';
-        $this->_Subtitle = '';
-        $this->_TitleDivider = ' — ';
+        $this->tags = [];
+        $this->strings = [];
+        $this->title = '';
+        $this->subtitle = '';
+        $this->titleDivider = ' — ';
         parent::__construct($sender);
         // Workaround beacuse we can't do parameter injection.
         $this->assetPreloadModel = \Gdn::getContainer()->get(\Vanilla\Web\Asset\AssetPreloadModel::class);
@@ -76,15 +77,16 @@ class HeadModule extends Gdn_Module {
      * Adds a "link" tag to the head containing a reference to a stylesheet.
      * By default a stylesheet is considered as a static-asset
      *
-     * @param string $hRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
+     * @param string $href Location of the stylesheet relative to the web root (if an absolute path with http:// is
+     * provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
      * @param string $media Type media for the stylesheet. ie. "screen", "print", etc.
      * @param bool $addVersion Whether to append version number as query string.
      * @param array $options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
      */
-    public function addCss($hRef, $media = '', $addVersion = true, $options = null) {
+    public function addCss($href, $media = '', $addVersion = true, $options = null) {
         $properties = [
             'rel' => 'stylesheet',
-            'href' => asset($hRef, false, $addVersion),
+            'href' => asset($href, false, $addVersion),
             'media' => $media,
             'static' => $options['static'] ?? true,
         ];
@@ -100,26 +102,27 @@ class HeadModule extends Gdn_Module {
     }
 
     /**
+     * Add an RSS feed link.
      *
-     *
-     * @param $hRef
-     * @param $title
+     * @param string $href
+     * @param string $title
      */
-    public function addRss($hRef, $title) {
+    public function addRss($href, $title) {
         $this->addTag('link', [
             'rel' => 'alternate',
             'type' => 'application/rss+xml',
             'title' => Gdn_Format::text($title),
-            'href' => asset($hRef)
+            'href' => asset($href)
         ]);
     }
 
     /**
      * Adds a new tag to the head.
      *
-     * @param string The type of tag to add to the head. ie. "link", "script", "base", "meta".
-     * @param array An associative array of property => value pairs to be placed in the tag.
-     * @param string an index to give the tag for later manipulation.
+     * @param string $tag The type of tag to add to the head. ie. "link", "script", "base", "meta".
+     * @param array $properties An associative array of property => value pairs to be placed in the tag.
+     * @param string|null $content an index to give the tag for later manipulation.
+     * @param string|null $index
      */
     public function addTag($tag, $properties, $content = null, $index = null) {
         $tag = array_merge([self::TAG_KEY => strtolower($tag)], array_change_key_case($properties));
@@ -127,16 +130,16 @@ class HeadModule extends Gdn_Module {
             $tag[self::CONTENT_KEY] = $content;
         }
         if (!array_key_exists(self::SORT_KEY, $tag)) {
-            $tag[self::SORT_KEY] = count($this->_Tags);
+            $tag[self::SORT_KEY] = count($this->tags);
         }
 
         if ($index !== null) {
-            $this->_Tags[$index] = $tag;
+            $this->tags[$index] = $tag;
         }
 
         // Make sure this item has not already been added.
-        if (!in_array($tag, $this->_Tags)) {
-            $this->_Tags[] = $tag;
+        if (!in_array($tag, $this->tags)) {
+            $this->tags[] = $tag;
         }
     }
 
@@ -189,14 +192,14 @@ class HeadModule extends Gdn_Module {
     /**
      * Adds a string to the collection of strings to be inserted into the head.
      *
-     * @param string The string to be inserted.
+     * @param string $string The string to be inserted.
      */
     public function addString($string) {
-        $this->_Strings[] = $string;
+        $this->strings[] = $string;
     }
 
     /**
-     *
+     * This module gets output in the head asset.
      *
      * @return string
      */
@@ -223,29 +226,29 @@ class HeadModule extends Gdn_Module {
      *
      * Only $tag is required.
      *
-     * @param string The name of the tag to remove from the head.  ie. "link"
-     * @param string Any property to search for in the tag.
+     * @param string $tag The name of the tag to remove from the head.  ie. "link"
+     * @param string $property Any property to search for in the tag.
      *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
-     * @param string Any value to search for in the specified property.
+     * @param string $value Any value to search for in the specified property.
      */
     public function clearTag($tag, $property = '', $value = '') {
         $tag = strtolower($tag);
         if (is_array($property)) {
             $query = array_change_key_case($property);
-        } elseif ($property)
+        } elseif ($property) {
             $query = [strtolower($property) => $value];
-        else {
+        } else {
             $query = false;
         }
 
-        foreach ($this->_Tags as $index => $collection) {
+        foreach ($this->tags as $index => $collection) {
             $tagName = $collection[self::TAG_KEY];
 
             if ($tagName == $tag) {
                 // If no property is specified and the tag is found, remove it directly.
                 // Otherwise remove it only if all specified property/value pairs match.
                 if (!$query || count(array_intersect_assoc($query, $collection)) == count($query)) {
-                    unset($this->_Tags[$index]);
+                    unset($this->tags[$index]);
                 }
             }
         }
@@ -255,23 +258,26 @@ class HeadModule extends Gdn_Module {
      * Return all strings.
      */
     public function getStrings() {
-        return $this->_Strings;
+        return $this->strings;
     }
 
     /**
      * Return all Tags of the specified type (or all tags).
+     *
+     * @param string $requestedType
+     * @return array
      */
     public function getTags($requestedType = '') {
         // Make sure that css loads before js (for jquery)
-        usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
+        usort($this->tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
         if ($requestedType == '') {
-            return $this->_Tags;
+            return $this->tags;
         }
 
         // Loop through each tag.
         $tags = [];
-        foreach ($this->_Tags as $index => $attributes) {
+        foreach ($this->tags as $index => $attributes) {
             $tagType = $attributes[self::TAG_KEY];
             if ($tagType == $requestedType) {
                 $tags[] = $attributes;
@@ -283,16 +289,16 @@ class HeadModule extends Gdn_Module {
     /**
      * Sets the favicon location.
      *
-     * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
+     * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
      */
-    public function setFavIcon($hRef) {
-        if (!$this->_FavIconSet) {
-            $this->_FavIconSet = true;
+    public function setFavIcon($href) {
+        if (!$this->faviconSet) {
+            $this->faviconSet = true;
             $this->addTag(
                 'link',
                 [
                     'rel' => 'shortcut icon',
-                    'href' => $hRef,
+                    'href' => $href,
                     'type' => 'image/x-icon'
                 ],
                 null,
@@ -307,8 +313,8 @@ class HeadModule extends Gdn_Module {
      * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
      */
     public function setTouchIcon($href) {
-        if (!$this->_TouchIconSet) {
-            $this->_TouchIconSet = true;
+        if (!$this->touchIconSet) {
+            $this->touchIconSet = true;
             $this->addTag(
                 'link',
                 [
@@ -322,11 +328,11 @@ class HeadModule extends Gdn_Module {
     /**
      * Sets browser address bar colour.
      *
-     * @param string meta tags for various browsers
+     * @param string $mobileAddressBarColor Meta tags for various browsers.
      */
     public function setMobileAddressBarColor($mobileAddressBarColor) {
-        if (!$this->_MobileAddressBarColorSet && $mobileAddressBarColor) {
-            $this->_MobileAddressBarColorSet = true;
+        if (!$this->mobileAddressBarColorSet && $mobileAddressBarColor) {
+            $this->mobileAddressBarColorSet = true;
             $this->addTag(
                 'meta',
                 [
@@ -340,13 +346,14 @@ class HeadModule extends Gdn_Module {
     /**
      * Gets or sets the tags collection.
      *
-     * @param array $value .
+     * @param array|null $value
+     * @return array
      */
     public function tags($value = null) {
         if ($value != null) {
-            $this->_Tags = $value;
+            $this->tags = $value;
         }
-        return $this->_Tags;
+        return $this->tags;
     }
 
     /**
@@ -359,25 +366,25 @@ class HeadModule extends Gdn_Module {
     public function title($title = '', $noSubtitle = false) {
         if ($title != '') {
             // Apply $Title to $this->_Title and to $this->_Sender.
-            $this->_Title = $title;
+            $this->title = $title;
             $this->_Sender->title($title);
-        } elseif ($this->_Title == '') {
+        } elseif ($this->title == '') {
             // Get Title from $this->_Sender if not supplied.
-            $this->_Title = valr('Data.Title', $this->_Sender, '');
+            $this->title = valr('Data.Title', $this->_Sender, '');
         }
         if ($noSubtitle) {
-            return $this->_Title;
+            return $this->title;
         } else {
-            if ($this->_Subtitle == '') {
+            if ($this->subtitle == '') {
                 // Get Subtitle from controller.
-                $this->_Subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
+                $this->subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
             }
 
             // Default Return title from controller's Data.Title + banner title;
             return concatSep(
-                $this->_TitleDivider,
-                $this->_Title,
-                $this->_Subtitle
+                $this->titleDivider,
+                $this->title,
+                $this->subtitle
             );
         }
     }
@@ -388,7 +395,7 @@ class HeadModule extends Gdn_Module {
      * @param string $subtitle The subtitle which should be displayed in the title.
      */
     public function setSubtitle($subtitle = '') {
-        $this->_Subtitle = $subtitle;
+        $this->subtitle = $subtitle;
     }
 
     /**
@@ -400,14 +407,14 @@ class HeadModule extends Gdn_Module {
      * @param string $titleDivider The string that concats title and subtitle.
      */
     public function setTitleDivider($titleDivider = ' — ') {
-        $this->_TitleDivider = $titleDivider;
+        $this->titleDivider = $titleDivider;
     }
 
     /**
+     * Compare two tags in the tags array for sorting.
      *
-     *
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     public static function tagCmp($a, $b) {
@@ -423,8 +430,9 @@ class HeadModule extends Gdn_Module {
             $sortB = val(self::SORT_KEY, $b, 0);
             if ($sortA < $sortB) {
                 $cmp = -1;
-            } elseif ($sortA > $sortB)
+            } elseif ($sortA > $sortB) {
                 $cmp = 1;
+            }
         }
 
         return $cmp;
@@ -522,16 +530,16 @@ class HeadModule extends Gdn_Module {
         $this->fireEvent('BeforeToString');
 
         // Make sure that css loads before js (for jquery)
-        usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
+        usort($this->tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
-        $this->eventManager->fireArray('HeadTagsBeforeRender', [&$this->_Tags]);
+        $this->eventManager->fireArray('HeadTagsBeforeRender', [&$this->tags]);
 
         // Start with the title.
         $head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
 
         $tagStrings = [];
         // Loop through each tag.
-        foreach ($this->_Tags as $index => $attributes) {
+        foreach ($this->tags as $index => $attributes) {
             $tag = $attributes[self::TAG_KEY];
 
             // Inline the content of the tag, if necessary.
@@ -594,14 +602,12 @@ class HeadModule extends Gdn_Module {
                 }
 
                 $tagStrings[] = $tagString;
-
             } while ($iESpecific && isset($attributes['_notie'])); // We need a second pass
-
         } //endforeach
 
         $head .= implode("\n", array_unique($tagStrings));
 
-        foreach ($this->_Strings as $string) {
+        foreach ($this->strings as $string) {
             $head .= $string;
             $head .= "\n";
         }

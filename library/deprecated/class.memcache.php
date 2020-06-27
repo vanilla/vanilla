@@ -13,6 +13,8 @@
  * Cache Layer: Memcache
  *
  * A cache layer that stores its items in memcached and uses libmemcache to interact with the daemons.
+ *
+ * @deprecated
  */
 class Gdn_Memcache extends Gdn_Cache {
 

@@ -836,7 +836,7 @@ class Gdn_Autoloader_Map {
      *
      * @param $className
      * @param bool $mapOnly
-     * @return bool|The
+     * @return bool
      */
     public function lookup($className, $mapOnly = true) {
         $mapName = $this->mapInfo['name'];

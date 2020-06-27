@@ -11,6 +11,7 @@
 
 /**
  * Class Gdn_Condition
+ * @deprecated
  */
 class Gdn_Condition {
 
@@ -170,7 +171,7 @@ class Gdn_Condition {
             return false;
         }
 
-        if (stelen($expr) > 1 && $expr[0] === '`' && $expr[strlen($expr) - 1] == '`') {
+        if (strlen($expr) > 1 && $expr[0] === '`' && $expr[strlen($expr) - 1] == '`') {
             $result = preg_match($expr, $value);
         } else {
             $result = $value == $expr;

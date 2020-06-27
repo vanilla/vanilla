@@ -639,36 +639,6 @@ if (!function_exists('logMessage')) {
     }
 }
 
-if (!function_exists('boop')) {
-    /**
-     * Logs a message or print_r()'s an array to the screen.
-     *
-     * @param mixed $message The object or string to log to the screen
-     * @param optional $arguments A list of arguments to log to the screen as if from a function call
-     */
-    function boop($message, $arguments = [], $vardump = false) {
-        if (!defined('BOOP') || !BOOP) {
-            return;
-        }
-
-        if (is_array($message) || is_object($message) || $vardump === true) {
-            if ($vardump) {
-                var_dump($message);
-            } else {
-                print_r($message);
-            }
-        } else {
-            echo $message;
-        }
-
-        if (!is_null($arguments) && sizeof($arguments)) {
-            echo " (".implode(', ', $arguments).")";
-        }
-
-        echo "\n";
-    }
-}
-
 if (!function_exists('cleanErrorArguments')) {
     /**
      *

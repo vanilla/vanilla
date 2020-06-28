@@ -13,7 +13,6 @@
  * Cache Layer: Memcached
  *
  * A cache layer that stores its items in memcached and uses libmemcached to interact with the daemons.
- * @psalm-suppress all
  */
 class Gdn_Memcached extends Gdn_Cache {
 

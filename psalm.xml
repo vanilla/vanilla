@@ -13,6 +13,7 @@
         <directory name="library/core" />
         <ignoreFiles>
             <directory name="vendor" />
+            <file name="library/core/class.memcached.php"/>
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>

@@ -7,6 +7,7 @@
 
 namespace Vanilla\EmbeddedContent;
 
+use Garden\Web\RequestInterface;
 use Gdn_Format;
 
 /**
@@ -20,13 +21,18 @@ class LegacyEmbedReplacer {
     /** @var EmbedConfig */
     private $embedConfig;
 
+    /** @var RequestInterface */
+    private $request;
+
     /**
      * DI.
      *
+     * @param RequestInterface $request;
      * @param EmbedConfig $embedConfig
      */
-    public function __construct(EmbedConfig $embedConfig) {
+    public function __construct(EmbedConfig $embedConfig, RequestInterface $request) {
         $this->embedConfig = $embedConfig;
+        $this->request = $request;
     }
 
     /**
@@ -42,7 +48,6 @@ class LegacyEmbedReplacer {
         if (!$this->embedConfig->areEmbedsEnabled()) {
             return '';
         }
-        $host = http_build_query(['parent' => \Gdn::request()->getHost()]);
         list($width, $height) = $this->embedConfig->getLegacyEmbedSize();
 
         $urlParts = parse_url($url);
@@ -71,7 +76,8 @@ class LegacyEmbedReplacer {
                 break;
             }
         }
-
+        $twitchParams = ['parent' => $this->request->getHost(), 'autoplay' => 'false'];
+        $twitchQuery = http_build_query($twitchParams);
         if (!c('Garden.Format.' . $key, true)) {
             return '';
         }
@@ -224,7 +230,7 @@ EOT;
                 return <<<EOT
 
 <iframe
-    src="https://player.twitch.tv/?channel={$matches[1]}&{$host}&autoplay=false"
+    src="https://player.twitch.tv/?channel={$matches[1]}&{$twitchQuery}"
     height="360"
     width="640"
     frameborder="0"
@@ -238,7 +244,7 @@ EOT;
             case 'TwitchRecorded':
                 return <<<EOT
 <iframe
-    src="https://player.twitch.tv/?video={$matches[1]}&{$host}&autoplay=false"
+    src="https://player.twitch.tv/?video={$matches[1]}&{$twitchQuery}"
     height="360"
     width="640"
     frameborder="0"

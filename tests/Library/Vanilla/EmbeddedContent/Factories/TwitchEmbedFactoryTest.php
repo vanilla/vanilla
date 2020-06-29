@@ -56,10 +56,11 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
      */
     public function testCreateEmbedForUrl() {
         $url = "https://www.twitch.tv/videos/441409883";
+        $host = http_build_query(['parent' => \Gdn::request()->getHost()]);
         $videoID = "441409883";
-        $frameSrc = "https://player.twitch.tv/?video=441409883";
+        $frameSrc = "https://player.twitch.tv/?".$host."&video=441409883";
 
-        $oembedParams = http_build_query([ "url" => $url ]);
+        $oembedParams = http_build_query([ "url" => $url]);
         $oembedUrl = TwitchEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength

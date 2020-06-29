@@ -31,8 +31,8 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
     /**
      * DI.
      *
-     * @param RequestInterface $request
      * @param HttpClient $httpClient
+     * @param RequestInterface $request
      */
     public function __construct(HttpClient $httpClient, RequestInterface $request) {
         $this->httpClient = $httpClient;

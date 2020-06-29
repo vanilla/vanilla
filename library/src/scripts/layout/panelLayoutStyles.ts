@@ -35,7 +35,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const gutter =  {
+    const gutter = {
         ...globalVars.gutter,
     };
 
@@ -52,9 +52,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const contentSizes = makeThemeVars("content", {
         full: contentWidth,
         narrow:
-            foundationalWidths.narrowContentWidth < contentWidth
-                ? foundationalWidths.narrowContentWidth
-                : contentWidth,
+            foundationalWidths.narrowContentWidth < contentWidth ? foundationalWidths.narrowContentWidth : contentWidth,
     });
 
     const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
@@ -293,7 +291,9 @@ export const panelLayoutClasses = useThemeCache(() => {
         padding: 0,
     });
 
-    const offset = panelBackgroundVariables().config.render ? (layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - globalVars.gutter.half) : 0;
+    const offset = panelBackgroundVariables().config.render
+        ? layoutVariables().panelLayoutSpacing.withPanelBackground.gutter - globalVars.gutter.half
+        : 0;
 
     const leftColumn = style("leftColumn", {
         position: "relative",

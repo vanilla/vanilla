@@ -388,6 +388,10 @@ class UsersApiController extends AbstractApiController {
                 "description" => "Total number of unread notifications for the current user.",
                 "type" => "integer",
             ],
+            "countUnreadConversations" => [
+                "description" => "Total number of unread conversations for the current user.",
+                "type" => "integer",
+            ],
             "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
@@ -409,6 +413,7 @@ class UsersApiController extends AbstractApiController {
         // Expand permissions for the current user.
         $user["permissions"] = $this->globalPermissions();
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
+        $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
 
         $result = $out->validate($user);
         return $result;

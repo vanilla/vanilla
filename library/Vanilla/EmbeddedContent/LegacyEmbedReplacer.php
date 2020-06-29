@@ -42,7 +42,7 @@ class LegacyEmbedReplacer {
         if (!$this->embedConfig->areEmbedsEnabled()) {
             return '';
         }
-
+        $host = http_build_query(['parent' => \Gdn::request()->getHost()]);
         list($width, $height) = $this->embedConfig->getLegacyEmbedSize();
 
         $urlParts = parse_url($url);
@@ -222,8 +222,9 @@ EOT;
 
             case 'Twitch':
                 return <<<EOT
+
 <iframe
-    src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false"
+    src="https://player.twitch.tv/?channel={$matches[1]}&{$host}&autoplay=false"
     height="360"
     width="640"
     frameborder="0"
@@ -237,7 +238,7 @@ EOT;
             case 'TwitchRecorded':
                 return <<<EOT
 <iframe
-    src="https://player.twitch.tv/?video={$matches[1]}&autoplay=false"
+    src="https://player.twitch.tv/?video={$matches[1]}&{$host}&autoplay=false"
     height="360"
     width="640"
     frameborder="0"

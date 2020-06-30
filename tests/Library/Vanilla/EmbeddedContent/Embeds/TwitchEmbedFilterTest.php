@@ -11,7 +11,6 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use VanillaTests\Fixtures\MockHttpClient;
-use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\Request;
 
 /**

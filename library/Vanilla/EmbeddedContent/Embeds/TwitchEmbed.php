@@ -52,6 +52,8 @@ class TwitchEmbed extends AbstractEmbed {
 
     /**
      * Get the hostname from the request.
+     *
+     * @return string
      */
     public function getHost(): ?string {
         return $this->host;

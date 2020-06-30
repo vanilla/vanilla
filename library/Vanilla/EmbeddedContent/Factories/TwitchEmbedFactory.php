@@ -7,7 +7,6 @@
 namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
-use Garden\Web\RequestInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
@@ -59,6 +58,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $twitchID = $this->idFromUrl($url);
+
         $response = $this->httpClient->get(
             self::OEMBED_URL_BASE,
             ["url" => $url]

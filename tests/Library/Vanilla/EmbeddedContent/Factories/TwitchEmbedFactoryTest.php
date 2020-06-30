@@ -11,7 +11,6 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
-use Garden\Web\RequestInterface;
 
 /**
  * Tests for the embed and factory.

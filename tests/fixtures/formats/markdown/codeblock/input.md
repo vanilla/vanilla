@@ -12,6 +12,7 @@
         <li>another thing</li>
     </ul>
 
+
 ```
 <ul>
     <li>something</li>
@@ -20,12 +21,11 @@
 </ul>
 ```
 
-~~~
-public function doSomething() {
-    $var = [
-        'foo' => 'foo0'
-        'bar' => 'bar1',
-        'baz' => 'baz2',
-    ];
-}
-~~~
+
+    public function doSomething() {
+        $var = [
+            'foo0' =>  'foo',
+            'bar1' => 'bar',
+            'baz2' => 'baz',
+        ];
+    }

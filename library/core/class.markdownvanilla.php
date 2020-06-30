@@ -31,8 +31,6 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         // Sort gamuts by their priority.
         asort($this->block_gamut);
         asort($this->span_gamut);
-
-        $this->no_markup = true;
     }
 
     /**

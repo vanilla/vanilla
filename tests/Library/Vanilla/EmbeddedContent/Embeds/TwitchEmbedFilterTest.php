@@ -35,12 +35,12 @@ class TwitchEmbedFilterTest extends TestCase {
      */
     public function testTwitchFilterEmbed() {
         $data = [
-                "height" => 180,
-                "width" => 320,
-                "twitchID" => "video:441409883",
-                "url" => "https://www.twitch.tv/videos/441409883",
-                "embedType" => TwitchEmbed::TYPE,
-                "name" => 'Movie Magic'
+            "height" => 180,
+            "width" => 320,
+            "twitchID" => "video:441409883",
+            "url" => "https://www.twitch.tv/videos/441409883",
+            "embedType" => TwitchEmbed::TYPE,
+            "name" => 'Movie Magic'
         ];
         $dataEmbed = new TwitchEmbed($data);
         $this->twitchEmbedFilter->filterEmbed($dataEmbed);

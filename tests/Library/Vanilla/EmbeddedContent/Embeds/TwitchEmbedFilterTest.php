@@ -41,7 +41,6 @@ class TwitchEmbedFilterTest extends MinimalContainerTestCase {
      */
     public function testTwitchFilterEmbed() {
         $data = [
-
                 "height" => 180,
                 "width" => 320,
                 "twitchID" => "video:441409883",

@@ -17,10 +17,7 @@ use VanillaTests\Fixtures\Request;
  * Test twitch embed filter.
  */
 class TwitchEmbedFilterTest extends TestCase {
-
-    /** @var TwitchEmbedFactory */
-    private $factory;
-
+    
     /** @var MockHttpClient */
     private $httpClient;
 
@@ -36,7 +33,6 @@ class TwitchEmbedFilterTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
-        $this->factory = new TwitchEmbedFactory($this->httpClient);
         $this->request = new Request();
         $this->twitchEmbedFilter = new TwitchEmbedFilter($this->request);
     }

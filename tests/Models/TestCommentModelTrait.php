@@ -16,7 +16,7 @@ trait TestCommentModelTrait {
     /**
      * @var \CommentModel
      */
-    private $commentModel;
+    protected $commentModel;
 
     /**
      * Instantiate the comment model fixture.
@@ -52,12 +52,17 @@ trait TestCommentModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    private function insertComments(int $count, array $overrides = []): array {
+    protected function insertComments(int $count, array $overrides = []): array {
         $ids = [];
+        $rows = [];
         for ($i = 0; $i < $count; $i++) {
-            $ids[] = $this->commentModel->save($this->newComment($overrides));
+            $id = $this->commentModel->save($this->newComment($overrides));
+            TestCase::assertNotFalse($id);
+            $row = $this->commentModel->getID($id);
+            \CategoryModel::instance()->incrementLastComment($row);
+            $ids[] = $id;
+            $rows[] = $row;
         }
-        $rows = $this->commentModel->getWhere(['CommentID' => $ids])->resultArray();
         TestCase::assertCount($count, $rows, "Not enough test comments were inserted.");
         return $rows;
     }

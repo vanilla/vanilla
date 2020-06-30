@@ -8,6 +8,7 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { MessagesIcon } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import React from "react";
+import { useUsersState } from "@library/features/users/userModel";
 
 interface IProps {
     open?: boolean;
@@ -19,9 +20,11 @@ interface IProps {
  */
 export default function MessagesCount(props: IProps) {
     const { open, compact } = props;
+    const currentUser = useUsersState().currentUser;
+    const count = currentUser.data?.countUnreadConversations ? currentUser.data.countUnreadConversations : 0;
 
     return (
-        <MeBoxIcon count={0} countLabel={t("Messages") + ": "} compact={compact}>
+        <MeBoxIcon count={count} countLabel={t("Messages") + ": "} compact={compact}>
             <MessagesIcon filled={!!open} />
         </MeBoxIcon>
     );

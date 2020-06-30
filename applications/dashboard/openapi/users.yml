@@ -189,6 +189,12 @@ paths:
                         type: array
                         items:
                           type: string
+                      countUnreadNotifications:
+                        description: Total number of unread notifications for the current user.
+                        type: integer
+                      countUnreadConversations:
+                        description: Total number of unread conversations for the current user.
+                        type: integer
                     required:
                       - isAdmin
                       - permissions

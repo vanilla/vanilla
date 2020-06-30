@@ -14,29 +14,28 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test count updating around categories, discussions, and comments.
  */
-class CountsTest extends TestCase {
+abstract class CountsTest extends TestCase {
     use SetupTraitsTrait, SiteTestTrait, TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
      * @var array
      */
-    private $categories;
-
-
-    /**
-     * @var array
-     */
-    private $discussions = [];
+    protected $categories;
 
     /**
      * @var array
      */
-    private $comments = [];
+    protected $discussions = [];
+
+    /**
+     * @var array
+     */
+    protected $comments = [];
 
     /**
      * @var \Gdn_SQLDriver
      */
-    private $sql;
+    protected $sql;
 
     /**
      * @inheritDoc
@@ -84,14 +83,14 @@ class CountsTest extends TestCase {
     /**
      * Test the counts on the records that were inserted during setup.
      */
-    public function testSetUpCounts(): void {
+    public function assertAllCounts(): void {
         foreach ($this->discussions as $row) {
             $this->assertDiscussionCounts($row['DiscussionID']);
         }
 //
-//        foreach ($this->categories as $categoryID => $_) {
-//            $this->assertCategoryCounts($categoryID);
-//        }
+        foreach ($this->categories as $categoryID => $_) {
+            $this->assertCategoryCounts($categoryID);
+        }
     }
 
     /**
@@ -164,7 +163,7 @@ SQL
                 'CountComments' => 0
             ];
         } else {
-            $counts['CountComments'] = $counts['CountComments'] ?? 0;
+            $counts['CountComments'] = (int)($counts['CountComments'] ?? 0);
             // Get the last comment to fix the last discussion ID.
 //            if ($counts['LastCommentID'] !== null) {
 //                $lastComment = $this->sql->getWhere('Comment', ['CommentID' => $counts['LastCommentID']])->firstRow(DATASET_TYPE_ARRAY);

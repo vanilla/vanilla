@@ -18,11 +18,11 @@ class TwitchEmbedFilterTest extends TestCase {
     /** @var \Gdn_Request */
     private $request;
 
-    /** @var \Gdn_Request */
+    /** @var TwitchEmbedFilter */
     private $twitchEmbedFilter;
 
     /**
-     * Set the factory and client.
+     * Setup
      */
     public function setUp(): void {
         parent::setUp();
@@ -41,7 +41,7 @@ class TwitchEmbedFilterTest extends TestCase {
                 "url" => "https://www.twitch.tv/videos/441409883",
                 "embedType" => TwitchEmbed::TYPE,
                 "name" => 'Movie Magic'
-            ];
+        ];
         $dataEmbed = new TwitchEmbed($data);
         $this->twitchEmbedFilter->filterEmbed($dataEmbed);
         $this->assertEquals($this->request->getHost(), $dataEmbed->getHost());

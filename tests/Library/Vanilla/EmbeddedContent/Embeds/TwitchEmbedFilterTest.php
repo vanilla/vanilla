@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -47,7 +47,6 @@ class TwitchEmbedFilterTest extends TestCase {
      */
     public function testTwitchFilterEmbed() {
         $data = [
-
                 "height" => 180,
                 "width" => 320,
                 "twitchID" => "video:441409883",

@@ -71,17 +71,7 @@ class MessagesController extends ConversationsController {
 
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
-            $recipientUserIDs = [];
-            $to = explode(',', $this->Form->getFormValue('To', ''));
-            $userModel = new UserModel();
-            foreach ($to as $name) {
-                if (trim($name) != '') {
-                    $user = $userModel->getByUsername(trim($name));
-                    if (is_object($user)) {
-                        $recipientUserIDs[] = $user->UserID;
-                    }
-                }
-            }
+            $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));
 
             // Enforce MaxRecipients
             if (!$this->ConversationModel->addUserAllowed(0, count($recipientUserIDs))) {

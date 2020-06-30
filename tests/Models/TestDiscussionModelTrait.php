@@ -17,7 +17,7 @@ trait TestDiscussionModelTrait {
     /**
      * @var \DiscussionModel
      */
-    private $discussionModel;
+    protected $discussionModel;
 
     /**
      * Instantiate a fresh model for each
@@ -54,7 +54,7 @@ trait TestDiscussionModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    private function insertDiscussions(int $count, array $overrides = []): array {
+    protected function insertDiscussions(int $count, array $overrides = []): array {
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));

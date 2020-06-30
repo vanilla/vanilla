@@ -2997,11 +2997,19 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      *
      * Events: DeleteDiscussion.
      *
-     * @param int|array $discussionID Unique ID of discussion to delete or an array of discussion IDs.
+     * @param int $discussionID Unique ID of discussion to delete.
      * @param array $options Additional options to control the delete behavior. Not used for discussions.
      * @return bool Always returns **true**.
      */
     public function deleteID($discussionID, $options = []) {
+        if (is_array($discussionID)) {
+            $r = true;
+            foreach ($discussionID as $id) {
+                $r &= $this->deleteID($id, $options);
+            }
+            return $r;
+        }
+
         // Retrieve the users who have bookmarked this discussion.
         $bookmarkData = $this->getBookmarkUsers($discussionID);
 

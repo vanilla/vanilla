@@ -9,9 +9,14 @@
  */
 
 /**
- * Handles content moderation via /modersation endpoint.
+ * Handles content moderation via /moderation endpoint.
  */
 class ModerationController extends VanillaController {
+
+    use \Vanilla\Web\TwigRenderTrait;
+
+    // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
+    private const MAX_TIME_BATCH_DELETE = 10;
 
     /**
      * Looks at the user's attributes and form postback to see if any comments
@@ -291,6 +296,7 @@ class ModerationController extends VanillaController {
      * discussions (and has permission to do so).
      */
     public function confirmDiscussionDeletes() {
+        $startTime = time();
         $session = Gdn::session();
         $this->Form = new Gdn_Form();
         $discussionModel = new DiscussionModel();
@@ -299,7 +305,12 @@ class ModerationController extends VanillaController {
         $this->permission('Vanilla.Discussions.Delete', true, 'Category', 'any');
         $this->title(t('Confirm'));
 
-        $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+        $checkedDiscussions = $this->Request->post('discussionIDs', null);
+
+        if ($checkedDiscussions === null) {
+            $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+        }
+
         if (!is_array($checkedDiscussions)) {
             $checkedDiscussions = [];
         }
@@ -310,7 +321,11 @@ class ModerationController extends VanillaController {
 
         // Check permissions on each discussion to make sure the user has permission to delete them
         $allowedDiscussions = [];
-        $discussionData = $discussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $discussionIDs)->get();
+        $discussionData = $discussionModel->SQL
+            ->select('DiscussionID, CategoryID')
+            ->from('Discussion')
+            ->whereIn('DiscussionID', $discussionIDs)
+            ->get();
         foreach ($discussionData->result() as $discussion) {
             $countCheckedDiscussions = $discussionData->numRows();
             if (CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.Delete')) {
@@ -321,17 +336,49 @@ class ModerationController extends VanillaController {
         $countNotAllowed = $countCheckedDiscussions - count($allowedDiscussions);
         $this->setData('CountNotAllowed', $countNotAllowed);
 
-        if ($this->Form->authenticatedPostBack()) {
-            $discussionArray = ['discussionID' => $allowedDiscussions];
+        if ($this->Request->isAuthenticatedPostBack(true)) {
+            $checkedDiscussions = array_combine($allowedDiscussions, $allowedDiscussions);
             // Queue deleting discussions.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-            $scheduler->addJob(Vanilla\Library\Jobs\DeleteDiscussions::class, $discussionArray);
-            foreach ($discussionArray['discussionID'] as $discussionID) {
-                $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
+            foreach ($allowedDiscussions as $discussionID) {
+                $discussionModel->deleteID($discussionID);
+                unset($checkedDiscussions[$discussionID]);
+                Gdn::userModel()->saveAttribute(
+                    $session->UserID,
+                    'CheckedDiscussions',
+                    array_values($checkedDiscussions)
+                );
+                $this->jsonTarget("#Discussion_$discussionID", ["remove" => true], 'SlideUp');
+
+                $elapsedTime = time() - $startTime;
+                if ($elapsedTime > self::MAX_TIME_BATCH_DELETE) {
+                    break;
+                }
             }
-            // Clear selections
-            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
+            if (!empty($checkedDiscussions)) {
+                $this->jsonTarget('', [
+                    'url' => '/moderation/confirmdiscussiondeletes',
+                    'reprocess' => true,
+                    'data' => [
+                        'DeliveryType' => DELIVERY_TYPE_VIEW,
+                        'DeliveryMethod' => DELIVERY_METHOD_JSON,
+                        'discussionIDs' => array_values($checkedDiscussions),
+                        'fork' => false
+                    ]
+                ], 'Ajax');
+                $this->title(t("Deleting..."));
+                $this->setFormSaved(false);
+                $this->jsonTarget(
+                    "#Popup .Content",
+                    $this->renderTwig('/applications/vanilla/views/moderation/progress.twig', $this->Data),
+                    "Html"
+                );
+                $this->View = "progress";
+            } else {
+                $this->jsonTarget("!element", "", "closePopup");
+                $this->setFormSaved(true);
+            }
+
             ModerationController::informCheckedDiscussions($this, true);
         }
 

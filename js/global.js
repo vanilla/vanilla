@@ -620,9 +620,31 @@ jQuery(document).ready(function($) {
                     $target.addClass(item.Data);
                     break;
                 case 'Ajax':
+                    if (typeof item.Data === 'string') {
+                        ajax = {
+                            url: item.Data,
+                            reprocess: false,
+                            data: {}
+                        };
+                    } else {
+                        ajax = item.Data;
+                    }
+
                     $.ajax({
                         type: "POST",
-                        url: item.Data
+                        url: ajax.url,
+                        data: ajax.data,
+                        success: function (json) {
+                            if (!ajax.reprocess) {
+                                return;
+                            }
+                            if (json === null) {
+                                json = {};
+                            }
+
+                            var informed = gdn.inform(json);
+                            gdn.processTargets(json.Targets, $elem, $parent);
+                        }
                     });
                     break;
                 case 'Append':
@@ -656,7 +678,20 @@ jQuery(document).ready(function($) {
                     $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
-                    $target.slideUp('fast');
+                    let removeTarget = false;
+                    if ((typeof item.Data === "object" && item.Data !== null) && item.Data.remove !== "undefined") {
+                        removeTarget = !!item.Data.remove;
+                    }
+
+                    let slideUpComplete = (function (remove) {
+                        return function () {
+                            if (remove) {
+                                $(this).remove();
+                            }
+                        }
+                    })(removeTarget);
+
+                    $target.slideUp('fast', slideUpComplete);
                     break;
                 case 'SlideDown':
                     $target.slideDown('fast');
@@ -672,6 +707,17 @@ jQuery(document).ready(function($) {
                     break;
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
+                    break;
+                case "closePopup":
+                    if (typeof $.popup === "function" && typeof $.popup.close === "function") {
+                        var popupID = $target.attr("id");
+                        if (popupID) {
+                            $.popup.close({
+                                popupId: popupID,
+                                sender: $("body").get(0)
+                            })
+                        }
+                    }
                     break;
             }
         }

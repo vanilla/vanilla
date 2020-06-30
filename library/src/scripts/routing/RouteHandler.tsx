@@ -36,7 +36,9 @@ export default class RouteHandler<GeneratorProps> {
         key?: string,
     ) {
         this.loadable = Loadable({
-            loading: loadingComponent as any,
+            loading: function LoaderWrapper() {
+                return <>{loadingComponent}</>;
+            },
             loader: componentPromise,
         });
         this.url = (data: GeneratorProps) => formatUrl(url(data), true);

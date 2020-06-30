@@ -46,7 +46,7 @@ class TwitchEmbed extends AbstractEmbed {
      *
      * @param string $host
      */
-    public function setHost (string $host) {
+    public function setHost(string $host) {
         $this->host = $host;
     }
 

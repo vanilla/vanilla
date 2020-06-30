@@ -24,16 +24,13 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
     /** @var MockHttpClient */
     private $httpClient;
 
-    private $request;
-
     /**
      * Set the factory and client.
      */
     public function setUp(): void {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
-        $request = new \Gdn_Request;
-        $this->factory = new TwitchEmbedFactory($this->httpClient, $request);
+        $this->factory = new TwitchEmbedFactory($this->httpClient);
     }
 
     /**

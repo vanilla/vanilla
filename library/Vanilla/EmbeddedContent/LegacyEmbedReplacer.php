@@ -28,7 +28,7 @@ class LegacyEmbedReplacer {
      * DI.
      *
      * @param EmbedConfig $embedConfig
-     * @param RequestInterface $request;
+     * @param RequestInterface $request
      */
     public function __construct(EmbedConfig $embedConfig, RequestInterface $request) {
         $this->embedConfig = $embedConfig;

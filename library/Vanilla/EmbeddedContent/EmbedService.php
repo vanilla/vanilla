@@ -16,6 +16,7 @@ use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
@@ -169,6 +170,7 @@ class EmbedService implements EmbedCreatorInterface {
             // Twitch
             ->registerFactory($dic->get(TwitchEmbedFactory::class))
             ->registerEmbed(TwitchEmbed::class, TwitchEmbed::TYPE)
+            ->registerFilter($dic->get(TwitchEmbedFilter::class))
             // Twitter
             ->registerFactory($dic->get(TwitterEmbedFactory::class))
             ->registerEmbed(TwitterEmbed::class, TwitterEmbed::TYPE)

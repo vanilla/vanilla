@@ -11,6 +11,7 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
+use Garden\Web\RequestInterface;
 
 /**
  * Tests for the embed and factory.
@@ -23,13 +24,16 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
     /** @var MockHttpClient */
     private $httpClient;
 
+    private $request;
+
     /**
      * Set the factory and client.
      */
     public function setUp(): void {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
-        $this->factory = new TwitchEmbedFactory($this->httpClient);
+        $request = new \Gdn_Request;
+        $this->factory = new TwitchEmbedFactory($this->httpClient, $request);
     }
 
     /**
@@ -57,7 +61,7 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
     public function testCreateEmbedForUrl() {
         $url = "https://www.twitch.tv/videos/441409883";
         $videoID = "441409883";
-        $host = http_build_query(['parent' => \Gdn::request()->getHost(), 'video' => $videoID]);
+        $host = http_build_query(['video' => $videoID]);
         $frameSrc = "https://player.twitch.tv/?".$host;
         $oembedParams = http_build_query([ "url" => $url]);
         $oembedUrl = TwitchEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;

@@ -21,8 +21,8 @@ class LegacyEmbedReplacer {
     /** @var EmbedConfig */
     private $embedConfig;
 
-    /** @var RequestInterface */
-    private $request;
+    /** @var string */
+    private $host;
 
     /**
      * DI.
@@ -32,7 +32,7 @@ class LegacyEmbedReplacer {
      */
     public function __construct(EmbedConfig $embedConfig, RequestInterface $request) {
         $this->embedConfig = $embedConfig;
-        $this->request = $request;
+        $this->host = $request->getHost();
     }
 
     /**
@@ -76,8 +76,7 @@ class LegacyEmbedReplacer {
                 break;
             }
         }
-        $twitchParams = ['parent' => $this->request->getHost(), 'autoplay' => 'false'];
-        $twitchQuery = http_build_query($twitchParams);
+
         if (!c('Garden.Format.' . $key, true)) {
             return '';
         }
@@ -227,10 +226,15 @@ EOT;
                 break;
 
             case 'Twitch':
+                $twitchParams = http_build_query([
+                    'channel' => $matches[1],
+                    'parent' => $this->host,
+                    'autoplay' => 'false',
+                ]);
                 return <<<EOT
 
 <iframe
-    src="https://player.twitch.tv/?channel={$matches[1]}&{$twitchQuery}"
+    src="https://player.twitch.tv/?{$twitchParams}"
     height="360"
     width="640"
     frameborder="0"
@@ -242,9 +246,14 @@ EOT;
                 break;
 
             case 'TwitchRecorded':
+                $twitchParams = http_build_query([
+                    'video' => $matches[1],
+                    'parent' => $this->host,
+                    'autoplay' => 'false',
+                ]);
                 return <<<EOT
 <iframe
-    src="https://player.twitch.tv/?video={$matches[1]}&{$twitchQuery}"
+    src="https://player.twitch.tv/?{$twitchParams}"
     height="360"
     width="640"
     frameborder="0"

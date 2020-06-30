@@ -59,9 +59,8 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      */
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $twitchID = $this->idFromUrl($url);
-        $uri = self::OEMBED_URL_BASE;
         $response = $this->httpClient->get(
-            $uri,
+            self::OEMBED_URL_BASE,
             ["url" => $url]
         );
 

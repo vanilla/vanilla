@@ -48,6 +48,7 @@ class LegacyEmbedReplacer {
         if (!$this->embedConfig->areEmbedsEnabled()) {
             return '';
         }
+
         list($width, $height) = $this->embedConfig->getLegacyEmbedSize();
 
         $urlParts = parse_url($url);

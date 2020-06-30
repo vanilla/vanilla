@@ -6,16 +6,18 @@
 
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\MinimalContainerTestCase;
+use VanillaTests\Fixtures\Request;
 
 /**
  * Test twitch embed filter.
  */
-class TwitchEmbedFilterTest extends MinimalContainerTestCase {
+class TwitchEmbedFilterTest extends TestCase {
 
     /** @var TwitchEmbedFactory */
     private $factory;
@@ -25,7 +27,10 @@ class TwitchEmbedFilterTest extends MinimalContainerTestCase {
 
     /** @var \Gdn_Request */
     private $request;
-    
+
+    /** @var \Gdn_Request */
+    private $twitchEmbedFilter;
+
     /**
      * Set the factory and client.
      */
@@ -33,7 +38,8 @@ class TwitchEmbedFilterTest extends MinimalContainerTestCase {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new TwitchEmbedFactory($this->httpClient);
-        $this->request = new \Gdn_Request();
+        $this->request = new Request();
+        $this->twitchEmbedFilter = new TwitchEmbedFilter($this->request);
     }
 
     /**
@@ -51,7 +57,7 @@ class TwitchEmbedFilterTest extends MinimalContainerTestCase {
             ];
         $dataEmbed = new TwitchEmbed($data);
         /** @var TwitchEmbedFilter $filter */
-        $filter = self::container()->get(TwitchEmbedFilter::class);
+        $filter = $this->twitchEmbedFilter;
         $filter->filterEmbed($dataEmbed);
         $this->assertEquals($this->request->getHost(), $dataEmbed->getHost());
         $this->assertEquals($data, $dataEmbed->getData());

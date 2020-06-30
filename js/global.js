@@ -679,7 +679,7 @@ jQuery(document).ready(function($) {
                     break;
                 case 'SlideUp':
                     let removeTarget = false;
-                    if (typeof item.Data === "object" && item.Data.remove !== "undefined") {
+                    if ((typeof item.Data === "object" && item.Data !== null) && item.Data.remove !== "undefined") {
                         removeTarget = !!item.Data.remove;
                     }
 

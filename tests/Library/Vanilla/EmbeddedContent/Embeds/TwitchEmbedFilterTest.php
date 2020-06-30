@@ -15,10 +15,6 @@ use VanillaTests\Fixtures\Request;
  * Test twitch embed filter.
  */
 class TwitchEmbedFilterTest extends TestCase {
-    
-    /** @var MockHttpClient */
-    private $httpClient;
-
     /** @var \Gdn_Request */
     private $request;
 

@@ -54,9 +54,7 @@ class TwitchEmbedFilterTest extends TestCase {
                 "name" => 'Movie Magic'
             ];
         $dataEmbed = new TwitchEmbed($data);
-        /** @var TwitchEmbedFilter $filter */
-        $filter = $this->twitchEmbedFilter;
-        $filter->filterEmbed($dataEmbed);
+        $this->twitchEmbedFilter->filterEmbed($dataEmbed);
         $this->assertEquals($this->request->getHost(), $dataEmbed->getHost());
         $this->assertEquals($data, $dataEmbed->getData());
     }

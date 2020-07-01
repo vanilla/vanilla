@@ -175,7 +175,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * * TRUE: Nulls are allowed.
      * * FALSE: Nulls are not allowed.
      * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
-     * @param string $keyType What type of key is this column on the table? Options
+     * @param string|false $keyType What type of key is this column on the table? Options
      * are primary, key, and FALSE (not a key).
      * @return $this
      */

@@ -12,7 +12,7 @@
  * @param string $path The path to the asset.
  * @param bool|string $withDomain Whether or not to include the domain.
  * @param bool $addVersion Whether or not to add a version to the resulting asset to help bust the cache.
- * @return Returns the url to the asset.
+ * @return string Returns the url to the asset.
  *
  * @see asset()
  */

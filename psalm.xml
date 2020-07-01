@@ -8,10 +8,13 @@
     autoloader="tests/phpunit.php"
 >
     <projectFiles>
-        <directory name="library/Garden" />
-        <directory name="library/Vanilla" />
+        <directory name="library" />
         <ignoreFiles>
+            <directory name="library/deprecated" />
+            <directory name="library/setup" />
+            <directory name="library/src" />
             <directory name="vendor" />
+            <file name="library/core/class.memcached.php"/>
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>

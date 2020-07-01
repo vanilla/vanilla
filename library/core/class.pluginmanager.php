@@ -1197,12 +1197,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         foreach ($authors as $authorString) {
             $parts = explode(',', $authorString, 3);
             $author = [];
-            $author['Name'] = trim($author[0]);
+            $author['Name'] = trim($parts[0]);
             for ($i = 1; $i < count($parts); $i++) {
                 if (strpos($parts[$i], '@') !== false) {
                     $author['Email'] = $parts[$i];
-                } elseif (preg_match('`^https?://`', $parts[$i]))
+                } elseif (preg_match('`^https?://`', $parts[$i])) {
                     $author['Url'] = $parts[$i];
+                }
             }
             $result[] = $author;
         }
@@ -1214,8 +1215,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $name = $author['Name'];
                 if (isset($author['Url'])) {
                     $url = $author['Url'];
-                } elseif (isset($author['Email']))
+                } elseif (isset($author['Email'])) {
                     $url = "mailto:{$author['Email']}";
+                }
 
                 if (isset($url)) {
                     $htmls[] = '<a href="'.htmlspecialchars($url).'">'.htmlspecialchars($name).'</a>';
@@ -1224,7 +1226,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             $result = implode(', ', $htmls);
         }
         return $result;
-
     }
 
     /**

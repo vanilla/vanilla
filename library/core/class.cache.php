@@ -378,7 +378,6 @@ abstract class Gdn_Cache {
 
         $fails = &$storeServer['Fails'];
         $fails++;
-        $active = $isActive ? 'active' : 'inactive';
 
         // Check if we need to deactivate for 5 minutes
         if ($isActive && $storeServer['Fails'] > 3) {

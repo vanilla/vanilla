@@ -13,10 +13,10 @@
  *  - <b>code</b>: The text code set in the theme's information.
  *  - <b>default</b>: The default text if the user hasn't overridden.
  * @param Smarty $smarty The smarty object rendering the template.
- * @return The text.
+ * @return string The text.
  */
 function smarty_function_t($params, &$smarty) {
     $code = val('c', $params, '');
     $result = t($code, val('d', $params, $code));
-	return $result;
+    return $result;
 }

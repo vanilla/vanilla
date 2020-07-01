@@ -7,8 +7,10 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
+use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
 use VanillaTests\Fixtures\Request;
 
 /**
@@ -31,9 +33,48 @@ class TwitchEmbedFilterTest extends TestCase {
     }
 
     /**
+     * Verify ability to property detect supported embed types.
+     *
+     * @param string $embedType
+     * @param bool $expected
+     * @dataProvider provideEmbedTypes
+     */
+    public function testCanHandleEmbedType(string $embedType, bool $expected): void {
+        $this->assertSame($expected, $this->twitchEmbedFilter->canHandleEmbedType($embedType));
+    }
+
+    /**
+     * Provide data for testing embed type support.
+     *
+     * @return array
+     */
+    public function provideEmbedTypes(): array {
+        $result = [
+            "Twitch" => [TwitchEmbed::TYPE, true],
+            "YouTube" => [YouTubeEmbed::TYPE, false],
+        ];
+        return $result;
+    }
+
+    /**
+     * Verify ability to recognize an invalid embed when filtering.
+     */
+    public function testFilterInvalidEmbed(): void {
+        $this->expectException(EmbeddedContentException::class);
+        $this->getExpectedExceptionMessage("Expected a twitch embed.");
+
+        $invalidEmbed = new YouTubeEmbed([
+            "url" => "https://youtu.be/dQw4w9WgXcQ",
+            "embedType" => YouTubeEmbed::TYPE,
+            "videoID" => "dQw4w9WgXcQ",
+        ]);
+        $this->twitchEmbedFilter->filterEmbed($invalidEmbed);
+    }
+
+    /**
      * Test twitch filter embed.
      */
-    public function testTwitchFilterEmbed() {
+    public function testFilterValidEmbed(): void {
         $data = [
             "height" => 180,
             "width" => 320,

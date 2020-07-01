@@ -31,35 +31,38 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     public $Connection;
 
     /** @var int The index of the $this->_ResultSet currently being accessed. */
-    private $_Cursor = -1;
+    private $cursor = -1;
 
     /**
-     * @var intDetermines what type of result is returned from the various methods by default.
+     * @var string Determines what type of result is returned from the various methods by default.
      * Either DATASET_TYPE_OBJECT or DATASET_TYPE_ARRAY.
      */
     protected $_DatasetType = DATASET_TYPE_OBJECT;
 
     /** @var bool  */
-    protected $_EOF = false;
+    protected $eof = false;
 
     /**
      * @var PDOStatement Contains a PDOStatement object returned by a PDO query. FALSE by default.
      * This property is assigned by the database driver object when a query is
      * executed in $Database->query().
      */
-    private $_PDOStatement;
+    private $pdoStatement;
 
     /** @var array An array of either objects or associative arrays with the data in this dataset. */
     protected $_Result;
 
     /**
+     * Gdn_DataSet constructor.
      *
+     * @param array|null $result
+     * @param string $dataSetType
      */
     public function __construct($result = null, $dataSetType = null) {
         // Set defaults
         $this->Connection = null;
-        $this->_Cursor = -1;
-        $this->_PDOStatement = null;
+        $this->cursor = -1;
+        $this->pdoStatement = null;
         $this->_Result = $result;
         if ($dataSetType !== null) {
             $this->_DatasetType = $dataSetType;
@@ -72,7 +75,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     }
 
     /**
-     *
+     * Free up resources.
      */
     public function __destruct() {
         $this->freePDOStatement(true);
@@ -101,14 +104,20 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      * @param int $rowIndex The index to seek in the result resource.
      */
     public function dataSeek($rowIndex = 0) {
-        $this->_Cursor = $rowIndex;
+        $this->cursor = $rowIndex;
     }
 
     /**
-     *
+     * Get or set the dataset type.
      *
      * @param bool $datasetType
-     * @return $this|intDetermines|string
+     * @return $this|string
+     * @psalm-return (
+     *     $datasetType is false
+     *     ? $this
+     *     : string
+     * )
+     *
      */
     public function datasetType($datasetType = false) {
         if ($datasetType !== false) {
@@ -138,7 +147,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     }
 
     /**
-     *
+     * Take all of the items encoded in an attributes column and merge them into each row.
      *
      * @param string $name
      */
@@ -173,7 +182,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Fetches all rows from the PDOStatement object into the resultset.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
      * It will fill a different array depending on which type is specified.
      */
     protected function _fetchAllRows($datasetType = false) {
@@ -186,22 +195,17 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         }
 
         $result = [];
-        if (is_null($this->_PDOStatement)) {
+        if (is_null($this->pdoStatement)) {
             $this->_Result = $result;
             return;
         }
 
         // Calling fetchAll on insert/update/delete queries will raise an error!
-        if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->_PDOStatement->queryString))) !== 1) {
-            $result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+        if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->pdoStatement->queryString))) !== 1) {
+            $result = $this->pdoStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
         } else {
             $this->_Result = $result;
         }
-
-//		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-//      while($Row = $this->_PDOStatement->fetch()) {
-//			$Result[] = $Row;
-//		}
 
         $this->freePDOStatement(true);
         $this->_Result = $result;
@@ -210,13 +214,13 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns the first row or FALSE if there are no rows to return.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
      * @return bool|array|stdClass False when empty result set, object or array depending on $datasetType.
      */
     public function &firstRow($datasetType = false) {
         $result = &$this->result($datasetType);
         if (count($result) == 0) {
-            return $this->_EOF;
+            return $this->eof;
         }
 
         return $result[0];
@@ -243,12 +247,12 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      */
     public function freePDOStatement($destroyPDOStatement = true) {
         try {
-            if (is_object($this->_PDOStatement)) {
-                $this->_PDOStatement->closeCursor();
+            if (is_object($this->pdoStatement)) {
+                $this->pdoStatement->closeCursor();
             }
 
             if ($destroyPDOStatement) {
-                $this->_PDOStatement = null;
+                $this->pdoStatement = null;
             }
         } catch (Exception $ex) {
             // Go past exceptions in case wait_timeout exceeded.
@@ -303,11 +307,12 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     }
 
     /**
-     *
+     * Join a query to this dataset.
      *
      * @param array $data
      * @param array $columns The columns/table information for the join. Depending on the argument's index it will be interpreted differently.
-     *  - <b>numeric</b>: This column will come be added to the resulting join. The value can be either a string or a two element array where the second element specifies an alias.
+     *  - <b>numeric</b>: This column will come be added to the resulting join. The value can be either a string or a
+     *    two element array where the second element specifies an alias.
      *  - <b>alias</b>: The alias of the child table in the query.
      *  - <b>child</b>: The name of the child column.
      *  - <b>column</b>: The name of the column to put the joined data into. Can't be used with <b>prefix</b>.
@@ -388,10 +393,10 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         if (!isset($parentColumn)) {
             if (isset($childColumn)) {
                 $parentColumn = $childColumn;
-            } elseif (isset($table))
-                $parentColumn = $table.'ID';
-            else {
-                throw exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
+            } elseif (isset($table)) {
+                $parentColumn = $table . 'ID';
+            } else {
+                throw new Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
             }
         }
 
@@ -399,10 +404,10 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         if (!isset($childColumn)) {
             if (isset($parentColumn)) {
                 $childColumn = $parentColumn;
-            } elseif (isset($table))
-                $childColumn = $table.'ID';
-            else {
-                throw exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
+            } elseif (isset($table)) {
+                $childColumn = $table . 'ID';
+            } else {
+                throw new Exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
             }
         }
 
@@ -476,12 +481,13 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns the last row in the or FALSE if there are no rows to return.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
+     * @return object|array|false Returns the last row however it is formatted.
      */
     public function &lastRow($datasetType = false) {
         $result = &$this->result($datasetType);
         if (count($result) == 0) {
-            return $this->_EOF;
+            return $this->eof;
         }
 
         return $result[count($result) - 1];
@@ -490,30 +496,32 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns the next row or FALSE if there are no more rows.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
+     * @return object|array|false Returns the next row or **false** if there isn't one.
      */
     public function &nextRow($datasetType = false) {
         $result = &$this->result($datasetType);
-        ++$this->_Cursor;
+        ++$this->cursor;
 
-        if (isset($result[$this->_Cursor])) {
-            return $result[$this->_Cursor];
+        if (isset($result[$this->cursor])) {
+            return $result[$this->cursor];
         }
-        return $this->_EOF;
+        return $this->eof;
     }
 
     /**
      * Returns the number of fields in the DataSet.
      */
     public function numFields() {
-        $result = is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
+        $result = is_object($this->pdoStatement) ? $this->pdoStatement->columnCount() : 0;
         return $result;
     }
 
     /**
      * Returns the number of rows in the DataSet.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
+     * @return int Returns the count.
      */
     public function numRows($datasetType = false) {
         $result = count($this->result($datasetType));
@@ -523,24 +531,26 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns the previous row in the requested format.
      *
-     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @param string|false $datasetType The format in which the result should be returned: object or array.
+     * @return object|array|false Returns a reference to the previous row or **false** if there isn't one.
      */
     public function &previousRow($datasetType = false) {
         $result = &$this->result($datasetType);
-        --$this->_Cursor;
-        if (isset($result[$this->_Cursor])) {
-            return $result[$this->_Cursor];
+        --$this->cursor;
+        if (isset($result[$this->cursor])) {
+            return $result[$this->cursor];
         }
-        return $this->_EOF;
+        return $this->eof;
     }
 
     /**
      * Returns an array of data as the specified result type: object or array.
      *
-     * @param string $datasetType The format in which to return a row: object or array. The following values are supported.
+     * @param string|false $datasetType The format in which to return a row: object or array. The following values are supported.
      *  - <b>DATASET_TYPE_ARRAY</b>: An array of associative arrays.
      *  - <b>DATASET_TYPE_OBJECT</b>: An array of standard objects.
      *  - <b>FALSE</b>: The current value of the DatasetType property will be used.
+     * @return array Returns a reference to all of the result rows.
      */
     public function &result($datasetType = false) {
         $this->datasetType($datasetType);
@@ -563,6 +573,9 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
 
     /**
      * Returns an array of objects containing the ResultSet data.
+     *
+     * @param string $formatType Do not use.
+     * @return object[]
      */
     public function resultObject($formatType = '') {
         return $this->result(DATASET_TYPE_OBJECT);
@@ -579,7 +592,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         if (isset($result[$rowIndex])) {
             return $result[$rowIndex];
         }
-        return $this->_EOF;
+        return $this->eof;
     }
 
     /**
@@ -600,22 +613,23 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
                 }
             }
 
-            $this->_Cursor = -1;
-            $this->_PDOStatement = null;
+            $this->cursor = -1;
+            $this->pdoStatement = null;
             $this->_Result = $resultset;
         }
     }
 
     /**
-     * Assigns the pdostatement object to this object.
+     * Assigns the PDO statement object to this object.
      *
-     * @param PDOStatement $pDOStatement The PDO Statement Object being assigned.
+     * @param PDOStatement|false $pdoStatement The PDO Statement Object being assigned.
+     * @return PDOStatement|void
      */
-    public function pDOStatement(&$pDOStatement = false) {
-        if ($pDOStatement === false) {
-            return $this->_PDOStatement;
+    public function pdoStatement(&$pdoStatement = false) {
+        if ($pdoStatement === false) {
+            return $this->pdoStatement;
         } else {
-            $this->_PDOStatement = $pDOStatement;
+            $this->pdoStatement = $pdoStatement;
         }
     }
 
@@ -668,9 +682,9 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
                 foreach ($columnName as $name => $default) {
                     if (is_object($row) && property_exists($row, $name)) {
                         return $row->$name;
-                    } elseif (is_array($row) && array_key_exists($name, $row))
+                    } elseif (is_array($row) && array_key_exists($name, $row)) {
                         return $row[$name];
-                    else {
+                    } else {
                         $result[] = $default;
                     }
                 }
@@ -678,8 +692,9 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
             } else {
                 if (is_object($row) && property_exists($row, $columnName)) {
                     return $row->$columnName;
-                } elseif (is_array($row) && array_key_exists($columnName, $row))
+                } elseif (is_array($row) && array_key_exists($columnName, $row)) {
                     return $row[$columnName];
+                }
             }
         }
         if (is_array($columnName)) {

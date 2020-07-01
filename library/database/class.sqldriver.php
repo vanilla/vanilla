@@ -639,8 +639,8 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table from which to select data. Adds to the $this->_Froms collection.
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit Adds a limit to the query.
-     * @param int $pageNumber The page of data to retrieve.
+     * @param int|false $limit Adds a limit to the query.
+     * @param int|false $pageNumber The page of data to retrieve.
      * @return Gdn_DataSet
      */
     public function get($table = '', $orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
@@ -670,9 +670,9 @@ abstract class Gdn_SQLDriver {
     /**
      * A helper function for escaping sql identifiers.
      *
-     * @param string The sql containing identifiers to escape in a different language.
+     * @param string $sql The sql containing identifiers to escape in a different language.
      *   All identifiers requiring escaping should be enclosed in back ticks (`).
-     * @return array All of the tokens in the sql. The tokens that require escaping will still have back ticks.
+     * @return string[] All of the tokens in the sql. The tokens that require escaping will still have back ticks.
      */
     protected function _getIdentifierTokens($sql) {
         $tokens = preg_split('/`/', $sql, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -681,7 +681,7 @@ abstract class Gdn_SQLDriver {
         $inIdent = false;
         $currentToken = '';
         for ($i = 0; $i < count($tokens); $i++) {
-            $token = $tokens[i];
+            $token = $tokens[$i];
             $result .= $token;
             if ($token == '`') {
                 if ($inIdent && $i < count($tokens) - 1 && $tokens[$i + 1] == '`') {
@@ -917,7 +917,7 @@ abstract class Gdn_SQLDriver {
      * @param mixed $where Adds to the $this->_Wheres collection using $this->where();
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit The number of records to limit the query to.
+     * @param int|false $limit The number of records to limit the query to.
      * @param int $offset The offset where the query results should begin.
      * @return Gdn_DataSet The data returned by the query.
      */
@@ -952,8 +952,9 @@ abstract class Gdn_SQLDriver {
      * @param mixed $like Adds to the $this->_Wheres collection using $this->like();
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit The number of records to limit the query to.
-     * @param int $pageNumber The offset where the query results should begin.
+     * @param int|false $limit The number of records to limit the query to.
+     * @param int|false $pageNumber The offset where the query results should begin.
+     * @return Gdn_DataSet
      */
     public function getWhereLike($table = '', $like = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
         if ($table != '') {
@@ -1298,7 +1299,7 @@ abstract class Gdn_SQLDriver {
      * Sets the limit (and offset optionally) for the query.
      *
      * @param int $limit The number of records to limit the query to.
-     * @param int $offset The offset where the query results should begin.
+     * @param int|false $offset The offset where the query results should begin.
      * @return Gdn_SQLDriver $this
      */
     public function limit($limit, $offset = false) {
@@ -1691,8 +1692,9 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->where();
-     * @param int $limit Adds a limit to the query.
+     * @param string|false $where Adds to the $this->_Wheres collection using $this->where();
+     * @param int|false $limit Adds a limit to the query.
+     * @return bool Returns the result of the update.
      */
     public function put($table = '', $set = null, $where = false, $limit = false) {
         $this->update($table, $set, $where, $limit);
@@ -2053,8 +2055,8 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->where();
-     * @param int $limit Adds a limit to the query.
+     * @param string|false $where Adds to the $this->_Wheres collection using $this->where();
+     * @param int|false $limit Adds a limit to the query.
      * @return Gdn_SQLDriver $this
      */
     public function update($table, $set = null, $where = false, $limit = false) {

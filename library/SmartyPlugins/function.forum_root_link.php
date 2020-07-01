@@ -14,10 +14,10 @@
  * - <b>text</b>: Html text to be put inside an anchor. If this value is set then an html <a></a> is returned rather than just a url.
  * - <b>id, class, etc.></b>: When an anchor is generated then any other attributes are passed through and will be written in the resulting tag.
  * @param Smarty $smarty The smarty object rendering the template.
- * @return string Retirns the url.
+ * @return string Returns the url.
  */
 function smarty_function_forum_root_link($params, &$smarty) {
-    $text = val('text', $params, '', true);
+    $text = val('text', $params, '');
     $format = val('format', $params, '<li><a href="%url" class="%class">%text</a></li>');
 
     $options = [];

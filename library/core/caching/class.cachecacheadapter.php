@@ -7,8 +7,8 @@
 
 /**
  * Class CacheCacheAdapter
-     *
+ *
  * @deprecated Use the `Vanilla\Cache\CacheCacheAdapter` instead.
+ */
 class CacheCacheAdapter extends \Vanilla\Cache\CacheCacheAdapter implements \Vanilla\CacheInterface {
-     */
 }

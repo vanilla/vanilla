@@ -369,7 +369,6 @@ table.PreferenceGroup th {
 
 // Fix connection page of profile
 .DataList-Connections {
-    .Connection-Name,
     .Connection-Header {
         display: flex;
         align-items: center;
@@ -377,25 +376,17 @@ table.PreferenceGroup th {
     }
 
     .Connection-Header {
-        justify-content: space-between;
-
         @include maxWidth {
             justify-content: center;
         }
     }
 
     .Connection-Name {
-        flex: 1;
-        min-width: 200px;
         margin: $utility-baseUnitDouble 0;
-
-        @include maxWidth {
-            flex: initial;
-            min-width: 0;
-        }
     }
 
     .Connection-Connect {
+        margin-left: auto;
         position: static;
         padding: 0;
     }

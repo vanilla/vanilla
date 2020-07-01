@@ -115,6 +115,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $sender->permission($sender->RequiredAdminPermissions, '', false);
         $sender->setHighlightRoute('dashboard/settings');
 
+        $sender->CssClass .= " dashboard";
+
         if (!Gdn_Statistics::checkIsEnabled() && Gdn_Statistics::checkIsLocalhost()) {
             $sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {

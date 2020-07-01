@@ -10,7 +10,6 @@ import TitleBar from "@library/headers/TitleBar";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import PageContext from "@library/routing/PagesContext";
 import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
@@ -42,6 +41,7 @@ const makeMockRegisterUser: IMe = {
     photoUrl: "",
     dateLastActive: "",
     countUnreadNotifications: 1,
+    countUnreadConversations: 1,
 };
 
 const initialState = testStoreState({
@@ -70,26 +70,17 @@ function StoryTitleBar(props: { title: string }) {
     }
 
     return (
-        <PageContext.Provider
-            value={{
-                pages: {
-                    // search?: IPageLoader;
-                    // drafts?: IPageLoader;
-                },
-            }}
-        >
-            <MemoryRouter>
-                <BannerContextProvider>
-                    <TitleBarDeviceProvider>
-                        <StoryHeading depth={2}>{props.title}</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={true} />
-                        <Container>
-                            <PanelArea>{dummyData}</PanelArea>
-                        </Container>
-                    </TitleBarDeviceProvider>
-                </BannerContextProvider>
-            </MemoryRouter>
-        </PageContext.Provider>
+        <MemoryRouter>
+            <BannerContextProvider>
+                <TitleBarDeviceProvider>
+                    <StoryHeading depth={2}>{props.title}</StoryHeading>
+                    <TitleBar useMobileBackButton={false} isFixed={true} />
+                    <Container>
+                        <PanelArea>{dummyData}</PanelArea>
+                    </Container>
+                </TitleBarDeviceProvider>
+            </BannerContextProvider>
+        </MemoryRouter>
     );
 }
 

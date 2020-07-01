@@ -159,17 +159,17 @@ class HtmlFormat extends BaseFormat {
      * @inheritdoc
      */
     public function parseImageUrls(string $content): array {
-        $rendered = $this->renderHtml($content);
-        $document = new HtmlDocument($rendered);
-        $processor = new ImageHtmlProcessor($document);
-        return $processor->getImageURLs();
+        return array_column($this->parseImages($content), 'url');
     }
 
     /**
      * @inheritdoc
      */
     public function parseImages(string $content): array {
-        return [];
+        $rendered = $this->renderHtml($content);
+        $document = new HtmlDocument($rendered);
+        $processor = new ImageHtmlProcessor($document);
+        return $processor->getImages();
     }
 
     /**

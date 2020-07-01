@@ -29,6 +29,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     options: IComboBoxOption[] | undefined;
     onChange: (data: IComboBoxOption) => void;
     onInputChange?: (value: string) => void;
+    onMenuOpen?: () => void;
     labelNote?: string;
     noteAfterInput?: string;
     errors?: IFieldError[];
@@ -113,6 +114,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     menuIsOpen={isFocused === false ? false : undefined}
                     placeholder={props.placeholder}
                     isLoading={props.isLoading}
+                    onMenuOpen={props.onMenuOpen}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     menuPlacement={props.menuPlacement ?? "auto"}
@@ -141,6 +143,9 @@ function useOverrideProps(props: ISelectOneProps) {
             Option: selectOverrides.SelectOption,
             ValueContainer: function CustomValueContainer(localProps) {
                 return <selectOverrides.ValueContainer {...localProps} className={inputClassName} />;
+            },
+            DropdownIndicator: function CustomDropdownIndicator(localProps) {
+                return <selectOverrides.DropdownIndicator {...localProps} />;
             },
             NoOptionsMessage: noOptionsMessage || selectOverrides.NoOptionsMessage,
             LoadingMessage: selectOverrides.OptionLoader,

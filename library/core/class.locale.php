@@ -337,7 +337,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      *
      * @param string $code The code related to the language-specific definition.
      * Codes that begin with an '@' symbol are treated as literals and not translated.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string
      */
     public function translate($code, $default = false) {

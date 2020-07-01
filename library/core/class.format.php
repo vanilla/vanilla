@@ -64,8 +64,8 @@ class Gdn_Format {
      *  %9$s = gender suffix (some languages require this).
      *
      * @param object $activity An object representation of the activity being formatted.
-     * @param int $profileUserID If looking at a user profile, this is the UserID of the profile we are
-     *  looking at.
+     * @param int|string $profileUserID If looking at a user profile, this is the UserID of the profile we are looking at.
+     * @param int|string $viewingUserID The user viewing the headline.
      * @return string
      */
     public static function activityHeadline($activity, $profileUserID = '', $viewingUserID = '') {
@@ -1133,8 +1133,8 @@ class Gdn_Format {
      * array of $Array[Property] => Value sets.
      *
      * @param object $object The object to be converted to an array.
-     * @return unknown
-     * @todo could be just "return (array) $object;"?
+     * @return array
+     * @deprecated
      */
     public static function objectAsArray($object) {
         if (!is_object($object)) {

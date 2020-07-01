@@ -40,11 +40,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /** Flag for aggregating discussion counts. */
     const AGGREGATE_DISCUSSION = 'discussion';
 
-    /** @var Constants for category display options. */
+    /* Constants for category display options. */
     const DISPLAY_FLAT = 'Flat';
     const DISPLAY_HEADING = 'Heading';
     const DISPLAY_DISCUSSIONS = 'Discussions';
-    const DISPLAY_NESTED = 'Nested';
+    const DISPLAY_NESTED = 'Categories';
 
     /**
      * @var CategoryModel $instance;
@@ -251,6 +251,60 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
                 $category['Read'] = false;
             }
         }
+    }
+
+    /**
+     * Get searchable category IDs.
+     *
+     * @param int $categoryID The root category ID.
+     * @param bool|null $followedCategories If set, include or exclude followed categories.
+     * @param bool|null $includeChildCategories Get child category IDs as well.
+     * @param bool|null $includeArchivedCategories If set include archived categories.
+     *
+     * @return int[] CategoryIDs.
+     */
+    public function getSearchCategoryIDs(
+        ?int $categoryID = null,
+        ?bool $followedCategories = null,
+        ?bool $includeChildCategories = null,
+        ?bool $includeArchivedCategories = null
+    ): array {
+        $categoryFilter = [];
+        if (!$includeArchivedCategories) {
+            $categoryFilter['Archived'] = false;
+        }
+
+        $allPermissionCategories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
+        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
+        $this->eventManager->fire('AllowedCategories', $this, ['CategoriesID' => &$allPermissionCategoryIDs]);
+
+        $allPermissionCategories = array_intersect_key($allPermissionCategories, array_flip($allPermissionCategoryIDs));
+
+        if ($followedCategories) {
+            $allPermissionCategories = array_filter($allPermissionCategories, function ($category) {
+                return $category['Followed'];
+            });
+        }
+
+        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
+
+        if ($categoryID !== null) {
+            $resultIDs = [$categoryID];
+            if ($includeChildCategories) {
+                $subcategories = CategoryModel::getSubtree($categoryID);
+                $resultIDs = array_merge($resultIDs, array_column($subcategories, 'CategoryID'));
+            }
+            $resultIDs = array_intersect($allPermissionCategoryIDs, $resultIDs);
+        } else {
+            $resultIDs = $allPermissionCategoryIDs;
+        }
+
+        if (!empty($resultIDs)) {
+            // Make sure 0 (allowing other record types) makes it in.
+            $resultIDs[] = 0;
+        }
+
+        return $resultIDs;
     }
 
     /**

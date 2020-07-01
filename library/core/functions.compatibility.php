@@ -89,7 +89,7 @@ if (!function_exists('http_build_url')) {
      * @param mixed $url part(s) of a URL in form of a string or associative array like parse_url() returns.
      * @param mixed $parts Same as the first argument.
      * @param int $flags A bit mask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default.
-     * @param array &$new_url If set, it will be filled with the parts of the composed url like parse_url() would return.
+     * @param array|false $new_url If set, it will be filled with the parts of the composed url like parse_url() would return.
      * @return  string  Returns the constructed URL.
      * @see http://www.php.net/manual/en/function.http-build-url.php#96335
      * @see https://github.com/fuel/core/blob/974281dde67345ca8d7cfa27bcf4aa55c984d48e/base.php#L248

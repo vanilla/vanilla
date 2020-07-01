@@ -81,6 +81,7 @@
         "phing/phing": "2.*",
         "roave/security-advisories": "dev-master",
         "nette/robot-loader": "^3.2",
+        "vimeo/psalm": "^3.12",
         "cache/integration-tests": "dev-master",
         "symfony/phpunit-bridge": "^5.1"
     },
@@ -130,7 +131,11 @@
                 "LGPL-3.0",
                 "GPL-2.0",
                 "GPL-2.0+",
-                "LGPL-3.0-only"
+                "LGPL-3.0-only",
+
+                "OSL-3.0",
+                "Apache-2.0",
+                "ISC"
             ]
         }
     }

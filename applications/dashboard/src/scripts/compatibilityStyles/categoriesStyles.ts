@@ -39,6 +39,8 @@ export const categoriesCSS = () => {
 
     cssOut(`.DataList .PhotoWrap, .MessageList .PhotoWrap`, {
         top: unit(2),
+        width: unit(vars.image.width),
+        height: unit(vars.image.width),
     });
 
     cssOut(`.categoryList-heading`, {

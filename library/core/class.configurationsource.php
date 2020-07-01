@@ -36,7 +36,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     /** @var boolean Allow key splitting on dots. */
     protected $Splitting;
 
-    /** @var callback Save callback. */
+    /** @var callable Save callback. */
     protected $Callback;
 
     /** @var array Save callback options. */
@@ -71,7 +71,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     /**
      * Set a save callback
      *
-     * @param callback $callback
+     * @param callable $callback
      * @param array $options Callback options
      * @return boolean
      */
@@ -233,7 +233,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      *
      * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
      *
-     * @param type $data
+     * @param array $data
      */
     public function massImport($data) {
         if ($this->Splitting) {

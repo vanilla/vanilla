@@ -22,6 +22,7 @@ use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
+use Vanilla\Utility\SchemaUtils;
 
 /**
  * API Controller for the `/users` resource.
@@ -387,6 +388,10 @@ class UsersApiController extends AbstractApiController {
                 "description" => "Total number of unread notifications for the current user.",
                 "type" => "integer",
             ],
+            "countUnreadConversations" => [
+                "description" => "Total number of unread conversations for the current user.",
+                "type" => "integer",
+            ],
             "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
@@ -408,6 +413,7 @@ class UsersApiController extends AbstractApiController {
         // Expand permissions for the current user.
         $user["permissions"] = $this->globalPermissions();
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
+        $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
 
         $result = $out->validate($user);
         return $result;
@@ -474,6 +480,9 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'roleID:i?' => [
+                'x-filter' => ['field' => 'roleID']
+            ],
             'userID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'u.UserID']),
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
@@ -489,7 +498,8 @@ class UsersApiController extends AbstractApiController {
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
             ]
-        ], ['UserIndex', 'in']);
+        ], ['UserIndex', 'in'])
+            ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]));
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);

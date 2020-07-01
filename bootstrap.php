@@ -4,6 +4,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Controllers\SearchRootController;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -13,6 +14,9 @@ use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
 use Vanilla\Permissions;
+use Vanilla\Search\AbstractSearchDriver;
+use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
@@ -263,6 +267,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
     ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
+    ->addCall('addRoute', ['route' => new Reference('@new-search-route'), 'new-search'])
     ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
@@ -306,6 +311,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('@apiexpand-filter')
     ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
 
+    ->rule("@new-search-route")
+    ->setClass(\Garden\Web\ResourceRoute::class)
+    ->setConstructorArgs(['/search', '*\\%sSearchPageController'])
+    ->addCall('setThemeFeatureEnabled', [new Reference([ThemeFeatures::class, SearchRootController::ENABLE_FLAG])])
+    ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
+    ->addCall('setRootController', [SearchRootController::class])
+
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
@@ -341,6 +353,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(SearchModel::class)
     ->setShared(true)
+
+
+    ->rule(SearchService::class)
+    ->setShared(true)
+    ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
+    ->rule(AbstractSearchDriver::class)
+    ->setShared(true)
+    ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
 
     ->rule('Gdn_IPlugin')
     ->setShared(true)
@@ -441,6 +461,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Page::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
+    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
@@ -608,9 +629,10 @@ register_shutdown_function(function () use ($dic) {
     $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
 });
 
-// Construct the logger earlier so that its dependencies are satisfied.
-$log = $dic->get(\Vanilla\Logging\LogDecorator::class);
-// Replace the logger interface with the decorator.
-$dic->rule(\Vanilla\Logging\LogDecorator::class)
-    ->addAlias(\Psr\Log\LoggerInterface::class);
+// Add the log decorator.
+ContainerUtils::replace(
+    $dic,
+    \Psr\Log\LoggerInterface::class,
+    \Vanilla\Logging\LogDecorator::class
+);
 Logger::setLogger(null);

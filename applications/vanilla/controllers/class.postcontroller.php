@@ -525,49 +525,7 @@ class PostController extends VanillaController {
                 $this->Form->addHidden('vanilla_url', $vanilla_url);
                 $this->Form->addHidden('vanilla_category_id', $vanilla_category_id);
 
-                $PageInfo = fetchPageInfo($vanilla_url);
-
-                if (!($Title = $this->Form->getFormValue('Name'))) {
-                    $Title = val('Title', $PageInfo, '');
-                    if ($Title == '') {
-                        $Title = t('Undefined discussion subject.');
-                        if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
-                            $Title .= ' '.t('Page timed out.');
-                        }
-
-                    }
-                }
-
-                $Description = val('Description', $PageInfo, '');
-                $Images = val('Images', $PageInfo, []);
-                $LinkText = t('EmbededDiscussionLinkText', 'Read the full story here');
-
-                if (!$Description && count($Images) == 0) {
-                    $Body = formatString(
-                        '<p><a href="{Url}">{LinkText}</a></p>',
-                        ['Url' => $vanilla_url, 'LinkText' => $LinkText]
-                    );
-                } else {
-                    $Body = formatString('
-                <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-                   <p>{Excerpt}</p>
-                   <p><a href="{Url}">{LinkText}</a></p>
-                   <div class="ClearFix"></div>
-                </div>', [
-                        'Title' => $Title,
-                        'Excerpt' => $Description,
-                        'Image' => (count($Images) > 0 ? img(val(0, $Images), ['class' => 'LeftAlign']) : ''),
-                        'Url' => $vanilla_url,
-                        'LinkText' => $LinkText
-                    ]);
-                }
-
-                if ($Body == '') {
-                    $Body = $vanilla_url;
-                }
-                if ($Body == '') {
-                    $Body = t('Undefined discussion body.');
-                }
+                $PageInfo = $this->DiscussionModel->fetchPageInfo($vanilla_url);
 
                 // Validate the CategoryID for inserting.
                 $Category = CategoryModel::categories($vanilla_category_id);
@@ -610,9 +568,9 @@ class PostController extends VanillaController {
                     'CategoryID' => $vanilla_category_id,
                     'ForeignID' => $vanilla_identifier,
                     'Type' => $vanilla_type,
-                    'Name' => $Title,
-                    'Body' => $Body,
-                    'Format' => 'Html',
+                    'Name' => $PageInfo['Name'],
+                    'Body' => $PageInfo['Body'],
+                    'Format' => $PageInfo['Format'],
                     'Attributes' => dbencode($Attributes)
                 ];
                 $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;

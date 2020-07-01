@@ -545,6 +545,9 @@ components:
               type: object
               x-addon: hootsuite
           type: object
+        name:
+          description: Name of the comment (based on the discussion).
+          type: string
         body:
           description: The body of the comment.
           minLength: 1
@@ -561,6 +564,9 @@ components:
           format: date-time
           nullable: true
           type: string
+        categoryID:
+          description: The category of the comment.
+          type: number
         discussionID:
           description: The ID of the discussion.
           type: integer
@@ -604,6 +610,8 @@ components:
       required:
       - commentID
       - discussionID
+      - categoryID
+      - name
       - body
       - dateInserted
       - dateUpdated

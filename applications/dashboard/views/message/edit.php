@@ -6,6 +6,7 @@
             echo t('Add Message');
         ?></h1>
 <?php
+/** @var \MessageController $this */
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
@@ -54,18 +55,16 @@ echo $this->Form->errors();
             </div>
             <div class="input-wrap">
                 <?php echo $this->Form->dropDown('CategoryID', $this->data('Categories'), ['IncludeNull' => t('All Categories')]); ?>
-            </div>
-            <div class="input-wrap no-label padded-top">
-                <?php echo $this->Form->checkBox('IncludeSubcategories', 'Include Subcategories'); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="input-wrap no-label">
-                <?php echo $this->Form->checkBox('AllowDismiss', 'Allow users to dismiss this message', ['value' => '1']); ?>
+                <div class="no-label padded-top">
+                    <?php echo $this->Form->checkBox('IncludeSubcategories', 'Include Subcategories'); ?>
+                </div>
             </div>
         </li>
         <li class="form-group">
-            <?php echo $this->Form->toggle('Enabled', 'Enable this message', ['value' => '1']); ?>
+            <?php echo $this->Form->toggle('AllowDismiss', 'Dismissible', ['value' => '1'], 'Allow users to dismiss this message.'); ?>
+        </li>
+        <li class="form-group">
+            <?php echo $this->Form->toggle('Enabled', 'Enabled', ['value' => '1'], 'An enabled message will be visible on the site.'); ?>
         </li>
     </ul>
 <?php echo $this->Form->close('Save');

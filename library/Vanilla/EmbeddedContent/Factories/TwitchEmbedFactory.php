@@ -110,20 +110,22 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function idFromUrl(string $url): ?string {
+    public function idFromUrl(string $url): ?string {
         $host = parse_url($url, PHP_URL_HOST);
         $path = parse_url($url, PHP_URL_PATH);
 
-        if ($host === false || $host === null || $path === false || $path === null) {
+        if (!is_string($host) || !is_string($path)) {
             return null;
         }
 
-        if ($host === "clips.twitch.tv" || preg_match("`/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
+        if ($host === "clips.twitch.tv" && preg_match("`^/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
             return "clip:{$clipsMatch['clipID']}";
-        } elseif (preg_match("`/(?<type>videos|collections)/(?<id>[^/]+)`", $path, $videosMatch)) {
+        } elseif (preg_match("`^/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
+            return "clip:{$clipsMatch['clipID']}";
+        } elseif (preg_match("`^/(?<type>videos|collections)/(?<id>[^/]+)`", $path, $videosMatch)) {
             $type = $videosMatch["type"] === "videos" ? "video" : "collection";
             return "{$type}:{$videosMatch['id']}";
-        } elseif (preg_match("`/(?<channel>[^/]+)`", $path, $channelMatch)) {
+        } elseif (preg_match("`^/(?<channel>[^/]+)`", $path, $channelMatch)) {
             return "channel:{$channelMatch['channel']}";
         }
 

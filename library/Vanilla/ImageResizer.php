@@ -94,16 +94,19 @@ class ImageResizer {
             if (!empty($exif['Orientation'])) {
                 switch ($exif['Orientation']) {
                     case 2:
+                        /** @psalm-suppress UndefinedConstant */
                         imageflip($srcImage, IMG_FLIP_HORIZONTAL);
                         break;
                     case 3:
                         $srcImage = imagerotate($srcImage, 180, 0);
                         break;
                     case 4:
+                        /** @psalm-suppress UndefinedConstant */
                         imageflip($srcImage, IMG_FLIP_VERTICAL);
                         break;
                     case 5:
                         $srcImage = imagerotate($srcImage, -90, 0);
+                        /** @psalm-suppress UndefinedConstant */
                         imageflip($srcImage, IMG_FLIP_HORIZONTAL);
                         break;
                     case 6:
@@ -111,6 +114,7 @@ class ImageResizer {
                         break;
                     case 7:
                         $srcImage = imagerotate($srcImage, 90, 0);
+                        /** @psalm-suppress UndefinedConstant */
                         imageflip($srcImage, IMG_FLIP_HORIZONTAL);
                         break;
                     case 8:

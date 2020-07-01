@@ -17,7 +17,9 @@ use VanillaTests\SiteTestTrait;
  * @package VanillaTests\Models
  */
 class CategoryModelTest extends TestCase {
+
     use SiteTestTrait;
+    use ModelTestTrait;
 
     /**
      * @var \CategoryModel
@@ -622,5 +624,96 @@ class CategoryModelTest extends TestCase {
         if (!empty($notInSorted)) {
             $this->fail("The following categories are missing from original: ".implode(', ', array_column($notInSorted, 'Name')));
         }
+    }
+
+    /**
+     * Test searching of categories.
+     */
+    public function testSearchCategories() {
+        \Gdn::sql()->truncate('Category');
+        /** @var \CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(\CategoryModel::class);
+
+        $cat1 = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'Category 1',
+            'UrlCode' => 'cat1',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $cat1_1 = $categoryModel->save([
+            'ParentCategoryID' => $cat1,
+            'Name' => 'Category 1.1',
+            'UrlCode' => 'cat1_1',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $cat1_1_1 = $categoryModel->save([
+            'ParentCategoryID' => $cat1_1,
+            'Name' => 'Category 1.1.1',
+            'UrlCode' => 'cat1_1_1',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $cat2 = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'Category 2',
+            'UrlCode' => 'cat2',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $cat2_1_followed = $categoryModel->save([
+            'ParentCategoryID' => $cat2,
+            'Name' => 'Category 2.1 followed',
+            'UrlCode' => 'cat2_1',
+            'DisplayAs' => 'Discussions',
+        ]);
+
+        $cat2_2_archived = $categoryModel->save([
+            'ParentCategoryID' => $cat2,
+            'Name' => 'Category 2.2 archived',
+            'UrlCode' => 'cat2_2',
+            'DisplayAs' => 'Categories',
+            'Archived' => 1
+        ]);
+
+        $categoryModel->follow(\Gdn::session()->UserID, $cat2_1_followed, true);
+
+        $this->assertIDsEqual([
+            0,
+            $cat1,
+            $cat1_1,
+            $cat1_1_1,
+            $cat2,
+            $cat2_1_followed,
+            // Archived not included.
+        ], $categoryModel->getSearchCategoryIDs());
+
+        $this->assertIDsEqual([
+            0,
+            $cat2_1_followed,
+            // Archived not included.
+        ], $categoryModel->getSearchCategoryIDs(null, true));
+
+        $this->assertIDsEqual([
+            0,
+            $cat1,
+            $cat1_1,
+            $cat1_1_1,
+            $cat2,
+            $cat2_1_followed,
+            $cat2_2_archived
+            // Archived not included.
+        ], $categoryModel->getSearchCategoryIDs(null, null, null, true));
+
+        $this->assertIDsEqual([
+            0,
+            $cat1,
+            $cat1_1,
+            $cat1_1_1,
+            // Archived not included.
+        ], $categoryModel->getSearchCategoryIDs($cat1, null, true));
+
+        $this->assertIDsEqual([], $categoryModel->getSearchCategoryIDs(50000));
     }
 }

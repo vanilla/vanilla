@@ -12,6 +12,10 @@
  */
 class FloodControlHelper {
     /**
+     * Configure a flood controlled class.
+     *
+     * @psalm-suppress UndefinedDocblockClass
+     *
      * @param \Vanilla\FloodControlTrait $instance
      * @param string $configScope Scope under with the configurations are sets ('Vanilla', 'Conversations').
      * @param string $type Type of record that will be used to configure to trait.

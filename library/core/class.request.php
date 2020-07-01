@@ -1603,7 +1603,7 @@ class Gdn_Request implements RequestInterface {
      *    - Default port, rewrites                     http://www.forum.com/
      *    - Custom port, rewrites                      http://www.forum.com:8080/index.php?/
      *
-     * @param sring $path of the controller method.
+     * @param string $path of the controller method.
      * @param mixed $withDomain Whether or not to include the domain with the url. This can take the following values.
      * - true: Include the domain name.
      * - false: Do not include the domain. This is a relative path.

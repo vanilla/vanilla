@@ -8,6 +8,7 @@ namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;

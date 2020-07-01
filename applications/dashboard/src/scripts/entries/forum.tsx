@@ -17,7 +17,7 @@ import RecoverPasswordPage from "@dashboard/pages/RecoverPasswordPage";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
-import { addComponent } from "@library/utility/componentRegistry";
+import { addComponent, addPageComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
@@ -28,6 +28,9 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
 import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
+import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
+import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
+import { notEmpty } from "@vanilla/utils";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -36,11 +39,14 @@ onContent(convertAllUserContent);
 registerReducer("auth", authReducer);
 registerReducer("notifications", new NotificationsModel().reducer);
 
-Router.addRoutes([
-    <Route exact path="/authenticate/signin" component={SignInPage} key="signin" />,
-    <Route exact path="/authenticate/password" component={PasswordPage} key="password" />,
-    <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} key="recover" />,
-]);
+Router.addRoutes(
+    [
+        <Route exact path="/authenticate/signin" component={SignInPage} key="signin" />,
+        <Route exact path="/authenticate/password" component={PasswordPage} key="password" />,
+        <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} key="recover" />,
+        NEW_SEARCH_PAGE_ENABLED ? SearchPageRoute.route : null,
+    ].filter(notEmpty),
+);
 
 applySharedPortalContext(props => {
     return (
@@ -51,7 +57,7 @@ applySharedPortalContext(props => {
 });
 
 // Routing
-addComponent("App", () => <Router disableDynamicRouting />);
+addPageComponent(() => <Router disableDynamicRouting />);
 
 // The community is still very tied into the global.js and legacyAnalyticsTick.json.
 enableLegacyAnalyticsTick(true);
@@ -69,9 +75,11 @@ if (getMeta("themeFeatures.DataDrivenTheme", false)) {
     onReady(() => {
         compatibilityStyles();
         applyCompatibilityIcons();
+    });
 
-        $(document).on("contentLoad", function(e) {
-            applyCompatibilityIcons(e.target && e.target.parentElement ? e.target.parentElement : undefined);
-        });
+    onContent(e => {
+        applyCompatibilityIcons(
+            e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
+        );
     });
 }

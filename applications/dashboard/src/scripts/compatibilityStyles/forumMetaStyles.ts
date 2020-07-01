@@ -19,6 +19,17 @@ export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
 };
 
+export const linkSelectors = `
+    .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
+    .MainContent.Content .MItem.RoleTracker a:not(.Tag),
+    .MessageList .ItemComment .Username,
+    .MessageList .ItemDiscussion .Username,
+    .AuthorInfo .MItem.RoleTracker a:not(.Tag),
+    .MItem > a:not(.Tag),
+`;
+
 export const forumMetaCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
@@ -41,20 +52,9 @@ export const forumMetaCSS = () => {
     `,
         {
             color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.fontSize),
+            fontSize: unit(globalVars.meta.text.size),
         },
     );
-
-    const linkSelectors = `
-        .MessageList .ItemDiscussion .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MessageList.Discussion .Item.ItemComment .MItem.RoleTracker a:not(.Tag),
-        .MainContent.Content .MItem.RoleTracker a:not(.Tag),
-        .MessageList .ItemComment .Username,
-        .MessageList .ItemDiscussion .Username,
-        .AuthorInfo .MItem.RoleTracker a:not(.Tag),
-        .MItem > a:not(.Tag),
-        `;
 
     cssOut(`.MessageList .ItemComment span.MItem.RoleTracker`, {
         padding: 0,
@@ -189,6 +189,7 @@ export const forumMetaCSS = () => {
 
     mixinMetaContainer(`.Container .DataTable .DiscussionName .Meta.Meta-Discussion`, {
         overflow: "visible",
+        display: "block",
     });
 
     cssOut(`.Container .AuthorInfo .MItem`, {
@@ -230,7 +231,7 @@ export const forumMetaCSS = () => {
     });
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
-        marginLeft: unit(negative(globalVars.meta.text.margin)),
+        marginLeft: unit(negative(globalVars.meta.spacing.horizontalMargin)),
     });
 
     const linkColors = clickableItemStates();

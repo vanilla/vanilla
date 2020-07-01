@@ -550,9 +550,30 @@ class TagModel extends Gdn_Model {
     }
 
     /**
-     * @deprecated
+     * Get tagIDs for given tag names.
+     *
+     * @param string[] $names Tag names.
+     *
+     *@return int[]
+     */
+    public function getTagIDsByName(array $names): array {
+        if (empty($names)) {
+            return [];
+        }
+        $result = $this->SQL->select('TagID')->from('Tag')->where('Name', $names)->get()->resultArray();
+        $ids = array_column($result, 'TagID');
+        return $ids;
+    }
+
+    /**
+     * Deprecated sql generation.
      *
      * @param Gdn_SQLDriver $sql
+     * @param mixed $tag
+     * @param int $limit
+     * @param int $offset
+     * @param string $op
+     * @deprecated
      */
     public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
         deprecated('TagModel->setTagSql()', 'TagModel->getDiscussions()', '2018-06-19');

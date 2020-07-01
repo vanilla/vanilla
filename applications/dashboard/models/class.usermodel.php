@@ -75,6 +75,15 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
     private const USERAUTHENTICATION_CACHE_EXPIRY = 60;
 
+    /** @var string cache type flag for user data */
+    const CACHE_TYPE_USER = 'user';
+
+    /** @var string cache type flag for roles data */
+    const CACHE_TYPE_ROLES = 'roles';
+
+    /** @var string cache type flag for permissions data */
+    const CACHE_TYPE_PERMISSIONS = 'permissions';
+
     /** @var EventManager */
     private $eventManager;
 
@@ -1070,6 +1079,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $userID = $this->SQL->insert($this->Name, $fields);
 
         if ($userID) {
+            //force clear cache for that UserID
+            $this->clearCache($userID, [self::CACHE_TYPE_USER]);
+
             $user = $this->getID($userID);
             $userEvent = $this->eventFromRow(
                 (array)$user,
@@ -1204,25 +1216,23 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     /**
      * Add multi-dimensional user data to an array.
      *
-     * @param array $rows Results we need to associate user data with.
+     * @param array|iterable $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
-     * @param array $options Additional options. Passed to filter event.
-     *        [bool asFragments] - Expand as user fragments.
      */
-    public function expandUsers(array &$rows, array $columns) {
+    public function expandUsers(&$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
         }
 
         reset($rows);
-        $single = is_string(key($rows));
+        $single = !($rows instanceof Traversable) && is_string(key($rows));
 
         $userIDs = [];
 
-        $extractUserIDs = function(array $row) use ($columns, &$userIDs) {
+        $extractUserIDs = function ($row) use ($columns, &$userIDs) {
             foreach ($columns as $key) {
-                if (array_key_exists($key, $row)) {
+                if ($row[$key] ?? false) {
                     $id = $row[$key];
                     $userIDs[$id] = true;
                 }
@@ -1239,10 +1249,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
         $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
 
-        $populate = function(array &$row) use ($users, $columns) {
+        $populate = function (&$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
-                $id = val($key, $row);
+                $id = $row[$key] ?? null;
                 $user = null;
                 if (is_numeric($id)) {
                     // Massage the data, before injecting it into the results.
@@ -1264,7 +1274,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 }
                 $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
                 $user =  UserFragmentSchema::normalizeUserFragment($user);
-                setValue($destination, $row, $user);
+                $row[$destination] = $user;
             }
         };
 
@@ -2578,7 +2588,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
-                $this->clearCache($userID, ['user']);
+                $this->clearCache($userID, [self::CACHE_TYPE_USER]);
                 $this->EventArguments['UserID'] = $userID;
                 $this->fireEvent('AfterSave');
             } else {
@@ -2831,7 +2841,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             }
         }
 
-        $this->clearCache($UserID, ['roles', 'permissions']);
+        $this->clearCache($UserID, [self::CACHE_TYPE_ROLES, self::CACHE_TYPE_PERMISSIONS]);
 
         if ($RecordEvent) {
             $User = $this->getID($UserID);
@@ -2898,7 +2908,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $where = $filter;
             $keywords = val('Keywords', $filter, '');
             $optimize = val('Optimize', $filter);
-            unset($where['Keywords'], $where['Optimize']);
+            $roleID = $filter["roleID"] ?? null;
+            unset($where['Keywords'], $where['Optimize'], $where["roleID"]);
         } else {
             $keywords = $filter;
         }
@@ -2914,7 +2925,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } elseif (!empty($keywords)) {
+        } elseif (!empty($roleID) && !empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }
@@ -3029,18 +3040,20 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @return int
      */
     public function searchCount($filter = '') {
+        $roleID = false;
+
         if (is_array($filter)) {
             $where = $filter;
             $keywords = $where['Keywords'] ?? '';
-            unset($where['Keywords'], $where['Optimize']);
+            $roleID = $where["roleID"] ?? false;
+            unset($where['Keywords'], $where['Optimize'], $where["roleID"]);
         } else {
             $keywords = $filter;
         }
         $keywords = trim($keywords);
 
         // Check to see if the search exactly matches a role name.
-        $roleID = false;
-        if ($keywords !== "") {
+        if (empty($roleID) && $keywords !== "") {
             if (strtolower($keywords) == 'banned') {
                 $this->SQL->where('u.Banned >', 0);
             } else {
@@ -4352,7 +4365,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Save the values back to the db
         $saveResult = $this->SQL->put('User', [$column => $values], ['UserID' => $userID]);
-        $this->clearCache($userID, ['user']);
+        $this->clearCache($userID, [self::CACHE_TYPE_USER]);
 
         return $saveResult;
     }
@@ -5179,7 +5192,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             ->put();
 
         if (in_array($property, ['Permissions'])) {
-            $this->clearCache($rowID, ['permissions']);
+            $this->clearCache($rowID, [self::CACHE_TYPE_PERMISSIONS]);
         } else {
             $this->updateUserCache($rowID, $property, $value);
         }
@@ -5303,6 +5316,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * Delete cached data for user.
      *
      * @param int|null $userID The user to clear the cache for.
+     * @param ?string $cacheTypesToClear
      * @return bool Returns **true** if the cache was cleared or **false** otherwise.
      */
     public function clearCache($userID, $cacheTypesToClear = null) {

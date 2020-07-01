@@ -23,6 +23,21 @@
     });
 
     /**
+     * Improve keyboard actions on button-style elements for added accessibility.
+     */
+    $(document).delegate("[role=button]", "keydown", function(event) {
+        var $button = $(this);
+        var ENTER_KEY = 13;
+        var SPACE_KEY = 32;
+        var isActiveElement = document.activeElement === $button[0];
+        var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
+        if (isActiveElement && isSpaceOrEnter) {
+            event.preventDefault();
+            $button.click();
+        }
+    });
+
+    /**
      * Document ready handler. Runs only the first time the page is loaded.
      */
     $(function() {
@@ -41,7 +56,7 @@
      * Workarounds for limitations of flyout's HTML structure.
      */
     function kludgeFlyoutHTML() {
-        var $handles = $(".ToggleFlyout, .editor-dropdown, .ButtonGroup");
+        var $handles = $(".ToggleFlyout:not([data-is-kludged]), .editor-dropdown:not([data-is-kludged]), .ButtonGroup:not([data-is-kludged])");
 
         $handles.each(function() {
             $handles
@@ -64,10 +79,12 @@
                         $(this).attr("tabindex", "0");
                     });
             });
+
+            $(this).attr("data-is-kludged", "true");
         });
 
         if (USE_NEW_FLYOUTS) {
-            var $contents = $(".Flyout, .ButtonGroup .Dropdown");
+            var $contents = $(".Flyout:not([data-is-kludged]), .ButtonGroup .Dropdown:not([data-is-kludged])");
             var wrap = document.createElement("span");
             wrap.classList.add("mobileFlyoutOverlay");
 
@@ -80,21 +97,10 @@
                 // Some flyouts had conflicting inline display: none directly in the view.
                 // We don't change that on open/close with the new style anymore so let's clean it up here.
                 $item.removeAttr("style");
+
+                $(this).attr("data-is-kludged", "true");
             });
         }
-
-        // Button accessibility
-        $(document).delegate("[role=button]", "keydown", function(event) {
-            var $button = $(this);
-            var ENTER_KEY = 13;
-            var SPACE_KEY = 32;
-            var isActiveElement = document.activeElement === $button[0];
-            var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
-            if (isActiveElement && isSpaceOrEnter) {
-                event.preventDefault();
-                $button.click();
-            }
-        });
     }
 
     var BODY_CLASS = "flyoutIsOpen";

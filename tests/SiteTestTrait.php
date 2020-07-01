@@ -7,6 +7,7 @@
 
 namespace VanillaTests;
 
+use Garden\Container\Container;
 use Garden\EventManager;
 use PHPUnit\Framework\AssertionFailedError;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -58,6 +59,11 @@ trait SiteTestTrait {
     protected $moderatorID;
 
     /**
+     * @var array
+     */
+    protected $roles;
+
+    /**
      * Get the names of addons to install.
      *
      * @return string[] Returns an array of addon names.
@@ -81,6 +87,15 @@ trait SiteTestTrait {
     }
 
     /**
+     * Configure the container before addons are started.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        return;
+    }
+
+    /**
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
     private static function setupBeforeClassSiteTestTrait(): void {
@@ -88,6 +103,7 @@ trait SiteTestTrait {
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
+        static::configureContainerBeforeStartup($dic);
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);
@@ -280,7 +296,8 @@ TEMPLATE;
      * @return int
      */
     protected function createUserFixture(string $role, string $sx): int {
-        static $roleIDs;
+        $roleIDs = $this->getRoles();
+
         if (!isset($roleIDs)) {
             $roleIDs = array_column(
                 static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
@@ -298,5 +315,22 @@ TEMPLATE;
             ],
         ]);
         return $row['userID'];
+    }
+
+    /**
+     * Return all of the roles, keyed by name.
+     *
+     * @return array
+     */
+    protected function getRoles(): array {
+        if ($this->roles === null) {
+            $roles = array_column(
+                static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
+                'RoleID',
+                'Name'
+            );
+            $this->roles = $roles;
+        }
+        return $this->roles;
     }
 }

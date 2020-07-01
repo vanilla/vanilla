@@ -3,6 +3,7 @@
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
+ * @psalm-suppress all
  */
 
 namespace Vanilla\Adapters;
@@ -611,10 +612,10 @@ class SphinxClient {
      * Set groupBy and groupFunc attributes
      *
      * @param string $attribute
-     * @param string $func
+     * @param int $func
      * @param string $groupSort
      */
-    public function setGroupBy(string $attribute, string $func, string $groupSort = "@group desc") {
+    public function setGroupBy(string $attribute, int $func, string $groupSort = "@group desc") {
         assert($func === self::GROUPBY_DAY
             || $func === self::GROUPBY_WEEK
             || $func === self::GROUPBY_MONTH

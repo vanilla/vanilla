@@ -158,7 +158,7 @@ class Gdn_Theme {
     /**
      * Call before starting a row of bullet-seperated items.
      *
-     * @param strng|bool $sep The seperator used to seperate each section.
+     * @param string|bool $sep The seperator used to seperate each section.
      * @since 2.1
      */
     public static function bulletRow($sep = false) {

@@ -330,7 +330,9 @@
             # maxWidth: 200,
 
             ## URL to a logo.
-            # url: "https:#mysite.com/path/to/logo.svg",
+            desktop: {
+                # url: "https:#mysite.com/path/to/logo.png",
+            },
 
             ## Some vertical padding around the logo.
             ## A larger value will shring the logo.
@@ -340,7 +342,7 @@
                 ##
                 # heightOffset: 16,
                 ## URL to a logo.
-                # url: "https:#mysite.com/path/to/logo.svg",
+                # url: "https:#mysite.com/path/to/logo.png",
             },
 
             ## Translation values to apply to the logo.

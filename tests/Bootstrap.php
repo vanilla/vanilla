@@ -33,6 +33,9 @@ use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\SchemaFactory;
+use Vanilla\Search\AbstractSearchDriver;
+use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Web\UASniffer;
@@ -288,6 +291,9 @@ class Bootstrap {
 
             ->rule(SearchModel::class)
             ->setShared(true)
+
+            ->rule(AbstractSearchDriver::class)
+            ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
 
             // File base theme api provider
             ->rule(\Vanilla\Theme\ThemeService::class)

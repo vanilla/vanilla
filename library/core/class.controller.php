@@ -140,7 +140,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public $StatusMessage;
 
-    /** @var stringDefined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
+    /** @var string Defined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
     public $SyndicationMethod;
 
     /**
@@ -794,9 +794,10 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param string $View The name of the view to fetch. If not specified, it will use the value
      * of $this->View. If $this->View is not specified, it will use the value
      * of $this->RequestMethod (which is defined by the dispatcher class).
-     * @param string $ControllerName The name of the controller that owns the view if it is not $this.
-     * @param string $ApplicationFolder The name of the application folder that contains the requested controller
+     * @param string|false $ControllerName The name of the controller that owns the view if it is not $this.
+     * @param string|false $ApplicationFolder The name of the application folder that contains the requested controller
      * if it is not $this->ApplicationFolder.
+     * @return string Returns the view contents.
      */
     public function fetchView($View = '', $ControllerName = false, $ApplicationFolder = false) {
         $ViewPath = $this->fetchViewLocation($View, $ControllerName, $ApplicationFolder);
@@ -1374,8 +1375,8 @@ class Gdn_Controller extends Gdn_Pluggable {
      * them to the screen.
      *
      * @param string $view
-     * @param string $controllerName
-     * @param string $applicationFolder
+     * @param string|false $controllerName
+     * @param string|false $applicationFolder
      * @param string $assetName The name of the asset container that the content should be rendered in.
      */
     public function xRender($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') {

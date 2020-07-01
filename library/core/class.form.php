@@ -152,7 +152,7 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * Backwards compatibility getter.
      *
-     * @param strig $name The property to get.
+     * @param string $name The property to get.
      * @return mixed Returns the value of the property.
      */
     public function __get($name) {
@@ -448,10 +448,9 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Returns XHTML for a select list containing categories that the user has
-     * permission to use.
+     * Returns XHTML for a select list containing categories that the user has permission to use.
      *
-     * @param array $fieldName An array of category data to render.
+     * @param string $fieldName The name of the category ID field.
      * @param array $options An associative array of options for the select. Here
      * is a list of "special" options and their default values:
      *
@@ -1793,11 +1792,11 @@ class Gdn_Form extends Gdn_Pluggable {
      * should related directly to a field name in $this->_DataArray.
      * @param string $componentKey The key of the of the component registered in the frontend with addComponent.
      * @param array $props Extra props to pass to the component.
-     *
+     * @param string $child
      * @return string
      */
     public function react(string $fieldName, string $componentKey, array $props = [], string $child = "") {
-        $value = $attributes['value'] ?? $this->getValue($fieldName);
+        $value = $props['value'] ?? $this->getValue($fieldName);
         $tag = $props['tag'] ?? "div";
         $props = $props + [
             'initialValue' => $value,
@@ -2723,7 +2722,7 @@ PASSWORDMETER;
      *
      * @param string $fieldName The name of the field to get the value of.
      * @param mixed $default The default value to return if $fieldName isn't found.
-     * @return unknown
+     * @return mixed
      */
     public function getFormValue($fieldName, $default = '') {
         return val($fieldName, $this->formValues(), $default);
@@ -2808,7 +2807,7 @@ PASSWORDMETER;
      * It uses the assigned model to save the sent form fields.
      * If saving fails, it populates $this->_ValidationResults with validation errors & related fields.
      *
-     * @return unknown
+     * @return mixed
      */
     public function save() {
         $saveResult = false;
@@ -2950,13 +2949,13 @@ PASSWORDMETER;
     /**
      * Assign a set of data to be displayed in the form elements.
      *
-     * @param array $data A result resource or associative array containing data to be filled in
+     * @param array|object $data A result resource or associative array containing data to be filled in
      */
     public function setData($data) {
         if (is_object($data) === true) {
             // If this is a result object (/garden/library/database/class.dataset.php)
             // retrieve it's values as arrays
-            if ($data instanceof DataSet) {
+            if ($data instanceof Gdn_DataSet) {
                 $resultSet = $data->resultArray();
                 if (count($resultSet) > 0) {
                     $this->_DataArray = $resultSet[0];

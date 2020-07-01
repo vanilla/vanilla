@@ -82,7 +82,7 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options.
      *
      * - **themeType**: Specify "mobile" for the mobile theme.
-     * @return Returns an array of all of the addons that were enabled.
+     * @return array Returns an array of all of the addons that were enabled.
      */
     public function enable(Addon $addon, array $options = []) {
         $this->validateEnable($addon, $options);

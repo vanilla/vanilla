@@ -68,7 +68,8 @@
         "symfony/polyfill-php80": "^1.16",
         "metasyntactical/composer-plugin-license-check": "^0.5.0",
         "nette/neon": "^3.1",
-        "league/uri": "^6.2"
+        "league/uri": "^6.2",
+        "psr/simple-cache": "^1.0"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -80,7 +81,9 @@
         "phing/phing": "2.*",
         "roave/security-advisories": "dev-master",
         "nette/robot-loader": "^3.2",
-        "vimeo/psalm": "^3.12"
+        "vimeo/psalm": "^3.12",
+        "cache/integration-tests": "dev-master",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "provide": {
         "ext-gd": "*"

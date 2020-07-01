@@ -16,9 +16,11 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
@@ -119,6 +121,10 @@ class Bootstrap {
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
+
+            ->rule(CacheInterface::class)
+            ->setShared(true)
+            ->setClass(CacheCacheAdapter::class)
 
             // Configuration
             ->rule(ConfigurationInterface::class)

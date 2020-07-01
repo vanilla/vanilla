@@ -68,6 +68,10 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setFactory(['Gdn_Cache', 'initialize'])
     ->addAlias('Cache')
 
+    ->rule(\Psr\SimpleCache\CacheInterface::class)
+    ->setShared(true)
+    ->setClass(\Vanilla\Cache\CacheCacheAdapter::class)
+
     // Configuration
     ->rule('Gdn_Configuration')
     ->setShared(true)

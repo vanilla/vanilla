@@ -94,4 +94,10 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
     }
 
 
+    /**
+     * @inheritDoc
+     */
+    public function clear() {
+        return false;
+    }
 }

@@ -2800,11 +2800,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $writebackLimit = c('Vanilla.Views.DenormalizeWriteback', 10);
             $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussionID);
 
-            // Increment. If not success, create key.
-            $views = Gdn::cache()->increment($cacheKey);
-            if ($views === Gdn_Cache::CACHEOP_FAILURE) {
-                Gdn::cache()->store($cacheKey, 1);
-            }
+            // Increment.
+            $views = Gdn::cache()->increment($cacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
             // Every X views, writeback to Discussions
             if (($views % $writebackLimit) == 0) {
@@ -2822,7 +2819,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->where('DiscussionID', $discussionID)
                 ->put();
         }
-
     }
 
     /**

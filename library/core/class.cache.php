@@ -23,6 +23,11 @@ abstract class Gdn_Cache {
     /** @var string Type of cache this this: one of CACHE_TYPE_MEMORY, CACHE_TYPE_FILE, CACHE_TYPE_NULL. */
     protected $cacheType;
 
+    /**
+     * @var null The current cache config.
+     */
+    private $activeConfig = null;
+
     /** @var array Memory copy of store containers. */
     protected static $stores = [];
 
@@ -43,6 +48,9 @@ abstract class Gdn_Cache {
 
     /** Allows querying DB for missing keys, or firing a callback. */
     const FEATURE_FALLBACK = 'f_fallback';
+
+    /** Allows failure to fetch to return a default value. */
+    const FEATURE_DEFAULT = 'f_default';
 
     /** In incr/decr ops, what should the initial value be. */
     const FEATURE_INITIAL = 'f_initial';
@@ -439,7 +447,7 @@ abstract class Gdn_Cache {
     /**
      * Check if a value exists in the cache.
      *
-     * @param string $Key Cache key used for storage.
+     * @param string $key Cache key used for storage.
      * @return array array(key => value) for existing key or false if not found.
      */
     abstract public function exists($key);
@@ -447,8 +455,8 @@ abstract class Gdn_Cache {
     /**
      * Retrieve a key's value from the cache.
      *
-     * @param string $Key Cache key used for storage.
-     * @param array $Options
+     * @param string|string[] $key Cache key(s) used for storage.
+     * @param array $options
      * @return mixed key value or false on failure or not found.
      */
     abstract public function get($key, $options = []);
@@ -456,8 +464,8 @@ abstract class Gdn_Cache {
     /**
      * Remove a key/value pair from the cache.
      *
-     * @param string $Key Cache key used for storage.
-     * @param array $Options
+     * @param string $key Cache key used for storage.
+     * @param array $options
      * @return boolean true on success or false on failure.
      */
     abstract public function remove($key, $options = []);
@@ -467,9 +475,9 @@ abstract class Gdn_Cache {
      *
      * This will fail if the provided key does not already exist.
      *
-     * @param string $Key Cache key used for storage.
-     * @param mixed $Value Value to be cached.
-     * @param array $Options
+     * @param string $key Cache key used for storage.
+     * @param mixed $value Value to be cached.
+     * @param array $options
      * @return boolean true on success or false on failure.
      */
     abstract public function replace($key, $value, $options = []);
@@ -480,11 +488,33 @@ abstract class Gdn_Cache {
      * This will fail if the key does not already exist. Cannot take the value
      * of $Key below 0.
      *
-     * @param string $Key Cache key used for storage.
-     * @param int $Amount Amount to shift value up.
+     * @param string $key Cache key used for storage.
+     * @param int $amount Amount to shift value up.
      * @return int new value or false on failure.
      */
     abstract public function increment($key, $amount = 1, $options = []);
+
+    /**
+     * Increment a the value at a key.
+     *
+     * This is a convenience method that provides the options as defined parameters rather than an options array.
+     * It will also always try and set an initial value, even if its 0.
+     *
+     * @param string $key
+     * @param int $amount
+     * @param int $initial
+     * @param int $ttl
+     * @return int
+     */
+    public function incrementFrom(string $key, int $amount, int $initial = 1, $ttl = 0): int {
+        $result = $this->increment($key, $amount, [self::FEATURE_INITIAL => $initial, self::FEATURE_EXPIRY => $ttl]);
+
+        if (self::CACHEOP_FAILURE === $result) {
+            $this->store($key, $initial, [self::FEATURE_EXPIRY => $ttl]);
+            $result = $initial;
+        }
+        return $result;
+    }
 
     /**
      * Decrement the value of the provided key by {@link $Amount}.
@@ -492,8 +522,9 @@ abstract class Gdn_Cache {
      * This will fail if the key does not already exist. Cannot take the value
      * of $Key below 0.
      *
-     * @param string $Key Cache key used for storage.
-     * @param int $Amount Amount to shift value down.
+     * @param string $key Cache key used for storage.
+     * @param int $amount Amount to shift value down.
+     * @param array $options
      * @return int new value or false on failure.
      */
     abstract public function decrement($key, $amount = 1, $options = []);
@@ -501,10 +532,10 @@ abstract class Gdn_Cache {
     /**
      * Add a container to the cache pool.
      *
-     * @param array $Options An array of options with container constants as keys.
+     * @param array $options An array of options with container constants as keys.
      *  - CONTAINER_LOCATION: required. the location of the container. SERVER:IP, Filepath, etc.
      *  - CONTAINER_PERSISTENT: optional (default true). whether to use connect() or pconnect() where applicable.
-     *  - CONTAINER_WEIGHT: optional (default 1). number of buckets to create for this server which in turn control its probability of it being selected.
+     *  - CONTAINER_WEIGHT: optional (default 1). number of buckets to create for this server which control its probability of it being selected.
      *  - CONTAINER_RETRYINT: optional (default 15s). controls how often a failed container will be retried, the default value is 15 seconds.
      *  - CONTAINER_TIMEOUT: optional (default 1s). amount of time to wait for connection to container before timing out.
      *  - CONTAINER_CALLBACK: optional (default null). callback to execute if container fails to open/connect.
@@ -522,14 +553,18 @@ abstract class Gdn_Cache {
      *
      * @return boolean true on success of false on failure.
      */
-    abstract public function flush();
+    public function flush() {
+        self::$localCache = [];
+        return true;
+    }
 
     /**
+     * Try and get a cache key or fallback to a query or callback.
      *
-     *
-     * @param string $Key Cache key.
-     * @param array $Options
+     * @param string $key Cache key.
+     * @param array $options
      * @return mixed
+     * @deprecated This method should be avoided because it has a hidden dependency on `Gdn_Database`.
      */
     protected function fallback($key, $options) {
         $fallback = val(Gdn_Cache::FEATURE_FALLBACK, $options, null);
@@ -701,33 +736,32 @@ abstract class Gdn_Cache {
         return val($option, $activeOptions, $default);
     }
 
-    /*
+    /**
      * Get the value of a store-specific config
      *
      * The option keys are generic and cross-cache, but are always
      * stored under $Configuration['Cache'][ActiveCacheName]['Config'][*].
      *
-     * @param string|integer $Key The config key to retrieve
-     * @return mixed The value associated with the given config key
+     * @param string|int $key The config key to retrieve.
+     * @param mixed $default The default value if the key isn't found.
+     * @return mixed The value associated with the given config key.
      */
     public function config($key = null, $default = null) {
-        static $activeConfig = null;
-
-        if (is_null($activeConfig)) {
+        if (is_null($this->activeConfig)) {
             $activeCacheShortName = ucfirst($this->activeCache());
             $configKey = "Cache.{$activeCacheShortName}.Config";
-            $activeConfig = c($configKey, []);
+            $this->activeConfig = c($configKey, []);
         }
 
         if (is_null($key)) {
-            return $activeConfig;
+            return $this->activeConfig;
         }
 
-        if (!array_key_exists($key, $activeConfig)) {
+        if (!array_key_exists($key, $this->activeConfig)) {
             return $default;
         }
 
-        return val($key, $activeConfig, $default);
+        return val($key, $this->activeConfig, $default);
     }
 
     /**
@@ -751,6 +785,12 @@ abstract class Gdn_Cache {
         return self::$localCache[$key];
     }
 
+    /**
+     * Set a value in the local cache array.
+     *
+     * @param string|array|int $key
+     * @param mixed $value
+     */
     protected function localSet($key, $value = null) {
         if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) {
             return;
@@ -759,7 +799,13 @@ abstract class Gdn_Cache {
         if (!is_array($key)) {
             $key = [$key => $value];
         }
-        self::$localCache = array_merge(self::$localCache, $key);
+        foreach ($key as $k => $v) {
+            if (is_object($v)) {
+                self::$localCache[$k] = clone $v;
+            } else {
+                self::$localCache[$k] = $v;
+            }
+        }
     }
 
     /**

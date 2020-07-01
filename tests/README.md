@@ -36,6 +36,16 @@ create and drop databases. The only database that the tests use is `vanilla_test
 
 1. You must put `.circleci/scripts/templates/vanilla/conf/bootstrap.before.php` in your `conf/` folder.
     - This will ensure that the unit tests use their own config and cache path.
+    
+### Memcached Requirements
+
+In order to run tests with memcached installed you will need the following environment variable set.
+
+```bash
+export TEST_MEMCACHED_HOST="memcached:11211"
+```
+
+You will need to replace the actual host with the one you have set up.
 
 ### Running
 

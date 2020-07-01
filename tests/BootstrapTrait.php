@@ -22,6 +22,13 @@ trait BootstrapTrait {
      * Bootstrap the site.
      */
     public static function setUpBeforeClass(): void {
+        self::setUpBeforeClassBootstrap();
+    }
+
+    /**
+     * Set up everything we need to set up.
+     */
+    protected static function setUpBeforeClassBootstrap(): void {
         self::createContainer();
     }
 

@@ -23,6 +23,8 @@
         <env name="TEST_DB_PASSWORD" value="" />
         <env name="TEST_DB_HOST" value="127.0.0.1" />
         <env name="TEST_SPHINX_HOST" value="127.0.0.1" />
+
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled=1"/>
     </php>
 
     <testsuites>

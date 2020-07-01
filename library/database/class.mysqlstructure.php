@@ -25,9 +25,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     private const INDEX_OPTIONS = "algorithm=inplace, lock=none";
 
     /**
+     * Gdn_MySQLStructure constructor.
      *
-     *
-     * @param null $database
+     * @param Gdn_Database|null $database
      */
     public function __construct($database = null) {
         parent::__construct($database);
@@ -57,9 +57,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Determine whether or not a storage engine exists.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @return bool
      */
     public function hasEngine($engine) {
@@ -82,9 +82,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Set the storage engine of the table.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @param bool $checkAvailability
      * @return $this
      */
@@ -184,20 +184,19 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * Specifies the name of the view to create or modify.
      *
      * @param string $name The name of the view.
-     * @param string $Query The actual query to create as the view. Typically
-     * this can be generated with the $Database object.
+     * @param string $sql The actual query to create as the view. Typically this can be generated with the $Database object.
      */
-    public function view($name, $sQL) {
-        if (is_string($sQL)) {
-            $sQLString = $sQL;
-            $sQL = null;
+    public function view($name, $sql) {
+        if (is_string($sql)) {
+            $sQLString = $sql;
+            $sql = null;
         } else {
-            $sQLString = $sQL->getSelect();
+            $sQLString = $sql->getSelect();
         }
 
         $result = $this->executeQuery('create or replace view '.$this->_DatabasePrefix.$name." as \n".$sQLString);
-        if (!is_null($sQL)) {
-            $sQL->reset();
+        if (!is_null($sql)) {
+            $sql->reset();
         }
     }
 
@@ -302,6 +301,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
     /**
      * Get the character set for a  collation.
+     *
      * @param string $collation The name of the collation.
      * @return string Returns the name of the character set or an empty string if the collation was not found.
      */
@@ -412,7 +412,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     *
+     * Get the SQL used to generate the indexes for this table.
      *
      * @return array
      */
@@ -421,7 +421,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     *
+     * Get the SQL used to generate the indexes for this table.
      *
      * @return array
      */
@@ -454,9 +454,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                         // Try and guess the index type.
                         if (strcasecmp($row->Index_type, 'fulltext') == 0) {
                             $type = 'fulltext index '.$row->Key_name;
-                        } elseif ($row->Non_unique)
-                            $type = 'index '.$row->Key_name;
-                        else {
+                        } elseif ($row->Non_unique) {
+                            $type = 'index ' . $row->Key_name;
+                        } else {
                             $type = 'unique index '.$row->Key_name;
                         }
 
@@ -477,8 +477,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     /**
      * Modifies $this->table() with the columns specified with $this->column().
      *
-     * @param boolean $explicit If TRUE, this method will remove any columns from the table that were not
+     * @param bool $explicit If TRUE, this method will remove any columns from the table that were not
      * defined with $this->column().
+     * @return bool
      */
     protected function _modify($explicit = false) {
         $px = $this->_DatabasePrefix;
@@ -542,7 +543,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $alterSql[] = $addColumnSql;
-
             } else {
                 $existingColumn = $existingColumns[$columnKey];
 
@@ -551,13 +551,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $comment = "-- [Existing: $existingColumnDef, New: $columnDef]";
 
                 if ($existingColumnDef !== $columnDef) {
-
                     // The existing & new column types do not match, so modify the column.
                     $changeSql = "$comment\nchange `{$existingColumn->Name}` $columnDef";
 
                     if (strcasecmp($existingColumn->Type, 'varchar') === 0 && strcasecmp($column->Type, 'varchar') === 0
                             && $existingColumn->Length > $column->Length) {
-
                         $charLength = $this->Database->query("select max(char_length(`$columnName`)) as MaxLength from `$px{$this->_TableName}`;")
                             ->firstRow(DATASET_TYPE_ARRAY);
 
@@ -697,10 +695,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Get the DDL expression for a column definition.
      *
-     *
-     * @param stdClass $column
+     * @param object $column
      * @param string $newColumnName For rename action only.
+     * @return string
      */
     protected function _defineColumn($column, $newColumnName = null) {
         $column = clone $column;
@@ -799,9 +798,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Quote a value for the database.
      *
-     *
-     * @param $value
+     * @param mixed $value
      * @return string
      */
     protected static function _quoteValue($value) {

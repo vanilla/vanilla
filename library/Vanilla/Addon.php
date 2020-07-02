@@ -199,7 +199,11 @@ class Addon {
     }
 
     /**
-     * @inheritdoc
+     * Generate a path for this addon relative to a given directory.
+     *
+     * @param string $subpath The sub-path to generate from.
+     * @param string $relative One of the `self::PATH_*` constants.
+     * @return string Returns a generate path.
      */
     public function path($subpath = '', $relative = self::PATH_FULL) {
         $subpath = $subpath ? '/'.ltrim($subpath, '\\/') : '';

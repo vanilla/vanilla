@@ -78,9 +78,9 @@ abstract class HtmlProcessor {
     /**
      * Check if class exists in class array
      *
-     * @param array of strings $classes
+     * @param string[] $classes
      * @param string $target
-     * @return string array
+     * @return bool
      */
     protected function hasClass($classes, $target) {
         foreach ($classes as $c) {

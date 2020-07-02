@@ -1431,7 +1431,7 @@ abstract class Gdn_SQLDriver {
      * @return $this
      */
     public function noReset($noReset = true, $oneTime = true) {
-        $this->_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
+        $_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
         return $this;
     }
 

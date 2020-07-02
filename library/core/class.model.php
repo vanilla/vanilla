@@ -510,7 +510,7 @@ class Gdn_Model extends Gdn_Pluggable {
             deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
             $limit = $options;
         } else {
-            $options += ['reset' => true, 'limit' => null];
+            $options += ['rest' => true, 'limit' => null];
             $limit = $options['limit'];
         }
 

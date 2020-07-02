@@ -1431,7 +1431,7 @@ abstract class Gdn_SQLDriver {
      * @return $this
      */
     public function noReset($noReset = true, $oneTime = true) {
-        $_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
+        $this->_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
         return $this;
     }
 
@@ -2123,7 +2123,7 @@ abstract class Gdn_SQLDriver {
         }
 
         $sql = $this->getTruncate($table);
-        $result = $this->query($sql, 'truncate');
+        $result = $this->query($sql, 'delete');
         return $result;
     }
 

@@ -502,16 +502,16 @@ class Gdn_Model extends Gdn_Pluggable {
             $where = [$this->PrimaryKey => $where];
         }
 
-        $resetData = false;
+        $resetData = true;
         if ($options === true || val('reset', $options)) {
             deprecated('Gdn_Model->delete() with reset true');
-            $resetData = true;
         } elseif (is_numeric($options)) {
             deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
             $limit = $options;
         } else {
-            $options += ['rest' => true, 'limit' => null];
+            $options += ['reset' => true, 'limit' => null];
             $limit = $options['limit'];
+            $resetData = $options['reset'];
         }
 
         if ($resetData) {

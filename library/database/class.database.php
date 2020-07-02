@@ -80,9 +80,9 @@ class Gdn_Database {
     protected $SmoothWaitMaxMillis;
 
     /**
+     * Gdn_Database constructor.
      *
-     *
-     * @param mixed $config The configuration settings for this object.
+     * @param array|string|null $config The configuration settings for this object.
      * @see Database::init()
      */
     public function __construct($config = null) {
@@ -115,7 +115,7 @@ class Gdn_Database {
     }
 
     /**
-     *
+     * Close the connection to the database.
      */
     public function closeConnection() {
         if (!$this->_IsPersistent) {
@@ -149,7 +149,7 @@ class Gdn_Database {
     }
 
     /**
-     * Creates a new PDO object
+     * Creates a new PDO object.
      *
      * Supports connection smoothness. In the case that the connection cannot be done because a resources limit is reached
      * (max connections, max user connections, user limits) we loop up to `SmoothTimeoutMillis` milliseconds and we retry
@@ -162,11 +162,11 @@ class Gdn_Database {
      * Beware that in the theoretical "worst" case scenario we wait for up to (SmoothTimeoutMillis +  SmoothWaitMaxMillis - 1),
      * 5749ms for the defaults values.
      *
-     * @param $dsn
-     * @param $user
-     * @param $password
+     * @param string $dsn
+     * @param string $user
+     * @param string $password
      * @return PDO
-     * @throws Exception
+     * @throws Exception Throws an exception if there is an error connecting to the database.
      */
     protected function newPDO($dsn, $user, $password) {
         static $timeoutAt = null;
@@ -211,7 +211,7 @@ class Gdn_Database {
                     }
 
                     if ($timeout) {
-                        throw new Exception(errorMessage('Timeout while connecting to the database', $this->ClassName, 'Connection', $ex->getMessage()), 504);
+                        throw new Exception('Timeout while connecting to the database.', 504);
                     }
 
                     throw new Exception(
@@ -340,6 +340,8 @@ class Gdn_Database {
      *
      * @param string $sql A string of SQL to be executed.
      * @param array $inputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
+     * @param array $options
+     * @return mixed
      */
     public function query($sql, $inputParameters = null, $options = []) {
         $this->LastInfo = [];
@@ -434,9 +436,15 @@ class Gdn_Database {
                     $pDOStatement = $pDO->prepare($sql);
 
                     if (!is_object($pDOStatement)) {
-                        trigger_error(errorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->getPDOErrorMessage($pDO->errorInfo())), E_USER_ERROR);
+                        trigger_error(
+                            errorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->getPDOErrorMessage($pDO->errorInfo())),
+                            E_USER_ERROR
+                        );
                     } elseif ($pDOStatement->execute($inputParameters) === false) {
-                        trigger_error(errorMessage($this->getPDOErrorMessage($pDOStatement->errorInfo()), $this->ClassName, 'Query', $sql), E_USER_ERROR);
+                        trigger_error(
+                            errorMessage($this->getPDOErrorMessage($pDOStatement->errorInfo()), $this->ClassName, 'Query', $sql),
+                            E_USER_ERROR
+                        );
                     }
                 } else {
                     $pDOStatement = $pDO->query($sql);
@@ -456,7 +464,6 @@ class Gdn_Database {
 
                 // If we get here then the pdo statement prepared properly.
                 break;
-
             } catch (Gdn_UserException $uex) {
                 trigger_error($uex->getMessage(), E_USER_ERROR);
             } catch (Exception $ex) {
@@ -474,7 +481,6 @@ class Gdn_Database {
 
                 trigger_error($message, E_USER_ERROR);
             }
-
         }
 
         if ($pDOStatement instanceof PDOStatement) {
@@ -496,7 +502,6 @@ class Gdn_Database {
             } elseif (is_a($pDOStatement, 'PDOStatement')) {
                 $pDOStatement->closeCursor();
             }
-
         }
 
         if (isset($storeCacheKey)) {
@@ -513,7 +518,7 @@ class Gdn_Database {
     }
 
     /**
-     *
+     * Rollback the active transaction.
      */
     public function rollbackTransaction() {
         if ($this->_InTransaction) {
@@ -522,9 +527,9 @@ class Gdn_Database {
     }
 
     /**
+     * Get the specific PDO error message.
      *
-     *
-     * @param $errorInfo
+     * @param string|array $errorInfo
      * @return string
      */
     public function getPDOErrorMessage($errorInfo) {
@@ -532,8 +537,9 @@ class Gdn_Database {
         if (is_array($errorInfo)) {
             if (count($errorInfo) >= 2) {
                 $errorMessage = $errorInfo[2];
-            } elseif (count($errorInfo) >= 1)
+            } elseif (count($errorInfo) >= 1) {
                 $errorMessage = $errorInfo[0];
+            }
         } elseif (is_string($errorInfo)) {
             $errorMessage = $errorInfo;
         }

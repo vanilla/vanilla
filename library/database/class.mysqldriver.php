@@ -23,9 +23,9 @@
 class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
     /**
+     * Escape an identifier like a table or column name.
      *
-     *
-     * @param $string
+     * @param string $string
      * @return string
      * @deprecated
      */
@@ -51,29 +51,23 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
             return $escapedArray;
         }
-        // echo '<div>STRING: '.$String.'</div>';
-
         // This function may get "item1 item2" as a string, and so
         // we may need "`item1` `item2`" and not "`item1 item2`"
         if (ctype_alnum($string) === false) {
             if (strpos($string, '.') !== false) {
                 $mungedAliases = implode('.', array_keys($this->_AliasMap)).'.';
                 $tableName = substr($string, 0, strpos($string, '.') + 1);
-                //echo '<div>STRING: '.$String.'</div>';
-                //echo '<div>TABLENAME: '.$TableName.'</div>';
-                //echo '<div>ALIASES: '.$MungedAliases.'</div>';
-                // If the "TableName" isn't found in the alias list and it is a valid table name, apply the database prefix to it
-                $string = (strpos($mungedAliases, $tableName) !== false || strpos($tableName, "'") !== false) ? $string : $this->Database->DatabasePrefix.$string;
-                //echo '<div>RESULT: '.$String.'</div>';
 
+                // If the "TableName" isn't found in the alias list and it is a valid table name, apply the database prefix to it
+                $string = (strpos($mungedAliases, $tableName) !== false || strpos($tableName, "'") !== false) ?
+                    $string :
+                    $this->Database->DatabasePrefix.$string;
             }
 
             // This function may get "field >= 1", and need it to return "`field` >= 1"
             $leftBound = ($firstWordOnly === true) ? '' : '|\s|\(';
 
             $string = preg_replace('/(^'.$leftBound.')([\w-]+?)(\s|\)|$)/iS', '$1`$2`$3', $string);
-            //echo '<div>STRING: '.$String.'</div>';
-
         } else {
             return "`{$string}`";
         }
@@ -89,7 +83,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     }
 
     /**
-     *
+     * Escape a database identifier like a table or column name.
      *
      * @param string $refExpr
      * @return string
@@ -114,9 +108,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
     /**
      * Returns a platform-specific query to fetch table names.
-     * @param mixed $limitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
-     *  - <b>TRUE</b>: The search will be limited to the database prefix.
-     *  - <b>FALSE</b>: All tables will be fetched. Default.
+     *
+     * @param bool|string $limitToPrefix Whether or not to limit the search to tables with the database prefix or a
+     * specific table name. The following types can be given for this parameter:
+     *  - <b>true</b>: The search will be limited to the database prefix.
+     *  - <b>false</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
      * @return string
      */
@@ -125,8 +121,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
         if (is_bool($limitToPrefix) && $limitToPrefix && $this->Database->DatabasePrefix != '') {
             $sql .= " like ".$this->Database->connection()->quote($this->Database->DatabasePrefix.'%');
-        } elseif (is_string($limitToPrefix) && $limitToPrefix)
-            $sql .= " like ".$this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $limitToPrefix));
+        } elseif (is_string($limitToPrefix) && $limitToPrefix) {
+            $sql .= " like " . $this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $limitToPrefix));
+        }
 
         return $sql;
     }
@@ -379,7 +376,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     /**
      * Returns a truncate statement for this database engine.
      *
-     * @param string The name of the table to updated data in.
+     * @param string $table The name of the table to updated data in.
      * @return string
      */
     public function getTruncate($table) {
@@ -413,7 +410,6 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Sets the character encoding for this database engine.
      *
      * @param string $encoding
-     * @todo $encoding needs a description.
      */
     public function setEncoding($encoding) {
         if ($encoding != '' && $encoding !== false) {

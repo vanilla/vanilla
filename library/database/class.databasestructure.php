@@ -56,8 +56,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * The constructor for this class. Automatically fills $this->ClassName.
      *
-     * @param string $database
-     * @todo $database needs a description.
+     * @param Gdn_Database|null $database
      */
     public function __construct($database = null) {
         parent::__construct();
@@ -103,14 +102,14 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
+     * Create a column and return its object representation.
      *
-     *
-     * @param $name
-     * @param $type
-     * @param $null
-     * @param $default
-     * @param $keyType
-     * @return stdClass
+     * @param string $name
+     * @param string $type
+     * @param bool $null
+     * @param mixed $default
+     * @param string|array|false $keyType
+     * @return object
      */
     protected function _createColumn($name, $type, $null, $default, $keyType) {
         $length = '';
@@ -206,9 +205,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
         if (count($keyTypes1) == 0) {
             $keyType = false;
-        } elseif (count($keyTypes1) == 1)
+        } elseif (count($keyTypes1) == 1) {
             $keyType = $keyTypes1[0];
-        else {
+        } else {
             $keyType = $keyTypes1;
         }
 
@@ -239,7 +238,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * An associative array of $ColumnName => $ColumnProperties columns for the table.
      *
-     * @return array
+     * @param string $name The name of the column to fetch. Specify an empty string to get them all.
+     * @return array|object
      */
     public function columns($name = '') {
         if (strlen($name) > 0) {
@@ -280,13 +280,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
         if ($type && $length && $precision) {
             $result = "$type($length, $precision)";
-        } elseif ($type && $length)
+        } elseif ($type && $length) {
             $result = "$type($length)";
-        elseif (strtolower($type) == 'enum') {
+        } elseif (strtolower($type) == 'enum') {
             $result = val('Enum', $column, []);
-        } elseif ($type)
+        } elseif ($type) {
             $result = $type;
-        else {
+        } else {
             $result = 'int';
         }
 
@@ -297,7 +297,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Gets and/or sets the database prefix.
      *
      * @param string $databasePrefix
-     * @todo $databasePrefix needs a description.
+     * @return string
      */
     public function databasePrefix($databasePrefix = '') {
         if ($databasePrefix != '') {
@@ -324,9 +324,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
+     * Set the storage engine for the table.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @param bool $checkAvailability
      * @return $this
      */
@@ -381,10 +381,10 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
-     * @deprecated since 2.3. Was incorrectly public. Replaced by executeQuery().
      * @param string $sql The sql to execute.
      * @param bool $checkTreshold Should not be used
      * @return Gdn_Dataset
+     * @deprecated since 2.3. Was incorrectly public. Replaced by executeQuery().
      */
     public function query($sql, $checkTreshold = false) {
 
@@ -424,7 +424,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             }
             $this->Database->CapturedSql[] = $sql;
             return true;
-        } elseif ($checkThreshold && $this->getAlterTableThreshold() && $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
+        } elseif ($checkThreshold && $this->getAlterTableThreshold() &&
+            $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
             $this->addIssue("The table was past its threshold. Run the alter manually.", $sql);
 
             // Log an event to be captured and analysed later.
@@ -541,6 +542,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Whether or not the table exists in the database.
      *
+     * @param string|null $tableName
      * @return bool
      */
     public function tableExists($tableName = null) {

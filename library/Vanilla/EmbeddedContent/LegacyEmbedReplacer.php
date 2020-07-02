@@ -7,6 +7,7 @@
 
 namespace Vanilla\EmbeddedContent;
 
+use Garden\Web\RequestInterface;
 use Gdn_Format;
 
 /**
@@ -20,13 +21,18 @@ class LegacyEmbedReplacer {
     /** @var EmbedConfig */
     private $embedConfig;
 
+    /** @var string */
+    private $host;
+
     /**
      * DI.
      *
      * @param EmbedConfig $embedConfig
+     * @param RequestInterface $request
      */
-    public function __construct(EmbedConfig $embedConfig) {
+    public function __construct(EmbedConfig $embedConfig, RequestInterface $request) {
         $this->embedConfig = $embedConfig;
+        $this->host = $request->getHost();
     }
 
     /**
@@ -221,9 +227,15 @@ EOT;
                 break;
 
             case 'Twitch':
+                $twitchParams = http_build_query([
+                    'channel' => $matches[1],
+                    'parent' => $this->host,
+                    'autoplay' => 'false',
+                ]);
                 return <<<EOT
+
 <iframe
-    src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false"
+    src="https://player.twitch.tv/?{$twitchParams}"
     height="360"
     width="640"
     frameborder="0"
@@ -235,9 +247,14 @@ EOT;
                 break;
 
             case 'TwitchRecorded':
+                $twitchParams = http_build_query([
+                    'video' => $matches[1],
+                    'parent' => $this->host,
+                    'autoplay' => 'false',
+                ]);
                 return <<<EOT
 <iframe
-    src="https://player.twitch.tv/?video={$matches[1]}&autoplay=false"
+    src="https://player.twitch.tv/?{$twitchParams}"
     height="360"
     width="640"
     frameborder="0"

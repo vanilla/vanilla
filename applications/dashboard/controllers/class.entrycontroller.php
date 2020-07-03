@@ -2121,10 +2121,7 @@ class EntryController extends Gdn_Controller {
     /**
      * Set where to go after signin.
      *
-     * @access public
-     * @since 2.0.0
-     *
-     * @param string $target Where we're requested to go to.
+     * @param string|false $target Where we're requested to go to.
      * @return string URL to actually go to (validated & safe).
      */
     public function target($target = false) {
@@ -2134,21 +2131,16 @@ class EntryController extends Gdn_Controller {
                 $target = $this->Request->get('Target', $this->Request->get('target', '/'));
             }
         }
+        $target = url($target, true);
 
-        // Make sure that the target is a valid url.
-        if (!preg_match('`(^https?://)`', $target)) {
-            $target = '/' . ltrim($target, '/');
-
-            // Never redirect back to signin.
-            if (preg_match('`^/entry/signin`i', $target)) {
-                $target = '/';
-            }
+        // Never redirect back to sign in/out pages.
+        if (($this->Request->getHost() === parse_url($target, PHP_URL_HOST) &&
+            preg_match('`/entry/(?:signin|signout|autosignedout)($|\?)`i', $target)) ||
+            !isTrustedDomain($target)
+        ) {
+            $target = url('/', true);
         }
 
-        if (!isTrustedDomain(url($target, true))) {
-            $target = url(Gdn::router()->getDestination('DefaultController'));
-        }
-
-        return url($target, true);
+        return $target;
     }
 }

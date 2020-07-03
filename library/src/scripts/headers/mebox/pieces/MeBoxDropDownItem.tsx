@@ -55,19 +55,24 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         const classesMeBoxMessage = meBoxMessageClasses();
         const classesMetas = metasClasses();
 
-        let authors: JSX.Element[];
+        let authorList: JSX.Element[];
 
         if (this.props.type === MeBoxItemType.MESSAGE) {
             // Message
+            const { authors } = this.props;
             const authorCount = this.props.authors.length;
-            if ("authors" in this.props && authorCount > 0) {
-                authors = this.props.authors!.map((user, index) => {
-                    return (
-                        <React.Fragment key={`meBoxAuthor-${index}`}>
-                            <strong>{user.name}</strong>
-                            {`${index < authorCount - 1 ? `, ` : ""}`}
-                        </React.Fragment>
-                    );
+            if (authors && authorCount > 0) {
+                authorList = authors.map((user, index) => {
+                    if (user) {
+                        return (
+                            <React.Fragment key={`meBoxAuthor-${index}`}>
+                                <strong>{user.name}</strong>
+                                {`${index < authorCount - 1 ? `, ` : ""}`}
+                            </React.Fragment>
+                        );
+                    } else {
+                        return <React.Fragment key={`meBoxAuthor-${index}`} />;
+                    }
                 });
             }
         }
@@ -83,9 +88,9 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                         )}
                     </div>
                     <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>
-                        {!!authors! && (
+                        {!!authorList! && (
                             <div className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}>
-                                {authors!}
+                                {authorList!}
                             </div>
                         )}
                         {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}

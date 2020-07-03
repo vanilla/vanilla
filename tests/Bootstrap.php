@@ -380,6 +380,9 @@ class Bootstrap {
             ->addCall('setDispatchEventName', ['SchedulerDispatch'])
             ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
             ->setShared(true)
+
+            ->rule(\Gdn_Form::class)
+            ->addAlias('Form')
             ;
     }
 

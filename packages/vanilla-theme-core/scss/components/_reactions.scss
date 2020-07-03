@@ -59,3 +59,7 @@ $reactions_bg:                        rgba(0,0,0,0.5) !default;
         margin-top: 1px;
     }
 }
+
+.Flyout .ReactButton .Count {
+    order: 1;
+}

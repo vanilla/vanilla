@@ -174,7 +174,8 @@ select::-ms-expand {
 @if($staticVariables) {
     #Form_OK,
     .Button:not(.GroupOptionsTitle),
-    .Buttons .btn-primary {
+    .Buttons .btn-primary,
+    .btn-primary.Close {
         @include Button;
     }
 }

@@ -1,21 +1,17 @@
-* something
-* something else
-* another thing
-
-* something
-* something else
-* another thing
+    * something
+    * something else
+    * another thing
 
 
-* something
-* something else
-* another thing
 
 
-public function doSomething() {
-    $var = [
-        'foo0' =>  'foo',
-        'bar1' => 'bar',
-        'baz2' => 'baz',
-    ];
-}
+    * something
+    * something else
+    * another thing
+
+
+
+
+    * something
+    * something else
+    * another thing

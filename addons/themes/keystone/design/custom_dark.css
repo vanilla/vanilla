@@ -154,7 +154,7 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */.Reactions .ReactButton{color:#e0e0e0}.Reactions .ReactButton:hover{color:#f7bc2d}.RecordReactions{-ms-flex-wrap:wrap;display:-webkit-box;display:-ms-flexbox;display:flex;flex-wrap:wrap;margin-left:-3px;margin-right:-3px}.RecordReactions .PhotoWrap{height:24px;position:relative;width:24px}.RecordReactions .ReactSprite{-ms-flex-align:center;-webkit-box-align:center;align-items:center;background-color:rgba(0,0,0,.5);border-radius:50%;color:#fff;display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;height:14px;margin-right:0;overflow:hidden;width:14px}.RecordReactions .UserReactionWrap{margin:0 3px 3px;width:24px}.RecordReactions .ReactAwesome:before{font-size:11px;margin-left:1.5px;margin-top:1px}
+ */.Reactions .ReactButton{color:#e0e0e0}.Reactions .ReactButton:hover{color:#f7bc2d}.RecordReactions{-ms-flex-wrap:wrap;display:-webkit-box;display:-ms-flexbox;display:flex;flex-wrap:wrap;margin-left:-3px;margin-right:-3px}.RecordReactions .PhotoWrap{height:24px;position:relative;width:24px}.RecordReactions .ReactSprite{-ms-flex-align:center;-webkit-box-align:center;align-items:center;background-color:rgba(0,0,0,.5);border-radius:50%;color:#fff;display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;height:14px;margin-right:0;overflow:hidden;width:14px}.RecordReactions .UserReactionWrap{margin:0 3px 3px;width:24px}.RecordReactions .ReactAwesome:before{font-size:11px;margin-left:1.5px;margin-top:1px}.Flyout .ReactButton .Count{-ms-flex-order:1;-webkit-box-ordinal-group:2;order:1}
 
 /*!
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>

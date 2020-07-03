@@ -226,10 +226,10 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
     }
 
     /**
-     * Main function. Performs some preprocessing on the input text and pass
-     * it through the document gamut.
-     *
-     * @api
+     * Overrides the main function to add some processing before $this->hashHTMLBlocks()
+     * Changes done:
+     * - Add $this->doSpoilers()
+     * - Add $this->doBlockQuotes()
      *
      * @param  string $text
      * @return string

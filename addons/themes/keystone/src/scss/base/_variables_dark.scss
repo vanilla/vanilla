@@ -85,13 +85,13 @@ $navigation_backgroundColor:             mix($global-color_black, $header-bg, 12
     Buttons
 \* -------------------------------------------------------------- */
 
-$button-basic_fg:                        $global-color_grey !default;
+$button-basic_fg:                        $global-color_primary !default;
 $button-basic_bg:                        transparent !default;
-$button-basic_border:                    $global-color_grey !default;
+$button-basic_border:                    $global-color_primary !default;
 
-$button-basic-hover_fg:                  $global-color_primary !default;
+$button-basic-hover_fg:                  $global-color_white !default;
 $button-basic-hover_bg:                  transparent !default;
-$button-basic-hover_border:              $global-color_primary !default;
+$button-basic-hover_border:              $global-color_white !default;
 
 $button-primary_fg:                      $global-color_white !default;
 $button-primary_bg:                      $global-color_primary !default;

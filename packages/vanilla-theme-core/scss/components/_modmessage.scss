@@ -48,19 +48,19 @@ a.Dismiss.Dismiss {
 }
 
 .WarningMessage {
-    background-color: mix($global-color_warning, $global-color_bg, 10%);
-    border-color: $global-color_warning;
-
-    a {
-        color: darken($global-color_warning, 25%);
-    }
-}
-
-.AlertMessage {
     background-color: mix($global-error_fg, $global-color_bg, 10%);
     border-color: $global-error_fg;
 
     a {
-        color: darken($global-error_fg, 20%);
+        color: darken($global-error_fg, 25%);
+    }
+}
+
+.AlertMessage {
+    background-color: mix($global-color_warning, $global-color_bg, 10%);
+    border-color: $global-color_warning;
+
+    a {
+        color: darken($global-color_warning, 20%);
     }
 }

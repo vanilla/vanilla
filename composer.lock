@@ -3243,16 +3243,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.4.0",
+            "version": "v4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120"
+                "reference": "c346bbfafe2ff60680258b631afb730d186ed864"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120",
-                "reference": "bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/c346bbfafe2ff60680258b631afb730d186ed864",
+                "reference": "c346bbfafe2ff60680258b631afb730d186ed864",
                 "shasum": ""
             },
             "require": {
@@ -3291,7 +3291,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2020-04-10T16:34:50+00:00"
+            "time": "2020-07-02T17:12:47+00:00"
         },
         {
             "name": "ocramius/package-versions",
@@ -5487,16 +5487,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.12.1",
+            "version": "3.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "9b860214d58c48b5cbe99bdb17914d0eb723c9cd"
+                "reference": "7c7ebd068f8acaba211d4a2c707c4ba90874fa26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/9b860214d58c48b5cbe99bdb17914d0eb723c9cd",
-                "reference": "9b860214d58c48b5cbe99bdb17914d0eb723c9cd",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/7c7ebd068f8acaba211d4a2c707c4ba90874fa26",
+                "reference": "7c7ebd068f8acaba211d4a2c707c4ba90874fa26",
                 "shasum": ""
             },
             "require": {
@@ -5580,7 +5580,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2020-06-23T00:24:34+00:00"
+            "time": "2020-07-03T16:59:07+00:00"
         },
         {
             "name": "voku/html-min",

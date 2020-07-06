@@ -434,7 +434,7 @@ class Gdn_Theme {
         if ($logo) {
             return img(Gdn_Upload::url($logo), ['alt' => $title]);
         } else {
-            return $title;
+            return htmlEsc($title);
         }
     }
 

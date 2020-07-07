@@ -13,7 +13,11 @@
     margin: 0 0 $global-block_margin;
     border-radius: $global_borderRadius;
     padding: $component-base_padding;
+    background-color: mix($global-color_fg, $global-color_bg, 10%);
+    border-color: $global-color_fg;
+
     a {
+        color: $global-color_fg;
         text-decoration: underline;
     }
 
@@ -34,30 +38,29 @@ a.Dismiss.Dismiss {
     @include CloseButton;
 }
 
-.WarningMessage {
-    background-color: mix($global-color_bg, $global-color_warning, 80%);
-    border-color: $global-color_warning;
-
-    a {
-        color: darken($global-color_warning, 10%);
-    }
-}
-
-.CasualMessage,
-.InfoMessage {
-    background-color: mix($global-color_bg, $global-color_primary, 80%);
+.CasualMessage {
+    background-color: mix($global-color_primary, $global-color_bg, 10%);
     border-color: $global-color_primary;
 
     a {
-        color: darken($global-color_primary, 10%);
+        color: darken($global-color_primary, 12%);
+    }
+}
+
+.WarningMessage {
+    background-color: mix($global-error_fg, $global-color_bg, 10%);
+    border-color: $global-error_fg;
+
+    a {
+        color: darken($global-error_fg, 25%);
     }
 }
 
 .AlertMessage {
-    background-color: mix($global-color_bg, $global-error_fg, 80%);
-    border-color: $global-error_fg;
+    background-color: mix($global-color_warning, $global-color_bg, 10%);
+    border-color: $global-color_warning;
 
     a {
-        color: darken($global-error_fg, 15%);
+        color: darken($global-color_warning, 20%);
     }
 }

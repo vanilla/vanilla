@@ -1,9 +1,13 @@
-.CasualMessage,
-.InfoMessage {
-  background-color: $component-casual-message_bg;
-  border-color: $component-casual-message_borderColor;
+.CasualMessage {
+    background-color: mix($global-color_secondary, $global-color_bg, 10%);
+    border-color: $global-color_secondary;
+}
 
-  a {
-    color: $component-casual-message_link-color;
-  }
- }
+.CasualMessage,
+.AlertMessage,
+.WarningMessage {
+
+    a {
+        color: $global-color_fg;
+    }
+}

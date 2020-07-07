@@ -23,7 +23,7 @@ class DomUtilsTest extends TestCase {
     /**
      * Test truncating words.
      *
-     * @param ?int $wordCount
+     * @param int|null $wordCount
      * @param string $html
      * @param string $expected
      * @dataProvider provideTrimWordsTests
@@ -230,7 +230,7 @@ class DomUtilsTest extends TestCase {
         });
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
-        $this->assertEquals($expectedCount, $count);
+        $this->assertSame($expectedCount, $count);
     }
 
     /**
@@ -261,7 +261,8 @@ class DomUtilsTest extends TestCase {
                 'forbiddenword',
                 '<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">',
                 '<img src="img_test.jpg" alt="*** image" width="100" height="100">'],
-            'emoji' => [1, '🤓','test 🤓', 'test ***']
+            'emoji' => [1, '🤓','test 🤓', 'test ***'],
+            'count' => [3, 'a+', '<p>a aaa is</p><p>aaa</p>', '<p>*** *** is</p><p>***</p>']
         ];
         return $r;
     }

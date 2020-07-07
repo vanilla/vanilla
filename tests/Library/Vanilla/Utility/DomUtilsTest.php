@@ -234,6 +234,22 @@ class DomUtilsTest extends TestCase {
     }
 
     /**
+     * Make sure that HTML in the callback doesn't corrupt the DOM.
+     */
+    public function testPregReplaceCallbackHtml(): void {
+        $in = new HtmlDocument('<p>this is bad.</p>');
+
+        DomUtils::pregReplaceCallback($in->getDom(), ['`bad`'], function (array $matches): string {
+            return str_repeat('>', strlen($matches[0]));
+        });
+        $actual = $in->getInnerHtml();
+        $expected = <<<EOT
+<p>this is &gt;&gt;&gt;.</p>
+EOT;
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
      * Provide tests for `TestPregReplaceCallback()`.
      *
      * @return array

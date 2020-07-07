@@ -216,7 +216,7 @@ class DomUtilsTest extends TestCase {
      * Test preg replace.
      *
      * @param int $expectedCount
-     * @param string $patternText
+     * @param string|string[] $patternText
      * @param string $input
      * @param int $expected
      * @dataProvider providePregReplaceCallbackTests

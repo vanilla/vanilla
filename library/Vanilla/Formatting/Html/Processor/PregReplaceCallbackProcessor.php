@@ -21,17 +21,22 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
     /** @var Callable $callback */
     private $callback;
 
+    /** @var array $attributes */
+    private $attributes;
+
     /**
      * PregReplaceCallbackProcessor constructor.
      *
      * @param HtmlDocument $document
      * @param array $pattern
      * @param callable $callback
+     * @param array $attributes
      */
-    public function __construct(HtmlDocument $document, array $pattern, callable $callback) {
+    public function __construct(HtmlDocument $document, array $pattern, callable $callback, ?array $attributes = []) {
         parent::__construct($document);
         $this->setPattern($pattern);
         $this->setCallback($callback);
+        $this->setAttributes($attributes);
     }
 
     /**
@@ -48,17 +53,32 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
      * Apply DomUtils::pregReplaceCallback()
      */
     public function applyPregReplaceProcessor() {
-        DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback);
+        if (empty($this->attributes)) {
+            DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback);
+        } else {
+            DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback, $this->attributes);
+        }
     }
 
     /**
      * Set pattern
      *
-     * @param array $pattern
+     * @param string|string[] $pattern
      * @return $this
      */
-    private function setPattern(array $pattern) {
+    private function setPattern($pattern) {
         $this->pattern = $pattern;
+        return $this;
+    }
+
+    /**
+     * Set attributes
+     *
+     * @param array $attributes
+     * @return $this
+     */
+    private function setAttributes(?array $attributes) {
+        $this->attributes = $attributes;
         return $this;
     }
 

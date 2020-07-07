@@ -224,7 +224,7 @@ class DomUtilsTest extends TestCase {
     public function testPregReplaceCallback($expectedCount, string $patternText, string $input, string $expected): void {
         $domDocument = new HtmlDocument($input);
         $dom = $domDocument->getDom();
-        $pattern = ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'];
+        $pattern = ['/'.$patternText.'/'];
         $count = DomUtils::pregReplaceCallback($dom, $pattern, function (array $matches): string {
             return '***';
         });
@@ -278,7 +278,7 @@ EOT;
                 '<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">',
                 '<img src="img_test.jpg" alt="*** image" width="100" height="100">'],
             'emoji' => [1, '🤓','test 🤓', 'test ***'],
-            'count' => [3, 'a', '<p>a aaa is</p><p>aaa</p>', '<p>* *** is</p><p>***</p>']
+            'count' => [2, 'a+', '<p>a aaa is</p><p>aaa</p>', '<p>*** *** is</p><p>***</p>']
         ];
         return $r;
     }

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
+import { onContent, getMeta, _executeReady, triggerContentLoaded } from "@library/utility/appUtils";
 import { logDebug, logError, debug } from "@vanilla/utils";
 import { translationDebug } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
@@ -58,8 +58,7 @@ _executeReady()
             mountInputs();
         });
 
-        const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
-        document.dispatchEvent(contentEvent);
+        triggerContentLoaded();
     })
     .catch(error => {
         logError(error);

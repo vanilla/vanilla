@@ -107,3 +107,45 @@ paths:
                   - groups
                 type: array
           description: Success
+  /dashboard/menu-legacy:
+    get:
+      x-hidden: true
+      summary: Get an HTML dashboard menu.
+      description: |
+        This endpoint is for internal use only. It is subject to change at any time. It generates the dashboard panel HTML.
+      tags:
+      - Dashboard
+      parameters:
+        - in: query
+          name: locale
+          description: The locale to get the HTML in.
+          example: en
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: activeUrl
+          description: The currently active page URL. Used to set the active item.
+          example: https://mysite.com/forum/settings/brandin
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: section
+          description: Section of the dashboard to load for.
+          schema:
+            type: string
+            enum:
+              - settings
+              - moderation
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  html:
+                    type: string
+                    description: HTML contents of the panel.
+          description: Success

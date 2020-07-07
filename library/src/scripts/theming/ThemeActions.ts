@@ -11,6 +11,7 @@ import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
+import { reloadDashboardNav } from "@dashboard/reloadDashboardNav";
 
 const createAction = actionCreatorFactory("@@themes");
 
@@ -110,6 +111,8 @@ export default class ThemeActions extends ReduxActions {
             const response = await this.api.put(`/themes/current`, body);
             setMeta("ui.themeKey", themeID);
             setMeta("ui.mobileThemeKey", themeID);
+            setMeta("ui.desktopThemeKey", themeID);
+            reloadDashboardNav();
             return response.data;
         })(body);
         return this.dispatch(thunk);

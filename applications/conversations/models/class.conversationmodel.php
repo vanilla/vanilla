@@ -896,11 +896,11 @@ class ConversationModel extends ConversationsModel {
             if (!$countRecipients) {
                 // Count current recipients
                 $conversationModel = new ConversationModel();
-                $countRecipients = $conversationModel->getRecipients($conversationID);
+                $countRecipients = count($conversationModel->getRecipients($conversationID));
             }
 
             // Add 1 because sender counts as a recipient.
-            $canAddRecipients = count($countRecipients) < ($maxRecipients + 1);
+            $canAddRecipients = $countRecipients < ($maxRecipients + 1);
         }
 
         return $canAddRecipients;

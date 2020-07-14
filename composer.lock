@@ -416,16 +416,16 @@
         },
         {
             "name": "nette/neon",
-            "version": "v3.1.2",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/neon.git",
-                "reference": "3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e"
+                "reference": "72dd80316595d4b5c5312ea4e9beb53f3ba823d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/neon/zipball/3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e",
-                "reference": "3c3dcbc6bf6c80dc97b1fc4ba9a22ae67930fc0e",
+                "url": "https://api.github.com/repos/nette/neon/zipball/72dd80316595d4b5c5312ea4e9beb53f3ba823d7",
+                "reference": "72dd80316595d4b5c5312ea4e9beb53f3ba823d7",
                 "shasum": ""
             },
             "require": {
@@ -441,7 +441,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -474,7 +474,7 @@
                 "nette",
                 "yaml"
             ],
-            "time": "2020-03-04T11:47:04+00:00"
+            "time": "2020-05-15T20:57:55+00:00"
         },
         {
             "name": "paragonie/random_compat",

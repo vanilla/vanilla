@@ -12,7 +12,6 @@ import Loader from "@library/loaders/Loader";
 import { buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import apiv2 from "@library/apiv2";
-import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
@@ -26,6 +25,7 @@ import { IConversation, GetConversationsExpand } from "@library/@types/api/conve
 import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
 import { ComposeIcon } from "@library/icons/titleBar";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs

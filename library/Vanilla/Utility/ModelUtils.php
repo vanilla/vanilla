@@ -20,6 +20,9 @@ class ModelUtils {
     // Expand field value to indicate expanding all fields.
     public const EXPAND_ALL = "all";
 
+    // Expand field value to indicate expanding to a crawlable record.
+    public const EXPAND_CRAWL = "crawl";
+
     /**
      * Given an array of expand options, determine if a value matches any of them.
      *

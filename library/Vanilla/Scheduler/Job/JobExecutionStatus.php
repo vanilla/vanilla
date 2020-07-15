@@ -10,7 +10,7 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Job Status
  */
-class JobExecutionStatus {
+class JobExecutionStatus implements \JsonSerializable {
     /**
      * @var string
      */
@@ -29,6 +29,13 @@ class JobExecutionStatus {
      * @return string
      */
     public function getStatus(): string {
+        return $this->myStatus;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
         return $this->myStatus;
     }
 

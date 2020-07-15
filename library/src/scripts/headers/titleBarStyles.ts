@@ -887,23 +887,23 @@ export const titleBarClasses = useThemeCache(() => {
                 // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
                 ...allButtonStates({
                     allStates: {
-                        borderColor: colorOut(vars.resister.borderColor, true),
+                        borderColor: colorOut(vars.resister.borderColor),
                         color: colorOut(vars.resister.fg),
                     },
                     noState: {
-                        backgroundColor: colorOut(vars.resister.bg, true),
+                        backgroundColor: colorOut(vars.resister.bg),
                     },
                     hover: {
                         color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                        backgroundColor: colorOut(vars.resister.states.bg),
                     },
                     focus: {
                         color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                        backgroundColor: colorOut(vars.resister.states.bg),
                     },
                     active: {
                         color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                        backgroundColor: colorOut(vars.resister.states.bg),
                     },
                 }),
             },
@@ -974,11 +974,7 @@ export const titleBarClasses = useThemeCache(() => {
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
-    const titleBarContainer = style("titleBarContainer", {
-        ...paddings({
-            horizontal: globalVars.gutter.half,
-        }),
-    });
+    const titleBarContainer = style("titleBarContainer", {});
 
     return {
         root,

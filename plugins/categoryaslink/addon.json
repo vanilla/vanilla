@@ -1,0 +1,18 @@
+{
+    "name": "Category As Link",
+    "description": "Configure a category to show up on the Category List but link to a custom URL.",
+    "version": "1.0",
+    "key": "categoryaslink",
+    "type": "addon",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.3.0"
+    }
+}

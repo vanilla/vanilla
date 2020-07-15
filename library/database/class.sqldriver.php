@@ -77,14 +77,6 @@ abstract class Gdn_SQLDriver {
      */
     protected $_NamedParameters = [];
 
-    /**
-     * @var int Whether or not to reset the properties when a query is executed.
-     *   0 = The object will reset after query execution.
-     *   1 = The object will not reset after the <b>NEXT</b> query execution.
-     *   2 = The object will not reset after <b>ALL</b> query executions.
-     */
-    protected $_NoReset = false;
-
     /** @var int The offset from which data should be returned. FALSE by default. */
     protected $_Offset;
 
@@ -1424,18 +1416,6 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Allows a query to be called without resetting the object.
-     *
-     * @param boolean $noReset Whether or not to reset this object when the next query executes.
-     * @param boolean $oneTime Whether or not this will apply for only the next query or for all subsequent queries.
-     * @return $this
-     */
-    public function noReset($noReset = true, $oneTime = true) {
-        $_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
-        return $this;
-    }
-
-    /**
      * Sets the offset for the query.
      *
      * @param int $offset The offset where the query results should begin.
@@ -1905,14 +1885,6 @@ abstract class Gdn_SQLDriver {
      * @return $this
      */
     public function reset() {
-        // Check the _NoReset flag.
-        switch ($this->_NoReset) {
-            case 1:
-                $this->_NoReset = 0;
-                return $this;
-            case 2:
-                return $this;
-        }
         $this->_Selects = [];
         $this->_Froms = [];
         $this->_Joins = [];
@@ -1943,9 +1915,9 @@ abstract class Gdn_SQLDriver {
         return $this;
     }
 
+
     /**
-     * Allows the specification of columns to be selected in a database query.
-     * Returns this object for chaining purposes. ie. $db->select()->from();
+     * Parse select information for SqlDriver::select().
      *
      * @param mixed $select NotRequired "*" The field(s) being selected. It
      * can be a comma delimited string, the name of a single field, or an array
@@ -1954,9 +1926,9 @@ abstract class Gdn_SQLDriver {
      * the select column. Only valid if a single column name is provided.
      * Accepted values are MAX, MIN, AVG, SUM.
      * @param string $alias NotRequired "" The alias to give a column name.
-     * @return $this
+     * @return array The select information. ['Field:s', 'Function:s', 'Alias:s'];
      */
-    public function select($select = '*', $function = '', $alias = '') {
+    public function parseSelectExpression($select = '*', $function = '', $alias = ''): array {
         if (is_string($select)) {
             if ($function == '') {
                 $select = explode(',', $select);
@@ -1966,6 +1938,7 @@ abstract class Gdn_SQLDriver {
         }
         $count = count($select);
 
+        $selects = [];
         for ($i = 0; $i < $count; $i++) {
             $field = trim($select[$i]);
 
@@ -1984,13 +1957,32 @@ abstract class Gdn_SQLDriver {
                     $alias = '';
                 }
             }
-
             $expr = ['Field' => $field, 'Function' => $function, 'Alias' => $alias];
+            $selects[] = $expr;
+        }
+        return $selects;
+    }
 
+    /**
+     * Allows the specification of columns to be selected in a database query.
+     * Returns this object for chaining purposes. ie. $db->select()->from();
+     *
+     * @param mixed $select NotRequired "*" The field(s) being selected. It
+     * can be a comma delimited string, the name of a single field, or an array
+     * of field names.
+     * @param string $function NotRequired "" The aggregate function to be used on
+     * the select column. Only valid if a single column name is provided.
+     * Accepted values are MAX, MIN, AVG, SUM.
+     * @param string $alias NotRequired "" The alias to give a column name.
+     * @return $this
+     */
+    public function select($select = '*', $function = '', $alias = '') {
+        $selectInfos = $this->parseSelectExpression($select, $function, $alias);
+        foreach ($selectInfos as $selectInfo) {
             if ($alias == '') {
-                $this->_Selects[] = $expr;
+                $this->_Selects[] = $selectInfo;
             } else {
-                $this->_Selects[$alias] = $expr;
+                $this->_Selects[$alias] = $selectInfo;
             }
         }
         return $this;
@@ -2123,7 +2115,7 @@ abstract class Gdn_SQLDriver {
         }
 
         $sql = $this->getTruncate($table);
-        $result = $this->query($sql, 'truncate');
+        $result = $this->query($sql, 'delete');
         return $result;
     }
 

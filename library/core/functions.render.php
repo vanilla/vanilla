@@ -1401,11 +1401,13 @@ if (!function_exists('userAnchor')) {
 
         $px = val('Px', $options, '');
         $name = val($px.'Name', $user, t('Unknown'));
+        $userID = $user->UserID ?? $user['UserID'] ?? $user[$px.'UserID'];
         $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
 
         $attributes = [
-            'class' => $cssClass,
-            'rel' => val('Rel', $options)
+            'class' => trim(($cssClass ?? "") . " js-userCard"),
+            'rel' => val('Rel', $options),
+            'data-userid' => $userID,
         ];
         if (isset($options['title'])) {
             $attributes['title'] = $options['title'];
@@ -1480,7 +1482,7 @@ if (!function_exists('userPhoto')) {
             $user = (object)$user;
         }
 
-        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap');
+        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap', 'js-userCard');
         $imgClass = val('ImageClass', $options, 'ProfilePhoto');
 
         $size = val('Size', $options);
@@ -1522,8 +1524,8 @@ if (!function_exists('userPhoto')) {
 
         $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
 
-        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '">'
-                .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '" data-userid="'.(json_decode($user)->UserID).'">'
+                .img($photoUrl, ['alt' => $name, 'class' => $imgClass, 'data-fallback' => 'avatar'])
             .'</a>';
     }
 }

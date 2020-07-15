@@ -15,6 +15,7 @@ import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/ani
 import { useLastValue } from "@vanilla/react-utils";
 
 interface IProps {
+    id?: string;
     onOverlayClick: React.MouseEventHandler;
     onModalClick: React.MouseEventHandler;
     onKeyDown: React.KeyboardEventHandler;
@@ -147,6 +148,7 @@ export function ModalView(props: IProps) {
                     style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
                 >
                     <EntranceAnimation
+                        id={props.id}
                         {...contentTransition}
                         targetTransform={targetTransform}
                         isEntered={props.isVisible}

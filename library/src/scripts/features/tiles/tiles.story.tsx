@@ -96,7 +96,7 @@ export const Tiles4Columns = storyWithConfig(
     },
 );
 
-export const Tiles4ColumnsLeftAligned = storyWithConfig(
+export const Tiles4ColumnLeftAligned = storyWithConfig(
     {
         themeVars: {
             tiles: {

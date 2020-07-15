@@ -6,7 +6,7 @@
 import getStore, { resetStore } from "@library/redux/getStore";
 import { registerReducer, resetReducers } from "@library/redux/reducerRegistry";
 
-describe.only("reducerRegistry", () => {
+describe("reducerRegistry", () => {
     afterEach(() => {
         resetStore();
         resetReducers();

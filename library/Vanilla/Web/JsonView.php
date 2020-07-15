@@ -9,6 +9,7 @@ namespace Vanilla\Web;
 
 use Garden\Web\ViewInterface;
 use Garden\Web\Data;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Class JsonView

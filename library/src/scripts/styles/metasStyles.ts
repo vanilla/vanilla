@@ -59,7 +59,7 @@ export const metaContainerStyles = (overwrites?: any) => {
         lineHeight: globalVars.lineHeights.meta,
         color: colorOut(vars.colors.fg),
         width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
-        overflow: "hidden",
+        overflow: "initial", // We can't hide overflow or stuff like user cards will not be shown.
         textAlign: "left",
         fontSize: unit(globalVars.meta.text.size),
         ...margins({

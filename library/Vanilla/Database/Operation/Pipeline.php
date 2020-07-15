@@ -78,13 +78,18 @@ class Pipeline {
      *
      * @param Operation $databaseOperation Context for the operation to be performed.
      * @param callable $primaryAction A closure to perform the database operation.
+     * @param bool $executeStack Whether or not to execute the stack with the primary action.
      *
      * @return mixed
      */
-    public function process(Operation $databaseOperation, callable $primaryAction) {
-        $this->primaryAction = $primaryAction;
-        $result = call_user_func($this->stack, $databaseOperation);
-        call_user_func($this->postProcessStack, $databaseOperation);
-        return $result;
+    public function process(Operation $databaseOperation, callable $primaryAction, bool $executeStack = true) {
+        if (!$executeStack) {
+            return call_user_func($primaryAction, $databaseOperation);
+        } else {
+            $this->primaryAction = $primaryAction;
+            $result = call_user_func($this->stack, $databaseOperation);
+            call_user_func($this->postProcessStack, $databaseOperation);
+            return $result;
+        }
     }
 }

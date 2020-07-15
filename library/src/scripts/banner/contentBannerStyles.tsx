@@ -82,6 +82,6 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
     return bannerVariables(forced, "contentBanner");
 });
 
-export const contentBannerClasses = useThemeCache(() => {
-    return bannerClasses(contentBannerVariables());
+export const contentBannerClasses = useThemeCache(mediaQueries => {
+    return bannerClasses(mediaQueries, contentBannerVariables());
 });

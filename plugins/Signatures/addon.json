@@ -1,0 +1,26 @@
+{
+    "name": "Signatures",
+    "description": "Users may create custom signatures that appear after each of their comments.",
+    "version": "1.7",
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": {
+        "Plugins.Signatures.Edit": 1
+    },
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/signatures",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "signatures.png",
+    "key": "signatures",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

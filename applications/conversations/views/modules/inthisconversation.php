@@ -7,6 +7,8 @@
                 <?php
                 $Username = htmlspecialchars(val('Name', $User));
                 $Photo = val('Photo', $User);
+                $userID = $user->UserID ?? $user['UserID'];
+
 
                 if (val('Deleted', $User)) {
                     echo anchor(
@@ -16,7 +18,10 @@
                             'span', ['class' => 'Conversation-User',]
                         ),
                         userUrl($User),
-                        ['title' => sprintf(t('%s has left this conversation.'), $Username)]
+                        [
+                            'title' => sprintf(t('%s has left this conversation.'), $Username),
+                            "data-userid"=> $userID
+                        ]
                     );
                 } else {
                     echo anchor(
@@ -25,7 +30,10 @@
                             wrap($Username, 'span', ['class' => 'Username']),
                             'span', ['class' => 'Conversation-User']
                         ),
-                        userUrl($User)
+                        userUrl($User),
+                        [
+                            "data-userid"=> $userID
+                        ]
                     );
                 }
                 ?>

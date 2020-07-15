@@ -117,6 +117,15 @@ class SiteSectionModel {
             foreach ($this->providers as $provider) {
                 $this->siteSections = array_merge($this->siteSections, $provider->getAll());
             }
+
+            // Make sure we have only unique values.
+            $uniqueSections = [];
+            foreach ($this->siteSections as $siteSection) {
+                if (!isset($uniqueSections[$siteSection->getSectionID()])) {
+                    $uniqueSections[$siteSection->getSectionID()] = $siteSection;
+                }
+            }
+            $this->siteSections = array_values($uniqueSections);
         }
         return $this->siteSections;
     }

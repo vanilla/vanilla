@@ -1,8 +1,10 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -41,13 +43,13 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     /** @var string The format of the email. */
     protected $format;
 
-    /** @var string The supported email formats. */
+    /** @var string[] The supported email formats. */
     public static $supportedFormats = ['html', 'text'];
 
     /**
      * Constructor.
      */
-    function __construct() {
+    public function __construct() {
         $this->PhpMailer = new \Vanilla\VanillaMailer();
         $this->PhpMailer->CharSet = 'utf-8';
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
@@ -346,9 +348,12 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     /**
+     * Send the email.
+     *
      * @param string $eventName
-     * @todo add port settings
      * @return boolean
+     * @throws \Exception Throws an exception if emailing is disabled.
+     * @throws \PHPMailer\PHPMailer\Exception Throws an exception if there is a problem sending the email.
      */
     public function send($eventName = '') {
         $this->formatMessage($this->emailTemplate->toString());

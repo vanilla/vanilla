@@ -9,10 +9,13 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\AssertionFailedError;
+use UserModel;
+use UsersApiController;
 use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -35,7 +38,7 @@ class UsersTest extends AbstractResourceTest {
     private $configuration;
 
     /**
-     * @var \UserModel
+     * @var UserModel
      */
     private $userModel;
 
@@ -64,7 +67,7 @@ class UsersTest extends AbstractResourceTest {
         $this->configuration = static::container()->get('Config');
         $this->configuration->set('Garden.Email.Disabled', true);
 
-        $this->userModel = static::container()->get(\UserModel::class);
+        $this->userModel = static::container()->get(UserModel::class);
 
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
@@ -172,7 +175,7 @@ class UsersTest extends AbstractResourceTest {
      * Test confirm email is successful.
      */
     public function testConfirmEmailSucceed() {
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
 
         $emailKey = ['confirmationCode' =>'test123'];
@@ -193,7 +196,7 @@ class UsersTest extends AbstractResourceTest {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.');
 
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
 
         $emailKey = ['confirmationCode' =>'test123'];;
@@ -224,7 +227,7 @@ class UsersTest extends AbstractResourceTest {
         $expected = [
             "userID" => 0,
             "name" => "Guest",
-            "photoUrl" => \UserModel::getDefaultAvatarUrl(),
+            "photoUrl" => UserModel::getDefaultAvatarUrl(),
             "dateLastActive" => null,
             "isAdmin" => false,
             "countUnreadNotifications" => 0,
@@ -256,7 +259,7 @@ class UsersTest extends AbstractResourceTest {
      * Test getting current user info when the user is a valid member.
      */
     public function testMeMember() {
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
         $userID = $this->api()->getUserID();
         $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
@@ -699,5 +702,37 @@ class UsersTest extends AbstractResourceTest {
         foreach ($users as $user) {
             $this->assertTrue(in_array($roleID, array_column($user['roles'], 'roleID')), 'The user does not satisfy the roleID filter.');
         }
+    }
+
+    /**
+     * Test GET /:ID with a member role
+     */
+    public function testGetUserViewProfileOnly() {
+        $user = $this->testPost();
+        $user2 = $this->testPost();
+
+        /** @var UserModel $userModel */
+        $userModel =  static::container()->get(UserModel::class);
+        $userModel->setField($user2['userID'], 'ShowEmail', 1);
+
+        $this->api()->setUserID($user['userID']);
+
+        $response = $this->api()->get("/users/{$user2['userID']}")->getBody();
+
+        /** @var UsersApiController $userApiController */
+        $userApiController = static::container()->get(UsersApiController::class);
+        $viewProfileSchema = $userApiController->viewProfileSchema();
+        $viewProfileSchema->validate($response);
+
+        $this->assertArrayHasKey('name', $response);
+        $this->assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('photoUrl', $response);
+        $this->assertArrayHasKey('roles', $response);
+        $this->assertArrayHasKey('dateInserted', $response);
+        $this->assertArrayHasKey('dateLastActive', $response);
+        $this->assertArrayHasKey('countDiscussions', $response);
+        $this->assertArrayHasKey('countComments', $response);
+
+        $this->assertArrayNotHasKey('banned', $response);
     }
 }

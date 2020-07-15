@@ -6,6 +6,7 @@ import React from "react";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
 import { colorOut } from "@library/styles/styleHelpers";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     isContentBanner?: boolean;
@@ -13,7 +14,8 @@ interface IProps {
 
 export function DefaultBannerBg(props: IProps) {
     const { isContentBanner } = props;
-    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    const { mediaQueries } = useLayout();
+    const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
 
     return (

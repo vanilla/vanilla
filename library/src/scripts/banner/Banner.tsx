@@ -9,7 +9,6 @@ import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
@@ -22,6 +21,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useComponentDebug } from "@vanilla/react-utils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     action?: React.ReactNode;
@@ -40,15 +40,13 @@ interface IProps {
  * A component representing a single crumb in a breadcrumb component.
  */
 export default function Banner(props: IProps) {
-    const device = useDevice();
+    const { isCompact, mediaQueries } = useLayout();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
-
     const { action, className, isContentBanner } = props;
-
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
     const { options } = vars;
 
@@ -80,10 +78,7 @@ export default function Banner(props: IProps) {
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
-    const hideButton =
-        device === Devices.MOBILE ||
-        device === Devices.XS ||
-        bannerVariables().presets.button.preset === ButtonPreset.HIDE;
+    const hideButton = isCompact || bannerVariables().presets.button.preset === ButtonPreset.HIDE;
 
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
@@ -92,7 +87,7 @@ export default function Banner(props: IProps) {
                 buttonClass={classes.searchButton}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 isLarge={true}
-                placeholder={t("Search")}
+                placeholder={t("SearchBoxPlaceHolder", "Search")}
                 inputClass={classes.input}
                 iconClass={classes.icon}
                 buttonLoaderClassName={classes.buttonLoader}
@@ -134,7 +129,7 @@ export default function Banner(props: IProps) {
                                 )}
                         </div>
                         {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-                        <Container fullGutter className={classes.fullHeight}>
+                        <Container className={classes.fullHeight}>
                             <div className={classes.imagePositioner}>
                                 {/*For SEO & accessibility*/}
                                 {options.hideTitle && (

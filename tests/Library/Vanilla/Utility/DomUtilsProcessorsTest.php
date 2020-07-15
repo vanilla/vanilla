@@ -9,6 +9,7 @@
 namespace VanillaTests\Library\Vanilla\Utility;
 
 use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Formatting\Html\Processor\PregReplaceCallbackProcessor;
 use Vanilla\Formatting\Html\Processor\StripEmbedsProcessor;
 use Vanilla\Formatting\Html\Processor\StripImagesProcessor;
 use Vanilla\Formatting\Html\Processor\TrimWordsProcessor;
@@ -73,6 +74,26 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
 
         $trimWordsProcessor = empty($wordCount) ? new TrimWordsProcessor($domDocument) : new TrimWordsProcessor($domDocument, $wordCount);
         $domDocument->applyProcessors([$trimWordsProcessor]);
+        $actual = $domDocument->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Test preg replace with callback.
+     *
+     * @param int $expectedCount
+     * @param string $patternText
+     * @param string $input
+     * @param int $expected
+     * @dataProvider providePregReplaceCallbackTests
+     */
+    public function testPregReplaceCallback($expectedCount, string $patternText, string $input, string $expected): void {
+        $domDocument = new HtmlDocument($input);
+        $this->assertHtmlStringEqualsHtmlString($input, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
+        $pregReplaceCallbackProcessor = new PregReplaceCallbackProcessor($domDocument, ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'], function (array $matches): string {
+            return '***';
+        });
+        $domDocument->applyProcessors([$pregReplaceCallbackProcessor]);
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }

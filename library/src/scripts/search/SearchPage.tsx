@@ -10,12 +10,9 @@ import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
@@ -34,6 +31,10 @@ import qs from "qs";
 import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
+import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@library/layout/components/PanelWidget";
+import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
 interface IProps {
     placeholder?: string;
@@ -49,8 +50,7 @@ function SearchPage(props: IProps) {
         getCurrentDomain,
         getDefaultFormValues,
     } = useSearchForm<{}>();
-    const device = useDevice();
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
+    const { isCompact } = useLayout();
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
 
@@ -80,7 +80,7 @@ function SearchPage(props: IProps) {
                 <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
                 <TwoColumnLayout
                     className="hasLargePadding"
-                    middleTop={
+                    mainTop={
                         <>
                             <PanelWidget>
                                 <PageHeading
@@ -134,15 +134,15 @@ function SearchPage(props: IProps) {
                                     sortOptions={[]}
                                 />
                             </PanelWidgetHorizontalPadding>
-                            {isMobile && (
+                            {isCompact && (
                                 <PanelWidgetHorizontalPadding>
                                     <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
                                 </PanelWidgetHorizontalPadding>
                             )}
                         </>
                     }
-                    middleBottom={<SearchPageResults />}
-                    rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
+                    mainBottom={<SearchPageResults />}
+                    rightTop={!isCompact && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>
         </DocumentTitle>

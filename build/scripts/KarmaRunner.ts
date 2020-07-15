@@ -57,7 +57,7 @@ export class KarmaRunner {
             files: this.files,
             // base path, that will be used to resolve files and exclude
             basePath: VANILLA_ROOT,
-            frameworks: ["mocha", "chai"],
+            frameworks: ["mocha", "chai", "viewport"],
             reporters: ["mocha"],
             // reporter options
             mochaReporter: {

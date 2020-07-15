@@ -116,4 +116,34 @@ class UserModelTest extends SharedBootstrapTestCase {
         $this->assertInstanceOf(UserEvent::class, $this->lastEvent);
         $this->assertEquals(UserEvent::ACTION_UPDATE, $this->lastEvent->getAction());
     }
+
+    /**
+     * Test searching for users by a role keyword.
+     */
+    public function testSearchByRole(): void {
+        $roles = $this->getRoles();
+        $adminRole = $roles["Administrator"];
+
+        // Make sure we have at least one non-admin.
+        $this->userModel->save([
+            "Name" => __FUNCTION__,
+            "Email" => __FUNCTION__ . "@example.com",
+            "Password" => "vanilla",
+            "RoleID" => $roles["Member"],
+        ]);
+
+        $users = $this->userModel->search("Administrator")->resultArray();
+        \RoleModel::setUserRoles($users);
+
+        $result = true;
+        foreach ($users as $user) {
+            $userRoles = array_keys($user["Roles"]);
+            if (!in_array($adminRole, $userRoles)) {
+                $result = false;
+                break;
+            }
+        }
+
+        $this->assertTrue($result, "Failed to only return users in the specific role.");
+    }
 }

@@ -30,6 +30,7 @@ class ThemeFeatures implements \JsonSerializable {
         'SharedMasterView' => false,
         'ProfileHeader' => false,
         'DataDrivenTheme' => false,
+        'UserCards' => false,
         'DisableKludgedVars' => false,
         'NewEventsPage' => false,
         SearchRootController::ENABLE_FLAG => false,
@@ -81,11 +82,16 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['SharedMasterView'] = true;
             $themeValues['NewFlyouts'] = true;
             $themeValues['NewEventsPage'] = true;
+            $themeValues['UserCards'] = true;
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
         }
 
         if (FeatureFlagHelper::featureEnabled(SearchRootController::ENABLE_FLAG)) {
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
+        }
+
+        if (FeatureFlagHelper::featureEnabled('UserCards')) {
+            $themeValues['UserCards'] = true;
         }
 
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);

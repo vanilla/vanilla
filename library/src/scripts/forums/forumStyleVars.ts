@@ -37,7 +37,7 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             margin: undefined as MarginProperty<TLength> | undefined,
             bg: undefined as ColorHelper | undefined,
             read: {
-                bg: undefined as ColorHelper | undefined,
+                bg: globalVars.mainColors.bg,
             },
         },
     });

@@ -9,6 +9,8 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut } from "@library/styles/styleHelpersColors";
 
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
@@ -221,27 +223,125 @@ export function MessagesIcon(props: { filled?: boolean; className?: string }) {
     );
 }
 
-export function UserIcon(props: { filled?: boolean; className?: string }) {
-    const title = t("Me");
+export enum UserIconTypes {
+    DEFAULT = "default",
+    SELECTED_INACTIVE = "fg background added",
+    SELECTED_ACTIVE = "primary color and primary background added",
+}
+
+interface IUserIconType {
+    head: {
+        outline: string | undefined;
+        bg: string | undefined;
+    };
+    body: {
+        outline: string | undefined;
+        bg: string | undefined;
+    };
+    circle: {
+        outline: string;
+        bg: string;
+    };
+}
+
+const userIconStyles = (type: UserIconTypes): IUserIconType => {
+    const mainColors = globalVariables().mainColors;
+    const fg = colorOut(mainColors.fg) as string;
+    const bg = colorOut(mainColors.bg) as string;
+    const primary = colorOut(mainColors.primary) as string;
+
+    const styles: IUserIconType = {
+        head: {
+            outline: undefined,
+            bg: undefined,
+        },
+        body: {
+            outline: undefined,
+            bg: undefined,
+        },
+        circle: {
+            outline: fg,
+            bg: bg,
+        },
+    };
+
+    switch (type) {
+        case UserIconTypes.SELECTED_INACTIVE:
+            styles.head.bg = bg;
+            styles.body.bg = bg;
+            styles.circle.bg = fg;
+            break;
+        case UserIconTypes.SELECTED_ACTIVE:
+            styles.head.bg = bg;
+            styles.body.bg = bg;
+            styles.circle.outline = primary;
+            styles.circle.bg = primary;
+            break;
+        default:
+            // DEFAULT
+            styles.head.outline = fg;
+            styles.body.outline = fg;
+    }
+    return styles;
+};
+
+export function UserIcon(props: { styleType?: UserIconTypes; className?: string; title: string; alt: string }) {
+    const { styleType = UserIconTypes.DEFAULT, className, title = t("Me"), alt } = props;
     const classes = iconClasses();
+
+    const { head, body, circle } = userIconStyles(styleType);
+
     return (
         <svg
+            role={"image"}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
-            className={classNames(classes.user, "icon-user", props.className)}
-            aria-hidden="true"
+            className={classNames(classes.user, className)}
+            aria-label={title}
         >
             <title>{title}</title>
-            {!!props.filled && (
+            <desc>{alt}</desc>
+
+            {/*Background for whole Icon*/}
+            {circle.bg && <path d="M10,0A10,10,0,1,0,20,10,10,10,0,0,0,10,0Z" style={{ fill: circle.bg }} />}
+
+            {/*Body bg*/}
+            {body.bg && (
                 <path
-                    fill="currentColor"
-                    d="M10,0A10,10,0,1,0,20,10,10,10,0,0,0,10,0Zm0,4.516a3.549,3.549,0,1,1-3.548,3.55h0A3.547,3.547,0,0,1,10,4.516ZM10,18.5a8.472,8.472,0,0,1-6.349-2.862,3.855,3.855,0,0,1,3.768-3.057c.831,0,1.226.459,2.581.459s1.754-.459,2.581-.459a3.855,3.855,0,0,1,3.768,3.057A8.472,8.472,0,0,1,10,18.5Z"
+                    d="M15.415,17.3a8.761,8.761,0,0,0,.761-.653c.18-.175.325-.335.436-.463A4.027,4.027,0,0,0,12.656,12.5c-.827,0-1.226.459-2.581.459S8.325,12.5,7.494,12.5a4.023,4.023,0,0,0-3.823,3.17,3.034,3.034,0,0,0,.486.916,3.559,3.559,0,0,0,.909.781,10.755,10.755,0,0,0,4.8,1.616A10.634,10.634,0,0,0,15.415,17.3Z"
+                    style={{ fill: body.bg }}
                 />
             )}
-            {!props.filled && (
+
+            {/*Body Outline */}
+            {body.outline && (
                 <path
-                    fill="currentColor"
-                    d="M5,16.875a8.5,8.5,0,0,0,10,0v-.208A2.59,2.59,0,0,0,12.5,14a10.754,10.754,0,0,1-2.5.475A10.754,10.754,0,0,1,7.5,14,2.59,2.59,0,0,0,5,16.667Zm11.352-1.226a8.5,8.5,0,1,0-12.7,0,3.856,3.856,0,0,1,3.771-3.068c.831,0,1.226.459,2.581.459s1.754-.459,2.581-.459A3.856,3.856,0,0,1,16.352,15.649ZM10,0A10,10,0,1,1,0,10,10,10,0,0,1,10,0Zm0,4.516a3.549,3.549,0,1,1-3.548,3.55h0A3.547,3.547,0,0,1,10,4.516Zm0,5.807a2.259,2.259,0,1,0-2.258-2.26v0A2.259,2.259,0,0,0,10,10.323Z"
+                    d="M12.663,12.5c-.827,0-1.226.459-2.581.459S8.332,12.5,7.5,12.5a4.022,4.022,0,0,0-3.824,3.173,13.175,13.175,0,0,0,1.4,1.7l-.02-.512a2.486,2.486,0,0,1,2.488-2.982h.049a10.754,10.754,0,0,0,2.5.475,10.684,10.684,0,0,0,2.487-.472c1.408.059,2.474.732,2.52,3.1l.325.326a6.453,6.453,0,0,0,1.2-1.117A4.025,4.025,0,0,0,12.663,12.5Z"
+                    style={{ fill: body.outline }}
+                />
+            )}
+
+            {/*Head Background */}
+            {head.bg && (
+                <path
+                    d="M10.141,4.514h0a3.55,3.55,0,1,0,3.533,3.567V8.063a3.54,3.54,0,0,0-3.531-3.549h0Z"
+                    style={{ fill: head.bg }}
+                />
+            )}
+
+            {/*Head Outline*/}
+            {head.outline && (
+                <path
+                    d="M10.141,4.514h0a3.55,3.55,0,1,0,3.533,3.567V8.063a3.54,3.54,0,0,0-3.531-3.549h0Zm0,5.808a2.26,2.26,0,1,1,2.253-2.267v.009a2.254,2.254,0,0,1-2.25,2.258Z"
+                    style={{ fill: head.outline }}
+                />
+            )}
+
+            {/*Circle Border*/}
+            {circle.outline && (
+                <path
+                    d="M10,0A10,10,0,1,0,20,10,10,10,0,0,0,10,0Zm0,18.419A8.418,8.418,0,1,1,18.417,10,8.418,8.418,0,0,1,10,18.419Z"
+                    style={{ fill: circle.outline }}
                 />
             )}
         </svg>

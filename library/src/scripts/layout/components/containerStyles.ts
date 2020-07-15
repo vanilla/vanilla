@@ -6,42 +6,25 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { percent, color } from "csx";
+import { percent } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
-    const smallPadding = panelWidgetVariables().spacing.padding;
-
-    let spacingInit = makeThemeVars("spacing", {
-        padding: {
-            horizontal: vars.gutter.size,
-        },
+    let spacing = makeThemeVars("spacing", {
+        padding: globalVars.constants.fullGutter / 2,
         mobile: {
-            padding: {
-                horizontal: smallPadding,
-            },
-        },
-    });
-
-    const spacing = makeThemeVars("spacing", {
-        ...spacingInit,
-        paddingFull: {
-            horizontal: vars.gutter.size + smallPadding,
-        },
-        paddingFullMobile: {
-            horizontal: smallPadding * 2,
+            padding: globalVars.widget.padding,
         },
     });
 
     const sizing = makeThemeVars("sizes", {
-        full: vars.contentSizes.full,
+        full: vars.contentWidth,
         narrowContentSize: vars.contentSizes.narrow,
     });
 
@@ -57,7 +40,6 @@ export const containerVariables = useThemeCache(() => {
 });
 
 export const containerMainStyles = (): NestedCSSProperties => {
-    const globalVars = globalVariables();
     const vars = containerVariables();
     return {
         display: "flex",
@@ -65,10 +47,12 @@ export const containerMainStyles = (): NestedCSSProperties => {
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: globalVars.content.width,
+        maxWidth: unit(vars.sizing.full + vars.spacing.padding * 2),
         marginLeft: "auto",
         marginRight: "auto",
-        ...paddings(vars.spacing.padding),
+        ...paddings({
+            horizontal: vars.spacing.padding,
+        }),
         $nest: {
             "&.isNarrow": {
                 maxWidth: vars.sizing.narrowContentSize,
@@ -81,7 +65,9 @@ export function containerMainMediaQueries() {
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = containerVariables();
     return mediaQueries.oneColumnDown({
-        ...paddings(vars.spacing.mobile.padding),
+        ...paddings({
+            horizontal: vars.spacing.mobile.padding,
+        }),
     });
 }
 
@@ -93,9 +79,16 @@ export const containerClasses = useThemeCache(() => {
 
     const fullGutter = style(
         "fullGutter",
-        { ...containerMainStyles(), ...paddings(vars.spacing.paddingFull) },
+        {
+            ...containerMainStyles(),
+            ...paddings({
+                horizontal: vars.spacing.padding * 2,
+            }),
+        },
         mediaQueries.oneColumnDown({
-            ...paddings(vars.spacing.paddingFullMobile),
+            ...paddings({
+                horizontal: vars.spacing.mobile.padding * 2,
+            }),
         }),
     );
 

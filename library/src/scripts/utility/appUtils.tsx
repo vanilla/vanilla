@@ -210,6 +210,9 @@ export function onReady(callback: PromiseOrNormalCallback) {
     _readyHandlers.push(callback);
 }
 
+// Export to the window for use in the application.
+window.onVanillaReady = onReady;
+
 /**
  * Execute all of the registered events in order.
  *
@@ -279,9 +282,6 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
  * @param template - the template for the string (must be translated ahead of time)
  * @param variable - the variable to insert in the template
  */
-export function accessibleLabel(template: string, variable?: string[]) {
-    if (!variable) {
-        return undefined;
-    }
+export function accessibleLabel(template: string, variable: string[]) {
     return sprintf(template, variable);
 }

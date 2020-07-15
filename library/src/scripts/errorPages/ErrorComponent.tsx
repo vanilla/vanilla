@@ -4,10 +4,7 @@
  * @license Proprietary
  */
 
-import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
@@ -17,6 +14,8 @@ import {
     messageFromErrorCode,
     IErrorMessageProps,
 } from "@library/errorPages/CoreErrorMessages";
+import PanelWidgetVerticalPadding from "@library/layout/components/PanelWidgetVerticalPadding";
+import PanelWidget from "@library/layout/components/PanelWidget";
 
 interface IProps extends IErrorMessageProps {}
 

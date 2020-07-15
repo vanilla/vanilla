@@ -786,7 +786,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             return false;
         }
 
-        $uniqueID = $data['uniqueid'];
+        $uniqueID = $data['id'] ?? $data['uniqueid'];
         $user = arrayTranslate($data, [
             'name' => 'Name',
             'email' => 'Email',
@@ -2665,6 +2665,17 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $row['isAdmin'] = in_array($row['Admin'], [1, 2]);
             unset($row['Admin']);
         }
+
+        $row['CountDiscussions'] = $row['CountDiscussions'] ?? false;
+        if (!$row['CountDiscussions']) {
+            $row['CountDiscussions'] = 0;
+        }
+
+        $row['CountComments'] = $row['CountComments'] ?? false;
+        if (!$row['CountComments']) {
+            $row['CountComments'] = 0;
+        }
+
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;
@@ -2681,7 +2692,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             'name:s' => 'Name of the user.',
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => [
+            'email:s?' => [
                 'description' => 'Email address of the user.',
                 'minLength' => 0,
             ],
@@ -2705,6 +2716,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
             ], 'RoleFragment'),
+            'label:s?',
         ]);
         return $result;
     }
@@ -2718,7 +2730,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $result = Schema::parse([
                 "banned",
                 "bypassSpam",
-                "email",
+                "email?",
                 "emailConfirmed",
                 "dateInserted",
                 "dateLastActive",
@@ -2729,6 +2741,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "roles?",
                 "showEmail",
                 "userID",
+                "title?",
+                "countDiscussions?",
+                "countComments?",
+                "label?",
             ]);
             $result->add($this->schema());
 
@@ -2925,7 +2941,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } elseif (!empty($roleID) && !empty($keywords)) {
+        } elseif (empty($roleID) && !empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }
@@ -3380,10 +3396,43 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
             // And insert the new user
             $userID = $this->insertInternal($fields, $options);
+
+            if ($userID) {
+                //user registered successfully, trigger applicant notification
+                $this->triggerApplicantNotification($userID, $username);
+            }
         } else {
             $userID = false;
         }
         return $userID;
+    }
+
+    /**
+     * Trigger notification to users with 'Preferences.Email.Applicant' enabled
+     *
+     * @param int $userID
+     * @param string $username
+     */
+    public function triggerApplicantNotification($userID = 0, $username = '') {
+        if ($userID > 0 && !empty($username)) {
+            // Notification text
+            $label = t('NewApplicantEmail', 'New applicant:');
+            $story = anchor(Gdn_Format::text($label . ' ' . $username), externalUrl('dashboard/user/applicants'));
+
+            try {
+                $data = Gdn::database()->sql()->getWhere('UserMeta', ['Name' => 'Preferences.Email.Applicant'])->resultArray();
+                $activityModel = new ActivityModel();
+                foreach ($data as $row) {
+                    $activityModel->add($userID, 'Applicant', $story, $row['UserID'], '', '/dashboard/user/applicants', 'Only');
+                }
+            } catch (Exception $ex) {
+                Logger::event(
+                    'applicant_notification_failure',
+                    Logger::ERROR,
+                    $ex->getMessage()
+                );
+            }
+        }
     }
 
     /**

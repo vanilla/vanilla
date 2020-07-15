@@ -44,6 +44,8 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
 import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -171,7 +173,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         padding: {
             ...EMPTY_SPACING,
             vertical: globalVars.gutter.size,
-            horizontal: containerVariables().spacing.paddingFull.horizontal,
+            horizontal: containerVariables().spacing.padding * 2,
         },
     });
 
@@ -472,13 +474,16 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 });
 
 export const bannerClasses = useThemeCache(
-    (alternativeVariables?: ReturnType<typeof bannerVariables>, altName?: string) => {
+    (
+        mediaQueries: IMediaQueryFunction,
+        alternativeVariables?: ReturnType<typeof bannerVariables>,
+        altName?: string,
+    ) => {
         const vars = alternativeVariables ?? bannerVariables();
         const { presets } = vars;
         const style = styleFactory(altName ?? "banner");
         const formElementVars = formElementsVariables();
         const globalVars = globalVariables();
-        const mediaQueries = layoutVariables().mediaQueries();
 
         const isCentered = vars.options.alignment === "center";
 
@@ -540,23 +545,32 @@ export const bannerClasses = useThemeCache(
                 image: finalUrl,
             };
 
-            return style(
-                "outerBackground",
-                {
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: percent(100),
-                    height: calc(`100% + 2px`),
-                    transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
-                    display: "block",
-                    ...backgroundHelper(finalVars),
+            return style("outerBackground", {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: percent(100),
+                height: calc(`100% + 2px`),
+                transform: translateY(`-1px`), // Depending on how the browser rounds the pixels, there is sometimes a 1px gap above the banner
+                display: "block",
+                ...backgroundHelper(finalVars),
+                $nest: {
+                    ...(finalTabletUrl
+                        ? mediaQueries({
+                              [LayoutTypes.THREE_COLUMNS]: {
+                                  twoColumnsDown: backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl }),
+                              },
+                          }).$nest
+                        : {}),
+                    ...(finalMobileUrl
+                        ? mediaQueries({
+                              [LayoutTypes.THREE_COLUMNS]: {
+                                  twoColumnsDown: backgroundHelper({ ...vars.outerBackground, image: finalMobileUrl }),
+                              },
+                          }).$nest
+                        : {}),
                 },
-                finalTabletUrl &&
-                    mediaQueries.twoColumnsDown(backgroundHelper({ ...vars.outerBackground, image: finalTabletUrl })),
-                finalMobileUrl &&
-                    mediaQueries.oneColumnDown(backgroundHelper({ ...vars.outerBackground, image: finalMobileUrl })),
-            );
+            });
         });
 
         const defaultBannerSVG = style("defaultBannerSVG", {
@@ -592,8 +606,7 @@ export const bannerClasses = useThemeCache(
                 },
                 media(
                     {
-                        maxWidth:
-                            vars.contentContainer.minWidth + containerVariables().spacing.paddingFull.horizontal * 2,
+                        maxWidth: vars.contentContainer.minWidth + containerVariables().spacing.padding * 2 * 2,
                     },
                     {
                         right: "initial",
@@ -620,50 +633,52 @@ export const bannerClasses = useThemeCache(
 
         const noTopMargin = style("noTopMargin", {});
 
-        const searchContainer = style(
-            "searchContainer",
-            {
-                position: "relative",
-                width: percent(100),
-                maxWidth: unit(vars.searchBar.sizing.maxWidth),
-                margin: isCentered ? "auto" : undefined,
-                ...margins(vars.searchBar.margin),
-                $nest: {
-                    "& .search-results": {
-                        width: percent(100),
-                        maxWidth: unit(vars.searchBar.sizing.maxWidth),
-                        margin: "auto",
-                        zIndex: 2,
-                    },
-                    [`&.${noTopMargin}`]: {
-                        marginTop: 0,
-                    },
+        const searchContainer = style("searchContainer", {
+            position: "relative",
+            width: percent(100),
+            maxWidth: unit(vars.searchBar.sizing.maxWidth),
+            margin: isCentered ? "auto" : undefined,
+            ...margins(vars.searchBar.margin),
+            $nest: {
+                "& .search-results": {
+                    width: percent(100),
+                    maxWidth: unit(vars.searchBar.sizing.maxWidth),
+                    margin: "auto",
+                    zIndex: 2,
                 },
-            },
-            mediaQueries.oneColumnDown({
-                ...margins(vars.searchBar.marginMobile),
-                [noTopMargin]: {
+                [`&.${noTopMargin}`]: {
                     marginTop: 0,
                 },
-            }),
-        );
+                ...mediaQueries({
+                    [LayoutTypes.THREE_COLUMNS]: {
+                        oneColumnDown: {
+                            ...margins(vars.searchBar.marginMobile),
+                            [noTopMargin]: {
+                                marginTop: 0,
+                            },
+                        },
+                    },
+                }).$nest,
+            },
+        });
 
         const icon = style("icon", {});
         const input = style("input", {});
 
         const buttonLoader = style("buttonLoader", {});
 
-        const title = style(
-            "title",
-            {
-                display: "block",
-                ...fonts(vars.title.font),
-                flexGrow: 1,
-            },
-            mediaQueries.oneColumnDown({
-                ...fonts(vars.title.fontMobile),
+        const title = style("title", {
+            display: "block",
+            ...fonts(vars.title.font),
+            flexGrow: 1,
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        ...fonts(vars.title.fontMobile),
+                    },
+                },
             }),
-        );
+        });
 
         const textWrapMixin: NestedCSSProperties = {
             display: "flex",
@@ -673,8 +688,12 @@ export const bannerClasses = useThemeCache(
             width: percent(100),
             marginLeft: isCentered ? "auto" : undefined,
             marginRight: isCentered ? "auto" : undefined,
-            ...mediaQueries.oneColumnDown({
-                maxWidth: percent(100),
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        maxWidth: percent(100),
+                    },
+                },
             }),
         };
 
@@ -758,23 +777,23 @@ export const bannerClasses = useThemeCache(
             {
                 alignSelf: "stretch",
                 maxWidth: makeImageMinWidth(
-                    globalVars.content.width,
-                    containerVariables().spacing.paddingFull.horizontal * 2,
+                    layoutVariables().contentWidth,
+                    containerVariables().spacing.padding * 2 * 2,
                 ),
                 flexGrow: 1,
                 position: "relative",
                 overflow: "hidden",
             },
             media(
-                { maxWidth: globalVars.content.width },
+                { maxWidth: layoutVariables().contentWidth },
                 {
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding * 2),
                 },
             ),
             layoutVariables()
                 .mediaQueries()
                 .oneColumnDown({
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding * 2),
                 }),
             media(
                 { maxWidth: 500 },
@@ -784,42 +803,44 @@ export const bannerClasses = useThemeCache(
             ),
         );
 
-        const logoContainer = style(
-            "logoContainer",
-            {
-                display: "flex",
-                width: percent(100),
-                height: unit(vars.logo.height),
-                maxWidth: percent(100),
-                minHeight: unit(vars.logo.height),
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-                overflow: "hidden",
-            },
-            mediaQueries.oneColumnDown({
-                height: unitIfDefined(vars.logo.mobile.height),
-                minHeight: unitIfDefined(vars.logo.mobile.height),
+        const logoContainer = style("logoContainer", {
+            display: "flex",
+            width: percent(100),
+            height: unit(vars.logo.height),
+            maxWidth: percent(100),
+            minHeight: unit(vars.logo.height),
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            overflow: "hidden",
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        height: unitIfDefined(vars.logo.mobile.height),
+                        minHeight: unitIfDefined(vars.logo.mobile.height),
+                    },
+                },
             }),
-        );
+        });
 
         const logoSpacer = style("logoSpacer", {
             ...paddings(vars.logo.padding),
         });
 
-        const logo = style(
-            "logo",
-            {
-                height: unit(vars.logo.height),
-                width: unit(vars.logo.width),
-                maxHeight: percent(100),
-                maxWidth: percent(100),
-            },
-            mediaQueries.oneColumnDown({
-                height: unitIfDefined(vars.logo.mobile.height),
-                width: unitIfDefined(vars.logo.mobile.width),
+        const logo = style("logo", {
+            height: unit(vars.logo.height),
+            width: unit(vars.logo.width),
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        height: unitIfDefined(vars.logo.mobile.height),
+                        width: unitIfDefined(vars.logo.mobile.width),
+                    },
+                },
             }),
-        );
+        });
 
         const rightImage = style(
             "rightImage",
@@ -907,38 +928,40 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const middleContainer = style(
-            "middleContainer",
-            {
-                height: percent(100),
-                position: "relative",
-                minHeight: unit(vars.dimensions.minHeight),
-            },
-            mediaQueries.oneColumnDown({
-                minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+        const middleContainer = style("middleContainer", {
+            height: percent(100),
+            position: "relative",
+            minHeight: unit(vars.dimensions.minHeight),
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        minHeight: unitIfDefined(vars.dimensions.mobile.minHeight),
+                    },
+                },
             }),
-        );
+        });
 
-        const searchStrip = style(
-            "searchStrip",
-            {
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1,
-                background: colorOut(vars.searchStrip.bg),
-                ...paddings(vars.searchStrip.padding),
-                minHeight: unitIfDefined(vars.searchStrip.minHeight),
-                marginTop: unitIfDefined(vars.searchStrip.offset),
-            },
-            mediaQueries.oneColumnDown({
-                background: vars.searchStrip.mobile.bg ? colorOut(vars.searchStrip.mobile.bg) : undefined,
-                ...paddings(vars.searchStrip.mobile.padding),
-                minHeight: unitIfDefined(vars.searchStrip.mobile.minHeight),
-                marginTop: unitIfDefined(vars.searchStrip.mobile.offset),
+        const searchStrip = style("searchStrip", {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1,
+            background: colorOut(vars.searchStrip.bg),
+            ...paddings(vars.searchStrip.padding),
+            minHeight: unitIfDefined(vars.searchStrip.minHeight),
+            marginTop: unitIfDefined(vars.searchStrip.offset),
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        background: vars.searchStrip.mobile.bg ? colorOut(vars.searchStrip.mobile.bg) : undefined,
+                        ...paddings(vars.searchStrip.mobile.padding),
+                        minHeight: unitIfDefined(vars.searchStrip.mobile.minHeight),
+                        marginTop: unitIfDefined(vars.searchStrip.mobile.offset),
+                    },
+                },
             }),
-        );
+        });
 
         return {
             root,

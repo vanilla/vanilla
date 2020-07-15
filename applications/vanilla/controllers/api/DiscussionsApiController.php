@@ -220,6 +220,7 @@ class DiscussionsApiController extends AbstractApiController {
             ->merge($this->discussionModel->userDiscussionSchema())
             ->merge(Schema::parse([
                 'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
+                'recordID:i?',
             ]));
         return $result;
     }

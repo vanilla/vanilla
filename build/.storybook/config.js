@@ -6,25 +6,24 @@
 
 // @ts-check
 
-'use strict';
+"use strict";
 
 import { forceRenderStyles } from "typestyle";
-import { configure, addDecorator, addParameters } from '@storybook/react';
-import { checkA11y, withA11y } from '@storybook/addon-a11y';
-import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
-import { unit } from '@library/styles/styleHelpers';
-import { layoutVariables } from '@library/layout/panelLayoutStyles';
-import 'storybook-chromatic';
-const { applyStoryContext } = require('../../library/src/scripts/storybookConfig');
+import { configure, addDecorator, addParameters } from "@storybook/react";
+import { checkA11y, withA11y } from "@storybook/addon-a11y";
+import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
+import { unit } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+const { applyStoryContext } = require("../../library/src/scripts/storybookConfig");
 
 addParameters({
     chromatic: {
         delay: 2000, // Add a slight delay to ensure everything has rendered properly.
         diffThreshold: 0.7, // Default is 0.67. Lower numbers are more accurate.
-                            // Set to prevent diffs like this https://www.chromaticqa.com/snapshot?appId=5d5eba16c782b600204ba187&id=5d8cef8dbc622e00202a6edd
-                            // From triggering
-    }
-})
+        // Set to prevent diffs like this https://www.chromaticqa.com/snapshot?appId=5d5eba16c782b600204ba187&id=5d8cef8dbc622e00202a6edd
+        // From triggering
+    },
+});
 
 addDecorator(checkA11y);
 addDecorator(withA11y);
@@ -32,40 +31,40 @@ addDecorator(withA11y);
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 
 const customViewports = {
-    'panelLayout_withBleed': {
-        name: 'Panel Layout - Full',
+    panelLayout_withBleed: {
+        name: "Panel Layout - Full",
         styles: {
             width: unit(panelLayoutBreakPoints.noBleed + 100), // 100 is arbitrary. We just want more than being right up to the minimum margin
-            height: '1000px',
+            height: "1000px",
         },
     },
-    'panelLayout_noBleed': {
-        name: 'Panel Layout - Minimum Margin',
+    panelLayout_noBleed: {
+        name: "Panel Layout - Minimum Margin",
         styles: {
             width: unit(panelLayoutBreakPoints.noBleed),
-            height: '1000px',
+            height: "1000px",
         },
     },
 
-    'panelLayout_twoColumns': {
-        name: 'Panel Layout - Two Columns',
+    panelLayout_twoColumns: {
+        name: "Panel Layout - Two Columns",
         styles: {
             width: unit(panelLayoutBreakPoints.twoColumn),
-            height: '1000px',
+            height: "1000px",
         },
     },
-    'panelLayout_oneColumn': {
-        name: 'Panel Layout - One Columns',
+    panelLayout_oneColumn: {
+        name: "Panel Layout - One Columns",
         styles: {
             width: unit(panelLayoutBreakPoints.oneColumn),
-            height: '1000px',
+            height: "1000px",
         },
     },
-    'panelLayout_xs': {
-        name: 'Panel Layout - Extra Small',
+    panelLayout_xs: {
+        name: "Panel Layout - Extra Small",
         styles: {
             width: unit(panelLayoutBreakPoints.xs),
-            height: '1000px',
+            height: "1000px",
         },
     },
 };
@@ -81,16 +80,12 @@ addParameters({
 
 addParameters({
     options: {
-      storySort: (a, b) =>
-        a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, { numeric: true }),
+        storySort: (a, b) => (a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, { numeric: true })),
     },
 });
 
 // Load Stories
-const storyFiles = require.context(
-    '../..',
-    true,
-    /^(?!.*(?:\/node_modules\/|\/vendor\/$)).*\.story\.tsx?$/);
+const storyFiles = require.context("../..", true, /^(?!.*(?:\/node_modules\/|\/vendor\/|\/cloud\/)).*\.story\.tsx?$/);
 configure(storyFiles, module);
 
 applyStoryContext();
@@ -98,4 +93,4 @@ applyStoryContext();
 module.hot?.accept(() => {
     forceRenderStyles();
     applyStoryContext();
-})
+});

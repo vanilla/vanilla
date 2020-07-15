@@ -38,6 +38,7 @@ use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
@@ -45,6 +46,7 @@ use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -207,6 +209,7 @@ class Bootstrap {
 
             // EventManager
             ->rule(\Garden\EventManager::class)
+            ->setClass(SpyingEventManager::class)
             ->addAlias(EventListenerConfigInterface::class)
             ->addAlias(EventDispatcherInterface::class)
             ->addAlias(ListenerProviderInterface::class)
@@ -260,6 +263,11 @@ class Bootstrap {
             ->addAlias(Gdn::AliasLocale)
             ->addAlias(LocaleInterface::class)
 
+            ->rule(\Garden\Web\Cookie::class)
+            ->setShared(true)
+            ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
+            ->addAlias('Cookie')
+
             ->rule('Identity')
             ->setClass('Gdn_CookieIdentity')
             ->setShared(true)
@@ -306,6 +314,10 @@ class Bootstrap {
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+            ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
+
+            ->rule(LogTransactionMiddleware::class)
+            ->setShared(true)
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
             ->addAlias('HstsModel')
@@ -337,7 +349,7 @@ class Bootstrap {
             ->addAlias('FileUtils')
 
             ->rule('WebLinking')
-            ->setClass(\Vanilla\Web\WebLinking::class)
+            ->setClass(\Vanilla\Web\Pagination\WebLinking::class)
             ->setShared(true)
 
             ->rule(\Vanilla\EmbeddedContent\EmbedService::class)

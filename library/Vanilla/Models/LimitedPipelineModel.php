@@ -30,9 +30,9 @@ class LimitedPipelineModel extends PipelineModel {
     /**
      * @inheritdoc
      */
-    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
+    public function insert(array $set, $options = []) {
         if (in_array('insert', $this->operations)) {
-            return parent::insert($set, $mode);
+            return parent::insert($set, $options);
         } else {
             throw new ServerException('Method insert() is not supported.');
         }
@@ -63,9 +63,9 @@ class LimitedPipelineModel extends PipelineModel {
     /**
      * @inheritdoc
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
+    public function update(array $set, array $where, $options = []): bool {
         if (in_array('update', $this->operations)) {
-            return parent::update($set, $where, $mode);
+            return parent::update($set, $where, $options);
         } else {
             throw new ServerException('Method update() is not supported.');
         }

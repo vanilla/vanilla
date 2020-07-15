@@ -297,7 +297,7 @@ story.add("Icons", () => {
                     <titleBarIcons.MessagesIcon />
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`UserIcon`}>
-                    <titleBarIcons.UserIcon />
+                    <titleBarIcons.UserIcon title={"Title Text"} alt={"Alt Text"} />
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`UserWarningIcon`}>
                     <titleBarIcons.UserWarningIcon />

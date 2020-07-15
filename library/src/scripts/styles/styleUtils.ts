@@ -10,11 +10,10 @@ import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
-import { color, rgba, rgb, hsla, hsl, ColorHelper, list } from "csx";
+import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
-import isNumeric from "validator/lib/isNumeric";
 import { useEffect, useState } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 

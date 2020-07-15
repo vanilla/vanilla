@@ -20,7 +20,7 @@ import { AppContext } from "@library/AppContext";
 import { addComponent, addPageComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
-import { compatibilityStyles } from "@dashboard/compatibilityStyles";
+import { compatibilityStyles, cssOut } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import { createBrowserHistory, History } from "history";
 import { applySharedPortalContext, mountPortal } from "@vanilla/react-utils";
@@ -30,7 +30,8 @@ import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pag
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
 import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
 import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
-import { notEmpty } from "@vanilla/utils";
+import { notEmpty, PromiseOrNormalCallback } from "@vanilla/utils";
+import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -71,15 +72,44 @@ addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);
 addComponent("community-content-banner", CommunityContentBanner);
 
-if (getMeta("themeFeatures.DataDrivenTheme", false)) {
-    onReady(() => {
+const applyReactElementsInForum = (props: {
+    metaPermissionKey: string;
+    onInitialLoad: () => void;
+    onNewHTML: (e) => void;
+}) => {
+    const { metaPermissionKey, onInitialLoad, onNewHTML } = props;
+
+    if (getMeta(metaPermissionKey, false)) {
+        onReady(() => {
+            onInitialLoad();
+        });
+        onContent(e => {
+            onNewHTML(e);
+        });
+    }
+};
+
+applyReactElementsInForum({
+    metaPermissionKey: "themeFeatures.DataDrivenTheme",
+    onInitialLoad: () => {
         compatibilityStyles();
         applyCompatibilityIcons();
-    });
-
-    onContent(e => {
+    },
+    onNewHTML: e => {
         applyCompatibilityIcons(
             e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
         );
-    });
-}
+    },
+});
+
+applyReactElementsInForum({
+    metaPermissionKey: "themeFeatures.UserCards",
+    onInitialLoad: () => {
+        applyCompatibilityUserCards();
+    },
+    onNewHTML: e => {
+        applyCompatibilityUserCards(
+            e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
+        );
+    },
+});

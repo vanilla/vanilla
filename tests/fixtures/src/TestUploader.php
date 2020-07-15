@@ -49,7 +49,11 @@ class TestUploader {
     public static function resetUploads() {
         if (file_exists(self::TEST_UPLOAD_PATH)) {
             $files = glob(self::TEST_UPLOAD_PATH.'/*.*');
-            array_walk($files, 'unlink');
+            foreach ($files as $file) {
+                if (is_resource($file)) {
+                    unlink($file);
+                }
+            }
         }
 
         $_FILES = [];

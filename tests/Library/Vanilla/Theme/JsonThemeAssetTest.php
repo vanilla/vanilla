@@ -51,10 +51,9 @@ JSON;
             'empty object' => [
                 '{}'
             ],
-            // Unfortunately can't be fixed at the moment.
-            // 'nested empty array' => [
-            //    '{"key":[]}'
-            // ],
+             'nested empty array' => [
+                '{"key":[]}'
+             ],
             'nested empty object' => [
                 '{"key":{}}'
             ],

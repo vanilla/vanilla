@@ -4,17 +4,17 @@
  */
 
 import React from "react";
-import { PanelWidget } from "@library/layout/PanelLayout";
-import { DeviceProvider } from "@library/layout/DeviceContext";
-import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
-import { twoColumnLayoutVariables } from "@library/layout/twoColumnLayoutStyles";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
+import { twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
+import TwoColumnLayout from "./TwoColumnLayout";
+import PanelWidget from "./components/PanelWidget";
+import { Container } from "./components/Container";
 
 export default {
-    title: "TwoColumnLayout",
+    title: "twoColumnLayout",
     parameters: {
         chromatic: {
-            viewports: Object.values(twoColumnLayoutVariables().panelLayoutBreakPoints),
+            viewports: Object.values(twoColumnLayoutVariables().breakPoints),
         },
     },
 };
@@ -32,35 +32,35 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 
 export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
+        <Container>
             <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                mainTop={<DummyPanel>Middle Top</DummyPanel>}
+                mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
             />
-        </DeviceProvider>
+        </Container>
     );
 });
 
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
+        <Container>
             <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
+                mainTop={<DummyPanel>Middle Top</DummyPanel>}
+                mainBottom={<DummyPanel>Middle Bottom</DummyPanel>}
                 rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom</DummyPanel>}
             />
-        </DeviceProvider>
+        </Container>
     );
 });
 
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
+        <Container>
             <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={
+                mainTop={<DummyPanel>Middle Top</DummyPanel>}
+                mainBottom={
                     <DummyPanel>
                         Middle Bottom{smallIpsum}
                         {smallIpsum}
@@ -69,20 +69,20 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 rightTop={<DummyPanel>Right Top</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
             />
-        </DeviceProvider>
+        </Container>
     );
 });
 
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
+        <Container>
             <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
             />
-        </DeviceProvider>
+        </Container>
     );
 });
 
@@ -100,14 +100,14 @@ export const DarkMode = storyWithConfig(
     },
     () => {
         return (
-            <DeviceProvider>
+            <Container>
                 <TwoColumnLayout
-                    middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                    mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                    mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                     rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
                     rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
                 />
-            </DeviceProvider>
+            </Container>
         );
     },
 );

@@ -31,6 +31,8 @@ export enum GlobalPreset {
     LIGHT = "light",
 }
 
+export const FULL_GUTTER = 40;
+
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -38,15 +40,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#037DBC");
     const makeThemeVars = variableFactory("global", forcedVars);
 
-    const utility = {
-        "percentage.third": percent(100 / 3),
-        "percentage.nineSixteenths": percent((9 / 16) * 100),
-        "svg.encoding": "data:image/svg+xml,",
-    };
-
     const constants = makeThemeVars("constants", {
         stateColorEmphasis: 0.15,
-        fullGutter: 48,
+        fullGutter: FULL_GUTTER,
         states: {
             hover: {
                 stateEmphasis: 0.08,
@@ -191,11 +187,37 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const gutterSize = 16;
+    // @Deprecated - It's confusing that this gutter is 16 and the layout is 48.
+    // TODO: Refactor
     const gutter = makeThemeVars("gutter", {
         size: gutterSize,
         half: gutterSize / 2,
         quarter: gutterSize / 4,
     });
+
+    /*
+    // The gutter used to be like this:
+    //     size: 16,
+    //     half: 8,
+    //     quarter: 4,
+    //
+    // This was very confusing because the layout uses "gutter" as well, but very different values.
+    //
+    // the fractions are not ideal, but it gives the same style as before without having 2 wildly different "gutter" sizes
+    //
+    // Mapping:
+    // size -> third
+    // half -> sixth
+    // quarter -> twelfth
+
+    const gutter = {
+        size: constants.fullGutter,
+        half: constants.fullGutter / 2, // 24
+        third: constants.fullGutter / 3, // 16
+        sixth: constants.fullGutter / 6, // 8
+        twelfth: constants.fullGutter / 12, // 4
+    };
+    */
 
     const lineHeights = makeThemeVars("lineHeight", {
         base: 1.5,
@@ -205,25 +227,55 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         meta: 1.5,
     });
 
-    const panelWidth = 216;
-    const panel = makeThemeVars("panelWidth", {
-        width: panelWidth,
-        paddedWidth: panelWidth + gutter.size * 2,
+    // Three column
+    // 216 + 40 + 672 + 40 + 216 = 1184 (correct full width of three column layout)
+    // 1184 + 40 = 1224 - padded
+    // 1184 - 343px =  (two column layout)
+    //                                           52 (Extra space) + 244px (Foundation)
+
+    // These globals are here because the layout system was created based on a 3 column layout
+    // These variables are used as a starting off point and as a base, but each layout can define
+    // its own variables. These are the globals from which the rest is calculated.
+    const foundationalWidths = makeThemeVars("foundationalWidths", {
+        panelWidth: 216,
+        middleColumn: 672,
+        minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
+        narrowContentWidth: 900, // For home page widgets, narrower than full width
+        breakPoints: {
+            // Other break points are calculated
+            twoColumns: 1200,
+            xs: 500,
+        },
     });
 
-    const middleColumnWidth = 672;
+    const widgetInit = makeThemeVars("widget", {
+        padding: 10,
+    });
+
+    const widget = makeThemeVars("widget", {
+        ...widgetInit,
+        paddingBothSides: widgetInit.padding * 2,
+    });
+
+    const panelInit = makeThemeVars("panel", {
+        width: foundationalWidths.panelWidth,
+    });
+
+    const panel = makeThemeVars("panel", {
+        ...panelInit,
+        paddedWidth: panelInit.width + widget.paddingBothSides,
+    });
+
     const middleColumnInit = makeThemeVars("middleColumn", {
-        width: middleColumnWidth,
+        width: foundationalWidths.middleColumn,
     });
 
     const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnInit.width,
-        paddedWidth: middleColumnInit.width + gutter.size * 2,
+        paddedWidth: middleColumnInit.width + widget.paddingBothSides,
     });
 
-    const content = makeThemeVars("content", {
-        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 4,
-    });
+    const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
     const fontsInit0 = makeThemeVars("fonts", {
         size: {
@@ -333,7 +385,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         spacing: {
             horizontalMargin: 4,
             verticalMargin: 12,
-            default: gutter.quarter,
+            default: 4,
         },
         colors: {
             fg: mixBgAndFg(0.85),
@@ -468,7 +520,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     return {
         options,
-        utility,
         elementaryColors,
         mainColors,
         messageColors,
@@ -478,7 +529,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         meta,
         gutter,
         panel,
-        content,
+        middleColumn,
+        contentWidth,
         fonts,
         spacer,
         lineHeights,
@@ -499,6 +551,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         constants,
         getRatioBasedOnBackgroundDarkness,
         buttonPreset,
+        foundationalWidths,
+        widget,
     };
 });
 

@@ -5,7 +5,7 @@
  */
 
 import { IApiError, LoadStatus } from "@library/@types/api/core";
-import { IMe, IMeCounts } from "@library/@types/api/users";
+import { IMe, IMeCounts, IUser } from "@library/@types/api/users";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IPermission, IPermissions } from "@library/features/users/userModel";
@@ -13,6 +13,10 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { useSelector } from "react-redux";
 
 const createAction = actionCreatorFactory("@@users");
+
+export interface IGetUserByIDQuery {
+    userID: number;
+}
 
 // The duration we wait to check for new counts.
 const COUNT_CACHE_PERIOD = 60; // 60 Seconds
@@ -76,6 +80,17 @@ export default class UserActions extends ReduxActions {
         })();
 
         return this.dispatch(apiThunk);
+    };
+
+    public static getUserACs = createAction.async<{ userID: number }, IUser, IApiError>("GET_USER");
+
+    public getUserByID = (query: IGetUserByIDQuery) => {
+        const { userID } = query;
+        const thunk = bindThunkAction(UserActions.getUserACs, async () => {
+            const reponse = await this.api.get(`/users/${userID}/?expand[]=all`);
+            return reponse.data;
+        })({ userID });
+        return this.dispatch(thunk);
     };
 }
 

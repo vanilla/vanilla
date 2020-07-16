@@ -17,7 +17,7 @@ import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
-import SearchContext, { SearchContextProvider } from "@library/contexts/SearchContext";
+import SearchContext from "@library/contexts/SearchContext";
 import { MemoryRouter } from "react-router";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 
@@ -63,7 +63,7 @@ export default {
     title: "Search/Filters",
     parameters: {
         chromatic: {
-            viewports: layoutVariables().panelLayoutBreakPoints.twoColumn,
+            viewports: [1400, 500],
         },
     },
 };

@@ -27,7 +27,7 @@ echo '<div class="MainForm">';
             <?php
             echo $this->Form->label('Password', 'Password');
             echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
-            echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
+            echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword', ['title' => t('Forgot your password?')]);
             ?>
         </li>
     </ul>
@@ -69,7 +69,7 @@ echo '</div>';
                 }
 
                 if (c('Garden.Registration.Method') != 'Invitation') {
-                    printf(t("Don't have an account? %s"), anchor(t('Create One.'), '/entry/register'.$Target));
+                    printf(t("Don't have an account? %s"), anchor(t('Create One.'), '/entry/register'.$Target, '', ['title' => t('Create an Account')]));
                 }
                 ?>
             </div>

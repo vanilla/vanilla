@@ -156,7 +156,23 @@ export const storyBookClasses = useThemeCache(() => {
 
     const unorderedList = style("unorderedList", {});
 
-    const listItem = style("listItem", {});
+    const listVars = {
+        spacing: {
+            top: em(0.5),
+            left: em(2),
+        },
+    };
+
+    const listItem = style("listItem", {
+        position: "relative",
+        listStylePosition: "inside",
+        listStyle: "inside",
+        ...margins({
+            top: listVars.spacing.top,
+            left: listVars.spacing.left,
+        }),
+    });
+
     const separator = style("separator", {});
     const link = style("link", {});
 
@@ -198,14 +214,11 @@ export const storyBookClasses = useThemeCache(() => {
         transform: translateX(`-${unit(vars.gaps.tile * 3.5)}`),
         ...layoutVariables()
             .mediaQueries()
-            .oneColumn(
-                {
-                    display: "block",
-                    width: percent(100),
-                    transform: "none",
-                },
-                false,
-            ),
+            .oneColumnDown({
+                display: "block",
+                width: percent(100),
+                transform: "none",
+            }),
     });
 
     const tile = style("tile", {

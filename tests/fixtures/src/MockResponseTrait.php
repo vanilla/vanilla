@@ -32,14 +32,14 @@ trait MockResponseTrait {
      * Add a single response to be queued up if a request is created.
      *
      * @param string $uri
-     * @param HttpResponse|array $response
+     * @param HttpResponse $response
      * @param string $method
      *
      * @return $this
      */
     public function addMockResponse(
         string $uri,
-        $response,
+        HttpResponse $response,
         string $method = HttpRequest::METHOD_GET
     ) {
         $key = $this->makeMockResponseKey($uri, $method);

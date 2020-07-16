@@ -1,0 +1,23 @@
+{
+    "name": "Civil Tongue Ex",
+    "description": "A swear word filter for your forum. Making your forum safer for younger audiences.",
+    "version": "1.2.1",
+    "mobileFriendly": true,
+    "settingsUrl": "/plugin/tongue",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "civil-tongue.png",
+    "usePopupSettings": false,
+    "key": "civiltongueex",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

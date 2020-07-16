@@ -11,7 +11,7 @@ import { expect } from "chai";
 
 const timeStamp = "2020-04-22T14:31:19Z";
 
-describe.only("DateTime", () => {
+describe("DateTime", () => {
     after(() => {
         setCurrentLocale("en");
     });

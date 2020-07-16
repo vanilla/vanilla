@@ -18,7 +18,7 @@ import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/Twi
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
 import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
 import { onContent, t } from "@library/utility/appUtils";
-import { logWarning } from "@vanilla/utils";
+import { logWarning, logError } from "@vanilla/utils";
 import React, { useContext } from "react";
 import Quill from "quill/core";
 import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
@@ -137,10 +137,15 @@ function ensureEmbedDescription() {
 }
 
 export async function mountAllEmbeds(root: HTMLElement = document.body) {
-    const mountPoints = root.querySelectorAll("[data-embedjson]");
+    const mountPoints = root.querySelectorAll(".js-embed[data-embedjson]");
     const promises = Array.from(mountPoints).map(mountPoint => {
-        const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        return mountEmbed(mountPoint as HTMLElement, parsedData, false);
+        try {
+            const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
+            return mountEmbed(mountPoint as HTMLElement, parsedData, false);
+        } catch (e) {
+            logError("failed to mountEmbed", { error: e, mountPoint });
+            return Promise.resolve();
+        }
     });
     await Promise.all(promises);
 }

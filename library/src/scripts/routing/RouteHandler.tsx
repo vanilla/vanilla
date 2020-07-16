@@ -32,13 +32,14 @@ export default class RouteHandler<GeneratorProps> {
         componentPromise: LoadFunction,
         public path: string | string[],
         url: (data: GeneratorProps) => string,
-        loadingComponent: React.ComponentType = Loader,
+        LoadingComponent: React.ComponentType = Loader,
         key?: string,
     ) {
+        function LoaderWrapper() {
+            return <LoadingComponent />;
+        }
         this.loadable = Loadable({
-            loading: function LoaderWrapper() {
-                return <>{loadingComponent}</>;
-            },
+            loading: LoaderWrapper,
             loader: componentPromise,
         });
         this.url = (data: GeneratorProps) => formatUrl(url(data), true);

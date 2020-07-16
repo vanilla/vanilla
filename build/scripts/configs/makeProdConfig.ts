@@ -95,10 +95,15 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                               comments: false,
                           },
                       },
-                      parallel: true,
+                      parallel: process.env.PARALLEL_CORES ? parseInt(process.env.PARALLEL_CORES, 10) : true,
                       sourceMap: true, // set to true if you want JS source maps
                   }),
-                  new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
+                  new OptimizeCSSAssetsPlugin({
+                      cssProcessorOptions: { map: { inline: false, annotations: true } },
+                      cssProcessorPluginOptions: {
+                          preset: ["default", { discardComments: { removeAll: true } }],
+                      },
+                  }),
               ],
     };
 

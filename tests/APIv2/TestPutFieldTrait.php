@@ -7,7 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 trait TestPutFieldTrait {
     /**

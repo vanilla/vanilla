@@ -391,9 +391,9 @@ class ProfileController extends Gdn_Controller {
         $this->setData('_CanConfirmEmail', $canConfirmEmail);
         $this->setData('_EmailConfirmed', $confirmed);
         $this->Form->setValue('ConfirmEmail', (int)$confirmed);
-
+        $sessionUserID = Gdn::session()->UserID;
         // Decide if we can *see* email
-        $this->setData('_CanViewPersonalInfo', Gdn::session()->UserID == val('UserID', $user) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
+        $this->setData('_CanViewPersonalInfo', $sessionUserID == val('UserID', $user) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
 
         // Decide if there will be a Titles field.
         $canAddEditTitle = c('Garden.Profile.Titles', false);
@@ -424,8 +424,10 @@ class ProfileController extends Gdn_Controller {
             if ($submittedEmail !== null && $canEditEmail && $user['Email'] !== $submittedEmail) {
                 $authOptions['ForceTimeout'] = true;
             }
-
-            $this->reauth($authOptions);
+            // Do not reauthenticate if we are editing a user.
+            if ($user['UserID'] === $sessionUserID) {
+                $this->reauth($authOptions);
+            }
 
             // If the Form was reloaded because of reauth, reset the the form values to the original submission values.
             $originalFormValues = (isset($originalSubmission))
@@ -468,9 +470,7 @@ class ProfileController extends Gdn_Controller {
             // These options become available when POSTing as a user with Garden.Settings.Manage permissions
 
             if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-
                 // Role change
-
                 $requestedRoles = $this->Form->getFormValue('RoleID', null);
                 if (!is_null($requestedRoles)) {
                     $roleModel = new RoleModel();
@@ -489,11 +489,8 @@ class ProfileController extends Gdn_Controller {
 
                     // Allow saving roles
                     $settings['SaveRoles'] = true;
-
                 }
-
                 // Password change
-
                 $newPassword = $this->Form->getFormValue('Password', null);
                 if (!is_null($newPassword)) {
                 }
@@ -1403,12 +1400,10 @@ class ProfileController extends Gdn_Controller {
                 ]);
 
                 $this->jsonTarget(".DataList-Tokens", $this->revealTokenRow($token), 'Prepend');
-
             } catch (\Garden\Schema\ValidationException $ex) {
                 $this->Form->addError($ex);
             }
         }
-
         $this->title(t('Add Token'));
         $this->_setBreadcrumbs($this->data('Title'), $this->canonicalUrl());
         $this->render();
@@ -1425,15 +1420,11 @@ class ProfileController extends Gdn_Controller {
                 $token = $tokenApi->get($accessTokenID, [
                     'transientKey' => $this->Form->getFormValue('TransientKey')
                 ]);
-
                 $this->jsonTarget("#Token_{$token['accessTokenID']}", $this->revealTokenRow($token), 'ReplaceWith');
-
-
             } catch (\Garden\Schema\ValidationException $ex) {
                 $this->Form->addError($ex);
             }
         }
-
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -1446,15 +1437,11 @@ class ProfileController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack(true)) {
             try {
                 $tokenApi->delete($accessTokenID);
-
                 $this->jsonTarget("#Token_{$accessTokenID}", '', 'SlideUp');
-
-
             } catch (\Garden\Schema\ValidationException $ex) {
                 $this->Form->addError($ex);
             }
         }
-
         $this->render('token-delete', 'Profile', 'Dashboard');
     }
 
@@ -1719,7 +1706,6 @@ EOT;
 
             $this->fireEvent('AddProfileTabs');
         }
-
         return true;
     }
 
@@ -1755,7 +1741,6 @@ EOT;
 
         // Remove unwanted fields.
         $this->Data = arrayTranslate($user, ['UserID', 'Name', 'Email', 'Photo']);
-
         $this->render();
     }
 
@@ -1920,7 +1905,6 @@ EOT;
     }
 
     public function editMode($switch) {
-
         $this->EditMode = $switch;
         if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== false) {
             $this->CssClass = str_replace('EditMode', '', $this->CssClass);
@@ -1957,7 +1941,6 @@ EOT;
         }
         $users = array_values($users);
         $this->setData('Users', $users);
-
         $this->render();
     }
 }

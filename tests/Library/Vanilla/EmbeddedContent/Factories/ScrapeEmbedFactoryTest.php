@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
+use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory;
 use VanillaTests\MinimalContainerTestCase;
@@ -72,12 +73,14 @@ class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
         $name = "Hello Title";
         $description = "Hello description";
         $images = ["https://test.com/image.png", "https://other.com/pic.jpg"];
-        $this->pageScraper->addMockResponse($urlToCheck, [
+        $this->pageScraper->addMockResponse($urlToCheck, new HttpResponse(200, [
+            'content-type' => 'application/json'
+        ], json_encode([
             'Title' => $name,
             'Description' => $description,
             'Images' => $images,
             'Url' => $urlToCheck,
-        ]);
+        ])));
 
         // Check over the network.
         $embed = $this->factory->createEmbedForUrl($urlToCheck);

@@ -7,14 +7,10 @@
 import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
-interface IProps {
-    children: JSX.Element;
-}
-
 /**
- * Separator, for react storybook.
+ * Adds <li> element with proper styles for react storybook.
  */
-export function StoryListItem(props: IProps) {
+export function StoryListItem(props) {
     const classes = storyBookClasses();
     return <li className={classes.listItem}>{props.children}</li>;
 }

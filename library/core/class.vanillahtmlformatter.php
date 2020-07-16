@@ -168,7 +168,7 @@ class VanillaHtmlFormatter {
     public function format($html, $options = []) {
         $allowExtended = $options['allowedExtendedContent'] ?? false;
 
-        $defaultBlockedAttrs = 'on*, target';
+        $defaultBlockedAttrs = 'on*, target, data-embedJson';
         if (!$allowExtended) {
             $defaultBlockedAttrs .= ', download';
         }

@@ -70,6 +70,19 @@ class VanillaController extends Gdn_Controller {
     }
 
     /**
+     * Get current site section locale
+     *
+     * @return string
+     */
+    protected function getContentLocale(): string {
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        /** @var \Vanilla\Contracts\Site\SiteSectionInterface $siteSection */
+        $siteSection = $siteSectionModel->getCurrentSiteSection();
+        return $siteSection->getContentLocale();
+    }
+
+    /**
      * Get vanilla controllers status.
      * Returns true when forum is disabled for root or specific site section.
      *

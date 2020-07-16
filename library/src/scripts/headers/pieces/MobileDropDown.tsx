@@ -8,23 +8,18 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
 import Container from "@library/layout/components/Container";
-import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
-import Heading from "@library/layout/Heading";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import SmartAlign from "@library/layout/SmartAlign";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
 import { panelBackgroundClasses } from "@library/layout/panelBackgroundStyles";
 import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAnimation";
+import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
 export interface IProps {
     className?: string;

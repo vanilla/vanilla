@@ -18,6 +18,7 @@ import classNames from "classnames";
 import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
+import { UserIconTypes } from "@library/icons/titleBar";
 
 /**
  * Implements User Drop down for header
@@ -52,7 +53,7 @@ export function UserDropDown(props: IProps) {
                 <MeBoxIcon compact={false}>
                     <UserPhoto
                         userInfo={userInfo}
-                        open={isOpen}
+                        styleType={UserIconTypes.SELECTED_ACTIVE}
                         className="headerDropDown-user meBox-user"
                         size={UserPhotoSize.SMALL}
                     />

@@ -32,8 +32,6 @@ export function usePageChangeListener(handler: PageViewHandler) {
     }, [handler]);
 }
 
-window.onPageView = onPageView;
-
 let previousPath: string | null = null;
 
 function getPreviousPath() {

@@ -1,0 +1,24 @@
+{
+    "name": "Vanilla jsConnect",
+    "description": "Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href=\"http://docs.vanillaforums.com/help/sso/jsconnect/\">documentation</a> for details.",
+    "version": "1.6",
+    "mobileFriendly": true,
+    "license": "GNU GPL2",
+    "settingsUrl": "/settings/jsconnect",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "jsconnect.png",
+    "key": "jsconnect",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5"
+    }
+}

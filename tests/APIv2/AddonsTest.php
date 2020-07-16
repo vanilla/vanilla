@@ -31,7 +31,8 @@ class AddonsTest extends AbstractAPIv2Test {
      * Test listing core addons.
      */
     public function testIndexCoreAddons() {
-        $addons = $this->api()->get('/addons');
+        // Suppressed because some users may have some addons symlinked that aren't valid for this test.
+        $addons = @$this->api()->get('/addons');
         $addons = array_column($addons->getBody(), null, 'key');
 
         $expected = array_merge($this->coreAddons, $this->coreThemes);

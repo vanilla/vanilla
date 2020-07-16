@@ -77,6 +77,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 'recordType:s',
                 'type:s',
                 'body:s?',
+                'excerpt:s?',
                 'recordID:i',
                 'name:s',
                 'url' => [
@@ -85,7 +86,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 ],
                 'dateInserted:dt',
                 'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
-                "insertUserID:i"
+                "insertUserID:i",
+                "format:s",
             ]);
 
             $extra = $this->extraSchema();
@@ -139,6 +141,27 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      */
     public function getUrl(): string {
         return $this->data['url'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getExcerpt(): string {
+        return $this->data['excerpt'] ?? '';
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBody(): string {
+        return $this->data['body'] ?? '';
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFormat(): string {
+        return $this->data['format'] ?? '';
     }
 
     ///

@@ -58,7 +58,7 @@ class FormTest extends MinimalContainerTestCase {
 
         // Make sure we are escaped properly.
         $expectedHtml = <<<HTML
-<div class="Messages Errors">
+<div aria-label="Validation Failed" class="Messages Errors" role="alert">
 <ul>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>

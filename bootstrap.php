@@ -121,6 +121,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule(Garden\Web\Cookie::class)
     ->setShared(true)
+    ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
     ->addAlias('Cookie')
 
     // PluginManager
@@ -278,6 +279,15 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)])
+
+    ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
+    ->setShared(true)
+
+    ->rule("@baseUrl")
+    ->setFactory(function (Gdn_Request $request) {
+        return $request->getSimpleUrl('');
+    })
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
@@ -354,7 +364,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(SearchModel::class)
     ->setShared(true)
 
-
     ->rule(SearchService::class)
     ->setShared(true)
     ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
@@ -398,8 +407,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Smarty')
     ->setShared(true)
 
-    ->rule('WebLinking')
-    ->setClass(\Vanilla\Web\WebLinking::class)
+    ->rule(\Vanilla\Web\Pagination\WebLinking::class)
     ->setShared(true)
 
     ->rule('ViewHandler.tpl')

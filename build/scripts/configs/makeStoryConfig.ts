@@ -7,6 +7,8 @@
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
+import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
+
 // tslint:disable
 const TSDocgenPlugin = require("react-docgen-typescript-webpack-plugin");
 const merge = require("webpack-merge");
@@ -27,5 +29,10 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
             ["process.env.NODE_ENV"]: "'test'",
         }),
     );
+    baseConfig.optimization = {
+        minimizer: [
+            new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
+        ],
+    };
     return merge(baseStorybookConfig, baseConfig as any);
 }

@@ -3,20 +3,22 @@
  * @license GPL-2.0-only
  */
 
-import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { IPanelLayoutClasses, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
-import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
+import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
+import { logError } from "@vanilla/utils";
+import Panel from "./components/Panel";
+import PanelOverflow from "./components/PanelOverflow";
+import PanelArea from "./components/PanelArea";
+import PanelAreaHorizontalPadding from "./components/PanelAreaHorizontalPadding";
+import PanelWidgetHorizontalPadding from "./components/PanelWidgetHorizontalPadding";
 
-export interface IPanelLayoutProps {
+export interface IPanelLayoutProps extends ILayoutProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: keyof JSX.IntrinsicElements;
@@ -31,7 +33,6 @@ export interface IPanelLayoutProps {
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
-    classes?: IPanelLayoutClasses;
 }
 
 /**
@@ -64,15 +65,36 @@ export interface IPanelLayoutProps {
  * | MiddleBottom |
  * | RightBottom  |
  */
-export default function PanelLayout(props: IPanelLayoutProps) {
-    const { topPadding, className, growMiddleBottom, isFixed, ...childComponents } = props;
+function PanelLayout(props: IPanelLayoutProps) {
+    const {
+        className,
+        contentTag = "div",
+        growMiddleBottom = false,
+        topPadding = true,
+        isFixed = true,
+        mediaQueries,
+        ...childComponents
+    } = props;
 
     // Handle window resizes
 
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const device = useDevice();
+    const {
+        classes = props.classes,
+        currentDevice,
+        isCompact,
+        isFullWidth,
+        rightPanelCondition = () => {
+            return false;
+        },
+    } = useLayout();
+
+    if (!classes) {
+        logError(`Classes not loaded for panel layout of type: ${props.type}, classes given: `, classes);
+    }
+
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
     const measuredPanelTop = sidePanelMeasure.top;
@@ -87,34 +109,31 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     ]);
 
     // Calculate some rendering variables.
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const isTablet = device === Devices.TABLET;
-    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-    const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
-    const shouldRenderRightPanel: boolean = isFullWidth || (isTablet && !shouldRenderLeftPanel);
-    const classes = props.classes ?? panelLayoutClasses();
+
+    const shouldRenderLeftPanel: boolean = !isCompact && (!!childComponents.leftTop || !!childComponents.leftBottom);
+    const shouldRenderRightPanel: boolean = isFullWidth || rightPanelCondition(currentDevice, shouldRenderLeftPanel);
+    const shouldRenderBreadcrumbs: boolean = !!childComponents.breadcrumbs;
 
     // Determine the classes we want to display.
     const panelClasses = classNames(
         classes.root,
         { noLeftPanel: !shouldRenderLeftPanel },
         { noRightPanel: !shouldRenderRightPanel },
-        { noBreadcrumbs: !childComponents.breadcrumbs },
+        { noBreadcrumbs: !shouldRenderBreadcrumbs },
         className,
         { hasTopPadding: topPadding },
         growMiddleBottom ? inheritHeightClass() : "",
     );
 
     // If applicable, set semantic tag, like "article"
-    const ContentTag = props.contentTag as "div";
-
+    const ContentTag = contentTag;
     return (
         <div className={panelClasses}>
-            {childComponents.breadcrumbs && (
+            {shouldRenderBreadcrumbs && (
                 <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
                     {shouldRenderLeftPanel && <Panel className={classNames(classes.leftColumn)} ariaHidden={true} />}
                     <PanelAreaHorizontalPadding
-                        className={classNames(classes.middleColumnMaxWidth, {
+                        className={classNames(classes.mainColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel,
                         })}
                     >
@@ -128,7 +147,7 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                     ref={panelRef}
                     className={classNames(classes.container, props.growMiddleBottom ? inheritHeightClass() : "")}
                 >
-                    {!isMobile && shouldRenderLeftPanel && (
+                    {!isCompact && shouldRenderLeftPanel && (
                         <Panel
                             className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
                                 [classes.isSticky]: isFixed,
@@ -139,39 +158,46 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                                 isLeft={true}
                                 renderLeftPanelBackground={props.renderLeftPanelBackground}
                             >
-                                {childComponents.leftTop && <PanelArea>{childComponents.leftTop}</PanelArea>}
-                                {childComponents.leftBottom && <PanelArea>{childComponents.leftBottom}</PanelArea>}
+                                {childComponents.leftTop !== undefined && (
+                                    <PanelArea>{childComponents.leftTop}</PanelArea>
+                                )}
+                                {childComponents.leftBottom !== undefined && (
+                                    <PanelArea>{childComponents.leftBottom}</PanelArea>
+                                )}
                             </PanelOverflow>
                         </Panel>
                     )}
 
                     <ContentTag
-                        className={classNames(classes.content, classes.middleColumnMaxWidth, {
+                        className={classNames(classes.content, classes.mainColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
                             hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                         })}
                     >
                         <Panel
                             className={classNames(
-                                classes.middleColumn,
+                                classes.mainColumn,
                                 props.growMiddleBottom ? inheritHeightClass() : "",
                             )}
                         >
-                            {childComponents.middleTop && <PanelArea>{childComponents.middleTop}</PanelArea>}
-                            {!shouldRenderLeftPanel && childComponents.leftTop && (
+                            {childComponents.middleTop !== undefined && (
+                                <PanelArea>{childComponents.middleTop}</PanelArea>
+                            )}
+                            {!shouldRenderLeftPanel && childComponents.leftTop !== undefined && (
                                 <PanelArea>{childComponents.leftTop}</PanelArea>
                             )}
-                            {!shouldRenderRightPanel && childComponents.rightTop && (
+                            {!shouldRenderRightPanel && childComponents.rightTop !== undefined && (
                                 <PanelArea>{childComponents.rightTop}</PanelArea>
                             )}
-                            <PanelArea className={classNames(props.growMiddleBottom ? inheritHeightClass() : "")}>
+                            <PanelArea className={classNames({ [inheritHeightClass()]: props.growMiddleBottom })}>
                                 {childComponents.middleBottom}
                             </PanelArea>
-                            {!shouldRenderRightPanel && childComponents.rightBottom && (
+                            {!shouldRenderRightPanel && childComponents.rightBottom !== undefined && (
                                 <PanelArea>{childComponents.rightBottom}</PanelArea>
                             )}
                         </Panel>
                     </ContentTag>
+
                     {shouldRenderRightPanel && (
                         <Panel
                             className={classNames(classes.rightColumn, offsetClass, panelOffsetClass, {
@@ -179,8 +205,12 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                             })}
                         >
                             <PanelOverflow offset={overflowOffset}>
-                                {childComponents.rightTop && <PanelArea>{childComponents.rightTop}</PanelArea>}
-                                {childComponents.rightBottom && <PanelArea>{childComponents.rightBottom}</PanelArea>}
+                                {childComponents.rightTop !== undefined && (
+                                    <PanelArea>{childComponents.rightTop}</PanelArea>
+                                )}
+                                {childComponents.rightBottom !== undefined && (
+                                    <PanelArea>{childComponents.rightBottom}</PanelArea>
+                                )}
                             </PanelOverflow>
                         </Panel>
                     )}
@@ -190,79 +220,4 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     );
 }
 
-PanelLayout.defaultProps = {
-    contentTag: "div",
-    growMiddleBottom: false,
-    topPadding: true,
-    isFixed: true,
-};
-
-// Simple container components.
-interface IContainerProps {
-    className?: string;
-    children?: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
-    ariaHidden?: boolean;
-    innerRef?: React.RefObject<HTMLDivElement>;
-}
-
-export function Panel(props: IContainerProps) {
-    const Tag = (props.tag as "div") || "div";
-    const classes = panelLayoutClasses();
-    return (
-        <Tag className={classNames(classes.panel, props.className)} aria-hidden={props.ariaHidden} ref={props.innerRef}>
-            {props.children}
-        </Tag>
-    );
-}
-
-export function PanelOverflow(
-    props: IContainerProps & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
-) {
-    const classes = panelAreaClasses();
-    const panelVars = panelBackgroundVariables();
-    const color =
-        panelVars.config.render && !!props.isLeft && props.renderLeftPanelBackground
-            ? panelVars.colors.backgroundColor
-            : undefined;
-    return (
-        <div className={classes.areaOverlay}>
-            <div className={classes.areaOverlayBefore(color, "left")}></div>
-            <div ref={props.innerRef} className={classNames(props.className, classes.overflowFull(props.offset))}>
-                {props.children}
-            </div>
-            <div className={classes.areaOverlayAfter(color, "right")}></div>
-        </div>
-    );
-}
-
-export function PanelArea(props: IContainerProps) {
-    const Tag = (props.tag as "div") || "div";
-    const classes = panelAreaClasses();
-    return (
-        <Tag ref={props.innerRef} className={classNames(classes.root, props.className)}>
-            {props.children}
-        </Tag>
-    );
-}
-
-export function PanelAreaHorizontalPadding(props: IContainerProps) {
-    const Tag = props.tag || "div";
-    const classes = panelAreaClasses();
-    return <Tag className={classNames(classes.root, props.className, "hasNoVerticalPadding")}>{props.children}</Tag>;
-}
-
-export function PanelWidget(props: IContainerProps) {
-    const classes = panelWidgetClasses();
-    return <div className={classNames(classes.root, props.className)}>{props.children}</div>;
-}
-
-export function PanelWidgetVerticalPadding(props: IContainerProps) {
-    const classes = panelWidgetClasses();
-    return <div className={classNames(classes.root, "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
-}
-
-export function PanelWidgetHorizontalPadding(props: IContainerProps) {
-    const classes = panelWidgetClasses();
-    return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
-}
+export default withLayout(PanelLayout);

@@ -49,6 +49,11 @@ class Cookie {
     private $flushAll = false;
 
     /**
+     * @var string
+     */
+    private $prefix = '';
+
+    /**
      * Construct a {@link Cookie} objects.
      *
      * @param array $cookies The initial cookies array or **null** to use the **$_COOKIE** super global.
@@ -92,7 +97,7 @@ class Cookie {
      * @return null
      */
     public function get($name, $default = null) {
-        return isset($this->cookies[$name]) ? $this->cookies[$name] : $default;
+        return $this->cookies[$this->cookieName($name)] ?? $default;
     }
 
     /**
@@ -140,6 +145,8 @@ class Cookie {
      * @return $this
      */
     public function setCookie($name, $value, $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+        $name = $this->cookieName($name);
+
         if ($value === null) {
             $this->delete($name);
         } else {
@@ -165,6 +172,8 @@ class Cookie {
      * @return $this
      */
     public function delete($name) {
+        $name = $this->cookieName($name);
+
         unset($this->cookies[$name]);
         return $this;
     }
@@ -311,5 +320,39 @@ class Cookie {
     public function setFlushAll($flushAll) {
         $this->flushAll = $flushAll;
         return $this;
+    }
+
+    /**
+     * Get the cookie prefix.
+     *
+     * @return string
+     */
+    public function getPrefix(): string {
+        return $this->prefix;
+    }
+
+    /**
+     * Set the cookie prefix.
+     *
+     * @param string $prefix
+     * @return $this
+     */
+    public function setPrefix(string $prefix) {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
+    /**
+     * Calculate the full cookie named based on the prefix.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function cookieName(string $name): string {
+        if (substr($name, 0, 1) === '/') {
+            return substr($name, 1);
+        } else {
+            return $this->getPrefix().$name;
+        }
     }
 }

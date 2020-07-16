@@ -14,7 +14,7 @@ import { searchResultClasses, searchResultsClasses } from "@library/features/sea
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IResult {
     name: string;
@@ -39,8 +39,9 @@ export default function Result(props: IResult) {
     const hasAttachments = attachments && attachments.length > 0;
     const showImage = image && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
-    const classesSearchResults = searchResultsClasses();
-    const classes = searchResultClasses();
+    const layoutContext = useLayout();
+    const classesSearchResults = searchResultsClasses(layoutContext.mediaQueries);
+    const classes = searchResultClasses(layoutContext.mediaQueries, !!icon);
     const imageComponent = showImage ? (
         <img
             src={image}
@@ -56,33 +57,47 @@ export default function Result(props: IResult) {
     }
     const HeadingTag = `h${headingLevel}` as "h1";
 
+    const { isCompact } = useLayout();
+
     const media = hasMedia ? (
-        <div className={classNames("searchResult-media", classes.mediaElement, { hasImage: showImage })}>
+        <div
+            className={classNames(classes.mediaElement, {
+                hasImage: showImage,
+                [classes.compactMediaElement]: isCompact,
+            })}
+        >
             {showImage && imageComponent}
             {attachmentOutput}
         </div>
     ) : null;
 
+    const excerptElement =
+        excerpt && excerpt.length > 0 ? (
+            <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
+                <>
+                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
+                    {afterExcerpt}
+                </>
+            </Paragraph>
+        ) : null;
+
     return (
         <li className={classNames(classesSearchResults.item, className)}>
-            <article className={classNames(classesSearchResults.result)}>
-                <div className={classNames(classes.root, { hasIcon: !!icon })}>
-                    {icon && <div className={classes.iconWrap}>{icon}</div>}
-                    <div className={classNames(classes.main, { hasMedia: !!media })}>
-                        <SmartLink to={url} tabIndex={0} className={classes.link}>
-                            <HeadingTag className={classes.title}>{name}</HeadingTag>
-                        </SmartLink>
-                        {meta && <div className={classes.metas}>{meta}</div>}
-                        {!!excerpt && (
-                            <Paragraph className={classes.excerpt}>
-                                <>
-                                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
-                                    {afterExcerpt}
-                                </>
-                            </Paragraph>
-                        )}
+            <article className={classesSearchResults.result}>
+                <div className={classNames(classes.root)}>
+                    <div className={classes.content}>
+                        {icon && <div className={classes.iconWrap}>{icon}</div>}
+                        <div className={classNames(classes.main, { hasMedia: !!media, hasIcon: !!icon })}>
+                            <SmartLink to={url} tabIndex={0} className={classes.link}>
+                                <HeadingTag className={classes.title}>{name}</HeadingTag>
+                            </SmartLink>
+                            {meta && <div className={classes.metas}>{meta}</div>}
+                            {isCompact && media}
+                            {!isCompact && excerptElement}
+                        </div>
+                        {!isCompact && media}
+                        {isCompact && excerptElement}
                     </div>
-                    {media}
                 </div>
             </article>
         </li>

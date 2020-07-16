@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {
+    absolutePosition,
     colorOut,
     EMPTY_FONTS,
     fonts,
@@ -19,24 +19,24 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent, px } from "csx";
-import { media } from "typestyle";
+import { calc, important, percent, viewHeight } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { BorderBottomProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { buttonVariables } from "@library/forms/buttonStyles";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("searchResults");
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.primary,
+        fg: globalVars.mainColors.fg,
     });
 
     const title = makeThemeVars("title", {
-        fonts: {
-            color: undefined,
+        font: {
+            ...EMPTY_FONTS,
+            color: colors.fg,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
@@ -67,27 +67,20 @@ export const searchResultsVariables = useThemeCache(() => {
     const spacing = makeThemeVars("spacing", {
         padding: {
             top: 15,
-            right: globalVars.gutter.half,
+            right: globalVars.widget.padding,
             bottom: 16,
-            left: globalVars.gutter.half,
+            left: globalVars.widget.padding,
         },
     });
 
     const mediaElement = makeThemeVars("mediaElement", {
-        width: 115,
+        width: 190,
+        height: 106.875,
+        margin: 15,
+        compact: {
+            ratio: (9 / 16) * 100,
+        },
     });
-
-    const breakPoints = makeThemeVars("breakPoints", {
-        compact: 800,
-    });
-
-    const mediaQueries = () => {
-        const compact = styles => {
-            return media({ maxWidth: px(breakPoints.compact) }, styles);
-        };
-
-        return { compact };
-    };
 
     return {
         colors,
@@ -98,31 +91,35 @@ export const searchResultsVariables = useThemeCache(() => {
         spacing,
         icon,
         mediaElement,
-        breakPoints,
-        mediaQueries,
     };
 });
 
-export const searchResultsClasses = useThemeCache(() => {
+export const searchResultsClasses = useThemeCache(mediaQueries => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
-    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style(
-        {
-            display: "block",
-            position: "relative",
-            borderTop: singleBorder({
-                color: vars.separator.fg,
-                width: vars.separator.width,
-            }),
-            marginTop: negativeUnit(globalVars.gutter.half),
-        } as NestedCSSProperties,
-        mediaQueries.oneColumnDown({
-            borderTop: 0,
+    const root = style({
+        display: "block",
+        position: "relative",
+        borderTop: singleBorder({
+            color: vars.separator.fg,
+            width: vars.separator.width,
         }),
-    );
+        marginTop: negativeUnit(globalVars.gutter.half),
+        ...mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    borderTop: 0,
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    borderTop: 0,
+                },
+            },
+        }),
+    } as NestedCSSProperties);
     const noResults = style("noResults", {
         fontSize: globalVars.userContent.font.sizes.default,
         ...paddings({
@@ -157,99 +154,138 @@ export const searchResultsClasses = useThemeCache(() => {
     };
 });
 
-export const searchResultClasses = useThemeCache(() => {
+export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false) => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResult");
-    const mediaQueries = vars.mediaQueries();
     const metaVars = metasVariables();
+
+    const linkColors = clickableItemStates();
 
     const title = style("title", {
         display: "block",
-        ...fonts(vars.title.fonts),
+        ...fonts(vars.title.font),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
         paddingRight: unit(24),
+        $nest: linkColors.$nest,
     });
 
-    const root = style(
-        {
-            display: "flex",
-            alignItems: "stretch",
-            justifyContent: "space-between",
-            width: percent(100),
-            ...paddings(vars.spacing.padding),
-            cursor: "pointer",
-            color: colorOut(vars.title.fonts.color),
-        },
-        mediaQueries.compact({
-            flexWrap: "wrap",
-        }),
-    );
-
-    const mediaWidth = vars.mediaElement.width + vars.spacing.padding.left;
-    const iconWidth = vars.icon.size + vars.spacing.padding.left;
-
-    const main = style(
-        "main",
-        {
-            display: "block",
-            width: percent(100),
-            $nest: {
-                "&.hasMedia": {
-                    width: calc(`100% - ${unit(mediaWidth)}`),
-                },
-                "&.hasIcon": {
-                    width: calc(`100% - ${unit(iconWidth)}`),
-                },
-                "&.hasMedia.hasIcon": {
-                    width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
+    // This is so 100% is the space within the padding of the root element
+    const content = style("contents", {
+        display: "flex",
+        alignItems: "stretch",
+        justifyContent: "space-between",
+        width: percent(100),
+        color: colorOut(vars.title.font.color),
+        ...mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    flexWrap: "wrap",
                 },
             },
-        },
-        mediaQueries.compact({
-            $nest: {
-                "&.hasMedia": {
-                    width: percent(100),
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    flexWrap: "wrap",
                 },
             },
         }),
-    );
+    });
 
-    const mediaElement = style(
-        "mediaElement",
-        {
-            position: "relative",
-            width: unit(vars.mediaElement.width),
-            overflow: "hidden",
-        },
-        mediaQueries.compact({
-            width: percent(100),
-            $nest: {
-                "&.hasImage": {
-                    height: unit(vars.mediaElement.width),
-                },
+    const root = style({
+        display: "block",
+        width: percent(100),
+        ...paddings(vars.spacing.padding),
+    });
+
+    const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
+    const iconWidth = hasIcon ? vars.icon.size + vars.spacing.padding.left : 0;
+
+    const mainCompactStyles = {
+        $nest: {
+            "&.hasMedia": {
+                width: percent(100),
             },
-        }),
-    );
+            "&.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+            "&.hasMedia.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+        },
+    };
+
+    const main = style("main", {
+        display: "block",
+        width: percent(100),
+        $nest: {
+            "&.hasMedia": {
+                width: calc(`100% - ${unit(mediaWidth)}`),
+            },
+            "&.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+            "&.hasMedia.hasIcon": {
+                width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
+            },
+            ...mediaQueries({
+                [LayoutTypes.TWO_COLUMNS]: {
+                    oneColumnDown: mainCompactStyles,
+                },
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: mainCompactStyles,
+                },
+            }).$nest,
+        },
+    });
 
     const image = style("image", {
         ...objectFitWithFallback(),
     });
 
-    const attachments = style(
-        "attachments",
-        {
-            display: "flex",
-            flexWrap: "nowrap",
+    const compactMediaElement = style("compactMediaElement", {
+        $nest: {
+            [`& .${image}`]: {
+                position: important("absolute"),
+            },
         },
-        mediaQueries.compact({
-            flexWrap: "wrap",
-            width: percent(100),
-            marginTop: unit(12),
+    });
+
+    const mediaElement = style("mediaElement", {
+        position: "relative",
+        width: unit(vars.mediaElement.width),
+        height: unit(vars.mediaElement.height),
+        overflow: "hidden",
+        $nest: {
+            [`&.${compactMediaElement}`]: {
+                overflow: "hidden",
+                position: "relative",
+                marginTop: unit(globalVars.gutter.size),
+                paddingTop: percent(vars.mediaElement.compact.ratio),
+                width: percent(100),
+            },
+        },
+    });
+
+    const attachmentCompactStyles: NestedCSSProperties = {
+        flexWrap: "wrap",
+        width: percent(100),
+        marginTop: unit(12),
+    };
+
+    const attachments = style("attachments", {
+        display: "flex",
+        flexWrap: "nowrap",
+        ...mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: attachmentCompactStyles,
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: attachmentCompactStyles,
+            },
         }),
-    );
+    });
 
     const metas = style("metas", {
         marginTop: unit(2),
@@ -259,13 +295,22 @@ export const searchResultClasses = useThemeCache(() => {
         width: calc(`100% + ${unit(metaVars.spacing.default * 2)}`),
     });
 
+    const compactExcerpt = style("compactExcerpt", {});
+
     const excerpt = style("excerpt", {
         marginTop: unit(vars.excerpt.margin),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
+        $nest: {
+            [`&.${compactExcerpt}`]: {
+                ...margins({
+                    top: globalVars.gutter.size,
+                    left: iconWidth,
+                }),
+            },
+        },
     });
 
-    const linkColors = clickableItemStates();
     const link = style("link", {
         color: colorOut(globalVars.mainColors.fg),
         $nest: linkColors.$nest,
@@ -284,20 +329,24 @@ export const searchResultClasses = useThemeCache(() => {
         borderRadius: "50%",
         width: unit(vars.icon.size),
         height: unit(vars.icon.size),
-        marginRight: unit(vars.spacing.padding.left),
+        cursor: "pointer",
     });
 
     return {
         root,
         main,
         mediaElement,
+        compactMediaElement,
         image,
         title,
         attachments,
         metas,
         excerpt,
+        compactExcerpt,
         afterExcerptLink,
+        attachmentCompactStyles,
         link,
         iconWrap,
+        content,
     };
 });

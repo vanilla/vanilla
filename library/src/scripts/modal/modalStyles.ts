@@ -41,7 +41,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("spacing", {
-        horizontalMargin: 16,
+        horizontalMargin: 40,
     });
 
     const border = makeThemeVars("border", {
@@ -172,19 +172,19 @@ export const modalClasses = useThemeCache(() => {
             "&.isXL": {
                 width: unit(vars.sizing.xl),
                 height: percent(100),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isMedium": {
                 width: unit(vars.sizing.medium),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isSmall": {
                 width: unit(vars.sizing.small),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&&&.isSidePanelRight": {
                 ...sidePanelMixin,

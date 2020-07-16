@@ -14,6 +14,7 @@ import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbSt
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
+import ProfileLink from "@library/navigation/ProfileLink";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -40,7 +41,13 @@ export class ResultMeta extends React.Component<IProps> {
                             <Translate
                                 source="<0/> by <1/>"
                                 c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                                c1={updateUser.name}
+                                c1={
+                                    <ProfileLink
+                                        className={classesMetas.meta}
+                                        username={updateUser.name}
+                                        userID={updateUser.userID}
+                                    />
+                                }
                             />
                         )}
                     </span>

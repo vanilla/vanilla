@@ -221,13 +221,13 @@ export const themeCardClasses = useThemeCache(() => {
         color: vars.colors.btnTextColor.toString(),
         $nest: {
             "&:hover": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight, true),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
             },
             "&:focus": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight, true),
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
             },
             "&:active": {
-                backgroundColor: colorOut(globalVars.states.active.highlight, true),
+                backgroundColor: colorOut(globalVars.states.active.highlight),
             },
         },
     });

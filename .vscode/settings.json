@@ -1,0 +1,92 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "cloud/plugins": true,
+        "cloud/applications": true,
+        "cloud/themes": true,
+        ".idea": true,
+        "cgi-bin": true,
+        "dist": true,
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "vendor": true,
+        "**/.phpunit.result.cache": true,
+        ".htaccess.dist": true
+    },
+    "search.exclude": {
+        "**/*.code-search": true,
+        "cache": true,
+        "uploads": true,
+        "yarn.lock": true,
+        "composer.lock": true
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[yaml]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[php]": {
+        "editor.formatOnSave": false
+    },
+    "[scss]": {
+        "editor.formatOnSave": false
+    },
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[twig]": {
+        "editor.defaultFormatter": "mblode.twig-language-2"
+    },
+    "emmet.excludeLanguages": ["ts", "tsx", "js", "jsx"],
+    "editor.wordWrapColumn": 120,
+
+    // Inteliphense instead.
+    "php.suggest.basic": false,
+    "files.associations": {
+        "*.jsx": "javascriptreact",
+        "*.tpl": "html"
+    },
+
+    // To copy
+    "javascript.validate.enable": true,
+    "php-docblocker.returnGap": true,
+    "php-docblocker.useShortNames": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnSave": true,
+    "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+    "twig-language.indentStyle": "space",
+    "twig-language-2.indentStyle": "space",
+    "editor.stablePeek": true,
+    "search.quickOpen.includeSymbols": true,
+    "search.useIgnoreFiles": false,
+    "phpcs.standard": "./vendor/vanilla/standards/code-sniffer/Vanilla",
+    "eslint.packageManager": "yarn",
+    "gremlins.showInProblemPane": true,
+    "editor.gotoLocation.multipleDefinitions": "goto",
+    "editor.gotoLocation.multipleTypeDefinitions": "goto",
+    "eslint.alwaysShowStatus": true,
+    "phpcs.autoConfigSearch": false,
+    "phpcs.enable": false,
+    "jestrunner.jestCommand": "yarn test:unit"
+}

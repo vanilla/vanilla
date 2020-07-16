@@ -10,6 +10,7 @@ import { t } from "@library/utility/appUtils";
 import { splitStringLoosely } from "@vanilla/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { IUserFragment } from "@library/@types/api/users";
+import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 
 export interface IMentionSuggestionData extends IUserFragment {
     domID: string;
@@ -76,7 +77,7 @@ export default function MentionSuggestion(props: IMentionProps) {
             <button type="button" className="atMentionList-suggestion">
                 <span className="atMentionList-user">
                     <span className="atMentionList-photoWrap">
-                        <img src={photoUrl} alt={name} className="atMentionList-photo" />
+                        <UserPhoto userInfo={mentionData} className={"atMentionList-photo"} />
                     </span>
                     <span className="atMentionList-userName">{formattedName}</span>
                 </span>

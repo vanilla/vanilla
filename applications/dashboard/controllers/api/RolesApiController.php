@@ -149,6 +149,19 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a roles schema with minimal fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function minimalRolesSchema() {
+        return $this->schema(Schema::parse([
+            'roleID:i',
+            'name:s',
+            'description:s|n',
+        ])->add($this->fullSchema()), 'minimalRanksSchema');
+    }
+
+    /**
      * Get a single role.
      *
      * @param int $id The ID of the role.
@@ -254,12 +267,17 @@ class RolesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
-        $this->permission('Garden.Settings.Manage');
+        $session = $this->getSession();
+        $showFullSchema = false;
+        if ($session->checkPermission('Garden.Settings.Manage')) {
+            $showFullSchema = true;
+        }
 
         $in = $this->schema([
             'expand?' => ApiUtils::getExpandDefinition(['permissions'])
         ], 'in')->setDescription('List roles.');
-        $out = $this->schema([':a' => $this->roleSchema()], 'out');
+        $out = $showFullSchema ? $this->schema([':a' => $this->roleSchema()], 'out') :
+            $this->schema([':a' => $this->minimalRolesSchema()], 'out');
 
         $query = $in->validate($query);
 

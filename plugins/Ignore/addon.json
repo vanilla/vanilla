@@ -1,0 +1,24 @@
+{
+    "name": "Ignore",
+    "description": "This plugin allows users to ignore others, filtering their comments out of discussions.",
+    "version": "1.5",
+    "requiredTheme": false,
+    "mobileFriendly": true,
+    "hasLocale": false,
+    "settingsUrl": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "ignore.png",
+    "key": "ignore",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5"
+    }
+}

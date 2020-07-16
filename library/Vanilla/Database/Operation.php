@@ -6,12 +6,16 @@
 
 namespace Vanilla\Database;
 
+use Garden\MetaTrait;
+use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 
 /**
  * Simple class to represent a database operation.
  */
 class Operation {
+
+    use MetaTrait;
 
     /** Type identifier for delete operations. */
     const TYPE_DELETE = 'DELETE';
@@ -43,8 +47,6 @@ class Operation {
 
     /** @var array Conditions to specify the scope of the operation. */
     private $where = [];
-
-    private $mode = self::MODE_DEFAULT;
 
     /**
      * Get the reference to the object performing this operation.
@@ -115,7 +117,7 @@ class Operation {
      * @param string $mode
      */
     public function setMode(string $mode) {
-        $this->mode = $mode;
+        $this->options[Model::OPT_MODE] = $mode;
     }
 
     /**
@@ -124,7 +126,7 @@ class Operation {
      * @return string
      */
     public function getMode(): string {
-        return $this->mode;
+        return $this->options[Model::OPT_MODE] ?? self::MODE_DEFAULT;
     }
 
     /**

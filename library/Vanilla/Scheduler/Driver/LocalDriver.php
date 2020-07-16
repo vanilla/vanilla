@@ -72,11 +72,15 @@ class LocalDriver implements DriverInterface {
         try {
             return $driverSlip->execute();
         } catch (\Throwable $t) {
-            $msg = "Driver failed to execute Job";
-            $msg .= ". Message: ".$t->getMessage();
-            $msg .= ". File: ".$t->getFile();
-            $msg .= ". Line: ".$t->getLine();
+            $msg = $t->getMessage();
+            if (strpos($msg, "File: ") !== false) {
+                $msg = "Scheduler failed to execute Job";
+                $msg .= ". Message: ".$t->getMessage();
+                $msg .= ". File: ".$t->getFile();
+                $msg .= ". Line: ".$t->getLine();
+            }
 
+            trigger_error($msg, E_USER_WARNING);
             $driverSlip->setStackExecutionFailed($msg);
             return $driverSlip->getStatus();
         }

@@ -11,7 +11,7 @@ use Vanilla\Events\EventAction;
 /**
  * An event affecting a specific resource.
  */
-abstract class ResourceEvent {
+abstract class ResourceEvent implements \JsonSerializable {
 
     /** A resource has been removed. */
     public const ACTION_DELETE = EventAction::DELETE;
@@ -105,5 +105,38 @@ abstract class ResourceEvent {
         }
         $type = lcfirst(preg_replace('/Event$/', '', $baseName));
         return $type;
+    }
+
+    /**
+     * Create a normalized variation of the record's payload.
+     *
+     * @return array A tuple of [string, int]
+     */
+    public function getRecordTypeAndID(): array {
+        $recordType = $this->getType();
+
+        $idKey = $this->type . 'ID';
+        $payloadRecord = $this->payload[$this->type] ?? $this->payload;
+        $recordID = $payloadRecord['recordID'] ?? $payloadRecord[$idKey] ?? null;
+
+        return [$recordType, $recordID];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return [
+            'type' => $this->type,
+            'action' => $this->action,
+            'payload' => $this->getPayload(),
+        ];
+    }
+
+    /**
+     * Convert to string.
+     */
+    public function __toString() {
+        return json_encode($this, JSON_PRETTY_PRINT);
     }
 }

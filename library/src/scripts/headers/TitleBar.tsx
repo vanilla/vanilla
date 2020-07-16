@@ -33,8 +33,6 @@ import { animated, useSpring } from "react-spring";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import WidgetContainer from "@library/layout/components/WidgetContainer";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { SearchPageRoute } from "@library/search/SearchPageRoute";
 
 interface IProps {

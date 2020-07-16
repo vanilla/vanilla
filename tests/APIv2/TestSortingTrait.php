@@ -20,6 +20,15 @@ trait TestSortingTrait {
     protected $sortFields = [];
 
     /**
+     * Get the URL used for test sorts.
+     *
+     * @return string
+     */
+    protected function sortUrl(): string {
+        return $this->indexUrl();
+    }
+
+    /**
      * Test the sorting of a single field.
      *
      * @param string $field
@@ -32,7 +41,7 @@ trait TestSortingTrait {
 
         foreach ($fields as $field) {
             /* @var AbstractResourceTest $this */
-            $actual = $this->api()->get($this->indexUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
+            $actual = $this->api()->get($this->sortUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
             static::assertSorted($actual, $field);
         }
     }

@@ -41,6 +41,7 @@ class APIExpandMiddleware {
         "lastUser.ssoID" => "lastUserID",
         "updateUser.ssoID" => "updateUserID",
         "user.ssoID" => "userID",
+        "ssoID" => "userID",
     ];
 
     /** @var string */
@@ -294,10 +295,10 @@ class APIExpandMiddleware {
     /**
      * Grab users SSO IDs and return them mapped to the original user IDs.
      *
-     * @param array $userIDs
+     * @param int[] $userIDs
      * @return array
      */
-    protected function joinSSOIDs(array $userIDs): array {
+    public function joinSSOIDs(array $userIDs): array {
         $result = $this->userModel->getDefaultSSOIDs($userIDs);
         return $result;
     }

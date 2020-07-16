@@ -27,6 +27,15 @@ abstract class AbstractSearchDriver {
     abstract public function search(array $queryData, SearchOptions $options): SearchResults;
 
     /**
+     * Return short form of search driver name
+     *
+     * @return string
+     */
+    public function driver(): string {
+        return '';
+    }
+
+    /**
      * Get the schema for a query.
      *
      * @return Schema
@@ -76,7 +85,7 @@ abstract class AbstractSearchDriver {
                 continue;
             }
             $recordIDs = array_column($recordSet, 'recordID');
-            $resultItems = $searchType->getResultItems($recordIDs);
+            $resultItems = $searchType->getResultItems($recordIDs, ['driver' => $this->driver()]);
             foreach ($resultItems as $resultItem) {
                 $id = $resultItem->getAltRecordID() ?? $resultItem->getRecordID();
                 $resultsItemsByTypeAndID[$resultItem->getType().$id] = $resultItem;

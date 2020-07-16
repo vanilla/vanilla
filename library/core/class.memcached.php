@@ -284,7 +284,7 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param mixed $value data value to shard
      * @param integer $keySize value size
      * @param int|boolean $shards number of shards, or simply bool true
-     * @return array
+     * @return MemcachedShard
      */
     public function shard($key, $value, $keySize, $shards = true) {
 
@@ -293,7 +293,6 @@ class Gdn_Memcached extends Gdn_Cache {
 
         // Apply automated shard limits if shard allocation is automatic
         if (!is_numeric($shards)) {
-
             // By default, shard to all servers
             $shards = $mapSize;
 
@@ -570,8 +569,14 @@ class Gdn_Memcached extends Gdn_Cache {
                 $data = $this->memcache->get($realKey);
                 if ($data === false && $this->memcache->getResultCode() === \Memcached::RES_NOTFOUND) {
                     $data = $default;
-                } elseif ($useLocal) {
-                    $this->localSet($data);
+                } else {
+                    if (is_object($data) && $data instanceof MemcachedShard) {
+                        $data = $this->unShard($data, $default);
+                    }
+
+                    if ($useLocal) {
+                        $this->localSet($data);
+                    }
                 }
 
                 // Check if things went ok.
@@ -588,25 +593,7 @@ class Gdn_Memcached extends Gdn_Cache {
                 foreach ($data as $localKey => &$localValue) {
                     // Is this a sharded key manifest?
                     if (is_object($localValue) && $localValue instanceof MemcachedShard) {
-                        $manifest = $localValue;
-
-                        // MultiGet sub-keys
-                        $shardKeys = [];
-                        foreach ($manifest->keys as $serverKey => $keys) {
-                            $serverKeys = $this->memcache->getMultiByKey($serverKey, $keys);
-                            $shardKeys = array_merge($shardKeys, $serverKeys);
-                        }
-                        ksort($shardKeys, SORT_NATURAL);
-
-                        // Check subkeys for validity
-                        $shardData = implode('', array_values($shardKeys));
-                        unset($shardKeys);
-                        $dataHash = md5($shardData);
-                        if ($dataHash != $manifest->hash) {
-                            continue;
-                        }
-
-                        $localValue = unserialize($shardData);
+                        $localValue = $this->unShard($localValue, false);
                     }
 
                     if ($localValue !== false) {
@@ -888,6 +875,36 @@ class Gdn_Memcached extends Gdn_Cache {
     public function setStoreDefault(string $key, $value) {
         $this->storeDefaults[$key] = $value;
         return $this;
+    }
+
+    /**
+     * Unshard a cache key.
+     *
+     * @param MemcachedShard $localValue
+     * @param mixed $default
+     * @return mixed
+     */
+    private function unShard(MemcachedShard $localValue, $default = null): array {
+        $manifest = $localValue;
+
+        // MultiGet sub-keys
+        $shardKeys = [];
+        foreach ($manifest->keys as $serverKey => $keys) {
+            $serverKeys = $this->memcache->getMultiByKey($serverKey, $keys);
+            $shardKeys = array_merge($shardKeys, $serverKeys);
+        }
+        ksort($shardKeys, SORT_NATURAL);
+
+        // Check subkeys for validity
+        $shardData = implode('', array_values($shardKeys));
+        unset($shardKeys);
+        $dataHash = md5($shardData);
+        if ($dataHash != $manifest->hash) {
+            return $default;
+        }
+
+        $localValue = unserialize($shardData);
+        return $localValue;
     }
 }
 

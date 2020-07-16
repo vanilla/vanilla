@@ -9,18 +9,29 @@ import { logError, logDebugConditionnal } from "@vanilla/utils/src/debugUtils";
 import { stringIsLinearGradient } from "@library/styles/styleUtils";
 export type ColorValues = ColorHelper | undefined;
 
-export const colorOut = (colorValue: ColorValues | string, makeImportant = false, debug = false) => {
+export const colorOut = (
+    colorValue: ColorValues | string,
+    options?: {
+        debug?: boolean;
+        makeImportant?: boolean;
+    },
+) => {
+    const { debug = false, makeImportant } = options || {};
+
     logDebugConditionnal(debug, "colorOut - colorValue: ", colorValue);
+
     if (!colorValue) {
         return undefined;
+    }
+
+    if (stringIsLinearGradient(colorValue)) {
+        logDebugConditionnal(debug, "colorOut - linear gradient detected - colorValue: ", colorValue);
+        // @ts-ignore
+        return colorValue.toString();
     } else {
-        if (stringIsLinearGradient(colorValue)) {
-            logDebugConditionnal(debug, "colorOut - linear gradient detected - colorValue: ", colorValue);
-            return colorValue.toString();
-        } else {
-            const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
-            return makeImportant ? important(output.toString()) : output.toString();
-        }
+        const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
+        // @ts-ignore
+        return makeImportant ? important(output.toString()) : output.toString();
     }
 };
 
@@ -29,7 +40,7 @@ export const ensureColorHelper = (colorValue: string | ColorHelper) => {
 };
 
 export const importantColorOut = (colorValue: ColorValues | string) => {
-    return colorOut(colorValue, true) as string;
+    return colorOut(colorValue, { makeImportant: true });
 };
 
 /**

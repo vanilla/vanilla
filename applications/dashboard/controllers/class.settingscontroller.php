@@ -35,6 +35,21 @@ class SettingsController extends DashboardController {
     private $_BanModel;
 
     /**
+     * @var \Vanilla\Models\AddonModel
+     */
+    private $addonModel;
+
+    /**
+     * SettingsController constructor.
+     *
+     * @param \Vanilla\Models\AddonModel $addonModel
+     */
+    public function __construct(\Vanilla\Models\AddonModel $addonModel) {
+        parent::__construct();
+        $this->addonModel = $addonModel;
+    }
+
+    /**
      * Highlight menu path. Automatically run on every use.
      *
      * @since 2.0.0
@@ -1471,6 +1486,12 @@ class SettingsController extends DashboardController {
         $this->render('blank', 'utility', 'dashboard');
     }
 
+    /**
+     * Enable a plugin.
+     *
+     * @param string $pluginName The key of the plugin.
+     * @param string $filter
+     */
     public function enablePlugin($pluginName, $filter = 'all') {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
@@ -1485,8 +1506,9 @@ class SettingsController extends DashboardController {
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
         $requirementsEnabled = [];
-
         try {
+            $this->addonModel->validateEnable($addon);
+
             $validation = new Gdn_Validation();
             $result = Gdn::pluginManager()->enablePlugin($pluginName, $validation);
             if (!$result) {

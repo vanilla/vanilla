@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Utility methods useful for greating API endpoints.
@@ -66,12 +67,16 @@ class ApiUtils {
      * @return array
      */
     public static function getExpandDefinition(array $fields, $default = false) {
-        if (!in_array(self::EXPAND_ALL, $fields)) {
-            $fields[] = self::EXPAND_ALL;
+        if (!in_array(ModelUtils::EXPAND_ALL, $fields)) {
+            $fields[] = ModelUtils::EXPAND_ALL;
+            $fields[] = ModelUtils::EXPAND_CRAWL;
         }
 
         $result = [
-            'description' => 'Expand associated records using one or more valid field names. A value of "'.self::EXPAND_ALL.'" will expand all expandable fields.',
+            'description' =>
+                'Expand associated records using one or more valid field names. A value of "'
+                . ModelUtils::EXPAND_ALL
+                . '" will expand all expandable fields.',
             'default' => $default,
             'items' => [
                 'enum' => $fields,

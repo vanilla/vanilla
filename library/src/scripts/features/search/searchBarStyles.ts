@@ -91,7 +91,7 @@ export const searchBarVariables = useThemeCache(() => {
     };
 });
 
-export const searchBarClasses = useThemeCache((overwrites = {}) => {
+export const searchBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const titleBarVars = titleBarVariables();
@@ -122,100 +122,98 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         side: "right",
     });
 
-    const root = style(
-        {
-            cursor: "pointer",
-            $nest: {
-                "& .searchBar__placeholder": {
-                    color: colorOut(formElementVars.placeholder.color),
-                    margin: "auto",
-                    height: unit(calculatedHeight),
-                    lineHeight: unit(calculatedHeight),
-                    top: 0,
-                    transform: "none",
-                },
+    const root = style({
+        cursor: "pointer",
+        $nest: {
+            "& .searchBar__placeholder": {
+                color: colorOut(formElementVars.placeholder.color),
+                margin: "auto",
+                height: unit(calculatedHeight),
+                lineHeight: unit(calculatedHeight),
+                top: 0,
+                transform: "none",
+            },
 
-                "& .suggestedTextInput-valueContainer": {
-                    $nest: {
-                        [`.${classesInputBlock.inputText}`]: {
-                            height: "auto",
-                        },
-                        "& > *": {
-                            width: percent(100),
-                        },
+            "& .suggestedTextInput-valueContainer": {
+                $nest: {
+                    [`.${classesInputBlock.inputText}`]: {
+                        height: "auto",
+                    },
+                    "& > *": {
+                        width: percent(100),
                     },
                 },
-                "& .searchBar-submitButton": {
-                    position: "relative",
-                    minWidth: unit(vars.search.minWidth),
-                    flexBasis: unit(vars.search.minWidth),
-                    minHeight: unit(vars.sizing.height),
-                    $nest: {
-                        "&:hover, &:focus": {
-                            zIndex: 1,
-                        },
+            },
+            "& .searchBar-submitButton": {
+                position: "relative",
+                minWidth: unit(vars.search.minWidth),
+                flexBasis: unit(vars.search.minWidth),
+                minHeight: unit(vars.sizing.height),
+                $nest: {
+                    "&:hover, &:focus": {
+                        zIndex: 1,
                     },
-                    borderTopLeftRadius: important(0),
-                    borderBottomLeftRadius: important(0),
-                    paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
                 },
-                "& .searchBar__control": {
-                    border: 0,
-                    backgroundColor: colorOut(globalVars.elementaryColors.transparent),
-                    width: percent(100),
-                    maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
-                    $nest: {
-                        "&.searchBar__control--is-focused": {
-                            boxShadow: "none",
-                            $nest: {
-                                "&.inputText": {
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                    ...borders(buttonVariables().standard.borders),
-                                },
+                borderTopLeftRadius: important(0),
+                borderBottomLeftRadius: important(0),
+                paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
+            },
+            "& .searchBar__control": {
+                border: 0,
+                backgroundColor: colorOut(globalVars.elementaryColors.transparent),
+                width: percent(100),
+                maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
+                $nest: {
+                    "&.searchBar__control--is-focused": {
+                        boxShadow: "none",
+                        $nest: {
+                            "&.inputText": {
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                                ...borders(buttonVariables().standard.borders),
                             },
                         },
                     },
                 },
-                "& .searchBar__value-container": {
-                    position: "static",
-                    overflow: "auto",
-                    cursor: "text",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
-                    fontSize: unit(inputVars.font.size),
-                    height: unit(calculatedHeight),
-                    $nest: {
-                        "& > div": {
-                            width: percent(100),
-                        },
+            },
+            "& .searchBar__value-container": {
+                position: "static",
+                overflow: "auto",
+                cursor: "text",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                fontSize: unit(inputVars.font.size),
+                height: unit(calculatedHeight),
+                $nest: {
+                    "& > div": {
+                        width: percent(100),
                     },
                 },
-                "& .searchBar__indicators": {
-                    display: "none",
-                },
-                "& .searchBar__input": {
-                    width: percent(100),
-                },
-                "& .searchBar__input input": {
-                    height: "auto",
-                    minHeight: 0,
-                    width: important(`100%`),
-                    borderRadius: important(0),
-                    lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
-                },
             },
-        } as NestedCSSProperties,
-        mediaQueries.oneColumnDown({
-            $nest: {
-                "& .searchBar-submitButton": {
-                    minWidth: 0,
-                },
+            "& .searchBar__indicators": {
+                display: "none",
             },
-        }),
-    );
+            "& .searchBar__input": {
+                width: percent(100),
+            },
+            "& .searchBar__input input": {
+                height: "auto",
+                minHeight: 0,
+                width: important(`100%`),
+                borderRadius: important(0),
+                lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+            },
+            ...mediaQueries.oneColumnDown({
+                $nest: {
+                    "& .searchBar-submitButton": {
+                        minWidth: 0,
+                    },
+                },
+            }),
+        },
+    } as NestedCSSProperties);
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const searchResultsStyles = {
@@ -307,10 +305,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             color: colorOut(vars.input.fg),
             cursor: "text",
             transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
-            ...borderRadii({
-                left: vars.border.radius,
-                right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
-            }),
             $nest: {
                 "&&&": {
                     display: "flex",
@@ -319,6 +313,10 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     justifyContent: "flex-start",
                     paddingLeft: unit(vars.searchIcon.gap),
                     paddingRight: unit(vars.searchIcon.padding.right),
+                    ...borderRadii({
+                        left: vars.border.radius,
+                        right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+                    }),
                 },
             },
         });

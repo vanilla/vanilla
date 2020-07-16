@@ -34,6 +34,13 @@ interface IProps extends NavLinkProps {
 export default function SmartLink(props: IProps) {
     const { replace, ...passthru } = props;
 
+    // Filter out undefined props
+    for (const prop in passthru) {
+        if (!passthru[prop]) {
+            delete passthru[prop];
+        }
+    }
+
     return (
         <LinkContext.Consumer>
             {context => {

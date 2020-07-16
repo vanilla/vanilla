@@ -18,6 +18,9 @@ final class DomUtils {
     /** @var array */
     private const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
 
+    /** @var array */
+    private const TEXT_ATTRIBUTES = ['title', 'alt', 'aria-label'];
+
     /**
      * Remove embeds from the dom.
      *
@@ -94,5 +97,30 @@ final class DomUtils {
             }
         }
         return $wordCounter;
+    }
+
+    /**
+     * Search and replace dom text while preserving html tags.
+     *
+     * @param DOMDocument $dom
+     * @param string|string[] $pattern Regex pattern.
+     * @param callable $callback Callback function.
+     * @param array $attributes The attributes to search for.
+     * @return int Return the number of replacements.
+     */
+    public static function pregReplaceCallback(DOMDocument $dom, $pattern, callable $callback, array $attributes = self::TEXT_ATTRIBUTES): int {
+        $xpath = new \DOMXPath($dom);
+        $xpathQuery = $xpath->query('//text() | //@'.implode(' | //@', $attributes));
+        $replacementCount = 0;
+        if ($xpathQuery->length > 0) {
+            foreach ($xpathQuery as $node) {
+                $replaced = preg_replace_callback($pattern, $callback, $node->nodeValue, $limit = -1, $count);
+                if ($count > 0 && $replaced !== $node->nodeValue) {
+                    $replacementCount += $count;
+                    $node->nodeValue = $replaced;
+                }
+            }
+        }
+        return $replacementCount;
     }
 }

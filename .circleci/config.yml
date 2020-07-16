@@ -100,12 +100,14 @@ jobs:
                     yarn test
     frontend_lint:
         executor: core/node
+        resource_class: large
         steps:
             - *attach_workspace
             - run: |
-                cd ~/workspace/repo
-                yarn lint
-                yarn prettier --check "**/src/scripts/**/*"
+                  cd ~/workspace/repo
+                  # 4 cores
+                  yarn lint -w 4
+                  yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         executor: core/node
         resource_class: large

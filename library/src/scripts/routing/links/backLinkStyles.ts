@@ -7,11 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, margins, negative, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, px, translateY } from "csx";
+import { important, percent, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { media } from "typestyle";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -93,7 +91,6 @@ const backLinkClasses = useThemeCache(() => {
     const label = style(
         "label",
         {
-            lineHeight: px(globalVars.icon.sizes.default),
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
             paddingLeft: px(12),

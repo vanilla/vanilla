@@ -94,25 +94,29 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
 
     let columnCount = vars.options.columns;
     let width: CSSPercentage = "50%";
-    let additionnalMediaQueries = [] as NestedCSSProperties[];
+    let additionalMediaQueries = [] as NestedCSSProperties[];
     let itemPadding = vars.itemSpacing.paddingTwoColumns;
     switch (columnCount) {
         case 3:
-            width = globalVars.utility["percentage.third"];
-            additionnalMediaQueries.push(
-                mediaQueries.twoColumns({
-                    width: percent(50),
-                }),
-            );
+            width = percent((1 / 3) * 100);
+            if ("twoColumns" in mediaQueries) {
+                additionalMediaQueries.push(
+                    mediaQueries.twoColumns({
+                        width: percent(50),
+                    }),
+                );
+            }
             itemPadding = vars.itemSpacing.paddingThreeColumns;
             break;
         case 4:
             width = "25%";
-            additionnalMediaQueries.push(
-                mediaQueries.twoColumns({
-                    width: percent(50),
-                }),
-            );
+            if ("twoColumns" in mediaQueries) {
+                additionalMediaQueries.push(
+                    mediaQueries.twoColumns({
+                        width: percent(50),
+                    }),
+                );
+            }
             itemPadding = vars.itemSpacing.paddingFourColumns;
             break;
     }
@@ -143,7 +147,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
             width,
             padding: unit(itemPadding),
         },
-        ...additionnalMediaQueries,
+        ...additionalMediaQueries,
         mediaQueries.oneColumnDown({
             display: "block",
             width: percent(100),

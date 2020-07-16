@@ -34,7 +34,7 @@ class MockPageScraper extends \Vanilla\PageScraper {
     public function pageInfo(string $url): array {
         $key = $this->makeMockResponseKey($url);
         if ($this->mockedResponses[$key]) {
-            return $this->mockedResponses[$key];
+            return $this->mockedResponses[$key]->getBody();
         } else {
             throw new Exception("No mock result found for url $url.");
         }

@@ -7,7 +7,7 @@
 
 import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
 import { logDebug, logError, debug } from "@vanilla/utils";
-import { translationDebug } from "@vanilla/i18n";
+import { translationDebug, translate } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
@@ -16,6 +16,8 @@ import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
 import { isLegacyAnalyticsTickEnabled } from "@library/analytics/AnalyticsData";
+import getStore from "@library/redux/getStore";
+import { hasPermission } from "@library/features/users/Permission";
 
 if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
@@ -30,8 +32,25 @@ translationDebug(translationDebugValue);
 
 bootstrapLocales();
 
-// Export the API to the global object.
+// Export some globals to the window.
+
+// Exposed under other namespaces for legacy reasons.
 window.gdn.apiv2 = apiv2;
+window.onPageView = onPageView;
+
+// Named this way to discourage direct usage.
+window.__VANILLA_INTERNAL_IS_READY__ = false;
+window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__ = {
+    apiv2,
+    translate,
+    getCurrentUser: () => {
+        return getStore().getState().users.current.data;
+    },
+    getCurrentUserPermissions: () => {
+        return getStore().getState().users.permissions.data;
+    },
+    currentUserHasPermission: hasPermission,
+};
 
 // Record the page view.
 onPageView((params: { history: History }) => {
@@ -60,6 +79,7 @@ _executeReady()
 
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
         document.dispatchEvent(contentEvent);
+        window.__VANILLA_INTERNAL_IS_READY__ = true;
     })
     .catch(error => {
         logError(error);

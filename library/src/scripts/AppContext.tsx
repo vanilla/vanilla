@@ -20,7 +20,7 @@ import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { BannerContextProvider, BannerContextProviderNoHistory } from "@library/banner/BannerContext";
+import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContext";
 
 interface IProps {

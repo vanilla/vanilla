@@ -31,7 +31,7 @@ export const navLinksVariables = useThemeCache(() => {
         padding: {
             ...EMPTY_SPACING,
             vertical: globalVars.spacer.size * 2,
-            horizontal: containerVariables().spacing.paddingFull.horizontal,
+            horizontal: containerVariables().spacing.padding * 2,
         },
         paddingMobile: {
             ...EMPTY_SPACING,

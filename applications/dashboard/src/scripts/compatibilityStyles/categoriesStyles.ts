@@ -128,4 +128,8 @@ export const categoriesCSS = () => {
             left: "auto",
         }),
     });
+
+    cssOut(`.DataList .Item, .DataList .Empty`, {
+        width: percent(100),
+    });
 };

@@ -8,6 +8,7 @@
 use Firebase\JWT\JWT;
 use Garden\Web\Cookie;
 use Vanilla\Logger;
+use Vanilla\Events\EventAction;
 
 /**
  * Class SsoUtils
@@ -42,10 +43,15 @@ class SsoUtils {
 
     /**
      * SsoUtils constructor.
+     *
+     * @param \Gdn_Configuration $config
+     * @param Cookie $cookie
+     * @param \Gdn_Session $session
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, ?\Psr\Log\LoggerInterface $logger = null) {
         $this->cookie = $cookie;
-        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-ssostatetoken';
+        $this->cookieName = '-ssostatetoken';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
         $this->session = $session;
         if ($logger === null) {
@@ -93,7 +99,7 @@ class SsoUtils {
      * action should use a different context name.
      *
      * @param string $context Context defining where the verification happens.
-     * @param $stateToken
+     * @param string $stateToken
      * @throws Gdn_UserException If the state token is invalid/expired.
      */
     public function verifyStateToken($context, $stateToken) {
@@ -108,7 +114,8 @@ class SsoUtils {
             // Stash the token in case we post back!
             $this->session->stash("{$context}StateToken", $storedStateTokenData);
             $isStateTokenValid = true;
-        } catch (Exception $e){}
+        } catch (Exception $e) {
+        }
 
         if (!$storedStateTokenData) {
             $storedStateTokenData = $this->session->stash("{$context}StateToken", '', false);
@@ -123,9 +130,9 @@ class SsoUtils {
     /**
      * Consume a state token and return its data.
      *
-     * @throws Exception
-     * @param $stateToken
+     * @param string $stateToken
      * @return array The state token data.
+     * @throws Exception Throws an exception when the token is invalid.
      */
     protected function consumeStateToken($stateToken) {
         $stateTokenData = null;
@@ -133,7 +140,8 @@ class SsoUtils {
         if ($jwt) {
             try {
                 $stateTokenData = (array)JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+            }
         }
 
         if (!$stateTokenData || empty($stateTokenData['stateToken'])) {
@@ -159,7 +167,7 @@ class SsoUtils {
     protected function isStateTokenValid($stateTokenData, $stateToken, $source = '') {
         $loggingContext = [
             'source' => $source,
-            'event' => 'state_token_errors',
+            'event' => EventAction::eventName('stateToken', EventAction::FAILURE),
             'timestamp' => time(),
         ];
         // Validate expected data.
@@ -188,7 +196,10 @@ class SsoUtils {
 
         // Check the token.
         if ($stateToken !== $stateTokenData['stateToken']) {
-            $this->logger->error('StateTokens do not match.', ['StoredStateToken' => $stateTokenData['stateToken'], 'RecievedStateToken' => $stateToken] + $loggingContext);
+            $this->logger->error(
+                'StateTokens do not match.',
+                ['storedStateToken' => $stateTokenData['stateToken'], 'receivedStateToken' => $stateToken] + $loggingContext
+            );
             return false;
         }
 

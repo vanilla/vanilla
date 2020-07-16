@@ -482,7 +482,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
             color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
-        color: colorOut(vars.item.colors.fg, true),
+        color: colorOut(vars.item.colors.fg),
         ...userSelect("none"),
         ...buttonStates(
             {
@@ -491,28 +491,20 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.highlight, true),
-                    color: globalVars.states.hover.contrast
-                        ? colorOut(globalVars.states.hover.contrast, true)
-                        : undefined,
+                    backgroundColor: colorOut(globalVars.states.hover.highlight),
+                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.hover.contrast) : undefined,
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.highlight, true),
-                    color: globalVars.states.hover.contrast
-                        ? colorOut(globalVars.states.focus.contrast, true)
-                        : undefined,
+                    backgroundColor: colorOut(globalVars.states.focus.highlight),
+                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.focus.contrast) : undefined,
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.active.highlight, true),
-                    color: globalVars.states.hover.contrast
-                        ? colorOut(globalVars.states.active.contrast, true)
-                        : undefined,
+                    backgroundColor: colorOut(globalVars.states.active.highlight),
+                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.active.contrast) : undefined,
                 },
                 keyboardFocus: {
-                    borderColor: colorOut(globalVars.states.focus.highlight, true),
-                    color: globalVars.states.hover.contrast
-                        ? colorOut(globalVars.states.focus.contrast, true)
-                        : undefined,
+                    borderColor: colorOut(globalVars.states.focus.highlight),
+                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.focus.contrast) : undefined,
                 },
             },
             undefined,

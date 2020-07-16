@@ -116,9 +116,9 @@ class MorePagerModule extends PagerModule {
         $details = false;
         if ($this->TotalRecords > 0) {
             if ($this->_Totalled === true) {
-                $details = self::formatUrl(t('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+                $details = self::formatUrl(t('%1$s to %2$s of %3$s'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
             } else {
-                $details = self::formatUrl(t('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+                $details = self::formatUrl(t('%1$s to %2$s'), $this->Offset, $this->_LastOffset);
             }
         }
         return $details;

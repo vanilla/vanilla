@@ -7,10 +7,7 @@ import {
     ILinkColorOverwritesWithOptions,
     EMPTY_LINK_COLOR_OVERWRITES_WITH_OPTIONS,
 } from "@library/styles/styleHelpersLinks";
-import merge from "lodash/merge";
-import { important } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const tagVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");

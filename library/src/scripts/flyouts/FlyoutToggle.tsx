@@ -195,6 +195,7 @@ export default function FlyoutToggle(props: IProps) {
             <React.Fragment>
                 {props.openAsModal ? (
                     <Modal
+                        id={contentID}
                         label={t("title")}
                         size={ModalSizes.SMALL}
                         exitHandler={closeMenuHandler}

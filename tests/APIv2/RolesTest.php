@@ -6,10 +6,14 @@
 
 namespace VanillaTests\APIv2;
 
+use RolesApiController;
+use VanillaTests\UsersAndRolesApiTestTrait;
+
 /**
  * Test the /api/v2/roles endpoints.
  */
 class RolesTest extends AbstractResourceTest {
+    use UsersAndRolesApiTestTrait;
 
     protected $editFields = ['canSession', 'deletable', 'description', 'name', 'personalInfo', 'type'];
 
@@ -266,5 +270,31 @@ class RolesTest extends AbstractResourceTest {
         $this->assertFalse($this->hasPermission('comments.add', 'category', $permissions, 1));
         $this->assertFalse($this->hasPermission('discussions.view', 'category', $permissions, 1));
         $this->assertFalse($this->hasPermission('tokens.add', 'global', $permissions));
+    }
+
+    /**
+     * Test GET /Roles with a user that doesn't have Garden.Settings.Manage'
+     */
+    public function testGetRolesWithMember() {
+        $member = $this->createUser();
+        $this->api()->setUserID($member['userID']);
+
+        $roles = $this->api()->get($this->baseUrl)->getBody();
+
+        /** @var RolesApiController $rolesApiController */
+        $rolesApiController = \Gdn::getContainer()->get(RolesApiController::class);
+        $minimalSchema = $rolesApiController->minimalRolesSchema();
+
+        foreach ($roles as $role) {
+            $minimalSchema->validate($role);
+            $this->assertArrayHasKey('roleID', $role);
+            $this->assertArrayHasKey('name', $role);
+            $this->assertArrayHasKey('description', $role);
+
+            $this->assertArrayNotHasKey('type', $role);
+            $this->assertArrayNotHasKey('deletable', $role);
+            $this->assertArrayNotHasKey('canSession', $role);
+            $this->assertArrayNotHasKey('personalInfo', $role);
+        }
     }
 }

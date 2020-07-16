@@ -5,14 +5,22 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit, modifyColorBasedOnLightness, borders, EMPTY_BORDER } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    modifyColorBasedOnLightness,
+    borders,
+    EMPTY_BORDER,
+    borderRadii,
+    paddings,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { SearchBarPresets } from "@library/banner/bannerStyles";
+import { bannerVariables, SearchBarPresets } from "@library/banner/bannerStyles";
 import { ButtonPreset } from "@library/forms/buttonStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { inputClasses } from "@library/forms/inputStyles";
@@ -35,6 +43,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         // If we have a BG image, make sure we have some opacity so it shines through.
         baseColor = baseColor.fade(0.3);
     }
+
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
@@ -187,7 +196,6 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                border: 0,
             },
             ".searchBar__placeholder": {
                 color: colorOut(vars.colors.placeholder),
@@ -208,32 +216,36 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style(
-        "contents",
-        {
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "nowrap",
-            minHeight: unit(formElementsVars.sizing.height),
-            justifyContent: "center",
-            width: percent(100),
-            position: "relative",
-            ...borders(vars.borders),
-        },
-        mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
-        }),
-    );
+    const contents = style("contents", {
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "nowrap",
+        minHeight: unit(formElementsVars.sizing.height),
+        justifyContent: "center",
+        width: percent(100),
+        position: "relative",
+        ...borders(vars.borders),
+    });
 
     const close = style("close", {
         color: "inherit",
         whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.semiBold,
+        margin: 0,
+        ...paddings({
+            horizontal: 10,
+        }),
+        ...borderRadii(
+            {
+                left: 0,
+            },
+            {
+                isImportant: true,
+            },
+        ),
     });
 
-    const cancelContents = style("cancelContents", {
-        padding: px(4),
-    });
+    const cancelContents = style("cancelContents", {});
 
     const searchAndResults = style("searchAndResults", {
         flex: 1,
@@ -244,11 +256,28 @@ export const compactSearchClasses = useThemeCache(() => {
         flexWrap: "nowrap",
     });
 
+    const valueContainer = style("valueContainer", {
+        $nest: {
+            "&&&": {
+                ...borderRadii(
+                    {
+                        left: vars.borders.radius,
+                        right: 0,
+                    },
+                    {
+                        isImportant: true,
+                    },
+                ),
+            },
+        },
+    });
+
     return {
         root,
         contents,
         close,
         cancelContents,
         searchAndResults,
+        valueContainer,
     };
 });

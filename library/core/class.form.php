@@ -1615,7 +1615,7 @@ class Gdn_Form extends Gdn_Pluggable {
     public function errors() {
         $return = '';
         if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
-            $return = "<div class=\"Messages Errors\">\n<ul>\n";
+            $return = "<div class=\"Messages Errors\" role=\"alert\" aria-label=\"".htmlspecialchars(t('Validation Failed'))."\">\n<ul>\n";
             foreach ($this->_ValidationResults as $fieldName => $problems) {
                 $count = count($problems);
                 for ($i = 0; $i < $count; ++$i) {

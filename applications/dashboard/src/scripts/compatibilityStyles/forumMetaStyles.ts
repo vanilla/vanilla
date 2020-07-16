@@ -14,6 +14,7 @@ import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
@@ -174,6 +175,7 @@ export const forumMetaCSS = () => {
     cssOut(
         `
     .AuthorWrap a.Username,
+    .AuthorWrap .${userCardClasses().link},
     .AuthorInfo .MItem,
     .DiscussionMeta .MItem,
     `,

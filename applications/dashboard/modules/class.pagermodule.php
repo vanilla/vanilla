@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
-use Vanilla\Web\WebLinking;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Builds a pager control related to a dataset.
@@ -386,7 +386,7 @@ class PagerModule extends Gdn_Module {
             return sprintf(
                 $this->Wrapper,
                 attribute(['class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
-                $this->previousLink($pageCount + 1)
+                $this->previousLink(($pageCount + 1), t('Previous'))
             );
         }
 
@@ -407,14 +407,14 @@ class PagerModule extends Gdn_Module {
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
         $linkCount = $pagesToDisplay + 2;
-
         $pager = "";
 
         // Previous
         if ($currentPage == 1) {
             $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev', 'tabindex' => "0"]);
+            $attr = ['title' => t('Previous Page'), 'aria-label' => t('Previous Page')];
+            $pager .= $this->previousLink($currentPage, $previousText, $attr);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -485,12 +485,11 @@ class PagerModule extends Gdn_Module {
         if ($currentPage == $pageCount) {
             $pager .= '<span class="Next Pager-nav" aria-disabled="true">'.$nextText.'</span>';
         } else {
-            $pager .= anchor(
-                $nextText,
-                $this->pageUrl($currentPage + 1),
-                'Next Pager-nav',
-                ['rel' => 'next', 'tabindex' => "0"]
-            ); // extra sprintf parameter in case old url style is set
+            $nextAttr = [
+                'title' => t('Next Page'),
+                'aria-label' => t('Next Page')
+            ];
+            $pager .= $this->nextLink($currentPage, $nextText, $nextAttr);
         }
         if ($pageCount <= 1) {
             $pager = '';
@@ -544,7 +543,7 @@ class PagerModule extends Gdn_Module {
 
         if ($currentPage > 1) {
             $pageParam = 'p'.($currentPage - 1);
-            $pager .= $this->previousLink($currentPage);
+            $pager .= $this->previousLink($currentPage, t('Previous'));
         }
 
         $hasNext = true;
@@ -554,7 +553,7 @@ class PagerModule extends Gdn_Module {
 
         if ($hasNext) {
             $pageParam = 'p'.($currentPage + 1);
-            $pager = concatSep(' ', $pager, anchor(t('Next'), $this->pageUrl($currentPage + 1), 'Next', ['rel' => 'next']));
+            $pager = concatSep(' ', $pager, $this->nextLink($currentPage, t('Next')));
         }
 
         $clientID = $this->ClientID;
@@ -672,12 +671,48 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
-     * Generate the previous page link.
+     * Returns next page link.
      *
      * @param int $currentPage
+     * @param string $linkLabel
+     * @param array $extraAttributes
      * @return string
      */
-    private function previousLink($currentPage): string {
-        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev', 'tabindex' => '0']);
+    private function nextLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'next',
+            'tabindex' => "0"
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage + 1),
+            'Next',
+            $attr
+        );
+    }
+
+    /**
+     * Returns previous page link.
+     *
+     * @param int $currentPage
+     * @param string $linkLabel
+     * @param array $extraAttributes
+     * @return string
+     */
+    private function previousLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'prev',
+            'tabindex' => '0'
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage - 1),
+            'Previous',
+            $attr
+        );
     }
 }

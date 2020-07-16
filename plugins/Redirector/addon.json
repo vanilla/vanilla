@@ -1,0 +1,22 @@
+{
+    "name": "Forum Redirector",
+    "description": "Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo",
+    "version": "1.3",
+    "mobileFriendly": true,
+    "icon": "redirector.png",
+    "license": "GNU GPL2",
+    "key": "redirector",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    },
+    "icon": "redirector.png"
+}

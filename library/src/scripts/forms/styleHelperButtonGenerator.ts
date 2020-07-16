@@ -16,7 +16,6 @@ import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export const generateButtonStyleProperties = (
     buttonTypeVars: IButtonType,

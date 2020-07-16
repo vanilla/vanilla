@@ -279,9 +279,6 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
  * @param template - the template for the string (must be translated ahead of time)
  * @param variable - the variable to insert in the template
  */
-export function accessibleLabel(template: string, variable?: string[]) {
-    if (!variable) {
-        return undefined;
-    }
+export function accessibleLabel(template: string, variable: string[]) {
     return sprintf(template, variable);
 }

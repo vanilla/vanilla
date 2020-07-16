@@ -83,4 +83,20 @@ class MemcachedTest extends SimpleCacheTest {
     protected function createLegacyCache(): \Gdn_Cache {
         return self::$memcached;
     }
+
+    /**
+     * Keys should be able to be busted into shards.
+     */
+    public function testDataSharding(): void {
+        $cache = $this->createLegacyCache();
+        $data = array_fill(0, 1000, 'foo');
+        $stored = $cache->store(__FUNCTION__, $data, [\Gdn_Cache::FEATURE_SHARD => true]);
+        $this->assertNotSame(\Gdn_Cache::CACHEOP_FAILURE, $stored);
+
+        $actual = $cache->get(__FUNCTION__);
+        $this->assertSame($data, $actual);
+
+        $actual2 = $cache->get([__FUNCTION__]);
+        $this->assertSame($data, $actual2[__FUNCTION__]);
+    }
 }

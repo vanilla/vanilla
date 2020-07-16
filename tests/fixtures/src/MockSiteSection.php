@@ -55,8 +55,8 @@ class MockSiteSection implements SiteSectionInterface {
         string $basePath,
         string $sectionID,
         string $sectionGroup,
-        array $defaultRoute,
-        string $themeID
+        array $defaultRoute = [],
+        string $themeID = null
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
@@ -145,7 +145,7 @@ class MockSiteSection implements SiteSectionInterface {
     }
 
     /**
-     * @return int|string
+     * @return int|string|null
      */
     public function getSectionThemeID() {
         return $this->themeID;

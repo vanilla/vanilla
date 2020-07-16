@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\EventManager;
 use Garden\Http\HttpClient;
 use Garden\Web\RequestInterface;
 use Gdn;
@@ -34,6 +35,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
 use VanillaTests\Fixtures\Models\MockUserProvider;
 use VanillaTests\Fixtures\NullCache;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * A very minimal PHPUnit test case using Garden\Container.
@@ -111,6 +113,12 @@ class MinimalContainerTestCase extends TestCase {
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
             ->setClass(MockHttpClient::class)
+
+
+            // Prevent real HTTP requests.
+            ->rule(EventManager::class)
+            ->setClass(SpyingEventManager::class)
+            ->setShared(true)
 
             ->rule(UASnifferInterface::class)
             ->setClass(MockUASniffer::class)

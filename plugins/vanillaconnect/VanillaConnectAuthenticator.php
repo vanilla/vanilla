@@ -69,7 +69,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         $this->request = $request;
 
         $this->cookie = $cookie;
-        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-vanillaconnectnonce';
+        $this->cookieName = '-vanillaconnectnonce';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
 
         parent::__construct($authenticatorID, $authenticatorModel);

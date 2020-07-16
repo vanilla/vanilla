@@ -17,6 +17,7 @@ use Garden\Web\RequestInterface;
  * @package Vanilla\Web
  */
 class ApiFilterMiddleware {
+    const FIELD_ALLOW = 'api-allow';
 
     /**
      * @var array The blacklisted fields.
@@ -34,7 +35,7 @@ class ApiFilterMiddleware {
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
-        $apiAllow = $response->getMeta('api-allow');
+        $apiAllow = $response->getMeta(self::FIELD_ALLOW);
         if (!is_array($apiAllow)) {
             $apiAllow = [];
         }

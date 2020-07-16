@@ -115,7 +115,7 @@ class CommentsApiController extends AbstractApiController {
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment['CommentID']);
+            $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
         }
         $this->commentModel->deleteID($id);
@@ -387,6 +387,8 @@ class CommentsApiController extends AbstractApiController {
      */
     public function normalizeOutput(array $dbRecord) {
         $normalizedRow = $this->commentModel->normalizeRow($dbRecord);
+        $normalizedRow['type'] = 'comment';
+        $normalizedRow['recordID'] = 'commentID';
         // Allow addons to hook into the normalization process.
         $options = [];
         $result = $this->getEventManager()->fireFilter(

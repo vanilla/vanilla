@@ -109,7 +109,8 @@ class PostController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $categoryID Unique ID of the category to add the discussion to.
+     * @param int|string $categoryID Unique ID of the category to add the discussion to.
+     * @throws Gdn_UserException Invalid draftID provided.
      */
     public function discussion($categoryID = '') {
         // Override CategoryID if categories are disabled
@@ -255,6 +256,10 @@ class PostController extends VanillaController {
             if ($draftID == 0) {
                 $draftID = $this->Form->getFormValue('DraftID', 0);
                 if ($draftID) {
+                    if (!is_numeric($draftID)) {
+                        throw new Gdn_UserException("Invalid draft ID.");
+                    }
+
                     $draftObject = $this->DraftModel->getID($draftID, DATASET_TYPE_ARRAY);
                     if (!$draftObject) {
                         throw notFoundException('Draft');
@@ -473,7 +478,8 @@ class PostController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $DiscussionID Unique ID to add the comment to. If blank, this method will throw an error.
+     * @param int|string $DiscussionID Unique ID to add the comment to. If blank, this method will throw an error.
+     * @throws Gdn_UserException Invalid draftID provided.
      */
     public function comment($DiscussionID = '') {
         // Get $DiscussionID from RequestArgs if valid
@@ -626,6 +632,9 @@ class PostController extends VanillaController {
         $Session = Gdn::session();
         $CommentID = isset($this->Comment) && property_exists($this->Comment, 'CommentID') ? $this->Comment->CommentID : '';
         $DraftID = isset($this->Comment) && property_exists($this->Comment, 'DraftID') ? $this->Comment->DraftID : '';
+        if (!is_numeric($DraftID) && $DraftID !== '') {
+            throw new Gdn_UserException("Invalid draft ID.");
+        }
         $this->EventArguments['CommentID'] = $CommentID;
         $this->EventArguments['DraftID'] = $DraftID;
 

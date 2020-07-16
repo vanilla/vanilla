@@ -31,6 +31,10 @@ trait StaticCacheTrait {
      * @return mixed
      */
     public static function sc(string $key, $default = false) {
+        if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+            return self::f($key, $default);
+        }
+
         if (empty($key)) {
             throw new \Exception('Static cache key can not be empty!');
         } else {

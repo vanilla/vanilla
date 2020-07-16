@@ -889,7 +889,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             'name:s?', // Should be represented relative to the discussion (e.g. "Re: My Discussion")
             'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            'url:s?' => 'The full URL to the comment.'
+            'url:s?' => 'The full URL to the comment.',
+            'type:s?' => 'Record type for search drivers.',
+            'format:s?' => 'The format of the comment'
         ]);
         return $result;
     }

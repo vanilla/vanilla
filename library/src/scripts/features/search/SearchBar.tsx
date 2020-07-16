@@ -251,7 +251,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const classes = searchBarClasses(!this.props.hideSearchButton);
+        const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
                 <form className={classNames("searchBar-form", classes.form)} onSubmit={this.onFormSubmit}>
@@ -285,7 +285,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "suggestedTextInput-inputText",
                                 "inputText",
                                 "isClearable",
-                                classes.valueContainer(this.props.hideSearchButton),
+                                classes.valueContainer(!!this.props.hideSearchButton),
                                 this.props.valueContainerClasses,
                                 {
                                     ["focus-visible"]: props.isFocused,
@@ -301,7 +301,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 />
                             )}
                         </div>
-                        <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
+                        <ConditionalWrap condition={!!this.props.hideSearchButton} className={visibility().srOnly}>
                             <Button
                                 submit={true}
                                 id={this.searchButtonID}

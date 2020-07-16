@@ -1,0 +1,23 @@
+<h1>{{Title}}</h1>
+<div class="padded content">
+    {% if isSitePrivate %}
+       <p class="Message AlertMessage">
+         Private communities are currently enabled. Sitemaps are not recommended with private communities unless you know what you're doing.
+      </p>
+    {% endif %}
+      <p>
+         A site map is an xml file that search engines can use to help index your site. Learn more about sitemaps at <a href="https://sitemaps.org" target="_blank" rel="noopener">sitemaps.org.</a>
+      </p>
+    <ul>
+        <li>
+            Your main site map is located here: <a href="{{url('/sitemapindex.xml', true)}}">
+                {{url('/sitemapindex.xml', true)}}
+            </a>
+        </li>
+        <li>
+            Your <a href="{{url('/robots.txt', true)}}">robots.txt</a> file contains the location of this
+            site map so that search engines that are aware of your site will know where to look.
+        </li>
+    </ul>
+   {{ ConfigurationModule.render()|raw }}
+</div>

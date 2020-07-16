@@ -7,17 +7,12 @@
 namespace VanillaTests\APIv2;
 
 use Gdn_Configuration;
-use Gdn_Request;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
-use Garden\Container\Reference;
-use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Theme\ThemeService;
+use Vanilla\Http\InternalClient;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
-use VanillaTests\InternalClient;
 
 /**
  * Test the /api/v2/themes endpoints.

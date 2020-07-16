@@ -11,7 +11,7 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import CloseButton from "@library/navigation/CloseButton";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
-import { t } from "@library/utility/appUtils";
+import { accessibleLabel, t } from "@library/utility/appUtils";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import Button from "@library/forms/Button";
@@ -26,7 +26,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { TouchScrollable } from "react-scrolllock";
-import { UserIcon } from "@library/icons/titleBar";
+import { UserIcon, UserIconTypes } from "@library/icons/titleBar";
 
 interface IProps extends IInjectableUserState, IMeBoxProps {}
 
@@ -54,6 +54,9 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
         const titleBarVars = titleBarClasses();
         const panelBodyClass = classNames("compactMeBox-body", classes.body);
 
+        const titleText = t("Me");
+        const altText = accessibleLabel(t(`User: "%s"`), [t(`Me`)]);
+
         return (
             <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
@@ -63,15 +66,10 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}
                 >
-                    <UserPhoto
-                        userInfo={userInfo}
-                        open={this.state.open}
-                        className="meBox-user"
-                        size={UserPhotoSize.SMALL}
-                    />
+                    <UserPhoto userInfo={userInfo} className="meBox-user" size={UserPhotoSize.SMALL} />
                 </Button>
                 <Modal
-                    isVisible={!!this.state.open}
+                    isVisible={this.state.open}
                     size={ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT}
                     elementToFocusOnExit={this.buttonRef.current!}
                     exitHandler={this.close}
@@ -89,12 +87,20 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                             {
                                 buttonContent: (
                                     <MeBoxIcon compact={true}>
-                                        <UserIcon filled={false} />
+                                        <UserIcon
+                                            styleType={UserIconTypes.SELECTED_INACTIVE}
+                                            title={titleText}
+                                            alt={altText}
+                                        />
                                     </MeBoxIcon>
                                 ),
                                 openButtonContent: (
                                     <MeBoxIcon compact={true}>
-                                        <UserIcon filled={true} />
+                                        <UserIcon
+                                            styleType={UserIconTypes.SELECTED_ACTIVE}
+                                            title={titleText}
+                                            alt={altText}
+                                        />
                                     </MeBoxIcon>
                                 ),
                                 panelContent: (

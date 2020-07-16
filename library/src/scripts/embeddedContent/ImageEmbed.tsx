@@ -4,7 +4,6 @@
  */
 
 import { IBaseEmbedProps, FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
@@ -13,7 +12,6 @@ import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { AccessibleImageMenuIcon, DeleteIcon } from "@library/icons/common";
-import { visibility } from "@library/styles/styleHelpersVisibility";
 import { t } from "@vanilla/i18n/src";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { accessibleLabel } from "@library/utility/appUtils";

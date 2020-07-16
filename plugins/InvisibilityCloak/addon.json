@@ -1,0 +1,17 @@
+{
+    "name": "Invisibility Cloak",
+    "description": "Hide your forum from the prying eyes of search engines and bots while you set it up.",
+    "version": "1.0",
+    "key": "invisibilitycloak",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    },
+    "icon": "invisibility_cloak.png"
+}

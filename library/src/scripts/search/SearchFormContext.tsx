@@ -191,7 +191,7 @@ export function SearchFormContextProvider(props: IProps) {
                     params: form,
                     result: {
                         results: response.data.map(item => {
-                            item.body = item.excerpt;
+                            item.body = item.excerpt ?? item.body;
                             return item;
                         }),
                         pagination: SimplePagerModel.parseHeaders(response.headers),

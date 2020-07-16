@@ -18,7 +18,7 @@ import { BannerContextProvider } from "@library/banner/BannerContext";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import Container from "@library/layout/components/Container";
-import { PanelArea } from "@library/layout/PanelLayout";
+import PanelArea from "@library/layout/components/PanelArea";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 

@@ -11,7 +11,6 @@ import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import classNames from "classnames";
 
 interface IProps {
     buttonClassName?: string;

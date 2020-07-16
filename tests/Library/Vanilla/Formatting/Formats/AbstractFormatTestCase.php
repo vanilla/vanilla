@@ -185,10 +185,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      */
     public function testParseImageUrls(string $input, array $expectedOutput) {
         $format = $this->prepareFormatter();
-        $headings = $format->parseImageUrls($input);
+        $images = $format->parseImageUrls($input);
         $this->assertEquals(
             json_encode($expectedOutput, JSON_PRETTY_PRINT),
-            json_encode($headings, JSON_PRETTY_PRINT)
+            json_encode($images, JSON_PRETTY_PRINT)
         );
     }
 

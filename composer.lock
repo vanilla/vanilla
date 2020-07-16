@@ -1453,16 +1453,16 @@
         },
         {
             "name": "symfony/polyfill-php74",
-            "version": "v1.17.0",
+            "version": "v1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php74.git",
-                "reference": "140bd737b73d174dd12ddda79eb0594a2964a947"
+                "reference": "3e894c7976e4b96b43817e4927787a25a97883e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php74/zipball/140bd737b73d174dd12ddda79eb0594a2964a947",
-                "reference": "140bd737b73d174dd12ddda79eb0594a2964a947",
+                "url": "https://api.github.com/repos/symfony/polyfill-php74/zipball/3e894c7976e4b96b43817e4927787a25a97883e7",
+                "reference": "3e894c7976e4b96b43817e4927787a25a97883e7",
                 "shasum": ""
             },
             "require": {
@@ -1471,7 +1471,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.17-dev"
+                    "dev-master": "1.18-dev"
+                },
+                "thanks": {
+                    "name": "symfony/polyfill",
+                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -1522,7 +1526,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-05-12T16:47:27+00:00"
+            "time": "2020-07-14T12:35:20+00:00"
         },
         {
             "name": "symfony/polyfill-php80",

@@ -7,10 +7,7 @@
 import { percent } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, margins, paddings, unit } from "@library/styles/styleHelpers";
-
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { TextDecorationProperty } from "csstype";
+import { allLinkStates, unit } from "@library/styles/styleHelpers";
 
 export const panelListVariables = useThemeCache(() => {
     const globalVals = globalVariables();
@@ -38,10 +35,9 @@ export const panelListVariables = useThemeCache(() => {
     };
 });
 
-export const panelListClasses = useThemeCache(() => {
+export const panelListClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
     const vars = panelListVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("panelList");
 
     const root = style({
@@ -84,7 +80,7 @@ export const panelListClasses = useThemeCache(() => {
     const items = style("items", {});
 
     return {
-        root,
+        root: root + " panelList", // This needs to be referenced in another file and was causing a circular import, so the static class is targetted instead
         title,
         item,
         link,

@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Vanilla\Library\Scheduler;
 
+use PHPUnit\Framework\Error\Deprecated;
+
 /**
  * Class SchedulerTest
  */
@@ -264,9 +266,6 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $trackingSlip = $dummyScheduler->addJob(\VanillaTests\Fixtures\Scheduler\ThrowableEchoJob::class);
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(\Vanilla\Scheduler\Job\JobExecutionStatus::received()));
-
-        /** @var $eventManager \Garden\EventManager */
-        $eventManager = $container->get(\Garden\EventManager::class);
 
         /** @var $eventManager \Garden\EventManager */
         $eventManager = $container->get(\Garden\EventManager::class);

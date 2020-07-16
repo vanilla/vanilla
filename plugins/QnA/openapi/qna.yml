@@ -1,0 +1,11 @@
+openapi: 3.0.2
+info:
+components:
+  parameters:
+    # This is a partial schema to add Q&A options to the main schema.
+    DiscussionExpand:
+      schema:
+        items:
+          enum:
+            - acceptedAnswers
+

@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Web\RequestInterface;
 use Gdn;
 use Gdn_Session;
+use UserModel;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
@@ -247,6 +248,7 @@ class SiteMeta implements \JsonSerializable {
                 'shareImage' => $this->shareImage,
                 'bannerImage' => $this->bannerImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
+                'fallbackAvatar' => UserModel::getDefaultAvatarUrl(),
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,

@@ -7,8 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { calc, color, percent, px } from "csx";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { calc, color, percent } from "csx";
 
 export const panelBackgroundVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelBackground");
@@ -29,7 +28,6 @@ export const panelBackgroundClasses = useThemeCache(() => {
 
     const vars = panelBackgroundVariables();
     const layoutVars = layoutVariables();
-    const widgetVars = panelWidgetVariables();
     const globalVars = globalVariables();
 
     const root = style({

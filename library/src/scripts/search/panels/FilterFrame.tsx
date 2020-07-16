@@ -11,7 +11,8 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import React from "react";
-import { filterPanelClasses } from "@library/search/panels/FilterPanel.styles";
+import { filterPanelClasses } from "@library/search/panels/filterPanel.styles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ISearchFilterPanel {
     title?: string;
@@ -32,7 +33,7 @@ export function FilterFrame(props: ISearchFilterPanel) {
     };
 
     const titleID = useUniqueID("searchFilter");
-    const classes = filterPanelClasses();
+    const classes = filterPanelClasses(useLayout().mediaQueries);
 
     return (
         <form onSubmit={onSubmit} aria-describedby={titleID}>

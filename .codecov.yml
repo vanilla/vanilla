@@ -4,7 +4,7 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: "...90"
 
   status:
     project:
@@ -24,7 +24,7 @@ parsers:
 comment:
   layout: "diff,flags,tree"
   behavior: default
-  require_changes: no
+  require_changes: true
 
 ignore:
   - "**/views/**/*.php"
@@ -32,4 +32,5 @@ ignore:
   - "**/conf/**/*.php"
   - "**/*.css"
   - "**/*.scss"
+  - "**/tests/**/*.php"
   - "library/deprecated"

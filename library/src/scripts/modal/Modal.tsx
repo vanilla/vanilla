@@ -22,6 +22,7 @@ React.memo(
 );
 
 interface IProps {
+    id?: string;
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element | null;
@@ -85,6 +86,7 @@ export default class Modal extends React.Component<IProps, IState> {
         return mountPortal(
             <>
                 <ModalView
+                    id={this.props.id}
                     onDestroyed={this.handleDestroyed}
                     scrollable={this.props.scrollable}
                     onKeyDown={this.handleTabbing}

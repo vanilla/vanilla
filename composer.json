@@ -41,7 +41,7 @@
         "firebase/php-jwt": "^5.2",
         "michelf/php-markdown": "~1.9",
         "pclzip/pclzip": "~2.0",
-        "phpmailer/phpmailer": "~5.2",
+        "phpmailer/phpmailer": "^6.1.6",
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
         "ramsey/uuid": "^3.0",
@@ -81,6 +81,7 @@
         "phing/phing": "2.*",
         "roave/security-advisories": "dev-master",
         "nette/robot-loader": "^3.2",
+        "johnkary/phpunit-speedtrap": "^3.2",
         "vimeo/psalm": "^3.12",
         "cache/integration-tests": "dev-master",
         "symfony/phpunit-bridge": "^5.1"
@@ -128,11 +129,11 @@
                 "BSD-2-Clause",
                 "BSD-3-Clause",
                 "LGPL-2.1",
+                "LGPL-2.1-only",
                 "LGPL-3.0",
+                "LGPL-3.0-only",
                 "GPL-2.0",
                 "GPL-2.0+",
-                "LGPL-3.0-only",
-
                 "OSL-3.0",
                 "Apache-2.0",
                 "ISC"

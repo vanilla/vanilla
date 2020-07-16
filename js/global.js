@@ -1569,3 +1569,44 @@ if (typeof String.prototype.trim !== 'function') {
 });
 
 })(jQuery);
+
+
+// Handle bad user images
+function handleBadImage(imageElement) {
+    // If you specify a known type (like "avatar"), it will use the url from the meta data
+    // You can also hard code the url you wish on that image and it will use that.
+    if (!imageElement.complete || typeof imageElement.naturalWidth == "undefined" || imageElement.naturalWidth === 0) {
+        var type = imageElement.dataset["fallback"];
+        if (type !== undefined) {
+            jQuery(imageElement).removeAttr("data-fallback"); // remove so it can't make infinite loop
+            switch(type) {
+                case "avatar":
+                    imageElement.src = gdn.meta.ui.fallbackAvatar;
+                    break;
+                default:
+                    imageElement.src = fallback;
+            }
+        }
+    }
+}
+
+(function ($) {
+    // Initial load
+    jQuery(function () {
+        jQuery('img[data-fallback]').each(
+            function (index, targetImage){
+                handleBadImage(targetImage);
+            }
+        );
+    });
+
+    // New html
+    jQuery(document).on('contentLoad',function(e) {
+        jQuery(e.target)
+            .find('img[data-fallback]')
+            .each(function (index, targetImage){
+                    handleBadImage(targetImage);
+                }
+            );
+    });
+})(jQuery);

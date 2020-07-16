@@ -742,7 +742,13 @@ class RoleModel extends Gdn_Model {
      * @return bool Returns **true** on success or **false** on failure.
      */
     public function deleteAndReplace($roleID, $newRoleID) {
-        // First update users that will be orphaned
+        $roleID = (int) $roleID;
+
+        // Grab the affected users
+        $userModel = Gdn::userModel();
+        $affectedUsers = $userModel->getByRole($roleID)->resultArray();
+
+        // Update users that will be orphaned
         if (is_numeric($newRoleID) && $newRoleID > 0) {
             $this->SQL
                 ->options('Ignore', true)
@@ -758,6 +764,12 @@ class RoleModel extends Gdn_Model {
         // Remove permissions for this role.
         $permissionModel = Gdn::permissionModel();
         $permissionModel->delete($roleID);
+
+        // Clear the user cache for the affected users.
+        foreach ($affectedUsers as $user) {
+            $userModel->clearCache($user->UserID);
+        }
+
 
         // Remove the role
         $this->SQL->delete('UserRole', ['RoleID' => $roleID]);

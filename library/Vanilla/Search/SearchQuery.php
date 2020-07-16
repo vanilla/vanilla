@@ -24,6 +24,9 @@ abstract class SearchQuery {
     /** @var array */
     private $queryData;
 
+    /** @var array $indexes */
+    protected $indexes;
+
     /**
      * Create a query.
      *
@@ -76,6 +79,26 @@ abstract class SearchQuery {
     abstract public function whereText(string $text, array $fieldNames = []);
 
     /**
+     * Add index to scan to the search query
+     *
+     * @param string $index
+     * @return mixed
+     */
+    public function addIndex(string $index) {
+        $this->indexes[$index] = true;
+    }
+
+    /**
+     * Get all indexes to scan
+     *
+     * @return array|null
+     */
+    public function getIndexes(): ?array {
+        return array_keys($this->indexes);
+    }
+
+
+    /**
      * Set filter values for some attribute.
      *
      * @param string $attribute
@@ -91,4 +114,27 @@ abstract class SearchQuery {
         bool $exclude = false,
         string $filterOp = SearchQuery::FILTER_OP_OR
     );
+
+    /**
+     * Set int range filter
+     *
+     * @param string $attribute
+     * @param int $min
+     * @param int $max
+     * @param bool $exclude
+     *
+     * @return $this
+     */
+    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
+        return $this;
+    }
+
+    /**
+     * Return driver compatibility
+     *
+     * @return string
+     */
+    public function driver(): string {
+        return '';
+    }
 }

@@ -11,6 +11,7 @@ import Translate from "@library/content/Translate";
 import Result, { IResult } from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@vanilla/i18n/src";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     className?: string;
@@ -29,7 +30,7 @@ export default function ResultList(props: IProps) {
 
     const hasResults = results && results.length > 0;
     let content;
-    const classes = searchResultsClasses();
+    const classes = searchResultsClasses(useLayout().mediaQueries);
 
     if (hasResults) {
         const ResultComponent = result ?? Result;

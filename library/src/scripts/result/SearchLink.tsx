@@ -4,10 +4,11 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import classNames from "classnames";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     className?: string;
@@ -22,7 +23,10 @@ export default function SearchLink(props: IProps) {
     const { label, className, url } = props;
 
     return (
-        <SmartLink to={url} className={classNames(searchResultClasses().afterExcerptLink, className)}>
+        <SmartLink
+            to={url}
+            className={classNames(searchResultClasses(useLayout().mediaQueries).afterExcerptLink, className)}
+        >
             {label}
         </SmartLink>
     );

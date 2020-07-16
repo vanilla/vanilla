@@ -10,6 +10,7 @@
 
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
+use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
@@ -982,7 +983,7 @@ class ActivityModel extends Gdn_Model {
                     } else {
                         $Emailed = self::SENT_SKIPPED;
                     }
-                } catch (phpmailerException $pex) {
+                } catch (\PHPMailer\PHPMailer\Exception $pex) {
                     if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$Email->PhpMailer->isServerError($pex)) {
                         $Emailed = self::SENT_FAIL;
                     } else {
@@ -1307,7 +1308,7 @@ class ActivityModel extends Gdn_Model {
                         } else {
                             $emailed = self::SENT_SKIPPED;
                         }
-                    } catch (phpmailerException $pex) {
+                    } catch (\PHPMailer\PHPMailer\Exception $pex) {
                         if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$email->PhpMailer->isServerError($pex)) {
                             $emailed = self::SENT_FAIL;
                         } else {
@@ -2152,7 +2153,7 @@ class ActivityModel extends Gdn_Model {
         try {
             $email->send();
             return self::SENT_OK;
-        } catch (phpmailerException $pex) {
+        } catch (\PHPMailer\PHPMailer\Exception $pex) {
             $this->logger->error("A PHPMailer exception occurred while sending a notification.", [
                 "event" => "activity_email_failed",
                 "exception" => $pex,

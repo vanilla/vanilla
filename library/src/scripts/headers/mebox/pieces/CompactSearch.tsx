@@ -20,6 +20,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { useEscapeListener, useLastValue, useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useLayoutEffect, useRef, useState } from "react";
+import IndependentSearch from "@library/features/search/IndependentSearch";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -36,6 +37,7 @@ export interface ICompactSearchProps {
     buttonContentClassName?: string;
     cancelContentClassName?: string;
     clearButtonClass?: string;
+    valueContainerClass?: string;
 }
 
 /**
@@ -139,6 +141,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                             onCloseSuggestions={props.onCloseSuggestions}
                             className={"compactSearch-searchBar"}
                             clearButtonClass={props.clearButtonClass}
+                            valueContainerClasses={classNames(classes.valueContainer, props.valueContainerClass)}
                         />
 
                         <div

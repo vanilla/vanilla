@@ -8,8 +8,10 @@
 namespace VanillaTests;
 
 use Psr\Container\ContainerInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
+use Vanilla\SchemaFactory;
 
 /**
  * A Vanilla installer that handles uninstalling.
@@ -220,7 +222,14 @@ class TestInstallModel extends InstallModel {
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
 
-        // Clear all database related objects from the container.
+        FeatureFlagHelper::clearCache();
+        if (class_exists(\DiscussionModel::class)) {
+            \DiscussionModel::cleanForTests();
+        }
 
+        if (class_exists(\SubcommunityModel::class)) {
+            \SubcommunityModel::clearStaticCache();
+        }
+        // Clear all database related objects from the container.
     }
 }

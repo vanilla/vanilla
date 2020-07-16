@@ -5,8 +5,6 @@
  */
 
 import React from "react";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import Paragraph, { IParagraphProps } from "@library/layout/Paragraph";
 import classNames from "classnames";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";

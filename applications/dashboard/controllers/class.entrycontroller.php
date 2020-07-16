@@ -1543,21 +1543,10 @@ class EntryController extends Gdn_Controller {
                         Gdn::authenticator()->setIdentity($authUserID, true);
                     }
 
-                    // Notification text
-                    $label = t('NewApplicantEmail', 'New applicant:');
-                    $story = anchor(Gdn_Format::text($label . ' ' . $values['Name']), externalUrl('dashboard/user/applicants'));
-
                     $this->EventArguments['AuthUserID'] = $authUserID;
                     $this->EventArguments['Story'] = &$story;
                     $this->fireEvent('RegistrationPending');
                     $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
-
-                    // Grab all of the users that need to be notified.
-                    $data = Gdn::database()->sql()->getWhere('UserMeta', ['Name' => 'Preferences.Email.Applicant'])->resultArray();
-                    $activityModel = new ActivityModel();
-                    foreach ($data as $row) {
-                        $activityModel->add($authUserID, 'Applicant', $story, $row['UserID'], '', '/dashboard/user/applicants', 'Only');
-                    }
 
                     if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
                         $this->setRedirectTo('/entry/registerthanks');

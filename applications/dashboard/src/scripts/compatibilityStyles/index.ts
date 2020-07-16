@@ -54,6 +54,7 @@ import { suggestedTextStyleHelper } from "@library/features/search/suggestedText
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { forumVariables } from "@library/forums/forumStyleVars";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -170,6 +171,34 @@ compatibilityStyles = useThemeCache(() => {
         {
             color: fg,
             fontSize: unit(vars.fonts.size.large),
+        },
+    );
+
+    cssOut(
+        `
+            .MessageList .Item:not(.Read) .Title,
+            .DataList .Item:not(.Read) .Title,
+    `,
+        {
+            $nest: {
+                "&&": {
+                    fontWeight: vars.fonts.weights.bold,
+                },
+            },
+        },
+    );
+
+    cssOut(
+        `
+            .MessageList .Item.Read .Title,
+            .DataList .Item.Read .Title,
+    `,
+        {
+            $nest: {
+                "&&": {
+                    fontWeight: vars.fonts.weights.normal,
+                },
+            },
         },
     );
 
@@ -294,7 +323,7 @@ compatibilityStyles = useThemeCache(() => {
         borderTopColor: colorOut(vars.border.color),
     });
 
-    cssOut(`.Author a:not(.PhotoWrap)`, {
+    cssOut(`.Author a:not(.PhotoWrap), .Author .${userCardClasses().link}`, {
         fontWeight: vars.fonts.weights.bold,
     });
 
@@ -355,6 +384,13 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.Item.Read`, {
         backgroundColor: colorOut(formVars.lists.colors.read.bg),
+        opacity: 1,
+        $nest: {
+            "&:hover, &:focus, &:active, &.focus-visible": {
+                backgroundColor: colorOut(formVars.lists.colors.read.bg),
+                opacity: 1,
+            },
+        },
     });
 
     cssOut(".Bullet, .QuickSearch", {

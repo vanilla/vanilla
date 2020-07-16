@@ -7,7 +7,7 @@
 
 namespace VanillaTests;
 
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 /**
  * @method InternalClient api()

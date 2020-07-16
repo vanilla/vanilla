@@ -558,11 +558,9 @@ export const userContentClasses = useThemeCache(() => {
             wordBreak: "break-word",
             lineHeight: globalVars.lineHeights.base,
             fontSize: vars.fonts.size,
+            marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
             $nest: {
                 // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
-                "&::before": {
-                    marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
-                },
                 "& iframe": {
                     width: percent(100),
                 },

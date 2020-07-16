@@ -17,10 +17,11 @@ use Vanilla\Utility\ArrayUtils;
  * Basic model class.
  */
 class Model implements InjectableInterface {
-    const OPT_LIMIT = "limit";
-    const OPT_OFFSET = "offset";
-    const OPT_SELECT = "select";
-    const OPT_ORDER = 'order';
+    public const OPT_LIMIT = "limit";
+    public const OPT_OFFSET = "offset";
+    public const OPT_SELECT = "select";
+    public const OPT_ORDER = 'order';
+    public const OPT_MODE = 'mode';
 
     /** @var \Gdn_Database */
     private $database;
@@ -149,7 +150,7 @@ class Model implements InjectableInterface {
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
         $offset = $options[self::OPT_OFFSET] ?? 0;
-        $selects =  $options[self::OPT_SELECT] ?? [];
+        $selects = $options[self::OPT_SELECT] ?? [];
 
         $sqlDriver = $this->createSql();
 
@@ -167,7 +168,13 @@ class Model implements InjectableInterface {
         if (empty($selects)) {
             $schema = Schema::parse([":a" => $this->getReadSchema()]);
         } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->getReadSchema())]);
+            $selectExpressions = $sqlDriver->parseSelectExpression($selects);
+            $selectFinalFieldNames = [];
+            foreach ($selectExpressions as $selectExpression) {
+                $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
+            }
+
+            $schema = Schema::parse([":a" => Schema::parse($selectFinalFieldNames)->add($this->getReadSchema())]);
         }
         // What if a processor goes here?
 
@@ -257,10 +264,11 @@ class Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
+     * @param array $options An array of options to affect the insert.
      * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set) {
+    public function insert(array $set, array $options = []) {
         $set = $this->getWriteSchema()->validate($set);
         $result = $this->createSql()->insert($this->table, $set);
         if ($result === false) {
@@ -309,10 +317,11 @@ class Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
+     * @param array $options Options to control the update.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, array $options = []): bool {
         $set = $this->getWriteSchema()->validate($set, true);
         $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.

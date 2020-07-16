@@ -67,7 +67,7 @@ class CommentSearchType extends DiscussionSearchType {
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs): array {
+    public function getResultItems(array $recordIDs, array $options = []): array {
         try {
             $results = $this->commentsApi->index([
                 'commentID' => implode(",", $recordIDs),
@@ -183,5 +183,12 @@ class CommentSearchType extends DiscussionSearchType {
         $db->reset();
 
         return $sql;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIndex(): string {
+        return 'comment';
     }
 }

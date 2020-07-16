@@ -50,7 +50,7 @@ export const flyoutCSS = () => {
     });
 
     cssOut(`.selectBox-item.isActive .dropdown-menu-link.selectBox-link`, {
-        backgroundColor: colorOut(globalVars.states.active.highlight, true),
+        backgroundColor: colorOut(globalVars.states.active.highlight),
         $nest: {
             "& .dropdown-menu-link.selectBox-link": {
                 cursor: "pointer",

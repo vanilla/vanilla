@@ -1,0 +1,21 @@
+{
+    "name": "Q&A",
+    "description": "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
+    "version": "1.4.2",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/qna",
+    "icon": "qna.png",
+    "key": "qna",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=3.2"
+    }
+}

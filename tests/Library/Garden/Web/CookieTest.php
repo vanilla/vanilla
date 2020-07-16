@@ -63,6 +63,15 @@ class CookieTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test the cookie prefix accessors.
+     */
+    public function testGetSetPrefix() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('px');
+        $this->assertSame('px', $cookie->getPrefix());
+    }
+
+    /**
      * Test deleting a cookie.
      */
     public function testDelete() {
@@ -263,5 +272,31 @@ class CookieTest extends SharedBootstrapTestCase {
 
         $r = $cookie->makeDeleteCookieCalls();
         $this->assertArrayHasKey('foo', $r);
+    }
+
+    /**
+     * The cookie prefix should be prepended to cookie names.
+     */
+    public function testCookiePrefix() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('_');
+
+        $cookie->set('a', 'b');
+        $this->assertSame('b', $cookie->get('a'));
+        $this->assertSame('b', $cookie->get('/_a'));
+
+        $cookie->delete('a');
+        $this->assertSame('foo', $cookie->get('a', 'foo'));
+    }
+
+    /**
+     * I should be able to specify an absolute cookie name by prefixing with a "/".
+     */
+    public function testCookiePrefixRoot() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('f');
+
+        $cookie->set('/foo', 'bar');
+        $this->assertSame('bar', $cookie->get('oo'));
     }
 }

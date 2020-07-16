@@ -8,7 +8,8 @@
  * @since 2.0
  */
 
- use Vanilla\Message;
+use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Message;
 
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
@@ -171,6 +172,18 @@ class DiscussionController extends VanillaController {
 
         if ($this->Offset < 0) {
             $this->Offset = 0;
+        }
+
+        //set language meta
+        $this->Head->addTag('meta', ['property' => 'language', 'content' => $this->getContentLocale()]);
+
+        //set last-modified-date meta (Must be in the format YYYY-MM-DD)
+        try {
+            $lastDate = date_create($this->data('Discussion.LastDate'));
+            $formattedLastDate = date_format($lastDate, 'Y-m-d');
+            $this->Head->addTag('meta', ['http-equiv' => 'last-modified', 'property' => 'last-modified-date', 'content' => $formattedLastDate]);
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_NOTICE);
         }
 
         // Set the canonical url to have the proper page title.

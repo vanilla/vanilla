@@ -29,4 +29,20 @@ if (!supportsAllFeatures) {
 } else {
     {{ debugModeLiteral }} && console.log("Modern browser detected. No polyfills necessary");
 }
+
+if (!window.onVanillaReady) {
+    window.onVanillaReady = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-DOMContentReady", function () {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
+}
 {%- endautoescape -%}

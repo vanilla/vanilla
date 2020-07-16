@@ -63,18 +63,27 @@ class UsersApiController extends AbstractApiController {
     private $menuCountsSchema;
 
     /**
+     * @var \Vanilla\Web\APIExpandMiddleware
+     */
+    private $expandMiddleware;
+
+    /**
      * UsersApiController constructor.
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param CounterModel $counterModel
      * @param ImageResizer $imageResizer
+     * @param ActivityModel $activityModel
+     * @param \Vanilla\Web\APIExpandMiddleware $expandMiddleware
      */
     public function __construct(
         UserModel $userModel,
         Gdn_Configuration $configuration,
         CounterModel $counterModel,
         ImageResizer $imageResizer,
-        ActivityModel $activityModel
+        ActivityModel $activityModel,
+        \Vanilla\Web\APIExpandMiddleware $expandMiddleware
     ) {
         $this->configuration = $configuration;
         $this->counterModel = $counterModel;
@@ -82,6 +91,7 @@ class UsersApiController extends AbstractApiController {
         $this->imageResizer = $imageResizer;
         $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
         $this->activityModel = $activityModel;
+        $this->expandMiddleware = $expandMiddleware;
     }
 
     /**
@@ -169,25 +179,44 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @param array $query The request query.
-     * @throws NotFoundException if the user could not be found.
      * @return Data
+     * @throws ServerException If session isn't found.
+     * @throws NotFoundException If the user could not be found.
      */
     public function get($id, array $query) {
-        $this->permission([
+        $session = $this->getSession();
+
+        $showFullSchema = false;
+        if ($session->checkPermission([
             'Garden.Users.Add',
             'Garden.Users.Edit',
             'Garden.Users.Delete'
-        ]);
+        ])) {
+            $showFullSchema = true;
+        } elseif (!$session->checkPermission([
+            'Garden.Profiles.View',
+        ])) {
+            $this->permission('Garden.Profile.View');
+        }
+
 
         $this->idParamSchema();
         $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
-        $out = $this->schema($this->userSchema(), 'out');
+        $out = $showFullSchema ? $this->schema($this->userSchema(), 'out') : $this->viewProfileSchema();
 
         $query = $in->validate($query);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
+        $showEmail = $row['showEmail'] ?? false;
+        if (!$showEmail &&
+            !$session->checkPermission('Garden.Moderation.Manage')
+        ) {
+            unset($row['email']);
+        }
+
         $result = $out->validate($row);
+
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
@@ -369,7 +398,7 @@ class UsersApiController extends AbstractApiController {
      * Get a fragment representing the current user.
      *
      * @param array $query
-     * @return array
+     * @return Data
      * @throws ValidationException If output validation fails.
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
      * @throws \Vanilla\Exception\PermissionException If the user does not have valid permission to access this action.
@@ -382,6 +411,8 @@ class UsersApiController extends AbstractApiController {
             "userID",
             "name",
             "photoUrl",
+            "email:s|n" => ['default' => null],
+            "ssoID:s|n" => ['default' => null],
             "dateLastActive",
             "isAdmin:b",
             "countUnreadNotifications" => [
@@ -415,8 +446,11 @@ class UsersApiController extends AbstractApiController {
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
         $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
 
+        $ssoIDs = $this->expandMiddleware->joinSSOIDs([$user['userID']]);
+        $user["ssoID"] = $ssoIDs[$user['userID']] ?? null;
+
         $result = $out->validate($user);
-        return $result;
+        return new Data($result, [\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW => ['email']]);
     }
 
     /**
@@ -480,6 +514,12 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'dateLastActive?' => new DateFilterSchema([
+                'x-filter' => [
+                    'field' => 'u.DateLastActive',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'roleID:i?' => [
                 'x-filter' => ['field' => 'roleID']
             ],
@@ -493,7 +533,7 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100,
+                'maximum' => 500,
             ],
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
@@ -533,7 +573,6 @@ class UsersApiController extends AbstractApiController {
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
         return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
-
     }
 
     /**
@@ -955,5 +994,24 @@ class UsersApiController extends AbstractApiController {
             $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
+    }
+
+    /**
+     * Get a user schema with minimal profile fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function viewProfileSchema() {
+        return $this->schema(Schema::parse([
+                'name:s?',
+                'email:s?',
+                'photoUrl:s?',
+                'roles:a?',
+                'dateInserted',
+                'dateLastActive:dt',
+                'countDiscussions?',
+                'countComments?',
+                'label:s?'
+        ])->add($this->fullSchema()), 'ViewProfile');
     }
 }

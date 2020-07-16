@@ -9,12 +9,11 @@ namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Formats\TextFormat;
+use Vanilla\Http\InternalClient;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\InternalClient;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
-use VanillaTests\TestLogger;
 
 abstract class AbstractAPIv2Test extends TestCase {
     use SiteTestTrait, SetupTraitsTrait;

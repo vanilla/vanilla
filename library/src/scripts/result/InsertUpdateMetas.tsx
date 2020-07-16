@@ -12,6 +12,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import ProfileLink from "@library/navigation/ProfileLink";
+import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 
 interface IProps {
     dateInserted: string;
@@ -28,14 +29,26 @@ export default function InsertUpdateMetas(props: IProps) {
                 <Translate
                     source="Published <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateInserted} />}
-                    c1={<ProfileLink className={classesMetas.metaStyle} username={props.insertUser.name} />}
+                    c1={
+                        <ProfileLink
+                            className={classesMetas.metaStyle}
+                            username={props.insertUser.name}
+                            userID={props.insertUser.userID}
+                        />
+                    }
                 />
             </DropDownItemMeta>
             <DropDownItemMeta>
                 <Translate
                     source="Updated <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateUpdated} />}
-                    c1={<ProfileLink className={classesMetas.metaStyle} username={props.updateUser.name} />}
+                    c1={
+                        <ProfileLink
+                            className={classesMetas.metaStyle}
+                            username={props.updateUser.name}
+                            userID={props.updateUser.userID}
+                        />
+                    }
                 />
             </DropDownItemMeta>
         </DropDownItemMetas>

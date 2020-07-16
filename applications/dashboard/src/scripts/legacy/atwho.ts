@@ -218,7 +218,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
     /**
      * Pre-insert handler for atwho.
      *
-     * Note, in contenteditable mode (iframe for us), the value is surrounded by span tags.
+     * Note, in content editable mode (iframe for us), the value is surrounded by span tags.
      */
     function beforeInsertHandler(value: string, $li: JQuery<any>): string {
         // It's better to use the value provided, as it may have
@@ -309,7 +309,6 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             cWindow: iframeWindow,
         })
         .atwho({
-            alias: "emoji",
             at: ":",
             tpl: emojiTemplate,
             insert_tpl: "${atwho-data-value}",

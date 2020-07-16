@@ -723,14 +723,20 @@ function setHandlers() {
 /**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string $Code The translation code of the type of object that wasn't found.
+ * @param string $recordType The translation code of the type of object that wasn't found.
  * @return Exception
  */
 function notFoundException($recordType = 'Page') {
     Gdn::dispatcher()
         ->passData('RecordType', $recordType)
-        ->passData('Description', sprintf(t('The %s you were looking for could not be found.'), t(strtolower($recordType))));
-    return new Gdn_UserException(sprintf(t('%s not found.'), t($recordType)), 404);
+        ->passData(
+            'Description',
+            t(
+                sprintf('The %s you were looking for could not be found.', strtolower($recordType)),
+                t('The page you were looking for could not be found.')
+            )
+        );
+    return new Gdn_UserException(t(sprintf('%s Not Found', $recordType), t('Page Not Found')), 404);
 }
 
 /**

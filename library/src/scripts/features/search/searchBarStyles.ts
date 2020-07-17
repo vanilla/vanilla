@@ -127,7 +127,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             cursor: "pointer",
             $nest: {
                 "& .searchBar__placeholder": {
-                    color: colorOut(formElementVars.placeholder.color),
+                    color: colorOut(vars.placeholder.color),
                     margin: "auto",
                     height: unit(calculatedHeight),
                     lineHeight: unit(calculatedHeight),
@@ -399,7 +399,7 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
         top: 0,
         bottom: 0,
         left: unit(globalVars.border.width * 2),
-        height: unit(formElementVars.sizing.height),
+        height: unit(vars.sizing.height),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

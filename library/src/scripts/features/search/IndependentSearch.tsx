@@ -16,7 +16,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 
-interface IProps extends IWithSearchProps, RouteComponentProps<{}> {
+export interface IIndependentSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
     placeholder?: string;
     buttonClass?: string;
@@ -43,7 +43,7 @@ interface IState {
 /**
  * Implements independent search component. All wired up, just drop it where you need it.
  */
-export function IndependentSearch(props: IProps) {
+export function IndependentSearch(props: IIndependentSearchProps) {
     const id = useUniqueID("search");
     const resultsRef = useRef<HTMLDivElement>(null);
     const [query, setQuery] = useState("");

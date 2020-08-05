@@ -26,6 +26,14 @@
             <arg line="--working-dir=${project.dir} install --no-dev --optimize-autoloader" />
         </composer>
     </target>
+    
+    <!-- Restore developer localhost after the build. -->
+    <target name="cleanup">
+        <composer composer="/usr/local/bin/composer" command="install">
+            <arg value="--working-dir=${project.dir}" />
+            <arg value="--quiet" />
+        </composer>
+    </target>
 
     <!-- Build the package. -->
     <target name="dist" depends="build">
@@ -60,5 +68,7 @@
 
         <!-- Archive everything in the package contents directory. -->
         <exec command="zip -X -r vanilla.zip ./package" dir="." />
+        
+        <phingcall target="cleanup" />
     </target>
 </project>

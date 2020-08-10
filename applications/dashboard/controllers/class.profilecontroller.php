@@ -1177,7 +1177,7 @@ class ProfileController extends Gdn_Controller {
 
             $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
 
-            if (count($this->Form->errors() == 0)) {
+            if (count($this->Form->errors()) == 0) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {

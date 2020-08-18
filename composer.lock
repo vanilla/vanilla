@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fc0a1883fc32a13c4ae8f9ab9abd2a1",
+    "content-hash": "5ee22f76bef4536418aa62eeb323853e",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -78,6 +78,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -893,6 +894,36 @@
             "time": "2019-06-18T15:37:11+00:00"
         },
         {
+            "name": "vanilla/cloud-interops",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/cloud-interops.git",
+                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/cloud-interops/zipball/370b91568c8628dfb33dcf9f9687f3664d718206",
+                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vanilla\\CloudInterops\\": "Vanilla/CloudInterops"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "description": "Provides Vanilla Cloud contracts",
+            "time": "2020-08-17T21:51:54+00:00"
+        },
+        {
             "name": "vanilla/garden-container",
             "version": "v3.0.1",
             "source": {
@@ -1483,8 +1514,8 @@
             "authors": [
                 {
                     "name": "Frank Kleine",
-                    "role": "Developer",
-                    "homepage": "http://frankkleine.de/"
+                    "homepage": "http://frankkleine.de/",
+                    "role": "Developer"
                 }
             ],
             "description": "Virtual file system to mock the real file system in unit tests.",
@@ -2247,6 +2278,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2017-11-27T05:48:46+00:00"
         },
         {
@@ -3089,8 +3121,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
@@ -3287,13 +3319,14 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.1.0",
+        "php": ">=7.2",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-fileinfo": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.1"
-    }
+        "php": "7.2"
+    },
+    "plugin-api-version": "1.1.0"
 }

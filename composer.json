@@ -23,11 +23,11 @@
     ],
     "config": {
         "platform": {
-            "php": "7.1"
+            "php": "7.2"
         }
     },
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.2",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-fileinfo": "*",
@@ -43,6 +43,7 @@
         "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
+        "vanilla/cloud-interops": "^1.0",
         "vanilla/garden-container": "^3.0.1",
         "vanilla/garden-http": "~2.1",
         "vanilla/garden-schema": "~1.0",

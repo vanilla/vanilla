@@ -35,26 +35,10 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @return void
      */
-    public function base_render_before($sender) {
-        if (inSection('Dashboard')) {
-            return;
-        }
 
-        $hasAdvancedSearch = class_exists('AdvancedSearchPlugin');
-
-        //set "hasAdvancedSearch" to smarty
-        $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
-
-        // For backwards compatibility in CustomizeTheme
-        $imageUrl = BannerImageModel::getCurrentBannerImageLink();
-        $sender->setData('heroImageUrl', $imageUrl);
-
-        //set ThemeOptions to smarty
-        $themeOptions = c("Garden.ThemeOptions");
-
-        foreach ($themeOptions as $key => &$value) {
-            $sender->setData("ThemeOptions.".$key, $value);
-        }
+    
+    public function base_render_before() {
+        echo "Hello this is a change that I'm making";
     }
 
     /**

@@ -16,6 +16,7 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+/** @var Gdn_Database $Database */
 $SQL = $Database->sql();
 $Construct = $Database->structure();
 $Px = $Database->DatabasePrefix;

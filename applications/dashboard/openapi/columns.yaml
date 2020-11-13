@@ -1,0 +1,37 @@
+openapi: 3.0.2
+info:
+paths:
+components:
+  schemas:
+    InsertInfo:
+      type: object
+      properties:
+        dateInserted:
+          type: integer
+          format: date-time
+          description: The date the record was inserted.
+        insertUserID:
+          type: integer
+          description: The user that inserted the record.
+        insertIPAddress:
+          type: string
+          format: ipv4
+          description: The IP address the record was inserted from.
+      required:
+        - dateInserted
+        - insertUserID
+        - insertIPAddress
+    UpdateInfo:
+      type: object
+      properties:
+        dateUpdateed:
+          type: integer
+          format: date-time
+          description: The date the record was updateed.
+        updateUserID:
+          type: integer
+          description: The user that updateed the record.
+        updateIPAddress:
+          type: string
+          format: ipv4
+          description: The IP address the record was updateed from.

@@ -6,8 +6,8 @@
 import React from "react";
 import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 
-export const STORY_IMAGE =
-    "https://user-images.githubusercontent.com/1770056/74069119-5dda5580-49cb-11ea-883b-61b7463c8cfc.png";
+export const STORY_IMAGE = require("./storyDataImage.png");
+export const STORY_ICON = require("./storyDataImage.png");
 
 export const STORY_LOGO_WHITE = "https://us.v-cdn.net/6030677/uploads/1861f935b5982c0bec354466296d241f.png";
 export const STORY_LOGO_BLACK = "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png";

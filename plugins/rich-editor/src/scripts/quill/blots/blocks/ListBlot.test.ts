@@ -41,11 +41,11 @@ describe("ListBlot", () => {
         const indent = document.getElementById("indent")!;
         const outdent = document.getElementById("outdent")!;
         const formatter = new Formatter(quill, quill.getSelection());
-        indent.addEventListener("click", e => {
+        indent.addEventListener("click", (e) => {
             e.preventDefault();
             formatter.indentList();
         });
-        outdent.addEventListener("click", e => {
+        outdent.addEventListener("click", (e) => {
             e.preventDefault();
             formatter.outdentList();
         });
@@ -471,5 +471,14 @@ describe("ListBlot", () => {
 
             expect(quill.getContents().ops).deep.eq([OpUtils.op("1234"), OpUtils.list(ListType.BULLETED, 0, "\n\n")]);
         });
+    });
+
+    it("can start at an arbitrary depth and get deleted properly", () => {
+        // Insert a list item at depth 1.
+        insertListBlot({ type: ListType.BULLETED, depth: 1 }, "Test");
+        expect(quill.getContents().ops).deep.eq([OpUtils.op("Test"), OpUtils.list(ListType.BULLETED, 1)]);
+        // Try to remove the list item.
+        quill.setContents([OpUtils.op("\n")]);
+        expect(quill.getContents().ops).deep.eq([OpUtils.op("\n")]);
     });
 });

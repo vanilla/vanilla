@@ -44,7 +44,8 @@ export function UserDropDown(props: IProps) {
 
     return (
         <DropDown
-            id={ID}
+            handleID={ID + "-handle"}
+            contentID={ID + "-content"}
             name={t("My Account")}
             buttonClassName={classNames(classesHeader.button)}
             contentsClassName={classNames(classes.contents, classesHeader.dropDownContents)}

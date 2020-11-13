@@ -7,8 +7,20 @@ import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { getThemeVariables } from "@library/theming/getThemeVariables";
+import { uuidv4 } from "@vanilla/utils";
 
-type INavItemGenerator = () => ITitleBarNav;
+export interface INavigationVariableItem {
+    id: string;
+    name: string;
+    url: string;
+    children: INavigationVariableItem[];
+    permission?: string;
+    isCustom?: boolean;
+    isHidden?: boolean;
+}
+
+type INavItemGenerator = () => INavigationVariableItem;
 
 const navItemGenerators: INavItemGenerator[] = [];
 
@@ -18,36 +30,56 @@ export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
 
 export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("navigation", forcedVars);
-    const forumEnabled = getMeta("siteSection.apps.forum", true);
 
-    let defaultForumLinks: ITitleBarNav[] = [];
-    if (forumEnabled) {
-        defaultForumLinks = [
-            {
-                to: "/discussions",
-                children: t("Discussions"),
-            },
-            { to: "/categories", children: t("Categories") },
-        ];
-    }
-    const navItems: { [language: string]: ITitleBarNav[] | undefined; default: ITitleBarNav[] } = makeVars("navItems", {
-        default: [...defaultForumLinks, ...navItemGenerators.map(generator => generator())],
-        [getCurrentLocale()]: undefined,
-    });
+    const navigationItems: INavigationVariableItem[] = makeVars("navigationItems", getDefaultNavItems());
 
     const logo = makeVars("logo", {
         url: "/",
     });
 
-    const currentLocale = getCurrentLocale();
-
-    const getNavItemsForLocale = (locale = currentLocale): ITitleBarNav[] => {
-        if (locale in navItems) {
-            return navItems[locale] ?? navItems.default;
-        } else {
-            return navItems.default;
-        }
-    };
-
-    return { navItems, logo, getNavItemsForLocale };
+    return { navigationItems, logo };
 });
+
+function getDefaultNavItems() {
+    // Existing custom nav links.
+    const navVars = getThemeVariables()?.navigation;
+    const legacyCustomNavItems: ITitleBarNav[] | null =
+        navVars?.navItems?.[getCurrentLocale()] ?? navVars?.navItems?.default ?? null;
+
+    return legacyCustomNavItems ? legacyCustomNavItems.map(mapLegacyNavItem) : getBuiltinNavItems();
+}
+
+function mapLegacyNavItem(item: ITitleBarNav): INavigationVariableItem {
+    return {
+        name: item.children as string,
+        url: item.to,
+        permission: item.permission,
+        id: uuidv4(),
+        children: [],
+    };
+}
+
+function getBuiltinNavItems() {
+    const forumEnabled = getMeta("siteSection.apps.forum", true);
+
+    let builtins: INavigationVariableItem[] = [];
+    if (forumEnabled) {
+        builtins.push({
+            id: "builtin-discussions",
+            url: "/discussions",
+            name: t("Discussions"),
+            children: [],
+        });
+        builtins.push({
+            id: "builtin-categories",
+            url: "/categories",
+            name: t("Categories"),
+            children: [],
+        });
+    }
+
+    navItemGenerators.forEach((generator) => {
+        builtins.push(generator());
+    });
+    return builtins;
+}

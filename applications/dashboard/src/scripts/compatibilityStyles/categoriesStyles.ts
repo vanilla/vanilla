@@ -12,14 +12,17 @@ import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { calc, important, percent, translateY } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { forumVariables } from "@library/forms/forumStyleVars";
 
 export const forumCategoriesVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumCategories");
     const image = makeThemeVars("image", {
-        width: 40,
+        width: forumVariables().userPhoto.sizing.medium,
     });
 
-    return { image };
+    return {
+        image: image,
+    };
 });
 
 export const categoriesCSS = () => {
@@ -35,12 +38,6 @@ export const categoriesCSS = () => {
 
     cssOut(`.ItemContent.Category`, {
         position: "relative",
-    });
-
-    cssOut(`.DataList .PhotoWrap, .MessageList .PhotoWrap`, {
-        top: unit(2),
-        width: unit(vars.image.width),
-        height: unit(vars.image.width),
     });
 
     cssOut(`.categoryList-heading`, {
@@ -127,6 +124,30 @@ export const categoriesCSS = () => {
             top: unit((globalVars.fonts.size.largeTitle * globalVars.lineHeights.condensed) / 2),
             left: "auto",
         }),
+    });
+
+    cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading`, {
+        paddingLeft: 0,
+        paddingTop: unit(18),
+        fontWeight: globalVars.fonts.weights.bold,
+        fontSize: unit(globalVars.fonts.size.large),
+    });
+
+    cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading .Count`, {
+        display: "none",
+    });
+
+    cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1`, {
+        paddingTop: unit(18),
+    });
+
+    cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1 a.ItemLink`, {
+        fontWeight: globalVars.fonts.weights.semiBold,
+        fontSize: unit(globalVars.fonts.size.large),
+    });
+
+    cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories li.Depth2 a.ItemLink`, {
+        fontWeight: globalVars.fonts.weights.normal,
     });
 
     cssOut(`.DataList .Item, .DataList .Empty`, {

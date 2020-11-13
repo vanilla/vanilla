@@ -19,6 +19,7 @@ interface IProps extends IMenuPlacement {
     value?: IComboBoxOption;
     inputClassName?: string;
     disabled?: boolean;
+    forceOpen?: boolean;
     isClearable?: boolean;
     errors?: IFieldError[];
     selectRef?: React.RefObject<Select>;
@@ -34,6 +35,7 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 label={null}
                 labelID={labelID}
                 inputID={inputID}
+                forceOpen={props.forceOpen}
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}

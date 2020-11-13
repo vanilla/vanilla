@@ -271,6 +271,10 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
+    const inlineBlock = style("inlineBlock", {
+        display: "inline-block",
+    });
+
     const confirm = style("confirm", {});
 
     const main = style("main", {});
@@ -309,6 +313,7 @@ export const messagesClasses = useThemeCache(() => {
         iconPosition,
         titleContent,
         content,
+        inlineBlock,
         confirm,
         errorIcon,
         messageWrapper,

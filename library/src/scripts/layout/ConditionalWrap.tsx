@@ -9,17 +9,23 @@ interface IProps {
     condition: boolean;
     className?: string;
     tag?: keyof JSX.IntrinsicElements;
+    component?: React.ComponentType<any>;
     children?: React.ReactNode;
+    componentProps?: object;
 }
 
 /**
  * Facilitates wrapping conditionally a component
  */
 export default function ConditionalWrap(props: IProps) {
-    const { condition, className, tag, children } = props;
-    const Tag = tag || "div";
+    const { condition, className, tag, children, component, componentProps = {} } = props;
+    const Component = component || tag || "div";
     if (condition) {
-        return <Tag className={className}>{children}</Tag>;
+        return (
+            <Component className={className} {...componentProps}>
+                {children}
+            </Component>
+        );
     } else {
         return <>{children}</>;
     }

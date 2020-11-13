@@ -19,6 +19,7 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label: React.ReactNode;
+    labelBold?: boolean;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
@@ -30,7 +31,7 @@ export default function CheckBox(props: IProps) {
     const labelID = useUniqueID("checkbox_label");
     const classes = checkRadioClasses();
 
-    const { isHorizontal } = props;
+    const { isHorizontal, labelBold = true } = props;
 
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
@@ -62,7 +63,9 @@ export default function CheckBox(props: IProps) {
             {props.label && (
                 <span
                     id={labelID}
-                    className={classNames(classes.label, props.tooltipLabel && visibility().visuallyHidden)}
+                    className={classNames(classes.label, props.tooltipLabel && visibility().visuallyHidden, {
+                        [classes.labelBold]: labelBold,
+                    })}
                 >
                     {props.label}
                 </span>

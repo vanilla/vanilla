@@ -76,7 +76,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
      */
     public function testHotReload() {
         $provider = $this->getWebpackAssetProvider();
-        $provider->setHotReloadEnabled(true, '');
+        $provider->setHotReloadEnabled(true);
         $sectionKey = 'forum';
 
         $styles = $provider->getStylesheets($sectionKey);
@@ -85,16 +85,11 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
 
         $scripts = $provider->getScripts($sectionKey);
         $this->assertEquals(1, count($scripts), "Only 1 script should be returned with hot reload");
-        $this->assertEquals("http://127.0.0.1:3030/$sectionKey-hot-bundle.js", $scripts[0]->getWebPath());
-
-        // Different hostname.
-        $provider->setHotReloadEnabled(true, 'localhost');
-        $scripts = $provider->getScripts($sectionKey);
-        $this->assertEquals("http://localhost:3030/$sectionKey-hot-bundle.js", $scripts[0]->getWebPath());
+        $this->assertEquals("https://webpack.vanilla.localhost:3030/$sectionKey-hot-bundle.js", $scripts[0]->getWebPath());
 
         $otherSectionKey = "otherSection";
         $scripts = $provider->getScripts($otherSectionKey);
-        $this->assertEquals("http://localhost:3030/$otherSectionKey-hot-bundle.js", $scripts[0]->getWebPath());
+        $this->assertEquals("https://webpack.vanilla.localhost:3030/$otherSectionKey-hot-bundle.js", $scripts[0]->getWebPath());
     }
 
     /**

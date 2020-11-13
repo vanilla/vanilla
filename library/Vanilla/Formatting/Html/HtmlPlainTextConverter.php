@@ -32,13 +32,13 @@ class HtmlPlainTextConverter {
         $result = $this->replaceHtmlElementsWithStrings(
             $result,
             [
-                'Spoiler' => "(Spoiler)",
-                'UserSpoiler' => "(Spoiler)",
-                'Quote' => "(Quote)",
-                'UserQuote' => "(Quote)",
+                'Spoiler' => "",
+                'UserSpoiler' => "",
+                'Quote' => "",
+                'UserQuote' => "",
             ],
             [
-                'img' => "(Image)"
+                'img' => ""
             ]
         );
         $result = $this->replaceListItems($result);

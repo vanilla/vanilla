@@ -47,7 +47,7 @@
                                 <p class="message" style='margin: 0;Margin-bottom: 10px;font-size: 100%;padding: 0;box-sizing: border-box;color: {$email.textColor};font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;margin-top: 10px;margin-bottom: 15px'>{$email.message}</p>
                                 {if $email.button}
                                 <div class="button-wrap center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;text-align: center">
-                                    <a href="{$email.button.url}" class="button" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;color: {$email.button.textColor};background-color: {$email.button.backgroundColor};border-color: {$email.button.backgroundColor};text-decoration: none;text-align: center;font-weight: 700;cursor: pointer;display: inline-block;border-width: 12px 18px;border-style: solid">{$email.button.text}</a>
+                                    <a href="{$email.button.url}" class="button" role="button" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%;color: {$email.button.textColor};background-color: {$email.button.backgroundColor};border-color: {$email.button.backgroundColor};text-decoration: none;text-align: center;font-weight: 700;cursor: pointer;display: inline-block;border-width: 12px 18px;border-style: solid">{$email.button.text}</a>
                                 </div>
                                 {/if}
                             </td>

@@ -8,12 +8,17 @@
 namespace VanillaTests\APIv2;
 
 use DiscussionModel;
+use Gdn_Configuration;
 
 /**
  * Test the /api/v2/discussions endpoints.
  */
 class CommentsTest extends AbstractResourceTest {
-    use AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait;
+
+    use TestExpandTrait;
+    use AssertLoggingTrait;
+    use TestPrimaryKeyRangeFilterTrait;
+    use TestSortingTrait;
 
     /**
      * {@inheritdoc}
@@ -25,6 +30,13 @@ class CommentsTest extends AbstractResourceTest {
         $this->sortFields = ['dateInserted', 'commentID'];
 
         parent::__construct($name, $data, $dataName);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getExpandableUserFields() {
+        return ['insertUser'];
     }
 
     /**

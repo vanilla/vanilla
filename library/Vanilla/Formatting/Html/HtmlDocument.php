@@ -8,26 +8,44 @@
 namespace Vanilla\Formatting\Html;
 
 use Vanilla\Formatting\Html\Processor\HtmlProcessor;
+use Vanilla\Formatting\Html\Processor\HtmlProcessorTrait;
 
 /**
  * Class for parsing and modifying HTML.
  */
 class HtmlDocument {
 
+    use HtmlProcessorTrait;
+
     /** @var \DOMDocument */
     private $dom;
+
+    /** @var bool */
+    private $wrap;
 
     /**
      * Constructor.
      *
      * @param string $innerHtml HTML to construct the DOM with.
+     * @param bool $wrap Whether or not to wrap in our own fragment prefix/suffix.
      */
-    public function __construct(string $innerHtml) {
+    public function __construct(string $innerHtml, bool $wrap = true) {
         $this->dom = new \DOMDocument();
+        $this->wrap = $wrap;
 
         // DomDocument will automatically add html, head and body wrapper if we don't.
         // We add our own to ensure consistency.
-        @$this->dom->loadHTML($this->getDocumentPrefix() . $innerHtml . $this->getDocumentSuffix(), LIBXML_NOBLANKS);
+        if ($wrap) {
+            $innerHtml = $this->getDocumentPrefix() . $innerHtml . $this->getDocumentSuffix();
+        }
+        @$this->dom->loadHTML($innerHtml, LIBXML_NOBLANKS);
+    }
+
+    /**
+     * @return HtmlDocument
+     */
+    protected function getDocument(): HtmlDocument {
+        return $this;
     }
 
     /**
@@ -72,12 +90,16 @@ class HtmlDocument {
      * @return string
      */
     public function getInnerHtml(): string {
-        $content = $this->dom->getElementsByTagName('body');
-        $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
+        if ($this->wrap) {
+            $content = $this->dom->getElementsByTagName('body');
+            $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
 
-        // The DOM Document added starting body and ending tags. We need to remove them.
-        $result = preg_replace('/^<body>/', '', $result);
-        $result = preg_replace('/<\/body>$/', '', $result);
+            // The DOM Document added starting body and ending tags. We need to remove them.
+            $result = preg_replace('/^<body>/', '', $result);
+            $result = preg_replace('/<\/body>$/', '', $result);
+        } else {
+            $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG);
+        }
         // saveXML adds closing <br> tags, which breaks formatting.
         $result = preg_replace('/<\/br>/', '', $result);
         return $result;

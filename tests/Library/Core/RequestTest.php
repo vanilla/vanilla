@@ -771,4 +771,34 @@ class RequestTest extends SharedBootstrapTestCase {
         ];
         return $r;
     }
+
+    /**
+     * Test `Gdn_Request::anonymizeIP()`.
+     *
+     * @param string $ip
+     * @param bool $full
+     * @param string $expected
+     * @dataProvider provideAnonymizeIPs
+     */
+    public function testAnonymizeIP(string $ip, bool $full, string $expected): void {
+        $request = self::createRequest();
+        $request->setIP($ip);
+
+        $actual = $request->anonymizeIP($full);
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $request->getIP());
+    }
+
+    /**
+     * Data provider for `testAnonymizeIP()`.
+     *
+     * @return array[]
+     */
+    public function provideAnonymizeIPs(): array {
+        $r = [
+            'basic' => ['1.2.3.4', false, '1.2.3.0'],
+            'basic full' => ['1.2.3.4', true, '0.0.0.0'],
+        ];
+        return $r;
+    }
 }

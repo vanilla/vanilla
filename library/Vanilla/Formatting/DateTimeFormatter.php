@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting;
 
 use Garden\StaticCacheTranslationTrait;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Formatting methods related to dates & times.
@@ -279,6 +280,15 @@ class DateTimeFormatter {
      */
     public static function timeStampToDateTime(int $timestamp): string {
         return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    /**
+     * Get the current time formatted as time string.
+     *
+     * @return string
+     */
+    public static function getCurrentDateTime(): string {
+        return self::timeStampToDateTime(CurrentTimeStamp::get());
     }
 
 

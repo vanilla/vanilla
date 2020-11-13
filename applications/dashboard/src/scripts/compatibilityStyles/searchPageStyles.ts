@@ -9,14 +9,14 @@ import { colorOut } from "@library/styles/styleHelpersColors";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { allLinkStates, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts/styles/metasStyles";
-import { important } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { SearchBarPresets } from "@library/banner/bannerStyles";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
@@ -166,7 +166,9 @@ export const searchPageCSS = () => {
     });
 
     // Search result styles
-    const searchResultsStyles = searchBarClasses().searchResultsStyles;
+    const searchResultsStyles = searchBarClasses({
+        preset: SearchBarPresets.BORDER,
+    } as ISearchBarOverwrites).searchResultsStyles;
     const searchResultsVars = searchResultsVariables();
 
     cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete`, {

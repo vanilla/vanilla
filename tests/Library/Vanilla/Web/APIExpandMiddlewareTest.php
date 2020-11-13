@@ -74,6 +74,19 @@ class APIExpandMiddlewareTest extends TestCase {
     }
 
     /**
+     * Test that we don't do anything if the expand field is not preset.
+     */
+    public function testPreservesEmptyExpand(): void {
+        $request = new Request('/');
+        $this->assertArrayNotHasKey('expand', $request->getQuery());
+
+        call_user_func($this->middleware, $request, function () {
+            return [];
+        });
+        $this->assertArrayNotHasKey('expand', $request->getQuery());
+    }
+
+    /**
      * Test a basic expansion.
      */
     public function testBasicExpand(): void {

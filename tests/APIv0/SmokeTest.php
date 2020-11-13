@@ -53,7 +53,7 @@ class SmokeTest extends BaseTest {
      * Set the testUser.
      *
      * @param array $testUser The user to set.
-     * @return StandardTest Returns `$this` for fluent calls.
+     * @return $this
      * @see APIv0::queryUserKey()
      */
     public function setTestUser($testUser) {
@@ -478,10 +478,9 @@ class SmokeTest extends BaseTest {
         $draft =  $this->testSaveDraft();
 
         $draftUpdate = [
-            'CategoryID' =>  $draft['CategoryID'],
+            'CategoryID' =>  $category['Category']['CategoryID'],
             'DiscussionID' => $draft['DiscussionID'],
             'DraftID' => $draft['DraftID'],
-            'CategoryID' => $category['Category']['CategoryID'],
             'Name' => $draft['Name'],
             'Format' => 'Markdown',
             'Body' => $draft['Body'],

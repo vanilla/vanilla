@@ -57,7 +57,6 @@ class RichFormat extends BaseFormat {
         $this->filterer = $filterer;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -65,7 +64,10 @@ class RichFormat extends BaseFormat {
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations);
+            $blotGroups = $this->parser->parse(
+                $operations,
+                $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
+            );
             return $this->renderer->render($blotGroups);
         } catch (\Throwable $e) {
             $this->logBadInput($e);

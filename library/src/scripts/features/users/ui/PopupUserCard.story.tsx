@@ -3,17 +3,19 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
-import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { DeviceProvider } from "@library/layout/DeviceContext";
+import { cssOut } from "@dashboard/compatibilityStyles";
+import gdn from "@library/gdn";
 
 export default {
     component: PopupUserCard,
-    title: "PopupUserCard",
+    title: "Components/User Card",
     parameters: {
         chromatic: {
             viewports: [1450, 700, layoutVariables().panelLayoutBreakPoints.xs],
@@ -40,15 +42,18 @@ const m: IUserCardInfo = {
     photoUrl: "",
     dateLastActive: "May May 2014",
     dateJoined: "May 2017",
-    label: null,
     countDiscussions: 207,
     countComments: 3456,
 };
 
+gdn.meta.context = { conversationsEnabled: true };
+
 export const UserCardNoPhotoNoLabel = () => (
-    <StoryContent>
-        <PopupUserCard user={m} visible={true} />
-    </StoryContent>
+    <DeviceProvider>
+        <StoryContent>
+            <PopupUserCard user={m} visible={true} />
+        </StoryContent>
+    </DeviceProvider>
 );
 
 export const UserCardWithoutPermission = storyWithConfig(
@@ -64,7 +69,7 @@ export const UserCardWithoutPermission = storyWithConfig(
                                 type: "global",
                                 id: 1,
                                 permissions: {
-                                    "email.view": false,
+                                    "personalInfo.view": false,
                                 },
                             },
                         ],
@@ -74,9 +79,11 @@ export const UserCardWithoutPermission = storyWithConfig(
         },
     },
     () => (
-        <StoryContent>
-            <PopupUserCard user={v} visible={true} />
-        </StoryContent>
+        <DeviceProvider>
+            <StoryContent>
+                <PopupUserCard user={v} visible={true} />
+            </StoryContent>
+        </DeviceProvider>
     ),
 );
 
@@ -93,7 +100,7 @@ export const UserCardWithPermission = storyWithConfig(
                                 type: "global",
                                 id: 1,
                                 permissions: {
-                                    "email.view": true,
+                                    "personalInfo.view": true,
                                 },
                             },
                         ],
@@ -103,8 +110,154 @@ export const UserCardWithPermission = storyWithConfig(
         },
     },
     () => (
-        <StoryContent>
-            <PopupUserCard user={v} visible={true} />
-        </StoryContent>
+        <DeviceProvider>
+            <StoryContent>
+                <PopupUserCard user={v} visible={true} />
+            </StoryContent>
+        </DeviceProvider>
+    ),
+);
+
+export const UserCardTestingPositions = storyWithConfig(
+    {
+        storeState: {
+            users: {
+                permissions: {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        isAdmin: false,
+                        permissions: [
+                            {
+                                type: "global",
+                                id: 1,
+                                permissions: {
+                                    "personalInfo.view": false,
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+    },
+    () => (
+        <DeviceProvider>
+            <div
+                style={{
+                    minHeight: "1000px",
+                    height: "100%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "space-between",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                }}
+            >
+                {/* Top Row */}
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "center",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "flex-end",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                {/* Middle Row */}
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                <span
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "33.33333333333333333333%",
+                    }}
+                >
+                    <PopupUserCard user={v} visible={true} />
+                </span>
+
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        justifyContent: "flex-end",
+                        display: "flex",
+                        alignItems: "center",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                {/* Bottom Row */}
+                <span
+                    style={{
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                <span
+                    style={{
+                        marginTop: "auto",
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "center",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+
+                <span
+                    style={{
+                        marginLeft: "auto",
+                        marginTop: "auto",
+                        width: "33.33333333333333333333%",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                    }}
+                >
+                    <PopupUserCard user={v} />
+                </span>
+            </div>
+        </DeviceProvider>
     ),
 );

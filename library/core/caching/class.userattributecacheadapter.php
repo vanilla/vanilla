@@ -8,7 +8,7 @@
 /**
  * Class UserAttributeCacheAdapter
  */
-class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
+class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface {
 
     /**
      * @var Gdn_Session
@@ -32,28 +32,28 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function get($key, $default = null) {
         return $this->session->getAttribute($key, $default);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function set($key, $value, $ttl = null) {
         return $this->setMultiple([$key => $value]);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete($key) {
         return $this->deleteMultiple([$key]);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMultiple($keys, $default = null) {
         $result = [];
@@ -64,7 +64,7 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setMultiple($values, $ttl = null) {
         $success = $this->session->isValid();
@@ -72,7 +72,7 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
             try {
                 // This also update the session!
                 $this->userModel->saveAttribute($this->session->UserID, $values);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $success = false;
             }
         }
@@ -80,14 +80,14 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function deleteMultiple($keys) {
         return $this->setMultiple(array_fill_keys($keys, null));
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function has($key) {
         return $this->get($key) !== null;
@@ -95,7 +95,7 @@ class UserAttributeCacheAdapter implements \Vanilla\CacheInterface {
 
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function clear() {
         return false;

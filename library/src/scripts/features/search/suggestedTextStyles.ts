@@ -6,14 +6,17 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/styleUtils";
-import { paddings, fonts } from "@library/styles/styleHelpers";
-import { percent } from "csx";
+import { paddings, fonts, unit } from "@library/styles/styleHelpers";
+import { calc, percent, translateX, viewWidth } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboard?: boolean }) => {
     const globalVars = globalVariables();
     const { forDashboard = false } = overwrite || {};
+    const mediaQueries = layoutVariables().mediaQueries();
+
     // The styles have been split here so they can be exported to the compatibility styles.
     const option = {
         ...buttonResetMixin(),
@@ -39,6 +42,13 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
             "&:hover, &:focus, &.isFocused": {
                 color: "inherit",
                 backgroundColor: globalVars.states.hover.highlight.toString(),
+            },
+            "&": {
+                ...mediaQueries.xs({
+                    ...paddings({
+                        vertical: 10,
+                    }),
+                }),
             },
         },
     } as NestedCSSProperties;

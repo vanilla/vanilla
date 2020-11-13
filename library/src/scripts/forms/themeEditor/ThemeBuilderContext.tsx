@@ -17,6 +17,8 @@ import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
 import { all } from "q";
 import { navigationVariables } from "@library/headers/navigationVariables";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
 
 ///
 /// Types
@@ -201,6 +203,8 @@ function variableGenerator(variables: IThemeVariables) {
         titleBar: titleBarVariables(variables),
         userContent: userContentVariables(variables),
         navigation: navigationVariables(variables),
+        homeWidgetItem: homeWidgetItemVariables({}, variables),
+        homeWidgetContainer: homeWidgetContainerVariables({}, variables),
     };
 
     // Mix in the addons generator variables.

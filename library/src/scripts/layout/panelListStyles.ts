@@ -35,7 +35,7 @@ export const panelListVariables = useThemeCache(() => {
     };
 });
 
-export const panelListClasses = useThemeCache(mediaQueries => {
+export const panelListClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
     const vars = panelListVariables();
     const style = styleFactory("panelList");

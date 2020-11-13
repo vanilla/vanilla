@@ -163,9 +163,9 @@ export function initializeAtComplete(editorElement, iframe?: any) {
                 }
             }
 
-            const filterSuccessHandler = data => {
+            const filterSuccessHandler = (data) => {
                 if (Array.isArray(data)) {
-                    data.forEach(result => {
+                    data.forEach((result) => {
                         if (typeof result === "object" && typeof result.name === "string") {
                             // Convert special characters to safely insert into template.
                             result.name = result.name

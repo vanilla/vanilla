@@ -41,7 +41,7 @@ class FullRecordCacheModel extends PipelineModel {
      *    - cacheOptions (array): Feature options from `Gdn_Cache::FEATURE_*`.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
-    public function get(array $where = [], array $options = []): array {
+    public function select(array $where = [], array $options = []): array {
         $cacheOptions = $options['cacheOptions'] ?? [];
         return $this->modelCache->getCachedOrHydrate(
             [
@@ -50,7 +50,7 @@ class FullRecordCacheModel extends PipelineModel {
                 'function' => __FUNCTION__, // For uniqueness.
             ],
             function () use ($where, $options) {
-                return parent::get($where, $options);
+                return parent::select($where, $options);
             },
             $cacheOptions
         );
@@ -61,5 +61,12 @@ class FullRecordCacheModel extends PipelineModel {
      */
     public function getAll() {
         return $this->get();
+    }
+
+    /**
+     * Clear the cache for the model.
+     */
+    public function clearCache() {
+        $this->modelCache->invalidateAll();
     }
 }

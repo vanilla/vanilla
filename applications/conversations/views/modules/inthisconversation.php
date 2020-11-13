@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+/** @var InThisConversationModule $this */
+?>
 <div class="Box InThisConversation">
     <?php echo panelHeading(t('In this Conversation')); ?>
     <ul class="PanelInfo">

@@ -1,5 +1,7 @@
 <?php
 if (!defined('APPLICATION')) exit();
+
+use Vanilla\Cache\StaticCache;
 use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('AdminCheck')) {
@@ -11,10 +13,9 @@ if (!function_exists('AdminCheck')) {
      * @return string
      */
     function adminCheck($discussion = null, $wrap = FALSE) {
-        static $useAdminChecks = NULL;
-        if ($useAdminChecks === null) {
-            $useAdminChecks = c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');
-        }
+        $useAdminChecks = StaticCache::getOrHydrate("useAdminCheck", function () {
+            return c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');;
+        });
         if (!$useAdminChecks) {
             return '';
         }
@@ -77,7 +78,7 @@ if (!function_exists('BookmarkButton')) {
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
             'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title, 'aria-label' => $accessibleLabel]
+            ['title' => $title, 'role' => "button", 'aria-label' => $accessibleLabel, 'aria-pressed' => $isBookmarked ? "true" : "false"]
         );
     }
 }
@@ -166,12 +167,15 @@ if (!function_exists('WriteDiscussion')) :
             }
             $sender->fireEvent('BeforeDiscussionContent');
             ?>
-            <span class="Options">
       <?php
-      echo optionsList($discussion);
-      echo bookmarkButton($discussion);
+      // render legacy options
+      if (!Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+            echo '<span class="Options">';
+            echo optionsList($discussion);
+            echo bookmarkButton($discussion);
+            echo '</span>';
+        }
       ?>
-   </span>
 
             <div class="ItemContent Discussion">
                 <div class="Title" role="heading" aria-level="3">
@@ -252,7 +256,16 @@ if (!function_exists('WriteDiscussion')) :
                     ?>
                 </div>
             </div>
-            <?php $sender->fireEvent('AfterDiscussionContent'); ?>
+            <?php
+                // render enhanced accessibility options
+                if (Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+                    echo '<span class="Options">';
+                    echo bookmarkButton($discussion);
+                    echo optionsList($discussion);
+                    echo '</span>';
+                }
+                $sender->fireEvent('AfterDiscussionContent');
+            ?>
         </li>
     <?php
     }

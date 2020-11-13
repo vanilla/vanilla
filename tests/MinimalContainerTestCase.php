@@ -8,11 +8,14 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\Container\Reference;
 use Garden\EventManager;
 use Garden\Http\HttpClient;
+use Garden\Http\Mocks\MockHttpHandler;
 use Garden\Web\RequestInterface;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
@@ -59,12 +62,15 @@ class MinimalContainerTestCase extends TestCase {
      * Setup the container.
      */
     protected function configureContainer() {
-        \Gdn::setContainer(new Container());
+         $container = new Container();
 
-        self::container()
+        $container
+            ->rule(Container::class)
+            ->addAlias(ContainerInterface::class)
+            ->setInstance(Container::class, $container)
             ->rule(FormatService::class)
             ->setShared(true)
-            ->addCall('registerBuiltInFormats', [self::container()])
+            ->addCall('registerBuiltInFormats')
 
             ->rule(Parser::class)
             ->addCall('addCoreBlotsAndFormats')
@@ -104,6 +110,8 @@ class MinimalContainerTestCase extends TestCase {
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
+            ->setInstance('@baseUrl', $this->baseUrl)
+
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
             ->setShared(true)
             ->setConstructorArgs([
@@ -112,8 +120,7 @@ class MinimalContainerTestCase extends TestCase {
 
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
-            ->setClass(MockHttpClient::class)
-
+            ->addCall('setHandler', [new Reference(MockHttpHandler::class)])
 
             // Prevent real HTTP requests.
             ->rule(EventManager::class)
@@ -161,6 +168,8 @@ class MinimalContainerTestCase extends TestCase {
 
             ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
         ;
+
+        \Gdn::setContainer($container);
     }
 
     /**

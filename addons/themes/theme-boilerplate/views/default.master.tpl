@@ -72,6 +72,7 @@
     locale-{$CurrentLocale.Lang}
 "}
 <body id="{$BodyID}" class="{$BodyClass}{$TemplateCss|strip:" "}">
+<a href="#MainContent" class="Button Primary btn button-skipToContent sr-only SrOnly">{t c="Skip to content"}</a>
 
     <!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -166,7 +167,7 @@
                                     </div>
                                 {/if}
                                 <div class="Frame-row">
-                                    <main class="Content MainContent">
+                                    <main id="MainContent" class="Content MainContent">
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">

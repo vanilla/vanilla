@@ -433,3 +433,158 @@ div.token-input-dropdown {
 .CommentForm .DraftButton {
     display: none !important;
 }
+
+.label-wrap {
+    img {
+        max-width: 50%;
+        max-height: 180px;
+        margin-top: $utility-baseUnitHalf;
+        margin-bottom: $utility-baseUnitHalf;
+    }
+}
+
+.info {
+    font-size: $global-small_fontSize;
+    color: $global-color_grey;
+}
+
+.form-group {
+    margin: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+    };
+}
+
+.file-upload {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+    font-weight: $global-normal_fontWeight;
+    min-height: $formElement_height;
+    cursor: pointer;
+    margin-bottom: 0;
+
+    @include maxWidth {
+        max-width: 100%;
+    }
+
+    input {
+        margin: 0;
+        filter: alpha(opacity = 0);
+        opacity: 0;
+
+        &:disabled,
+        &.disabled {
+            opacity: 0;
+        }
+    }
+
+    .form-control {
+        line-height: $formElement_height;
+    }
+}
+
+.file-upload-choose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    line-height: $formElement_height;
+    height: $formElement_height;
+    font-family: $global-body_fontFamily;
+    font-size: $global-medium_fontSize;
+    font-weight: $global-normal_fontWeight;
+    border: $formElement_border;
+    border-radius: $formElement_borderRadius;
+    color: $formElement_color;
+    background: $global-color_white;
+    padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+    margin: 0;
+    width: 100%;
+    max-width: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &:focus,
+    &:active {
+        @if ($staticVariables) {
+            background: $global-color_white;
+            border-color: $global-color_primary;
+            color: $formElement_color;
+        }
+        box-shadow: none;
+        outline: none;
+    }
+}
+
+.file-upload-browse {
+    @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+    );
+    margin-right: 0;
+    @if ($staticVariables) {
+        min-width: 75px; // width with english locale
+    }
+
+    &::before {
+        position: absolute;
+        content: '';
+        height: 34px;
+        width: $formElement_paddingHorizontal;
+        background-color: $global-color_white;
+        left: calc((#{$formElement_paddingHorizontal} + #{$formElement_borderWidth}) * -1);
+        border: 0;
+        z-index: 1;
+    }
+}
+
+.file-upload-browse.file-upload-browse.file-upload-browse {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: $formElement_height;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    &:focus,
+    &:hover,
+    &:active {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    &:not([disabled]) {
+        &:focus,
+        &:hover,
+        &:active {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+}
+
+.button-skipToContent {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &:active,
+    &:focus {
+        padding: $formElement_paddingVertical $formElement_paddingHorizontal !important;
+        overflow: initial !important;
+        color: $button-basic_fg;
+        background-color: $button-basic_bg;
+        border: $button-basic-hover_border !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        clip: auto !important;
+    }
+}

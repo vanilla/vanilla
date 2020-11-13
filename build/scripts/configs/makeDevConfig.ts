@@ -16,22 +16,28 @@ import { getOptions } from "../buildOptions";
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
 export async function makeDevConfig(entryModel: EntryModel, section: string) {
-    const options = await getOptions();
-
     const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = sectionEntries;
-    baseConfig.devtool = "eval-source-map";
+    baseConfig.devtool = "cheap-source-map";
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
-        publicPath: `http://${options.devIp}:3030/`,
+        publicPath: `https://webpack.vanilla.localhost:3030/`,
     };
     baseConfig.optimization = {
         namedModules: true,
         namedChunks: true,
         splitChunks: false,
+    };
+    baseConfig.devServer = {
+        host: "webpack.vanilla.localhost",
+        port: 3030,
+        public: "webpack.vanilla.localhost:3030",
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+        },
     };
     baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
     baseConfig.plugins!.push(new ReactRefreshPlugin());

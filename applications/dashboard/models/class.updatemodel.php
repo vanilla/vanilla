@@ -471,7 +471,7 @@ class UpdateModel extends Gdn_Model {
      * Offers a quick and dirty way of parsing an addon's info array without using eval().
      *
      * @param string $path The path to the info array.
-     * @param string $variable The name of variable containing the information.
+     * @param string|false $variable The name of variable containing the information.
      * @return array|false The info array or false if the file could not be parsed.
      * @deprecated since 2.3
      */

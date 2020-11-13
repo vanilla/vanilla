@@ -7,7 +7,7 @@ $accessibleLabel = !empty($trigger['text']) ? $trigger['text'] : $optionText;
 $triggerID = $dropdown->getTriggerId();
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
     if (($trigger['type'] ?? '') === 'button') :
-    ?><span class="Button-Options" tabindex="0" aria-label="<?php echo $accessibleLabel; ?>" id="<?php echo $triggerID; ?>">
+    ?><span class="Button-Options" aria-label="<?php echo $accessibleLabel; ?>" id="<?php echo $triggerID; ?>">
         <span class="OptionsTitle" title="<?php echo $optionText; ?>">
             <?php echo $accessibleLabel; ?>
         </span>

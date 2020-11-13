@@ -7,22 +7,26 @@
 export const sampleImages = {
     square: {
         big: require("./square/square-big.png"),
-        flush: require("./square/square-flush.png"),
+        medium: require("./square/square-medium.png"),
         small: require("./square/square-small.png"),
+        xs: require("./square/square-xs.png"),
     },
     flush: {
         big: require("./flush/16x9-big.png"),
-        flush: require("./flush/16x9-flush.png"),
+        medium: require("./flush/16x9-medium.png"),
         small: require("./flush/16x9-small.png"),
+        xs: require("./flush/16x9-xs.png"),
     },
     tall: {
         big: require("./tall/5x20-big.png"),
-        flush: require("./tall/5x20-flush.png"),
+        medium: require("./tall/5x20-medium.png"),
         small: require("./tall/5x20-small.png"),
+        xs: require("./tall/5x20-xs.png"),
     },
     wide: {
         big: require("./wide/20x5-big.png"),
-        flush: require("./wide/20x5-flush.png"),
+        medium: require("./wide/20x5-medium.png"),
         small: require("./wide/20x5-small.png"),
+        xs: require("./wide/20x5-xs.png"),
     },
 };

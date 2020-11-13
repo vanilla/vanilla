@@ -15,11 +15,11 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { unit, negative, negativeUnit } from "@library/styles/styleHelpers";
 import { ErrorIcon } from "@library/icons/common";
 
-const story = storiesOf("Messages", module);
+const story = storiesOf("Alerts", module);
 
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 
-story.add("Fixed Message", () => {
+story.add("Message (Fixed Position)", () => {
     const classesMessages = messagesClasses();
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
 

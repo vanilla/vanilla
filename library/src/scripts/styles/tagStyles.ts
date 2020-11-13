@@ -22,7 +22,7 @@ export const tagVariables = useThemeCache(() => {
     const $nest = makeThemeVars("states", linkColors.$nest || {});
 
     const colors = makeThemeVars("color", {
-        fg: globalVars.elementaryColors.lowContrast,
+        fg: globalVars.meta.text.color,
     });
 
     const font = makeThemeVars("font", {

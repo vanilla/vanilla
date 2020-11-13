@@ -9,6 +9,7 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
 <div class="DismissMessage InfoMessage">
     <?php
     echo t('You can follow individual categories and be notified of all posts within them.');
+    echo ' ('.t('CategoryNotificationDetails', 'Only the top two levels of categories are displayed. For more deeply nested categories, you will receive notifications if you select their parent category.').')'
     ?>
 </div>
 <table class="PreferenceGroup">
@@ -57,21 +58,34 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
                 </th>
             </tr>
         <?php else: ?>
+            <?php
+                $rowID = \Vanilla\Utility\HtmlUtils::uniqueElementID('categoryRowLabel');
+            ?>
             <tr>
-                <td class="<?php echo "Depth_{$Category['Depth']}"; ?>" headers="CategoryNotificationHeader">
+                <td id="<?php echo $rowID ?>" class="<?php echo "Depth_{$Category['Depth']}"; ?>" headers="CategoryNotificationHeader">
                     <?php echo $Category['Name']; ?>
                 </td>
+                <?php
+                $emaiDiscussionPreferenceID = "Email.NewDiscussion.{$CategoryID}";
+                $popupDiscussionPreferenceID ="Popup.NewDiscussion.{$CategoryID}";
+                $emaiCommentPreferenceID = "Email.NewComment.{$CategoryID}";
+                $popupCommentPreferenceID = "Popup.NewComment.{$CategoryID}";
+                ?>
                 <td class="PrefCheckBox<?php echo $emailClass; ?>" headers="DiscussionsNotificationHeader EmailDiscussionsHeader">
-                    <?php echo Gdn::controller()->Form->checkBox("Email.NewDiscussion.{$CategoryID}", '', ['value' => 1]); ?>
+                    <?php echo Gdn::controller()->Form->label(t('Email').', '.$Category['Name'].', '.strtolower(t('Notify me when people start new discussions.')), $emaiDiscussionPreferenceID, ['class' => 'sr-only srOnly']) ?>
+                    <?php echo Gdn::controller()->Form->checkBox($emaiDiscussionPreferenceID, '', ['value' => 1]); ?>
                 </td>
                 <td class="PrefCheckBox" headers="DiscussionsNotificationHeader PopupDiscussionsHeader">
-                    <?php echo Gdn::controller()->Form->checkBox("Popup.NewDiscussion.{$CategoryID}", '', ['value' => 1]); ?>
+                    <?php echo Gdn::controller()->Form->label(t('Popup').', '.$Category['Name'].', '.strtolower(t('Notify me when people start new discussions.')), $popupDiscussionPreferenceID, ['class' => 'sr-only srOnly']) ?>
+                    <?php echo Gdn::controller()->Form->checkBox($popupDiscussionPreferenceID, '', ['value' => 1]); ?>
                 </td>
                 <td class="PrefCheckBox<?php echo $emailClass; ?>" headers="CommentsNotificationHeader EmailCommentsHeader">
-                    <?php echo Gdn::controller()->Form->checkBox("Email.NewComment.{$CategoryID}", '', ['value' => 1]); ?>
+                    <?php echo Gdn::controller()->Form->label(t('Email').', '.$Category['Name'].', '.strtolower(t('Notify me when people comment on a discussion.')), $emaiCommentPreferenceID, ['class' => 'sr-only srOnly']) ?>
+                    <?php echo Gdn::controller()->Form->checkBox($emaiCommentPreferenceID, '', ['value' => 1]); ?>
                 </td>
                 <td class="PrefCheckBox" headers="CommentsNotificationHeader EmailCommentsHeader">
-                    <?php echo Gdn::controller()->Form->checkBox("Popup.NewComment.{$CategoryID}", '', ['value' => 1]); ?>
+                    <?php echo Gdn::controller()->Form->label(t('Popup').', '.$Category['Name'].', '.strtolower(t('Notify me when people comment on a discussion.')), $popupCommentPreferenceID, ['class' => 'sr-only srOnly']) ?>
+                    <?php echo Gdn::controller()->Form->checkBox($popupCommentPreferenceID, '', ['value' => 1]); ?>
                 </td>
             </tr>
         <?php

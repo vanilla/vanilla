@@ -284,6 +284,7 @@ class VanillaHooks extends Gdn_Plugin {
             // Break apart our tags and lowercase them all for comparisons.
             $tags = TagModel::splitTags($tagsString);
             $tags = array_map('strtolower', $tags);
+            /** @psalm-suppress EmptyArrayAccess $reservedTags */
             $reservedTags = array_map('strtolower', $reservedTags);
             $maxTags = c('Vanilla.Tagging.Max', 5);
 
@@ -293,7 +294,7 @@ class VanillaHooks extends Gdn_Plugin {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
             }
             if (!TagModel::validateTags($tags)) {
-                $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas or underscores.'));
             }
             if (count($tags) > $maxTags) {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
@@ -848,19 +849,6 @@ class VanillaHooks extends Gdn_Plugin {
     }
 
     /**
-     * Add the discussion search to the search.
-     *
-     * @since 2.0.0
-     * @package Vanilla
-     *
-     * @param object $sender SearchModel
-     */
-    public function searchModel_search_handler($sender) {
-        $searchModel = new VanillaSearchModel();
-        $searchModel->search($sender);
-    }
-
-    /**
      * @param NavModule $sender
      */
     public function siteNavModule_init_handler($sender) {
@@ -924,7 +912,7 @@ class VanillaHooks extends Gdn_Plugin {
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
-        $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'));
+        $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'), null, 'desc', 'PermsDiscussionsView');
         $totalRecords = $offset + $commentModel->LastCommentCount + 1;
 
         // Build a pager
@@ -985,7 +973,7 @@ class VanillaHooks extends Gdn_Plugin {
         [$offset, $limit] = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
 
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID);
+        $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID, 'PermsDiscussionsView');
         $countDiscussions = $offset + $discussionModel->LastDiscussionCount + 1;
 
         $sender->setData('UnfilteredDiscussionsCount', $discussionModel->LastDiscussionCount);

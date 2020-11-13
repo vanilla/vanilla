@@ -1,9 +1,7 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
-import { borders } from "@library/styles/styleHelpersBorders";
-import { paddings } from "@library/styles/styleHelpersSpacing";
-import { colorOut, fonts, unit, userSelect } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, EMPTY_FONTS, fonts, unit, userSelect } from "@library/styles/styleHelpers";
 import { TextTransformProperty } from "csstype";
 
 export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -20,6 +18,7 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
         month: {
             font: {
+                ...EMPTY_FONTS,
                 size: 10,
                 transform: "uppercase" as TextTransformProperty,
                 lineHeight: 1,
@@ -27,6 +26,7 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
         day: {
             font: {
+                ...EMPTY_FONTS,
                 size: 16,
                 weight: globalVars.fonts.weights.bold,
                 lineHeight: 1,
@@ -51,7 +51,11 @@ export const dateTimeClasses = useThemeCache(() => {
         minWidth: unit(compactVars.container.size),
         minHeight: unit(compactVars.container.size),
         ...userSelect(),
-        borderRadius: unit(compactVars.container.border.radius),
+        $nest: {
+            "&&": {
+                borderRadius: unit(compactVars.container.border.radius),
+            },
+        },
     });
 
     const compactDay = style("compactDay", {

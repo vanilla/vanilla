@@ -29,6 +29,15 @@ abstract class AbstractEmbed implements \JsonSerializable {
     protected $data = [];
 
     /**
+     * Determine if this embed is considered extended content.
+     *
+     * @return bool
+     */
+    public static function isExtendedContent(): bool {
+        return false;
+    }
+
+    /**
      * Create the embed by taking some data and validating it.
      *
      * @param array $data

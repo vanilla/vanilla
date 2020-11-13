@@ -9,7 +9,7 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import ThemePreviewCard from "./ThemePreviewCard";
 
-const story = storiesOf("Theme", module);
+const story = storiesOf("Theme UI", module);
 
 const margins = {
     marginRight: 24,

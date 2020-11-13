@@ -23,12 +23,12 @@ class UserFragmentSchema extends Schema {
         parent::__construct($this->parseInternal([
             'userID:i', // The ID of the user.
             'name:s', // The username of the user.
-            'photoUrl:s', // The URL of the user\'s avatar picture.
+            'url:s?', // Full URL to the user profile page.
+            'photoUrl:s', // The URL of the user's avatar picture.
             'dateLastActive:dt|n', // Time the user was last active.
             'label:s?'
         ]));
     }
-
 
     /** @var UserFragmentSchema */
     private static $cache = null;
@@ -51,10 +51,16 @@ class UserFragmentSchema extends Schema {
      * @return array
      */
     public static function normalizeUserFragment(array $dbRecord) {
-        if (array_key_exists('Photo', $dbRecord)) {
+        $photo = $dbRecord['Photo'] ?? '';
+        if ($photo) {
             $photo = userPhotoUrl($dbRecord);
             $dbRecord['PhotoUrl'] = $photo;
+        } else {
+            $url = \UserModel::getDefaultAvatarUrl($dbRecord);
+            $dbRecord['PhotoUrl'] = ($url) ? $url : \UserModel::getDefaultAvatarUrl();
         }
+
+        $dbRecord['url'] = url(userUrl($dbRecord), true);
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);

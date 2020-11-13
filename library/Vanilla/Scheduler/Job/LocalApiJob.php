@@ -8,7 +8,6 @@
 namespace Vanilla\Scheduler\Job;
 
 use Garden\Http\HttpClient;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Http\InternalClient;
 
@@ -17,7 +16,7 @@ use Vanilla\Http\InternalClient;
  */
 abstract class LocalApiJob implements LocalJobInterface, InjectableInterface {
 
-    /** @var HttpClient */
+    /** @var InternalClient */
     protected $vanillaClient;
 
     /**
@@ -31,19 +30,5 @@ abstract class LocalApiJob implements LocalJobInterface, InjectableInterface {
         $internalClient->setBaseUrl('');
         $internalClient->setThrowExceptions(true);
         $this->vanillaClient = $internalClient;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPriority(JobPriority $priority) {
-        // Unused.
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDelay(int $seconds) {
-        // Unused.
     }
 }

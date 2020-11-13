@@ -72,9 +72,10 @@ class Logger {
      *
      * @param LoggerInterface $logger The logger to add.
      * @param string $level One of the **Logger::*** constants.
+     * @param callable|null $filter Signature: (int $level, string $message, array $context)
      */
-    public static function addLogger(LoggerInterface $logger, $level = null) {
-        static::getLogger()->addLogger($logger, $level);
+    public static function addLogger(LoggerInterface $logger, $level = null, callable $filter = null) {
+        static::getLogger()->addLogger($logger, $level, $filter);
     }
 
     /**

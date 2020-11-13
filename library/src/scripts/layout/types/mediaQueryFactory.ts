@@ -30,7 +30,7 @@ export const mediaQueryFactory = (mediaQueriesByType, type): IMediaQueryFunction
     // The following function is the one called in component styles.
     return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries): NestedCSSProperties => {
         let output = { $nest: {} };
-        Object.keys(mediaQueriesForAllLayouts).forEach(layoutName => {
+        Object.keys(mediaQueriesForAllLayouts).forEach((layoutName) => {
             // Check if we're in the correct layout before applying
             if (layoutName === type) {
                 // Fetch the available styles and the media queries for the current layout
@@ -42,7 +42,7 @@ export const mediaQueryFactory = (mediaQueriesByType, type): IMediaQueryFunction
 
                 // Match the two together
                 if (stylesByMediaQuery) {
-                    Object.keys(stylesByMediaQuery).forEach(queryName => {
+                    Object.keys(stylesByMediaQuery).forEach((queryName) => {
                         const query: ILayoutMediaQueryFunction = mediaQueries[queryName];
                         const styles: NestedCSSProperties = stylesByMediaQuery[queryName];
                         if (!query) {

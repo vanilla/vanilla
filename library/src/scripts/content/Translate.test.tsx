@@ -31,7 +31,7 @@ describe("<Translate />", () => {
         const expected = "Before<div>Hello Test</div>After";
         const testStrings = ["Before<0/>After", "Before<0 />After"];
 
-        testStrings.forEach(str => {
+        testStrings.forEach((str) => {
             const rendered = render(
                 <div>
                     <Translate source={str} c0={<TestComponent />} />
@@ -61,7 +61,7 @@ describe("<Translate />", () => {
         const interpolatedContent = "Interpolated $$ < ?Content";
         const testString = `Before<0>${interpolatedContent}</0>After`;
         const expected = `Before<div>${escapeHTML(interpolatedContent)}</div>After`;
-        const c0 = content => <TestComponent content={content} />;
+        const c0 = (content) => <TestComponent content={content} />;
 
         const rendered = render(
             <div>

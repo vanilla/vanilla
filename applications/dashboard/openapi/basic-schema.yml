@@ -1,0 +1,90 @@
+openapi: 3.0.2
+info:
+paths:
+components:
+  schemas:
+    BasicSchema:
+      description: A basic OpenAPI schema validator so that schemas can be submitted as data.
+      type: object
+      properties:
+        type:
+          description: Must be an object.
+          type: string
+          enum: ['object']
+        properties:
+          description: A map of property names to property definitions.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/BasicSchemaProperty'
+        required:
+          description: The names of required properties.
+          type: array
+          items:
+            type: string
+      example:
+        type: object
+        properties:
+          license:
+            type: string
+            description: Find your license number in the help menu.
+          notes:
+            type: string
+            x-control: textarea
+    BasicSchemaProperty:
+      type: object
+      properties:
+        type:
+          description: The data type of the property.
+          type: string
+          enum:
+            - string
+            - number
+            - integer
+            - boolean
+        description:
+          description: A description to help the user enter the right information.
+          type: string
+        x-label:
+          description: The control label.
+          type: string
+        x-control:
+          description: The type of control used to collect the input.
+          type: string
+          enum:
+            - textbox
+            - textarea
+            - checkbox
+        default:
+          description: The default value if none is specified.
+          oneOf:
+            - type: string
+            - type: number
+            - type: integer
+            - type: boolean
+          nullable: true
+        enum:
+          description: Limit input to a set of values.
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: number
+              - type: integer
+              - type: boolean
+        minLength:
+          description: Minimum string length.
+          type: integer
+          minimum: 0
+        maxLength:
+          description: Maximum string length.
+          type: integer
+          minimum: 1
+        minimum:
+          description: Minimum numeric value.
+          type: number
+        maximum:
+          description: Maximum numeric value.
+          type: number
+      required:
+        - type
+

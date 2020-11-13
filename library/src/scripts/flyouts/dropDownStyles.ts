@@ -17,6 +17,8 @@ import {
     IStateSelectors,
     absolutePosition,
     negativeUnit,
+    pointerEvents,
+    srOnly,
 } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -266,7 +268,7 @@ export const dropDownClasses = useThemeCache(() => {
         height: unit(globalVars.separator.size),
         backgroundColor: colorOut(globalVars.separator.color),
         ...margins(vars.spacer.margin),
-
+        border: "none",
         $nest: {
             "&:first-child": {
                 height: 0,
@@ -288,6 +290,10 @@ export const dropDownClasses = useThemeCache(() => {
 
     const panelFirst = style("panelFirst", {
         $nest: {
+            // We want the initial view to have no left space
+            "& li": {
+                paddingLeft: important(unit(0)),
+            },
             "&&": {
                 position: "relative",
                 height: "initial",
@@ -325,6 +331,16 @@ export const dropDownClasses = useThemeCache(() => {
             },
             [`& + .${sectionContents} li:first-child`]: { paddingTop: unit(vars.spacer.margin.vertical) },
         },
+    });
+
+    const headingContentContainer = style("headingContentContainer", {
+        display: "flex",
+        alignItems: "center",
+        height: unit(44),
+    });
+
+    const headingTitleContainer = style("headingTitleContainer", {
+        flex: "auto",
     });
 
     const arrow = style("arrow", {
@@ -414,11 +430,32 @@ export const dropDownClasses = useThemeCache(() => {
 
     const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
 
+    const contentOffsetCenter = style("contentOffsetCenter", {
+        transform: `translateX(-50%)`,
+    });
+
     const contentOffsetLeft = style("contentOffsetLeft", {
         transform: `translateX(${unit(flyoutOffset)})`,
     });
+
     const contentOffsetRight = style("contentOffsetRight", {
         transform: `translateX(${negativeUnit(flyoutOffset)})`,
+    });
+
+    // Used to figure out the position of the flyout,
+    // without it being visible to the user until the calculation is complete
+    const positioning = style("positioning", {
+        ...pointerEvents(),
+        ...srOnly(),
+    });
+
+    const closeButton = style("closeButtonOffsetRight", {
+        display: "inline-block",
+        marginRight: unit(12),
+    });
+
+    const itemButton = style("itemButton", {
+        paddingLeft: globalVars.gutter.size,
     });
 
     return {
@@ -452,8 +489,14 @@ export const dropDownClasses = useThemeCache(() => {
         panelContent,
         backButton,
         check,
+        contentOffsetCenter,
         contentOffsetLeft,
         contentOffsetRight,
+        positioning,
+        closeButton,
+        itemButton,
+        headingContentContainer,
+        headingTitleContainer,
     };
 });
 
@@ -491,15 +534,15 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.highlight),
+                    backgroundColor: important(colorOut(globalVars.states.hover.highlight) as string),
                     color: globalVars.states.hover.contrast ? colorOut(globalVars.states.hover.contrast) : undefined,
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.focus.highlight),
+                    backgroundColor: important(colorOut(globalVars.states.focus.highlight) as string),
                     color: globalVars.states.hover.contrast ? colorOut(globalVars.states.focus.contrast) : undefined,
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.active.highlight),
+                    backgroundColor: important(colorOut(globalVars.states.active.highlight) as string),
                     color: globalVars.states.hover.contrast ? colorOut(globalVars.states.active.contrast) : undefined,
                 },
                 keyboardFocus: {

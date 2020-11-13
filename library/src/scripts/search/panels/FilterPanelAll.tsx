@@ -32,7 +32,7 @@ export function FilterPanelAll(props: IProps) {
                         const { value } = event.target;
                         updateForm({ name: value });
                     },
-                    value: form.name,
+                    value: form.name || undefined,
                 }}
             />
             <MultiUserInput

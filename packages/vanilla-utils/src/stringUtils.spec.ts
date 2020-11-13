@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { hashString, splitStringLoosely, matchAtMention } from "./stringUtils";
+import { hashString, splitStringLoosely, matchAtMention, labelize } from "./stringUtils";
 
 describe("hashString()", () => {
     it("the same string always results in the same value", () => {
@@ -109,5 +109,21 @@ describe("matching @mentions", () => {
 
         testSubjectsAndMatches(goodSubjects);
         testSubjectsAndMatches(badSubjects);
+    });
+});
+
+describe("labelize()", () => {
+    const tests = [
+        ["fooBar", "Foo Bar"],
+        ["foo  bar", "Foo Bar"],
+        ["fooID", "Foo ID"],
+        ["fooURL", "Foo URL"],
+        ["foo_bar", "Foo Bar"],
+        ["foo-bar", "Foo Bar"],
+    ];
+    tests.forEach(([str, expected]) => {
+        it("str", () => {
+            expect(labelize(str)).toBe(expected);
+        });
     });
 });

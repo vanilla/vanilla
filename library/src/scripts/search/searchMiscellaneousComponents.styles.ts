@@ -9,7 +9,12 @@ import { fonts, unit, margins } from "@library/styles/styleHelpers";
 
 export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("searchComponents");
-    return {};
+    const spacing = makeThemeVars("spacing", {
+        margin: 12,
+    });
+    return {
+        spacing,
+    };
 });
 
 export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
@@ -17,10 +22,11 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchMiscellaneousComponentsVariables();
 
-    const sortAndPagination = style("sortAndPagination", {
+    const root = style("root", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        marginBottom: unit(vars.spacing.margin),
     });
 
     const sort = style("sort", {
@@ -37,11 +43,12 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         marginRight: unit(6),
         ...fonts({
             color: globalVars.meta.text.color,
+            weight: globalVars.fonts.weights.normal,
         }),
     });
 
     return {
-        sortAndPagination,
+        root,
         sort,
         sortLabel,
     };

@@ -1,8 +1,7 @@
 <?php
 if (!defined('APPLICATION')) exit();
-use Vanilla\Utility\HtmlUtils;
-$tag = HtmlUtils::accessibleLabel($this);
-echo "<$tag>" . $this->data('Title') . "</$tag>";
+
+echo "<h2>" . $this->data('Title') . "</h2>";
 
 /** @var Gdn_Form $form */
 $form = $this->Form;

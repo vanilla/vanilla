@@ -8,7 +8,7 @@
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
+import { colorOut } from "@library/styles/styleHelpers";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -80,6 +80,15 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const userPhoto = makeThemeVars("userPhoto", userPhotoVariables());
 
+    const spacer = makeThemeVars("spacer", {
+        ...globalVars.spacer,
+    });
+
+    const countBox = makeThemeVars("countBox", {
+        width: 40,
+        height: 40,
+    });
+
     return {
         modern,
         table,
@@ -88,5 +97,7 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         discussion,
         categories,
         userPhoto,
+        countBox,
+        spacer,
     };
 });

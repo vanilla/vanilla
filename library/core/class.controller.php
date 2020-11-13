@@ -9,6 +9,7 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
@@ -43,7 +44,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * the master view. If an asset's key is not called by the master view,
      * that asset will not be rendered.
      */
-    public $Assets;
+    public $Assets = [];
 
     /** @var string */
     protected $_CanonicalUrl;
@@ -265,7 +266,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_FormSaved = '';
         $this->_Json = [];
         $this->_Headers = [
-            'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
+            'X-Vanilla-Version' => APPLICATION_VERSION,
             'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset=utf-8' // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING (this can be overridden by specific controllers)
         ];
@@ -491,6 +492,19 @@ class Gdn_Controller extends Gdn_Pluggable {
             return $allowJSONP;
         } else {
             return c('Garden.AllowJSONP');
+        }
+    }
+
+    /**
+     * Check to see if we've gone off the end of the page.
+     *
+     * @param int $offset The offset requested.
+     * @param int $totalCount The total count of records.
+     * @throws Exception Throws an exception if the offset is past the last page.
+     */
+    protected function checkPageRange(int $offset, int $totalCount) {
+        if ($offset > 0 && $offset >= $totalCount) {
+            throw notFoundException();
         }
     }
 
@@ -729,6 +743,15 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Check if this request is rendering a masterview.
+     *
+     * @returns bool
+     */
+    public function isRenderingMasterView(): bool {
+        return $this->deliveryType() === DELIVERY_TYPE_ALL;
+    }
+
+    /**
      * Returns the requested delivery method of the controller if $default is not
      * provided. Sets and returns the delivery method otherwise.
      *
@@ -774,6 +797,58 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setData('_Description', $value);
         }
         return $this->data('_Description');
+    }
+
+    /**
+     * Get the contextual title.
+     *
+     * If this page is part of a site section, it will return the section's name.
+     * Otherwise, it will return title()
+     *
+     * @return string
+     */
+    public function contextualTitle() {
+        $category = $this->data('Category', null);
+        if (!$category) {
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? null;
+            if ($categoryIdentifier && $categoryIdentifier > 0) {
+                $category = CategoryModel::categories($categoryIdentifier);
+            }
+        }
+        if (is_object($category)) {
+            $category = (array) $category;
+        }
+        if ($category) {
+            return $category['Name'] ?? '';
+        }
+        return $this->title();
+    }
+
+    /**
+     * Get the contextual description.
+     *
+     * If this page is part of a site section, it will return the section's description.
+     * Otherwise, it will return description()
+     *
+     * @return string
+     */
+    public function contextualDescription() {
+        $category = $this->data('Category', null);
+        if (!$category) {
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? null;
+            if ($categoryIdentifier && $categoryIdentifier > 0) {
+                $category = CategoryModel::categories($categoryIdentifier);
+            }
+        }
+        if (is_object($category)) {
+            $category = (array) $category;
+        }
+        if ($category) {
+            return $category['Description'] ?? '';
+        }
+        return $this->description();
     }
 
     /**
@@ -1287,7 +1362,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 ]
             );
 
-            if (!$session->isValid() && $this->deliveryType() == DELIVERY_TYPE_ALL) {
+            if (!$session->isValid() && $this->isRenderingMasterView()) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
@@ -1482,7 +1557,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $json = ipDecodeRecursive($this->_Json);
             $json = json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
             $this->_Json['Data'] = $json;
-            exit($this->_Json['Data']);
+            echo $json;
         } else {
             if ($this->SyndicationMethod === SYNDICATION_NONE) {
                 if (count($this->_InformMessages) > 0) {
@@ -1504,7 +1579,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Render
             if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
                 echo $view ? 'TRUE' : 'FALSE';
-            } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            } elseif ($this->isRenderingMasterView()) {
                 // Render
                 $this->renderMaster();
             } else {
@@ -1820,7 +1895,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData('Message', $ex->getMessage())
-                        ->passData('Url', url())
+                        ->passData('Url', url());
+
+                    if ($ex instanceof Garden\Web\Exception\HttpException) {
+                        Gdn::dispatcher()->passData('Description', $ex->getDescription());
+                    }
+
+                    Gdn::dispatcher()
                         ->dispatch($route);
                 } else {
                     // I dunno! Barf.
@@ -1900,7 +1981,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderMaster() {
         // Build the master view if necessary
-        if (in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL])) {
+        if ($this->isRenderingMasterView()) {
             $this->MasterView = $this->masterView();
 
             // Only get css & ui Components if this is NOT a syndication request
@@ -1947,8 +2028,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     } else {
                         // Check to see if there is a CSS cacher.
-                        $cssCacher = Gdn::factory('CssCacher');
-                        if (!is_null($cssCacher)) {
+                        $hasCacher = Gdn::getContainer()->has('CssCacher');
+                        if ($hasCacher) {
+                            $cssCacher = Gdn::getContainer()->get('CssCacher');
                             $path = $cssCacher->get($path, $appFolder);
                         }
 
@@ -2119,7 +2201,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         );
         $this->setData('CssClass', $cssClass, true);
 
-        if ($this->MasterView === 'default' && Gdn::themeFeatures()->useSharedMasterView()) {
+        if ($this->MasterView === 'default' && ($this->isReactView || Gdn::themeFeatures()->useSharedMasterView())) {
             /** @var MasterViewRenderer $viewRenderer */
             $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
             $result = $viewRenderer->renderGdnController($this);
@@ -2144,7 +2226,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Get theming assets for the page.
      */
     private function addThemeAssets() {
-        if (!$this->allowCustomTheming || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+        if (!$this->allowCustomTheming || !$this->isRenderingMasterView() || $this->MasterView === 'admin') {
             // We only want to load theme data for full page loads & controllers that require theming data.
             return;
         }

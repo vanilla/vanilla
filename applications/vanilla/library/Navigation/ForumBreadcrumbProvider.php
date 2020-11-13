@@ -20,20 +20,23 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
 
     use StaticCacheTranslationTrait;
 
-    /** @var \CategoryCollection */
-    private $categoryCollection;
+    /** @var \CategoryModel */
+    private $categoryModel;
 
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var Breadcrumb[] */
+    private $crumbsByCategoryID = [];
+
     /**
      * DI.
      *
-     * @param \CategoryCollection $categoryCollection
+     * @param \CategoryModel $categoryModel
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(\CategoryCollection $categoryCollection, SiteSectionModel $siteSectionModel) {
-        $this->categoryCollection = $categoryCollection;
+    public function __construct(\CategoryModel $categoryModel, SiteSectionModel $siteSectionModel) {
+        $this->categoryModel = $categoryModel;
         $this->siteSectionModel = $siteSectionModel;
     }
 
@@ -41,25 +44,34 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
      * @inheritdoc
      */
     public function getForRecord(RecordInterface $record, string $locale = null): array {
-        $ancestors = $this->categoryCollection->getAncestors($record->getRecordID());
+        $ancestors = $this->categoryModel->getAncestors($record->getRecordID());
 
         $crumbs = [
             new Breadcrumb(self::t('Home'), \Gdn::request()->url('/', true)),
         ];
         foreach ($ancestors as $ancestor) {
-            if ($ancestor['CategoryID'] === -1) {
+            $categoryID = $ancestor['CategoryID'];
+            $existingCrumb = $this->crumbsByCategoryID[$categoryID] ?? null;
+            if ($existingCrumb !== null) {
+                $crumbs[] = $existingCrumb;
+                continue;
+            }
+
+            if ($categoryID === -1) {
                 // If we actually get the root category, we don't want to see the "synthetic" root.
                 // We actually just want the categories page.
 
                 // However, if the homepage is categories, we don't want to duplicate that either.
                 if ($this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] === 'categories') {
                     continue;
-                };
+                }
 
-                $crumbs[] = new Breadcrumb(t('Categories'), url('/categories', true));
+                $newCrumb = new Breadcrumb(t('Categories'), url('/categories', true));
             } else {
-                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor, '', true));
+                $newCrumb = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor, '', true));
             }
+            $this->crumbsByCategoryID[$categoryID] = $newCrumb;
+            $crumbs[] = $newCrumb;
         }
         return $crumbs;
     }

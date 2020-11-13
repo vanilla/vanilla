@@ -5,17 +5,23 @@
  */
 
 import { IApiError, LoadStatus } from "@library/@types/api/core";
-import { IMe, IMeCounts, IUser } from "@library/@types/api/users";
+import { IMe, IMeCounts, IUser, IInvitees } from "@library/@types/api/users";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IPermission, IPermissions } from "@library/features/users/userModel";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { useSelector } from "react-redux";
+import { IPermissions } from "@library/features/users/userModel";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 const createAction = actionCreatorFactory("@@users");
 
 export interface IGetUserByIDQuery {
     userID: number;
+}
+
+export interface IInviteUsersByGroupIDQuery {
+    userID: number;
+    groupID: number; // The group to be invited
+    userIDs: number[]; // The invitees
+    emails: string[]; // The invitees
 }
 
 // The duration we wait to check for new counts.
@@ -91,6 +97,42 @@ export default class UserActions extends ReduxActions {
             return reponse.data;
         })({ userID });
         return this.dispatch(thunk);
+    };
+
+    public static inviteUsersACs = createAction.async<IInviteUsersByGroupIDQuery, IInvitees[], IApiError>(
+        "INVITE_USERS",
+    );
+
+    public inviteUsersByGroupID = (query: IInviteUsersByGroupIDQuery) => {
+        const { groupID, userIDs, emails } = query;
+        const body = { userIDs, emails };
+        const thunk = bindThunkAction(UserActions.inviteUsersACs, async () => {
+            const response = await this.api.post(`/groups/${groupID}/invitations`, body);
+            return response.data;
+        })(query);
+        return this.dispatch(thunk);
+    };
+
+    public static updateInviteeIDsAC = createAction<{ userID: number; IDs: number[] }>("UPDATE_INVITEE_IDS");
+    public updateIDs = ({ userID, IDs }) => {
+        this.dispatch(UserActions.updateInviteeIDsAC({ userID, IDs }));
+    };
+
+    public static updateInviteeEmailsAC = createAction<{ userID: number; emails: string[] }>("UPDATE_INVITEE_EMAIlS");
+    public updateEmails = ({ userID, emails }) => {
+        this.dispatch(UserActions.updateInviteeEmailsAC({ userID, emails }));
+    };
+
+    public static updateInviteeEmailsStringAC = createAction<{ userID: number; emailsString: string }>(
+        "UPDATE_INVITEE_EMAIlS_STRING",
+    );
+    public updateEmailsString = ({ userID, emailsString }) => {
+        this.dispatch(UserActions.updateInviteeEmailsStringAC({ userID, emailsString }));
+    };
+
+    public static updateInviteesAC = createAction<{ userID: number; invitees: IComboBoxOption[] }>("UPDATE_INVITEES");
+    public updateInvitees = ({ userID, invitees }) => {
+        this.dispatch(UserActions.updateInviteesAC({ userID, invitees }));
     };
 }
 

@@ -20,6 +20,7 @@
 
         .BoxNewDiscussion.BoxNewDiscussion {
             margin: $utility-baseUnitTriple 0;
+            text-align: center;
         }
 
         .ButtonGroup.Multi,
@@ -55,7 +56,6 @@
         background: transparent;
 
         li {
-            margin: 0;
             padding: 0;
             background: transparent;
         }

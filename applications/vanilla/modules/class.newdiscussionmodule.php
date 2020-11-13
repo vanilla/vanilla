@@ -107,7 +107,7 @@ class NewDiscussionModule extends Gdn_Module {
         }
 
         // Grab the allowed discussion types.
-        $discussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, isset($category) ? $category : []);
+        $discussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, isset($category) ? $category : [], $this->_Sender);
         $buttonsConfig = c('NewDiscussionModule.Types', []);
 
         foreach ($discussionTypes as $key => $type) {

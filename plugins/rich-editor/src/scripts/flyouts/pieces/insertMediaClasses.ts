@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { paddings, unit } from "@library/styles/styleHelpers";
+import { extendItemContainer, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { percent, px } from "csx";
@@ -22,25 +22,25 @@ export const insertMediaClasses = useThemeCache(() => {
         ...paddings({
             left: vars.flyout.padding.horizontal,
             right: vars.flyout.padding.horizontal,
-            bottom: vars.flyout.padding.vertical,
+            bottom: vars.flyout.padding.vertical * 2,
         }),
-    });
-
-    const help = style("help", {
-        marginRight: "auto",
-        fontSize: unit(globalVars.fonts.size.small),
     });
 
     const insert = style("insert", {
         $nest: {
-            "&&": {
+            "&&&": {
                 // Nest deeper to override margins from the forum.
                 width: percent(100),
                 position: "relative",
-                marginBottom: px(10),
+                marginBottom: 12,
             },
         },
     });
+
+    const insertCode = style("insertCode", {
+        fontFamily: globalVars.fonts.families.monospace,
+    });
+
     const button = style("button", {
         position: "relative",
         marginLeft: "auto",
@@ -53,5 +53,5 @@ export const insertMediaClasses = useThemeCache(() => {
         padding: 0,
     });
 
-    return { root, help, insert, footer, button };
+    return { root, insert, insertCode, footer, button };
 });

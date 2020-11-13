@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Site;
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SingleSiteSectionProvider;
 use VanillaTests\MinimalContainerTestCase;

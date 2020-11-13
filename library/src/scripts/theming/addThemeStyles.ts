@@ -30,7 +30,6 @@ export const addThemeClasses = useThemeCache(() => {
     const style = styleFactory("addTheme");
 
     const addTheme = style("addTheme", {
-        display: "block",
         ...flexHelper().middle(),
         ...paddings({
             all: vars.addTheme.padding,

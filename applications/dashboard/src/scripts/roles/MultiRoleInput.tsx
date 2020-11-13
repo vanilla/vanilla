@@ -23,7 +23,7 @@ export function MultiRoleInput(props: IProps) {
         <Tokens
             {...props}
             value={props.value
-                .map(roleID => {
+                .map((roleID) => {
                     const role = rolesByID.data?.[roleID];
                     if (!role) {
                         return null;
@@ -35,8 +35,8 @@ export function MultiRoleInput(props: IProps) {
                     }
                 })
                 .filter(notEmpty)}
-            onChange={options => {
-                const result = options?.map(option => option.value as number);
+            onChange={(options) => {
+                const result = options?.map((option) => option.value as number);
                 props.onChange(result);
             }}
             options={roleOptions.data ?? []}

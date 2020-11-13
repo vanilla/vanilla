@@ -21,7 +21,7 @@ class FloodControlHelper {
      * @param string $type Type of record that will be used to configure to trait.
      * @param bool $skipAdmins Whether to skip flood control for admins/moderators or not. Default is true.
      *
-     * @return \Vanilla\CacheInterface
+     * @return \Psr\SimpleCache\CacheInterface
      */
     public static function configure($instance, $configScope, $type, $skipAdmins = true) {
         $session = Gdn::session();
@@ -50,12 +50,12 @@ class FloodControlHelper {
         }
 
         if (c('Cache.Enabled')) {
-            $storageObject = new CacheCacheAdapter(Gdn::cache());
+            $storageObject = new \Vanilla\Cache\CacheCacheAdapter(Gdn::cache());
 
             $keyPostCount = $instance->getDefaultKeyCurrentPostCount();
             $keyLastDateChecked = $instance->getDefaultKeyLastDateChecked();
             // Add the type in the key in case that a model do multiple types (activityModel for example).
-            foreach([&$keyPostCount, &$keyLastDateChecked] as &$key) {
+            foreach ([&$keyPostCount, &$keyLastDateChecked] as &$key) {
                 $key = str_replace('%s.%s', '%s.'.strtolower($type).'.%s', $key);
             }
         } else {

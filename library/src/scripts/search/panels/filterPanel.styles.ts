@@ -8,7 +8,7 @@ import { fonts, paddings, srOnly, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
-export const filterPanelClasses = useThemeCache(mediaQueries => {
+export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
     const style = styleFactory("filterPanel");
 

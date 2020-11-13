@@ -7,22 +7,15 @@
 
 namespace VanillaTests\APIv2;
 
-use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Formats\TextFormat;
-use Vanilla\Http\InternalClient;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\SiteTestCase;
 
-abstract class AbstractAPIv2Test extends TestCase {
-    use SiteTestTrait, SetupTraitsTrait;
-
-    /**
-     * @var InternalClient
-     */
-    private $api;
-
+/**
+ * Base API test case.
+ */
+abstract class AbstractAPIv2Test extends SiteTestCase {
     /**
      * @var bool Set to false before setUp() to skip the session->start();
      */
@@ -48,14 +41,10 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
-
         if ($this->startSessionOnSetup) {
             $this->setAdminApiUser();
             $this->api->setTransientKey(md5(now()));
         }
-
-        $this->setUpTestTraits();
     }
 
     /**
@@ -64,17 +53,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
-
-        $this->tearDownTestTraits();
-    }
-
-    /**
-     * Get the API client for internal requests.
-     *
-     * @return InternalClient Returns the API client.
-     */
-    public function api() {
-        return $this->api;
     }
 
     public function assertRowsEqual(array $expected, array $actual) {

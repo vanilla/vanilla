@@ -23,6 +23,17 @@ trait TestCategoryModelTrait {
      */
     protected function setupTestCategoryModel() {
         $this->categoryModel = $this->container()->get(CategoryModel::class);
+
+        // This is necessary right now because the category model itself gets an instance from the container.
+        $this->container()->setInstance(CategoryModel::class, $this->categoryModel);
+        CategoryModel::reset();
+    }
+
+    /**
+     * Clear out the test category model instance.
+     */
+    protected function tearDownTestCategoryModel() {
+        $this->container()->setInstance(CategoryModel::class, null);
     }
 
     /**
@@ -69,5 +80,38 @@ trait TestCategoryModelTrait {
         TestCase::assertCount($count, $rows, "Not enough test categories were inserted.");
 
         return $rows;
+    }
+
+    /**
+     * Insert a category that is private to one or more roles.
+     *
+     * @param array $roleIDs The roles to restrict to.
+     * @param array $overrides Overrides for the category record.
+     * @return array Returns the category.
+     */
+    protected function insertPrivateCategory(array $roleIDs, array $overrides = []): array {
+        $overrides['CustomPermissions'] = true;
+
+        $permissions = [];
+        foreach ($roleIDs as $roleID) {
+            $permissions[] = [
+                'RoleID' => $roleID,
+                'Vanilla.Discussions.View' => true,
+                'Vanilla.Discussions.Add' => true,
+                'Vanilla.Discussions.Edit' => true,
+                'Vanilla.Discussions.Delete' => true,
+                'Vanilla.Discussions.Announce' => true,
+                'Vanilla.Discussions.Close' => true,
+                'Vanilla.Discussions.Sink' => true,
+                'Vanilla.Comments.Add' => true,
+                'Vanilla.Comments.Edit' => true,
+                'Vanilla.Comments.Delete' => true,
+            ];
+        }
+
+        $overrides['Permissions'] = $permissions;
+
+        $rows = $this->insertCategories(1, $overrides);
+        return $rows[0];
     }
 }

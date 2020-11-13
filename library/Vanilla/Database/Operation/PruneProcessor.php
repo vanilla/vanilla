@@ -40,12 +40,12 @@ class PruneProcessor implements Processor {
     /**
      * {@inheritdoc}
      */
-    public function handle(Operation $databaseOperation, callable $stack) {
-        switch ($databaseOperation->getType()) {
+    public function handle(Operation $operation, callable $stack) {
+        switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $op = $this->operation;
                 try {
-                    $this->operation = $databaseOperation;
+                    $this->operation = $operation;
                     $this->prune();
                 } finally {
                     $this->operation = $op;
@@ -53,7 +53,7 @@ class PruneProcessor implements Processor {
                 break;
         }
 
-        return $stack($databaseOperation);
+        return $stack($operation);
     }
 
     /**

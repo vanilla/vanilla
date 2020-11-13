@@ -957,7 +957,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
         $url = $this->authorizeUri(['target' => $target]);
         $providerName = $this->provider['Name'] ?? 'OAuth';
-        $linkLabel = sprintf(t('Sign in with %s'), $providerName);
+        $linkLabel = sprintf(t('Sign In with %s'), $providerName);
         $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
         return $result;
     }

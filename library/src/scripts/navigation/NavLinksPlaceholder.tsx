@@ -5,12 +5,14 @@
 
 import Container from "@library/layout/components/Container";
 import Heading from "@library/layout/Heading";
-import { LoadingRectange } from "@library/loaders/LoadingRectangle";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 import random from "lodash/random";
 import React from "react";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@vanilla/i18n/src";
 
 interface IProps {
     sectionsCount?: number;
@@ -57,21 +59,22 @@ function SingleNavLinksPlaceholder(props: { itemCount: number }) {
     const classes = navLinksClasses();
     return (
         <div className={classes.root}>
-            <LoadingRectange
-                className={classes.title}
-                height={24}
-                width={random(30, 75, false) + "%"}
-            ></LoadingRectange>
+            <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
+            <LoadingRectangle className={classes.title} height={24} width={random(30, 75, false) + "%"} />
             <div className={classes.items}>
                 {Array.from(Array(props.itemCount)).map((_, i) => {
                     return (
                         <React.Fragment key={i}>
-                            <LoadingRectange height={12} className={classes.item} width={random(70, 98, false) + "%"} />
+                            <LoadingRectangle
+                                height={12}
+                                className={classes.item}
+                                width={random(70, 98, false) + "%"}
+                            />
                         </React.Fragment>
                     );
                 })}
                 <div className={classes.viewAllItem}>
-                    <LoadingRectange width={"70px"} height={12} className={classes.viewAll} />
+                    <LoadingRectangle width={"70px"} height={12} className={classes.viewAll} />
                 </div>
             </div>
         </div>

@@ -71,18 +71,7 @@ class MessagesController extends ConversationsController {
 
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
-            $recipientUserIDs = [];
-            $to = explode(',', $this->Form->getFormValue('To', ''));
-            $userModel = new UserModel();
-            foreach ($to as $name) {
-                if (trim($name) != '') {
-                    $user = $userModel->getByUsername(trim($name));
-                    if (is_object($user)) {
-                        $recipientUserIDs[] = $user->UserID;
-                    }
-                }
-            }
-
+            $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));
             // Enforce MaxRecipients
             if (!$this->ConversationModel->addUserAllowed(0, count($recipientUserIDs))) {
                 // Reuse the Info message now as an error.
@@ -98,8 +87,9 @@ class MessagesController extends ConversationsController {
 
             $this->EventArguments['Recipients'] = $recipientUserIDs;
             $this->fireEvent('BeforeAddConversation');
-
-            $this->Form->setFormValue('RecipientUserID', $recipientUserIDs);
+            if (!empty($this->Form->getFormValue('To'))) {
+                $this->Form->setFormValue('RecipientUserID', $recipientUserIDs);
+            }
             $conversationID = $this->Form->save();
             if ($conversationID !== false) {
                 $target = $this->Form->getFormValue('Target', 'messages/'.$conversationID);
@@ -130,7 +120,8 @@ class MessagesController extends ConversationsController {
                     );
                     $recipient = '';
                 } else {
-                    $this->Form->setValue('To', $recipient);
+                    $recipient = Gdn::userModel()->getByUsername($recipient);
+                    $this->Form->setValue('Recipient', $recipient);
                 }
             }
             if ($subject != '') {
@@ -148,6 +139,23 @@ class MessagesController extends ConversationsController {
             ['Name' => $this->data('Title'), 'Url' => 'messages/add']
         ]);
 
+        $userData = [];
+        $recipients = Gdn::userModel()->getIDs($recipientUserIDs);
+        $recipient = $this->Form->getValue('Recipient');
+        if ($recipient) {
+            $recipient = (array)$recipient;
+            if (!empty($recipient)) {
+                $recipients [] = $recipient;
+            }
+        }
+
+        foreach ($recipients as $recipient) {
+            $userData [] = [
+                'id' => $recipient['UserID'],
+                'name' => $recipient['Name']
+            ];
+        }
+        $this->setData('userData', $userData);
         $this->CssClass = 'NoPanel';
 
         $this->render();
@@ -159,7 +167,7 @@ class MessagesController extends ConversationsController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $conversationID Unique ID of the conversation.
+     * @param int|string $conversationID Unique ID of the conversation.
      */
     public function addMessage($conversationID = '') {
         $this->Form->setModel($this->ConversationMessageModel);
@@ -195,7 +203,7 @@ class MessagesController extends ConversationsController {
             $newMessageID = $this->Form->save();
 
             if ($newMessageID) {
-                if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+                if ($this->isRenderingMasterView()) {
                     redirectTo('messages/'.$conversationID.'/#'.$newMessageID);
                 }
 
@@ -281,7 +289,7 @@ class MessagesController extends ConversationsController {
     /**
      * Clear the message history for a specific conversation & user.
      *
-     * @param int $conversationID Unique ID of conversation to clear.
+     * @param int|false $conversationID Unique ID of conversation to clear.
      * @param string $transientKey The CSRF token.
      */
     public function clear($conversationID = false, $transientKey = '') {
@@ -336,14 +344,11 @@ class MessagesController extends ConversationsController {
     /**
      * Shows all uncleared messages within a conversation for the viewing user
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $conversationID Unique ID of conversation to view.
+     * @param int|false $conversationID Unique ID of conversation to view.
      * @param int $offset Number to skip.
-     * @param int $limit Number to show.
+     * @param int|false $limit Number to show.
      */
-    public function index($conversationID = false, $offset = -1, $limit = '') {
+    public function index($conversationID = false, $offset = -1, $limit = false) {
         $this->Offset = $offset;
         $session = Gdn::session();
         Gdn_Theme::section('Conversation');
@@ -565,7 +570,7 @@ class MessagesController extends ConversationsController {
      * @param int $conversationID Unique ID of conversation to view.
      * @param string $transientKey Single-use hash to prove intent.
      */
-    public function bookmark($conversationID = '', $transientKey = '') {
+    public function bookmark($conversationID, $transientKey = '') {
         $session = Gdn::session();
         $bookmark = null;
 

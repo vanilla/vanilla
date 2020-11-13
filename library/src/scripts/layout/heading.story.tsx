@@ -14,7 +14,7 @@ import Heading from "@library/layout/Heading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { typographyClasses } from "@library/styles/typographyStyles";
 
-const story = storiesOf("UI Content", module);
+const story = storiesOf("Components", module);
 
 story.add("Headings", () => {
     const classesTypography = typographyClasses();

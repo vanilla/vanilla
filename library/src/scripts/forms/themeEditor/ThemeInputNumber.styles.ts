@@ -83,7 +83,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
         maxWidth: unit(vars.input.width - vars.spinner.width),
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(builderVariables.input.width),
-        ...borders({}, builderVariables.border as IGlobalBorderStyles),
+        ...borders({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
         borderRight: 0,
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
@@ -106,7 +106,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
 
     const stepUp = style("stepUp", {
         ...absolutePosition.topRight(),
-        ...borders({}, builderVariables.border as IGlobalBorderStyles),
+        ...borders({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
         ...userSelect(),
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
@@ -127,7 +127,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
     });
     const stepDown = style("stepDown", {
         ...absolutePosition.bottomRight(),
-        ...borders({}, builderVariables.border as IGlobalBorderStyles),
+        ...borders({}, { fallbackBorderVariables: builderVariables.border }),
         ...userSelect(),
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,

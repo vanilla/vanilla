@@ -29,7 +29,7 @@ interface IProps {}
 export function CommunityPostTypeFilter(props: IProps) {
     const { form, updateForm } = useSearchForm<{}>();
     const registeredTypes = CommunityPostTypeFilter.postTypes;
-    const allTypes = flatten(registeredTypes.map(v => v.values));
+    const allTypes = flatten(registeredTypes.map((v) => v.values));
 
     if (registeredTypes.length <= 1) {
         return null;
@@ -46,7 +46,7 @@ export function CommunityPostTypeFilter(props: IProps) {
                 if (noTypesSelected) {
                     isChecked = true;
                 } else {
-                    formTypes?.forEach(formType => {
+                    formTypes?.forEach((formType) => {
                         if (registeredType.values.includes(formType)) {
                             isChecked = true;
                         }
@@ -58,12 +58,12 @@ export function CommunityPostTypeFilter(props: IProps) {
                         label={registeredType.label}
                         key={i}
                         checked={isChecked}
-                        onChange={e => {
+                        onChange={(e) => {
                             const newChecked = e.target.checked;
 
                             if (newChecked) {
                                 const newTypesSet = new Set(formTypes ?? []);
-                                registeredType.values.forEach(typeToPush => {
+                                registeredType.values.forEach((typeToPush) => {
                                     newTypesSet.add(typeToPush);
                                 });
 
@@ -74,13 +74,13 @@ export function CommunityPostTypeFilter(props: IProps) {
                                 }
                             } else {
                                 const newTypesSet = new Set(form.types ?? []);
-                                registeredType.values.forEach(typeToPush => {
+                                registeredType.values.forEach((typeToPush) => {
                                     newTypesSet.delete(typeToPush);
                                 });
 
                                 if (newTypesSet.size === 0) {
                                     // Make a new set with all values minus the current one.
-                                    const newTypes = allTypes.filter(v => !registeredType.values.includes(v));
+                                    const newTypes = allTypes.filter((v) => !registeredType.values.includes(v));
                                     updateForm({ types: newTypes });
                                 } else {
                                     updateForm({ types: Array.from(newTypesSet) });

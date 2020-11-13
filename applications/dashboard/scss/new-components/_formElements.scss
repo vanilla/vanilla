@@ -82,3 +82,80 @@ $fontSize-small     : 12px !default;
 .inputBlock-inputText {
     box-sizing: border-box;
 }
+
+.label-wrap {
+    img {
+        max-width: 50%;
+        max-height: 180px;
+        margin-top: $utility-baseUnitHalf;
+        margin-bottom: $utility-baseUnitHalf;
+    }
+}
+
+.form-group {
+    margin: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+    };
+}
+
+.FormWrapper {
+    .file-upload {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        width: 100%;
+        font-weight: $global-fontWeight_normal;
+        min-height: $formElement_height;
+        cursor: pointer;
+        margin-bottom: 0;
+
+        input {
+            padding: 0;
+            margin: 0;
+            filter: alpha(opacity = 0);
+            opacity: 0;
+            width: 0;
+
+            &:disabled,
+            &.disabled {
+                opacity: 0;
+            }
+        }
+    }
+
+    .file-upload-browse {
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        touch-action: manipulation;
+        min-width: $global-button_minWidth;
+        line-height: $formElement_height;
+        height: $formElement_height;
+        font-weight: $global-fontWeight_normal;
+        user-select: none;
+        overflow: hidden;
+        cursor: pointer;
+        background-color: $button-basic_bg;
+        color: $button-basic_fg;
+        border: {
+            width: $formElement_borderWidth;
+            radius: $global-button_radius;
+            style: solid;
+            color: $button-basic_border;
+        }
+        order: -1;
+        margin-right: $utility-baseUnit;
+    }
+
+    .file-upload-choose {
+        line-height: $formElement_height;
+        height: $formElement_height;
+        font-size: $global-medium_fontSize;
+        font-weight: $global-fontWeight_normal;
+        font-family: $global-body_fontFamily;
+    }
+
+}

@@ -39,10 +39,10 @@ class MorePagerModule extends PagerModule {
     /** @var string Translation code to be used for "less" link. */
     public $LessCode;
 
-    /** @var The number of records being displayed on a single page of data. Default is 30. */
+    /** @var int The number of records being displayed on a single page of data. Default is 30. */
     public $Limit;
 
-    /** @var The total number of records in the dataset. */
+    /** @var int The total number of records in the dataset. */
     public $TotalRecords;
 
     /** @var string The string to contain the record offset. ie. /controller/action/%s/ */
@@ -52,7 +52,7 @@ class MorePagerModule extends PagerModule {
     public $Offset;
 
     /**
-     *
+     * MorePagerModule constructor.
      *
      * @param string $sender
      */
@@ -74,16 +74,14 @@ class MorePagerModule extends PagerModule {
     }
 
     /**
-     *
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function assetTarget() {
         return false;
     }
 
     /**
-     * Define all required parameters to create the Pager and PagerDetails.
+     * {@inheritDoc}
      */
     public function configure($offset, $limit, $totalRecords, $url, $forceConfigure = false) {
         if ($this->_PropertiesDefined === false || $forceConfigure === true) {
@@ -110,7 +108,7 @@ class MorePagerModule extends PagerModule {
     */
     public function details($formatString = '') {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
+            trigger_error('You must configure the pager with $Pager->configure() before retrieving the pager details.', E_USER_ERROR);
         }
 
         $details = false;
@@ -135,22 +133,35 @@ class MorePagerModule extends PagerModule {
     }
 
     /**
+     * Format a URL for the pager.
      *
-     *
-     * @param $url
-     * @param $offset
-     * @param string $limit
-     * @return mixed|string
+     * @param string $url
+     * @param int $offset
+     * @param int $limit
+     * @param int $count
+     * @return string
+     * @deprecated This method differs from its parent. Please consider it for use in this class only.
      */
-    public static function formatUrl($url, $offset, $limit = '') {
-        // Check for new style page.
-        if (strpos($url, '{Page}') !== false || strpos($url, '{Offset}') !== false) {
-            $page = pageNumber($offset, $limit, true);
-            return str_replace(['{Offset}', '{Page}', '{Size}'], [$offset, $page, $limit], $url);
-        } else {
-            return self::formatUrl($url, $page, $limit);
-        }
+    public static function formatUrl($url, $offset, $limit = 0, $count = 0) {
+        $page = pageNumber($offset, $limit, true);
+        $data = [
+            'offset' => $offset,
+            'limit'  => $limit,
+            'page' => $page,
+            'from' => $offset + 1,
+            'to' => $offset + $limit,
+            'count' => $count,
+        ];
+        $r = preg_replace_callback('`{(offset|page|size|from|to|count|pagecount)}`i', function ($m) use ($data) {
+            return $data[strtolower($m[1])] ?? '';
+        }, $url, -1, $matches);
 
+        // Check for new style page.
+        if ($matches === 0) {
+            return sprintf($url, $offset + 1, $offset + $limit, $count);
+        } else {
+            return $r;
+        }
     }
 
     /**
@@ -166,11 +177,13 @@ class MorePagerModule extends PagerModule {
     /**
      * Returns the "show x more (or less) items" link.
      *
-     * @param string The type of link to return: more or less
+     * @param string $type The type of link to return: more or less.
+     * @param array $attributes Extra attributes.
+     * @return string
      */
-    public function toString($type = 'more') {
+    public function toString($type = 'more', $attributes = []) {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
+            trigger_error('You must configure the pager with $Pager->configure() before retrieving the pager.', E_USER_ERROR);
         }
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.

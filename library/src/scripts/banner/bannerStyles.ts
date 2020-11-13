@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { searchBarVariables } from "@library/features/search/searchBarStyles";
 import { buttonGlobalVariables, ButtonPreset, buttonVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
@@ -13,22 +13,23 @@ import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSea
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
+
 import {
     absolutePosition,
     backgroundHelper,
-    borderRadii,
-    borders,
     colorOut,
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
+    EMPTY_BORDER_RADIUS,
     EMPTY_FONTS,
     EMPTY_SPACING,
     fonts,
+    IBorderRadiusOutput,
     IFont,
     importantUnit,
     isLightColor,
     modifyColorBasedOnLightness,
-    textInputSizingFromFixedHeight,
+    standardizeBorderRadius,
     unit,
     unitIfDefined,
 } from "@library/styles/styleHelpers";
@@ -37,7 +38,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color } from "csx";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color, viewWidth } from "csx";
 import { media } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
@@ -46,6 +47,7 @@ import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -64,6 +66,37 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, !!altName);
     const globalVars = globalVariables(forcedVars);
     const widgetVars = widgetVariables(forcedVars);
+    const compactSearchVars = compactSearchVariables(forcedVars);
+    const searchBarVars = searchBarVariables(forcedVars);
+
+    // Main colors
+    const colors = makeThemeVars("colors", {
+        primary: globalVars.mainColors.primary,
+        primaryContrast: globalVars.mainColors.primaryContrast,
+        secondary: globalVars.mainColors.secondary,
+        secondaryContrast: globalVars.mainColors.secondaryContrast,
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+        borderColor: globalVars.border.color,
+    });
+
+    const presets = makeThemeVars("presets", {
+        button: {
+            preset: isLightColor(colors.primaryContrast) ? ButtonPreset.TRANSPARENT : ButtonPreset.SOLID,
+        },
+        input: {
+            preset: SearchBarPresets.NO_BORDER,
+        },
+    });
+
+    if (presets.input.preset === SearchBarPresets.UNIFIED_BORDER) {
+        presets.button.preset = ButtonPreset.SOLID; // Unified border currently only supports solid buttons.
+    }
+
+    const isSolidButton = presets.button.preset === ButtonPreset.SOLID;
+    const isBordered = presets.input.preset === SearchBarPresets.BORDER;
+    const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
+    const isSolidBordered = isBordered && isSolidButton;
 
     const options = makeThemeVars("options", {
         enabled: true,
@@ -74,8 +107,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         hideSearch: false,
         searchPlacement: "middle" as SearchPlacement,
         overlayTitleBar: true,
+        url: "" as string | undefined,
     });
-    const compactSearchVars = compactSearchVariables(forcedVars);
 
     const topPadding = 69;
     const horizontalPadding = unit(
@@ -108,30 +141,11 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
     });
 
-    const inputAndButton = makeThemeVars("inputAndButton", {
-        borderRadius: compactSearchVars.borders.borderRadius,
-    });
-
-    // Main colors
-    const colors = makeThemeVars("colors", {
-        primary: globalVars.mainColors.primary,
-        primaryContrast: globalVars.mainColors.primaryContrast,
-        secondary: globalVars.mainColors.secondary,
-        secondaryContrast: globalVars.mainColors.secondaryContrast,
-        bg: globalVars.mainColors.bg,
-        fg: globalVars.mainColors.fg,
-        borderColor: globalVars.mixPrimaryAndFg(0.4),
-    });
-
-    const presets = makeThemeVars("presets", {
-        button: { preset: isLightColor(colors.primaryContrast) ? ButtonPreset.TRANSPARENT : ButtonPreset.SOLID },
-        input: { preset: SearchBarPresets.NO_BORDER },
-    });
-
+    // INPUT STATE
     const state = makeThemeVars("state", {
         colors: {
-            fg: colors.secondaryContrast,
-            bg: colors.secondary,
+            fg: !isBordered ? colors.secondaryContrast : colors.primary,
+            bg: !isBordered ? colors.secondary : colors.bg,
         },
         borders: {
             color: colors.bg,
@@ -143,7 +157,13 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     const border = makeThemeVars("border", {
         width: globalVars.border.width,
-        radius: globalVars.borderType.formElements.default.radius,
+        radius: searchBarVars.border.radius,
+    });
+
+    // Unified border loops around whole search component including search button
+    const unifiedBorder = makeThemeVars("unifiedBorder", {
+        width: globalVars.border.width * 2,
+        color: globalVars.mainColors.primary,
     });
 
     const backgrounds = makeThemeVars("backgrounds", {
@@ -230,7 +250,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         outerShadowOpacity: 0.75,
     });
 
-    const textMixin = {
+    const font = makeThemeVars("font", {
         ...EMPTY_FONTS,
         color: colors.primaryContrast,
         align: options.alignment,
@@ -243,17 +263,17 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
                 text.outerShadowOpacity,
             ),
         )}` as TextShadowProperty,
-    };
+    });
 
     const title = makeThemeVars("title", {
         maxWidth: 700,
         font: {
-            ...textMixin,
+            ...font,
             size: globalVars.fonts.size.largeTitle,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
         fontMobile: {
-            ...textMixin,
+            ...font,
             size: globalVars.fonts.size.title,
         },
         margins: {
@@ -267,7 +287,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     const description = makeThemeVars("description", {
         text: undefined as string | undefined,
         font: {
-            ...textMixin,
+            ...font,
             size: globalVars.fonts.size.large,
         },
         maxWidth: 400,
@@ -285,28 +305,30 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
     });
 
-    if (presets.input.preset === SearchBarPresets.UNIFIED_BORDER) {
-        presets.button.preset = ButtonPreset.SOLID; // Unified border currently only supports solid buttons.
-    }
-
-    const isSolidButton = presets.button.preset === ButtonPreset.SOLID;
-    const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
-
-    const inputHasNoBorder =
-        presets.input.preset === SearchBarPresets.UNIFIED_BORDER || presets.input.preset === SearchBarPresets.NO_BORDER;
-
-    const searchBar = makeThemeVars("searchBar", {
+    const searchBarInit = makeThemeVars("searchBar", {
         preset: presets.button.preset,
-        colors: {
-            fg: colors.fg,
-            bg: colors.bg,
-        },
+        input: searchBarVars.input,
         sizing: {
             maxWidth: 705,
             height: 40,
         },
+        border: {
+            color: !isBordered ? colors.bg : colors.primary,
+            leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
+            radius: border.radius,
+            width: globalVars.border.width,
+        },
+    });
+
+    const searchBar = makeThemeVars("searchBar", {
+        preset: presets.button.preset,
+        border: searchBarInit.border,
+        sizing: {
+            ...searchBarInit.sizing,
+            heightMinusBorder: searchBarInit.sizing.height - searchBarInit.border.width * 2,
+        },
         font: {
-            color: colors.fg,
+            color: searchBarInit.input.fg,
             size: globalVars.fonts.size.large,
         },
         margin: {
@@ -329,15 +351,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
                 ),
             )}` as TextShadowProperty,
         },
-        border: {
-            color: inputHasNoBorder ? colors.bg : colors.primary,
-            leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
-            radius: {
-                left: border.radius,
-                right: 0,
-            },
-            width: globalVars.border.width,
-        },
+
         state: {
             border: {
                 color: isSolidButton ? colors.fg : colors.primaryContrast,
@@ -345,46 +359,41 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
     });
 
-    let buttonBorderStyles = {
-        color: colors.bg,
-        width: 0,
-        left: {
-            ...EMPTY_BORDER,
-            color: searchBar.border.color,
-            width: searchBar.border.width,
-            radius: 0,
-        },
-        right: {
-            ...EMPTY_BORDER,
-            radius: border.radius,
-            color: colors.bg,
-        },
-    };
-
-    const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
-    const activeBorderColor = isTransparentButton ? colors.primaryContrast : colors.bg;
-
     let buttonStateStyles = {
         colors: {
-            fg: colors.secondaryContrast,
-            bg: bgColorActive,
+            fg: isSolidBordered ? colors.primary : colors.primaryContrast,
+            bg: isSolidBordered
+                ? colors.bg
+                : !isLightColor(colors.bg)
+                ? globalVars.elementaryColors.black.fade(0.3)
+                : globalVars.elementaryColors.white.fade(0.3),
         },
         borders: {
-            color: activeBorderColor,
+            color: isSolidBordered ? colors.primary : isTransparentButton ? colors.primaryContrast : colors.bg,
         },
         fonts: {
-            color: colors.primaryContrast,
+            color: isSolidBordered ? colors.primary : colors.primaryContrast,
         },
     };
-
-    if (isTransparentButton) {
-        buttonBorderStyles.color = colors.bg;
-        buttonBorderStyles.width = globalVars.border.width;
-    }
 
     const searchButtonBg = isTransparentButton ? rgba(0, 0, 0, 0) : colors.primary;
 
-    const searchButton = makeThemeVars("searchButton", {
+    let buttonBorderStyles = {
+        color: isTransparentButton || isSolidBordered ? globalVars.border.color : searchBarVars.input.bg,
+        width: searchBar.border.width,
+        borderRadius: {
+            ...EMPTY_BORDER_RADIUS,
+            left: 0,
+            right: border.radius,
+        } as IBorderRadiusOutput,
+        state: {
+            borders: buttonStateStyles.borders,
+        },
+    };
+
+    buttonBorderStyles.borderRadius = standardizeBorderRadius(buttonBorderStyles.borderRadius);
+
+    const searchButtonDropDown = makeThemeVars("searchButton", {
         name: "searchButton",
         preset: { style: presets.button.preset },
         spinnerColor: colors.primaryContrast,
@@ -392,10 +401,22 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             minHeight: searchBar.sizing.height,
         },
         colors: {
-            bg: searchButtonBg,
-            fg: colors.bg,
+            bg: isSolidBordered ? colors.bg : searchButtonBg,
+            fg: isSolidBordered ? colors.fg : colors.bg,
         },
-        borders: buttonBorderStyles,
+        borders: {
+            left: {
+                // ...EMPTY_BORDER,
+                radius: border.radius,
+                color: colors.bg,
+            },
+            right: {
+                // ...EMPTY_BORDER,
+                color: searchBar.border.color,
+                width: searchBar.border.width,
+                radius: 0,
+            },
+        },
         fonts: {
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.bold,
@@ -403,11 +424,38 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         state: buttonStateStyles,
     } as IButtonType);
 
-    if (isSolidButton) {
+    const searchButtonType = {
+        name: "searchButton",
+        preset: { style: presets.button.preset },
+        sizing: {
+            minHeight: searchBar.sizing.height,
+        },
+        colors: {
+            bg: isSolidBordered ? colors.bg : searchButtonBg,
+            fg: isSolidButton && isBordered ? font.color : colors.bg,
+        },
+        borders: buttonBorderStyles,
+        fonts: {
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.bold,
+        },
+        state: buttonStateStyles,
+    };
+
+    const searchButton = makeThemeVars("searchButton", searchButtonType);
+
+    if (isSolidButton && !isBordered) {
         const buttonVars = buttonVariables();
-        searchButton.state = buttonVars.primary.state;
+        searchButton.state = {
+            ...searchButton.state,
+            ...buttonVars.primary.state,
+        };
         searchButton.colors = buttonVars.primary.colors;
         searchButton.borders!.color = buttonVars.primary.borders.color;
+
+        searchButtonDropDown.state = buttonVars.primary.state;
+        searchButtonDropDown.colors = buttonVars.primary.colors;
+        searchButtonDropDown.borders!.color = buttonVars.primary.borders.color;
     }
 
     const buttonShadow = makeThemeVars("shadow", {
@@ -418,13 +466,6 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         background: modifyColorBasedOnLightness({ color: colors.primaryContrast, weight: text.shadowMix }).fade(
             0.1,
         ) as BackgroundColorProperty,
-    });
-
-    const unifiedBannerOptions = makeThemeVars("unifiedBannerOptions", {
-        border: {
-            width: 2,
-            color: colors.secondary,
-        },
     });
 
     const searchStrip = makeThemeVars("searchStrip", {
@@ -446,6 +487,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     });
 
     return {
+        font,
         presets,
         options,
         outerBackground,
@@ -454,6 +496,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         innerBackground,
         contentContainer,
         dimensions,
+        unifiedBorder,
         text,
         title,
         description,
@@ -463,13 +506,13 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         buttonShadow,
         searchButton,
         colors,
-        inputAndButton,
         rightImage,
         border,
         isTransparentButton,
-        unifiedBannerOptions,
         searchStrip,
         logo,
+        searchButtonDropDown,
+        searchButtonBg,
     };
 });
 
@@ -478,63 +521,64 @@ export const bannerClasses = useThemeCache(
         mediaQueries: IMediaQueryFunction,
         alternativeVariables?: ReturnType<typeof bannerVariables>,
         altName?: string,
+        options?: { debug?: boolean | string },
     ) => {
-        const vars = alternativeVariables ?? bannerVariables();
-        const { presets } = vars;
-        const style = styleFactory(altName ?? "banner");
+        const bannerVars = bannerVariables();
+        const vars = alternativeVariables ?? bannerVars;
         const formElementVars = formElementsVariables();
         const globalVars = globalVariables();
-
+        const buttonGlobalVars = buttonGlobalVariables();
+        const { searchBar } = vars;
+        const style = styleFactory(altName ?? "banner");
         const isCentered = vars.options.alignment === "center";
+        const borderRadius =
+            vars.searchBar.border.radius !== undefined ? vars.searchBar.border.radius : vars.border.radius;
+        const isUnifiedBorder = vars.presets.input.preset === SearchBarPresets.UNIFIED_BORDER;
+        const isBordered = vars.presets.input.preset === SearchBarPresets.BORDER;
+        const isSolidBordered = isBordered && vars.presets.button.preset === ButtonPreset.SOLID;
 
         const searchButton = style("searchButton", {
+            height: unit(vars.searchBar.sizing.height),
             $nest: {
                 "&.searchBar-submitButton": {
-                    ...generateButtonStyleProperties(vars.searchButton),
-                    borderTopRightRadius: importantUnit(vars.border.radius),
-                    borderBottomRightRadius: importantUnit(vars.border.radius),
-                    left: -1,
+                    ...generateButtonStyleProperties({
+                        buttonTypeVars: vars.searchButton,
+                        globalVars,
+                        formElementVars,
+                        buttonGlobalVars,
+                        debug: true,
+                    }),
+                    $nest: {
+                        "&&&&": {
+                            borderTopLeftRadius: importantUnit(0),
+                            borderBottomLeftRadius: importantUnit(0),
+                        },
+                        "&&&:hover,&&&:focus, &&&.focus-visible, &&&:active": {
+                            backgroundColor: isSolidBordered
+                                ? colorOut(vars.colors.bg)
+                                : colorOut(
+                                      !isLightColor(vars.searchButtonBg)
+                                          ? globalVars.elementaryColors.black.fade(0.3)
+                                          : globalVars.elementaryColors.white.fade(0.3),
+                                  ),
+                            borderColor: isSolidBordered ? colorOut(vars.colors.primary) : undefined,
+                            color: isSolidBordered ? colorOut(vars.colors.primary) : vars.searchButton!.colors!.fg,
+                        },
+                    },
                 },
             },
+        } as NestedCSSProperties);
+
+        const searchDropDownButton = style("searchDropDown", {
+            ...generateButtonStyleProperties({
+                buttonTypeVars: vars.searchButtonDropDown,
+                globalVars,
+                formElementVars,
+                buttonGlobalVars,
+            }),
         });
 
-        const valueContainer = mirrorLeftRadius => {
-            return style("valueContainer", {
-                $nest: {
-                    "&&.inputText": {
-                        ...textInputSizingFromFixedHeight(
-                            vars.searchBar.sizing.height,
-                            vars.searchBar.font.size,
-                            vars.searchBar.border.width * 2,
-                            vars.searchBar.border.radius.left,
-                        ),
-                        boxSizing: "border-box",
-                        paddingLeft: unit(searchBarVariables().searchIcon.gap),
-                        backgroundColor: colorOut(vars.searchBar.colors.bg),
-                        ...borders({
-                            ...vars.searchBar.border,
-                        }),
-                        $nest: {
-                            "&:active, &:hover, &:focus, &.focus-visible": {
-                                borderColor: colorOut(vars.searchBar.state.border.color),
-                            },
-                        },
-                        ...borderRadii({
-                            left: vars.border.radius,
-                            right: mirrorLeftRadius ? importantUnit(vars.border.radius) : importantUnit(0),
-                        }),
-                        borderColor: colorOut(vars.searchBar.border.color),
-                    },
-                    ".searchBar__control": {
-                        cursor: "text",
-                        position: "relative",
-                    },
-                    "& .searchBar__placeholder": {
-                        color: colorOut(vars.searchBar.font.color),
-                    },
-                },
-            } as NestedCSSProperties);
-        };
+        const valueContainer = style("valueContainer", {});
 
         const outerBackground = useThemeCache((url?: string) => {
             const finalUrl = url ?? vars.outerBackground.image ?? undefined;
@@ -633,12 +677,23 @@ export const bannerClasses = useThemeCache(
 
         const noTopMargin = style("noTopMargin", {});
 
+        const conditionalUnifiedBorder = isUnifiedBorder
+            ? {
+                  borderRadius,
+                  boxShadow: `0 0 0 ${unit(bannerVars.unifiedBorder.width)} ${colorOut(
+                      bannerVars.unifiedBorder.color,
+                  )}`,
+              }
+            : {};
+
         const searchContainer = style("searchContainer", {
             position: "relative",
             width: percent(100),
-            maxWidth: unit(vars.searchBar.sizing.maxWidth),
+            maxWidth: unit(searchBar.sizing.maxWidth),
+            height: unit(vars.searchBar.sizing.height),
             margin: isCentered ? "auto" : undefined,
             ...margins(vars.searchBar.margin),
+            ...conditionalUnifiedBorder,
             $nest: {
                 "& .search-results": {
                     width: percent(100),
@@ -699,6 +754,10 @@ export const bannerClasses = useThemeCache(
 
         const titleAction = style("titleAction", {});
         const titleWrap = style("titleWrap", { ...margins(vars.title.margins), ...textWrapMixin });
+        const titleUrlWrap = style("titleUrlWrap", {
+            marginLeft: isCentered ? "auto" : undefined,
+            marginRight: isCentered ? "auto" : undefined,
+        });
 
         const titleFlexSpacer = style("titleFlexSpacer", {
             display: isCentered ? "block" : "none",
@@ -740,20 +799,10 @@ export const bannerClasses = useThemeCache(
 
         const content = style("content", {
             boxSizing: "border-box",
+            flexGrow: 1,
             zIndex: 1,
             boxShadow: vars.searchBar.shadow.show ? vars.searchBar.shadow.style : undefined,
-            height: unit(vars.searchBar.sizing.height),
-            $nest: {
-                "&.hasFocus .searchBar-valueContainer": {
-                    boxShadow: `0 0 0 1px ${colorOut(vars.colors.primary)} inset`,
-                },
-                "& .searchBar-valueContainer icon-clear": {
-                    color: colorOut(vars.searchBar.font.color),
-                },
-                [`& .${searchBarClasses().icon}, & .searchBar__input`]: {
-                    color: colorOut(vars.searchBar.font.color),
-                },
-            },
+            minHeight: unit(vars.searchBar.sizing.height),
         });
 
         const imagePositioner = style("imagePositioner", {
@@ -859,15 +908,6 @@ export const bannerClasses = useThemeCache(
                 },
             ),
         );
-        const rootConditionalStyles =
-            presets.input.preset === SearchBarPresets.UNIFIED_BORDER
-                ? {
-                      backgroundColor: colorOut(vars.unifiedBannerOptions.border.color),
-                      boxShadow: `0 0 0 ${unit(vars.unifiedBannerOptions.border.width)} ${
-                          vars.unifiedBannerOptions.border.color
-                      }`,
-                  }
-                : {};
 
         const titleBarVars = titleBarVariables();
 
@@ -881,7 +921,6 @@ export const bannerClasses = useThemeCache(
                 maxWidth: percent(100),
                 backgroundColor: colorOut(vars.outerBackground.color),
                 $nest: {
-                    [`& .${searchBarClasses().independentRoot}`]: rootConditionalStyles,
                     "& .searchBar": {
                         height: unit(vars.searchBar.sizing.height),
                     },
@@ -909,21 +948,29 @@ export const bannerClasses = useThemeCache(
             height: percent(100),
         });
 
-        const iconContainer = style("iconContainer", {
-            $nest: {
-                "&&": {
-                    height: unit(vars.searchBar.sizing.height),
-                    outline: 0,
-                    border: 0,
-                    background: "transparent",
-                },
-            },
-        });
+        const iconContainer = style("iconContainer", {});
 
-        const resultsAsModal = style("resultsAsModalClasses", {
+        const resultsAsModal = style("resultsAsModal", {
             $nest: {
                 "&&": {
-                    top: unit(vars.searchBar.sizing.height),
+                    top: unit(vars.searchBar.sizing.height + 2),
+                    ...layoutVariables()
+                        .mediaQueries()
+                        .xs({
+                            width: viewWidth(100),
+                            left: `50%`,
+                            transform: translateX("-50%"),
+                            borderTopRightRadius: 0,
+                            borderTopLeftRadius: 0,
+
+                            $nest: {
+                                "& .suggestedTextInput-option": {
+                                    ...paddings({
+                                        horizontal: 21,
+                                    }),
+                                },
+                            },
+                        }),
                 },
             },
         });
@@ -970,6 +1017,7 @@ export const bannerClasses = useThemeCache(
             fullHeight,
             outerBackground,
             contentContainer,
+            valueContainer,
             text,
             icon,
             defaultBannerSVG,
@@ -981,10 +1029,10 @@ export const bannerClasses = useThemeCache(
             titleAction,
             titleFlexSpacer,
             titleWrap,
+            titleUrlWrap,
             description,
             descriptionWrap,
             content,
-            valueContainer,
             iconContainer,
             resultsAsModal,
             backgroundOverlay,
@@ -997,6 +1045,7 @@ export const bannerClasses = useThemeCache(
             logoContainer,
             logoSpacer,
             logo,
+            searchDropDownButton,
         };
     },
 );

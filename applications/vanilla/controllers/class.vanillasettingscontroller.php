@@ -638,7 +638,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @param $category
      */
     protected function setupDiscussionTypes($category) {
-        $discussionTypes = DiscussionModel::discussionTypes();
+        $discussionTypes = DiscussionModel::discussionTypes($category);
         $this->setData('DiscussionTypes', $discussionTypes);
 
         if (!$this->Form->isPostBack()) {
@@ -746,6 +746,10 @@ class VanillaSettingsController extends Gdn_Controller {
 
             if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
+            }
+
+            if ($this->Form->getFormValue("CustomPermissions", false) === false) {
+                $this->Form->setFormValue("Permissions", null);
             }
 
             if ($this->Form->save()) {
@@ -936,12 +940,13 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $this->title(t('Categories'));
 
-        // Get category data
+        // Get category data.
+        /** @var Gdn_DataSet $categoryData */
         $categoryData = $this->CategoryModel->getAll();
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
-        array_walk($categoryData->result(), function(&$value) use ($canDelete) {
+        array_walk($categoryData->result(), function (&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 

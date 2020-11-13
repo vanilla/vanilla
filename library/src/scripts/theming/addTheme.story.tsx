@@ -10,7 +10,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { AddTheme } from "./AddTheme";
 import { PlusIcon } from "@library/icons/common";
 
-const story = storiesOf("Theme", module);
+const story = storiesOf("Theme UI", module);
 
 story.add("Add Theme", () => {
     return (

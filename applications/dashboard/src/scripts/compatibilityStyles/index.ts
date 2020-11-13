@@ -6,7 +6,7 @@
  */
 
 import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { cssRaw, cssRule, media } from "typestyle";
+import { cssRaw, cssRule, forceRenderStyles, media } from "typestyle";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
@@ -55,6 +55,8 @@ import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDown
 import { logDebugConditionnal } from "@vanilla/utils";
 import { forumVariables } from "@library/forums/forumStyleVars";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
+import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -67,7 +69,7 @@ compatibilityStyles = useThemeCache(() => {
     const fg = colorOut(mainColors.fg);
     const bg = colorOut(mainColors.bg);
     const primary = colorOut(mainColors.primary);
-    const primaryContrast = colorOut(mainColors.primaryContrast);
+    const userPhotoVars = userPhotoVariables();
 
     fullBackgroundCompat();
 
@@ -178,6 +180,7 @@ compatibilityStyles = useThemeCache(() => {
         `
             .MessageList .Item:not(.Read) .Title,
             .DataList .Item:not(.Read) .Title,
+            .DataTable .Item:not(.Read) .Title
     `,
         {
             $nest: {
@@ -192,6 +195,7 @@ compatibilityStyles = useThemeCache(() => {
         `
             .MessageList .Item.Read .Title,
             .DataList .Item.Read .Title,
+            .DataTable .Item.Read .Title
     `,
         {
             $nest: {
@@ -328,11 +332,17 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList.Discussions .Item .Title`, {
-        width: `100%`,
+        width: calc(`100% - ${unit(vars.icon.sizes.default * 2 + vars.gutter.quarter)}`),
     });
 
     cssOut(`.DataList.Discussions .Item .Title a`, {
         textDecoration: important("none"),
+    });
+
+    cssOut(`.DataList.Discussions .Item .Options`, {
+        position: "absolute",
+        right: unit(layoutVars.cell.paddings.horizontal),
+        top: unit(layoutVars.cell.paddings.vertical),
     });
 
     cssOut(`.Container .DataList .Meta .Tag-Announcement`, {
@@ -418,6 +428,20 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
+    cssOut(`.DataList .PhotoWrap, .MessageList .PhotoWrap`, {
+        top: unit(2),
+        $nest: {
+            "&&": {
+                width: unit(userPhotoVars.sizing.medium),
+                height: unit(userPhotoVars.sizing.medium),
+            },
+        },
+    });
+
+    cssOut(`.LocaleOptions`, {
+        textAlign: "center",
+    });
+
     blockColumnCSS();
     buttonCSS();
     flyoutCSS();
@@ -463,7 +487,7 @@ export const mixinCloseButton = (selector: string) => {
     });
 };
 
-export const trimTrailingCommas = selector => {
+export const trimTrailingCommas = (selector) => {
     return selector.trim().replace(new RegExp("[,]+$"), "");
 };
 
@@ -478,38 +502,42 @@ export const camelCaseToDash = (str: string) => {
 export const nestedWorkaround = (selector: string, nestedObject, debug?: boolean) => {
     // $nest doesn't work in this scenario. Working around it by doing it manually.
     // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
+    const selectors: string[] = trimTrailingCommas(selector).split(",");
 
-    if (nestedObject) {
-        let rawStyles = `\n`;
-        Object.keys(nestedObject).forEach(key => {
-            const finalSelector = `${selector}${key.replace(/^&+/, "")}`;
-            let newStyleDeclaration = "";
-            if (selector !== "") {
-                const targetStyles = nestedObject[key];
-                const styleProps = targetStyles ? Object.keys(targetStyles) : [];
+    selectors.forEach((s, i) => {
+        const cleanSelector = s.trim();
+        if (nestedObject) {
+            let rawStyles = `\n`;
+            Object.keys(nestedObject).forEach((key) => {
+                const finalSelector = `${cleanSelector}${key.replace(/^&+/, "")}`;
+                let newStyleDeclaration = "";
+                if (cleanSelector !== "") {
+                    const targetStyles = nestedObject[key];
+                    const styleProps = targetStyles ? Object.keys(targetStyles) : [];
 
-                let emptyStyles = true;
+                    let emptyStyles = true;
 
-                if (styleProps.length > 0) {
-                    newStyleDeclaration += `${finalSelector} { `;
-                    styleProps.forEach(property => {
-                        const style = targetStyles[property];
-                        if (style !== undefined && style !== "") {
-                            newStyleDeclaration += `\n    ${camelCaseToDash(property)}: ${
-                                style instanceof ColorHelper ? colorOut(style) : style
-                            };`;
-                            emptyStyles = false;
-                        }
-                    });
-                    newStyleDeclaration += `\n}\n\n`;
+                    if (styleProps.length > 0) {
+                        newStyleDeclaration += `${finalSelector} { `;
+                        styleProps.forEach((property) => {
+                            const style = targetStyles[property];
+                            if (style !== undefined && style !== "") {
+                                newStyleDeclaration += `\n    ${camelCaseToDash(property)}: ${
+                                    style instanceof ColorHelper ? colorOut(style) : style
+                                };`;
+                                emptyStyles = false;
+                            }
+                        });
+                        newStyleDeclaration += `\n}\n\n`;
+                    }
+
+                    if (!emptyStyles) {
+                        rawStyles += newStyleDeclaration;
+                    }
                 }
-
-                if (!emptyStyles) {
-                    rawStyles += newStyleDeclaration;
-                }
-            }
-        });
-        logDebugConditionnal(debug, rawStyles);
-        cssRaw(rawStyles);
-    }
+            });
+            logDebugConditionnal(debug, rawStyles);
+            cssRaw(rawStyles);
+        }
+    });
 };

@@ -11,14 +11,12 @@ import React from "react";
 import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
 
 export default {
-    title: "NavLinksWithHeadings",
+    title: "Navigation/NavLinksWithHeadings",
 };
 
 export function StandardNavLinksStory() {
     return (
         <NavLinksWithHeadingsComponent
-            title={t("Browse Articles by Category")}
-            accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
             {...navLinksWithHeadingsData}
             depth={2}
             ungroupedTitle={t("Other Articles")}
@@ -26,9 +24,7 @@ export function StandardNavLinksStory() {
         />
     );
 }
-StandardNavLinksStory.story = {
-    name: "Standard",
-};
+StandardNavLinksStory.storyName = "Standard";
 
 export function Placeholder() {
     return <NavLinksPlaceholder title="Navigation Placeholder" showTitle />;

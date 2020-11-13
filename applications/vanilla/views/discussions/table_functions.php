@@ -97,8 +97,11 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Wrap">
          <span class="Options">
             <?php
-            echo optionsList($discussion);
-            echo bookmarkButton($discussion);
+                // render legacy options
+                if (!Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+                    echo optionsList($discussion);
+                    echo bookmarkButton($discussion);
+                }
             ?>
          </span>
                     <?php
@@ -119,6 +122,14 @@ if (!function_exists('writeDiscussionRow')) :
                     //			if ($Source = val('Source', $Discussion))
                     //				echo ' '.sprintf(t('via %s'), t($Source.' Source', $Source));
                     //
+
+                    // render enhanced accessibility options
+                    if (Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+                        echo '<span class="Options">';
+                        echo bookmarkButton($discussion);
+                        echo optionsList($discussion);
+                        echo '</span>';
+                    }
                     ?>
                 </div>
             </td>

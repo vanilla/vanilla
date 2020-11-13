@@ -60,7 +60,7 @@ export function styleFactory(componentName: string) {
             logDebug(styleObjs);
         }
 
-        const hasNestedStyles = !!objects.find(obj => typeof obj === "object" && "$nest" in obj);
+        const hasNestedStyles = !!objects.find((obj) => typeof obj === "object" && "$nest" in obj);
 
         // Applying $unique generally gives better consistency, but it can cause issues with nested styles.
         // As a result we don't apply it if the class has any nested styles.
@@ -161,7 +161,7 @@ export function variableFactory(
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
     const componentThemeVars = componentNames
-        .map(name => themeVars?.[name] ?? {})
+        .map((name) => themeVars?.[name] ?? {})
         .reduce((prev, curr) => {
             return merge(prev, curr);
         }, {});
@@ -212,7 +212,10 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
         if (Array.isArray(customVariable) && isArray(defaultVariable)) {
             // We currently can't pre-process arrays.
             return customVariable;
-        } else if (defaultVariable instanceof ColorHelper) {
+        } else if (
+            defaultVariable instanceof ColorHelper ||
+            (defaultVariable === undefined && typeof customVariable === "string" && customVariable.startsWith("#"))
+        ) {
             if (customVariable instanceof ColorHelper) {
                 return customVariable;
             } else if (typeof customVariable === "string" && customVariable.startsWith("linear-gradient")) {
@@ -303,10 +306,7 @@ export function stringIsLinearGradient(colorValue) {
     return (
         typeof colorValue === "string" &&
         !stringIsValidColor(colorValue) &&
-        colorValue
-            .toString()
-            .trim()
-            .startsWith("linear-gradient(")
+        colorValue.toString().trim().startsWith("linear-gradient(")
     );
 }
 
@@ -314,7 +314,7 @@ export function stringIsLinearGradient(colorValue) {
  * Check if string or ColorHelper is valid
  * @param colorString
  */
-export const isValidColor = colorValue => {
+export const isValidColor = (colorValue) => {
     return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
 };
 
@@ -422,4 +422,14 @@ function getDebugVars(vars: any): any {
     }
 
     return result;
+}
+
+/**
+ * For classes that allow overwriting variables, it can be difficult to trace where bugs come from.
+ * This function appends a string to the class name with the file it's from.
+ * Example: You've got a class: "searchBar-closeButton_fhrk8tj"
+ * If you pass a source to this function, the classnames becomes: "searchBar-closeButton:fromTitleBar_fhrk8tj"
+ */
+export function appendSource(className: string, source?: string) {
+    return `${className}${source ? "--" + source : ""}`;
 }

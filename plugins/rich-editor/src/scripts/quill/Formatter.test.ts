@@ -132,7 +132,7 @@ describe("Formatter", () => {
         formattingFunction();
 
         // Kludge out the dynamically generated refs.
-        const stripRefs = op => {
+        const stripRefs = (op) => {
             if (op.attributes && op.attributes.header && op.attributes.header.ref) {
                 op.attributes.header.ref = "";
             }
@@ -180,7 +180,7 @@ describe("Formatter", () => {
         enableValue: any = true,
     ) {
         describe(`Adding ${formatToTest} to existing inline formats`, () => {
-            testAgainst.forEach(opName => {
+            testAgainst.forEach((opName) => {
                 it(opName + " + " + formatToTest, () => {
                     const opMethod = OpUtils[opName] as () => any;
                     const initial = [opMethod()];

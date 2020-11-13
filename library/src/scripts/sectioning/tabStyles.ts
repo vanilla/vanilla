@@ -21,10 +21,15 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, viewHeight, calc, quote } from "csx";
+import { percent, viewHeight, calc, quote, color } from "csx";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { buttonResetMixin } from "@library/forms/buttonStyles";
+
+interface IListOptions {
+    includeBorder?: boolean;
+    isLegacy?: boolean;
+}
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -104,7 +109,7 @@ export const tabStandardClasses = useThemeCache(() => {
         width: "100%",
     });
 
-    const tabList = useThemeCache(() =>
+    const tabList = useThemeCache((options?: IListOptions) =>
         style("tabList", {
             display: "flex",
             justifyContent: "space-between",
@@ -122,10 +127,16 @@ export const tabStandardClasses = useThemeCache(() => {
                     borderRight: 0,
                 },
             },
+            ...(options?.isLegacy
+                ? {
+                      width: `calc(100% + 36px)`,
+                      marginLeft: "-18px",
+                  }
+                : undefined),
         }),
     );
 
-    const tab = useThemeCache(() =>
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style(
             "tab",
             {
@@ -134,7 +145,8 @@ export const tabStandardClasses = useThemeCache(() => {
                 flex: 1,
                 fontWeight: globalVars.fonts.weights.semiBold,
                 textAlign: "center",
-                border: "1px solid #bfcbd8",
+                border: singleBorder({ color: color("#bfcbd8") }),
+                borderTop: legacyButton ? "none" : undefined,
                 padding: "2px 0",
                 color: colorOut(vars.colors.fg),
                 backgroundColor: colorOut(vars.colors.bg),
@@ -149,8 +161,12 @@ export const tabStandardClasses = useThemeCache(() => {
                     "& + &": {
                         marginLeft: unit(negative(vars.border.width)),
                     },
+                    "&[data-selected]": {
+                        background: colorOut(globalVars.elementaryColors.white),
+                    },
                     "&:hover, &:focus, &:active": {
-                        border: "1px solid #bfcbd8",
+                        border: singleBorder({ color: color("#bfcbd8") }),
+                        borderTop: legacyButton ? "none" : undefined,
                         color: colorOut(globalVars.mainColors.primary),
                         zIndex: 1,
                     },
@@ -247,7 +263,7 @@ export const tabBrowseClasses = useThemeCache(() => {
     );
     const tabPanels = style("tabPanels", {});
 
-    const tabList = useThemeCache((options?: { includeBorder?: boolean }) =>
+    const tabList = useThemeCache((options?: IListOptions) =>
         style("tabList", {
             display: "flex",
             flexWrap: "wrap",
@@ -257,7 +273,7 @@ export const tabBrowseClasses = useThemeCache(() => {
         }),
     );
 
-    const tab = useThemeCache((largeTabs?: boolean) =>
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style("tab", {
             ...buttonResetMixin(),
             textTransform: largeTabs ? "inherit" : "uppercase",

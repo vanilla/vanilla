@@ -305,7 +305,8 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
         const buttonUtils = buttonUtilityClasses();
         return (
             <DropDown
-                id={this.id}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
                 name={t("Messages")}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
@@ -359,7 +360,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

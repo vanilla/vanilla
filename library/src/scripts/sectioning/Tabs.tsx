@@ -6,21 +6,24 @@ import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
+import { DomNodeAttacher } from "@vanilla/react-utils";
 
-interface IData {
+export interface ITabData {
     label: string;
-    contents: React.ReactNode;
+    contents?: React.ReactNode;
+    contentNodes?: Node[];
     error?: React.ReactNode;
     warning?: React.ReactNode;
     disabled?: boolean;
     [extra: string]: any;
 }
 interface IProps {
-    data: IData[];
+    data: ITabData[];
     tabType?: TabsTypes;
     largeTabs?: boolean;
     extendContainer?: boolean;
-    onChange?: (newTab: IData) => void;
+    legacyButtons?: boolean;
+    onChange?: (newTab: ITabData) => void;
     extraButtons?: React.ReactNode;
     defaultTabIndex?: number;
     includeBorder?: boolean;
@@ -36,18 +39,20 @@ export function Tabs(props: IProps) {
         <ReachTabs
             index={activeTab}
             className={classes.root(props.extendContainer)}
-            onChange={index => {
+            onChange={(index) => {
                 setActiveTab(index);
                 props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={classes.tabList({ includeBorder })}>
+            <TabList className={classes.tabList({ includeBorder, isLegacy: props.legacyButtons })}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
                         <Tab
                             key={index}
-                            className={classNames(classes.tab(props.largeTabs), { [classes.isActive]: isActive })}
+                            className={classNames(classes.tab(props.largeTabs, props.legacyButtons), {
+                                [classes.isActive]: isActive,
+                            })}
                             disabled={tab.disabled}
                         >
                             <div>{tab.label}</div>
@@ -71,7 +76,8 @@ export function Tabs(props: IProps) {
                 {data.map((tab, index) => {
                     return (
                         <TabPanel className={classes.panel({ includeVerticalPadding })} key={index}>
-                            {data[index].contents}
+                            {tab.contents && tab.contents}
+                            {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
                         </TabPanel>
                     );
                 })}

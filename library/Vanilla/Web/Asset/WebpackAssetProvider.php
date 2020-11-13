@@ -47,9 +47,6 @@ class WebpackAssetProvider {
     private $hotReloadEnabled = false;
 
     /** @var string */
-    private $hotReloadIP;
-
-    /** @var string */
     private $fsRoot = PATH_ROOT;
 
     /**
@@ -79,11 +76,9 @@ class WebpackAssetProvider {
      * Enable loading of hot reloading assets in place of the normal ones.
      *
      * @param bool $enabled The enable value.
-     * @param string $ip Optionally override the ip address the hot bundle is served from.
      */
-    public function setHotReloadEnabled(bool $enabled, string $ip = "") {
+    public function setHotReloadEnabled(bool $enabled) {
         $this->hotReloadEnabled = $enabled;
-        $this->hotReloadIP = $ip ?: "127.0.0.1";
     }
 
     /**
@@ -91,13 +86,6 @@ class WebpackAssetProvider {
      */
     public function isHotReloadEnabled(): bool {
         return $this->hotReloadEnabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHotReloadSocketAddress(): string {
-        return 'http://'.$this->hotReloadIP.':3030';
     }
 
     /**
@@ -143,7 +131,7 @@ class WebpackAssetProvider {
 
         // Return early with the hot build if that flag is enabled.
         if ($this->hotReloadEnabled) {
-            $scripts[] = new HotBuildAsset($section, $this->hotReloadIP);
+            $scripts[] = new HotBuildAsset($section);
             return $scripts;
         }
 

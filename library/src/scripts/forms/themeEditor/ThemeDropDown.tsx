@@ -23,7 +23,7 @@ interface IProps extends IMenuPlacement {
 export function ThemeDropDown(_props: IProps) {
     const { options, variableKey, disabled, afterChange, forceDefaultKey } = _props;
     const { inputID, labelID } = useThemeBlock();
-    const { generatedValue, initialValue, rawValue, setValue } = useThemeVariableField(variableKey);
+    const { generatedValue, initialValue, rawValue, setValue } = useThemeVariableField<string>(variableKey);
 
     const onChange = (option: IComboBoxOption | undefined) => {
         const newValue = option ? option.value.toString() : undefined;
@@ -31,26 +31,28 @@ export function ThemeDropDown(_props: IProps) {
         afterChange?.(newValue);
     };
 
-    const selectedOption = options.find(option => {
+    const selectedOption = options.find((option) => {
         if (option.value === rawValue) {
             return true;
         }
     });
 
-    const defaultOption = options.find(option => {
-        if (forceDefaultKey) {
-            return option.value === forceDefaultKey;
-        } else {
-            return option.value === generatedValue;
-        }
-    }) ?? {
-        label: t("Unknown"),
-        value: generatedValue,
-    };
+    const defaultOption =
+        options.find((option) => {
+            if (forceDefaultKey) {
+                return option.value === forceDefaultKey;
+            } else {
+                return option.value === generatedValue;
+            }
+        }) ??
+        ({
+            label: t("Unknown"),
+            value: generatedValue,
+        } as IComboBoxOption);
 
     useEffect(() => {
         if (afterChange) {
-            afterChange(defaultOption.value);
+            afterChange(String(defaultOption.value));
         }
     }, []);
 
@@ -58,7 +60,7 @@ export function ThemeDropDown(_props: IProps) {
         <>
             <div className={themeDropDownClasses().root}>
                 <SelectOne
-                    key={rawValue}
+                    key={rawValue ?? undefined}
                     label={null}
                     labelID={labelID}
                     inputID={inputID}

@@ -40,7 +40,7 @@ export default class ConversationsModel implements ReduxReducer<IConversationsSt
         state: IConversationsState = this.initialState,
         action: typeof ConversationsActions.ACTION_TYPES,
     ): IConversationsState => {
-        return produce<IConversationsState>(state, nextState => {
+        return produce<IConversationsState>(state, (nextState) => {
             switch (action.type) {
                 case ConversationsActions.GET_CONVERSATIONS_REQUEST:
                     nextState.conversationsByID.status = LoadStatus.LOADING;
@@ -49,7 +49,7 @@ export default class ConversationsModel implements ReduxReducer<IConversationsSt
                     nextState.conversationsByID.status = LoadStatus.SUCCESS;
                     nextState.conversationsByID.data = {};
                     const conversations = action.payload.data as IConversation[];
-                    conversations.forEach(conversation => {
+                    conversations.forEach((conversation) => {
                         nextState.conversationsByID.data![conversation.conversationID] = conversation;
                     });
                     break;

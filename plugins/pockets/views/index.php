@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(sprintf(t('About %s'), t('Pockets')), t('Pockets allow you to add free-form HTML to various places around the application.'));
-echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal');
+echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal js-full-height-modal ');
 ?>
 <div class="form-group">
     <div class="label-wrap-wide">
@@ -46,8 +46,8 @@ echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/
                 echo '</td>';
                 echo '<td><pre style="white-space: pre-wrap;">', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</pre></td>';
                 echo '<td class="options"><div class="btn-group">';
-                echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
-                echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal js-full-height-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
+                echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon js-modal-confirm', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                 echo renderPocketToggle($PocketRow);
                 echo '</div></td>';
                 echo "</tr>\n";

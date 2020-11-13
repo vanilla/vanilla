@@ -5,6 +5,8 @@
 
 import { important, px } from "csx";
 import isNumeric from "validator/lib/isNumeric";
+import { logError } from "@vanilla/utils";
+import { ColorValues } from "@library/styles/styleHelpersColors";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
 export * from "@library/styles/styleHelpersTypography";
@@ -37,7 +39,7 @@ export const debugHelper = (componentName: string) => {
     };
 };
 
-export const ifExistsWithFallback = checkProp => {
+export const ifExistsWithFallback = (checkProp) => {
     if (checkProp && checkProp.length > 0) {
         const next = checkProp.pop();
         return next ? next : ifExistsWithFallback(checkProp);
@@ -46,7 +48,7 @@ export const ifExistsWithFallback = checkProp => {
     }
 };
 
-export const processValue = variable => {
+export const processValue = (variable) => {
     const importantString = " !important";
     const isImportant: boolean = typeof variable === "string" && variable.endsWith(importantString);
     let value = variable;
@@ -65,13 +67,20 @@ export const processValue = variable => {
 
 export const unit = (
     val: string | number | undefined,
-    options: { unitFunction?: (value) => string; isImportant?: boolean } = {} as any,
+    options?: { unitFunction?: (value) => string; isImportant?: boolean; debug?: boolean },
 ) => {
+    const { unitFunction = px, isImportant = false, debug = false } = options || {};
+
+    if (typeof val === "object") {
+        logError(`You cannot pass objects (${JSON.stringify(val)}) to the "unit" function`);
+        return undefined;
+    }
+
     if (val === undefined) {
         return undefined;
     }
-    const { unitFunction = px, isImportant = false } = options;
-    const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
+
+    const valIsNumeric = isNumeric(val.toString().trim());
 
     let output;
 
@@ -104,7 +113,7 @@ export const negativeUnit = (val: string | number | undefined, unitFunction = px
     return negative(unit(val));
 };
 
-export const negative = val => {
+export const negative = (val) => {
     if (typeof val === "string") {
         val = val.trim();
         if (val.startsWith("-")) {
@@ -122,3 +131,14 @@ export const negative = val => {
 export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {
     return val !== undefined ? unit(val) : undefined;
 };
+
+export interface IStateColors {
+    allStates?: ColorValues; // Applies to all
+    noState?: ColorValues; // Applies to stateless link
+    hover?: ColorValues;
+    focus?: ColorValues;
+    clickFocus?: ColorValues; // Focused, not through keyboard
+    keyboardFocus?: ColorValues; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: ColorValues;
+    source?: string; // for debugging
+}

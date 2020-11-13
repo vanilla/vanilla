@@ -46,37 +46,37 @@ class BannerImageModelTest extends TestCase {
         $model = new \CategoryModel();
         $this->cat1 = $model->save([
             'Name' => 'Cat 1',
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
         $this->cat1_1 = $model->save([
             'Name' => 'Cat 1.1',
             'ParentCategoryID' => $this->cat1,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2 = $model->save([
             'Name' => 'Cat 2',
             'BannerImage' => "2.png",
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_1 = $model->save([
             'Name' => 'Cat 2.1',
             'ParentCategoryID' => $this->cat2,
             'BannerImage' => "2_1.png",
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_2 = $model->save([
             'Name' => 'Cat 2.2',
             'ParentCategoryID' => $this->cat2,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_2_1 = $model->save([
             'Name' => 'Cat 2.2.1',
             'ParentCategoryID' => $this->cat2_2,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
     }
 

@@ -7,6 +7,8 @@
 
 namespace VanillaTests;
 
+use Garden\Http\HttpRequest;
+use Garden\Http\HttpResponse;
 use Vanilla\Http\InternalClient;
 
 /**
@@ -21,12 +23,70 @@ trait UsersAndRolesApiTestTrait {
     protected $lastRoleID = null;
 
     /**
-     * Clear local info between tests.
+     * Run something with a specific set of permissions.
+     *
+     * This will create a temporary user and role with the given permissinos, and run the given callback.
+     *
+     * @param callable $callback The callback to run.
+     * @param array $globalPermissions The global permissions to use.
+     * @param array $otherPermissions Optional resource specific permissions.
+     *
+     * @return mixed
      */
-    public function setUpUsersAndRolesApiTestTrait(): void {
+    protected function runWithPermissions(callable $callback, array $globalPermissions, array ...$otherPermissions) {
+        // Sign in permission is needed to start a session with the user.
+        $globalPermissions = [
+            'type' => 'global',
+            'permissions' => array_merge([
+                'signIn.allow' => true,
+            ], $globalPermissions),
+        ];
+
+        $role = $this->createRole([
+            'permissions' => array_merge([$globalPermissions], $otherPermissions),
+        ]);
+        $user = $this->createUser([
+            'roleID' => [$this->lastRoleID],
+        ]);
+        $this->api()->setUserID($this->lastUserID);
+        $result = call_user_func($callback);
+
+        // Cleanup.
+        $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
+        $this->api()->deleteWithBody("/users/{$user['userID']}");
+        $this->api()->delete("/roles/{$role['roleID']}");
+        return $result;
+    }
+
+    /**
+     * Helper for creating a category permission definition.
+     *
+     * @param int $categoryID
+     * @param array $permissions
+     * @return array
+     */
+    protected function categoryPermission(int $categoryID, array $permissions): array {
+        return [
+            "id" => $categoryID,
+            "permissions" => $permissions,
+            "type" => "category"
+        ];
+    }
+
+    /**
+     * Clear local info between tests.
+     *
+     * @param bool $resetRoles Whether or not roles should be wiped.
+     */
+    public function setUpUsersAndRolesApiTestTrait(bool $resetRoles = true): void {
         $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
         $this->lastUserID = null;
         $this->lastRoleID = null;
+
+        if ($resetRoles) {
+            // Roles can be corrupted in between tests. Make sure there is a fresh start for them.
+            \PermissionModel::resetAllRoles();
+        }
     }
 
     /**
@@ -75,6 +135,22 @@ trait UsersAndRolesApiTestTrait {
         return $result;
     }
 
+    /**
+     * Give points to a user.
+     *
+     * @param int|array $userIDOrUser A user or userID
+     * @param int $points
+     * @param int|array|null $categoryIDOrCategory
+     */
+    protected function givePoints($userIDOrUser, int $points, $categoryIDOrCategory = null) {
+        $userID = is_array($userIDOrUser) ? $userIDOrUser['userID'] : $userIDOrUser;
+        $categoryID = is_array($categoryIDOrCategory) ? $categoryIDOrCategory['categoryID'] : $categoryIDOrCategory;
+        if ($categoryID !== null) {
+            \UserModel::givePoints($userID, $points, [0 => 'Test', 'CategoryID' => $categoryID]);
+        } else {
+            \UserModel::givePoints($userID, $points);
+        }
+    }
 
     /**
      * Create a role.

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { onContent, getMeta, onReady } from "@library/utility/appUtils";
+import { onContent, getMeta, onReady, t } from "@library/utility/appUtils";
 import { Route } from "react-router-dom";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -20,21 +20,26 @@ import { AppContext } from "@library/AppContext";
 import { addComponent, addPageComponent } from "@library/utility/componentRegistry";
 import { TitleBarHamburger } from "@library/headers/TitleBarHamburger";
 import { authReducer } from "@dashboard/auth/authReducer";
-import { compatibilityStyles, cssOut } from "@dashboard/compatibilityStyles";
+import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
-import { createBrowserHistory, History } from "history";
-import { applySharedPortalContext, mountPortal } from "@vanilla/react-utils";
+import { createBrowserHistory } from "history";
+import { applySharedPortalContext } from "@vanilla/react-utils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { CommunityBanner, CommunityContentBanner } from "@vanilla/library/src/scripts/banner/CommunityBanner";
 import { initPageViewTracking } from "@vanilla/library/src/scripts/pageViews/pageViewTracking";
 import { enableLegacyAnalyticsTick } from "@vanilla/library/src/scripts/analytics/AnalyticsData";
 import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
 import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
-import { notEmpty, PromiseOrNormalCallback } from "@vanilla/utils";
+import { notEmpty } from "@vanilla/utils";
 import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
+import { LayoutProvider } from "@vanilla/library/src/scripts/layout/LayoutContext";
+import { LayoutTypes } from "@vanilla/library/src/scripts/layout/types/interface.layoutTypes";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
+
+addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 
 // Redux
 registerReducer("auth", authReducer);
@@ -49,10 +54,10 @@ Router.addRoutes(
     ].filter(notEmpty),
 );
 
-applySharedPortalContext(props => {
+applySharedPortalContext((props) => {
     return (
         <AppContext variablesOnly errorComponent={ErrorPage}>
-            {props.children}
+            <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>{props.children}</LayoutProvider>
         </AppContext>
     );
 });
@@ -83,7 +88,7 @@ const applyReactElementsInForum = (props: {
         onReady(() => {
             onInitialLoad();
         });
-        onContent(e => {
+        onContent((e) => {
             onNewHTML(e);
         });
     }
@@ -95,7 +100,7 @@ applyReactElementsInForum({
         compatibilityStyles();
         applyCompatibilityIcons();
     },
-    onNewHTML: e => {
+    onNewHTML: (e) => {
         applyCompatibilityIcons(
             e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
         );
@@ -107,7 +112,7 @@ applyReactElementsInForum({
     onInitialLoad: () => {
         applyCompatibilityUserCards();
     },
-    onNewHTML: e => {
+    onNewHTML: (e) => {
         applyCompatibilityUserCards(
             e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
         );

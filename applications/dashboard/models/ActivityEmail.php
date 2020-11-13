@@ -26,6 +26,9 @@ class ActivityEmail {
     private $body = "";
 
     /** @var string */
+    private $title = "";
+
+    /** @var string */
     private $internalRoute;
 
     /** @var string[] */
@@ -93,6 +96,15 @@ class ActivityEmail {
      */
     public function getBody(): string {
         return $this->body;
+    }
+
+    /**
+     * Get the email title.
+     *
+     * @return string
+     */
+    public function getTitle(): string {
+        return $this->title;
     }
 
     /**
@@ -189,6 +201,15 @@ class ActivityEmail {
      */
     public function setBody(string $body) {
         $this->body = $body;
+    }
+
+    /**
+     * Set the email title.
+     *
+     * @param string $title
+     */
+    public function setTitle(string $title) {
+        $this->title = $title;
     }
 
     /**

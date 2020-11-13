@@ -1,4 +1,7 @@
- /* ================================================================ Reset CSS */
+// Many themes depend on this file. The only notable exception is the Bootstrap themes, which have their own base styles
+// If you need to fix something for all themes, put it in "style-compat.scss" as it will be loaded for all themes.
+
+/* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -10,12 +13,14 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   margin: 0;
   padding: 0;
   border: 0;
-  outline: 0;
   font-weight: inherit;
   font-style: inherit;
   font-size: 100%;
   font-family: inherit;
   vertical-align: baseline;
+  &:not(.focus-visible) {
+      outline: 0;
+  }
 }
 
 /* remember to define focus styles! */
@@ -204,19 +209,16 @@ h4 {
 h5 {
   font-size: 100%;
 }
-@if ($staticVariables) {
-    a {
-      text-decoration: none;
-      color: $vanilla-blue;
-    }
+
+a {
+  text-decoration: none;
+  color: $vanilla-blue;
 }
 
-@if ($staticVariables) {
-    a:hover,
-    a.TextColor:hover,
-    a:hover .TextColor {
-      color: $vanilla-pink;
-    }
+a:hover,
+a.TextColor:hover,
+a:hover .TextColor {
+  color: $vanilla-pink;
 }
 
 a.TextColor, a .TextColor {
@@ -652,10 +654,8 @@ body:not(.dataDriven) {
 
 .ButtonGroup.Multi > .NavButton.Handle,
 .ButtonGroup.Multi > .Button.Handle {
-  @if ($staticVariables) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-  }
   border-left: 0;
 }
 
@@ -873,26 +873,24 @@ div.Warning {
   background: url('images/progress.gif') center center no-repeat !important;
 }
 
-
-@if($staticVariables) {
-    .Pager {
-      font-weight: bold;
-      float: right;
-    }
-
-    .Pager a, .Pager span {
-      display: inline-block;
-      margin: 0 3px;
-    }
-
-    .Pager span {
-      color: $grey-3;
-    }
-
-    .Pager .Highlight {
-      color: $black;
-    }
+.Pager {
+  font-weight: bold;
+  float: right;
 }
+
+.Pager a, .Pager span {
+  display: inline-block;
+  margin: 0 3px;
+}
+
+.Pager span {
+  color: $grey-3;
+}
+
+.Pager .Highlight {
+  color: $black;
+}
+
 
 .MoreWrap {
   float: right;
@@ -1148,7 +1146,7 @@ body > #Frame > .Head {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
- @if ($staticVariables) {
+
     .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
       display: block;
       text-decoration: none;
@@ -1167,7 +1165,7 @@ body > #Frame > .Head {
 .MenuItems a:hover .Gloss {
   color: $white !important;
 }
-}
+
 
 .MenuItems li > strong {
   font-size: 12px;
@@ -1284,9 +1282,9 @@ a.Bookmark,
 a.Bookmarked,
 a.Bookmarking {
   display: inline-block;
-  @if ($staticVariables) {
+
     background: url('images/ui_sprites.png') 0 -2px no-repeat;
-  }
+
   height: 18px;
   width: 18px;
   /*	margin: 0 4px;*/
@@ -1435,7 +1433,7 @@ overflow: hidden;
   display: inline-block;
 }
 
-@if ($staticVariables) {
+
     .MeButton:hover {
       background: $grey-5;
       background: rgba(0, 0, 0, 0.07);
@@ -1445,7 +1443,7 @@ overflow: hidden;
       background: $grey-5;
       background: rgba(0, 0, 0, 0.07);
     }
-}
+
 
 .MeButton .Alert {
   position: absolute;
@@ -1936,16 +1934,12 @@ overflow: hidden;
   opacity: .9;
 }
 
- @if ($staticVariables) {
-    .Item.Read:hover {
-      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-      filter: alpha(opacity=100);
-      opacity: 1;
-    }
-}
 
-.Item.Read .Title, .Item.Read .BlockTitle {
-  font-weight: normal;
+.Item.Read:hover {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  opacity: 1;
+
 }
 
 .Item.Checked {
@@ -1974,19 +1968,18 @@ overflow: hidden;
   visibility: hidden;
 }
 
- @if ($staticVariables) {
-    .DataList a.Delete:hover {
-      text-decoration: none;
-      border: none;
-      background: $grey-1;
-      color: $white;
-      visibility: visible;
-    }
-
-    .Item:hover a.Delete {
-      visibility: visible;
-    }
+.DataList a.Delete:hover {
+  text-decoration: none;
+  border: none;
+  background: $grey-1;
+  color: $white;
+  visibility: visible;
 }
+
+.Item:hover a.Delete {
+  visibility: visible;
+}
+
 
 /* Condensed datalists make the main link & excerpt inline. */
 .DataList .Unfollow {
@@ -2049,15 +2042,13 @@ overflow: hidden;
   padding: 4px 0;
 }
 
- @if ($staticVariables) {
-    .PopList .Item:hover {
-      background: $grey-5;
-      background: rgba(0, 0, 0, 0.03);
-    }
+.PopList .Item:hover {
+  background: $grey-5;
+  background: rgba(0, 0, 0, 0.03);
+}
 
-    .PopList .Item.Title:hover {
-      background: inherit;
-    }
+.PopList .Item.Title:hover {
+  background: inherit;
 }
 
 .PopList .Item.Title {
@@ -2170,7 +2161,7 @@ overflow: hidden;
   width: 32px;
 }
 
- @if ($staticVariables) {
+
     .Activities a.CommentLink,
     .Activities a.CommentLink:hover {
       font-size: 12px;
@@ -2184,7 +2175,6 @@ overflow: hidden;
       line-height: 100%;
       font-weight: normal;
     }
-}
 
 /* ============================================================== MessageList */
 
@@ -2268,9 +2258,9 @@ img.LeftAlign {
 }
 
 .ClearFix {
-  @if ($staticVariables) {
+
     clear: both;
-  }
+
 }
 
 .codeBlock,
@@ -2285,6 +2275,9 @@ code, pre {
 .code,
 code {
   white-space: pre-wrap;
+  &.focus-visible {
+      outline-offset: -1px;
+  }
 }
 
 .codeBlock,
@@ -2387,12 +2380,12 @@ a.ChangePicture {
   display: block;
 }
 
-@if ($staticVariables) {
+
   a.ChangePicture:hover {
     color: $white;
     text-decoration: underline;
   }
-}
+
 
 .ProfileOptions {
   float: right;
@@ -2973,12 +2966,12 @@ tr.CategoryHeading td {
   font-size: 11px;
 }
 
-@if ($staticVariables) {
+
     .DiscussionSorter:hover {
       cursor: pointer;
       background: $grey-h;
     }
-}
+
 
 .DiscussionSorter .MenuItems {
   padding: 0;
@@ -3022,11 +3015,9 @@ tr.CategoryHeading td {
 
 .BlockTitle {
   display: block;
-  font-weight: bold;
+  font-weight: normal;
   overflow: hidden;
-  @if ($staticVariables) {
     text-overflow: ellipsis;
-  }
   white-space: nowrap;
   padding-bottom: 3px;
   font-size: 12px;
@@ -3079,10 +3070,13 @@ tr.CategoryHeading td {
   width: 14px;
 }
 
-.DiscussionForm label {
-  font-size: 14px;
-  font-weight: bold;
-  color: $grey-j;
+.GroupForm,
+.DiscussionForm {
+    label {
+        font-size: 14px;
+        font-weight: bold;
+        color: $grey-j;
+    }
 }
 
 .FormWrapper {
@@ -3336,12 +3330,12 @@ ul.Tabs li a {
   padding: 2px 8px 1px;
 }
 
-@if ($staticVariables) {
-    ul.Tabs li a:hover {
-      background: $grey-8;
-      color: $grey-7;
-    }
+
+ul.Tabs li a:hover {
+  background: $grey-8;
+  color: $grey-7;
 }
+
 
 ul.Tabs li a.Active {
   padding: 2px 8px;
@@ -3724,23 +3718,23 @@ position on the page to notify users of things like drafts being saved, etc. */
   line-height: 1.6;
 }
 
-@if ($staticVariables) {
+
     .InformMessages .InformMessage:hover {
       background: $grey-1;
       background: rgba(0, 0, 0, 0.8) !important;
     }
-}
+
 
 .InformMessages .InformMessage a {
   color: $blue-b;
 }
 
-@if ($staticVariables) {
+
     .InformMessages .InformMessage a:hover {
       color: $blue-c;
       text-decoration: underline;
     }
-}
+
 
 .InformMessages .InformMessage strong {
   font-weight: bold;
@@ -3767,16 +3761,16 @@ position on the page to notify users of things like drafts being saved, etc. */
   display: inline;
 }
 
-@if ($staticVariables) {
-    .InformMessages .InformMessage a.Close:hover {
-      background: $black;
-      color: $white;
-    }
 
-    .InformMessages .InformMessage:hover a.Close {
-        display: block;
-    }
+.InformMessages .InformMessage a.Close:hover {
+  background: $black;
+  color: $white;
 }
+
+.InformMessages .InformMessage:hover a.Close {
+    display: block;
+}
+
 
 /* iPad/iPhone */
 @media only screen and (device-width: 768px), only screen and (max-device-width: 480px) {

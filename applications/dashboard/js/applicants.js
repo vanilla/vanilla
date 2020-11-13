@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
     $(document).delegate('a.DeclineApplicant, a.ApproveApplicant', 'click', function() {
         // Prepare our message.
         var approvedMsg = gdn.definition('ApprovedTranslation', 'Approved');
-        var declinedMsg = gdn.definition('DeclinedTranslation', 'Declined');
+        var declinedMsg = gdn.definition('DeniedTranslation', 'Denied');
         var message = ($(this).hasClass('ApproveApplicant')) ? approvedMsg : declinedMsg;
         message = '<em class="ConfirmApplicant'+message+'">'+message+'</em>';
 

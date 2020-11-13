@@ -8957,7 +8957,7 @@ $(document).on('contentLoad', function(e) {
         // Selectors
         var drawer = '.js-drawer';
         var drawerToggle = '.js-drawer-toggle';
-        var content = '.main-row .main';
+        var content = '.main-row .dashboard-main';
         var container = '.main-container';
 
         $(drawer, element).drawer({
@@ -9055,7 +9055,7 @@ $(document).on('contentLoad', function(e) {
      * @param element - The scope of the function.
      */
     function responsiveTablesInit(element) {
-        var containerSelector = '#main-row .main';
+        var containerSelector = '#main-row .dashboard-main';
 
         // We're in a popup.
         if (typeof(DashboardModal.activeModal) === 'object') {

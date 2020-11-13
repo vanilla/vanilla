@@ -331,7 +331,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         $messageData = ApiUtils::convertInputKeys($body);
-        $messageID = $this->conversationMessageModel->save($messageData, $conversation);
+        $messageID = $this->conversationMessageModel->save($messageData, ['conversation' => $conversation]);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {
             throw new ServerException('Unable to insert message.', 500);

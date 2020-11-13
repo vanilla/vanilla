@@ -33,7 +33,7 @@ class WebpackAddonAsset extends WebpackAsset {
         $cacheBustingKey = "",
         bool $isCommonChunk = false
     ) {
-        $assetName = $addon->getKey();
+        $assetName = strtolower($addon->getKey());
         if ($isCommonChunk) {
             $assetName .= "-common";
         }

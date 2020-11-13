@@ -74,6 +74,23 @@
         font-size: $global-medium_fontSize;
     }
 
+    td .Wrap {
+        padding: {
+            top: $component-vertical_padding;
+            bottom: $component-vertical_padding;
+            left: calc(#{$component-horizontal_padding} / 2);
+            right: calc(#{$component-horizontal_padding} / 2);
+        };
+    }
+
+    td:first-child .Wrap {
+        padding-left: $component-horizontal_padding;
+    }
+
+    td:last-child .Wrap {
+        padding-right: $component-horizontal_padding;
+    }
+
     h2,
     h3,
     .Title.Title {
@@ -81,7 +98,6 @@
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
         display: block;
-        margin-bottom: $utility-baseUnit;
 
         @if $staticVariables {
             color: $component-title_color;
@@ -112,7 +128,7 @@
         font-weight: $component-base_fontWeight;
         line-height: $component-base_lineHeight;
         color: $component-base_color;
-        margin: 0 0 $utility-baseUnit;
+        margin: $utility-baseUnit 0 0;
     }
 
     .Excerpt:empty,
@@ -232,7 +248,7 @@
     .UserLink.BlockTitle,
     .BigCount .Meta,
     .Block.Wrap .Meta {
-         margin-left: $utility-baseUnitDouble;
+         margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
     }
 
     @if ($staticVariables) {
@@ -249,10 +265,15 @@
 
     .Meta,
     .MItem.Category {
+        margin-top: $utility-baseUnit;
 
         @include maxWidth {
             margin-top: $utility-baseUnitDouble;
         }
+    }
+
+    .Meta:empty {
+        display: none;
     }
 
     .MItem.RSS {
@@ -265,6 +286,7 @@
 
     td.BigCount {
         width: 110px;
+        padding: 0;
     }
 
     td.LatestPost,
@@ -279,8 +301,9 @@
     }
 
     tbody .Options {
-        top: 3px;
-        bottom: auto;
+        position: absolute;
+        top: $component-vertical_padding;
+        right: $component-horizontal_padding;
     }
 
     tbody {
@@ -308,14 +331,10 @@
                 font-size: inherit;
             }
 
-            .Wrap {
-                padding-left: $theme-photo_size;
-            }
-
             .PhotoWrap {
                 @if ($staticVariables) {
                     position: absolute;
-                    left: 0;
+                    left: calc(#{$formElement_paddingHorizontal} / 2);
                 }
                 width: $theme-photo_size;
                 height: $theme-photo_size;
@@ -349,10 +368,6 @@
 
             td.CategoryName {
                 margin-bottom: 0;
-
-                .Wrap {
-                    padding-left: 0;
-                }
 
                 .PhotoWrap {
                     margin: 0 $utility-baseUnitDouble 0 0;
@@ -453,6 +468,10 @@
 
         @include discussionsTableItem;
 
+        .userCardWrapper-link {
+            margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
+        }
+
         .MiniPager {
             margin: 0;
             display: block;
@@ -486,37 +505,39 @@
 
         td.CheckBoxColumn {
             width: 35px;
-
-            .Wrap {
-                padding: $utility-baseUnitHalf 0;
-            }
         }
 
         td.DiscussionName {
             width: 100%;
-            padding-right: $utility-baseUnit;
-
-            @if $component_lateralBorder == true {
-                padding-left: $component-base_padding;
-            } @else {
-                padding-left: 0;
-            }
-
         }
 
         //ideation styles
         .ItemIdea {
             td.DiscussionName {
-                position: relative;
-
-                .idea-counter-module {
-                    position: absolute;
-                    left: 0;
-                    margin: 0;
-                }
 
                 .Wrap {
-                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                }
+
+                .Options {
+                    position: absolute;
+                    top: $component-vertical_padding;
+                    right: calc(#{$component-vertical_padding} / 2);
+                }
+
+                .Title {
+                    flex-basis: calc(100% - (#{$component-vertical_padding} / 2 + #{$theme-photo_size} + 50px));
+                }
+
+                .idea-counter-module {
+                    margin-right: calc(#{$component-vertical_padding} / 2);
+                }
+
+                .Meta {
+                    margin-left: calc(#{$component-vertical_padding} / 2 + #{$theme-photo_size});
+                    flex-basis: calc(100% - (#{$component-vertical_padding} / 2 + #{$theme-photo_size} + 50px));
                 }
             }
         }
@@ -657,7 +678,7 @@ body.Section-Group {
 
                 .DateTile {
                     position: absolute;
-                    top: 0;
+                    top: $component-vertical_padding;
                     bottom: 0;
                     margin-top: 0;
                     height: $theme-photo_size;
@@ -666,7 +687,7 @@ body.Section-Group {
 
                 .OptionsMenu {
                     position: absolute;
-                    top: 0;
+                    top: $component-vertical_padding;
                     right: 0;
                     width: auto;
                 }
@@ -718,10 +739,6 @@ body.Section-Group {
 
         .PhotoWrap {
             margin-right: $utility-baseUnitDouble;
-
-            @include maxWidth {
-                display: none;
-            }
         }
 
         .Buttons .Button:nth-child(2) {
@@ -744,32 +761,14 @@ body.Section-Group {
                 flex-wrap: wrap;
             }
 
-            .Options {
-                order: 2;
-                margin-left: auto;
-                margin-right: 0;
-            }
-
-            .GroupDescription,
-            .Options {
+            .GroupDescription {
                 margin-top: $utility-baseUnitDouble;
-            }
-
-            .OptionsMenu {
-                position: absolute;
-                top: 0;
-                right: 0;
             }
 
             .Title-Wrapper {
                 padding-right: 20px;
             }
         }
-    }
-
-    .Options {
-        position: static;
-        align-items: flex-start;
     }
 
 
@@ -885,12 +884,6 @@ body.Section-Group {
     td.DiscussionName.DiscussionName .Wrap {
         display: block;
         padding-left: 0;
-    }
-
-    .Options {
-        position: static;
-        margin: 0;
-        float: right;
     }
 
     .DiscussionName {

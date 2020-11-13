@@ -187,7 +187,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
         }
 
         resolvedPromise
-            .then(data => {
+            .then((data) => {
                 // DOM node has been removed from the document.
                 if (!document.contains(this.domNode)) {
                     return;
@@ -201,7 +201,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
                 const loader = (this.domNode as Element).querySelector(".embedLinkLoader");
                 void this.createEmbedFromData(data, loader, newValue);
             })
-            .catch(e => {
+            .catch((e) => {
                 logError(e);
                 // DOM node has been removed from the document.
                 if (!document.contains(this.domNode)) {

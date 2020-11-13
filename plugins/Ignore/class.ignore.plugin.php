@@ -409,7 +409,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
             default:
                 $this->addIgnore($userID, $ignoreUserID);
-                $this->setData('Success', sprintf(t("Added %s to ignore list."), $ignoreUser->Name));
+                $sender->setData('Success', sprintf(t("Added %s to ignore list."), $ignoreUser->Name));
                 break;
         }
 

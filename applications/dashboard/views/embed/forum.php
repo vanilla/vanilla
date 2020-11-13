@@ -28,7 +28,7 @@ $nav = new NavModule();
 $nav->addLink(t('Vanilla Plugin for WordPress'), 'embed/wordpress', 'embed.wordpress', '', [], ['icon' => dashboardSymbol('plugin'), 'description' => t('Use Vanilla\'s Wordpress plugin if you want to embed in WordPress site.')]);
 $nav->addLink(t('Universal Forum Embed Code'), 'embed/universal', 'embed.universal', '', [], ['icon' => dashboardSymbol('code'), 'description' => t('Use the forum embed code to embed the entire forum in a non-WordPress site.')]);
 $nav->addLink(t('Universal Comment Embed Code'), 'embed/comments', 'embed.comments', '', [], ['icon' => dashboardSymbol('code-bubble'), 'description' => t('Use the comment embed code to embed Vanilla comments into a non-WordPress site.')]);
-$nav->addLink(t('Embed Settings'), 'embed/settings', 'embed.settings', '', [], ['icon' => dashboardSymbol('settings'), 'description' => t('Use the comment embed code to embed Vanilla comments into a non-WordPress site.')]);
+$nav->addLink(t('Embed Settings'), 'embed/settings', 'embed.settings', '', [], ['icon' => dashboardSymbol('settings'), 'description' => t('Advanced Embed Settings')]);
 $nav->setView('nav-adventure');
 
 echo $nav;

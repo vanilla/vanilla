@@ -16,12 +16,24 @@ use Vanilla\Logging\LoggerUtils;
  * Represent a discussion resource event.
  */
 class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
+
+    /**
+     * DiscussionEvent constructor.
+     *
+     * @param string $action
+     * @param array $payload
+     * @param array|null $sender
+     */
+    public function __construct(string $action, array $payload, ?array $sender = null) {
+        parent::__construct($action, $payload, $sender);
+        $this->addApiParams(['expand' => ['tagIDs', 'crawl']]);
+    }
     /**
      * @inheritDoc
      */
     public function getLogEntry(): LogEntry {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context['discussion'] = array_intersect_key($payload["discussion"] ?? [], [
+        $context['discussion'] = array_intersect_key($this->payload["discussion"] ?? [], [
             "discussionID" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
@@ -38,5 +50,13 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
         );
 
         return $log;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getApiUrl() {
+        [$recordType, $recordID] = $this->getRecordTypeAndID();
+        return "/api/v2/discussions?discussionID={$recordID}";
     }
 }

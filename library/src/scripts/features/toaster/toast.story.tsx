@@ -11,9 +11,9 @@ import Toast from "./Toast";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LoadStatus } from "@library/@types/api/core";
 
-const formsStory = storiesOf("Toast", module);
+const formsStory = storiesOf("Components", module);
 
-formsStory.add("Toast/Base", () =>
+formsStory.add("Toast", () =>
     (() => {
         return (
             <>

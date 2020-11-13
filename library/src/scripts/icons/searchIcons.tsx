@@ -224,3 +224,118 @@ export function TypeQuestionIcon(props: { className?: string; "aria-hidden"?: ar
         </svg>
     );
 }
+
+export function TypePlacesIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typePlaces, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+        >
+            <title>{t("Places")}</title>
+            <path
+                strokeLinecap="round"
+                d="M0.595 0.417L0.595 14.5"
+                transform="translate(5) rotate(-11 12.731 -4.133)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+            />
+            <path
+                d="M2.305 1.25L7.916 1.25 5.63 3.847 7.916 6.445 0.643 6.445 0.643 1.25z"
+                transform="translate(5) rotate(-11 12.731 -4.133)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+            />
+            <ellipse
+                cx="4.286"
+                cy="16.429"
+                rx="4.286"
+                ry="1.429"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+                transform="translate(5)"
+            />
+        </svg>
+    );
+}
+
+export function TypeGroupsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typeGroups, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 26 26"
+        >
+            <title>{t("Groups")}</title>
+            <circle cx="13" cy="13" r="13" style={{ fill: "none" }} />
+            <path
+                d="M18.7,8.5c1.1,0,2.1,0.6,2.1,2.7c0,1.5-0.9,2.7-2.1,2.7s-2.1-1.2-2.1-2.7C16.6,9.1,17.6,8.5,18.7,8.5z
+		 M12.9,5.8c1.6,0,3,0.9,3,3.8c0,2.1-1.3,3.8-3,3.8c-1.6,0-3-1.7-3-3.8C9.9,6.7,11.3,5.8,12.9,5.8z M7.2,8.5c1.2,0,2.1,0.6,2.1,2.7
+		c0,1.5-0.9,2.7-2.1,2.7s-2.1-1.2-2.1-2.7C5.1,9.1,6,8.5,7.2,8.5z M22.9,18.4h-3.3c0,0.5,0,0.9-0.1,1c-0.1,0.2-0.4,0.3-0.6,0.3H7
+		c-0.3,0-0.5-0.1-0.6-0.3c-0.1-0.1-0.1-0.5-0.1-1H3c-0.2,0-0.3-0.1-0.4-0.2c-0.1-0.1-0.1-1.8,0-1.9c0.5-0.8,1.4-1.4,2.5-1.9h0.1
+		c0.5,0.3,1.2,0.7,1.9,0.7c0.4,0,0.8-0.1,1.1-0.3c0.5-0.3,1-0.6,1.7-0.9c0.1,0,0.1,0,0.2,0c0.7,0.4,1.7,1.1,2.8,1.1s2.1-0.7,2.8-1.1
+		c0,0,0.1,0,0.2,0c0.7,0.2,1.3,0.5,1.9,1c0.3,0.1,0.6,0.2,0.9,0.2c0.8,0,1.5-0.5,2-0.7h0.1c0.9,0.2,1.8,0.9,2.5,1.9
+        c0.1,0.1,0.1,1.8,0,1.9C23.2,18.3,23,18.4,22.9,18.4z"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".867px" }}
+            />
+            <path
+                d="M19.6,18.4c0-0.7,0-1.6-0.1-1.7c-0.5-0.7-1.1-1.4-1.7-1.8"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".867px" }}
+            />
+            <path
+                d="M8,14.9c-0.8,0.5-1.2,1.1-1.6,1.8c-0.1,0.1-0.1,1-0.1,1.7"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".867px" }}
+            />
+        </svg>
+    );
+}
+
+export function TypeKnowledgeBaseIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typeKnowledgeBase, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 26 26"
+        >
+            <title>{t("Knowledge Base")}</title>
+            <circle cx="13" cy="13" r="13" style={{ fill: "none" }} />
+            <path
+                strokeWidth=".867"
+                d="M2.37 0L2.37 11.598"
+                style={{ fill: "none", stroke: "currentColor" }}
+                transform="translate(6.5 5.417)"
+            />
+            <rect
+                width="12.323"
+                height="14.275"
+                x=".474"
+                strokeWidth=".867"
+                rx="1.083"
+                style={{ fill: "none", stroke: "currentColor" }}
+                transform="translate(6.5 5.417)"
+            />
+            <path
+                strokeWidth=".867"
+                d="M.474 13.382s0-1.784 1.896-1.784H10.9c1.264 0 1.896-.595 1.896-1.784"
+                style={{ fill: "none", stroke: "currentColor" }}
+                transform="translate(6.5 5.417)"
+            />
+            <path
+                strokeLinecap="round"
+                strokeWidth=".975"
+                d="M4.74 4.015L9.479 4.015M4.74 5.799L9.479 5.799"
+                style={{ fill: "none", stroke: "currentColor" }}
+                transform="translate(6.5 5.417)"
+            />
+            <path
+                strokeWidth=".867"
+                d="M3.318 11.598L3.318 15.931 4.266 15.065 5.214 15.931 5.214 11.598z"
+                style={{ fill: "none", stroke: "currentColor" }}
+                transform="translate(6.5 5.417)"
+            />
+        </svg>
+    );
+}

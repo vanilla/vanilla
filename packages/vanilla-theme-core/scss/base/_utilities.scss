@@ -194,28 +194,19 @@
 
 /* ---------- Lists mixins ---------- */
 @mixin listItem {
-    padding-top: $component-base_padding;
-    padding-bottom: $component-base_padding;
     background: $component_bg;
+    padding: $component-base_padding;
+    box-shadow: $component_boxShadow;
 
     @if $component_lateralBorder == true {
-        padding-left: $component-base_padding;
-        padding-right: $component-base_padding;
-    } @else {
-        padding-left: 0;
-        padding-right: 0;
+        border-left: $component_border;
+        border-right: $component_border;
     }
 
     @if $component-item_spacing == 0 {
         border-top: $component_border;
 
-        @if $component_lateralBorder == true {
-            border-left: $component_border;
-            border-right: $component_border;
-        }
-
         &:first-child {
-
             @if $component_lateralBorder == true {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;
@@ -232,7 +223,6 @@
         }
 
     } @else {
-        box-shadow: $component_boxShadow;
         border-radius: $component_borderRadius;
         margin-bottom: $component-item_spacing;
         border-top: $component_border;
@@ -254,7 +244,6 @@
 }
 
 @mixin TableItem {
-
     @if $component-item_spacing == 0 {
 
         &:first-child {
@@ -289,8 +278,6 @@
 
         td {
             border-bottom: $component_border;
-            padding-top: $component-base_padding;
-            padding-bottom: $component-base_padding;
             @if ($staticVariables) {
                 background: $component_bg;
             }
@@ -299,26 +286,21 @@
         td:first-child {
             @if $component_lateralBorder == true {
                 border-left: $component_border;
-                padding-left: $component-base_padding;
             }
         }
 
         td:last-child {
             @if $component_lateralBorder == true {
                 border-right: $component_border;
-                padding-right: $component-base_padding;
             }
         }
 
     } @else {
-        box-shadow: $component_boxShadow;
         border-radius: $component_borderRadius;
 
         td {
-            background: $component_bg;
             border-top: $component_border;
             border-bottom: $component_border;
-            padding: $component-base_padding 0;
 
             @if $component_lateralBorder == true {
                 &:first-child {
@@ -327,23 +309,10 @@
                     border-bottom-left-radius: $component_borderRadius;
                 }
 
-                &:first-child:not(.CheckBoxColumn) {
-                    padding-left: $component-base_padding;
-                }
-
                 &:last-child {
                     border-right: $component_border;
                     border-top-right-radius: $component_borderRadius;
                     border-bottom-right-radius: $component_borderRadius;
-                    padding-right: $component-base_padding;
-                }
-            }
-
-            .Wrap {
-                padding: 0 $utility-baseUnitHalf;
-
-                @include maxWidth {
-                    padding: 0;
                 }
             }
         }
@@ -683,9 +652,12 @@
 
 @mixin lastCell {
     padding-right: $component-base_padding;
-    border-right: $component_border;
-    border-top-right-radius: $component_borderRadius;
-    border-bottom-right-radius: $component_borderRadius;
+    @if ($component_lateralBorder) {
+        border-right: $component_border;
+        border-top-right-radius: $component_borderRadius;
+        border-bottom-right-radius: $component_borderRadius;
+    }
+
 }
 
 @mixin photoWrap($size: $theme-photo_size, $round: $theme-photo_round) {
@@ -723,17 +695,16 @@
     $borderHover: $button-basic-hover_border
 ) {
     font-family: $formButton_fontFamily;
-    font-weight: $formButton_fontWeight;
-    font-size: $formButton_fontSize;
     transition: background 0.1s ease, border 0.1s ease;
-    border-width: $global-border-width;
-    border-color: $formButton_border;
+    border: $formButton_border;
     border-style: solid;
     @if ($staticVariables) {
-        border-color: $border;
+        font-weight: $formButton_fontWeight;
+        font-size: $formButton_fontSize;
         min-width: $formButton_height;
-        background: $bg;
         color: $fg;
+        background: $bg;
+        border-color: $border;
     }
     line-height: $formButton_height;
     min-height: $formButton_height;

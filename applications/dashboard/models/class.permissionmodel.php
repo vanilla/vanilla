@@ -25,11 +25,26 @@ class PermissionModel extends Gdn_Model {
     /** @var array Permission namespaces from enabled addons. */
     private $namespaces;
 
+    /** @var array $junctionModels */
+    protected $junctionModels = [];
+
+    public static $permissionsCleared = false;
+
     /**
      * Class constructor. Defines the related database table name.
      */
     public function __construct() {
         parent::__construct('Permission');
+    }
+
+    /**
+     * Add a model related to specific junction table
+     *
+     * @param string $junctionTable
+     * @param string $modelClass
+     */
+    public function addJunctionModel(string $junctionTable, string $modelClass) {
+        $this->junctionModels[$junctionTable] = $modelClass;
     }
 
     /**
@@ -198,11 +213,14 @@ class PermissionModel extends Gdn_Model {
      * Remove the cached permissions for all users.
      */
     public function clearPermissions() {
-        static $permissionsCleared = false;
-
-        if (!$permissionsCleared) {
+        if (!$this::$permissionsCleared) {
             Gdn::userModel()->clearPermissions();
-            $permissionsCleared = true;
+            $this::$permissionsCleared = true;
+            foreach ($this->junctionModels as $table => $modelClass) {
+                /** @var PermissionJunctionModelInterface $model */
+                $model = Gdn::getContainer()->get($modelClass);
+                $model->clearPermissions();
+            }
         }
     }
 
@@ -394,10 +412,10 @@ class PermissionModel extends Gdn_Model {
      *
      * @param int $userID Unique identifier for user.
      * @param string $limitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
-     * @param string $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
-     * @param string $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
-     * @param string $foreignKey Foreign table column to join on.
-     * @param int $foreignID Foreign ID to limit join to.
+     * @param string|false $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+     * @param string|false $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
+     * @param string|false $foreignKey Foreign table column to join on.
+     * @param int|false $foreignID Foreign ID to limit join to.
      * @return array Permission records.
      */
     public function getUserPermissions($userID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
@@ -443,10 +461,10 @@ class PermissionModel extends Gdn_Model {
      *
      * @param int $roleID Unique identifier for role.
      * @param string $limitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
-     * @param string $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
-     * @param string $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
-     * @param string $foreignKey Foreign table column to join on.
-     * @param int $foreignID Foreign ID to limit join to.
+     * @param string|false $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+     * @param string|false $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
+     * @param string|false $foreignKey Foreign table column to join on.
+     * @param int|false $foreignID Foreign ID to limit join to.
      * @return array Permission records.
      */
     public function getRolePermissions($roleID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
@@ -654,11 +672,13 @@ class PermissionModel extends Gdn_Model {
                         $roleOn = 'p.RoleID in ('.implode(',', $roleIDs).')';
                     }
 
+                    $junctionColumnsOn = 'p.JunctionColumn = '.$this->SQL->Database->connection()->quote($junctionColumn);
+                    $junctionTablesOn = 'p.JunctionTable = '.$this->SQL->Database->connection()->quote($junctionTable);
                     // Get the permissions for the junction table.
                     $sQL->select('junc.Name')
                         ->select('junc.'.$junctionColumn, '', 'JunctionID')
                         ->from($junctionTable.' junc')
-                        ->join('Permission p', "p.JunctionID = junc.$junctionColumn and $roleOn", 'left')
+                        ->join('Permission p', "p.JunctionID = junc.$junctionColumn and $roleOn and $junctionColumnsOn and $junctionTablesOn", 'left')
                         ->orderBy('junc.Sort')
                         ->orderBy('junc.Name');
 
@@ -731,10 +751,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function getPermissions($roleID, $limitToSuffix = '', $includeJunction = true) {
         $roleID = (array)$roleID;
-        $result = [];
-
         $globalPermissions = $this->getGlobalPermissions($roleID, $limitToSuffix);
-        $result[] = $globalPermissions;
 
         $junctionOptions = [];
         if ($includeJunction === false) {
@@ -747,7 +764,7 @@ class PermissionModel extends Gdn_Model {
             $limitToSuffix,
             $junctionOptions
         );
-        $result = array_merge($result, $junctionPermissions);
+        $result = array_merge($globalPermissions, $junctionPermissions);
 
         return $result;
     }
@@ -885,7 +902,7 @@ class PermissionModel extends Gdn_Model {
             }
         }
 
-        if (count($roleIDs) === 1) {
+        if (!is_array($roleID)) {
             return array_pop($data);
         } else {
             return $data;
@@ -1039,7 +1056,7 @@ class PermissionModel extends Gdn_Model {
      * @return string
      */
     public static function permissionNamespace($permissionName) {
-        if ($index = strpos($permissionName)) {
+        if ($index = strpos($permissionName, '.')) {
             return substr($permissionName, 0, $index);
         }
         return '';

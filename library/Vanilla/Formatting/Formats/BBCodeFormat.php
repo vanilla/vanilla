@@ -45,8 +45,8 @@ class BBCodeFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $renderedBBCode = $this->bbcodeParser->format($value);
+    public function renderHtml(string $content, bool $enhance = true): string {
+        $renderedBBCode = $this->bbcodeParser->format($content);
         return parent::renderHtml($renderedBBCode, $enhance);
     }
 

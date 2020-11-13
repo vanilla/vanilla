@@ -513,6 +513,12 @@ strong,
   }
 }
 
+li, dd {
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
 // Truncate
 //
 // Trucates text that flows longer than the width of its container.

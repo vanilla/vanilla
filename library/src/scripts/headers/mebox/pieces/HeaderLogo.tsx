@@ -17,6 +17,7 @@ export interface IHeaderLogo {
     logoClassName?: string;
     logoType: LogoType;
     color?: string;
+    overwriteLogo?: string; // for storybook
 }
 
 /**
@@ -26,7 +27,8 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
     public render() {
         const { doubleLogoStrategy } = titleBarVariables().logo;
         const classes = titleBarLogoClasses();
-        const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
+        const desktopOrMobileClass = this.props.logoType === LogoType.MOBILE ? classes.mobileLogo : classes.logo;
+        const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, desktopOrMobileClass);
         const url = navigationVariables().logo.url;
 
         if (doubleLogoStrategy === "hidden") {
@@ -36,7 +38,12 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
         return (
             <SmartLink to={url} className={classNames("headerLogo", this.props.className)}>
                 <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>
-                    <ThemeLogo alt={t("Vanilla")} className={logoClassName} type={this.props.logoType} />
+                    <ThemeLogo
+                        overwriteLogo={this.props.overwriteLogo}
+                        alt={t("Vanilla")}
+                        className={logoClassName}
+                        type={this.props.logoType}
+                    />
                 </span>
             </SmartLink>
         );

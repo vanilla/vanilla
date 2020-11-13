@@ -39,7 +39,7 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
         state: INotificationsState = this.initialState,
         action: typeof NotificationsActions.ACTION_TYPES,
     ): INotificationsState => {
-        return produce(state, nextState => {
+        return produce(state, (nextState) => {
             switch (action.type) {
                 case NotificationsActions.GET_NOTIFICATIONS_REQUEST:
                     nextState.notificationsByID.status = LoadStatus.LOADING;
@@ -48,7 +48,7 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                     nextState.notificationsByID.status = LoadStatus.SUCCESS;
                     nextState.notificationsByID.data = {};
                     const notifications = action.payload.data as INotification[];
-                    notifications.forEach(notification => {
+                    notifications.forEach((notification) => {
                         nextState.notificationsByID.data![notification.notificationID] = notification;
                     });
                     break;

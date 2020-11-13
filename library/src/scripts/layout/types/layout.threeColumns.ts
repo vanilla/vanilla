@@ -86,11 +86,11 @@ export const threeColumnLayoutVariables = useThemeCache(
             }
         };
 
-        const isFullWidth = currentDevice => {
+        const isFullWidth = (currentDevice) => {
             return currentDevice === Devices.DESKTOP || currentDevice === Devices.NO_BLEED;
         };
 
-        const isCompact = currentDevice => {
+        const isCompact = (currentDevice) => {
             return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
         };
 

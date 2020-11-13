@@ -27,7 +27,6 @@ use Vanilla\UploadedFile;
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
 class Gdn_Request implements RequestInterface {
-
     /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
 
@@ -87,6 +86,9 @@ class Gdn_Request implements RequestInterface {
 
     /** @var array Request data/parameters, either from superglobals or from a custom array of key/value pairs. */
     protected $_RequestArguments;
+
+    /** @var array Cache of env elements to avoid repeatedly casening strings in loops. */
+    private $envElementCache = [];
 
     /**
      * Instantiate a new instance of the {@link Gdn_Request} class.
@@ -179,9 +181,13 @@ class Gdn_Request implements RequestInterface {
      *
      * @param string $key Key to retrieve or set.
      * @param string $value Value of $Key key to set.
-     * @return string | null
+     * @return string|null
      */
     protected function _environmentElement($key, $value = null) {
+        if ($value === null && array_key_exists($key, $this->envElementCache)) {
+            return $this->envElementCache[$key];
+        }
+        $rawKey = $key;
         $key = strtoupper($key);
         if ($value !== null) {
             $this->_HaveParsedRequest = false;
@@ -209,14 +215,13 @@ class Gdn_Request implements RequestInterface {
                     break;
             }
 
+            $this->envElementCache[$rawKey] = $value;
             $this->_Environment[$key] = $value;
         }
 
-        if (array_key_exists($key, $this->_Environment)) {
-            return $this->_Environment[$key];
-        }
-
-        return null;
+        $result = $this->_Environment[$key] ?? null;
+        $this->envElementCache[$rawKey] = $result;
+        return $result;
     }
 
     /**
@@ -316,6 +321,7 @@ class Gdn_Request implements RequestInterface {
     public function fromImport($newRequest) {
         // Import Environment
         $this->_Environment = $newRequest->export('Environment');
+        $this->envElementCache = [];
         // Import Arguments
         $this->_RequestArguments = $newRequest->export('Arguments');
 
@@ -513,7 +519,7 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Get the path and file extenstion.
+     * Get the path and file extension.
      *
      * @return string
      */
@@ -1366,7 +1372,7 @@ class Gdn_Request implements RequestInterface {
      * @return self
      */
     public function setExt($extension) {
-        $extension = '.'.ltrim($extension, '.');
+        $extension = $extension ? '.'.ltrim($extension, '.') : '';
 
         $this->_parsedRequestElement('Extension', $extension);
         return $this;
@@ -1417,6 +1423,23 @@ class Gdn_Request implements RequestInterface {
     public function setIP($ip) {
         $this->_environmentElement('ADDRESS', $ip);
         return $this;
+    }
+
+    /**
+     * Anonymize the IP address on the request.
+     *
+     * @param bool $full Whether or not to fully anonymize the IP address.
+     * @return string Returns the anonymous IP.
+     */
+    public function anonymizeIP(bool $full = false): string {
+        if ($full) {
+            $ip = '0.0.0.0';
+        } else {
+            $ip = $this->getIP();
+            $ip = anonymizeIP($ip);
+        }
+        $this->setIP($ip);
+        return $ip;
     }
 
     /**

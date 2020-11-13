@@ -47,13 +47,6 @@ $embedVideo_width: $embed_width;
     background-color: black;
 }
 
-.embedVideo-scrim {
-    $bg: rgba(#000, 0.4);
-    content: "";
-    display: block;
-    @include absolute-fullSizeOfParent;
-    background: linear-gradient(to bottom, $bg, $bg);
-}
 
 .embedVideo-ratio {
     position: relative;
@@ -91,7 +84,7 @@ $embedVideo_width: $embed_width;
     border: none;
 }
 
-.embedVideo-playIcon {
+.embedVideo-playIconWrap {
     position: absolute;
     top: 0;
     left: 0;
@@ -100,6 +93,14 @@ $embedVideo_width: $embed_width;
     margin: auto;
     width: $richEditor-videoPlayIcon_width;
     height: $richEditor-videoPlayIcon_width;
+    $bg: rgba(#000, 0.4);
+    display: block;
+    background: linear-gradient(to bottom, $bg, $bg);
+    border-radius: 50%;
+}
+
+
+.embedVideo-playIcon {
     color: white;
 }
 

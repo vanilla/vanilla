@@ -65,10 +65,12 @@ class JsonFieldProcessor implements Processor {
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
                 $json = $set[$field];
-                $json = LoggerUtils::stringifyDates($json);
+                if (is_array($json)) {
+                    $json = LoggerUtils::stringifyDates($json);
+                }
                 $json = json_encode($json, JSON_FORCE_OBJECT);
                 if ($json === false) {
-                    throw new \Exception("Unable to encode field as JSON.");
+                    throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
                 }
                 $set[$field] = $json;
             }

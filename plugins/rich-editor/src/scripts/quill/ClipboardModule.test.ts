@@ -8,9 +8,11 @@ import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
+import { wait, waitFor } from "@testing-library/react";
+import { registerEmbed } from "@vanilla/library/src/scripts/embeddedContent/embedService";
+import { IFrameEmbed, supportsFrames } from "@vanilla/library/src/scripts/embeddedContent/IFrameEmbed";
 import { expect } from "chai";
 import Quill, { DeltaOperation } from "quill/core";
-import { isArray } from "util";
 
 describe("ClipboardModule", () => {
     let quill: Quill;
@@ -26,7 +28,7 @@ describe("ClipboardModule", () => {
             const testSimplePaste = (value: string | string[]) => {
                 let text = value;
                 let expected = text + "\n";
-                if (isArray(text)) {
+                if (Array.isArray(text)) {
                     [text, expected] = value;
                     expected = expected === undefined ? text + "\n" : expected + "\n";
                 }
@@ -285,6 +287,98 @@ describe("ClipboardModule", () => {
             quill.setContents([OpUtils.list()]);
             quill.clipboard.dangerouslyPasteHTML(0, "line");
             expect(quill.getContents().ops).deep.eq([OpUtils.op("line"), OpUtils.list()]);
+        });
+    });
+
+    // To be completed, it seems the image cannot be inserted correctly
+    // using the provided methods
+
+    describe("Pasting an embed-external into a list", () => {
+        it("can paste an image into a simple list of items", async () => {
+            const imageUrl =
+                "https://avatars0.githubusercontent.com/u/1770056?s=460&u=bd05532b8b91da6ccfe30b6bb598a86332d694dd&v=4";
+            const html = `
+                <div class="embedImage-link">
+                    <img src="${imageUrl}" >
+                </div>
+            `;
+            quill.setContents([OpUtils.op("a"), OpUtils.list(), OpUtils.op("b"), OpUtils.list()]);
+            quill.clipboard.dangerouslyPasteHTML(1, html);
+            const ops = quill.getContents().ops!;
+            await waitFor(() => {
+                expect(ops.length).eq(5);
+                expect(ops[0].insert).eq("a");
+                expect(ops[2].insert["embed-external"].data.url).eq(imageUrl);
+                expect(ops[3].insert).eq("b");
+            });
+        });
+
+        it("can paste a nested list of items", () => {
+            const html = `
+                <ul>
+                    <li>1</li>
+                    <li>Nested</li>
+                </ul>
+            `;
+            quill.setContents([OpUtils.op("a"), OpUtils.list(), OpUtils.op("b"), OpUtils.list()]);
+            quill.clipboard.dangerouslyPasteHTML(1, html);
+            const ops = quill.getContents().ops!;
+
+            // Please note this test is not necessarily of the desirable behaviour.
+            // If you are able to make better behaviour please feel free to update this test.
+
+            expect(ops).deep.equals([
+                OpUtils.op("a1"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("Nested"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("b"),
+                OpUtils.list(ListType.ORDERED),
+            ]);
+        });
+    });
+
+    describe("Embed conversion", () => {
+        const frameSrc = `https://www.example.com/embed/M7lc1UVf-VE?origin=http://example.com`;
+        const height = 500;
+        const width = 1000;
+        const iframeHtml = `
+Hello<iframe type="text/html" width="${width}" height="${height}" src="${frameSrc}" frameborder="0"></iframe>
+`;
+
+        it("Does not convert when iframes are disabled", () => {
+            supportsFrames(false);
+            quill.clipboard.dangerouslyPasteHTML(iframeHtml);
+            expect(quill.scroll.domNode.innerHTML).equal("<p>Hello</p>");
+        });
+
+        it("Does convert when iframes are enabled", async () => {
+            supportsFrames(true);
+            registerEmbed("iframe", IFrameEmbed);
+            reset();
+            quill.clipboard.dangerouslyPasteHTML(iframeHtml);
+
+            await waitFor(() => {
+                const frameHtml = quill.scroll.domNode.querySelector("iframe")?.outerHTML;
+                expect(frameHtml).equal(
+                    `<iframe src="https://www.example.com/embed/M7lc1UVf-VE?origin=http://example.com" class="embedIFrame-iframe" frameborder="0"></iframe>`,
+                );
+                expect(quill.getContents().ops?.[1]).deep.equals({
+                    insert: {
+                        "embed-external": {
+                            loaderData: {
+                                type: "link",
+                            },
+                            data: {
+                                embedType: "iframe",
+                                url: frameSrc,
+                                height,
+                                width,
+                            },
+                        },
+                    },
+                });
+            });
         });
     });
 });

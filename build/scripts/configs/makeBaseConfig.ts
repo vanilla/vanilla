@@ -25,7 +25,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 
     const modulePaths = [
         "node_modules",
-        ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
+        ...entryModel.addonDirs.map((dir) => path.resolve(dir, "node_modules")),
         path.join(VANILLA_ROOT, "node_modules"),
     ];
 

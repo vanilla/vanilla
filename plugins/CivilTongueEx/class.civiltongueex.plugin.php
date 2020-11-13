@@ -335,9 +335,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function notificationsController_informNotifications_handler($sender, &$args) {
+    public function notificationsController_informNotifications_handler($sender, $args) {
         $activities = val('Activities', $args);
-        foreach ($activities as $key => &$activity) {
+        foreach ($activities as $key => $activity) {
             if (val('Headline', $activity)) {
                 $activity['Headline'] = $this->replace($activity['Headline']);
                 $args['Activities'][$key]['Headline'] = $this->replace($args['Activities'][$key]['Headline']);
@@ -410,7 +410,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param ConversationModel $sender The sending object.
      * @param array $args
      */
-    public function conversationModel_afterAdd_handler($sender, &$args) {
+    public function conversationModel_afterAdd_handler($sender, $args) {
         if (val('Body', $args)) {
             $args['Body'] = $this->replace($args['Body']);
         }
@@ -425,7 +425,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param ConversationMessageModel $sender The sending object.
      * @param array $args
      */
-    public function conversationMessageModel_afterAdd_handler($sender, &$args) {
+    public function conversationMessageModel_afterAdd_handler($sender, $args) {
         if (val('Body', $args)) {
             $args['Body'] = $this->replace($args['Body']);
         }
@@ -440,7 +440,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param PollModule $sender Poll Module.
      * @param array $args Sending arguments.
      */
-    public function pollModule_afterLoadPoll_handler($sender, &$args) {
+    public function pollModule_afterLoadPoll_handler($sender, $args) {
         if ($options = val('PollOptions', $args)) {
             foreach ($options as &$option) {
                 $option['Body'] = $this->replace($option['Body']);

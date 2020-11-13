@@ -23,7 +23,7 @@ export function ThemePreviewTitle(props: IProps) {
                 <>
                     {t("Edits to this theme apply to:")}{" "}
                     <ul>
-                        {supportedSections.map(section => {
+                        {supportedSections.map((section) => {
                             return (
                                 <li key={section}>
                                     <span style={{ fontWeight: 600 }}>{t(section)}</span>

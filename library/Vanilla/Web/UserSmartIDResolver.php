@@ -102,5 +102,4 @@ class UserSmartIDResolver {
         $this->viewEmail = $viewEmail;
         return $this;
     }
-
 }

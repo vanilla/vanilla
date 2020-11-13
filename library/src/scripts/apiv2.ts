@@ -30,7 +30,7 @@ const apiv2 = axios.create({
         },
     },
     transformResponse: [...(axios.defaults.transformResponse as any), fieldErrorTransformer],
-    paramsSerializer: params => qs.stringify(params),
+    paramsSerializer: (params) => qs.stringify(params),
 });
 
 /**
@@ -75,6 +75,12 @@ export function extractJsonErrorFromCFHtmlString(body: string): IError | null {
  * Error handler for cloudflare errors when making APIv2 requests.
  */
 function cloudflareAxiosErrorHandler(error: AxiosError) {
+    const data = error.response?.data || "";
+
+    if (typeof data === "object" && data.message) {
+        (error as any).description = data.message;
+    }
+
     const contentType = error.response?.headers?.["content-type"];
     if (error.response && typeof contentType === "string" && contentType.startsWith("text/html")) {
         // we have an HTML error.

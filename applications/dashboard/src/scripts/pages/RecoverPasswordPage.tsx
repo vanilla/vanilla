@@ -58,7 +58,7 @@ export default function RecoverPasswordPage(props: IProps) {
                 {t("RecoverPasswordLabelCode", "Enter your email to continue.")}
             </Paragraph>
             <form
-                onSubmit={event => {
+                onSubmit={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     resetPassword({ email });
@@ -74,7 +74,7 @@ export default function RecoverPasswordPage(props: IProps) {
                     inputProps={{
                         required: true,
                         value: email,
-                        onChange: event => setEmail(event.target.value),
+                        onChange: (event) => setEmail(event.target.value),
                         disabled: !allowEdit,
                     }}
                     errors={getFieldErrors(error, "email")}

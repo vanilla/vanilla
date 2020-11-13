@@ -272,7 +272,7 @@ export function getBlotAtIndex<T extends Blot>(
     index: number,
     blotClass?: { new (value?: any): T },
 ): T | null {
-    const condition = blotClass ? blot => blot instanceof blotClass : blot => true;
+    const condition = blotClass ? (blot) => blot instanceof blotClass : (blot) => true;
     return quill.scroll.descendant(condition, index)[0] as T;
 }
 

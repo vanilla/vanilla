@@ -10,11 +10,21 @@ import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
 import { ISearchForm, ISearchRequestQuery, ISearchResults, ISearchFormBase } from "@library/search/searchTypes";
-import { ALLOWED_GLOBAL_SEARCH_FIELDS, ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
+import {
+    ALLOWED_GLOBAL_SEARCH_FIELDS,
+    ALL_CONTENT_DOMAIN_NAME,
+    MEMBERS_RECORD_TYPE,
+    MEMBERS_DOMAIN_NAME,
+    PLACES_DOMAIN_NAME,
+} from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
 import { ILoadable } from "@vanilla/library/src/scripts/@types/api/core";
 import React, { useCallback, useContext, useReducer } from "react";
 import merge from "lodash/merge";
+import Result from "@library/result/Result";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { useSearchScope } from "@library/features/search/SearchScopeContext";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 interface ISearchContextValue<ExtraFormValues extends object = ISearchFormBase> {
     results: ILoadable<ISearchResults>;
@@ -33,6 +43,11 @@ interface ISearchContextValue<ExtraFormValues extends object = ISearchFormBase> 
     updateForm(updateValues: Partial<ISearchForm<ExtraFormValues>>): void;
 
     /**
+     * Update some form values.
+     */
+    resetForm(): void;
+
+    /**
      * Perform a search.
      */
     search(): void;
@@ -47,12 +62,16 @@ interface ISearchContextValue<ExtraFormValues extends object = ISearchFormBase> 
      */
     getCurrentDomain(): ISearchDomain;
 
+    /**
+     * Get the default values for the form.
+     */
     getDefaultFormValues(): ISearchForm;
 }
 
 const SearchContext = React.createContext<ISearchContextValue>({
     getFilterComponentsForDomain: () => null,
     updateForm: () => {},
+    resetForm: () => {},
     results: INITIAL_SEARCH_STATE.results,
     form: DEFAULT_CORE_SEARCH_FORM,
     search: () => {},
@@ -71,7 +90,24 @@ interface IProps {
     children?: React.ReactNode;
 }
 
-const SEARCH_LIMIT_DEFAULT = 10;
+export const SEARCH_LIMIT_DEFAULT = 10;
+
+export function getGlobalSearchSorts(): ISelectBoxItem[] {
+    return [
+        {
+            content: t("Best Match"),
+            value: "relevance",
+        },
+        {
+            content: t("Newest"),
+            value: "-dateInserted",
+        },
+        {
+            content: t("Oldest"),
+            value: "dateInserted",
+        },
+    ];
+}
 
 export function SearchFormContextProvider(props: IProps) {
     const [state, dispatch] = useReducer(searchReducer, INITIAL_SEARCH_STATE);
@@ -89,6 +125,7 @@ export function SearchFormContextProvider(props: IProps) {
     const ALL_CONTENT_DOMAIN: ISearchDomain = {
         key: ALL_CONTENT_DOMAIN_NAME,
         name: t("All Content"),
+        sort: 0,
         icon: <TypeAllIcon />,
         PanelComponent: FilterPanelAll,
         getAllowedFields: () => {
@@ -100,10 +137,12 @@ export function SearchFormContextProvider(props: IProps) {
             for (const pluggableDomain of SearchFormContextProvider.pluggableDomains) {
                 allTypes.push(...pluggableDomain.getRecordTypes());
             }
-            return allTypes;
+
+            return allTypes.filter((t) => t !== MEMBERS_RECORD_TYPE);
         },
+        getSortValues: getGlobalSearchSorts,
         transformFormToQuery: (form: ISearchForm) => {
-            const query = { ...form };
+            const query: ISearchRequestQuery = { ...form };
             if (query.sort === "relevance") {
                 delete query.sort;
             }
@@ -114,6 +153,8 @@ export function SearchFormContextProvider(props: IProps) {
                 sort: "relevance",
             };
         },
+        isIsolatedType: () => false,
+        ResultComponent: Result,
     };
 
     const getDomains = () => {
@@ -122,13 +163,13 @@ export function SearchFormContextProvider(props: IProps) {
 
     const getCurrentDomain = (): ISearchDomain => {
         return (
-            getDomains().find(pluggableDomain => {
+            getDomains().find((pluggableDomain) => {
                 return pluggableDomain.key === state.form.domain;
             }) ?? ALL_CONTENT_DOMAIN
         );
     };
 
-    const buildQuery = (form: ISearchForm): ISearchRequestQuery => {
+    const getDate = (form: ISearchFormBase): string | undefined => {
         let dateInserted: string | undefined;
         if (form.startDate && form.endDate) {
             if (form.startDate === form.endDate) {
@@ -145,40 +186,88 @@ export function SearchFormContextProvider(props: IProps) {
             // Only end date.
             dateInserted = `<=${form.endDate}`;
         }
+        return dateInserted;
+    };
 
+    const makeFilterForm = (form: ISearchFormBase): Partial<ISearchForm> => {
         const currentDomain = getCurrentDomain();
-        const query = currentDomain.transformFormToQuery(form);
-
-        const filterQuery: ISearchRequestQuery = {
-            domain: query.domain,
-            page: query.page,
-            query: query.query,
-        };
-
+        const filterForm: Partial<ISearchForm> = {};
         const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
-
-        for (const [key, value] of Object.entries(query)) {
+        for (const [key, value] of Object.entries(form)) {
             if (allowedFields.includes(key)) {
-                filterQuery[key] = value;
+                filterForm[key] = value;
             }
         }
+        return filterForm;
+    };
 
-        const finalQuery: ISearchRequestQuery = {
-            ...filterQuery,
+    const searchScope = useSearchScope();
+    const buildQuery = (form: ISearchForm): ISearchRequestQuery => {
+        const filterForm = makeFilterForm(form);
+        const currentDomain = getCurrentDomain();
+
+        const allowedSorts = currentDomain.getSortValues().map((val) => val.value);
+        const sort = allowedSorts.includes(form.sort) ? form.sort : undefined;
+
+        const commonQueryEntries: ISearchRequestQuery = {
+            page: form.page,
             limit: SEARCH_LIMIT_DEFAULT,
-            expandBody: true,
-            insertUserIDs:
-                form.authors && form.authors.length ? form.authors.map(author => author.value as number) : undefined,
-            dateInserted,
-            recordTypes: currentDomain.getRecordTypes(),
-            expand: ["insertUser", "breadcrumbs", "image", "excerpt"],
+            dateInserted: getDate(form),
+            locale: getCurrentLocale(),
+            collapse: true,
+            ...currentDomain.transformFormToQuery(filterForm),
+            sort,
         };
+        if (searchScope.value?.value) {
+            commonQueryEntries.scope = searchScope.value.value;
+        }
+
+        let finalQuery: ISearchRequestQuery;
+
+        if (currentDomain.key === MEMBERS_DOMAIN_NAME) {
+            finalQuery = {
+                ...commonQueryEntries,
+                scope: "site", // Force site domain for members.
+                recordTypes: [MEMBERS_RECORD_TYPE],
+                expand: [],
+            };
+        } else if (currentDomain.key === PLACES_DOMAIN_NAME) {
+            // No recordTypes, only types (from form)
+            finalQuery = {
+                ...commonQueryEntries,
+                expand: ["breadcrumbs", "image", "excerpt", "-body"],
+            };
+        } else if (currentDomain.hasSpecificRecord?.(form)) {
+            finalQuery = {
+                ...commonQueryEntries,
+                expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
+            };
+        } else {
+            finalQuery = {
+                domain: form.domain,
+                ...commonQueryEntries,
+                insertUserIDs:
+                    form.authors && form.authors.length
+                        ? form.authors.map((author) => author.value as number)
+                        : undefined,
+                recordTypes: currentDomain.getRecordTypes(),
+                expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
+            };
+        }
+
+        // Filter out empty fields.
+        Object.entries(finalQuery).forEach(([field, value]) => {
+            if (value === "") {
+                delete finalQuery[field];
+            }
+        });
 
         return finalQuery;
     };
 
     const search = async () => {
         const { form } = state;
+
         dispatch(SearchActions.performSearchACs.started(form));
 
         try {
@@ -190,7 +279,7 @@ export function SearchFormContextProvider(props: IProps) {
                 SearchActions.performSearchACs.done({
                     params: form,
                     result: {
-                        results: response.data.map(item => {
+                        results: response.data.map((item) => {
                             item.body = item.excerpt ?? item.body;
                             return item;
                         }),
@@ -212,7 +301,7 @@ export function SearchFormContextProvider(props: IProps) {
     }, []);
 
     const getDefaultFormValues = () => {
-        const domainDefaults = getDomains().map(domain => domain.getDefaultFormValues());
+        const domainDefaults = getDomains().map((domain) => domain.getDefaultFormValues());
         const merged = merge({}, DEFAULT_CORE_SEARCH_FORM, ...domainDefaults);
         return merged;
     };
@@ -228,6 +317,7 @@ export function SearchFormContextProvider(props: IProps) {
                 getDomains,
                 getCurrentDomain,
                 getDefaultFormValues,
+                resetForm,
             }}
         >
             {props.children}
@@ -242,12 +332,24 @@ export function useSearchForm<T extends object>() {
 interface ISearchDomain {
     key: string;
     name: string;
+    sort: number; // The order the panel appears from left to right
     icon: React.ReactNode;
     PanelComponent: React.ComponentType<any>;
+    resultHeader?: React.ReactNode;
     getAllowedFields(): string[];
     getRecordTypes(): string[];
-    transformFormToQuery(form: ISearchForm): Partial<ISearchRequestQuery>;
+    transformFormToQuery(form: Partial<ISearchForm>): Partial<ISearchRequestQuery>;
     getDefaultFormValues(): Partial<ISearchForm>;
+    isIsolatedType(): boolean;
+    getSortValues(): ISelectBoxItem[];
+    ResultComponent: React.ComponentType<any>;
+    ResultWrapper?: React.ComponentType<any>;
+    MetaComponent?: React.ComponentType<any>;
+    hasSpecificRecord?(form: Partial<ISearchForm>): boolean;
+    getSpecificRecord?(form: Partial<ISearchForm>): number;
+    SpecificRecordPanel?: React.ComponentType<any>;
+    SpecificRecordComponent?: React.ComponentType<any>;
+    showSpecificRecordCrumbs?(): boolean; // We could later make this into a config object
 }
 
 interface IExtraFilter {

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
 
@@ -70,6 +71,23 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         if ($this->patchFields === null) {
             $this->patchFields = array_keys($this->record());
         }
+    }
+
+    /**
+     * Call `GET /:id/edit`
+     *
+     * @param mixed $rowOrID The PK value or a row.
+     * @return \Garden\Http\HttpResponse
+     */
+    protected function getEdit($rowOrID): HttpResponse {
+        if (is_array($rowOrID)) {
+            $id = $rowOrID[$this->pk];
+        } else {
+            $id = $rowOrID;
+        }
+
+        $r = $this->api()->get("{$this->baseUrl}/$id/edit");
+        return $r;
     }
 
     /**
@@ -183,9 +201,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
             $row = $record;
         }
 
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}/edit"
-        );
+        $r = $this->getEdit($row);
 
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual(arrayTranslate($record, $this->editFields), $r->getBody());
@@ -314,7 +330,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
         $this->assertEquals(200, $r->getStatusCode());
 
-        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $newRow = $this->getEdit($row);
         $this->assertSame($patchRow[$field], $newRow[$field]);
     }
 

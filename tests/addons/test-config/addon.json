@@ -1,0 +1,7 @@
+{
+    "key": "test-config",
+    "name": "Tests for custom config endpoint",
+    "type": "addon",
+    "version": "0.1",
+    "mobileFriendly": true
+}

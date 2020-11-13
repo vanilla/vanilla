@@ -81,16 +81,24 @@ class ModelCache implements InjectableInterface {
      *
      * @return mixed
      */
-    public function getCachedOrHydrate(array $keyArgs, callable $hydrate, array $cacheOptions = []) {
+    public function getCachedOrHydrate(array $args, callable $hydrate, array $cacheOptions = []) {
         if ($this->isFeatureDisabled) {
-            return $hydrate();
+            if (empty($args)) {
+                return $hydrate();
+            } else {
+                return call_user_func_array($hydrate, $args);
+            }
         }
 
-        $key = $this->createCacheKey($keyArgs);
+        $key = $this->createCacheKey($args);
         $result = $this->cache->get($key);
 
         if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
-            $result = $hydrate();
+            if (empty($args)) {
+                $result = $hydrate();
+            } else {
+                $result = call_user_func_array($hydrate, $args);
+            }
             $options = array_merge($this->defaultCacheOptions, $cacheOptions);
             $this->cache->store($key, serialize($result), $options);
         } else {

@@ -24,6 +24,7 @@ class Parser {
         'insert' => "\n",
     ]];
 
+    const PARSE_MODE_EXTENDED = "extended";
     const PARSE_MODE_NORMAL = "normal";
     const PARSE_MODE_QUOTE = "quote";
 

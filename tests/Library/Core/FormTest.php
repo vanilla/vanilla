@@ -577,4 +577,113 @@ EOT;
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
+
+    /**
+     * Make sure that `Gd_Form::getFormValue()` supports `"[]"` style form access.
+     *
+     * @param string $name
+     * @param string $expected
+     * @dataProvider provideNestedFormValueNames
+     */
+    public function testGetFormValueNesting(string $name, string $expected) {
+        $this->form->formValues(['a' => 'a', 'b' => ['a' => 'b', 'b' => ['a' => 'c']]]);
+
+        $this->assertSame($expected, $this->form->getFormValue($name));
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideNestedFormValueNames(): array {
+        $r = [
+            ['a', 'a'],
+            ['b[a]', 'b'],
+            ['b[b][a]', 'c'],
+        ];
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test Gdn_Form::verifyAdditionalPermissions()
+     *
+     * @param array $testPermissions
+     * @param array $testCategory
+     * @param bool $expected Expected result
+     * @dataProvider provideTestVerifyAdditionalPermissionsData
+     */
+    public function testVerifyAdditionalPermissions(array $testPermissions, array $testCategory, bool $expected) {
+        $actual = Gdn_Form::verifyAdditionalPermissions($testPermissions, $testCategory);
+        $this->assertSame($actual, $expected);
+    }
+
+    /**
+     * Provide test data for testVerifyAdditionalPermissions.
+     *
+     * @return array
+     */
+    public function provideTestVerifyAdditionalPermissionsData() {
+        $r = [
+            'hasPermission' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                ],
+                true,
+            ],
+            'doesntHavePermission' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => false,
+                ],
+                false,
+            ],
+            'hasMultiple' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                    "CanEdit" => true,
+                ],
+                true,
+            ],
+            'hasOneOfTwo' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            'hasNeither' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => false,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            'noCategoryKey' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+        ];
+        
+        return $r;
+    }
 }

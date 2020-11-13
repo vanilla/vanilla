@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, negativeUnit, unit } from "@library/styles/styleHelpers";
+import { colorOut, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
@@ -120,6 +120,7 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
         return style("multiLine", {
+            ...paddings({ vertical: 9 }),
             resize: (resize ? resize : "vertical") as ResizeProperty,
             overflow: (overflow ? overflow : "auto") as OverflowProperty,
         });

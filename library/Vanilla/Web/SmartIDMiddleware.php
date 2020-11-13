@@ -235,7 +235,7 @@ class SmartIDMiddleware {
      * @return array|false Returns the replaced array of **false** if no replacements were made.
      */
     private function replaceArray($arr) {
-        if (empty($arr)) {
+        if (empty($arr) || !is_array($arr)) {
             return false;
         }
 
@@ -269,7 +269,7 @@ class SmartIDMiddleware {
      * @param string $smartID The smart ID to lookup.
      * @return mixed Returns the resulting value of the smart ID.
      */
-    private function replaceSmartID(string $pk, string $smartID) {
+    public function replaceSmartID(string $pk, string $smartID) {
         list($column, $value) = explode(':', ltrim($smartID, static::SMART)) + ['', ''];
         list($pk, $columns, $resolver) = $this->pks[strtolower($pk)];
 
@@ -318,5 +318,15 @@ class SmartIDMiddleware {
      */
     public function hasFullSuffix(string $suffix): bool {
         return isset($this->fullSuffixes[$suffix]);
+    }
+
+    /**
+     * Basic validation of whether or not a value meets the basic smart ID format.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function valueIsSmartID(string $value): bool {
+        return !empty($value) && $value[0] === self::SMART;
     }
 }

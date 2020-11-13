@@ -7,25 +7,15 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\TestLogger;
 
 /**
  * Tests for the `Logger` class.
  */
-class LoggerTest extends TestCase {
-    use BootstrapTrait;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setupBoostrapTrait();
-    }
-
+class LoggerTest extends BootstrapTestCase {
     /**
      * Test adding and removing a logger.
      */

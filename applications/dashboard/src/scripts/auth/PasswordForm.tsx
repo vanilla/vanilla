@@ -77,7 +77,7 @@ export function PasswordForm(props: IProps) {
             aria-describedby={formDescribedBy}
             className="passwordForm"
             method="post"
-            onSubmit={event => {
+            onSubmit={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 loginWithPassword({
@@ -98,7 +98,7 @@ export function PasswordForm(props: IProps) {
                 inputProps={{
                     required: true,
                     disabled: !allowEdit,
-                    onChange: event => {
+                    onChange: (event) => {
                         updateForm({ username: event.target.value });
                     },
                     value: formState.username,
@@ -112,7 +112,7 @@ export function PasswordForm(props: IProps) {
                     required: true,
                     disabled: !allowEdit,
                     type: "password",
-                    onChange: event => {
+                    onChange: (event) => {
                         updateForm({ password: event.target.value });
                     },
                     value: formState.password,
@@ -123,7 +123,7 @@ export function PasswordForm(props: IProps) {
                     <span className="rememberMeAndForgot-rememberMe">
                         <Checkbox
                             label={t("Keep me signed in")}
-                            onChange={event => {
+                            onChange={(event) => {
                                 updateForm({ rememberMe: event.target.checked || false });
                             }}
                             checked={formState.rememberMe}

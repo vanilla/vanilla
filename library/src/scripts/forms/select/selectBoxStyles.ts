@@ -49,7 +49,6 @@ export const selectBoxClasses = useThemeCache(() => {
     });
 
     const buttonIcon = style("buttonIcon", {
-        marginLeft: px(6),
         marginRight: "auto",
     });
 

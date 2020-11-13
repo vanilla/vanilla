@@ -56,12 +56,12 @@ class SafeImageTest extends TestCase {
                 0,
                 1,
             ],
-            'meetsMinHeight' => [
+            'meetsMinHeight2' => [
                 false,
                 PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 900,
             ],
-            'meetsMinWidth' => [
+            'meetsMinWidth2' => [
                 false,
                 PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
                 0,

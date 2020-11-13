@@ -15,7 +15,7 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 
-const story = storiesOf("Messages", module);
+const story = storiesOf("Alerts", module);
 
 const shortMessage = `Something went wrong while contacting the server.`;
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
@@ -82,7 +82,7 @@ story.add("Message", () => {
                         <div className={classesMessages.content}>
                             <Translate
                                 source="Lorem ipsum dolor sit amet, consectetur adipiscing elit, <0>visit site</0>."
-                                c0={content => <SmartLink to="http://www.google.com">{content}</SmartLink>}
+                                c0={(content) => <SmartLink to="http://www.google.com">{content}</SmartLink>}
                             />
                         </div>
                     }

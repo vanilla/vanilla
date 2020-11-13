@@ -22,7 +22,7 @@ export function DashboardRadioButton(props: IProps) {
     const { onChange, value, isInline } = useDashboardRadioGroup();
 
     const controlledProps =
-        onChange !== undefined && value !== undefined
+        onChange !== undefined
             ? {
                   onChange: () => onChange(props.value),
                   checked: value === props.value,

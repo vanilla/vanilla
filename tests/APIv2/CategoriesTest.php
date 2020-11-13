@@ -8,13 +8,13 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
-use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
-use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Test the /api/v2/categories endpoints.
  */
 class CategoriesTest extends AbstractResourceTest {
+
+    use TestExpandTrait;
     use TestPrimaryKeyRangeFilterTrait;
 
     /** This category should never exist. */
@@ -53,6 +53,13 @@ class CategoriesTest extends AbstractResourceTest {
     public static function setUpBeforeClass(): void {
         parent::setupBeforeClass();
         self::$categoryModel = self::container()->get(CategoryModel::class);
+    }
+
+    /**
+     * There are no expandable user fields.
+     */
+    protected function getExpandableUserFields() {
+        return [];
     }
 
     /**

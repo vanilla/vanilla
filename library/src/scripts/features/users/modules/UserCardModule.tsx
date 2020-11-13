@@ -3,28 +3,30 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import ErrorMessages from "@library/forms/ErrorMessages";
-import { notEmpty, logError } from "@vanilla/utils";
+import { logError } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { Redirect } from "react-router";
 
 export interface IUserCardModule {
     userID: number;
-    buttonContent?: React.ReactNode; // Second fallback AND button content
+    buttonContent?: React.ReactNode;
     openAsModal?: boolean;
-    children?: React.ReactNode; // First fallback
     fallbackButton: React.ReactNode;
     visible?: boolean;
     buttonType?: ButtonTypes;
     buttonClass?: string;
+    handleID: string;
+    contentID: string;
+    userURL: string;
 }
 
 // Does not lazy load, will load user data right away
 export function UserCardModule(props: IUserCardModule) {
-    const { userID, buttonContent, openAsModal, children, fallbackButton, visible } = props;
+    const { userID, buttonContent, openAsModal, userURL, fallbackButton, visible, handleID, contentID } = props;
     const user = useUser({ userID });
 
     // Fallback to the original link, unchanged
@@ -36,28 +38,38 @@ export function UserCardModule(props: IUserCardModule) {
         if (user.error) {
             logError("failed to fetch data for UserCardModule", user);
         }
-        return (
-            <>
-                {/* Fallback to the original link, unchanged */}
-                {children || buttonContent}
-            </>
-        );
+        return <Redirect to={userURL} />; // if there's an error, redirect to the user's profile page.
     }
 
+    const {
+        email,
+        name,
+        photoUrl,
+        dateLastActive,
+        dateInserted,
+        label,
+        title,
+        countDiscussions = 0,
+        countComments = 0,
+    } = user.data!;
+
     const userCardInfo: IUserCardInfo = {
-        email: user.data.email,
-        userID: user.data.userID,
-        name: user.data.name,
-        photoUrl: user.data.photoUrl,
-        dateLastActive: user.data.dateLastActive || undefined,
-        dateJoined: user.data.dateInserted,
-        label: user.data.label,
-        countDiscussions: user.data.countDiscussions || 0,
-        countComments: user.data.countComments || 0,
+        email,
+        userID,
+        name,
+        photoUrl,
+        dateLastActive: dateLastActive || undefined,
+        dateJoined: dateInserted,
+        label,
+        title,
+        countDiscussions,
+        countComments,
     };
 
     return (
         <PopupUserCard
+            contentID={contentID}
+            handleID={handleID}
             buttonClass={props.buttonClass}
             buttonType={props.buttonType}
             user={userCardInfo}

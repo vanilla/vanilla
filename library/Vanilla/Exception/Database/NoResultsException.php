@@ -6,8 +6,18 @@
 
 namespace Vanilla\Exception\Database;
 
+use Garden\Web\Exception\NotFoundException;
+
 /**
  * An exception to be thrown when results are expected, but not actually received.
  */
-class NoResultsException extends \Exception {
+class NoResultsException extends NotFoundException {
+    /**
+     * NoResultsException constructor.
+     *
+     * @param string $message
+     */
+    public function __construct($message = 'Results') {
+        parent::__construct($message);
+    }
 }

@@ -6,15 +6,18 @@
  */
 
 namespace VanillaTests;
-use PDO;
 
+use PDO;
 
 /**
  * A database object used for testing.
  */
 class TestDatabase extends \Gdn_Database {
     /**
+     * TestDatabase constructor.
      *
+     * @param PDO|null $pdo
+     * @psalm-suppress UndefinedConstant
      */
     public function __construct(PDO $pdo = null) {
         $config = [

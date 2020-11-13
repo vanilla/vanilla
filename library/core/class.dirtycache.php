@@ -16,6 +16,12 @@
  */
 class Gdn_Dirtycache extends Gdn_Cache {
 
+    /** @var array Track all get keys. */
+    protected $countGets = [];
+
+    /** @var array Track all set keys. */
+    protected $countSets = [];
+
     /** @var array  */
     protected $cache = [];
 
@@ -45,6 +51,9 @@ class Gdn_Dirtycache extends Gdn_Cache {
      * {@inheritDoc}
      */
     public function store($key, $value, $options = []) {
+        if (is_string($key)) {
+            $this->trackSet($key);
+        }
         if (is_object($value)) {
             // Objects should store in the cache as separate copies.
             $value = clone $value;
@@ -72,9 +81,11 @@ class Gdn_Dirtycache extends Gdn_Cache {
 
         if (is_array($key)) {
             $result = [];
+            $found = false;
             foreach ($key as $k) {
                 if (isset($this->cache[$k])) {
                     $result[$k] = $this->cache[$k];
+                    $found = true;
                 } elseif ($hasDefault) {
                     $result[$k] = $default;
                 }
@@ -82,6 +93,7 @@ class Gdn_Dirtycache extends Gdn_Cache {
             return $result;
         } else {
             if (array_key_exists($key, $this->cache)) {
+                $this->trackGet($key);
                 return $this->cache[$key];
             } else {
                 return $default;
@@ -94,7 +106,6 @@ class Gdn_Dirtycache extends Gdn_Cache {
      */
     public function remove($key, $options = []) {
         unset($this->cache[$key]);
-
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -147,6 +158,30 @@ class Gdn_Dirtycache extends Gdn_Cache {
      */
     public function flush() {
         $this->cache = [];
+        $this->countGets = [];
+        $this->countSets = [];
         return true;
+    }
+
+    /**
+     * @param string $key
+     */
+    private function trackSet(string $key) {
+        if (!isset($this->countSets[$key])) {
+            $this->countSets[$key] = 1;
+        } else {
+            $this->countSets[$key]++;
+        }
+    }
+
+    /**
+     * @param string $key
+     */
+    private function trackGet(string $key) {
+        if (!isset($this->countGets[$key])) {
+            $this->countGets[$key] = 1;
+        } else {
+            $this->countGets[$key]++;
+        }
     }
 }

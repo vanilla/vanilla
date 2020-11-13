@@ -1,2 +1,9 @@
-**/bower_components
-**/node_modules
+bower_components
+node_modules
+cache
+.idea
+*.min.js
+cgi-bin
+dist
+.phpunit.result.cache
+.htaccess.dist

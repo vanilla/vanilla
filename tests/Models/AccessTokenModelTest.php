@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\Contracts\ConfigurationInterface;
+use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\SharedBootstrapTestCase;
 use AccessTokenModel;
 use VanillaTests\SiteTestTrait;
@@ -57,5 +59,22 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $id = $row['AccessTokenID'];
         $model->deleteID($id);
         $model->verify($token, true);
+    }
+
+    /**
+     * Test that our config saved tokens work correctly.
+     */
+    public function testEnsureSingleSystemToken() {
+        $model = new AccessTokenModel('sss');
+
+        $model->ensureSingleSystemToken();
+        $initialConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
+        $this->assertNotFalse($model->verify($initialConfToken));
+
+        // Run again, should revoke the first token and save a new one.
+        $model->ensureSingleSystemToken();
+        $secondConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
+        $this->assertFalse($model->verify($initialConfToken));
+        $this->assertNotFalse($model->verify($secondConfToken));
     }
 }

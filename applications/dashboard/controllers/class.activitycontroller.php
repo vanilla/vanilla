@@ -167,7 +167,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($iD)) {
-            throw gdn_UserException('Invalid ID');
+            throw new Gdn_UserException('Invalid ID');
         }
 
         $comment = $this->ActivityModel->getComment($iD);
@@ -207,7 +207,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($activityID)) {
-            throw gdn_UserException('Invalid ID');
+            throw new Gdn_UserException('Invalid ID');
         }
 
         if (!$this->ActivityModel->canDelete($this->ActivityModel->getID($activityID))) {

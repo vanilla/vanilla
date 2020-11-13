@@ -19,6 +19,10 @@ class MemcachedTest extends SimpleCacheTest {
      */
     protected static $memcached;
 
+    /**
+     * {@inheritDoc}
+     * @psalm-suppress UndefinedClass
+     */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::setUpBeforeClassBootstrap();
@@ -66,7 +70,7 @@ class MemcachedTest extends SimpleCacheTest {
         } else {
             $this->markTestSkipped("Memcached is not set up for testing.");
         }
-        $this->setupBoostrapTrait();
+        $this->setUpBootstrap();
         parent::setUp();
     }
 
@@ -86,10 +90,11 @@ class MemcachedTest extends SimpleCacheTest {
 
     /**
      * Keys should be able to be busted into shards.
+     *
+     * @dataProvider provideSomeData
      */
-    public function testDataSharding(): void {
+    public function testDataSharding($data): void {
         $cache = $this->createLegacyCache();
-        $data = array_fill(0, 1000, 'foo');
         $stored = $cache->store(__FUNCTION__, $data, [\Gdn_Cache::FEATURE_SHARD => true]);
         $this->assertNotSame(\Gdn_Cache::CACHEOP_FAILURE, $stored);
 
@@ -98,5 +103,19 @@ class MemcachedTest extends SimpleCacheTest {
 
         $actual2 = $cache->get([__FUNCTION__]);
         $this->assertSame($data, $actual2[__FUNCTION__]);
+    }
+
+    /**
+     * Provide some different types of data.
+     *
+     * @return array
+     */
+    public function provideSomeData(): array {
+        $r = [
+            'array' => [array_fill(0, 100, 'foo')],
+            'string' => ['foo'],
+            'int' => [123],
+        ];
+        return $r;
     }
 }

@@ -39,7 +39,7 @@ export function ImageEmbedModal(props: IProps) {
     const [alt, setAlt] = useState(props.initialAlt);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleTextChange = useCallback(event => {
+    const handleTextChange = useCallback((event) => {
         if (event) {
             event.stopPropagation();
             event.preventDefault();
@@ -96,7 +96,7 @@ export function ImageEmbedModal(props: IProps) {
                             <FrameFooter justifyRight={true}>
                                 <Button
                                     baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={e => {
+                                    onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         saveAndClose();

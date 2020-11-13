@@ -26,7 +26,7 @@ class MockUserProvider implements UserProviderInterface {
         $user = $this->usersByID[$id] ?? null;
         if (!$user) {
             if ($useUnknownFallback) {
-                return $this->getUnknownFragment();
+                return $this->getGeneratedFragment(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN);
             } else {
                 throw new NoResultsException('No user found for ID ' . $id);
             }

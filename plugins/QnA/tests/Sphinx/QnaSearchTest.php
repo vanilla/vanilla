@@ -33,7 +33,6 @@ class QnaSearchTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
-        \Gdn::config()->saveToConfig('Feature.useSearchService.Enabled', true);
         saveToConfig('Plugins.Sphinx.UseDeltas', true);
 
         self::container()
@@ -218,8 +217,8 @@ class QnaSearchTest extends AbstractAPIv2Test {
 
         $question2 = $this->createQuestion([
             'categoryID' => $category['categoryID'],
-            'name' => 'Question 1',
-            'body' => 'Question 1'
+            'name' => 'Question 2',
+            'body' => 'Question 2'
         ]);
 
         $discussion = $this->createDiscussion([
@@ -249,10 +248,10 @@ class QnaSearchTest extends AbstractAPIv2Test {
 
         $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
         $this->assertRowsEqual(['type' => 'question'], $results[0]);
-        $this->assertRowsEqual(['recordType' => 'comment'], $results[1]);
-        $this->assertRowsEqual(['type' => 'answer'], $results[1]);
-        $this->assertRowsEqual(['recordType' => 'discussion'], $results[2]);
-        $this->assertRowsEqual(['type' => 'question'], $results[2]);
+        $this->assertRowsEqual(['recordType' => 'discussion'], $results[1]);
+        $this->assertRowsEqual(['type' => 'question'], $results[1]);
+        $this->assertRowsEqual(['recordType' => 'comment'], $results[2]);
+        $this->assertRowsEqual(['type' => 'answer'], $results[2]);
         $this->assertRowsEqual(['recordType' => 'discussion'], $results[3]);
         $this->assertRowsEqual(['type' => 'discussion'], $results[3]);
     }

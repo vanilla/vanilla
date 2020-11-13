@@ -13,11 +13,12 @@ import { useThemePreviewToasterState } from "@library/features/toaster/themePrev
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { t } from "@vanilla/i18n/src";
+import { RecordID } from "@vanilla/utils";
 
 interface IThemePreview {
     name: string;
     redirect: string;
-    themeID: string | number;
+    themeID: RecordID;
     revisionID?: number;
 }
 

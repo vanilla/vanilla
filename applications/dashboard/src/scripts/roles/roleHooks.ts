@@ -12,6 +12,7 @@ import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/Se
 
 export function useRoles() {
     const { getAllRoles } = useRoleActions();
+
     const rolesByID = useSelector((state: IRoleStoreState) => state.roles.rolesByID);
 
     useEffect(() => {
@@ -29,7 +30,7 @@ export function useRoleSelectOptions(): ILoadable<IComboBoxOption[]> {
     if (roles.data) {
         return {
             ...roles,
-            data: Object.values(roles.data).map(role => {
+            data: Object.values(roles.data).map((role) => {
                 return {
                     value: role.roleID,
                     label: role.name,

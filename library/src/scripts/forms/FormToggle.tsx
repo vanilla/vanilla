@@ -4,11 +4,14 @@
  */
 
 import React, { useState } from "react";
-import { srOnly } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { useUniqueID } from "@library/utility/idUtils";
 import { formToggleClasses } from "@library/forms/FormToggle.styles";
 import classNames from "classnames";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { InformationIcon } from "@library/icons/common";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     enabled: boolean;
@@ -18,15 +21,29 @@ interface IProps {
     id?: string;
     labelID?: string;
     accessibleLabel?: string;
+    visibleLabel?: string;
+    visibleLabelUrl?: string;
     slim?: boolean;
     disabled?: boolean;
 }
 
 export function FormToggle(props: IProps) {
-    const { enabled, onChange, className, indeterminate, accessibleLabel, slim, disabled, ...IDs } = props;
+    const {
+        enabled,
+        onChange,
+        className,
+        indeterminate,
+        accessibleLabel,
+        visibleLabel,
+        visibleLabelUrl,
+        slim,
+        disabled,
+        ...IDs
+    } = props;
     const [isFocused, setIsFocused] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
-    if (IDs.labelID == null && accessibleLabel == null) {
+    if (IDs.labelID == null && accessibleLabel == null && visibleLabel == null) {
         throw new Error("Either a labelID or accessibleLabel must be passed to <FormToggle />");
     }
 
@@ -36,9 +53,11 @@ export function FormToggle(props: IProps) {
     const labelID = IDs.labelID ?? ownLabelID;
     const classes = formToggleClasses(slim ? { formToggle: { options: { slim } } } : undefined);
 
-    return (
-        <label
-            onClick={e => {
+    const WellContainer = visibleLabel ? "span" : "label";
+
+    const well = (
+        <WellContainer
+            onClick={(e) => {
                 if (disabled !== undefined && !disabled) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -50,14 +69,15 @@ export function FormToggle(props: IProps) {
                 classes.root,
                 enabled && "isOn",
                 indeterminate && "isIndeterminate",
-                isFocused && "isFocused",
+                isFocused,
+                isHovered,
                 {
                     isDisabled: disabled,
                 },
             )}
         >
             <ScreenReaderContent>
-                {accessibleLabel && <span id={labelID}>{accessibleLabel}</span>}
+                {!visibleLabel && accessibleLabel && <span id={labelID}>{accessibleLabel}</span>}
                 <input
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
@@ -67,13 +87,36 @@ export function FormToggle(props: IProps) {
                     aria-labelledby={labelID}
                     id={id}
                     checked={enabled}
-                    onChange={e => {
+                    onChange={(e) => {
                         onChange(e.target.checked);
                     }}
                 />
             </ScreenReaderContent>
-            <div className={classes.well}></div>
-            <div className={classes.slider}></div>
+            <div className={classes.well} />
+            <div className={classes.slider} />
+        </WellContainer>
+    );
+
+    return visibleLabel ? (
+        <label className={classes.visibleLabelContainer}>
+            {visibleLabel && (
+                <label id={labelID} className={classes.visibleLabel}>
+                    {visibleLabel}
+
+                    {visibleLabelUrl && (
+                        <LinkAsButton
+                            baseClass={ButtonTypes.ICON_COMPACT}
+                            to={visibleLabelUrl}
+                            ariaLabel={t("More information")}
+                        >
+                            <InformationIcon />
+                        </LinkAsButton>
+                    )}
+                </label>
+            )}
+            {well}
         </label>
+    ) : (
+        well
     );
 }

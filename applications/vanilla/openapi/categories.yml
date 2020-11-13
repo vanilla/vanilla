@@ -43,6 +43,13 @@ paths:
           default: false
           type: boolean
         allowEmptyValue: true
+      - description: Only list featured categories.
+        in: query
+        name: featured
+        required: false
+        schema:
+          default: false
+          type: boolean
       - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
@@ -800,6 +807,10 @@ components:
           description: The URL code of the category.
           minLength: 1
           type: string
+        featured:
+          description: Category is featured
+          type: boolean
+          default: false
       required:
       - name
       - urlcode

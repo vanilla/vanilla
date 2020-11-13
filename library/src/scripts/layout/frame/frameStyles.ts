@@ -7,7 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import { percent, viewHeight } from "csx";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -56,6 +57,7 @@ export const frameVariables = useThemeCache(() => {
 export const frameClasses = useThemeCache(() => {
     const vars = frameVariables();
     const style = styleFactory("frame");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const headerWrap = style("headerWrap", {
         background: colorOut(vars.colors.bg),
@@ -73,23 +75,28 @@ export const frameClasses = useThemeCache(() => {
         willChange: "height",
     });
 
-    const root = style({
-        backgroundColor: colorOut(vars.colors.bg),
-        maxHeight: percent(100),
-        height: percent(100),
-        borderRadius: unit(vars.border.radius),
-        width: percent(100),
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
-        $nest: {
-            [`.${bodyWrap}`]: {
-                flexGrow: 1,
-                overflowY: "auto",
+    const root = style(
+        {
+            backgroundColor: colorOut(vars.colors.bg),
+            maxHeight: viewHeight(80),
+            height: percent(100),
+            borderRadius: unit(vars.border.radius),
+            width: percent(100),
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
+            $nest: {
+                [`.${bodyWrap}`]: {
+                    flexGrow: 1,
+                    overflowY: "auto",
+                },
             },
         },
-    });
+        mediaQueries.xs({
+            maxHeight: percent(100),
+        }),
+    );
 
     return {
         root,

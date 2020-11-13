@@ -10,6 +10,7 @@ import produce from "immer";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IUserFragment } from "@library/@types/api/users";
+import { RecordID } from "@vanilla/utils";
 
 export enum ThemeType {
     DB = "themeDB",
@@ -21,7 +22,7 @@ export interface ITheme {
     features: Record<string, boolean>;
     supportedSections?: string[];
     preview: IThemePreview;
-    themeID: string | number;
+    themeID: RecordID;
     name: string;
     type: ThemeType;
     parentTheme?: string;
@@ -107,7 +108,7 @@ export const INITIAL_THEME_STATE: IThemeState = {
 
 export const themeReducer = produce(
     reducerWithInitialState(INITIAL_THEME_STATE)
-        .case(ThemeActions.getAssets.started, state => {
+        .case(ThemeActions.getAssets.started, (state) => {
             state.assets.status = LoadStatus.LOADING;
             return state;
         })
@@ -166,7 +167,7 @@ export const themeReducer = produce(
 
             // Go through any active revisions if we have them, and modify their active status.
             if (state.themeRevisions.data) {
-                state.themeRevisions.data = state.themeRevisions.data.map(revision => {
+                state.themeRevisions.data = state.themeRevisions.data.map((revision) => {
                     if (revision.themeID !== themeID) {
                         return revision;
                     }

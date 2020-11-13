@@ -185,4 +185,24 @@ trait PermissionsTranslationTrait {
 
         return $result;
     }
+
+    /**
+     * Untranslate a permission name from the new API style name to the old permission name.
+     *
+     * @param string $newName
+     * @return string
+     */
+    public function untranslatePermission(string $newName): string {
+        if ($pos = array_search($newName, $this->renamedPermissions)) {
+            return $pos;
+        }
+
+        if (in_array($newName, $this->junctionTableMappings['category'])) {
+            return 'Vanilla.'.implode('.', array_map('ucfirst', explode('.', $newName)));
+        } else {
+            return 'Garden.'.implode('.', array_map('ucfirst', explode('.', $newName)));
+        }
+
+        return $newName;
+    }
 }

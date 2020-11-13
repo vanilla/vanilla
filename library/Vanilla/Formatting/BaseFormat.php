@@ -16,6 +16,9 @@ abstract class BaseFormat implements FormatInterface {
     /** @var int */
     const EXCERPT_MAX_LENGTH = 325;
 
+    /** @var bool */
+    protected $allowExtendedContent = false;
+
     /**
      * Implement rendering of excerpts based on the plain-text version of format.
      *
@@ -56,5 +59,6 @@ abstract class BaseFormat implements FormatInterface {
      * @param bool $extendContent
      */
     public function setAllowExtendedContent(bool $extendContent): void {
+        $this->allowExtendedContent = $extendContent;
     }
 }

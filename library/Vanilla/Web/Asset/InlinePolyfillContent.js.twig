@@ -37,6 +37,9 @@ if (!window.onVanillaReady) {
             return;
         }
         document.addEventListener("X-DOMContentReady", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
             handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
         })
 

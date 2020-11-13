@@ -87,7 +87,7 @@ export class EditorUploadButton extends React.Component<IProps, { uploadCount: n
     private get inputAccepts(): string {
         switch (this.props.type) {
             case "file": {
-                const types = this.props.allowedMimeTypes.filter(type => !this.isMimeTypeImage(type));
+                const types = this.props.allowedMimeTypes.filter((type) => !this.isMimeTypeImage(type));
                 return types.join(", ");
             }
             case "image": {
@@ -126,7 +126,7 @@ export class EditorUploadButton extends React.Component<IProps, { uploadCount: n
                 throw error;
             }
 
-            filesArray.forEach(file => {
+            filesArray.forEach((file) => {
                 if (this.props.type === "image" && isFileImage(file)) {
                     embedInsertion.createImageEmbed(file);
                 } else {

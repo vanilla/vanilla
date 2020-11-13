@@ -11,6 +11,7 @@ use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Test the /api/v2/authenticate endpoints.

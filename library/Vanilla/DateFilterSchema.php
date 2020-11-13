@@ -9,6 +9,7 @@ namespace Vanilla;
 use DateTimeImmutable;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
@@ -57,11 +58,19 @@ class DateFilterSchema extends Schema {
                 'date' => [
                     'type' => 'array',
                     'minItems' => 1,
-                    'mixItems' => 2,
+                    'maxItems' => 2,
                     'items' => [
                         'type' => 'datetime',
                     ]
                 ],
+                'inclusiveRange' => [
+                    'type' => 'array',
+                    'minItems' => 2,
+                    'maxItems' => 2,
+                    'items' => [
+                        'type' => 'datetime'
+                    ]
+                ]
             ],
         ] + $extra);
     }
@@ -143,6 +152,7 @@ class DateFilterSchema extends Schema {
         $result = [
             'operator' => $open.$close,
             'date' => $dateTimes,
+            'inclusiveRange' => $dateTimes,
         ];
         return $result;
     }
@@ -171,11 +181,14 @@ class DateFilterSchema extends Schema {
         }
 
         try {
-            $dateTimes = [new DateTimeImmutable($date)];
+            $dateTime = new DateTimeImmutable($date);
         } catch (\Exception $e) {
             $field->addTypeError('datetime');
             return Invalid::value();
         }
+
+        $dateTimes = [$dateTime];
+        $inclusiveRange = [];
 
         // If all we have is a date, give us a range in that date.
         if (!preg_match('/\d\d:\d\d:\d\d/', $date)) {
@@ -185,16 +198,45 @@ class DateFilterSchema extends Schema {
                         $dateTimes[0],
                         $dateTimes[0]->modify('+1 day')->modify('-1 second'),
                     ];
+                    $inclusiveRange = $dateTimes;
                     break;
                 case "<=":
-                    $dateTimes = [$dateTimes[0]->modify('+1 day')->modify('-1 second')];
+                    $dateTimes = [self::currentDayEnd($dateTime)];
+                    $inclusiveRange = [self::farPastDate(), self::currentDayEnd($dateTime)];
                     break;
+                case "<":
+                    $inclusiveRange = [self::farPastDate(), self::prevDayEnd($dateTime)];
+                    break;
+                case ">=":
+                    $inclusiveRange = [self::currentDayStart($dateTime), self::farFutureDate()];
+                    break;
+                case ">":
+                    $inclusiveRange = [self::nextDayStart($dateTime), self::farFutureDate()];
+            }
+        } else {
+            switch ($operator) {
+                case "=":
+                    // Very super specific range here.
+                    $inclusiveRange = [$dateTime, $dateTime];
+                    break;
+                case "<=":
+                    $inclusiveRange = [self::farPastDate(), $dateTime];
+                    break;
+                case "<":
+                    $inclusiveRange = [self::farPastDate(), $dateTime->modify('-1 second')];
+                    break;
+                case ">=":
+                    $inclusiveRange = [$dateTime, self::farFutureDate()];
+                    break;
+                case ">":
+                    $inclusiveRange = [$dateTime->modify('+1 second'), self::farFutureDate()];
             }
         }
 
         $result = [
             'operator' => $operator,
             'date' => $dateTimes,
+            'inclusiveRange' => $inclusiveRange,
         ];
         return $result;
     }
@@ -320,5 +362,65 @@ class DateFilterSchema extends Schema {
         }
 
         return $result;
+    }
+
+    // Some small utiltiies
+
+    /**
+     * Get the furthest possible future date PHP can contain.
+     *
+     * @return DateTimeImmutable
+     */
+    public static function farFutureDate(): DateTimeImmutable {
+        return new DateTimeImmutable("Jan 1 2300");
+    }
+
+    /**
+     * Get the furthest possible past date PHP can contain.
+     *
+     * @return DateTimeImmutable
+     */
+    public static function farPastDate(): DateTimeImmutable {
+        return new DateTimeImmutable("@0");
+    }
+
+    /**
+     * Adjust the date to the first second of the next day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function nextDayStart(DateTimeImmutable $date): DateTimeImmutable {
+        return self::currentDayStart($date)->modify("+1 day");
+    }
+
+    /**
+     * Adjust the date to the last second of the previous day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function prevDayEnd(DateTimeImmutable $date): DateTimeImmutable {
+        return self::currentDayEnd($date)->modify("-1 day");
+    }
+
+    /**
+     * Adjust the date to the first second of the day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function currentDayStart(DateTimeImmutable $date): DateTimeImmutable {
+        return $date->setTime(0, 0, 0);
+    }
+
+    /**
+     * Adjust the date to the last second of the day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function currentDayEnd(DateTimeImmutable $date): DateTimeImmutable {
+        return $date->setTime(23, 59, 59);
     }
 }

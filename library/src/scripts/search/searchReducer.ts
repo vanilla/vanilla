@@ -9,6 +9,7 @@ import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext";
 
 export interface ISearchState {
     form: ISearchForm;
@@ -20,6 +21,8 @@ export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
     query: "",
     page: 1,
     sort: "relevance",
+    scope: SEARCH_SCOPE_LOCAL,
+    initialized: false,
 };
 
 export const INITIAL_SEARCH_STATE: ISearchState = {
@@ -29,9 +32,24 @@ export const INITIAL_SEARCH_STATE: ISearchState = {
     },
 };
 
+const reinitilizeParams = ["sort", "domain", "scope", "page"];
+
 export const searchReducer = produce(
     reducerWithoutInitialState<ISearchState>()
         .case(SearchActions.updateSearchFormAC, (nextState, payload) => {
+            nextState.form.needsResearch = false;
+            if (nextState.form.initialized) {
+                for (const reinitParam of reinitilizeParams) {
+                    if (payload[reinitParam] !== undefined && nextState.form[reinitParam] !== payload[reinitParam]) {
+                        nextState.form.needsResearch = true;
+                    }
+                }
+            }
+
+            if (!nextState.form.initialized && payload.initialized) {
+                nextState.form.needsResearch = true;
+            }
+
             nextState.form = {
                 ...nextState.form,
                 ...payload,
@@ -49,6 +67,8 @@ export const searchReducer = produce(
             return nextState;
         })
         .case(SearchActions.performSearchACs.started, (nextState, payload) => {
+            nextState.form.needsResearch = false;
+            nextState.form.initialized = true;
             nextState.results.status = LoadStatus.LOADING;
 
             return nextState;
@@ -65,8 +85,11 @@ export const searchReducer = produce(
 
             return nextState;
         })
-        .case(SearchActions.resetFormAC, nextState => {
-            nextState.form = DEFAULT_CORE_SEARCH_FORM;
+        .case(SearchActions.resetFormAC, (nextState) => {
+            nextState.form = { ...DEFAULT_CORE_SEARCH_FORM };
+            nextState.results = {
+                status: LoadStatus.PENDING,
+            };
             return nextState;
         }),
 );

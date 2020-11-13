@@ -68,8 +68,9 @@ class Gdn_CookieIdentity {
     public function init($config = null) {
         if (is_null($config)) {
             $config = Gdn::config('Garden.Cookie');
-        } elseif (is_string($config))
+        } elseif (is_string($config)) {
             $config = Gdn::config($config);
+        }
 
         $defaultConfig = array_replace(
             ['PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'],
@@ -85,7 +86,7 @@ class Gdn_CookieIdentity {
             $this->CookieDomain = '';
             trigger_error(
                 sprintf('Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).', $currentHost, $this->CookieDomain),
-                E_USER_WARNING
+                E_USER_NOTICE
             );
         }
 

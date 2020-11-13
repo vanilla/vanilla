@@ -8,36 +8,27 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\Schema\Schema;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Schema\RangeExpression;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\ApiUtils;
 
 /**
  * Class ApiUtilsTest
  */
-class ApiUtilsTest extends TestCase {
-
-    use BootstrapTrait, SetupTraitsTrait;
-
+class ApiUtilsTest extends BootstrapTestCase {
     /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setupTestTraits();
-    }
-
-    /**
+     * Basic tests for `ApiUtils::queryToFilters()`.
+     *
      * @param Schema $schema
      * @param array $validatedQuery
      * @param array $expectedResult
      * @dataProvider queryToFiltersProvider
      */
     public function testQueryToFilters(Schema $schema, array $validatedQuery, array $expectedResult) {
-        $this->assertEquals(ApiUtils::queryToFilters($schema, $validatedQuery), $expectedResult);
+        $actual = ApiUtils::queryToFilters($schema, $validatedQuery);
+        $this->assertEquals($expectedResult, $actual);
     }
 
     /**
@@ -84,6 +75,11 @@ class ApiUtilsTest extends TestCase {
                 ['somethingElse' => 'test'],
                 []
             ],
+            'Simple field as true' => [
+                Schema::parse(['id:i' => ['x-filter' => true]]),
+                ['id' => 123],
+                ['id' => 123],
+            ]
         ];
     }
 
@@ -172,5 +168,34 @@ EOT;
         parse_str($queryString, $query);
         $this->assertArrayHasKey("range", $query, "Object lost when building query.");
         $this->assertSame($range, $query["range"]);
+    }
+
+    /**
+     * Test `ApiUtils::offsetLimit()`.
+     *
+     * @param array $query
+     * @param int $expectedOffset
+     * @dataProvider provideOffsetLimitTests
+     */
+    public function testOffsetLimit(array $query, int $expectedOffset): void {
+        $query['limit'] = 10;
+        [$offset, $limit] = ApiUtils::offsetLimit($query);
+        $this->assertSame(10, $limit);
+        $this->assertSame($expectedOffset, $offset);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array[]
+     */
+    public function provideOffsetLimitTests(): array {
+        $r = [
+            'offset' => [['offset' => 0], 0],
+            'page' => [['page' => 2], 10],
+            'offset overrides page' => [['offset' => 2, 'page' => 3], 2],
+            'empty' => [[], 0],
+        ];
+        return $r;
     }
 }

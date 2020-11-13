@@ -1,0 +1,36 @@
+openapi: 3.0.2
+info:
+paths:
+  /tags:
+    get:
+      parameters:
+      - name: query
+        description: The search term to find a tag.
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    id:
+                      description: The ID of the tag.
+                      type: integer
+                    name:
+                      description: The full name of the tag.
+                      type: string
+                    urlCode:
+                      description: The url-code of the tag.
+                      type: string
+                  required:
+                  - id
+                  - name
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Tags
+      summary: List tags.

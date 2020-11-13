@@ -83,7 +83,7 @@ export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(functi
     } = _props;
     const config = useTransitionConfig(_props);
 
-    const transitions = useTransition(isEntered ? children : null, item => item?.key, config);
+    const transitions = useTransition(isEntered ? children : null, (item) => item?.key, config);
     const AnimatedComponent = asElement ? animated[asElement] : animated.div;
 
     return transitions.map(({ item, key, props: style }, i) => {

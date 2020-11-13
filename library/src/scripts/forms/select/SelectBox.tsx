@@ -10,10 +10,11 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import { CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useState, useRef } from "react";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { NBSP, DownTriangleIcon, CheckCompactIcon } from "@library/icons/common";
 
 export interface ISelectBoxItem {
     value: string;
@@ -24,7 +25,7 @@ export interface ISelectBoxItem {
     url?: string;
 }
 
-interface IProps {
+export interface ISelectBoxProps {
     className?: string;
     options: ISelectBoxItem[];
     value?: ISelectBoxItem;
@@ -35,61 +36,84 @@ interface IProps {
     openAsModal?: boolean;
     renderLeft?: boolean;
     offsetPadding?: boolean;
-}
-
-export interface ISelfLabelledProps extends IProps {
-    label: string;
-}
-
-export interface IExternalLabelledProps extends IProps {
+    verticalPadding?: boolean;
     describedBy: string;
+    labelWrap?: string; // conditional wrap around text to separate it from the icon.
+    horizontalOffset?: boolean;
+    afterButton?: React.ReactNode;
+    overwriteButtonContents?: React.ReactNode;
 }
 
 /**
  * Generates Select Box component (similar to a select)
  */
-export default function SelectBox(props: ISelfLabelledProps | IExternalLabelledProps) {
+export default function SelectBox(props: ISelectBoxProps) {
     const id = useUniqueID("selectBox");
     const firstValue = props.options.length > 0 ? props.options[0] : null;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const [ownValue, setOwnValue] = useState(firstValue);
-    const { renderLeft = true } = props;
+    const {
+        renderLeft = true,
+        verticalPadding = true,
+        horizontalOffset = true,
+        afterButton,
+        overwriteButtonContents,
+    } = props;
     const selectedOption = props.value || ownValue;
-    const [forceClosed, setForceClosed] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const ignoreRef = useRef<boolean>(false);
     const onChange = (value: ISelectBoxItem) => {
         const funct = props.onChange || setOwnValue;
+        ignoreRef.current = true;
+        setIsVisible(false);
         funct(value);
         setTimeout(() => {
-            buttonRef.current && buttonRef.current.focus();
-        }, 300);
+            ignoreRef.current = false;
+        }, 2);
     };
 
     const classes = selectBoxClasses();
     const classesDropDown = dropDownClasses();
     return (
-        <div
-            aria-describedby={"describedBy" in props ? props.describedBy : undefined}
-            className={classNames("selectBox", props.className)}
-        >
-            {"label" in props && props.label && <span className=" sr-only">{props.label}</span>}
+        <div aria-describedby={props.describedBy} className={classNames("selectBox", props.className)}>
             <DropDown
+                isVisible={isVisible}
+                onVisibilityChange={(val) => {
+                    if (ignoreRef.current !== true) {
+                        if (!ignoreRef.current) {
+                            setIsVisible(val);
+                        }
+                    }
+                }}
                 key={selectedOption ? selectedOption.value : undefined}
                 buttonRef={buttonRef}
-                id={id}
+                contentID={id + "-content"}
+                handleID={id + "-handle"}
                 className={classNames(
                     "selectBox-dropDown",
-                    "dropDownItem-verticalPadding",
-                    classesDropDown.verticalPadding,
+                    {
+                        "dropDownItem-verticalPadding": verticalPadding,
+                        [classesDropDown.verticalPadding]: verticalPadding,
+                    },
                     { [classes.offsetPadding]: props.offsetPadding },
                 )}
-                buttonContents={<SelectBoxButton activeItem={selectedOption} />}
+                buttonContents={
+                    <>
+                        <SelectBoxButton
+                            activeItem={selectedOption}
+                            labelWrap={props.labelWrap}
+                            overwriteButtonContents={overwriteButtonContents}
+                        />
+                        {afterButton}
+                    </>
+                }
                 buttonClassName={classNames(props.buttonClassName, classes.toggle)}
                 contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
                 buttonBaseClass={props.buttonBaseClass}
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
                 renderLeft={renderLeft}
-                horizontalOffset={true}
+                horizontalOffset={horizontalOffset}
             >
                 {props.options.map((option, i) => {
                     const isSelected = selectedOption && option.value === selectedOption.value;
@@ -105,13 +129,20 @@ SelectBox.defaultProps = {
     buttonBaseClass: ButtonTypes.TEXT,
 };
 
-function SelectBoxButton(props: { activeItem: ISelectBoxItem | null }) {
-    const { activeItem } = props;
+function SelectBoxButton(props: {
+    activeItem: ISelectBoxItem | null;
+    labelWrap?: string;
+    overwriteButtonContents?: React.ReactNode;
+}) {
+    const { activeItem, overwriteButtonContents } = props;
     const classes = selectBoxClasses();
 
     return activeItem && (activeItem.name || activeItem.content) ? (
         <React.Fragment>
-            {activeItem.content || activeItem.name}
+            <ConditionalWrap tag={"span"} condition={!!props.labelWrap} className={props.labelWrap}>
+                {overwriteButtonContents ?? (activeItem.content || activeItem.name)}
+            </ConditionalWrap>
+            {NBSP}
             <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
         </React.Fragment>
     ) : null;
@@ -132,7 +163,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
             <DropDownItemButton
                 className={classNames({ isSelected: isSelected })}
                 onClick={() => onClick(item)}
-                disabled={isSelected}
+                aria-current={isSelected}
                 buttonClassName={classNames(classesDropDown.action, classes.buttonItem)}
             >
                 <SelectBoxContents item={item} isSelected={isSelected} />

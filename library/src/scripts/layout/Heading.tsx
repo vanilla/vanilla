@@ -29,6 +29,10 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
     const finalDepth = depth ?? 2;
     const finalRenderDepth = renderAsDepth ?? finalDepth;
 
+    const isPageTitle = finalRenderDepth === 1;
+    const isSubTitle = finalRenderDepth === 2;
+    const isComponentSubTitle = finalRenderDepth >= 3;
+
     const Tag = `h${finalDepth}` as "h1";
     const classes = typographyClasses();
 
@@ -40,10 +44,10 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
                 "heading",
                 `heading-${finalRenderDepth}`,
                 {
-                    [classes.pageTitle]: finalRenderDepth === 1,
+                    [classes.pageTitle]: isPageTitle,
                     [classes.largeTitle]: isLarge,
-                    [classes.subTitle]: finalRenderDepth === 2,
-                    [classes.componentSubTitle]: finalRenderDepth >= 3,
+                    [classes.subTitle]: isSubTitle,
+                    [classes.componentSubTitle]: isComponentSubTitle,
                 },
 
                 className,

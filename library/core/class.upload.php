@@ -436,7 +436,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return bool Whether a file has been selected for the fiels.
      */
     public function isUpload($inputName) {
-        return val('name', val($inputName, $_FILES, '')) !== '';
+        return val('name', val($inputName, $_FILES, ''), '') !== '';
     }
 
     /**
@@ -444,49 +444,68 @@ class Gdn_Upload extends Gdn_Pluggable {
      */
     public function validateUpload($inputName, $throwException = true) {
         $ex = false;
+        $isUpload = self::isUpload($inputName);
 
-        if (!array_key_exists($inputName, $_FILES) || (!$this->fileUtils->isUploadedFile($_FILES[$inputName]['tmp_name']) && getValue('error', $_FILES[$inputName], 0) == 0)) {
-            // Check the content length to see if we exceeded the max post size.
-            $contentLength = Gdn::request()->getValueFrom('server', 'CONTENT_LENGTH');
-            $maxPostSize = self::unformatFileSize(ini_get('post_max_size'));
-            if ($contentLength > $maxPostSize) {
-                $ex = sprintf(t('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'), self::formatFileSize($maxPostSize));
-            } else {
-                $ex = t('The file failed to upload.');
-            }
-        } else {
-            switch ($_FILES[$inputName]['error']) {
-                case 1:
-                case 2:
-                    $maxFileSize = self::unformatFileSize(ini_get('upload_max_filesize'));
-                    $ex = sprintf(t('Gdn_Upload.Error.PhpMaxFileSize', 'The file is larger than the server\'s maximum file size. (%s)'), self::formatFileSize($maxFileSize));
-                    break;
-                case 3:
-                case 4:
+        if ($isUpload) {
+            if (!array_key_exists($inputName, $_FILES) ||
+                (!$this->fileUtils->isUploadedFile($_FILES[$inputName]['tmp_name']) && getValue('error', $_FILES[$inputName], 0) == 0)) {
+                // Check the content length to see if we exceeded the max post size.
+                $contentLength = Gdn::request()->getValueFrom('server', 'CONTENT_LENGTH');
+                $maxPostSize = self::unformatFileSize(ini_get('post_max_size'));
+                if ($contentLength > $maxPostSize) {
+                    $ex = sprintf(
+                        t('Gdn_Upload.Error.MaxPostSize', 'The file is larger than the maximum post size. (%s)'),
+                        self::formatFileSize($maxPostSize)
+                    );
+                } else {
                     $ex = t('The file failed to upload.');
-                    break;
-                case 6:
-                    $ex = t('The temporary upload folder has not been configured.');
-                    break;
-                case 7:
-                    $ex = t('Failed to write the file to disk.');
-                    break;
-                case 8:
-                    $ex = t('The upload was stopped by extension.');
-                    break;
+                }
+            } else {
+                switch ($_FILES[$inputName]['error']) {
+                    case 1:
+                    case 2:
+                        $maxFileSize = self::unformatFileSize(ini_get('upload_max_filesize'));
+                        $ex = sprintf(
+                            t('Gdn_Upload.Error.PhpMaxFileSize', 'The file is larger than the server\'s maximum file size. (%s)'),
+                            self::formatFileSize($maxFileSize)
+                        );
+                        break;
+                    case 3:
+                    case 4:
+                        $ex = t('The file failed to upload.');
+                        break;
+                    case 6:
+                        $ex = t('The temporary upload folder has not been configured.');
+                        break;
+                    case 7:
+                        $ex = t('Failed to write the file to disk.');
+                        break;
+                    case 8:
+                        $ex = t('The upload was stopped by extension.');
+                        break;
+                }
             }
         }
 
         $foo = self::formatFileSize($this->_MaxFileSize);
 
         // Check the maxfilesize again just in case the value was spoofed in the form.
-        if (!$ex && $this->_MaxFileSize > 0 && filesize($_FILES[$inputName]['tmp_name']) > $this->_MaxFileSize) {
-            $ex = sprintf(t('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'), self::formatFileSize($this->_MaxFileSize));
-        } elseif (!$ex) {
-            // Make sure that the file extension is allowed.
-            $extension = pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION);
-            if (!inArrayI($extension, $this->_AllowedFileExtensions)) {
-                $ex = sprintf(t('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'), htmlspecialchars($extension), implode(', ', $this->_AllowedFileExtensions));
+        if ($isUpload) {
+            if (!$ex && $this->_MaxFileSize > 0 && filesize($_FILES[$inputName]['tmp_name']) > $this->_MaxFileSize) {
+                $ex = sprintf(
+                    t('Gdn_Upload.Error.MaxFileSize', 'The file is larger than the maximum file size. (%s)'),
+                    self::formatFileSize($this->_MaxFileSize)
+                );
+            } elseif (!$ex) {
+                // Make sure that the file extension is allowed.
+                $extension = pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION);
+                if (!inArrayI($extension, $this->_AllowedFileExtensions)) {
+                    $ex = sprintf(
+                        t('You cannot upload files with this extension (%s). Allowed extension(s) are %s.'),
+                        htmlspecialchars($extension),
+                        implode(', ', $this->_AllowedFileExtensions)
+                    );
+                }
             }
         }
 

@@ -23,7 +23,7 @@ interface ConfigurationInterface {
     /**
      * Save a value to the configuration.
      *
-     * @param string $name A config key. Dot notation supported.
+     * @param string|array $name A config key. Dot notation supported.
      * @param string $value The value to save.
      * @param array|false $options Some options on how to save it. Pass false to do an "in-memory" save.
      * @return bool|int

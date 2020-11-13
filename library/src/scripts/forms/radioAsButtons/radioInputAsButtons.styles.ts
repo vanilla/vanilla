@@ -65,10 +65,13 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         justifyContent: "center",
     });
 
-    const labelStateStyles = generateButtonStyleProperties(buttonVariables().primary);
+    const labelStateStyles = generateButtonStyleProperties({ buttonTypeVars: buttonVariables().primary });
     nestedWorkaround(`.${label}`, labelStateStyles.$nest);
 
-    const hiddenInputStates = generateButtonStyleProperties(buttonVariables().primary, false, ` + .${label}`);
+    const hiddenInputStates = generateButtonStyleProperties({
+        buttonTypeVars: buttonVariables().primary,
+        stateSuffix: ` + .${label}`,
+    });
     const input = style("input", {
         ...srOnly(),
     });

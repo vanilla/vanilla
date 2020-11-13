@@ -23,7 +23,7 @@ interface IProps extends IWithEditorProps {
     matchedString: string;
     id: string;
     loaderID: string;
-    activeItemId: string | null;
+    activeItemID: string | null;
     onItemClick: React.MouseEventHandler<any>;
     showLoader: boolean;
     mentionSelection: RangeStatic | null;
@@ -47,7 +47,15 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader, mentionSelection } = this.props;
+        const {
+            activeItemID: activeItemID,
+            id,
+            onItemClick,
+            matchedString,
+            mentionProps,
+            showLoader,
+            mentionSelection,
+        } = this.props;
         const classesDropDown = dropDownClasses();
 
         const hasResults = mentionProps.length > 0 || showLoader;
@@ -86,11 +94,11 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         };
                     }
 
-                    const items = mentionProps.map(mentionProp => {
+                    const items = mentionProps.map((mentionProp) => {
                         if (mentionProp.mentionData == null) {
                             return null;
                         }
-                        const isActive = mentionProp.mentionData.domID === activeItemId;
+                        const isActive = mentionProp.mentionData.domID === activeItemID;
                         return (
                             <MentionSuggestion
                                 mentionData={mentionProp.mentionData}
@@ -107,7 +115,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         const loadingData = {
                             domID: this.props.loaderID,
                         };
-                        const isActive = loadingData.domID === activeItemId;
+                        const isActive = loadingData.domID === activeItemID;
 
                         items.push(
                             <MentionSuggestionLoading

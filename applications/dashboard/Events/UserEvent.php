@@ -14,11 +14,24 @@ use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggableEventTrait;
 use Vanilla\Logging\LoggerUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Represent a user resource event.
  */
 class UserEvent extends ResourceEvent implements LoggableEventInterface {
+
+    /**
+     * The users API needs expand all to be applied so certain fields work correctly.
+     *
+     * @return array
+     */
+    public function getApiParams(): ?array {
+        return [
+            'expand' => [ModelUtils::EXPAND_CRAWL, ModelUtils::EXPAND_ALL],
+        ];
+    }
+
     /**
      * @inheritDoc
      */

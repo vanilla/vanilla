@@ -28,7 +28,7 @@ if (!function_exists('CategoryPhoto')):
 
         if ($photoUrl) {
             $result = anchor(
-                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.Gdn::formatService()->renderPlainText(val('Name', $row), \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY).'" />',
+                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row, '')).'" />',
                 categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category');
         } else {
@@ -292,7 +292,7 @@ if (!function_exists('WriteTableRow')):
                     }
 
                     echo "<{$h} aria-level='".$level."' class='".$headingClass."'>";
-                    $safeName = Gdn::formatService()->renderPlainText($row['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
+                    $safeName = htmlspecialchars($row['Name'] ?? '');
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
                     Gdn::controller()->fireEvent('AfterCategoryTitle');
@@ -354,10 +354,11 @@ if (!function_exists('WriteTableRow')):
                             if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);
 
-                                echo ' <span>',
-                                sprintf('in %s', anchor(Gdn::formatService()->renderPlainText($lastCategory['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY), categoryUrl($lastCategory, '', '//'))),
-                                '</span>';
-
+                                if (is_array($lastCategory)) {
+                                    echo ' <span>',
+                                    sprintf('in %s', anchor(htmlspecialchars($lastCategory['Name'] ?? ''), categoryUrl($lastCategory, '', '//'))),
+                                    '</span>';
+                                }
                             }
                             ?>
                         </div>
@@ -413,7 +414,7 @@ if (!function_exists('writeCategoryTable')):
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];
             $class = val('CssClass', $category);
-            $name = Gdn::formatService()->renderPlainText($category['Name'], \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
+            $name = htmlspecialchars($category['Name'] ?? '');
 
             if ($displayAs === 'Heading') :
                 if ($inTable) {
@@ -483,6 +484,10 @@ if (!function_exists('followButton')) :
      */
     function followButton($categoryID) {
         $output = ' ';
+        if (!is_numeric($categoryID)) {
+            return $output;
+        }
+
         $userID = Gdn::session()->UserID;
         $category = CategoryModel::categories($categoryID);
 

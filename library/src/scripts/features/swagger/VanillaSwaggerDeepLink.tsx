@@ -17,7 +17,7 @@ export function VanillaSwaggerDeepLink({ enabled, path, text }: IProps) {
     return (
         <a
             href={id}
-            onClick={e => {
+            onClick={(e) => {
                 e.preventDefault();
             }}
             className="nostyle"

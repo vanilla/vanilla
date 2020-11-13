@@ -79,16 +79,20 @@ class LogDecorator implements LoggerInterface {
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
+
         $context += $this->staticContextDefaults + [
-            Logger::FIELD_USERID => $this->session->UserID,
-            'ip' => $this->request->getIP(),
-            'timestamp' => time(),
-            'method' => $this->request->requestMethod(),
-            'domain' => rtrim($this->request->url('/', true), '/'),
-            'path' => $this->request->getPath(),
-            'requestID' => $this->request->getAttribute('requestID', null),
-        ];
+                Logger::FIELD_USERID => $this->session->UserID,
+                'ip' => $this->request->getIP(),
+                'timestamp' => time(),
+                'requestID' => $this->request->getAttribute('requestID', null),
+                'vanillaVersion' => APPLICATION_VERSION,
+                'requestMethod' => $this->request->requestMethod(),
+                'requestScheme' => $this->request->getScheme(),
+                'requestHostname' => $_SERVER['HTTP_HOST'] ?? null,
+                'requestPath' => $_SERVER['REQUEST_URI'] ?? null,
+                'requestUrl' => $this->request->getUrl(),
+            ];
 
         $this->addUsername(Logger::FIELD_USERID, Logger::FIELD_USERNAME, $context);
         $this->addUsername(Logger::FIELD_TARGET_USERID, Logger::FIELD_TARGET_USERNAME, $context);

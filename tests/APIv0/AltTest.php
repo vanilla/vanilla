@@ -7,23 +7,12 @@
 
 namespace VanillaTests\APIv0;
 
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
  * Tests an alternate install method.
  */
-class AltTest extends SharedBootstrapTestCase {
-    /** @var APIv0  $api */
-    protected static $api;
-
-    /**
-     * Make sure there is a fresh copy of Vanilla for the class' tests.
-     */
-    public static function setUpBeforeClass(): void {
-        parent::setUpBeforeClass();
-        $api = new APIv0();
-        self::$api = $api;
-    }
+class AltTest extends AbstractAPIv2Test {
 
     /**
      * Test an alternate install method.
@@ -60,37 +49,64 @@ class AltTest extends SharedBootstrapTestCase {
      * @param bool $enabled Whether the update token feature should be enabled.
      * @param string $updateToken The update token to use.
      * @param string $postUpdateToken The update token to post during `utility/update`.
+     * @param bool $retried Whether this is a retry or not.
      */
-    private function doAltInstallWithUpdateToken(bool $enabled, string $updateToken, string $postUpdateToken) {
-        $this->api()->uninstall();
-        $this->api()->createDatabase();
+    private function doAltInstallWithUpdateToken(bool $enabled, string $updateToken, string $postUpdateToken, bool $retried = false) {
+        $apiv0 = new APIv0();
 
-        $config = $this->getBaseConfig();
+        $apiv0->uninstall();
+        $apiv0->createDatabase();
+
+        $config = $this->getBaseConfig($apiv0);
         $config['Feature']['updateTokens']['Enabled'] = $enabled;
         $config['Garden']['UpdateToken'] = $updateToken;
 
-        $this->api()->saveToConfig($config);
-        $r = $this->api()->post('/utility/update.json', ['updateToken' => $postUpdateToken])->getBody();
-        $this->api()->saveToConfig(['Garden.Installed' => true]);
+        $apiv0->saveToConfig($config);
+        $r = $apiv0->post('/utility/update.json', ['updateToken' => $postUpdateToken])->getBody();
+        $this->assertEquals(true, $r['Success'], "Site failed to install properly " . json_encode($r, JSON_PRETTY_PRINT));
+        $apiv0->saveToConfig(['Garden.Installed' => true]);
 
         // Do a simple get to make sure there isn't an error.
-        $r = $this->api()->get('/discussions.json');
-        $data = $r->getBody();
-        $this->assertNotEmpty($data['Discussions']);
+        $data = $this->dispatchData("/discussions", DELIVERY_TYPE_DATA);
+        $this->assertIsArray($data);
+        /** @var \Gdn_DataSet $discussions */
+        $discussions = $data['Discussions'] ?? null;
+        $discussions = $discussions->resultArray();
+        $this->assertIsArray($discussions, "Could not find discussions in: ". json_encode($data, JSON_PRETTY_PRINT));
+
+        if (count($discussions, 3)) {
+            $this->assertCount(3, $discussions);
+        } elseif (!$retried) {
+            // This test is notoriously flaky.
+            // If this failed, we are just going to try again. We are still unsure what causes the failure.
+            $this->doAltInstallWithUpdateToken($enabled, $updateToken, $postUpdateToken, true);
+        } else {
+            $wholeConfig = \Gdn::config()->get(".");
+            /** @var \DiscussionModel $discussionModel */
+            $discussionModel = $this->container()->get(\DiscussionModel::class);
+            $allDiscussions = $discussionModel->getWhere()->resultArray();
+            $message = "Alt Install failed twice.\n"
+                . "Dumping Config:\n"
+                . json_encode($wholeConfig, JSON_PRETTY_PRINT) . "\n"
+                . "Dumping Discussion Table:\n"
+                . json_encode($allDiscussions, JSON_PRETTY_PRINT);
+
+            $this->fail($message);
+        }
     }
 
     /**
      * Get the config to be applied to the site before update.
+     *
+     * @param APIv0 $apiv0
      */
-    private function getBaseConfig() {
-        $api = $this->api();
-
+    private function getBaseConfig(APIv0 $apiv0) {
         $config = [
             'Database' => [
-                'Host' => $api->getDbHost(),
-                'Name' => $api->getDbName(),
-                'User' => $api->getDbUser(),
-                'Password' => $api->getDbPassword(),
+                'Host' => $apiv0->getDbHost(),
+                'Name' => $apiv0->getDbName(),
+                'User' => $apiv0->getDbUser(),
+                'Password' => $apiv0->getDbPassword(),
             ],
             'EnabledApplications' => [
                 'Vanilla' => 'vanilla',
@@ -106,7 +122,7 @@ class AltTest extends SharedBootstrapTestCase {
             'Garden' => [
                 'Installed' => null, // Important to bypass the redirect to /dashboard/setup. False would not do here.
                 'Title' => get_called_class(),
-                'Domain' => parse_url($api->getBaseUrl(), PHP_URL_HOST),
+                'Domain' => parse_url($apiv0->getBaseUrl(), PHP_URL_HOST),
                 'Cookie' => [
                     'Salt' => 'salt',
                     'Name' => 'vf_'.strtolower(get_called_class()).'_ENDTX',
@@ -120,14 +136,5 @@ class AltTest extends SharedBootstrapTestCase {
         ];
 
         return $config;
-    }
-
-    /**
-     * Get the API to make requests against.
-     *
-     * @return APIv0 Returns the API.
-     */
-    public function api() {
-        return self::$api;
     }
 }

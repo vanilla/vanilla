@@ -20,22 +20,21 @@
 
         .PhotoWrap {
             position: absolute;
-            top: $component-base_padding;
+            top: $component-vertical_padding;
+            left: $component-horizontal_padding;
             margin-right: 0;
-
-            @if $component_lateralBorder == true {
-                left: $component-base_padding;
-            } @else {
-                left: 0;
-            }
         }
 
         @if ($staticVariables) {
             .Author + a,
             .Excerpt,
             .Meta {
+                padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
+            }
+
+            .Excerpt,
+            .Meta {
                 display: block;
-                padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
             }
         }
     }
@@ -66,7 +65,7 @@
     }
 
     .MessageList .Message {
-        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
     }
 }
 

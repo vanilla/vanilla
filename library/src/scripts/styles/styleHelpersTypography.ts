@@ -18,6 +18,8 @@ import {
     TextTransformProperty,
     WhiteSpaceProperty,
     TextAlignProperty,
+    LetterSpacingProperty,
+    OverflowBlockProperty,
 } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { colorOut } from "@library/styles/styleHelpersColors";
@@ -59,7 +61,7 @@ export const monoFallbacks = [
 export function fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
     return fontFamilies
         .concat(options.isMonospaced ? monoFallbacks : fontFallbacks)
-        .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
+        .map((font) => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
         .join(", ");
 }
 
@@ -128,6 +130,7 @@ export interface IFont {
     align?: TextAlignProperty;
     family?: FontFamilyProperty[];
     transform?: TextTransformProperty;
+    letterSpacing?: LetterSpacingProperty<TLength>;
 }
 
 export const EMPTY_FONTS: IFont = {
@@ -139,31 +142,32 @@ export const EMPTY_FONTS: IFont = {
     align: undefined,
     family: undefined,
     transform: undefined,
+    letterSpacing: undefined,
 };
 
 export const fonts = (props: IFont): NestedCSSProperties => {
-    if (props) {
-        const fontSize = props.size !== undefined ? unit(props.size) : undefined;
-        const fontWeight = props.weight !== undefined ? props.weight : undefined;
-        const color = props.color !== undefined ? colorOut(props.color) : undefined;
-        const lineHeight = props.lineHeight !== undefined ? props.lineHeight : undefined;
-        const textAlign = props.align !== undefined ? props.align : undefined;
-        const textShadow = props.shadow !== undefined ? props.shadow : undefined;
-        const fontFamily = props.family !== undefined ? fontFamilyWithDefaults(props.family) : undefined;
-        const textTransform = props.transform !== undefined ? props.transform : undefined;
-        return {
-            color,
-            fontSize,
-            fontWeight,
-            lineHeight,
-            textAlign,
-            textShadow,
-            fontFamily,
-            textTransform,
-        };
-    } else {
-        return {};
-    }
+    const globalVars = globalVariables();
+    const fontSize = props.size !== undefined ? unit(props.size) : undefined;
+    const fontWeight = props.weight;
+    const color = props.color !== undefined ? colorOut(props.color) : undefined;
+    const lineHeight = props.lineHeight;
+    const textAlign = props.align !== undefined ? props.align : undefined;
+    const textShadow = props.shadow !== undefined ? props.shadow : undefined;
+    const fontFamily = props.family !== undefined ? fontFamilyWithDefaults(props.family) : undefined;
+    const textTransform = props.transform !== undefined ? props.transform : undefined;
+    const letterSpacing = props.letterSpacing !== undefined ? props.letterSpacing : undefined;
+
+    return {
+        color,
+        fontSize,
+        fontWeight,
+        lineHeight,
+        textAlign,
+        textShadow,
+        fontFamily,
+        textTransform,
+        letterSpacing,
+    };
 };
 
 // must be nested
@@ -206,10 +210,10 @@ export const singleLineEllipsis = () => {
     };
 };
 
-export const longWordEllipsis = () => {
+export const longWordEllipsis = (): NestedCSSProperties => {
     return {
-        textOverflow: "ellipsis" as TextOverflowProperty,
-        overflowX: "hidden" as OverflowXProperty,
-        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+        textOverflow: "ellipsis",
+        overflowX: "hidden",
+        maxWidth: percent(100),
     };
 };

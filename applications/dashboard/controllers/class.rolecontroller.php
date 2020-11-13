@@ -134,6 +134,7 @@ class RoleController extends DashboardController {
 
         $this->setHighlightRoute('dashboard/role');
         $permissionModel = Gdn::permissionModel();
+        $roleSync = !empty(c('Garden.SSO.'.UserModel::OPT_ROLE_SYNC));
         $this->Role = $this->RoleModel->getByRoleID($roleID);
         // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
         $this->addJsFile('jquery.gardencheckboxgrid.js');
@@ -172,6 +173,11 @@ class RoleController extends DashboardController {
             $this->Form->setData($this->Role);
         } else {
             $this->removeRankPermissions();
+            if (!$roleSync) {
+                $this->Form->removeFormValue('Sync');
+            } else {
+                $this->Form->setFormValue('Sync', (string)$this->Form->getFormValue('Sync'));
+            }
 
             // Make sure the role's checkbox has a false value so that the role model can handle a sparse update of
             // column from other places.
@@ -213,6 +219,7 @@ class RoleController extends DashboardController {
         }
 
         $this->setData('_Types', $this->RoleModel->getDefaultTypes(true));
+        $this->setData('_roleSyncVisible', $roleSync);
 
         $this->render();
     }

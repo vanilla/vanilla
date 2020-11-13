@@ -192,10 +192,11 @@ window.vanilla.embed = function(host) {
     }
 
     setHeight = function(height) {
-        if (optStr('height'))
+        if (optStr('height')) {
             return;
+        }
 
-        document.getElementById('vanilla' + id).style['height'] = height + "px";
+        document.getElementById('vanilla' + id).style.height = height + "px";
         if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
             try {
                 gadgets.window.adjustHeight();
@@ -203,7 +204,7 @@ window.vanilla.embed = function(host) {
                 // Do nothing...
             }
         }
-    }
+    };
 
     vanillaUrl = function(path) {
         // What type of embed are we performing?

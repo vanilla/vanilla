@@ -1,0 +1,35 @@
+openapi: 3.0.2
+info:
+  description: API access to your community.
+  title: Vanilla API
+  version: "2.0"
+servers:
+  - url: /api/v2
+paths:
+  /config:
+    parameters:
+      - name: test
+        in: query
+        description: Test parameter merging.
+        style: form
+        schema:
+          type: array
+          items:
+            type: string
+components:
+  schemas:
+    Config:
+      type: object
+      properties:
+        'perms.site.manage':
+          type: string
+          default: foo
+        'perms.public':
+          type: integer
+          default: 1
+          x-read: public
+        'perms.community.moderate':
+          type: boolean
+          default: true
+          x-read: member
+          x-write: community.manage

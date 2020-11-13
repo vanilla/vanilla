@@ -194,9 +194,9 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
             default:
                 const itemList = items
                     .map((item, index) => ({ ...item, index }))
-                    .filter(item => item.label.toLocaleUpperCase().startsWith(event.key.toLocaleUpperCase()));
+                    .filter((item) => item.label.toLocaleUpperCase().startsWith(event.key.toLocaleUpperCase()));
                 if (typeof state.focusedItem !== "undefined") {
-                    const next = itemList.find(item => item.index > state.focusedItem);
+                    const next = itemList.find((item) => item.index > state.focusedItem);
                     if (next) {
                         dispatch({ type: "set_focused_item", item: next.index });
                     }
@@ -233,7 +233,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
         }
     };
 
-    const handleAccessibility = items => {
+    const handleAccessibility = (items) => {
         if ((state.open || state.buttonFocus) && buttonRef.current) {
             buttonRef.current.focus();
         }
@@ -330,7 +330,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                 <animated.div
                     className={classes.toggleWrap}
                     style={{
-                        transform: interpolate([s], s => `scale(${s})`),
+                        transform: interpolate([s], (s) => `scale(${s})`),
                     }}
                 >
                     <AnimatedButton
@@ -348,8 +348,8 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                                     range: [0, 0.25, 0.45, 0.75, 1],
                                     output: [1, 0.97, 0.7, 0.9, 1],
                                 })
-                                .interpolate(o => `${o}`),
-                            transform: interpolate([d], d => `rotate(${d}deg)`),
+                                .interpolate((o) => `${o}`),
+                            transform: interpolate([d], (d) => `rotate(${d}deg)`),
                         }}
                         baseClass={ButtonTypes.CUSTOM}
                         onClick={() => dispatch({ type: "toggle_open" })}

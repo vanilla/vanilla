@@ -13,37 +13,37 @@ import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextComp
 import * as EditorIcons from "@library/icons/editorIcons";
 import * as titleBarIcons from "@library/icons/titleBar";
 import * as CommonIcons from "@library/icons/common";
+import { ApproveIcon, BookmarkIcon, ErrorIcon, InformationIcon, PendingIcon, WarningIcon } from "@library/icons/common";
 import {
-    EmojiGroupSmileysPeopleIcon,
-    EmojiGroupAnimalsNatureIcon,
-    EmojiGroupFoodDrinkIcon,
-    EmojiGroupTravelPlacesIcon,
     EmojiGroupActivitiesIcon,
-    EmojiGroupObjectsIcon,
-    EmojiGroupSymbolsIcon,
+    EmojiGroupAnimalsNatureIcon,
     EmojiGroupFlagsIcon,
+    EmojiGroupFoodDrinkIcon,
+    EmojiGroupObjectsIcon,
+    EmojiGroupSmileysPeopleIcon,
+    EmojiGroupSymbolsIcon,
+    EmojiGroupTravelPlacesIcon,
 } from "./emojiGroups";
 import {
-    FileTypeGenericIcon,
-    FileTypeWordIcon,
     FileTypeExcelIcon,
+    FileTypeGenericIcon,
     FileTypeImageIcon,
-    FileTypePowerPointIcon,
     FileTypePDFIcon,
+    FileTypePowerPointIcon,
+    FileTypeWordIcon,
     FileTypeZipIcon,
 } from "@library/icons/fileTypes";
 import {
-    RevisionStatusPublishedIcon,
-    RevisionStatusPendingIcon,
     RevisionStatusDraftIcon,
+    RevisionStatusPendingIcon,
+    RevisionStatusPublishedIcon,
 } from "@library/icons/revision";
 import * as SearchIcons from "@library/icons/searchIcons";
 
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
-import { ColorHelper, color } from "csx";
+import { color } from "csx";
 
 const story = storiesOf("Components", module);
 
@@ -135,6 +135,12 @@ story.add("Icons", () => {
                 <StoryTileAndTextCompact text={`GlobeIcon`}>
                     <CommonIcons.GlobeIcon />
                 </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`PendingIcon`}>
+                    <PendingIcon />
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`ApproveIcon`}>
+                    <ApproveIcon />
+                </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`ErrorIcon`}>
                     <ErrorIcon />
                 </StoryTileAndTextCompact>
@@ -151,6 +157,9 @@ story.add("Icons", () => {
                     <a href="#" className={iconClasses().bookmark()}>
                         <BookmarkIcon />
                     </a>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`FeatureIcon`}>
+                    <CommonIcons.FeatureIcon />
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Editor</StoryHeading>
@@ -375,6 +384,18 @@ story.add("Icons", () => {
 
             <StoryTileAndTextCompact text={`TypeQuestion`}>
                 <SearchIcons.TypeQuestionIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypePlaces`}>
+                <SearchIcons.TypePlacesIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeGroups`}>
+                <SearchIcons.TypeGroupsIcon />
+            </StoryTileAndTextCompact>
+
+            <StoryTileAndTextCompact text={`TypeKnowledgeBase`}>
+                <SearchIcons.TypeKnowledgeBaseIcon />
             </StoryTileAndTextCompact>
         </StoryContent>
     );

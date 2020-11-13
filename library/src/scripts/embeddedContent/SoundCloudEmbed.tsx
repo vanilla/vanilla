@@ -58,7 +58,7 @@ function soundCloudPlayerUrl(props: IProps): string {
         url: `https://api.soundcloud.com/${resourceType}/${resourceID}`,
     };
     const query = Object.keys(parameters)
-        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(parameters[key]))
+        .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(parameters[key]))
         .join("&");
 
     return `https://w.soundcloud.com/player/?${query}`;

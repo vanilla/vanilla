@@ -33,7 +33,7 @@ export const roleReducer = produce(
         })
         .case(RoleActions.getAllACs.done, (nextState, payload) => {
             const rolesByID: Record<number, IRole> = {};
-            payload.result.forEach(role => {
+            payload.result.forEach((role) => {
                 rolesByID[role.roleID] = role;
             });
             nextState.rolesByID = {

@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) { exit(); }
 $Session = Gdn::session();
-$CancelUrl = '/discussions';
-if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
-    $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
+$CancelUrl = $this->data('_CancelUrl');
+if (!$CancelUrl) {
+    $CancelUrl = '/discussions';
+    if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
+        $CancelUrl = '/categories/' . urlencode($this->Category->UrlCode);
+    }
 }
-
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php

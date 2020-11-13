@@ -29,6 +29,7 @@ interface IProps {
     children?: React.ReactNode;
     isVisible: boolean;
     onDestroyed: () => void;
+    onKeyPress?: (e) => void;
 }
 
 /**
@@ -132,14 +133,14 @@ export function ModalView(props: IProps) {
     // And our various focusing tricks or the page will jump.
     forceRenderStyles();
     return (
-        <div>
+        <div onKeyPress={props.onKeyPress}>
             <EntranceAnimation
                 fade
                 isEntered={props.isVisible}
                 className={classes.overlayScrim}
                 onDestroyed={handleDestroy}
             >
-                <span></span>
+                <span />
             </EntranceAnimation>
             <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
                 <div

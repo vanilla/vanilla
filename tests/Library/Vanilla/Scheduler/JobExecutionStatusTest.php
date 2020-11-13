@@ -1,18 +1,19 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Vanilla\Library\Scheduler;
+namespace VanillaTests\Library\Vanilla\Scheduler;
 
-use \Vanilla\Scheduler\Job\JobExecutionStatus;
+use PHPUnit\Framework\TestCase;
+use Vanilla\Scheduler\Job\JobExecutionStatus;
 
 /**
  * Class JobExecutionStatusTest.
  */
-final class JobExecutionStatusTest extends \PHPUnit\Framework\TestCase {
+final class JobExecutionStatusTest extends TestCase {
 
     /**
      * Verifying positive assertion of "abandoned" status.
@@ -75,6 +76,20 @@ final class JobExecutionStatusTest extends \PHPUnit\Framework\TestCase {
      */
     public function testStatusRetry() {
         $this->assertTrue(JobExecutionStatus::retry()->is(JobExecutionStatus::retry()));
+    }
+
+    /**
+     * Verifying positive assertion of "intended" status.
+     */
+    public function testStatusIntended() {
+        $this->assertTrue(JobExecutionStatus::intended()->is(JobExecutionStatus::intended()));
+    }
+
+    /**
+     * Verifying positive assertion of "intended" status.
+     */
+    public function testStatusUnknown() {
+        $this->assertTrue(JobExecutionStatus::unknown()->is(JobExecutionStatus::unknown()));
     }
 
     /**

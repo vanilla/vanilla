@@ -12,7 +12,7 @@ import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpa
 import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
-import { DIST_DIRECTORY } from "./env";
+import { DIST_DIRECTORY, VANILLA_ROOT } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
 import { copyMonacoEditorModule, installLerna } from "./utility/moduleUtils";
@@ -72,7 +72,7 @@ export default class Builder {
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
         const configs = await Promise.all([
-            ...sections.map(section => makeProdConfig(this.entryModel, section)),
+            ...sections.map((section) => makeProdConfig(this.entryModel, section)),
             makePolyfillConfig(this.entryModel),
         ]);
 
@@ -93,7 +93,7 @@ export default class Builder {
      * @param config The config to build.
      */
     private async runBuild(config: Configuration | Configuration[]) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             const compiler = webpack(config as Configuration);
             compiler.run((err: Error, stats: Stats) => {
                 if (err || stats.hasErrors()) {
@@ -127,25 +127,42 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 
+        const certPath = path.resolve(VANILLA_ROOT, "../vanilla-docker/resources/certificates");
+        const crtFile = path.resolve(certPath, "wildcard.vanilla.localhost.crt");
+        const keyFile = path.resolve(certPath, "wildcard.vanilla.localhost.key");
+
+        const https = fse.existsSync(certPath)
+            ? {
+                  key: fse.readFileSync(keyFile),
+                  cert: fse.readFileSync(crtFile),
+              }
+            : false;
+
+        if (https) {
+            print(chalk.green("Found SSL certs. Serving over https://"));
+        }
+
         const devServerOptions: DevServerConfiguration = {
-            host: this.options.devIp,
+            host: "webpack.vanilla.localhost",
             port: 3030,
             hotOnly: true,
             open: false,
-            https: false,
+            https,
             disableHostCheck: true,
+            sockHost: "webpack.vanilla.localhost:3030",
+            public: "webpack.vanilla.localhost:3030",
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
                 "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
-            publicPath: `http://${this.options.devIp}:3030/`,
+            publicPath: `https://webpack.vanilla.localhost:3030/`,
             stats: this.statOptions,
         };
 
         const sections = await this.entryModel.getSections();
         const config = await Promise.all(
-            sections.map(async section => {
+            sections.map(async (section) => {
                 const sectionConfig = await makeDevConfig(this.entryModel, section);
                 WebpackDevServer.addDevServerEntrypoints(sectionConfig as any, devServerOptions);
                 return sectionConfig;
@@ -154,6 +171,6 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const compiler = webpack(config) as any;
 
         const server = new WebpackDevServer(compiler, devServerOptions);
-        server.listen(3030, devServerOptions.host || "127.0.0.1");
+        server.listen(3030, "127.0.0.1");
     }
 }

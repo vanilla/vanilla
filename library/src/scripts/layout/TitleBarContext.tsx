@@ -69,9 +69,9 @@ export function withTitleBarDevice<T extends ITitleBarDeviceProps = ITitleBarDev
     const ComponentWithDevice = (props: Optionalize<T, ITitleBarDeviceProps>) => {
         return (
             <TitleBarDeviceContext.Consumer>
-                {context => {
+                {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
-                    return <WrappedComponent device={context} {...(props as T)} />;
+                    return <WrappedComponent device={context} {...(props as any)} />;
                 }}
             </TitleBarDeviceContext.Consumer>
         );

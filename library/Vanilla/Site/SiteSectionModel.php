@@ -7,6 +7,9 @@
 
 namespace Vanilla\Site;
 
+use Gdn;
+use Gdn_Cache;
+use Gdn_Router;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
@@ -16,6 +19,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
  * @package Vanilla\Site
  */
 class SiteSectionModel {
+
     /** @var SiteSectionProviderInterface[] $providers */
     private $providers = [];
 
@@ -34,12 +38,16 @@ class SiteSectionModel {
     /** @var array $apps */
     private $apps = [];
 
+    /** @var SiteSectionInterface[] $siteSectionsForAttribute */
+    private $siteSectionsForAttributes = [];
+
     /**
      * SiteSectionModel constructor.
      *
      * @param ConfigurationInterface $config
+     * @param Gdn_Router $router
      */
-    public function __construct(ConfigurationInterface $config, \Gdn_Router $router) {
+    public function __construct(ConfigurationInterface $config, Gdn_Router $router) {
         $this->defaultSiteSection = new DefaultSiteSection($config, $router);
     }
 
@@ -195,5 +203,41 @@ class SiteSectionModel {
      */
     public function applications(): array {
         return $this->apps;
+    }
+
+    /**
+     * Get a site-section by it's attribute name and value.
+     *
+     * @param string $attributeName
+     * @param string|int $attributeValue
+     * @param string $recordType
+     * @return SiteSectionInterface
+     */
+    public function getSiteSectionForAttribute(string $attributeName, $attributeValue, $recordType = 'siteSection'): SiteSectionInterface {
+        $key = $recordType . '_' .$attributeName . '_' .$attributeValue;
+        $siteSectionForAttribute = $this->siteSectionsForAttributes[$key] ?? null;
+
+        if (!$siteSectionForAttribute) {
+            foreach ($this->getAll() as $siteSection) {
+                $attributes = $siteSection->getAttributes();
+                $attribute = $attributes[$attributeName] ?? [];
+                if (is_array($attribute)) {
+                    if (in_array($attributeValue, $attribute)) {
+                        $this->siteSectionsForAttributes[$key] = $siteSection;
+                        return $siteSection;
+                    }
+                }
+
+                if ($attribute === $attributeValue) {
+                    $this->siteSectionsForAttributes[$key] = $siteSection;
+                    return $siteSection;
+                }
+            }
+
+            $this->siteSectionsForAttributes[$key] = $this->defaultSiteSection;
+            return $this->defaultSiteSection;
+        }
+
+        return $siteSectionForAttribute;
     }
 }

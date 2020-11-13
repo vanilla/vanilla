@@ -109,7 +109,6 @@ form {
     padding-bottom: 16px;
     margin-bottom: 0;
     border-bottom: $border-width dotted #e7e8e9;
-    width: 100%;
 
     > .no-grid {
         padding-left: $padding-row;
@@ -184,6 +183,12 @@ label,
 }
 
 .input-wrap {
+
+    input,
+    .SelectOne__single-value {
+        font-size: 14px;
+    }
+
     &:not(.inline) label {
         display: block;
     }

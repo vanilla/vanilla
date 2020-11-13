@@ -3,11 +3,27 @@ info:
 paths:
   /media:
     post:
+      summary: Upload a media file.
+      tags:
+      - Media
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  $ref: '#/components/schemas/UploadedFile'
+              required:
+              - file
+              type: object
+        required: true
       responses:
         '201':
+          description: Success
           content:
             application/json:
               schema:
+                type: object
                 properties:
                   dateInserted:
                     description: When the media item was created.
@@ -61,32 +77,6 @@ paths:
                 - insertUserID
                 - foreignType
                 - foreignID
-                type: object
-          description: Success
-      tags:
-      - Media
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                file:
-                  $ref: '#/components/schemas/UploadedFile'
-                type:
-                  description: The upload type.
-                  enum:
-                  - image
-                  - text
-                  - archive
-                  - binary
-                  minLength: 1
-                  type: string
-              required:
-              - file
-              - type
-              type: object
-        required: true
-      summary: Add a media item.
   /media/by-url:
     delete:
       parameters:

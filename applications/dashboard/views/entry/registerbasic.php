@@ -12,9 +12,9 @@
         echo $this->Form->open(['Action' => url('/entry/register'), 'id' => 'Form_User_Register']);
         echo $this->Form->errors();
         ?>
-        <ul>
+        <ul role="presentation">
             <?php if (!$this->data('NoEmail')): ?>
-                <li>
+                <li role="presentation">
                     <?php
                     echo $this->Form->label('Email', 'Email');
                     echo $this->Form->textBox('Email', ['type' => 'email', 'Wrap' => TRUE]);
@@ -22,7 +22,7 @@
                     ?>
                 </li>
             <?php endif; ?>
-            <li>
+            <li role="presentation">
                 <?php
                 echo $this->Form->label('Username', 'Name');
                 echo $this->Form->textBox('Name', ['autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
@@ -30,14 +30,14 @@
                 ?>
             </li>
             <?php $this->fireEvent('RegisterBeforePassword'); ?>
-            <li>
+            <li role="presentation">
                 <?php
                 echo $this->Form->label('Password', 'Password');
                 echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
                 echo $this->Form->input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
                 ?>
             </li>
-            <li>
+            <li role="presentation">
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
                 echo $this->Form->input('PasswordMatch', 'password', ['Wrap' => TRUE]);
@@ -46,7 +46,7 @@
             </li>
             <?php $this->fireEvent('ExtendedRegistrationFields'); ?>
             <?php if ($this->Form->getValue('DiscoveryText') || val('DiscoveryText', $this->Form->validationResults())): ?>
-                <li>
+                <li role="presentation">
                     <?php
                     echo $this->Form->label('Why do you want to join?', 'DiscoveryText');
                     echo $this->Form->textBox('DiscoveryText', ['MultiLine' => true, 'Wrap' => TRUE]);
@@ -58,13 +58,13 @@
 
             <?php $this->fireEvent('RegisterFormBeforeTerms'); ?>
 
-            <li>
+            <li role="presentation">
                 <?php
                 echo $this->Form->checkBox('TermsOfService', '@'.$TermsOfServiceText, ['value' => '1']);
                 echo $this->Form->checkBox('RememberMe', 'Remember me on this computer', ['value' => '1']);
                 ?>
             </li>
-            <li class="Buttons">
+            <li class="Buttons"  role="presentation">
                 <?php echo $this->Form->button('Sign Up', ['class' => 'Button Primary']); ?>
             </li>
         </ul>

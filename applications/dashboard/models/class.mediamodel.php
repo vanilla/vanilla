@@ -33,7 +33,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * Get a media row by ID.
      *
      * @param int $mediaID The ID of the media entry.
-     * @param string $datasetType The format of the result dataset.
+     * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object|false Returns the media row or **false** if it isn't found.
      */
@@ -45,11 +45,11 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /**
      * Assing an attachment to another record.
      *
-     * @param $foreignID
-     * @param $foreignTable
-     * @param $newForeignID
-     * @param $newForeignTable
-     * @return Gdn_Dataset
+     * @param int $foreignID
+     * @param string $foreignTable
+     * @param int $newForeignID
+     * @param string $newForeignTable
+     * @return bool
      */
     public function reassign($foreignID, $foreignTable, $newForeignID, $newForeignTable) {
         $this->fireEvent('BeforeReassign');

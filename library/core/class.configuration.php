@@ -355,23 +355,23 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *
-     * @param string $name The name of the configuration setting to get. If the setting is contained
+     * @param string $key The name of the configuration setting to get. If the setting is contained
      * within an associative array, use dot denomination to get the setting. ie.
      * <code>$this->get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function get($name, $defaultValue = false) {
+    public function get($key, $defaultValue = false) {
         // Shortcut, get the whole config
-        if ($name == '.') {
+        if ($key == '.') {
             return $this->Data;
         }
 
-        if (!is_string($name)) {
-            Deprecation::unsupportedParam('$name', $name, "Only string parameters are allowed.");
+        if (!is_string($key)) {
+            Deprecation::unsupportedParam('$name', $key, "Only string parameters are allowed.");
         }
 
-        $keys = $this->splitConfigKey((string) $name);
+        $keys = $this->splitConfigKey((string) $key);
         $keyCount = count($keys);
 
         $value = $this->Data;

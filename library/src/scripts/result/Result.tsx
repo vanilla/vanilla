@@ -15,6 +15,7 @@ import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { useLayout } from "@library/layout/LayoutContext";
+import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 
 export interface IResult {
     name: string;
@@ -28,6 +29,8 @@ export interface IResult {
     location: ICrumb[] | string[];
     afterExcerpt?: React.ReactNode; // Likely SearchLink
     icon?: React.ReactNode;
+    userCardInfo?: IUserCardInfo;
+    rel?: string;
 }
 
 /**
@@ -88,7 +91,7 @@ export default function Result(props: IResult) {
                     <div className={classes.content}>
                         {icon && <div className={classes.iconWrap}>{icon}</div>}
                         <div className={classNames(classes.main, { hasMedia: !!media, hasIcon: !!icon })}>
-                            <SmartLink to={url} tabIndex={0} className={classes.link}>
+                            <SmartLink to={url} tabIndex={0} className={classes.link} rel={props.rel}>
                                 <HeadingTag className={classes.title}>{name}</HeadingTag>
                             </SmartLink>
                             {meta && <div className={classes.metas}>{meta}</div>}

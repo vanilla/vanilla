@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/** @var \EntryController $this */
+
 // Get the connection information.
 if (!($ConnectName = $this->Form->getFormValue('FullName'))) {
     $ConnectName = $this->Form->getFormValue('Name');
@@ -110,7 +112,6 @@ if (!$hasUserID) {
 
                     // One User was found in GDN_User based on the Email.
                     if (count($ExistingUsers) == 1 && $NoConnectName) {
-                        $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                         $Row = reset($ExistingUsers);
 
                         echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
@@ -153,6 +154,7 @@ if (!$hasUserID) {
                 if (!$this->data('HidePassword')) {
                     echo '<li id="ConnectPassword">';
                     echo $this->Form->label('Password', 'ConnectPassword');
+                    $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                     echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
                     echo $this->Form->input('ConnectPassword', 'password');
                     echo '</li>';

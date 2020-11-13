@@ -7,17 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla\Models;
 
-use PHPUnit\Framework\TestCase;
 use Vanilla\Models\LegacyModelUtils;
-use VanillaTests\BootstrapTrait;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Tests for the `LegacyModelUtils` class.
  */
-class LegacyModelUtilsTest extends TestCase {
-    use BootstrapTrait;
-
+class LegacyModelUtilsTest extends BootstrapTestCase {
     /**
      * @var \Gdn_Model
      */
@@ -28,9 +24,6 @@ class LegacyModelUtilsTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setupBoostrapTrait();
-
-        $this->initializeDatabase();
         $this->model = $this->container()->getArgs(\Gdn_Model::class, ['legacyModelUtilsTest']);
 
         // Create a basic table for the test.

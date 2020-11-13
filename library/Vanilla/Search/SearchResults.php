@@ -6,6 +6,9 @@
 
 namespace Vanilla\Search;
 
+use Garden\Schema\ValidationException;
+use Vanilla\Utility\SchemaUtils;
+
 /**
  * Item to handle search results.
  */
@@ -23,6 +26,9 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /** @var int */
     private $limit;
 
+    /** @var string[] $terms */
+    private $terms;
+
     /**
      * Constructor.
      *
@@ -31,11 +37,12 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      * @param int $offset
      * @param int $limit
      */
-    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit) {
+    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit, array $terms = []) {
         $this->resultItems = $resultItems;
         $this->totalCount = $totalCount;
         $this->offset = $offset;
         $this->limit = $limit;
+        $this->terms = $terms;
     }
 
     /**
@@ -43,6 +50,16 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      */
     public function getResultItems(): array {
         return $this->resultItems;
+    }
+
+    /**
+     * Remove a resultItem based on it's key.
+     *
+     * @param int $key
+     */
+    public function removeResultItem(int $key) {
+         unset($this->resultItems[$key]);
+         $this->totalCount--;
     }
 
     /**
@@ -73,6 +90,13 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
         return $this->limit;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getTerms(): array {
+        return $this->terms;
+    }
+
     ///
     /// PHP interfaces
     ///
@@ -96,5 +120,25 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      */
     public function count() {
         return count($this->resultItems);
+    }
+
+    /**
+     * Convert some search results into legacy results.
+     *
+     * @return array
+     */
+    public function asLegacyResults(): array {
+        $results = [];
+        $schema = SearchResultItem::legacySchema();
+        foreach ($this->resultItems as $serviceResult) {
+            try {
+                $legacyResult = $schema->validate($serviceResult->asLegacyArray());
+                $results[] = $legacyResult;
+            } catch (ValidationException $e) {
+                $formatted = formatException($e);
+                trigger_error("Validation of result failed.\n$formatted");
+            }
+        }
+        return $results;
     }
 }

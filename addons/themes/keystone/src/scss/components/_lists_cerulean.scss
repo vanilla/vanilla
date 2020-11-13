@@ -20,14 +20,14 @@
                 border-left: $arrow-size solid transparent;
                 border-right: $arrow-size solid $component_borderColor;
                 content: "";
-                left: -#{$arrow-size + $component-base_padding};
+                left: -#{$arrow-size * 2};
                 position: absolute;
-                top: $component-base_padding;
+                top: $component-vertical_padding;
             }
 
             &::after {
               border-right: $arrow-size solid $global-color_white;
-              left: -#{$arrow-size + $component-base_padding - 2px};
+              left: -#{$arrow-size * 2 - 1px};
             }
 
             .Item-Header {
@@ -64,8 +64,8 @@
                 .Item-Header {
 
                     .PhotoWrap {
-                        top: $utility-baseUnitDouble;
-                        left: $utility-baseUnitDouble;
+                        top: $component-vertical_padding;
+                        left: $component-horizontal_padding;
                     }
 
                     .Meta,

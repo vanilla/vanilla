@@ -4,17 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { AnchorHTMLAttributes } from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
-import SmartLink from "@library/routing/links/SmartLink";
+import SmartLink, { ISmartLinkProps } from "@library/routing/links/SmartLink";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { useLocation } from "react-router";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 import { formatUrl, siteUrl } from "@library/utility/appUtils";
 
-export interface ITitleBarNav {
+export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     className?: string;
     to: string;
     children: React.ReactNode;
@@ -31,6 +31,7 @@ interface IProps extends ITitleBarNav {}
  */
 export function TitleBarNavItem(props: IProps) {
     const location = useLocation();
+    const { to, className, buttonType, linkClassName, linkContentClassName, children, permission, ...passthru } = props;
 
     /**
      * Checks if we're on the current page
@@ -38,7 +39,7 @@ export function TitleBarNavItem(props: IProps) {
      */
     const currentPage = (): boolean => {
         if (location && location.pathname) {
-            return siteUrl(window.location.pathname) === formatUrl(props.to, true);
+            return siteUrl(window.location.pathname) === formatUrl(to, true);
         } else {
             return false;
         }
@@ -47,18 +48,17 @@ export function TitleBarNavItem(props: IProps) {
     const classes = titleBarNavClasses();
 
     return (
-        <TitleBarListItem className={classNames(props.className, classes.root, { isCurrent })}>
+        <TitleBarListItem className={classNames(className, classes.root, { isCurrent })}>
             <SmartLink
-                to={props.to}
+                {...passthru}
+                to={to}
                 className={classNames(
-                    props.linkClassName,
+                    linkClassName,
                     classes.link,
-                    props.buttonType ? getButtonStyleFromBaseClass(props.buttonType) : "",
+                    buttonType ? getButtonStyleFromBaseClass(buttonType) : "",
                 )}
             >
-                <div className={classNames(props.linkContentClassName, isCurrent ? classes.linkActive : "")}>
-                    {props.children}
-                </div>
+                <div className={classNames(linkContentClassName, isCurrent ? classes.linkActive : "")}>{children}</div>
             </SmartLink>
         </TitleBarListItem>
     );

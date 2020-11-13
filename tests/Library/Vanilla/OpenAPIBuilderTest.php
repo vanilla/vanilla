@@ -51,7 +51,7 @@ class OpenAPIBuilderTest extends TestCase {
         );
 
         $request = new Request();
-        $builder = new OpenAPIBuilder($am, $request);
+        $builder = new OpenAPIBuilder($am, $request, PATH_ROOT.'/tests/cache/'.__FUNCTION__.'.php');
 
         $data = $builder->generateFullOpenAPI();
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

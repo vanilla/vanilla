@@ -13,7 +13,7 @@
  */
 class CategoryController extends VanillaController {
 
-    /** @var Gdn_CategoryModel */
+    /** @var CategoryModel */
     public $CategoryModel;
 
     public function __construct() {
@@ -37,7 +37,7 @@ class CategoryController extends VanillaController {
             $this->CategoryModel->saveUserTree($categoryID, ['Unfollow' => (int)(!(bool)$value)]);
         }
 
-        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+        if ($this->isRenderingMasterView()) {
             redirectTo('/categories');
         }
 

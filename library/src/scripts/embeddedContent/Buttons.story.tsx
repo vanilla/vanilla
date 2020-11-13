@@ -11,7 +11,6 @@ import Button from "@library/forms/Button";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
 import { ButtonPreset, buttonUtilityClasses } from "@library/forms/buttonStyles";
@@ -21,7 +20,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export default {
-    title: "Buttons",
+    title: "Components/Buttons",
 };
 
 function StoryButton() {

@@ -59,17 +59,24 @@ export function BackRoutingProvider(props: { children: React.ReactNode }) {
     const history = useHistory();
     const { pushSmartLocation } = useLinkContext();
     const canGoBack = historyDepth > 1;
+    const canBrowserGoBack = !!document.referrer && !!window.history?.back;
 
     const navigateBack = useCallback(
         (url?: string) => {
             if (canGoBack) {
                 history.goBack();
+            } else if (canBrowserGoBack) {
+                window.history.back();
+                setTimeout(() => {
+                    // In case the browser back didn't actually work.
+                    window.location.href = document.referrer;
+                }, 300);
             } else {
                 ignoreRef.current = true;
                 pushSmartLocation(url ?? backFallbackUrl);
             }
         },
-        [canGoBack, history, pushSmartLocation, backFallbackUrl],
+        [canGoBack, history, pushSmartLocation, backFallbackUrl, canBrowserGoBack],
     );
 
     useEffect(() => {

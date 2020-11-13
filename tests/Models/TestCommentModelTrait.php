@@ -58,7 +58,7 @@ trait TestCommentModelTrait {
         for ($i = 0; $i < $count; $i++) {
             $id = $this->commentModel->save($this->newComment($overrides));
             TestCase::assertNotFalse($id);
-            $row = $this->commentModel->getID($id);
+            $row = $this->commentModel->getID($id, DATASET_TYPE_ARRAY);
             \CategoryModel::instance()->incrementLastComment($row);
             $ids[] = $id;
             $rows[] = $row;

@@ -59,7 +59,7 @@ export function UserPhoto(props: IProps) {
                     {...commonProps}
                     src={photoUrl}
                     className={classNames(classes.photo)}
-                    onError={e => {
+                    onError={(e) => {
                         setBadImage(true);
                     }}
                 />

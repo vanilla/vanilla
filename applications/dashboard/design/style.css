@@ -17,12 +17,21 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   margin: 0;
   padding: 0;
   border: 0;
-  outline: 0;
   font-weight: inherit;
   font-style: inherit;
   font-size: 100%;
   font-family: inherit;
   vertical-align: baseline;
+}
+html:not(.focus-visible), body:not(.focus-visible), div:not(.focus-visible), span:not(.focus-visible), applet:not(.focus-visible), object:not(.focus-visible), iframe:not(.focus-visible),
+h1:not(.focus-visible), h2:not(.focus-visible), h3:not(.focus-visible), h4:not(.focus-visible), h5:not(.focus-visible), h6:not(.focus-visible), p:not(.focus-visible), blockquote:not(.focus-visible), pre:not(.focus-visible),
+a:not(.focus-visible), abbr:not(.focus-visible), acronym:not(.focus-visible), address:not(.focus-visible), big:not(.focus-visible), cite:not(.focus-visible), code:not(.focus-visible),
+del:not(.focus-visible), dfn:not(.focus-visible), em:not(.focus-visible), font:not(.focus-visible), img:not(.focus-visible), ins:not(.focus-visible), kbd:not(.focus-visible), q:not(.focus-visible), s:not(.focus-visible), samp:not(.focus-visible),
+small:not(.focus-visible), strike:not(.focus-visible), sub:not(.focus-visible), sup:not(.focus-visible), tt:not(.focus-visible), var:not(.focus-visible),
+dl:not(.focus-visible), dt:not(.focus-visible), dd:not(.focus-visible), ol:not(.focus-visible), ul:not(.focus-visible), li:not(.focus-visible),
+fieldset:not(.focus-visible), form:not(.focus-visible), label:not(.focus-visible), legend:not(.focus-visible),
+table:not(.focus-visible), caption:not(.focus-visible), tbody:not(.focus-visible), tfoot:not(.focus-visible), thead:not(.focus-visible), tr:not(.focus-visible), th:not(.focus-visible), td:not(.focus-visible) {
+  outline: 0;
 }
 
 /* remember to define focus styles! */
@@ -1931,10 +1940,6 @@ td.CheckBoxColumn {
   opacity: 1;
 }
 
-.Item.Read .Title, .Item.Read .BlockTitle {
-  font-weight: normal;
-}
-
 .Item.Checked {
   background: #ffc;
 }
@@ -2263,6 +2268,10 @@ code, pre {
 .code,
 code {
   white-space: pre-wrap;
+}
+.code.focus-visible,
+code.focus-visible {
+  outline-offset: -1px;
 }
 
 .codeBlock,
@@ -2995,7 +3004,7 @@ tr.CategoryHeading td {
 
 .BlockTitle {
   display: block;
-  font-weight: bold;
+  font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3050,6 +3059,7 @@ tr.CategoryHeading td {
   width: 14px;
 }
 
+.GroupForm label,
 .DiscussionForm label {
   font-size: 14px;
   font-weight: bold;

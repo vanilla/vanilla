@@ -80,7 +80,7 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @dataProvider provideWysiwyg
      */
     public function testWysiwyg(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
+        [$input, $expectedOutput] = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::wysiwyg($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
@@ -165,7 +165,7 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param string $format
      */
     public function assertFixturePassesForFormat(string $fixtureDir, string $format) {
-        list($input, $expectedHtml, $expectedText) = $this->getFixture($fixtureDir);
+        [$input, $expectedHtml, $expectedText] = $this->getFixture($fixtureDir);
         $outputHtml = \Gdn_Format::to($input, $format);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedHtml,
@@ -195,7 +195,7 @@ class GdnFormatTest extends MinimalContainerTestCase {
         $expectedOutputs = [];
 
         foreach ($fixtureDirs as $fixtureDir) {
-            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            [$input, $expectedOutput] = $this->getFixture($fixtureDir[0]);
             $allInputs[] = $input;
             $expectedOutputs[] = $expectedOutput;
         }
@@ -218,7 +218,7 @@ class GdnFormatTest extends MinimalContainerTestCase {
         $expectedOutputs = [];
 
         foreach ($fixtureDirs as $i => $fixtureDir) {
-            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            [$input, $expectedOutput] = $this->getFixture($fixtureDir[0]);
             $allInputs->$i = $input;
             $expectedOutputs[] = $expectedOutput;
         }
@@ -228,5 +228,27 @@ class GdnFormatTest extends MinimalContainerTestCase {
         foreach ($expectedOutputs as $i => $expectedOutput) {
             $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs->$i);
         }
+    }
+
+    /**
+     * Test various cases that cause us not to format mentions.
+     */
+    public function testMentionCharBailout() {
+        $invalidFirstChars = '@{ hello @}asdf  @"{hello}';
+
+        // With quotes any character is allowed.
+        $expected = '@{ hello @}asdf  <a href="http://vanilla.test/minimal-container-test/profile/%7Bhello%7D" rel="nofollow">@{hello}</a>';
+        $this->assertEquals($expected, \Gdn_Format::mentions($invalidFirstChars));
+    }
+
+    /**
+     * Test various cases that cause us not to format mentions.
+     */
+    public function testTooManyBailout() {
+        $tooManyAlphas = "";
+        for ($i = 0; $i < 60; $i++) {
+            $tooManyAlphas .= "@someone ";
+        }
+        $this->assertEquals($tooManyAlphas, \Gdn_Format::mentions($tooManyAlphas));
     }
 }

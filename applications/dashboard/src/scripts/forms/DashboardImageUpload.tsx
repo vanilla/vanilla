@@ -55,7 +55,7 @@ export function DashboardImageUpload(props: IProps) {
                     id={inputID}
                     className={classes}
                     disabled={props.disabled}
-                    onChange={async event => {
+                    onChange={async (event) => {
                         const file = event.target.files && event.target.files[0];
                         if (!file) {
                             return;

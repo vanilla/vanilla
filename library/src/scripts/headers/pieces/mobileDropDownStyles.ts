@@ -116,9 +116,8 @@ export const mobileDropDownClasses = useThemeCache(() => {
     );
 
     const buttonContents = style("buttonContents", {
-        display: "inline-block",
+        display: "flex",
         position: "relative",
-        paddingRight: vars.chevron.width * 2,
         lineHeight: 1.5,
         overflow: "hidden",
         textOverflow: "ellipsis",
@@ -128,11 +127,14 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const title = style(
         "title",
         {
-            display: "inline",
+            display: "inline-flex",
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             lineHeight: vars.title.lineHeight,
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
         },
         mediaQueries.xs({
             textAlign: "left",
@@ -140,11 +142,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     );
 
     const icon = style("icon", {
-        position: "absolute",
-        display: "block",
-        top: 0,
-        right: 0,
-        bottom: 0,
+        display: "inline-flex",
         maxHeight: percent(100),
         maxWidth: percent(100),
         margin: `auto 0`,

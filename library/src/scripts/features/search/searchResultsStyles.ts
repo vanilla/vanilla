@@ -10,6 +10,7 @@ import {
     absolutePosition,
     colorOut,
     EMPTY_FONTS,
+    EMPTY_SPACING,
     fonts,
     margins,
     negativeUnit,
@@ -65,12 +66,7 @@ export const searchResultsVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("spacing", {
-        padding: {
-            top: 15,
-            right: globalVars.widget.padding,
-            bottom: 16,
-            left: globalVars.widget.padding,
-        },
+        padding: globalVars.itemList.padding,
     });
 
     const mediaElement = makeThemeVars("mediaElement", {
@@ -94,7 +90,7 @@ export const searchResultsVariables = useThemeCache(() => {
     };
 });
 
-export const searchResultsClasses = useThemeCache(mediaQueries => {
+export const searchResultsClasses = useThemeCache((mediaQueries) => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
@@ -120,15 +116,11 @@ export const searchResultsClasses = useThemeCache(mediaQueries => {
             },
         }),
     } as NestedCSSProperties);
+
     const noResults = style("noResults", {
         fontSize: globalVars.userContent.font.sizes.default,
-        ...paddings({
-            top: globalVars.spacer.size,
-            right: globalVars.gutter.half,
-            bottom: globalVars.spacer.size,
-            left: globalVars.gutter.half,
-        }),
     });
+
     const item = style("item", {
         position: "relative",
         display: "block",
@@ -332,6 +324,11 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         cursor: "pointer",
     });
 
+    const commentWrap = style("commentWrap", {
+        display: "flex",
+        marginTop: unit(globalVars.gutter.size),
+    });
+
     return {
         root,
         main,
@@ -347,6 +344,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         attachmentCompactStyles,
         link,
         iconWrap,
+        commentWrap,
         content,
     };
 });

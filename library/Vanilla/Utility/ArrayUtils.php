@@ -90,7 +90,7 @@ final class ArrayUtils {
             self::assertArray($array, "Unexpected argument type. Expected an array or array-like object.");
 
             $currentKey = reset($keys);
-            if (array_key_exists($currentKey, $array)) {
+            if (self::arrayKeyExists($currentKey, $array)) {
                 $value = $array[$currentKey];
                 $nextKeys = array_slice($keys, 1);
                 if (count($nextKeys) > 0) {
@@ -105,6 +105,22 @@ final class ArrayUtils {
         $result = $search($array, $keys);
 
         return $result;
+    }
+
+    /**
+     * An object safe version of `array_key_exists()`
+     *
+     * @param string|int $key The key to lookup.
+     * @param array|ArrayAccess $array The array or object to look at.
+     * @return bool Returns **true** if the key exists or **false** otherwise.
+     */
+    private static function arrayKeyExists($key, $array) {
+        if (is_array($array)) {
+            return array_key_exists($key, $array);
+        } elseif ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+        return false;
     }
 
     /**
@@ -184,13 +200,13 @@ final class ArrayUtils {
         $keys = self::explodePath($path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
-            if (array_key_exists($currentKey, $array) && !self::isArray($array[$currentKey])) {
+            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey])) {
                 throw new \InvalidArgumentException(
                     "Unexpected type in path. Expected an array or array-like object."
                 );
             }
 
-            if (!array_key_exists($currentKey, $array)) {
+            if (!self::arrayKeyExists($currentKey, $array)) {
                 $array[$currentKey] = [];
             }
 
@@ -324,7 +340,7 @@ final class ArrayUtils {
      *
      * Note that string comparisons are case-insensitive to emulate common database collations.
      *
-     * @param string $keys The keys to sort by.
+     * @param string[] $keys The keys to sort by.
      * @return callable Returns a function that can be passed to `usort`.
      */
     public static function sortCallback(string ...$keys): callable {
@@ -358,6 +374,51 @@ final class ArrayUtils {
     }
 
     /**
+     * Make a filte function based on a simple where like filter array.
+     *
+     * @param array $where The filter array.
+     * @param bool $strict Whether or not to use strict comparisons.
+     * @return callable Returns a function suitable to be used with `array_filter` or on its own.
+     */
+    public static function filterCallback(array $where, bool $strict = false): callable {
+        return function ($row) use ($where, $strict) {
+            foreach ($where as $key => $value) {
+                if (!array_key_exists($key, $row)) {
+                    return false;
+                } elseif ($strict && $row[$key] !== $value) {
+                    return false;
+                } elseif ($row[$key] != $value) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    /**
+     * Like `array_column` except values the values ar always an array of values.
+     * If there are multiple matching the same index key, then the multiple will be in that array.
+     *
+     * @param array $input The input array.
+     * @param string|null $valueKey The key to pull out or null for the full value.
+     * @param string $indexKey The key to index under. Unlike array_column this is required.
+     *
+     * @return array The indexed array.
+     */
+    public static function arrayColumnArrays(array $input, ?string $valueKey, string $indexKey): array {
+        $result = [];
+        foreach ($input as $inputRow) {
+            $rowKey = $inputRow[$indexKey] ?? '';
+            $rowValue = $inputRow;
+            if ($valueKey !== null) {
+                $rowValue = $inputRow[$valueKey] ?? null;
+            }
+            $result[$rowKey][] = $rowValue;
+        }
+        return $result;
+    }
+
+    /**
      * Remap one data key into another if it doesn't exist.
      *
      * @param array $data The data to modify.
@@ -377,5 +438,77 @@ final class ArrayUtils {
             }
         }
         return $data;
+    }
+
+    /**
+     * Pluck a set of keys from an array.
+     *
+     * @param mixed $arr
+     * @param string[] $keys
+     * @return array
+     * @todo Add tests.
+     */
+    public static function pluck($arr, array $keys): array {
+        self::assertArray($arr, __METHOD__."() expects argument 1 to be an array or array-like object.");
+
+        $keys = array_fill_keys($keys, true);
+        $result = array_intersect_key($arr, $keys);
+        return $result;
+    }
+
+    /**
+     * Convert an array's key from pascal case to camel case.
+     *
+     * @param array $arr
+     * @return array
+     * @todo Add tests.
+     */
+    public static function camelCase(array $arr): array {
+        $result = [];
+        foreach ($arr as $key => $value) {
+            if (is_array($value)) {
+                $result[lcfirst($key)] = self::camelCase($value);
+            } else {
+                $result[lcfirst($key)] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Convert an array's key from camel case to pascal case.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function pascalCase(array $arr): array {
+        $result = [];
+        foreach ($arr as $key => $value) {
+            if (is_array($value)) {
+                $result[ucfirst($key)] = self::pascalCase($value);
+            } else {
+                $result[ucfirst($key)] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Box a mixed variable into an array by exploding a string or returning the array.
+     *
+     * This method is meant to handle legacy functionality where we allow array variables to also be strings.
+     *
+     * @param string $glue The glue used to explode.
+     * @param mixed $array The arrayish variable to work on.
+     * @return array Returns an exploded string.
+     */
+    public static function explodeMixed(string $glue, $array): array {
+        if (empty($array)) {
+            return [];
+        } elseif (is_string($array)) {
+            return self::explodeTrim($glue, $array);
+        } else {
+            return (array)$array;
+        }
     }
 }

@@ -22,7 +22,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface {
      */
     public function getLogEntry(): LogEntry {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context['comment'] = array_intersect_key($payload["comment"] ?? [], [
+        $context['comment'] = array_intersect_key($this->payload["comment"] ?? [], [
             "commentID" => true,
             "discussionID" => true,
             "dateInserted" => true,

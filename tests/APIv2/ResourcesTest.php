@@ -58,6 +58,30 @@ class ResourcesTest extends AbstractAPIv2Test {
     }
 
     /**
+     * The index should return the resource for the main tables.
+     */
+    public function testIndexRecordTypes(): void {
+        $r = $this->api()->get('/resources', ['recordTypes' => ['user', 'category']])->getBody();
+        $expected = [
+            [
+                'recordType' => 'user',
+                'url' => 'http://vanilla.test/resourcestest/api/v2/resources/user',
+                'crawlable' => true,
+            ],
+            [
+                'recordType' => 'category',
+                'url' => 'http://vanilla.test/resourcestest/api/v2/resources/category',
+                'crawlable' => true,
+            ],
+        ];
+
+        usort($expected, ArrayUtils::sortCallback('recordType'));
+        usort($r, ArrayUtils::sortCallback('recordType'));
+
+        $this->assertSame($expected, $r);
+    }
+
+    /**
      * A basic smoke test of the individual resource endpoints.
      */
     public function testResourceCrawlInspection(): void {

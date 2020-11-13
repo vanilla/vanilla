@@ -39,6 +39,7 @@ export const colorPickerClasses = useThemeCache(() => {
         position: "relative",
         ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size, 2, 0),
         width: unit(inputWidth),
+        maxWidth: unit(inputWidth), // Needed for Firefox.
         color: colorOut(builderVariables.defaultFont.color),
         flexBasis: unit(inputWidth),
         ...borders(builderVariables.border),
@@ -59,14 +60,8 @@ export const colorPickerClasses = useThemeCache(() => {
         width: unit(vars.swatch.width),
         flexBasis: unit(vars.swatch.width),
         height: percent(100),
-        ...borders(
-            {
-                top: builderVariables.border as IGlobalBorderStyles,
-                right: builderVariables.border as IGlobalBorderStyles,
-                bottom: builderVariables.border as IGlobalBorderStyles,
-            },
-            {} as IGlobalBorderStyles,
-        ),
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
         borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
         borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
         $nest: {

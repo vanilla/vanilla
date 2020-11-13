@@ -11,13 +11,19 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Dashboard\Modules\CommunityLeadersModule;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Contracts;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Event handlers for the Dashboard application.
  */
-class DashboardHooks extends Gdn_Plugin {
+class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     /** @var string */
     private $mobileThemeKey;
@@ -37,6 +43,8 @@ class DashboardHooks extends Gdn_Plugin {
      * @param \Vanilla\AddonManager $addonManager
      * @param Contracts\ConfigurationInterface $config
      * @param Emoji $emoji
+     * @throws \Garden\Container\ContainerException Catch container errors.
+     * @throws \Garden\Container\NotFoundException Catch if ther is no container.
      */
     public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config, Emoji $emoji) {
         parent::__construct();
@@ -80,10 +88,21 @@ class DashboardHooks extends Gdn_Plugin {
             ->addCall('addProvider', [new Reference(ActivityCounterProvider::class)])
             ->addCall('addProvider', [new Reference(LogCounterProvider::class)])
             ->addCall('addProvider', [new Reference(RoleCounterProvider::class)])
+
+            ->rule(WidgetService::class)
+            ->addCall('registerWidget', [CommunityLeadersModule::class])
         ;
 
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
         $mf->addModel('user', UserModel::class, 'u');
+
+        $privateIPs = \Gdn::config('Garden.Privacy.IPs');
+
+        if (in_array($privateIPs, ['full', 'partial'])) {
+            \Vanilla\Utility\ContainerUtils::addCall($dic, \Gdn_Request::class, 'anonymizeIP', [$privateIPs === 'full']);
+            // This is a kludge, but given this is a privacy setting, let's ensure newed up IPs are used properly.
+            $_SERVER['HTTP_CLIENT_IP'] = $_SERVER['HTTP_X_FORWARDED_FOR'] = $_SERVER['REMOTE_ADDR'] = \Gdn::request()->getIP();
+        }
     }
 
     /**
@@ -94,8 +113,7 @@ class DashboardHooks extends Gdn_Plugin {
     public function base_render_before($sender) {
         $session = Gdn::session();
 
-
-        if ($sender->MasterView == 'admin') {
+        if ($sender->MasterView == 'admin' && ($sender->isRenderingMasterView() || $sender->deliveryType() === DELIVERY_TYPE_VIEW)) {
             if (val('Form', $sender)) {
                 $sender->Form->setStyles('bootstrap');
             }
@@ -138,7 +156,7 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         // Check the statistics.
-        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+        if ($sender->isRenderingMasterView()) {
             Gdn::statistics()->check();
         }
 
@@ -165,6 +183,9 @@ class DashboardHooks extends Gdn_Plugin {
             $exceptions = [];
         }
 
+        // All registration pages should display "Register" messages.
+        $location = strpos(strtolower($location), 'dashboard/entry/register') === 0 ? 'dashboard/entry/register' : $location;
+
         if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') && (val('MessagesLoaded', $sender) != '1' && $sender->MasterView != 'empty' && arrayInArray($exceptions, $messageCache, false) || inArrayI($location, $messageCache))) {
             $messageModel = new MessageModel();
             $messageData = $messageModel->getMessagesForLocation($location, $exceptions, $sender->data('Category.CategoryID'));
@@ -172,13 +193,14 @@ class DashboardHooks extends Gdn_Plugin {
                 $messageModule = new MessageModule($sender, $message);
                 if ($signInOnly) { // Insert special messages even in SignIn popup
                     echo $messageModule;
-                } elseif ($sender->deliveryType() == DELIVERY_TYPE_ALL)
+                } elseif ($sender->isRenderingMasterView()) {
                     $sender->addModule($messageModule);
+                }
             }
             $sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
         }
 
-        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+        if ($sender->isRenderingMasterView()) {
             $gdn_Statistics = Gdn::factory('Statistics');
             $gdn_Statistics->check($sender);
         }
@@ -307,9 +329,35 @@ class DashboardHooks extends Gdn_Plugin {
         $nav->addGroupToSection('Moderation', t('Site'), 'site')
             ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Messages'), '/dashboard/message', 'site.messages', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'], false), 'Moderation', t('Users'), '/dashboard/user', 'site.users', '', $sort)
-            ->addLinkToSectionIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), 'Moderation', t('Applicants'), '/dashboard/user/applicants', 'site.applicants', '', $sort, ['popinRel' => '/dashboard/user/applicantcount'], false)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Ban Rules'), '/dashboard/settings/bans', 'site.bans', '', $sort)
+            ;
 
+        $nav
+            ->addGroupToSection('Moderation', t('Requests'), 'requests')
+            ->addLinkToSectionIf(
+                $session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'),
+                'Moderation',
+                t('Applicants'),
+                '/dashboard/user/applicants',
+                'requests.applicants',
+                '',
+                $sort,
+                ['popinRel' => '/dashboard/user/applicantcount'],
+                false
+            )
+            ->addLinkToSectionIf(
+                \Vanilla\FeatureFlagHelper::featureEnabled(ManageController::FEATURE_ROLE_APPLICATIONS) &&
+                $session->checkPermission('Garden.Community.Manage'),
+                'Moderation',
+                t('Role Applicants'),
+                '/manage/requests/role-applications',
+                'requests.role-applications',
+                '',
+                $sort
+            )
+            ;
+
+        $nav
             ->addGroupToSection('Moderation', t('Content'), 'moderation')
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
@@ -334,6 +382,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('User Profile'), '/dashboard/settings/profile', 'users.profile', '', $sort)
 
             ->addGroup(t('Discussions'), 'forum', '', ['after' => 'users'])
             ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
@@ -368,9 +417,12 @@ class DashboardHooks extends Gdn_Plugin {
     /**
      * Aggressively prompt users to upgrade PHP version.
      *
-     * @param $sender
+     * @param SettingsController $sender
      */
     public function settingsController_render_before($sender) {
+        if (!inSection('Dashboard') || $sender->isRenderingMasterView()) {
+            return;
+        }
         // Set this in your config to dismiss our upgrade warnings. Not recommended.
         $warning = c('Vanilla.WarnedMeToUpgrade');
         if ($warning && version_compare(ENVIRONMENT_PHP_NEXT_VERSION, $warning) <= 0) {
@@ -422,7 +474,7 @@ class DashboardHooks extends Gdn_Plugin {
         $tagTypes = $tagModel->getTagTypes();
 
 
-        list($offset, $limit) = offsetLimit($page, 100);
+        [$offset, $limit] = offsetLimit($page, 100);
         $sender->setData('_Limit', $limit);
 
         if ($search) {
@@ -536,7 +588,7 @@ class DashboardHooks extends Gdn_Plugin {
                     // Make sure the tag is valid
                     $tagData = $sender->Form->getFormValue('Name');
                     if (!TagModel::validateTag($tagData)) {
-                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas or underscores.'));
                     }
 
                     // Make sure that the tag name is not already in use.
@@ -575,7 +627,7 @@ class DashboardHooks extends Gdn_Plugin {
                     // Make sure the tag is valid
                     $tagName = $sender->Form->getFormValue('Name');
                     if (!TagModel::validateTag($tagName)) {
-                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas or underscores.'));
                     }
 
                     $tagType = $sender->Form->getFormValue('Type');
@@ -690,6 +742,24 @@ class DashboardHooks extends Gdn_Plugin {
                 // There was some sort of error. Let's print that out.
                 foreach (Gdn::userModel()->Validation->resultsArray() as $msg) {
                     trace($msg, TRACE_ERROR);
+                }
+                if (c('Vanilla.SSO.Debug') && $this->logger instanceof Psr\Log\LoggerInterface) {
+                    $this->logger->info(
+                        'SSO String Failed to Connect',
+                        [
+                            Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_APPLICATION,
+                            'event' => 'embedded_sso',
+                            'timestamp' => time(),
+                            'userid' => Gdn::session()->UserID,
+                            'username' => Gdn::session()->User->Name ?? 'anonymous',
+                            'ip' => Gdn::request()->getIP(),
+                            'method' => Gdn::request()->requestMethod(),
+                            'domain' => rtrim(url('/', true), '/'),
+                            'path' => Gdn::request()->getPath(),
+                            'error_message' => $msg ?? 'Unknown Error',
+                            'vanilla_sso' => $sso
+                        ]
+                    );
                 }
                 Gdn::userModel()->Validation->reset();
             }
@@ -822,7 +892,7 @@ class DashboardHooks extends Gdn_Plugin {
         // found. We should clear the user prefs in that case.
         if (!empty($args['PathArgs'])) {
             if (Gdn::session()->isValid()) {
-                $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+                $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'] ?? '';
                 try {
                     $userModel = new UserModel();
                     $userModel->clearSectionNavigationPreference($uri);

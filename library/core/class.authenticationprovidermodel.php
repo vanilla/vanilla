@@ -24,11 +24,8 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     const COLUMN_NAME = 'Name';
 
     const ALL_CACHE_KEY = 'AuthenticationProviders-All';
-
-    /**
-     * @var array The default authentication provider.
-     */
-    private static $default = null;
+    const DEFAULT_CACHE_KEY = 'AuthenticationProviders-Default';
+    const CACHE_TTL = 60 * 30; // 30 minutes.
 
     /**
      *
@@ -37,6 +34,17 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         parent::__construct('UserAuthenticationProvider');
         $this->PrimaryKey = self::COLUMN_KEY;
     }
+
+    /**
+     * Cache invalidation.
+     */
+    protected function onUpdate() {
+        parent::onUpdate();
+        $cache = Gdn::cache();
+        $cache->remove(self::ALL_CACHE_KEY);
+        $cache->remove(self::DEFAULT_CACHE_KEY);
+    }
+
 
     /**
      *
@@ -61,15 +69,21 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      * @return array
      */
     public static function getDefault() {
-        if (self::$default === null) {
+        $cache = Gdn::cache();
+        // GDN cache has local caching by default.
+        $result = $cache->get(self::DEFAULT_CACHE_KEY);
+        if ($result === Gdn_Cache::CACHEOP_FAILURE) {
             $rows = self::getWhereStatic(['IsDefault' => 1]);
             if (empty($rows)) {
-                self::$default = false;
+                $result = false;
             } else {
-                self::$default = array_pop($rows);
+                $result = array_pop($rows);
             }
+            $cache->store(self::DEFAULT_CACHE_KEY, $result, [
+                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL,
+            ]);
         }
-        return self::$default;
+        return $result;
     }
 
     /**
@@ -79,40 +93,44 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      */
     public function getProviders() {
         if (Gdn::session()->isValid()) {
+            $userID = Gdn::session()->UserID;
             $this->SQL
                 ->select('uap.*')
-                ->from('UserAuthenticationProvider uap');
-
-            if (Gdn::session()->isValid()) {
-                $userID = Gdn::session()->UserID;
-
-                $this->SQL
-                    ->select('ua.ForeignUserKey', '', 'UniqueID')
-                    ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $userID", 'left');
-            }
+                ->from('UserAuthenticationProvider uap')
+                ->select('ua.ForeignUserKey', '', 'UniqueID')
+                ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $userID", 'left');
 
             $data = $this->SQL->get()->resultArray();
         } else {
-            $cache = Gdn::cache();
-
-            $data = $cache->get(self::ALL_CACHE_KEY);
-            if ($data === Gdn_Cache::CACHEOP_FAILURE) {
-                $data = $this->SQL
-                    ->select('uap.*')
-                    ->from('UserAuthenticationProvider uap')
-                    ->get()
-                    ->resultArray()
-                ;
-                $cache->store(self::ALL_CACHE_KEY, $data, [
-                    Gdn_Cache::FEATURE_EXPIRY => 120, // 2 minute expiry.
-                ]);
-            }
+            $data = $this->getAll();
         }
 
         $data = Gdn_DataSet::index($data, ['AuthenticationKey']);
         foreach ($data as &$row) {
             self::calculate($row);
         }
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll(): array {
+        $cache = Gdn::cache();
+
+        $data = $cache->get(self::ALL_CACHE_KEY);
+        if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+            $data = $this->SQL
+                ->select('uap.*')
+                ->from('UserAuthenticationProvider uap')
+                ->get()
+                ->resultArray()
+            ;
+            $cache->store(self::ALL_CACHE_KEY, $data, [
+                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL,
+            ]);
+        }
+
         return $data;
     }
 
@@ -224,51 +242,47 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     }
 
     /**
-     *
-     *
-     * @param array $data
-     * @param bool $settings
-     * @return bool
+     * {@inheritDoc}
      */
-    public function save($data, $settings = false) {
+    public function save($formPostValues, $settings = false) {
         // Grab the current record.
         $row = false;
         if ($id = val('ID', $settings)) {
             $row = $this->getWhere([$this->PrimaryKey => $id])->firstRow(DATASET_TYPE_ARRAY);
-        } elseif (isset($data[$this->PrimaryKey])) {
-            $row = $this->getWhere([$this->PrimaryKey => $data[$this->PrimaryKey]])->firstRow(DATASET_TYPE_ARRAY);
+        } elseif (isset($formPostValues[$this->PrimaryKey])) {
+            $row = $this->getWhere([$this->PrimaryKey => $formPostValues[$this->PrimaryKey]])->firstRow(DATASET_TYPE_ARRAY);
         } elseif ($pK = val('PK', $settings)) {
-            $row = $this->getWhere([$pK => $data[$pK]])->firstRow(DATASET_TYPE_ARRAY);
+            $row = $this->getWhere([$pK => $formPostValues[$pK]])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         // Get the columns and put the extended data in the attributes.
         $this->defineSchema();
         $columns = $this->Schema->fields();
         $remove = ['TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1];
-        $data = array_diff_key($data, $remove);
-        $attributes = array_diff_key($data, $columns);
+        $formPostValues = array_diff_key($formPostValues, $remove);
+        $attributes = array_diff_key($formPostValues, $columns);
 
         if (!empty($attributes)) {
-            $data = array_diff_key($data, $attributes);
-            $data['Attributes'] = dbencode($attributes);
+            $formPostValues = array_diff_key($formPostValues, $attributes);
+            $formPostValues['Attributes'] = dbencode($attributes);
         }
 
         $insert = !$row;
         if ($insert) {
-            $this->addInsertFields($data);
+            $this->addInsertFields($formPostValues);
         } else {
-            $this->addUpdateFields($data);
+            $this->addUpdateFields($formPostValues);
         }
 
         // Validate the form posted values
-        if ($this->validate($data, $insert) === true) {
+        if ($this->validate($formPostValues, $insert) === true) {
             // Clear the default from other authentication providers.
-            $default = val('IsDefault', $data);
+            $default = val('IsDefault', $formPostValues);
             if ($default) {
                 $this->SQL->put(
                     $this->Name,
                     ['IsDefault' => 0],
-                    ['AuthenticationKey <>' => val('AuthenticationKey', $data)]
+                    ['AuthenticationKey <>' => val('AuthenticationKey', $formPostValues)]
                 );
             }
 
@@ -288,6 +302,6 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         } else {
             $primaryKeyVal = false;
         }
-        return $primaryKeyVal;
+        return $primaryKeyVal ?? null;
     }
 }

@@ -25,6 +25,8 @@ import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary"
 import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { visibility } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { BrightcoveEmbed } from "@library/embeddedContent/BrightcoveEmbed";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
@@ -46,7 +48,9 @@ export interface IBaseEmbedData {
     name?: string;
 }
 
-export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {}
+export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {
+    [key: string]: any;
+}
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
     async?: boolean;
@@ -68,6 +72,7 @@ export function useEmbedContext() {
 }
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
+    ensureBuiltinEmbeds();
     return new Promise((resolve, reject) => {
         const type = data.embedType || null;
         if (type === null) {
@@ -138,7 +143,7 @@ function ensureEmbedDescription() {
 
 export async function mountAllEmbeds(root: HTMLElement = document.body) {
     const mountPoints = root.querySelectorAll(".js-embed[data-embedjson]");
-    const promises = Array.from(mountPoints).map(mountPoint => {
+    const promises = Array.from(mountPoints).map((mountPoint) => {
         try {
             const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
             return mountEmbed(mountPoint as HTMLElement, parsedData, false);
@@ -150,24 +155,40 @@ export async function mountAllEmbeds(root: HTMLElement = document.body) {
     await Promise.all(promises);
 }
 
-// Default embed registration
-registerEmbed("codepen", CodePenEmbed);
-registerEmbed("file", FileEmbed);
-registerEmbed("gettyimages", GettyImagesEmbed);
-registerEmbed("getty", GettyImagesEmbed);
-registerEmbed("giphy", GiphyEmbed);
-registerEmbed("imgur", ImgurEmbed);
-registerEmbed("instagram", InstagramEmbed);
-registerEmbed("link", LinkEmbed);
-registerEmbed("quote", QuoteEmbed);
-registerEmbed("soundcloud", SoundCloudEmbed);
-registerEmbed("twitch", VideoEmbed);
-registerEmbed("twitter", TwitterEmbed);
-registerEmbed("vimeo", VideoEmbed);
-registerEmbed("wistia", VideoEmbed);
-registerEmbed("youtube", VideoEmbed);
-registerEmbed("panopto", PanoptoEmbed);
-registerEmbed("image", ImageEmbed);
+let builtinsRegistered = false;
+
+/**
+ * Mount the built-in embeds if they aren't already.
+ */
+function ensureBuiltinEmbeds() {
+    if (builtinsRegistered) {
+        return;
+    }
+    builtinsRegistered = true;
+    // Default embed registration
+    registerEmbed("codepen", CodePenEmbed);
+    registerEmbed("file", FileEmbed);
+    registerEmbed("gettyimages", GettyImagesEmbed);
+    registerEmbed("getty", GettyImagesEmbed);
+    registerEmbed("giphy", GiphyEmbed);
+    registerEmbed("imgur", ImgurEmbed);
+    registerEmbed("instagram", InstagramEmbed);
+    registerEmbed("link", LinkEmbed);
+    registerEmbed("quote", QuoteEmbed);
+    registerEmbed("soundcloud", SoundCloudEmbed);
+    registerEmbed("twitch", VideoEmbed);
+    registerEmbed("twitter", TwitterEmbed);
+    registerEmbed("vimeo", VideoEmbed);
+    registerEmbed("wistia", VideoEmbed);
+    registerEmbed("youtube", VideoEmbed);
+    registerEmbed("panopto", PanoptoEmbed);
+    registerEmbed("image", ImageEmbed);
+    registerEmbed("brightcove", BrightcoveEmbed);
+
+    if (supportsFrames()) {
+        registerEmbed("iframe", IFrameEmbed);
+    }
+}
 
 // This is specifically required because of some legacy formats that don't render
 // The embed json format. Twitter was converted out of global JS and merged here.

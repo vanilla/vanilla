@@ -93,7 +93,7 @@ export const groupsCSS = () => {
         width: percent(100),
     });
 
-    cssOut(`.Photo.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
+    cssOut(`.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
         width: unit(vars.logo.height),
         height: unit(vars.logo.height),
         flexBasis: unit(vars.logo.height),
@@ -113,17 +113,6 @@ export const groupsCSS = () => {
         alignItems: "center",
     });
 
-    cssOut(`.Groups .DataTable .Item td, .DataTable .Item td`, {
-        borderBottom: singleBorder(),
-        ...paddings({
-            ...layoutVars.cell.paddings,
-        }),
-    });
-
-    cssOut(`.Groups .DataTable .Item:first-child td, .DataTable .Item:first-child td`, {
-        borderTop: singleBorder(),
-    });
-
     cssOut(`.GroupOptions`, {
         top: calc(`100% + ${unit(globalVars.gutter.size)}`),
         marginLeft: "auto",
@@ -132,14 +121,6 @@ export const groupsCSS = () => {
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
         color: colorOut(globalVars.meta.colors.fg),
     });
-
-    cssOut(
-        `.Groups .DataTable .Excerpt, .Groups .DataTable .CategoryDescription, .DataTable .Excerpt, .DataTable .CategoryDescription`,
-        {
-            color: colorOut(globalVars.mainColors.fg),
-            fontSize: unit(globalVars.fonts.size.medium),
-        },
-    );
 
     cssOut(`.Groups .Name.Group-Name .Options .Button`, {
         minWidth: 0,
@@ -203,10 +184,7 @@ export const groupsCSS = () => {
 
     // Group Box
     cssOut(`.Group-Box .Item:not(tr)`, {
-        display: "flex",
-        flexDirection: "row-reverse",
         width: percent(100),
-        alignItems: "center",
     });
 
     cssOut(`.Group-Box .ItemContent`, {
@@ -258,7 +236,9 @@ export const groupsCSS = () => {
     cssOut(
         `.Group-Box .PageControls .Button-Controls`,
         mediaQueries.aboveMobile({
-            ...absolutePosition.middleRightOfParent(),
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+            margin: "auto 0",
         }),
     );
 

@@ -5,7 +5,7 @@
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, pointerEvents, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, flexHelper, margins, paddings, pointerEvents, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
 import { inputMixin, inputVariables } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -63,6 +63,10 @@ export const selectOneClasses = useThemeCache(() => {
                 width: unit(inputVariables().sizing.height / 2),
                 cursor: "pointer",
             },
+            "& .suggestedTextInput-head": {
+                ...flexHelper().middleLeft(),
+                justifyContent: "space-between",
+            },
             "& .SelectOne__single-value": {
                 textOverflow: "ellipsis",
                 maxWidth: calc(`100% - ${unit(vars.padding.right + singleValueOffset)}`),
@@ -87,6 +91,22 @@ export const selectOneClasses = useThemeCache(() => {
             "& .SelectOne__menu-notice--no-options": {
                 padding: 10,
                 overflow: "hidden",
+            },
+            "& .suggestedTextInput-option": {
+                width: "100%",
+                textAlign: "left",
+                ...paddings({
+                    vertical: 8,
+                    horizontal: 12,
+                }),
+            },
+            "& .suggestedTextInput-option:hover": {
+                backgroundColor: colorOut(globalVars.states.hover.highlight),
+            },
+            "& .icon-selectedCategory": {
+                ...margins({
+                    horizontal: 4,
+                }),
             },
             "& .inputBlock": inputMixin(),
         },

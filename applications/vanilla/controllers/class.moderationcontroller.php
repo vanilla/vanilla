@@ -8,15 +8,16 @@
  * @since 2.0
  */
 
+use Webmozart\Assert\Assert;
+
 /**
  * Handles content moderation via /moderation endpoint.
  */
 class ModerationController extends VanillaController {
-
     use \Vanilla\Web\TwigRenderTrait;
 
     // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
-    private const MAX_TIME_BATCH_DELETE = 10;
+    private const MAX_TIME_BATCH = 10;
 
     /**
      * Looks at the user's attributes and form postback to see if any comments
@@ -46,6 +47,8 @@ class ModerationController extends VanillaController {
      * Looks at the user's attributes and form postback to see if any comments
      * have been checked for administration, and if so, adds an inform message to
      * $sender to take action.
+     *
+     * @param Gdn_Controller $sender
      */
     public static function informCheckedComments($sender) {
         $session = Gdn::session();
@@ -214,8 +217,11 @@ class ModerationController extends VanillaController {
 
     /**
      * Remove all comments checked for administration from the user's attributes.
+     *
+     * @param int $discussionID
+     * @param string $transientKey
      */
-    public function clearCommentSelections($discussionID = '', $transientKey = '') {
+    public function clearCommentSelections($discussionID, $transientKey = '') {
         $session = Gdn::session();
         if ($session->validateTransientKey($transientKey)) {
             $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
@@ -241,8 +247,10 @@ class ModerationController extends VanillaController {
     /**
      * Form to confirm that the administrator wants to delete the selected
      * comments (and has permission to do so).
+     *
+     * @param int $discussionID
      */
-    public function confirmCommentDeletes($discussionID = '') {
+    public function confirmCommentDeletes(int $discussionID) {
         $session = Gdn::session();
         $this->Form = new Gdn_Form();
         $discussionModel = new DiscussionModel();
@@ -278,7 +286,14 @@ class ModerationController extends VanillaController {
             // Delete the selected comments
             $commentModel = new CommentModel();
             foreach ($commentIDs as $commentID) {
-                $commentModel->deleteID($commentID);
+                Assert::integerish($commentID);
+                $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
+                if ((int)$comment['DiscussionID'] === (int)$discussionID) {
+                    // Make sure the comment is from the same discussion that was deleted.
+                    // The user interface ensures this, but just in case it becomes not true due to a UX error let's not
+                    // make this an error that the user may not be able to recover from.
+                    $commentModel->deleteID($commentID);
+                }
             }
 
             // Clear selections
@@ -313,6 +328,8 @@ class ModerationController extends VanillaController {
 
         if (!is_array($checkedDiscussions)) {
             $checkedDiscussions = [];
+        } else {
+            array_walk($checkedDiscussions, [Assert::class, 'integerish']);
         }
 
         $discussionIDs = $checkedDiscussions;
@@ -338,8 +355,7 @@ class ModerationController extends VanillaController {
 
         if ($this->Request->isAuthenticatedPostBack(true)) {
             $checkedDiscussions = array_combine($allowedDiscussions, $allowedDiscussions);
-            // Queue deleting discussions.
-            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+
             foreach ($allowedDiscussions as $discussionID) {
                 $discussionModel->deleteID($discussionID);
                 unset($checkedDiscussions[$discussionID]);
@@ -351,7 +367,7 @@ class ModerationController extends VanillaController {
                 $this->jsonTarget("#Discussion_$discussionID", ["remove" => true], 'SlideUp');
 
                 $elapsedTime = time() - $startTime;
-                if ($elapsedTime > self::MAX_TIME_BATCH_DELETE) {
+                if ($elapsedTime > self::MAX_TIME_BATCH) {
                     break;
                 }
             }
@@ -393,22 +409,25 @@ class ModerationController extends VanillaController {
         $this->Form = new Gdn_Form();
         $DiscussionModel = new DiscussionModel();
         $CategoryModel = new CategoryModel();
+        $startTime = time();
 
         $this->title(t('Confirm'));
 
         if ($DiscussionID) {
             $CheckedDiscussions = (array)$DiscussionID;
-            $ClearSelection = false;
             $discussion = $DiscussionModel->getID($DiscussionID, DATASET_TYPE_ARRAY);
             $this->setData('CategoryID', $discussion['CategoryID']);
             $this->setData('DiscussionType', $discussion['Type']);
         } else {
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
+            $CheckedDiscussions = $this->Request->post('discussionIDs', null);
+
+            if ($CheckedDiscussions === null) {
+                $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
+            }
+
             if (!is_array($CheckedDiscussions)) {
                 $CheckedDiscussions = [];
             }
-
-            $ClearSelection = true;
         }
 
         $DiscussionIDs = $CheckedDiscussions;
@@ -432,11 +451,13 @@ class ModerationController extends VanillaController {
                 $AllowedDiscussions[] = $DiscussionID;
             }
         }
+
+        $checkedDiscussions = array_combine($AllowedDiscussions, $AllowedDiscussions);
         $this->setData('CountAllowed', count($AllowedDiscussions));
         $CountNotAllowed = $CountCheckedDiscussions - count($AllowedDiscussions);
         $this->setData('CountNotAllowed', $CountNotAllowed);
 
-        if ($this->Form->authenticatedPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack(true)) {
             // Retrieve the category id
             $CategoryID = $this->Form->getFormValue('CategoryID');
             $Category = CategoryModel::categories($CategoryID);
@@ -449,8 +470,6 @@ class ModerationController extends VanillaController {
                 if (!$Category['PermsDiscussionsAdd']) {
                     throw forbiddenException('@' . t('You do not have permission to add discussions to this category.'));
                 }
-
-                $AffectedCategories = [];
 
                 // Iterate and move.
                 foreach ($AllowedDiscussions as $DiscussionID) {
@@ -466,7 +485,10 @@ class ModerationController extends VanillaController {
                             'DateInserted' => $Discussion['DateLastComment'],
                             'Type' => 'redirect',
                             'CategoryID' => $Discussion['CategoryID'],
-                            'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => discussionUrl($Discussion)]),
+                            'Body' => formatString(
+                                t('This discussion has been <a href="{url,html}">moved</a>.'),
+                                ['url' => discussionUrl($Discussion)]
+                            ),
                             'Format' => 'Html',
                             'Closed' => true
                         ];
@@ -490,54 +512,52 @@ class ModerationController extends VanillaController {
                         }
                     }
 
-                    $DiscussionModel->setField($DiscussionID, 'CategoryID', $CategoryID);
+                    $DiscussionModel->save([
+                        "CategoryID" => $CategoryID,
+                        "DiscussionID" => $DiscussionID,
+                    ]);
+                    unset($checkedDiscussions[$DiscussionID]);
 
-                    if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
-                        $AffectedCategories[$Discussion['CategoryID']] = [-1, -$Discussion['CountComments']];
-                    } else {
-                        $AffectedCategories[$Discussion['CategoryID']][0] -= 1;
-                        $AffectedCategories[$Discussion['CategoryID']][1] -= $Discussion['CountComments'];
-                    }
-                    if (!isset($AffectedCategories[$CategoryID])) {
-                        $AffectedCategories[$CategoryID] = [1, $Discussion['CountComments']];
-                    } else {
-                        $AffectedCategories[$CategoryID][0] += 1;
-                        $AffectedCategories[$CategoryID][1] += $Discussion['CountComments'];
-                    }
-                }
+                    Gdn::userModel()->saveAttribute(
+                        $Session->UserID,
+                        "CheckedDiscussions",
+                        array_values($checkedDiscussions)
+                    );
 
-                // Update recent posts and counts on all affected categories.
-                CategoryModel::clearCache();
-                foreach ($AffectedCategories as $categoryID => $counts) {
-                    $CategoryModel->refreshAggregateRecentPost($categoryID, true);
-
-                    // Prepare to adjust post counts for this category and its ancestors.
-                    list($discussionOffset, $commentOffset) = $counts;
-
-                    // Offset the discussion count for this category and its parents.
-                    if ($discussionOffset < 0) {
-                        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
-                    } else {
-                        CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
-                    }
-
-                    // Offset the comment count for this category and its parents.
-                    if ($commentOffset < 0) {
-                        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
-                    } else {
-                        CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
+                    $elapsedTime = time() - $startTime;
+                    if ($elapsedTime > self::MAX_TIME_BATCH) {
+                        break;
                     }
                 }
-                CategoryModel::clearCache();
 
-                // Clear selections.
-                if ($ClearSelection) {
-                    Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
+                if (!empty($checkedDiscussions)) {
+                    $this->jsonTarget('', [
+                        'url' => '/moderation/confirmdiscussionmoves',
+                        'reprocess' => true,
+                        'data' => [
+                            'DeliveryType' => DELIVERY_TYPE_VIEW,
+                            'DeliveryMethod' => DELIVERY_METHOD_JSON,
+                            'CategoryID' => $CategoryID,
+                            'RedirectLink' => $this->Form->getFormValue('RedirectLink') ? 1 : 0,
+                            'discussionIDs' => array_values($checkedDiscussions),
+                            'fork' => false
+                        ]
+                    ], 'Ajax');
+                    $this->title(t("Moving..."));
+                    $this->setFormSaved(false);
+                    $this->jsonTarget(
+                        "#Popup .Content",
+                        $this->renderTwig('/applications/vanilla/views/moderation/progress.twig', $this->Data),
+                        "Html"
+                    );
+                    $this->View = "progress";
+                } else {
                     ModerationController::informCheckedDiscussions($this);
-                }
 
-                if ($this->Form->errorCount() == 0) {
-                    $this->jsonTarget('', '', 'Refresh');
+                    if ($this->Form->errorCount() == 0) {
+                        $this->setFormSaved(true);
+                        $this->jsonTarget('', '', 'Refresh');
+                    }
                 }
             }
         }

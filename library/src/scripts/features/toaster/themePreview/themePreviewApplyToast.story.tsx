@@ -9,11 +9,10 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import Toast from "../Toast";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { LoadStatus } from "@library/@types/api/core";
 
-const formsStory = storiesOf("Toast", module);
+const formsStory = storiesOf("Theme UI/Toast", module);
 
-formsStory.add("Toast/ThemePreview/Apply", () =>
+formsStory.add("Theme Preview (Apply)", () =>
     (() => {
         return (
             <>

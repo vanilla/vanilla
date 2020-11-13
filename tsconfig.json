@@ -12,10 +12,12 @@
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
-            "@groups/*": ["./applications/groups/src/scripts/*"]
+            "@groups/*": ["./applications/groups/src/scripts/*"],
+            "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
+            "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"]
         },
         "typeRoots": ["@types", "./node_modules/@types"]
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*"]
+    "include": ["**/*.ts", "**/*.tsx", ".storybookAppPages/*.ts*"],
+    "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*", "node_modules/**/*"]
 }

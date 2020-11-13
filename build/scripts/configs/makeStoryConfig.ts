@@ -7,11 +7,6 @@
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
-import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
-
-// tslint:disable
-const TSDocgenPlugin = require("react-docgen-typescript-webpack-plugin");
-const merge = require("webpack-merge");
 
 /**
  * Create the storybook configuration.
@@ -19,20 +14,51 @@ const merge = require("webpack-merge");
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
 export async function makeStoryConfig(baseStorybookConfig: Configuration, entryModel: EntryModel) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, "storybook");
-    baseConfig.mode = "development";
-    baseConfig.optimization = {
-        splitChunks: false,
-    };
-    baseConfig.plugins?.push(
+    const baseConfig = await makeBaseConfig(entryModel, "storybook");
+
+    // Apply our module resolutions.
+    baseStorybookConfig.resolve = baseConfig.resolve;
+
+    // Ensure our environmental variable is applied.
+    baseStorybookConfig.plugins?.push(
         new webpack.DefinePlugin({
             ["process.env.NODE_ENV"]: "'test'",
         }),
     );
-    baseConfig.optimization = {
-        minimizer: [
-            new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
+
+    // We need to process SCSS files.
+    baseStorybookConfig.module?.rules.push({
+        test: /\.scss$/,
+        use: [
+            "style-loader",
+            {
+                loader: "css-loader",
+                options: {
+                    sourceMap: true,
+                    url: false,
+                },
+            },
+            {
+                loader: "sass-loader",
+                options: {
+                    implementation: require("sass"), // Use dart sass
+                },
+            },
         ],
-    };
-    return merge(baseStorybookConfig, baseConfig as any);
+    });
+
+    baseStorybookConfig.module?.rules.unshift({
+        test: /\/(design|resources)\/.*\.(css|ttf)$/,
+        loader: "file-loader",
+        options: {
+            name: "[path][name]-[hash].[ext]",
+        },
+    });
+
+    baseStorybookConfig.module?.rules.push({
+        test: /\.html$/,
+        use: "raw-loader",
+    });
+
+    return baseStorybookConfig;
 }

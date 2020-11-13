@@ -8,7 +8,9 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\Models\AddonModel;
 use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 use Vanilla\Theme\FsThemeProvider;
 
@@ -18,6 +20,8 @@ use Vanilla\Theme\FsThemeProvider;
 class SettingsController extends DashboardController {
 
     const DEFAULT_AVATAR_FOLDER = 'defaultavatar';
+    const CONFIG_CSP_DOMAINS = "ContentSecurityPolicy.ScriptSrc.AllowedDomains";
+    const CONFIG_TRUSTED_DOMAINS = "Garden.TrustedDomains";
 
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Form', 'Database'];
@@ -41,12 +45,10 @@ class SettingsController extends DashboardController {
 
     /**
      * SettingsController constructor.
-     *
-     * @param \Vanilla\Models\AddonModel $addonModel
      */
-    public function __construct(\Vanilla\Models\AddonModel $addonModel) {
+    public function __construct() {
         parent::__construct();
-        $this->addonModel = $addonModel;
+        $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
     }
 
     /**
@@ -521,16 +523,16 @@ class SettingsController extends DashboardController {
                 'Control' => 'imageUploadReact',
                 'Description' => t(
                     'LogoDescription',
-                    'The banner logo appears at the top of your site. Some themes may not display this logo.'
-                ),
+                    'The banner logo appears at the top of your site.'
+                ).' '.t('LogoDisclaimer'),
             ],
             'Garden.MobileLogo' => [
                 'Label' => t('Mobile Banner Logo'),
                 'Control' => 'imageUploadReact',
                 'Description' => t(
                     'MobileLogoDescription',
-                    'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'
-                ),
+                    'The mobile banner logo appears at the top of your site.'
+                ).' '.t('LogoDisclaimer'),
             ],
             'Garden.BannerImage' => [
                 'Label' => t('Banner Image'),
@@ -606,6 +608,27 @@ class SettingsController extends DashboardController {
                 ]
             ];
         }
+        $configurationModule = new ConfigurationModule($this);
+        $configurationModule->initialize($items);
+        $this->setData('ConfigurationModule', $configurationModule);
+        $this->render();
+    }
+
+    /**
+     * Settings page for user profile redirection.
+     */
+    public function profile() {
+        $this->permission(['Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('dashboard/settings/profile');
+        $this->title(t('User Profile'));
+
+        $items = [
+            'Garden.Profile.RedirectUrl' => [
+                'Control' => 'textbox',
+                'Description' => t("Custom URL to redirect the user instead of rendering Vanilla's profile page.")
+            ]
+        ];
+
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize($items);
         $this->setData('ConfigurationModule', $configurationModule);
@@ -782,7 +805,8 @@ class SettingsController extends DashboardController {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
-            'Garden.TrustedDomains',
+            self::CONFIG_TRUSTED_DOMAINS,
+            self::CONFIG_CSP_DOMAINS,
             'Garden.Format.WarnLeaving',
             HstsModel::MAX_AGE_KEY,
             HstsModel::INCLUDE_SUBDOMAINS_KEY,
@@ -795,22 +819,29 @@ class SettingsController extends DashboardController {
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Format trusted domains as a string
-            $trustedDomains = val('Garden.TrustedDomains', $configurationModel->Data);
+            $trustedDomains = val(self::CONFIG_TRUSTED_DOMAINS, $configurationModel->Data);
             if (is_array($trustedDomains)) {
                 $trustedDomains = implode("\n", $trustedDomains);
             }
 
-            $configurationModel->Data['Garden.TrustedDomains'] = $trustedDomains;
+            $configurationModel->Data[self::CONFIG_TRUSTED_DOMAINS] = $trustedDomains;
 
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
             // Format the trusted domains as an array based on newlines & spaces
-            $trustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $trustedDomains = explodeTrim("\n", $trustedDomains);
+            $trustedDomains = $this->Form->getValue(self::CONFIG_TRUSTED_DOMAINS);
+            $trustedDomains = ArrayUtils::explodeTrim("\n", $trustedDomains);
             $trustedDomains = array_unique(array_filter($trustedDomains));
             $trustedDomains = implode("\n", $trustedDomains);
-            $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
+            $this->Form->setFormValue(self::CONFIG_TRUSTED_DOMAINS, $trustedDomains);
+
+            // Join CSP domains with newlines.
+            $cspDomains = $this->Form->getValue("ContentSecurityPolicy.ScriptSrc.AllowedDomains", '');
+            $cspDomains = explode("\n", $cspDomains);
+            $cspDomains = array_unique(array_filter($cspDomains));
+            $this->Form->setFormValue("ContentSecurityPolicy.ScriptSrc.AllowedDomains", $cspDomains);
+
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
 
             $this->Form->setFormValue(HstsModel::INCLUDE_SUBDOMAINS_KEY, $this->Form->getValue(HstsModel::INCLUDE_SUBDOMAINS_KEY) === '1');
@@ -823,7 +854,7 @@ class SettingsController extends DashboardController {
             }
 
             // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
+            $this->Form->setFormValue(self::CONFIG_TRUSTED_DOMAINS, $trustedDomains);
         }
 
         $this->render();

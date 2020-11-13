@@ -109,4 +109,44 @@ class StringUtilsTest extends TestCase {
 
         return $r;
     }
+
+    /**
+     * Test `StringUtils::labelize()`.
+     *
+     * @param string $in
+     * @param string $expected
+     * @dataProvider provideLabelizeTests
+     */
+    public function testLabelize(string $in, string $expected): void {
+        $actual = StringUtils::labelize($in);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideLabelizeTests(): array {
+        $r = [
+            ["fooBar", "Foo Bar"],
+            ["foo  bar", "Foo Bar"],
+            ["fooID", "Foo ID"],
+            ["fooURL", "Foo URL"],
+            ["foo_bar", "Foo Bar"],
+            ["foo-bar", "Foo Bar"],
+        ];
+
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test the contains() method.
+     */
+    public function testContains() {
+        $this->assertTrue(StringUtils::contains('string 1', 'ring'));
+        $this->assertTrue(StringUtils::contains('string 1', 'string 1'));
+        $this->assertFalse(StringUtils::contains('string 1', 'string 12'));
+        $this->assertFalse(StringUtils::contains('string 1', ''));
+    }
 }

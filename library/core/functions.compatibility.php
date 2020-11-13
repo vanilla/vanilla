@@ -11,6 +11,8 @@
  * @since 2.2
  */
 
+use Garden\Web\Cookie;
+
 if (!function_exists('apc_fetch') && function_exists('apcu_fetch')) {
     /**
      * Fetch a stored variable from the cache.
@@ -182,11 +184,11 @@ if (!function_exists('http_build_url')) {
 
     function current_url() {
         $pageURL = 'http';
-        if (val('HTTPS', $_SERVER) === "on") {
+        if (($_SERVER['HTTPS'] ?? '') === "on") {
             $pageURL .= "s";
         }
         $pageURL .= "://";
-        if ($_SERVER["SERVER_PORT"] != "80") {
+        if (($_SERVER["SERVER_PORT"] ?? "80") != "80") {
             $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
         } else {
             $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
@@ -420,7 +422,7 @@ if (!function_exists('safeHeader')) {
 
 if (!function_exists('safeCookie')) {
     /**
-     * Context-aware call to setcookie().
+     * Context-aware call to \Garden\Web\Cookie setCookie().
      *
      * This method is context-aware and will avoid setting cookies if the request
      * context is not HTTP.
@@ -432,19 +434,20 @@ if (!function_exists('safeCookie')) {
      * @param string $domain
      * @param boolean|null $secure
      * @param boolean $httponly
+     * @param string|null $sameSite This could be one of (\Garden\Web\Cookie::SAME_SITE_NONE, SAME_SITE_LAX, SAME_SITE_STRICT).
+     * @throws \Garden\Container\ContainerException If there was an error while retrieving an item from the container.
+     * @throws \Garden\Container\NotFoundException If the item was not found in the container.
      */
-    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = null, $httponly = false) {
+    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = null, $httponly = false, $sameSite = null) {
         static $context = null;
         if (is_null($context)) {
             $context = requestContext();
         }
 
         if ($context == 'http') {
-            if ($secure === null && c('Garden.ForceSSL') && Gdn::request()->scheme() === 'https') {
-                $secure = true;
-            }
-
-            setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+            /** @var Cookie $cookie */
+            $cookie = Gdn::getContainer()->get(Cookie::class);
+            $cookie->setCookie('/'.$name, $value, $expire, $path, $domain, $secure, $httponly, $sameSite);
         }
     }
 }

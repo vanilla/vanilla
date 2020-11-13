@@ -158,10 +158,10 @@ export default class EntryModel {
         }
 
         names = names
-            .filter(name => name.match(EntryModel.TS_REGEX))
-            .map(name => name.replace(EntryModel.TS_REGEX, ""))
+            .filter((name) => name.match(EntryModel.TS_REGEX))
+            .map((name) => name.replace(EntryModel.TS_REGEX, ""))
             // Filter out unwanted sections (special cases).
-            .filter(name => !this.excludedSections.includes(name));
+            .filter((name) => !this.excludedSections.includes(name));
 
         names = Array.from(new Set(names));
 
@@ -172,14 +172,14 @@ export default class EntryModel {
      * Get the directories of all addons being built.
      */
     public get addonDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.addonDir);
+        return Object.values(this.buildAddons!).map((addon) => addon.addonDir);
     }
 
     /**
      * Get all of the src directories in the project.
      */
     public get srcDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.srcDir);
+        return Object.values(this.buildAddons!).map((addon) => addon.srcDir);
     }
 
     /**
@@ -209,7 +209,7 @@ export default class EntryModel {
     private async initPackages() {
         const dirNames = await readDir(PACKAGES_DIRECTORY);
         this.packageDirs = [
-            ...dirNames.map(name => path.resolve(PACKAGES_DIRECTORY, name)),
+            ...dirNames.map((name) => path.resolve(PACKAGES_DIRECTORY, name)),
             path.resolve(VANILLA_ROOT, "library"),
         ];
     }
@@ -230,11 +230,11 @@ export default class EntryModel {
 
         // Filter only the enabled addons for a development build.
         if (this.options.mode === BuildMode.DEVELOPMENT) {
-            addonKeyList = addonKeyList.filter(addonPath => {
+            addonKeyList = addonKeyList.filter((addonPath) => {
                 const addonKey = path.basename(addonPath).toLowerCase();
 
                 // Check if we have a case-insensitive addon key match.
-                return this.options.enabledAddonKeys.some(val => {
+                return this.options.enabledAddonKeys.some((val) => {
                     if (val.toLowerCase() === addonKey) {
                         return true;
                     }

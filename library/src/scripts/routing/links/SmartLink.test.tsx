@@ -85,7 +85,7 @@ describe("<SmartLink />", () => {
         const forcedFormatter = (input, withDomain) => FORCED_RESULT;
 
         const data = [CONTEXT_BASE + "/test", SUBPATH + "/testOther"];
-        data.forEach(loc => {
+        data.forEach((loc) => {
             const result = renderLocation(loc, forcedFormatter);
             expect(result.find("a").prop("href"), `Input was ${loc}`).eq(FORCED_RESULT);
         });

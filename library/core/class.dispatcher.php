@@ -10,11 +10,14 @@
  */
 
 use Garden\Container\Container;
+use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Utility\Timers;
 
 /**
  * Handles all requests and routing.
@@ -42,6 +45,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '#^home/error(/|$)#' => self::BLOCK_NEVER,
         '#^home/leaving(/|$)#' => self::BLOCK_NEVER,
         '#^home/termsofservice(/|$)#' => self::BLOCK_PERMISSION,
+        '#^home/updatemode(/|$)#' => self::BLOCK_NEVER,
+        '#^home/unauthorized(/|$)#' => self::BLOCK_NEVER,
         '#^plugin(/|$)#' => self::BLOCK_NEVER,
         '#^settings/analyticstick.json$#' => self::BLOCK_PERMISSION,
         '#^sso(/|$)#' => self::BLOCK_NEVER,
@@ -124,6 +129,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var bool */
     private $isHomepage;
 
+    /** @var Timers */
+    private $timers;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var bool */
+    private $rethrowExceptions = false;
+
     /**
      * Gdn_Dispatcher constructor.
      *
@@ -137,7 +151,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->container = $container;
         $this->dispatcher = $dispatcher;
         $this->logger = $this->container->get(LoggerInterface::class);
+        $this->timers = $this->container->get(Timers::class);
+        $this->config = $this->container->get(ConfigurationInterface::class);
         $this->reset();
+    }
+
+    /**
+     * @param bool $rethrowExceptions
+     */
+    public function setRethrowExceptions(bool $rethrowExceptions): void {
+        $this->rethrowExceptions = $rethrowExceptions;
     }
 
     /**
@@ -311,6 +334,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Now that the controller has been found, dispatch to a method on it.
             $this->dispatchController($request, $routeArgs);
         } else {
+            $this->applyTimeHeaders($response);
             $this->dispatcher->render($request, $response);
         }
     }
@@ -410,7 +434,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $result['deliveryType'] = self::requestVal('DeliveryType', $result['query'], $result['post'], $deliveryType);
 
         // Figure out the controller.
-        list($controllerName, $pathArgs) = $this->findController($parts);
+        [$controllerName, $pathArgs] = $this->findController($parts);
         $result['pathArgs'] = $pathArgs;
 
         if ($controllerName) {
@@ -867,7 +891,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
         // Find the method to call.
-        list($controllerMethod, $pathArgs) = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
+        [$controllerMethod, $pathArgs] = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
         if (!$controllerMethod) {
             // The controller method was not found.
             return $this->dispatchNotFound('method_notfound', $request);
@@ -907,7 +931,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->fireEvent('BeforeControllerMethod');
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, 'before');
             call_user_func_array($callback, $args);
+            $this->applyTimeHeaders();
         } catch (\Throwable $ex) {
+            if ($this->rethrowExceptions) {
+                throw $ex;
+            }
             if ($this->dispatchException === null) {
                 $this->dispatchException = $ex;
                 $controller->renderException($ex);
@@ -929,6 +957,60 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             exit();
         }
     }
+
+    /**
+     * @return array|null
+     */
+    private function getAllTimerHeaders(): ?array {
+        return array_merge(
+            $this->getTimerHeadersForKey('cacheRead'),
+            $this->getTimerHeadersForKey('cacheWrite'),
+            $this->getTimerHeadersForKey('dbRead'),
+            $this->getTimerHeadersForKey('dbWrite')
+        );
+    }
+
+    /**
+     * Get timer entry headers for a key.
+     *
+     * @param string $key
+     * @return array
+     */
+    private function getTimerHeadersForKey(string $key): array {
+        $timer = $this->timers->get($key);
+        if ($timer === null) {
+            return [];
+        }
+        $result = [
+            "x-app-$key-count" => $timer['count'],
+            "x-app-$key-time" => Timers::formatDuration($timer['time']),
+            "x-app-$key-max" => Timers::formatDuration($timer['max']),
+        ];
+        return $result;
+    }
+
+    /**
+     * Apply our cache trace headers.
+     *
+     * @param Data|null $data
+     */
+    private function applyTimeHeaders(?Data $data = null) {
+        if (!$this->config->get('trace.headers', debug())) {
+            return;
+        }
+        $headers = $this->getAllTimerHeaders();
+        if ($headers === null) {
+            return;
+        }
+        foreach ($headers as $header => $value) {
+            if ($data !== null) {
+                $data->setHeader($header, $value);
+            } else {
+                safeHeader("{$header}: {$value}");
+            }
+        }
+    }
+
 
     /**
      * This is the old default implementation of canonical URL calculation from `Gdn_Controller`.

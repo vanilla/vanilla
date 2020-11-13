@@ -68,12 +68,11 @@ class DiscussionsModule extends Gdn_Module {
         $where = ['Announce' => 'all'];
 
         if ($categoryIDs) {
-            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($visibleCategoriesResult !== true) {
-                $where['d.CategoryID'] = $visibleCategoriesResult;
+            $visibleCategoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoryIDs !== true) {
+                $categoryIDs = array_intersect($visibleCategoryIDs, $categoryIDs);
             }
+            $where['d.CategoryID'] = $categoryIDs;
         }
 
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
@@ -97,6 +96,7 @@ class DiscussionsModule extends Gdn_Module {
      * Get a list of category IDs to limit.
      *
      * @return array
+     *
      */
     public function getCategoryIDs() {
         return $this->categoryIDs;

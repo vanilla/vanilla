@@ -51,6 +51,11 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      * @inheritdoc
      */
     public function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
+        if ($embed instanceof ErrorEmbed) {
+            // If we had an issue with actually rendering the embed, don't allow it take down the page.
+            return $embed;
+        }
+
         if (!($embed instanceof QuoteEmbed)) {
             throw new EmbeddedContentException('Expected a quote embed. Instead got a ' . get_class($embed));
         }

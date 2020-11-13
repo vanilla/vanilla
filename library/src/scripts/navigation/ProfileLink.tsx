@@ -7,7 +7,6 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
-import { UserCardModule } from "@library/features/users/modules/UserCardModule";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { hasPermission } from "@library/features/users/Permission";
@@ -28,6 +27,7 @@ interface IProps {
 export default function ProfileLink(props: IProps) {
     const { username, isUserCard = true, cardAsModal } = props;
     const children = props.children || username;
+    const profileURL = makeProfileUrl(username);
     if (isUserCard && hasPermission("profiles.view")) {
         return (
             <UserCardModuleLazyLoad
@@ -36,11 +36,12 @@ export default function ProfileLink(props: IProps) {
                 openAsModal={cardAsModal}
                 userID={props.userID}
                 buttonClass={props.className}
+                userURL={profileURL}
             />
         );
     } else {
         return (
-            <a href={makeProfileUrl(username)} className={classNames(props.className)}>
+            <a href={profileURL} className={classNames(props.className)}>
                 {children}
             </a>
         );

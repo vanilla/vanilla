@@ -170,8 +170,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const plusCircle = themeVars("plusCircle", {
-        width: 14,
-        height: 14,
+        width: 16,
+        height: 16,
     });
 
     const deleteIcon = themeVars("deleteIcon", {
@@ -327,6 +327,11 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.settings.height),
     });
 
+    const triangeTiny = style("triangeTiny", {
+        width: unit(8),
+        height: unit(8),
+    });
+
     const warning = style("warning", {
         width: unit(vars.warning.width),
         height: unit(vars.warning.height),
@@ -445,6 +450,11 @@ export const iconClasses = useThemeCache(() => {
     const hamburger = style("alertIconCompact", {
         width: unit(vars.standard.width),
         height: unit(vars.standard.height),
+    });
+
+    const external = style("alertIconCompact", {
+        width: 22,
+        height: 22,
     });
 
     const errorFgColor = style("errorFgColor", {
@@ -568,6 +578,21 @@ export const iconClasses = useThemeCache(() => {
         height: unit(vars.typeQuestion.height),
     });
 
+    const typePlaces = style("TypePlaces", {
+        width: unit(vars.typeQuestion.width),
+        height: unit(vars.typeQuestion.height),
+    });
+
+    const typeGroups = style("TypeGroups", {
+        width: unit(vars.typeQuestion.width),
+        height: unit(vars.typeQuestion.height),
+    });
+
+    const typeKnowledgeBase = style("TypeKnowledgeBase", {
+        width: unit(vars.typeQuestion.width),
+        height: unit(vars.typeQuestion.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -588,6 +613,7 @@ export const iconClasses = useThemeCache(() => {
         close,
         closeCompact,
         closeTiny,
+        triangeTiny,
         chevronLeftCompact,
         chevronLeftSmallCompact,
         selectedCategory,
@@ -600,6 +626,7 @@ export const iconClasses = useThemeCache(() => {
         discussionIcon,
         globeIcon,
         isSmall,
+        external,
         hamburger,
         documentation,
         bookmark,
@@ -613,5 +640,8 @@ export const iconClasses = useThemeCache(() => {
         typeIdeasIcon,
         typePollsIcon,
         typeQuestion,
+        typePlaces,
+        typeGroups,
+        typeKnowledgeBase,
     };
 });

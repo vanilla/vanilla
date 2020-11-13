@@ -15,7 +15,8 @@
         "bmewburn.vscode-intelephense-client",
         "esbenp.prettier-vscode",
         "mblode.twig-language-2",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "silvenon.mdx"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

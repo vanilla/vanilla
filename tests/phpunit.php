@@ -13,6 +13,7 @@ date_default_timezone_set("UTC");
 
 ini_set("default_charset", "UTF-8");
 error_reporting(E_ALL);
+ini_set('log_errors', '0');
 
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
@@ -34,7 +35,9 @@ $files = glob(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
 foreach ($files as $file) {
     $dest = $dir.'/'.basename($file);
     $r = copy($file, $dest);
-    echo "Copy $file to $dest";
+    if (!$r) {
+        throw new \Exception("Could not copy $dest.", 500);
+    }
 }
 
 // ===========================================================================

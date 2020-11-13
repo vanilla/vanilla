@@ -1,15 +1,12 @@
 <?php
 /**
- * Gdn_Model.
- *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
- * @package Core
- * @since 2.0
  */
 
 use Garden\EventManager;
+use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Model base class.
@@ -130,6 +127,17 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
 
         parent::__construct();
+    }
+
+    /**
+     * Get a clean SQL driver instance.
+     *
+     * @return \Gdn_SQLDriver
+     */
+    protected function createSql(): \Gdn_SQLDriver {
+        $sql = clone $this->Database->sql();
+        $sql->reset();
+        return $sql;
     }
 
     /**
@@ -323,7 +331,6 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Update a row in the database.
      *
-     * @since 2.1
      * @param int $rowID
      * @param array|string $property
      * @param mixed $value
@@ -337,6 +344,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $set = array_intersect_key($property, $this->Schema->fields());
         self::serializeRow($set);
         $this->SQL->put($this->Name, $set, [$this->PrimaryKey => $rowID]);
+        $this->onUpdate();
     }
 
     /**
@@ -354,7 +362,6 @@ class Gdn_Model extends Gdn_Pluggable {
      * Serialize Attributes and Data columns in a row.
      *
      * @param array $row
-     * @since 2.1
      */
     public static function serializeRow(&$row) {
         foreach ($row as $name => &$value) {
@@ -440,6 +447,7 @@ class Gdn_Model extends Gdn_Pluggable {
             }
 
             $result = $this->SQL->insert($this->Name, $quotedFields);
+            $this->onUpdate();
         }
         return $result;
     }
@@ -481,6 +489,7 @@ class Gdn_Model extends Gdn_Pluggable {
             }
 
             $result = $this->SQL->put($this->Name, $quotedFields, $where, $limit);
+            $this->onUpdate();
         }
         return $result;
     }
@@ -511,6 +520,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $options += ['limit' => null];
 
         $result = $this->SQL->delete($this->Name, $where, $options['limit']);
+        $this->onUpdate();
         return $result;
     }
 
@@ -595,16 +605,14 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Get the data from the model based on its primary key.
      *
-     * @param mixed $iD The value of the primary key in the database.
+     * @param mixed $id The value of the primary key in the database.
      * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object
-     *
-     * @since 2.3 Added the $options parameter.
      */
-    public function getID($iD, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         $this->options($options);
-        $result = $this->getWhere([$this->PrimaryKey => $iD])->firstRow($datasetType);
+        $result = $this->getWhere([$this->PrimaryKey => $id])->firstRow($datasetType);
 
         $fields = ['Attributes', 'Data'];
 
@@ -755,7 +763,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateInserted)) {
             if (!isset($fields[$this->DateInserted])) {
-                $fields[$this->DateInserted] = Gdn_Format::toDateTime();
+                $fields[$this->DateInserted] =  DateTimeFormatter::getCurrentDateTime();
             }
         }
 
@@ -782,7 +790,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateUpdated)) {
             if (!isset($fields[$this->DateUpdated])) {
-                $fields[$this->DateUpdated] = Gdn_Format::toDateTime();
+                $fields[$this->DateUpdated] =  DateTimeFormatter::getCurrentDateTime();
             }
         }
 
@@ -804,7 +812,6 @@ class Gdn_Model extends Gdn_Pluggable {
      * @param string|array $key The key of the option.
      * @param mixed $value The value of the option or not specified just to get the current value.
      * @return mixed The value of the option or $this if $value is specified.
-     * @since 2.3
      */
     public function options($key, $value = null) {
         if (is_array($key)) {
@@ -863,11 +870,13 @@ class Gdn_Model extends Gdn_Pluggable {
         $values = dbencode(array_merge($values, $name));
 
         // Save the values back to the db
-        return $this->SQL
+        $result = $this->SQL
             ->from($this->Name)
             ->where($fieldName, $rowID)
             ->set($column, $values)
             ->put();
+        $this->onUpdate();
+        return $result;
     }
 
     /**
@@ -896,6 +905,7 @@ class Gdn_Model extends Gdn_Pluggable {
             ->set($property, $value)
             ->where($primaryKey, $rowID)
             ->put();
+        $this->onUpdate();
         return $value;
     }
 
@@ -1028,5 +1038,12 @@ class Gdn_Model extends Gdn_Pluggable {
         );
 
         return $data->value('Rows', 0);
+    }
+
+    /**
+     * Called whenever a record is updated.
+     */
+    protected function onUpdate() {
+        $this->fireEvent('onUpdate');
     }
 }

@@ -23,7 +23,7 @@
         }
 
         .Trace .TagColumn {
-            width: 50px;
+            width: 100px;
         }
 
         .Trace .Tag-Info {

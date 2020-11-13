@@ -16,7 +16,7 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import { Tabs } from "@library/sectioning/Tabs";
 
 export default {
-    title: "Modals",
+    title: "Layout/Modals",
 };
 
 export function DismissableModal() {

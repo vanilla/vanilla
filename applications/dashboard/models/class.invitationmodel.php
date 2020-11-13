@@ -235,6 +235,9 @@ class InvitationModel extends Gdn_Model {
      * {@inheritdoc}
      */
     public function deleteID($id, $options = []) {
+        \Webmozart\Assert\Assert::integerish($id);
+        \Webmozart\Assert\Assert::isArray($options);
+
         $session = Gdn::session();
         $userID = $session->UserID;
 

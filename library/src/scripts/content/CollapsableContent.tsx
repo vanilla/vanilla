@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { BottomChevronIcon } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { useMeasure } from "@vanilla/react-utils";
+import { useDomNodeAttachment, useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
 import { nextTick } from "q";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -56,19 +56,13 @@ export function CollapsableContent(props: IProps) {
 
     const heightLimit = containerMaxHeight + containerOvershoot;
 
-    const ref = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const measurements = useMeasure(ref);
 
     // When we mount for the first time copy domNodes over
     // For usage with autoWrapCollapsableContent()
-    useLayoutEffect(() => {
-        if (domNodesToAttach && ref.current) {
-            domNodesToAttach.forEach(node => {
-                ref.current?.appendChild(node);
-            });
-        }
-    }, [domNodesToAttach]); // eslint-ignore-line
+
+    const ref = useDomNodeAttachment(domNodesToAttach);
+    const measurements = useMeasure(ref);
 
     useLayoutEffect(() => {
         nextTick(() => {
@@ -93,7 +87,9 @@ export function CollapsableContent(props: IProps) {
         }
     };
 
-    const maxCollapsedHeight = measurements.height < heightLimit ? measurements.height : containerMaxHeight;
+    const hasMeasuredHeight = measurements.height > 0;
+    const hasSmallMeasuredHeight = measurements.height < heightLimit;
+    const maxCollapsedHeight = hasMeasuredHeight && hasSmallMeasuredHeight ? measurements.height : containerMaxHeight;
     const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
     const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
 
@@ -168,7 +164,7 @@ export async function autoWrapCollapsableContent() {
 
     return await Promise.all(
         Array.from(jsCollapsables).map((element: HTMLElement) => {
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 const nodes = Array.from(element.childNodes);
                 const className = element.getAttribute("data-className") || undefined;
 

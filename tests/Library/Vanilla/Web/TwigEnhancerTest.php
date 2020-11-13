@@ -8,32 +8,56 @@
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\EventManager;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Web\TwigEnhancer;
-use VanillaTests\BootstrapTrait;
+use VanillaTests\SiteTestCase;
 
 /**
- * Tests for our twig enhancement utilties.
+ * Tests for our twig enhancement utilities.
  */
-class TwigEnhancerTest extends TestCase {
+class TwigEnhancerTest extends SiteTestCase {
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
 
-    use BootstrapTrait;
+    /**
+     * @var TwigEnhancer
+     */
+    private $enhancer;
+
+    /**
+     * @var \Gdn_Session
+     */
+    private $session;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->container()->call(function (
+            EventManager $eventManager,
+            TwigEnhancer $enhancer,
+            \Gdn_Session $session
+        ) {
+            $this->eventManager = $eventManager;
+            $this->enhancer = $enhancer;
+            $this->session = $session;
+        });
+
+        $this->createUserFixtures();
+    }
 
     /**
      * Test rendering controller assets.
      */
-    public function testRenderControllerAsset() {
-        /** @var EventManager $eventManager */
-        $eventManager = self::container()->get(EventManager::class);
-
-        /** @var TwigEnhancer $enhancer */
-        $enhancer = self::container()->get(TwigEnhancer::class);
-
-        $eventManager->bind('base_beforeRenderAsset', function () {
+    public function testRenderControllerAsset(): void {
+        $this->eventManager->bind('base_beforeRenderAsset', function () {
             echo "Before";
         });
 
-        $eventManager->bind('base_afterRenderAsset', function () {
+        $this->eventManager->bind('base_afterRenderAsset', function () {
             echo "After";
         });
 
@@ -41,8 +65,18 @@ class TwigEnhancerTest extends TestCase {
         $controller->addAsset('Content', ' Content ', 'Item1');
         \Gdn::controller($controller);
 
-        $result = $enhancer->renderControllerAsset('Content')->jsonSerialize();
+        $result = $this->enhancer->renderControllerAsset('Content')->jsonSerialize();
 
         $this->assertEquals('Before Content After', $result);
+    }
+
+    /**
+     * A basic integration test of the `hasPermission()` method.
+     */
+    public function testHasPermission(): void {
+        $this->session->start($this->memberID);
+        $this->assertTrue($this->enhancer->hasPermission('Garden.SignIn.Allow'));
+        $this->assertTrue($this->enhancer->hasPermission('Vanilla.Discussions.View', 1));
+        $this->assertFalse($this->enhancer->hasPermission('Vanilla.Discussions.Announce', 1));
     }
 }

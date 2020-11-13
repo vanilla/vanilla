@@ -18,10 +18,10 @@ import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownM
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
-const story = storiesOf("Components", module);
+const story = storiesOf("Components/Dropdowns", module);
 
 story.add(
-    "Dropdowns",
+    "All",
     () => {
         const doNothing = () => {
             return;

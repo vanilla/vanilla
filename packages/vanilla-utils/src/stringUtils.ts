@@ -5,6 +5,8 @@
  * @license GPL-2.0-only
  */
 
+import mergeWith from "lodash/mergeWith";
+
 /**
  * A simple, fast method of hashing a string. Similar to Java's hash function.
  * https://stackoverflow.com/a/7616484/1486603
@@ -22,6 +24,42 @@ export function hashString(str: string): number {
 }
 
 /**
+ * Generate a RFC4122 compliant uuid. NOTE!!! Not cryptographically secure.
+ *
+ * This does not use a true random source (Eg. using Math.random()).
+ * To use a better source would require dropping IE in order to use the crypto module.
+ */
+export function uuidv4() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+/**
+ * Convert a camel case variable to a title case label.
+ *
+ * @param str - The string to labelize.
+ * @returns Returns a new string suitable for a label.
+ */
+export function labelize(str: string): string {
+    /**
+     * $labelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $labelCode);
+     * $labelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $labelCode);
+     * $labelCode = preg_replace('`\s+`', ' ', $labelCode);
+     * $labelCode = ucfirst(trim($labelCode));
+     */
+    let label = str.replace(/([^A-Z0-9])([A-Z0-9])/, "$1 $2");
+    label = label.replace(/([A-Z0-9])(?=[a-z])/, " $1");
+    label = label.replace(/[_-]/, " ");
+    label = label.replace(/\s+/, " ");
+    let parts = label.split(" ");
+    label = parts.map((s) => s.charAt(0).toLocaleUpperCase() + s.slice(1)).join(" ");
+    return label;
+}
+
+/**
  * Hash an object into a short key, that is stable no matter what order the parameters are.
  */
 export function stableObjectHash<T extends object>(obj: T): number {
@@ -29,7 +67,7 @@ export function stableObjectHash<T extends object>(obj: T): number {
     const ordered: any = {};
     Object.keys(obj)
         .sort()
-        .forEach(function(key) {
+        .forEach(function (key) {
             ordered[key] = obj[key];
         });
     return hashString(JSON.stringify(ordered));
@@ -98,7 +136,7 @@ export function splitStringLoosely(toSplit: string, splitWith: string): string[]
     const normalizedPieces = normalizedName.split(new RegExp(`(${normalizedSplitTerm})`, "i"));
 
     let charactersUsed = 0;
-    return normalizedPieces.map(piece => {
+    return normalizedPieces.map((piece) => {
         const start = charactersUsed;
         charactersUsed += piece.length;
         return toSplit.substring(start, charactersUsed);
@@ -219,7 +257,20 @@ export function capitalizeFirstLetter(str: string): string {
  * @param duration The amount of time to wait.
  */
 export function promiseTimeout(duration: number): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(resolve, duration);
     });
+}
+
+function mergeCustomizer(into: any, source: any) {
+    if (Array.isArray(into) || Array.isArray(source)) {
+        return source;
+    }
+}
+
+/**
+ * Merge 2 objects, but replace arrays instead of merging them.
+ */
+export function mergeAndReplaceArrays(item1: Record<any, any>, item2: Record<any, any>) {
+    return mergeWith({}, item1, item2, mergeCustomizer);
 }

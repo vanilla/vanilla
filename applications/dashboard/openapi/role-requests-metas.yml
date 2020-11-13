@@ -1,0 +1,212 @@
+openapi: 3.0.2
+info: {}
+paths:
+  /role-requests/metas:
+    put:
+      summary: Add or update a role request meta definition.
+      tags:
+        - Role Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roleID:
+                  type: integer
+                  description: The role to apply to.
+                type:
+                  $ref: '#/components/schemas/RoleRequestType'
+                name:
+                  type: string
+                  description: The title displayed to to the user.
+                body:
+                  type: string
+                  description: The default text to display to the user.
+                format:
+                  $ref: '#/components/schemas/Format'
+                attributesSchema:
+                  $ref: '#/components/schemas/BasicSchema'
+              required:
+                - roleID
+                - type
+                - body
+                - format
+                - attributesSchema
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleRequestMeta'
+    get:
+      summary: List role request meta information
+      tags:
+        - Role Requests
+      parameters:
+        - name: type
+          in: query
+          description: Filter on type.
+          schema:
+            $ref: '#/components/schemas/RoleRequestType'
+        - name: roleID
+          in: query
+          description: Filter on role.
+          schema:
+            type: integer
+        - name: hasRole
+          in: query
+          description: Filter on roles the user already has or doesn't have.
+          schema:
+            type: boolean
+        - name: expand
+          in: query
+          description: Expand the result.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - role
+                - roleRequest
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleRequestMeta'
+  /role-requests/metas/{type}/{roleID}:
+    get:
+      summary: Get a meta item.
+      tags:
+        - Role Requests
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: The type of request.
+          schema:
+            $ref: '#/components/schemas/RoleRequestType'
+        - name: roleID
+          in: path
+          required: true
+          description: The role ID.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleRequestMeta'
+    delete:
+      summary: Delete a meta item.
+      tags:
+        - Role Requests
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: The type of request.
+          schema:
+            $ref: '#/components/schemas/RoleRequestType'
+        - name: roleID
+          in: path
+          required: true
+          description: The role ID.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Success.'
+components:
+  schemas:
+    RoleRequestMeta:
+      type: object
+      properties:
+        roleID:
+          type: integer
+        type:
+          $ref: '#/components/schemas/RoleRequestType'
+        name:
+          type: string
+          description: The title displayed to to the user.
+        body:
+          type: string
+          description: The default text to display to the user.
+        format:
+          $ref: '#/components/schemas/Format'
+        attributesSchema:
+          $ref: '#/components/schemas/BasicSchema'
+        attributes:
+          $ref: '#/components/schemas/RoleRequestMetaAttributes'
+        url:
+          type: string
+          description: The URL users visit to apply/accept the role request.
+          format: uri
+        hasRole:
+          type: boolean
+          description: Whether or not the user has this role.
+        roleRequest:
+          $ref: '#/components/schemas/RoleRequestFragment'
+      required:
+        - roleID
+        - type
+        - name
+        - body
+        - format
+        - attributesSchema
+        - attributes
+        - url
+      example:
+        roleID: 1
+        type: application
+        name: Community Manager Application
+        body: Fill out the fields below to apply to become a community manager.
+        format: markdown
+        attributesSchema:
+          type: object
+          properties:
+            body:
+              type: string
+              description: Tell us why you want to be a community manager.
+              x-label: Details
+            isExperienced:
+              type: boolean
+              x-label: I have previous experience as a community manager.
+        attributes: {}
+        url: https://example.com/requests/role-applications?role=1
+    RoleRequestMetaAttributes:
+      type: object
+      properties:
+        notification:
+          description: Customize the notification sent when a role is approved.
+          type: object
+          properties:
+            name:
+              description: Override the notification subject.
+              type: string
+            body:
+              description: Override the notification body.
+              type: string
+            format:
+              $ref: '#/components/schemas/Format'
+            url:
+              description: Overide the notification URL.
+              type: string
+              format: uri
+        link:
+          description: Customize the request link display.
+          type: object
+          properties:
+            name:
+              description: Override the link text.
+              type: string
+            description:
+              description: Give a link description.
+              type: string

@@ -49,9 +49,6 @@ class HtmlFormat extends BaseFormat {
     /** @var HtmlPlainTextConverter */
     private $plainTextConverter;
 
-    /** @var bool allowExtendedContent */
-    private $allowExtendedContent;
-
     protected $processors = [UserContentCssProcessor::class, HeadingHtmlProcessor::class];
 
     /**
@@ -270,14 +267,5 @@ class HtmlFormat extends BaseFormat {
         }
 
         return false;
-    }
-
-    /**
-     * Set allowExtendedContent.
-     *
-     * @param bool $extendContent
-     */
-    public function setAllowExtendedContent(bool $extendContent): void {
-        $this->allowExtendedContent = $extendContent;
     }
 }

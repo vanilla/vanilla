@@ -86,7 +86,7 @@ export function hasPermission(permission: string | string[], options?: IPermissi
         options.resourceID = null;
     }
 
-    const permissionGroups = permissions.data.permissions.filter(permission => {
+    const permissionGroups = permissions.data.permissions.filter((permission) => {
         const matchesGlobal = permission.type === "global";
         const matchesResource = permission.type === options?.resourceType && permission.id === options?.resourceID;
         switch (options!.mode) {
@@ -100,7 +100,7 @@ export function hasPermission(permission: string | string[], options?: IPermissi
     });
 
     let hasMatch = false;
-    permissionGroups.forEach(permissionGroupToCheck => {
+    permissionGroups.forEach((permissionGroupToCheck) => {
         for (const [permissionKey, permissionValue] of Object.entries(permissionGroupToCheck.permissions)) {
             if (permissionsToCheck.includes(permissionKey) && permissionValue) {
                 hasMatch = true;
@@ -108,4 +108,8 @@ export function hasPermission(permission: string | string[], options?: IPermissi
         }
     });
     return hasMatch;
+}
+
+export function isUserAdmin(): boolean {
+    return getStore().getState().users.current.data?.isAdmin ?? false;
 }

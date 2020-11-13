@@ -29,7 +29,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import {
     calc,
     ColorHelper,
-    important,
     linearGradient,
     percent,
     px,
@@ -39,6 +38,7 @@ import {
     translateX,
     translateY,
     viewHeight,
+    viewWidth,
 } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -49,9 +49,9 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { media } from "typestyle";
 import { LogoAlignment } from "./TitleBar";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { BackgroundProperty } from "csstype";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -94,6 +94,13 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const border = makeThemeVars("border", {
+        type: BorderType.NONE,
+        color: globalVars.border.color,
+        width: globalVars.border.width,
+    });
+
+    //Set bottom border of the bar container div
+    const barBorder = makeThemeVars("barBorder", {
         type: BorderType.NONE,
         color: globalVars.border.color,
         width: globalVars.border.width,
@@ -262,6 +269,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
         offsetRight: globalVars.gutter.size,
         justifyContent: LogoAlignment.LEFT,
+        maxHeight: undefined,
         maxWidth: 200,
         heightOffset: sizing.height / 3,
         tablet: {},
@@ -271,7 +279,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         mobile: {
             url: undefined,
             maxWidth: undefined,
-            heightOffset: sizing.height / 3,
+            maxHeight: undefined,
+            heightOffset: sizing.mobile.height / 4,
         }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
         offsetVertical: {
             amount: 0,
@@ -323,8 +332,20 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         };
     };
 
+    const cancelButtonInit = makeThemeVars("closeButtonInit", {
+        allStates: colors.fg,
+        hoverOpacity: globalVars.constants.states.hover.borderEmphasis,
+    });
+
+    const stateColors = makeThemeVars("stateColors", {
+        hover: cancelButtonInit.allStates.mix(colorsInit.bg, cancelButtonInit.hoverOpacity), // This needs to be a mix and not an opacity so we can overlay the borders and not have the two borders mix together
+        focus: cancelButtonInit.allStates,
+        active: cancelButtonInit.allStates,
+    });
+
     return {
         fullBleed,
+        barBorder,
         border,
         sizing,
         colors,
@@ -350,6 +371,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         spacing,
         swoop,
         fullHeight,
+        stateColors,
     };
 });
 
@@ -384,6 +406,29 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
+    const getBarBorderVars = (): NestedCSSProperties => {
+        switch (vars.barBorder.type) {
+            case BorderType.BORDER:
+                return {
+                    borderBottom: singleBorder({
+                        color: vars.barBorder.color,
+                        width: vars.barBorder.width,
+                    }),
+                };
+            case BorderType.SHADOW:
+                return {
+                    boxShadow: shadowHelper().embed(globalVars.elementaryColors.black).boxShadow,
+                };
+            case BorderType.SHADOW_AS_BORDER:
+                // Note that this is empty because this option is set on the background elsewhere.
+                return {};
+            case BorderType.NONE:
+                return {};
+            default:
+                return {};
+        }
+    };
+
     const root = style({
         maxWidth: percent(100),
         color: colorOut(vars.colors.fg),
@@ -394,22 +439,9 @@ export const titleBarClasses = useThemeCache(() => {
                 color: vars.colors.fg.toString(),
                 cursor: "pointer",
             },
-            "&& .suggestedTextInput-clear.searchBar-clear": {
-                $nest: {
-                    "&:hover": {
-                        color: vars.colors.fg.toString(),
-                    },
-                    "&:active": {
-                        color: vars.colors.fg.toString(),
-                    },
-                    "&:focus": {
-                        color: vars.colors.fg.toString(),
-                    },
-                },
-            },
             "& .searchBar__placeholder": {
+                textAlign: "left",
                 color: vars.colors.fg.fade(0.8).toString(),
-                cursor: "pointer",
             },
             [`& .${backLinkClasses().link}`]: {
                 $nest: {
@@ -417,9 +449,6 @@ export const titleBarClasses = useThemeCache(() => {
                         color: colorOut(vars.colors.fg),
                     },
                 },
-            },
-            [`& .${searchBarClasses().valueContainer}`]: {
-                backgroundColor: colorOut(vars.compactSearch.bg),
             },
         },
         ...(vars.swoop.amount
@@ -530,6 +559,7 @@ export const titleBarClasses = useThemeCache(() => {
     const bar = style(
         "bar",
         {
+            ...getBarBorderVars(),
             display: "flex",
             justifyContent: "flex-start",
             flexWrap: "nowrap",
@@ -566,6 +596,7 @@ export const titleBarClasses = useThemeCache(() => {
             marginRight: unit(vars.logo.offsetRight),
             justifyContent: vars.logo.justifyContent,
             ...logoOffsetDesktop,
+            maxHeight: percent(100),
             $nest: {
                 "&&": {
                     color: colorOut(vars.colors.fg),
@@ -662,16 +693,37 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const compactSearchResults = style("compactSearchResults", {
-        position: "absolute",
-        top: unit(formElementVars.sizing.height),
-        width: percent(100),
-        $nest: {
-            "&:empty": {
-                display: "none",
+    const compactSearchResults = style(
+        "compactSearchResults",
+        {
+            position: "absolute",
+            top: unit(formElementVars.sizing.height + 2),
+            width: percent(100),
+            $nest: {
+                "&:empty": {
+                    display: "none",
+                },
             },
         },
-    });
+        layoutVariables()
+            .mediaQueries()
+            .xs({
+                $nest: {
+                    "&&&": {
+                        width: viewWidth(100),
+                        left: calc(`50% + ${unit(40)}`), // This is not arbitrary, it's based on the hamburger placement, but because of the way it's calculated, it makes for a messy calculation. We need to refactor it.
+                        transform: translateX("-50%"),
+                        borderTopRightRadius: 0,
+                        borderTopLeftRadius: 0,
+                    },
+                    "& .suggestedTextInput-option": {
+                        ...paddings({
+                            horizontal: 21,
+                        }),
+                    },
+                },
+            }),
+    );
 
     const extraMeBoxIcons = style("extraMeBoxIcons", {
         display: "flex",
@@ -911,15 +963,12 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const clearButtonClass = style("clearButtonClass", {
-        opacity: 0.7,
-        $nest: {
-            "&&": {
-                color: colorOut(vars.colors.fg),
-            },
-            "&:hover, &:focus": {
-                opacity: 1,
-            },
-        },
+        // opacity: 0.7,
+        // $nest: {
+        //     "&:hover, &:focus": {
+        //         opacity: 1,
+        //     },
+        // },
     });
 
     const guestButton = style("guestButton", {
@@ -938,6 +987,14 @@ export const titleBarClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
+    });
+
+    const logoLeftAligned = style("logoLeftAligned", {
+        position: "relative",
+        height: percent(100),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
     });
 
     const hamburger = style("hamburger", {
@@ -975,6 +1032,32 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const titleBarContainer = style("titleBarContainer", {});
+
+    const skipNav = style("skipNav", {
+        position: "absolute",
+        backgroundColor: colorOut(globalVars.mainColors.bg),
+        color: "gray",
+        border: 0,
+        borderRadius: unit(6),
+        clip: "rect(0 0 0 0)",
+        height: unit(0),
+        width: unit(0),
+        margin: unit(-1),
+        padding: 0,
+        overflow: "hidden",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        $nest: {
+            "&:focus, &:active": {
+                // This is over the icon and we want it to be a little further to the left of the main nav
+                left: unit(-40),
+                width: unit(144),
+                height: unit(38),
+                clip: "auto",
+            },
+        },
+    });
 
     return {
         root,
@@ -1016,6 +1099,7 @@ export const titleBarClasses = useThemeCache(() => {
         logoFlexBasis,
         desktopNavWrap,
         logoCenterer,
+        logoLeftAligned,
         hamburger,
         isSticky,
         logoAnimationWrap,
@@ -1023,33 +1107,55 @@ export const titleBarClasses = useThemeCache(() => {
         swoop,
         signInIconOffset,
         titleBarContainer,
+        skipNav,
     };
 });
+
+const getLogoMaxHeight = (vars, mobile: boolean) => {
+    const titleBarHeight = mobile ? vars.sizing.mobile ?? vars.sizing.height : vars.sizing.height;
+    let specifiedLogoHeight = mobile
+        ? vars.logo.mobile.maxHeight ?? vars.logo.maxHeight ?? vars.sizing.mobile.height
+        : vars.logo.maxHeight ?? vars.sizing.height;
+
+    // Make sure it doesn't go over the size of the title bar
+    if (specifiedLogoHeight > titleBarHeight) {
+        specifiedLogoHeight = titleBarHeight;
+    }
+
+    return specifiedLogoHeight - (mobile ? vars.logo.mobile.heightOffset : vars.logo.heightOffset);
+};
 
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
     const style = styleFactory("titleBarLogo");
+    const mediaQueries = vars.mediaQueries();
 
     const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
 
-    const logo = style("logo", {
-        display: "block",
-        maxHeight: px(vars.sizing.height - vars.logo.heightOffset),
-        maxWidth: unit(vars.logo.maxWidth),
-        width: "auto",
-        $nest: {
-            "&.isCentred": {
-                margin: "auto",
-            },
-        },
-    });
-
-    const mobileLogo = style("mobileLogo", {
+    const mobileLogoStyles = {
         display: "flex",
         justifyContent: vars.mobileLogo.justifyContent,
-        maxHeight: px(vars.sizing.mobile.height - (vars.logo.mobile.heightOffset ?? vars.logo.heightOffset)),
+        maxHeight: unit(getLogoMaxHeight(vars, true)),
         maxWidth: unit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
-    });
+    };
+
+    const logo = style(
+        "logo",
+        {
+            display: "block",
+            maxHeight: unit(getLogoMaxHeight(vars, false)),
+            maxWidth: unit(vars.logo.maxWidth),
+            width: "auto",
+            $nest: {
+                "&.isCentred": {
+                    margin: "auto",
+                },
+            },
+        },
+        mediaQueries.compact(mobileLogoStyles),
+    );
+
+    const mobileLogo = style("mobileLogo", mobileLogoStyles);
 
     const isCenter = style("isCenter", {
         position: "absolute",

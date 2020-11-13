@@ -19,6 +19,10 @@ import { isLegacyAnalyticsTickEnabled } from "@library/analytics/AnalyticsData";
 import getStore from "@library/redux/getStore";
 import { hasPermission } from "@library/features/users/Permission";
 
+// Has some side effects of creating globals.
+import "@library/gdn";
+import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+
 if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
 }
@@ -71,16 +75,21 @@ _executeReady()
     .then(() => {
         logDebug("Bootstrapping complete.");
         // Mount all data-react components.
-        onContent(e => {
-            _mountComponents(e.target as HTMLElement);
+        onContent((e) => {
+            _mountComponents(e.target as HTMLElement).finally(() => {
+                setImmediate(() => {
+                    // Without setImmediate there is a FOUC
+                    loadedCSS();
+                });
+            });
             blotCSS();
             mountInputs();
         });
 
+        window.__VANILLA_INTERNAL_IS_READY__ = true;
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
         document.dispatchEvent(contentEvent);
-        window.__VANILLA_INTERNAL_IS_READY__ = true;
     })
-    .catch(error => {
+    .catch((error) => {
         logError(error);
     });

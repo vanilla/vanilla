@@ -71,8 +71,9 @@ function VideoThumbnail(props: { name?: string; onClick: React.MouseEventHandler
     return (
         <button type="button" aria-label={props.name} className="embedVideo-playButton" onClick={props.onClick}>
             <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" />
-            <span className="embedVideo-scrim" />
-            <PlayIcon />
+            <span className="embedVideo-playIconWrap">
+                <PlayIcon />
+            </span>
         </button>
     );
 }
@@ -95,11 +96,6 @@ function PlayIcon() {
     return (
         <svg className="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
             <title>{t("Play Video")}</title>
-            <path
-                className="embedVideo-playIconPath embedVideo-playIconPath-circle"
-                style={cssStyle}
-                d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"
-            />
             <polygon
                 className="embedVideo-playIconPath embedVideo-playIconPath-triangle"
                 style={cssStyle}

@@ -47,7 +47,7 @@
   }
 }
 
-.main {
+.dashboard-main {
   position: relative;
   flex-grow: 1;
   // The panels are fixed width and the main content fills the rest of the screen.
@@ -123,7 +123,7 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 // For wide panel-less pages, like the Dashboard Home page
 
 .main-row-wide {
-  .main {
+  .dashboard-main {
     max-width: 1296px;
   }
 
@@ -138,7 +138,7 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 
 // Drawer functionality, and responsive show/hide
 
-.drawer-show .main {
+.drawer-show .dashboard-main {
   transform: translate3d($drawer-width, 0, 0);
 
   &::after {

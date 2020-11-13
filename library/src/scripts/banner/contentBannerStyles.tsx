@@ -10,6 +10,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { EMPTY_SPACING } from "@library/styles/styleHelpers";
 import merge from "lodash/merge";
 import clone from "lodash/clone";
+import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
@@ -82,6 +83,8 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
     return bannerVariables(forced, "contentBanner");
 });
 
-export const contentBannerClasses = useThemeCache(mediaQueries => {
-    return bannerClasses(mediaQueries, contentBannerVariables());
-});
+export const contentBannerClasses = useThemeCache(
+    (mediaQueries: IMediaQueryFunction, options?: { debug?: boolean | string }) => {
+        return bannerClasses(mediaQueries, contentBannerVariables(), "contentBanner", options);
+    },
+);

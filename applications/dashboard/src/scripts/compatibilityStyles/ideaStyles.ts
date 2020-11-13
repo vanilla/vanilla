@@ -8,9 +8,11 @@
 import { colorOut, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { forumVariables } from "@library/forms/forumStyleVars";
 
 export const ideaCSS = () => {
     const globalVars = globalVariables();
+    const forumVars = forumVariables();
 
     cssOut(
         `
@@ -45,12 +47,21 @@ export const ideaCSS = () => {
         color: colorOut(globalVars.mainColors.fg),
     });
 
+    cssOut(`.idea-counter-module`, {
+        float: "none",
+        margin: 0,
+    });
+
     cssOut(
         `
-        .Groups .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap,
-        .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap`,
+        .DataList .ItemIdea.ItemIdea.ItemIdea .idea-counter-module .idea-counter-box,
+        .DataList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto,
+        .MessageList .ItemIdea.ItemIdea.ItemIdea .idea-counter-module .idea-counter-box,
+        .MessageList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto
+    `,
         {
-            paddingLeft: unit(50),
+            width: unit(forumVars.countBox.width),
+            height: unit(forumVars.countBox.height),
         },
     );
 };

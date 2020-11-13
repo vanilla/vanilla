@@ -48,7 +48,7 @@ export function DashboardRadioGroup(props: IProps) {
         <RadioGroupContext.Provider value={props}>
             <div
                 className={classNames(rootClass, { inline: props.isInline }, { grid: props.isGrid })}
-                role={props.type}
+                role={type}
                 aria-labelledby={labelID}
             >
                 {props.children}

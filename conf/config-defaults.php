@@ -70,7 +70,6 @@ $Configuration['Garden']['Authenticator']['RegisterUrl'] = '/entry/register?Targ
 $Configuration['Garden']['Authenticator']['SignInUrl'] = '/entry/signin?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignOutUrl'] = '/entry/signout/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes'] = ['password'];
-$Configuration['Garden']['Authenticator']['SyncScreen'] = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name'] = "Password";
 $Configuration['Garden']['UserAccount']['AllowEdit'] = true; // Allow users to edit their account information? (SSO requires accounts be edited in external system).
 $Configuration['Garden']['Registration']['Method'] = 'Captcha'; // Options are: Basic, Captcha, Approval, Invitation
@@ -179,9 +178,9 @@ $Configuration['Modules']['Conversations']['Content'] = ['MessageModule', 'MeMod
 // Routes.
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
-$Configuration['Routes']['Default404'] = ['dashboard/home/filenotfound', 'NotFound'];
-$Configuration['Routes']['DefaultPermission'] = ['dashboard/home/unauthorized', 'NotAuthorized'];
-$Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
+$Configuration['Routes']['Default404'] = ['home/filenotfound', 'NotFound'];
+$Configuration['Routes']['DefaultPermission'] = ['home/unauthorized', 'NotAuthorized'];
+$Configuration['Routes']['UpdateMode'] = 'home/updatemode';
 
 // Themes
 $Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList", "NewEventList"];

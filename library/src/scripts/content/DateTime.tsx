@@ -112,6 +112,11 @@ export default class DateTime extends Component<IDateTimeProps> {
             return inputMoment.from(moment());
         } else {
             if (this.props.type !== DateFormats.COMPACT) {
+                // If it's the same day, return the time.
+                if (moment().isSame(inputMoment, "day")) {
+                    return inputMoment.format("h:mm a");
+                }
+                // Otherwise return the date.
                 return inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options);
             } else {
                 const classes = dateTimeClasses();

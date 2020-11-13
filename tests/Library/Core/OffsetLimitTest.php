@@ -27,10 +27,10 @@ class OffsetLimitTest extends TestCase {
      * @param bool $testThrow Whether or not to throw an error if the {@link $testOffsetOrPage} is too high.
      * @param array $expected The expected result.
      * @dataProvider provideTestOffsetLimitArrays
-     * @throws |Exception Throws a 404 exception if the {@link $testOffsetOrPage} is too high and {@link $throw} is true.
+     * @throws \Exception Throws a 404 exception if the {@link $testOffsetOrPage} is too high and {@link $throw} is true.
      */
     public function testOffsetLimit($testOffsetOrPage, $testLimitOrPageSize, $testThrow, $expected) {
-        $actual = offsetLimit($testOffsetOrPage, $testLimitOrPageSize, $testThrow, $expected);
+        $actual = offsetLimit($testOffsetOrPage, $testLimitOrPageSize, $testThrow);
         $this->assertSame($expected, $actual);
     }
 

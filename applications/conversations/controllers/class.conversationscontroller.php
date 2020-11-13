@@ -44,7 +44,7 @@ class ConversationsController extends Gdn_Controller {
             redirectTo('/entry/signin?Target='.urlencode($this->SelfUrl));
         }
 
-        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+        if ($this->isRenderingMasterView()) {
             $this->Head = new HeadModule($this);
             $this->addJsFile('jquery.js');
             $this->addJsFile('jquery.form.js');

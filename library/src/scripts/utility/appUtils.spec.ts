@@ -39,9 +39,9 @@ describe("metaDataFunctions", () => {
 
 describe("formatUrl", () => {
     it("passes absolute URLs through directly", () => {
-        const paths = ["https://test.com", "//test.com", "http://test.com"];
+        const paths = ["https://test.com", "//test.com", "http://test.com", "   http://test.com", " https://test.com"];
 
-        paths.forEach(path => {
+        paths.forEach((path) => {
             expect(application.formatUrl(path)).toEqual(path);
         });
     });

@@ -35,22 +35,23 @@ var discussionTagging = {
             var tagAdd = gdn.definition('TaggingAdd', false);
             var maxTags = gdn.definition('MaxTagsAllowed', false);
 
-            $tagsInput.tokenInput(tagSearch, {
-                hintText: gdn.definition("TagHint", "Start to type..."),
-                searchingText: '', // search text gives flickery ux, don't like
-                searchDelay: 300,
-                animateDropdown: false,
-                minChars: 1,
-                maxLength: 25,
-                prePopulate: tags,
-                dataFields: ["#Form_CategoryID"],
-                allowFreeTagging: tagAdd,
-                tokenLimit: maxTags,
-                zindex: 3000,
-                allowTabOut: true,
-                ariaLabel: gdn.translate("Tag"),
-            });
-
+            if ($('.Form-Tags').find('.token-input-list').length < 1) {    //tokenInput has already been instantiated
+                $tagsInput.tokenInput(tagSearch, {
+                    hintText: gdn.definition("TagHint", "Start to type..."),
+                    searchingText: '', // search text gives flickery ux, don't like
+                    searchDelay: 300,
+                    animateDropdown: false,
+                    minChars: 1,
+                    maxLength: 25,
+                    prePopulate: tags,
+                    dataFields: ["#Form_CategoryID"],
+                    allowFreeTagging: tagAdd,
+                    tokenLimit: maxTags,
+                    zindex: 3000,
+                    allowTabOut: true,
+                    ariaLabel: gdn.translate("Tag"),
+                });
+             }
             // Show available link
             $element.on('click', '.ShowTags a', function () {
                 $element.find('.ShowTags a').hide();
@@ -70,13 +71,15 @@ var discussionTagging = {
 }
 
 $(document).on('contentLoad', function(e) {
-    if (e.target.id === 'DiscussionForm') {
-        discussionTagging.start($('.FormWrapper', e.target));
-    } else {
-        var elementID = '#DiscussionForm';
-        if ($(e.target).find('#DiscussionAddTagForm').length) {
-            elementID = '#DiscussionAddTagForm';
+    window.onVanillaReady(function() {
+        if (e.target.id === 'DiscussionForm') {
+            discussionTagging.start($('.FormWrapper', e.target));
+        } else {
+            var elementID = '#DiscussionForm';
+            if ($(e.target).find('#DiscussionAddTagForm').length) {
+                elementID = '#DiscussionAddTagForm';
+            }
+            discussionTagging.start($(elementID, e.target));
         }
-        discussionTagging.start($(elementID, e.target));
-    }
+    })
 });

@@ -1,36 +1,37 @@
 codecov:
-  require_ci_to_pass: yes
+    require_ci_to_pass: yes
 
 coverage:
-  precision: 2
-  round: down
-  range: "...90"
+    precision: 2
+    round: down
+    range: "...90"
 
-  status:
-    project:
-      default:
-        informational: true
-    patch: yes
-    changes: no
+    status:
+        project:
+            default:
+                informational: true
+        patch: yes
+        changes: no
 
 parsers:
-  gcov:
-    branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
+    gcov:
+        branch_detection:
+            conditional: yes
+            loop: yes
+            method: no
+            macro: no
 
 comment:
-  layout: "diff,flags,tree"
-  behavior: default
-  require_changes: true
+    layout: "diff,flags,tree"
+    behavior: default
+    require_changes: true
 
 ignore:
-  - "**/views/**/*.php"
-  - "**/settings/**.*.php"
-  - "**/conf/**/*.php"
-  - "**/*.css"
-  - "**/*.scss"
-  - "**/tests/**/*.php"
-  - "library/deprecated"
+    - "**/views/**/*.php"
+    - "**/settings/*.php"
+    - "**/conf/**/*.php"
+    - "**/*.css"
+    - "**/*.scss"
+    - "**/tests/**/*.php"
+    - "applications/vanilla/settings/configuration.php"
+    - "library/deprecated"

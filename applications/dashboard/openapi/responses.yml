@@ -3,6 +3,22 @@ info:
 paths:
 components:
   responses:
+    NotFound:
+      description: The record does not exist or was not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: More information about the error.
+              status:
+                type: number
+                description: The HTTP status code for the error.
+                format: int32
+            required:
+              - message
     PermissionError:
       description: You don't have adequate permissions to access this resource.
       content:

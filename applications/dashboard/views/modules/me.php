@@ -11,12 +11,13 @@ if ($this->CssClass)
 
 $DashboardCount = 0;
 $ModerationCount = 0;
+$spamCount = 0;
 // Spam & Moderation Queue
 if ($Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false)) {
     $LogModel = new LogModel();
     $spamCount = $LogModel->getOperationCount('spam');
     $ModerationCount = $LogModel->getOperationCount('moderate,pending');
-    $DashboardCount += $ModerationCount + $spamCount;
+    $DashboardCount += $ModerationCount;
 }
 // Applicant Count
 if ($Session->checkPermission('Garden.Users.Approve')) {
@@ -52,7 +53,7 @@ if ($Session->isValid()):
     echo '<div class="Flyout FlyoutMenu Flyout-withFrame"></div></span>';
 
     // Inbox
-    if (Gdn::addonManager()->lookupAddon('conversations')) {
+    if (Gdn::addonManager()->isEnabled('conversations', \Vanilla\Addon::TYPE_ADDON)) {
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';

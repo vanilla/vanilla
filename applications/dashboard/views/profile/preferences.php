@@ -81,12 +81,12 @@
                 foreach ($Preferences as $Event => $Settings) {
                     $RowHasConfigValues = false;
                     $ColumnsMarkup = '';
+                    $rowID = \Vanilla\Utility\HtmlUtils::uniqueElementID('rowLabel');
                     // Loop through all means of notification.
                     foreach ($PreferenceTypes as $NotificationType) {
                         if ($NotificationType === 'Email' && c('Garden.Email.Disabled')) {
                             continue;
                         }
-
                         $ConfigPreference = c('Preferences.'.$NotificationType.'.'.$Event, 0);
                         $preferenceDisabled = ($ConfigPreference === false || $ConfigPreference == 2);
 
@@ -95,7 +95,7 @@
                             $ColumnsMarkup .= wrap('&nbsp;', 'td', ['class' => 'PrefCheckBox']);
                         } else {
                             // Everything's fine, show checkbox.
-                            $checkbox = $this->Form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1']);
+                            $checkbox = $this->Form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1', 'aria-label' => $NotificationType, 'aria-describedby' => $rowID]);
                             $ColumnsMarkup .= wrap(
                                 $checkbox,
                                 'td',
@@ -122,7 +122,8 @@
                             'td',
                             [
                                 'class' => 'Description',
-                                'headers' => "{$Header}NotificationHeader"
+                                'headers' => "{$Header}NotificationHeader",
+                                'id' => $rowID,
                             ]
                         );
                         echo $ColumnsMarkup;

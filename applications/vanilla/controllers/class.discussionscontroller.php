@@ -17,7 +17,7 @@ use Vanilla\Formatting\Formats\HtmlFormat;
  */
 class DiscussionsController extends VanillaController {
 
-    /** @var arrayModels to include. */
+    /** @var array Models to include. */
     public $Uses = ['Database', 'DiscussionModel', 'Form'];
 
     /** @var boolean Value indicating if discussion options should be displayed when rendering the discussion view.*/
@@ -38,7 +38,7 @@ class DiscussionsController extends VanillaController {
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
      *
-     * @param int $page Multiplied by PerPage option to determine offset.
+     * @param string $page Multiplied by PerPage option to determine offset.
      */
     public function table($page = '0') {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
@@ -53,7 +53,7 @@ class DiscussionsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Page Multiplied by PerPage option to determine offset.
+     * @param string|false $Page Multiplied by PerPage option to determine offset.
      */
     public function index($Page = false) {
         $this->allowJSONP(true);
@@ -138,7 +138,7 @@ class DiscussionsController extends VanillaController {
                 null,
                 $saveFollowing
             );
-            if ($this->SelfUrl === "discussions") {
+            if (strpos($this->SelfUrl, "discussions") !== false) {
                 $this->enableFollowingFilter = true;
             }
         } else {
@@ -152,6 +152,9 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        if ($this->data('ApplyRestrictions') === true) {
+            $DiscussionModel->setOption('ApplyRestrictions', true);
+        }
         $DiscussionModel->setSort(Gdn::request()->get());
         $DiscussionModel->setFilters(Gdn::request()->get());
         $this->setData('Sort', $DiscussionModel->getSort());
@@ -171,6 +174,7 @@ class DiscussionsController extends VanillaController {
                 $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategoriesResult);
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
+            $announcementsWhere['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = $announcementsWhere['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {

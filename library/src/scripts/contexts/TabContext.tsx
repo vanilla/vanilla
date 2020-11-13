@@ -7,12 +7,13 @@
 import * as React from "react";
 import { Optionalize } from "@library/@types/utils";
 import RadioGroupContext, { IRadioGroupProps } from "@library/forms/radioAsButtons/RadioGroupContext";
+import { RecordID } from "@vanilla/utils";
 
 export interface ITabContext {
     setData: (data: any) => void;
     groupID: string;
     childClass: string;
-    activeItem?: string | number;
+    activeItem?: RecordID;
 }
 
 const TabContext = React.createContext<ITabContext>({} as any);
@@ -29,7 +30,7 @@ export function withTabs<T extends ITabContext = ITabContext>(WrappedComponent: 
         const { activeItem = 0 } = props;
         return (
             <TabContext.Consumer>
-                {context => {
+                {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
                     return <WrappedComponent {...context} {...(props as T)} />;
                 }}

@@ -1,342 +1,413 @@
 version: 2.1
 orbs:
-    core: vanilla/core@2
-    codecov: codecov/codecov@1.0.5
+  core: vanilla/core@2
+  codecov: codecov/codecov@1.0.5
 aliases:
-    - &run_yarn
-        run:
-            name: Install Yarn Packages
-            command: |
-                if [ -d ~/workspace/repo ]; then
-                    cd ~/workspace/repo
-                fi
-                yarn install --pure-lockfile
-                yarn install-all
-    - &attach_workspace
-        attach_workspace:
-            at: ~/workspace
-    - &prepare_coverage
-        run:
-            name: Prepare Coverage
-            command: mkdir ~/phpunit
-    - &upload_coverage
-        run:
-            name: Upload Coverage
-            command: |
-                cd ~/workspace/repo
-                curl -s https://codecov.io/bash | bash -s -- \
-                    -s "$HOME/workspace/repo" \
-                    -y ".codecov.yml"\
-                    -Z || echo 'Codecov upload failed'
-    - &run_composer
-        run:
-            name: Install Composer Packages
-            command: |
-                cd ~/workspace/repo
-                VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
-    - &run_php_lint
-        run:
-            name: Linting PHP
-            command: |
-                cd ~/workspace/repo
-                # Validate syntax in all the files
-                .circleci/scripts/php-lint.sh ./applications
-                .circleci/scripts/php-lint.sh ./conf
-                .circleci/scripts/php-lint.sh ./library
-                .circleci/scripts/php-lint.sh ./plugins
-                .circleci/scripts/php-lint.sh ./themes
+  - &restore_yarn_cache
+    restore_cache:
+      keys:
+        # when lock file changes, use increasingly general patterns to restore cache
+        - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+        - yarn-packages-v1-{{ .Branch }}-
+        - yarn-packages-v1-
+  - &run_yarn
+    run:
+      name: Install Yarn Packages
+      command: |
+        if [ -d ~/workspace/repo ]; then
+            cd ~/workspace/repo
+        fi
+        yarn install --pure-lockfile
+  - &save_yarn_cache
+    save_cache:
+      paths:
+        - ~/.cache/yarn
+      key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+  - &attach_workspace
+    attach_workspace:
+      at: ~/workspace
+  - &prepare_coverage
+    run:
+      name: Prepare Coverage
+      command: mkdir ~/phpunit
+  - &upload_coverage
+    run:
+      name: Upload Coverage
+      command: |
+        cd ~/workspace/repo
+        .circleci/scripts/uploadCodecov.sh
+  - &run_composer
+    run:
+      name: Install Composer Packages
+      command: |
+        cd ~/workspace/repo
+        cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+        cp ./phpunit.xml.dist ./phpunit.xml
+        VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+  - &run_php_lint
+    run:
+      name: Linting PHP
+      command: |
+        cd ~/workspace/repo
+        # Validate syntax in all the files
+        .circleci/scripts/php-lint.sh ./applications
+        .circleci/scripts/php-lint.sh ./conf
+        .circleci/scripts/php-lint.sh ./library
+        .circleci/scripts/php-lint.sh ./plugins
+        .circleci/scripts/php-lint.sh ./themes
 
-                # Run code sniffer on the diffed files.
-                ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
-    - &run_php_static
-      run:
-        name: PHP Static Analysis
-        command: |
-          cd ~/workspace/repo
-          ./vendor/bin/psalm
+        # Run code sniffer on the diffed files.
+        ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+  - &run_php_static
+    run:
+      name: PHP Static Analysis
+      command: |
+        cd ~/workspace/repo
+        ./vendor/bin/psalm
+  - &db_sphinx_env
+    MYSQL_HOST: 127.0.0.1
+    MYSQL_DATABASE: vanilla_test
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  - &prepare_mysql
+    run:
+      name: Prepare MySQL
+      command: |
+        # Wait for MySQL to be fully booted.
+        dockerize -wait tcp://localhost:3306 -timeout 15s
+
+        # Create the SQL "circleci" user. Once we remove travis this should no longer be necessary.
+        mysql -h 127.0.0.1 -u root -e \
+            "CREATE USER 'circleci'@'127.0.0.1'; GRANT ALL PRIVILEGES ON * . * TO 'circleci'@'127.0.0.1' IDENTIFIED BY '';"
+  - &prepare_hosts
+    run:
+      name: Prepare Hosts
+      command: |
+        # Localhost redirects
+        echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+        cat /etc/hosts
+executors:
+  php72:
+    docker:
+      - image: adamcharron/php-mysql:7.2
+      - image: vanillaryan/sphinxsearch-vanilla-ci
+        environment: *db_sphinx_env
+      - image: mysql:5.7
+        environment: *db_sphinx_env
+  php72-sphinx:
+    docker:
+      - image: adamcharron/php-mysql:7.2
+      - image: vanillaryan/sphinxsearch-vanilla-ci
+        environment: *db_sphinx_env
+      - image: mysql:5.7
+        environment: *db_sphinx_env
+  php73:
+    docker:
+      - image: adamcharron/php-mysql:7.3
+      - image: mysql:5.7
+        environment: *db_sphinx_env
+  php73-sphinx:
+    docker:
+      - image: adamcharron/php-mysql:7.3
+      - image: vanillaryan/sphinxsearch-vanilla-ci
+        environment: *db_sphinx_env
+      - image: mysql:5.7
+        environment: *db_sphinx_env
 
 jobs:
-    frontend_setup:
-        executor: core/node
-        steps:
-            - run:
-                name: Versions
-                command: |
-                    node --version
-                    yarn --version
-            - core/checkout
-            - run:
-                # Makes workspace persisting much faster if not needed.
-                name: Cleaning up git directory
-                command: |
-                    cd ~/workspace/repo
-                    rm -rf .git
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
-            - *run_yarn
-            - persist_to_workspace:
-                root: ~/workspace
-                paths:
-                    - repo
-                    - ci-scripts
-    frontend_build:
-        executor: core/node
-        resource_class: large
-        steps:
-            - *attach_workspace
-            - run:
-                name: Build Frontend
-                command: |
-                    cd ~/workspace/repo
-                    yarn build
-    frontend_test:
-        executor: core/node
-        steps:
-            - *attach_workspace
-            - run:
-                name: Build Frontend
-                command: |
-                    cd ~/workspace/repo
-                    yarn test
-    frontend_lint:
-        executor: core/node
-        resource_class: large
-        steps:
-            - *attach_workspace
-            - run: |
-                  cd ~/workspace/repo
-                  # 4 cores
-                  yarn lint -w 4
-                  yarn prettier --check "**/src/scripts/**/*"
-    frontend_typechecker:
-        executor: core/node
-        resource_class: large
-        steps:
-            - *attach_workspace
-            - run: |
-                cd ~/workspace/repo
-                yarn check-types
-    php_setup:
-        executor: core/php72
-        steps:
-            - run:
-                name: Versions
-                command: |
-                    php --version
-                    composer --version
-            - core/checkout
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
-            - *run_composer
-            - persist_to_workspace:
-                root: ~/workspace
-                paths:
-                    - repo
-                    - ci-scripts
-    php_72_lint:
-        executor: core/php72
-        steps: &php_lint_steps
-            - core/checkout
-            - *run_composer
-            - *run_php_lint
-    php_72_static:
-      executor: core/php72
-      steps: &php_static_steps
-        - core/checkout
-        - *run_composer
-        - *run_php_static
-    php_72_tests:
-        executor: core/php72
-        resource_class: large
-        steps: &php_unit_test_steps
-            - *attach_workspace
-            - run:
-                name: Test setup
-                command: |
-                    cd ~/workspace/repo
-                    cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - core/prepare_php_tests
-            - *prepare_coverage
-            - run:
-                name: Library Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="Library" \
-                        --log-junit ~/phpunit/library-junit.xml \
-                        --coverage-clover=library-coverage.xml
-            - run:
-                name: APIv2 Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="APIv2" \
-                        --log-junit ~/phpunit/apiv2-junit.xml \
-                        --coverage-clover=apiv2-coverage.xml
-            - *upload_coverage
-            - store_test_results:
-                path: ~/phpunit
-    php_72_integration:
-        executor: core/php72
-        resource_class: large
-        steps: &php_integration_test_steps
-            - *attach_workspace
-            - core/prepare_php_tests
-            - core/prepare_nginx
-            - run:
-                name: APIv0 Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="APIv0" \
-                        --coverage-clover=apiv0-coverage.xml
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="Models" \
-                        --log-junit ~/phpunit/models-junit.xml \
-                        --coverage-clover=models-coverage.xml
-            - *upload_coverage
-            - store_test_results:
-                path: ~/phpunit
-    php_73_lint:
-        executor: core/php73
-        steps: *php_lint_steps
-    php_73_static:
-      executor: core/php73
-      steps: *php_static_steps
-    php_73_tests:
-        executor: core/php73
-        steps: *php_unit_test_steps
-    php_73_integration:
-        executor: core/php73
-        steps: *php_integration_test_steps
-    dependency_audit:
-        executor: core/php72
-        steps:
-            - core/checkout
-            - run: yarn audit
-    chromatic_test:
-        executor: core/node
-        steps:
-            - run:
-                command: |
-                    if [ -z "$CHROMATIC_APP_CODE" ]; then
-                        echo "No Chromatic app code detected. Exiting."
-                        circleci-agent step halt
-                    else
-                        echo "Chromatic app code detected. Proceeding..."
-                    fi
-                name: "Conditionally perform Chromatic test"
-            - checkout
-            - *run_yarn
-            - run:
-                command: yarn chromatic test --exit-zero-on-changes
-                name: Chromatic - accept all changes
-    chromatic_run_accept_all:
-        executor: core/node
-        steps:
-            - run:
-                command: |
-                    if [ -z "$CHROMATIC_APP_CODE" ]; then
-                        echo "No Chromatic app code detected. Exiting."
-                        circleci-agent step halt
-                    else
-                        echo "Chromatic app code detected. Proceeding..."
-                    fi
-                name: "Conditionally perform Chromatic test"
-            - checkout
-            - *run_yarn
-            - run:
-                command: yarn chromatic test --auto-accept-changes
-                name: Chromatic - accept all changes
+  frontend_setup:
+    executor: core/node
+    steps:
+      - run:
+          name: Versions
+          command: |
+            node --version
+            yarn --version
+      - core/checkout
+      - run:
+          # Makes workspace persisting much faster if not needed.
+          name: Cleaning up git directory
+          command: |
+            cd ~/workspace/repo
+            rm -rf .git
+      - *restore_yarn_cache
+      - *run_yarn
+      - *save_yarn_cache
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - repo
+            - ci-scripts
+  frontend_build:
+    executor: core/node
+    resource_class: large # 4 cores
+    steps:
+      - *attach_workspace
+      - run:
+          name: Build Frontend
+          command: |
+            cd ~/workspace/repo
+            NODE_OPTIONS=--max_old_space_size=7000 PARALLEL_CORES=4 yarn build
+  frontend_test:
+    executor: core/node
+    steps:
+      - *attach_workspace
+      - run:
+          name: Build Frontend
+          command: |
+            cd ~/workspace/repo
+            yarn test
+  frontend_lint:
+    executor: core/node
+    resource_class: large
+    steps:
+      - *attach_workspace
+      - run: |
+          cd ~/workspace/repo
+          # 4 cores
+          yarn lint -w 4
+          yarn prettier --check "**/src/scripts/**/*"
+  frontend_typechecker:
+    executor: core/node
+    resource_class: large
+    steps:
+      - *attach_workspace
+      - run: |
+          cd ~/workspace/repo
+          yarn check-types
+  php_setup:
+    executor: php72
+    steps:
+      - run:
+          name: Versions
+          command: |
+            php --version
+            composer --version
+      - core/checkout
+      # We explcitly don't cache dependencies.
+      # The cache validation & fetching seems to take longer than fetching from source.
+      - *run_composer
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - repo
+            - ci-scripts
+  php_72_lint:
+    executor: php72
+    steps: &php_lint_steps
+      - core/checkout
+      - *run_composer
+      - *run_php_lint
+  php_72_static:
+    executor: core/php72
+    steps: &php_static_steps
+      - *attach_workspace
+      - *run_php_static
+  php_72_tests:
+    executor: php72-sphinx
+    resource_class: large
+    parallelism: 12
+    steps: &php_unit_test_steps
+      - *attach_workspace
+      - *prepare_mysql
+      - *prepare_hosts
+      - *prepare_coverage
+      - run:
+          name: PHP Tests
+          command: |
+            cd ~/workspace/repo
+            filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
 
+            echo -e "\033[1;33m====== Running PHPUnit with extra filter ======\033[0m"
+            echo "--filter $filter";
+            echo ""
+
+            # phpdbg to generate code coverage is about 5x faster than xdebug.
+            # Containers have 4gb a memory. Try to avoid coming too close to the limit.
+            # Remember that sphinx and mysql also take memory.
+            phpdbg -qrr \
+              -d memory_limit=2048M \
+              ./vendor/bin/phpunit \
+              -c phpunit.xml.dist \
+              --exclude-group=ignore \
+              --log-junit ~/phpunit/php-tests-junit.xml \
+              --coverage-clover=php-tests-coverage.xml \
+              --filter $filter
+      - run:
+          name: Adjust JUnit Paths
+          command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
+      - run:
+          name: Fix Clover Paths
+          command: |
+            # CodeCov requires file paths be resolved.
+            cd ~/workspace/repo
+            php ./.circleci/scripts/resolveCloverPaths.php ./php-tests-coverage.xml
+
+            echo "====== Resolved files ====="
+            grep "<file" ./php-tests-coverage.xml
+      - *upload_coverage
+      - store_test_results:
+          path: ~/phpunit
+  php_72_integration:
+    executor: php72-sphinx
+    resource_class: medium
+    steps: &php_integration_test_steps
+      - *attach_workspace
+      - *prepare_mysql
+      - *prepare_hosts
+      - core/prepare_nginx
+      - run:
+          name: APIv0 Tests
+          command: |
+            cd ~/workspace/repo
+            ./vendor/bin/phpunit \
+                -c phpunit.xml.dist \
+                --exclude-group=ignore \
+                --testsuite="APIv0" \
+                --coverage-clover=apiv0-coverage.xml
+      - *upload_coverage
+      - store_test_results:
+          path: ~/phpunit
+  php_73_lint:
+    executor: php73
+    steps: *php_lint_steps
+  php_73_static:
+    executor: core/php73
+    steps: *php_static_steps
+  php_73_tests:
+    executor: php73-sphinx
+    steps: *php_unit_test_steps
+  php_73_integration:
+    executor: php73-sphinx
+    steps: *php_integration_test_steps
+  dependency_audit:
+    executor: php72-sphinx
+    steps:
+      - core/checkout
+      - run: yarn audit
+  chromatic_test:
+    executor: php72-sphinx
+    working_directory: ~/workspace/repo
+    steps:
+      - run:
+          command: |
+            if [ -z "$CHROMATIC_APP_CODE" ]; then
+                echo "No Chromatic app code detected. Exiting."
+                circleci-agent step halt
+            else
+                echo "Chromatic app code detected. Proceeding..."
+            fi
+          name: "Conditionally perform Chromatic test"
+      - checkout
+      - *prepare_mysql
+      - *prepare_hosts
+      - *run_composer
+      - *restore_yarn_cache
+      - *run_yarn
+      - *save_yarn_cache
+      - run:
+          command: yarn chromatic test --exit-zero-on-changes --exit-once-uploaded
+          name: Chromatic - accept all changes
+  chromatic_run_accept_all:
+    executor: php72-sphinx
+    working_directory: ~/workspace/repo
+    steps:
+      - run:
+          command: |
+            if [ -z "$CHROMATIC_APP_CODE" ]; then
+                echo "No Chromatic app code detected. Exiting."
+                circleci-agent step halt
+            else
+                echo "Chromatic app code detected. Proceeding..."
+            fi
+          name: "Conditionally perform Chromatic test"
+      - checkout
+      - *prepare_mysql
+      - *prepare_hosts
+      - *run_composer
+      - *restore_yarn_cache
+      - *run_yarn
+      - *save_yarn_cache
+      - run:
+          command: yarn chromatic test --auto-accept-changes
+          name: Chromatic - accept all changes
 
 workflows:
-    version: 2
-    commit:
-        jobs:
-            - chromatic_test:
-                filters:
-                    branches:
-                        ignore: master
-            - chromatic_run_accept_all:
-                filters:
-                    branches:
-                        only: master
-            # PHP 7.2 jobs are only nightly until we move upwards on infra.
+  version: 2
+  commit:
+    jobs:
+      - chromatic_test:
+          filters:
+            branches:
+              ignore: master
+      - chromatic_run_accept_all:
+          filters:
+            branches:
+              only: master
+      # PHP 7.2 jobs are only nightly until we move upwards on infra.
+      - php_setup
+      - php_72_lint
+      - php_72_static:
+          requires:
             - php_setup
-            - php_72_lint
-            - php_72_static
-            - php_72_integration:
-                requires:
-                    - php_setup
-            - php_72_tests:
-                requires:
-                    - php_setup
-            # JS and browsers
-            - frontend_setup
-            - frontend_lint:
-                requires:
-                    - frontend_setup
-            - frontend_typechecker:
-                requires:
-                    - frontend_setup
-            - frontend_build:
-                requires:
-                    - frontend_setup
-            - frontend_test:
-                requires:
-                    - frontend_setup
-    nightly:
-        triggers:
-            - schedule:
-                cron: "0 0 * * *" # Once a day.
-                filters:
-                    branches:
-                        only:
-                            - master
-        jobs:
-            - dependency_audit
-            # PHP and serverside
+      - php_72_integration:
+          requires:
             - php_setup
-            - php_72_lint
-            - php_72_static
-            - php_73_lint
-            - php_73_static
-            - php_72_integration:
-                requires:
-                    - php_setup
-            - php_73_integration:
-                requires:
-                    - php_setup
-            - php_72_tests:
-                requires:
-                    - php_setup
-            - php_73_tests:
-                requires:
-                    - php_setup
-            ## JS & browsers
+      - php_72_tests:
+          requires:
+            - php_setup
+      # JS and browsers
+      - frontend_setup
+      - frontend_lint:
+          requires:
             - frontend_setup
-            - frontend_lint:
-                requires:
-                    - frontend_setup
-            - frontend_typechecker:
-                requires:
-                    - frontend_setup
-            - frontend_build:
-                requires:
-                    - frontend_setup
-            - frontend_test:
-                requires:
-                    - frontend_setup
+      - frontend_typechecker:
+          requires:
+            - frontend_setup
+      - frontend_build:
+          requires:
+            - frontend_setup
+      - frontend_test:
+          requires:
+            - frontend_setup
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *" # Once a day.
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - dependency_audit
+      # PHP and serverside
+      - php_setup
+      - php_72_lint
+      - php_72_static
+      - php_73_lint
+      - php_73_static
+      - php_72_integration:
+          requires:
+            - php_setup
+      - php_73_integration:
+          requires:
+            - php_setup
+      - php_72_tests:
+          requires:
+            - php_setup
+      - php_73_tests:
+          requires:
+            - php_setup
+      ## JS & browsers
+      - frontend_setup
+      - frontend_lint:
+          requires:
+            - frontend_setup
+      - frontend_typechecker:
+          requires:
+            - frontend_setup
+      - frontend_build:
+          requires:
+            - frontend_setup
+      - frontend_test:
+          requires:
+            - frontend_setup

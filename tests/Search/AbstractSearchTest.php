@@ -10,12 +10,9 @@ namespace VanillaTests\Search;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Http\HttpResponse;
-use Vanilla\Forum\Search\ArticleSearchIndexTemplate;
 use Vanilla\Forum\Search\CategorySearchIndexTemplate;
 use Vanilla\Forum\Search\CommentSearchIndexTemplate;
 use Vanilla\Forum\Search\DiscussionSearchIndexTemplate;
-use Vanilla\Forum\Search\GroupSearchIndexTemplate;
-use Vanilla\Forum\Search\KnowledgeBaseSearchIndexTemplate;
 use Vanilla\Forum\Search\UserSearchIndexTemplate;
 use Vanilla\Http\InternalClient;
 use Vanilla\Search\GlobalSearchType;
@@ -89,14 +86,10 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
             $container->addCall('registerSearchType', [new Reference($typeClass)]);
         }
 
-        $container->addCall('registerSearchIndexTemplate', [new Reference(ArticleSearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(CategorySearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(CommentSearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(DiscussionSearchIndexTemplate::class)]);
-        $container->addCall('registerSearchIndexTemplate', [new Reference(GroupSearchIndexTemplate::class)]);
-        $container->addCall('registerSearchIndexTemplate', [new Reference(KnowledgeBaseSearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(UserSearchIndexTemplate::class)]);
-
 
         static::configureSearchContainer($container);
     }

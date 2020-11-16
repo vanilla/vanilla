@@ -18,7 +18,7 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
     use CommunityApiTestTrait;
 
     /** @var string[] */
-    public static $addons = ["DiscussionExcerpt", "IndexPhotos"];
+    public static $addons = ["IndexPhotos"];
 
     /** @var array */
     private static $commentedDiscussionID;

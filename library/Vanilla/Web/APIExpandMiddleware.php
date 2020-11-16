@@ -99,6 +99,10 @@ class APIExpandMiddleware {
         $result = [];
 
         $expand = $this->readExpand($request);
+        if ($expand === null) {
+            return [];
+        }
+
         $supportedFields = array_keys($this->supportedFields);
         foreach ($expand as $expandField) {
             if (in_array($expandField, $supportedFields)) {
@@ -126,11 +130,16 @@ class APIExpandMiddleware {
      * Extract the API expand array from a request.
      *
      * @param RequestInterface $request
-     * @return array
+     * @return array| null
      */
-    private function readExpand(RequestInterface $request): array {
+    private function readExpand(RequestInterface $request): ?array {
         $query = $request->getQuery();
-        $expand = $query[self::EXPAND_FIELD] ?? "";
+        $expand = $query[self::EXPAND_FIELD] ?? null;
+
+        if ($expand === null) {
+            return null;
+        }
+
         $fields = is_string($expand) ? explode(",", $expand) : [];
         array_walk($fields, "trim");
         return $fields;

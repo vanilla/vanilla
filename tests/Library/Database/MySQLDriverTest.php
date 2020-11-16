@@ -8,6 +8,8 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Database\SetLiterals\Increment;
+use Vanilla\Database\SetLiterals\MinMax;
 use Vanilla\Schema\RangeExpression;
 use VanillaTests\SiteTestTrait;
 
@@ -311,5 +313,89 @@ EOT;
             '[]' => ['', []],
         ];
         return $r;
+    }
+
+    /**
+     * Test the `Increment` value.
+     *
+     * @param int $increment
+     * @param string $expected
+     * @dataProvider incrementTests
+     */
+    public function testIncrement(int $increment, string $expected): void {
+        $sql = $this->sql->update('test')->set('a', new Increment($increment))->getUpdateSql();
+        $expected = <<<SQL
+update `GDN_test` `test`
+set `a` = `a` $expected
+SQL;
+        $this->assertSame($expected, $sql);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function incrementTests(): array {
+        $r = [
+            [1, '+1'],
+            [-1, '-1'],
+        ];
+
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * An increment of zero shouldn't add a SET clause.
+     */
+    public function testIncrementEmpty(): void {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot generate UPDATE statement with missing clauses.');
+        $sql = $this->sql->update('test', ['a' => new Increment(0)])->getUpdateSql();
+    }
+
+    /**
+     * Test min/max literals.
+     *
+     * @param string $op
+     * @param string $expected
+     * @dataProvider minMaxTests
+     */
+    public function testMinMax(string $op = MinMax::OP_MIN, string $expected = '<') {
+        $dt = new \DateTime('2020-06-20', new \DateTimeZone('UTC'));
+
+        $sql = $this->sql->update('test')->set('a', new MinMax($op, $dt))->getUpdateSql();
+        $expected = <<<SQL
+update `GDN_test` `test`
+set `a` = case when `a` is null or '2020-06-20 00:00:00' $expected `a` then '2020-06-20 00:00:00' else `a` end
+SQL;
+        $this->assertSame($expected, $sql);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function minMaxTests(): array {
+        return [
+            MinMax::OP_MIN => [MinMax::OP_MIN, '<'],
+            MinMax::OP_MAX => [MinMax::OP_MAX, '>'],
+        ];
+    }
+
+    /**
+     * The driver should convert an array `<>` to a not in clause.
+     */
+    public function testWhereNotInShorthand() {
+        $sql = $this->sql->from('test')->where(['foo <>' => ['a', 'b']])->getSelect();
+
+        $expected = <<<SQL
+select *
+from `GDN_test` `test`
+where `foo` not in ('a', 'b')
+SQL;
+
+        $this->assertSame($expected, $sql);
     }
 }

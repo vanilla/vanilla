@@ -1,15 +1,15 @@
 {
     "global": {
         "mainColors": {
-            "primary": "#9966b2",
-            "fg": "#fff",
-            "bg": "#555a62",
-            "primaryContrast": "#fff"
+            "primary": "#9966b2"
         },
         "fonts": {
             "families": {
                 "body": ["Nunito"]
             }
+        },
+        "options": {
+            "preset": "dark"
         }
     },
     "banner": {

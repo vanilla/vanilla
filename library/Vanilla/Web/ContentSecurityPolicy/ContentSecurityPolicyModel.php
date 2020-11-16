@@ -7,6 +7,7 @@
 namespace Vanilla\Web\ContentSecurityPolicy;
 
 use Psr\Log\LoggerInterface;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 
 /**
@@ -29,16 +30,21 @@ class ContentSecurityPolicyModel {
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
      * ContentSecurityPolicyModel constructor.
      *
      * @param UASnifferInterface $ieDetector
      * @param LoggerInterface $logger
+     * @param ConfigurationInterface $config
      */
-    public function __construct(UASnifferInterface $ieDetector, LoggerInterface $logger) {
+    public function __construct(UASnifferInterface $ieDetector, LoggerInterface $logger, ConfigurationInterface $config) {
         $this->isIE11 = $ieDetector->isIE11();
         $this->logger = $logger;
         $this->nonce = md5(base64_encode(APPLICATION_VERSION.rand(1, 1000000)));
+        $this->config = $config;
     }
 
     /**
@@ -55,14 +61,19 @@ class ContentSecurityPolicyModel {
      */
     public function getPolicies(): array {
         $nonce = $this->getNonce();
-        // Note:
-        // In modern browsers that support `nonce-` unsafe-inline is ignored.
-        // Older browsers need unsafe inline applied.
-        // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
-        // "Specifying nonce makes a modern browser ignore 'unsafe-inline' which could still be set for older browsers without nonce support."
-        $policies[] = new Policy(Policy::SCRIPT_SRC, "'nonce-$nonce' 'unsafe-inline'");
-        foreach ($this->providers as $provider) {
-            $policies = array_merge($policies, $provider->getPolicies());
+
+        $policies = [];
+
+        if (!$this->config->get('HotReload.Enabled', false)) {
+            // Note:
+            // In modern browsers that support `nonce-` unsafe-inline is ignored.
+            // Older browsers need unsafe inline applied.
+            // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+            // "Specifying nonce makes a modern browser ignore 'unsafe-inline' which could still be set for older browsers without nonce support."
+            $policies[] = new Policy(Policy::SCRIPT_SRC, "'nonce-$nonce' 'unsafe-inline'");
+            foreach ($this->providers as $provider) {
+                $policies = array_merge($policies, $provider->getPolicies());
+            }
         }
         return $policies;
     }
@@ -126,7 +137,7 @@ class ContentSecurityPolicyModel {
 
         // If we have just one, we can support ALLOW_FROM.
         // See https://tools.ietf.org/html/rfc7034#section-2.3.2.3
-        if (count($ancestorArguments) <= 1) {
+        if (count($ancestorArguments) === 1) {
             return Policy::X_FRAME_ALLOW_FROM . ' ' . $ancestorArguments[0];
         }
 

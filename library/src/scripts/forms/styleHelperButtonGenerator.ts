@@ -14,28 +14,40 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import cloneDeep from "lodash/cloneDeep";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { nestedWorkaround } from "@dashboard/compatibilityStyles";
+import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 
-export const generateButtonStyleProperties = (
-    buttonTypeVars: IButtonType,
-    setZIndexOnState = false,
-    stateSuffix?: string,
-) => {
-    const globalVars = globalVariables();
-    const formElVars = formElementsVariables();
-    const buttonGlobals = buttonGlobalVariables();
+export const generateButtonStyleProperties = (props: {
+    buttonTypeVars: IButtonType;
+    setZIndexOnState?: boolean;
+    stateSuffix?: string;
+    debug?: boolean | string;
+    globalVars?: any;
+    formElementVars?: any;
+    buttonGlobalVars?: any;
+}) => {
+    const {
+        setZIndexOnState = false,
+        stateSuffix,
+        globalVars = globalVariables(),
+        formElementVars = formElementsVariables(),
+        buttonGlobalVars = buttonGlobalVariables(),
+        debug = false,
+    } = props;
+
     const zIndex = setZIndexOnState ? 1 : undefined;
-    const buttonDimensions = buttonTypeVars.sizing || {};
+    const buttonDimensions = props.buttonTypeVars.sizing || {};
 
-    const state = buttonTypeVars.state ?? {};
-    const colors = buttonTypeVars.colors ?? {
+    const state = props.buttonTypeVars.state ?? {};
+    const colors = props.buttonTypeVars.colors ?? {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
     };
 
     // Make sure we have the second level, if it was empty
-    buttonTypeVars = merge(
+    const buttonTypeVars = merge(
         {
             preset: ButtonPreset.ADVANCED,
             colors,
@@ -43,14 +55,13 @@ export const generateButtonStyleProperties = (
             hover: state,
             focus: state,
             active: state,
-            borders: state,
             focusAccessible: state,
         },
-        buttonTypeVars,
+        props.buttonTypeVars,
     );
 
     let backgroundColor =
-        buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg;
+        buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobalVars.colors.bg;
 
     let fontColor =
         buttonTypeVars.fonts && buttonTypeVars.fonts.color
@@ -69,19 +80,23 @@ export const generateButtonStyleProperties = (
 
     const borderVars = {
         ...EMPTY_BORDER,
-        ...buttonGlobals.border,
-        ...(buttonTypeVars.borders ?? {}),
+        ...buttonGlobalVars.borders,
+        ...buttonTypeVars.borders,
     };
 
-    let defaultBorder = borders(borderVars) as NestedCSSProperties;
-
-    // Remove debug and fallback
+    const defaultBorder = borders(borderVars, {
+        fallbackBorderVariables: buttonGlobalVars.border,
+        debug,
+    });
 
     const hoverBorder =
         buttonTypeVars.hover && buttonTypeVars.hover.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.hover.borders }, buttonGlobals.border),
+                  borders(
+                      { ...EMPTY_BORDER, ...buttonTypeVars.hover.borders },
+                      { fallbackBorderVariables: buttonGlobalVars.border },
+                  ),
               )
             : {};
 
@@ -89,7 +104,10 @@ export const generateButtonStyleProperties = (
         buttonTypeVars.active && buttonTypeVars.active.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.active.borders }, buttonGlobals.border),
+                  borders(
+                      { ...EMPTY_BORDER, ...buttonTypeVars.active.borders },
+                      { fallbackBorderVariables: buttonGlobalVars.border },
+                  ),
               )
             : {};
 
@@ -99,7 +117,7 @@ export const generateButtonStyleProperties = (
                   cloneDeep(defaultBorder),
                   borders(
                       { ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
-                      buttonGlobals.border,
+                      { fallbackBorderVariables: buttonGlobalVars.border },
                   ),
               )
             : defaultBorder;
@@ -108,20 +126,23 @@ export const generateButtonStyleProperties = (
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders({ ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders }, buttonGlobals.border),
+                  borders(
+                      { ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders },
+                      { fallbackBorderVariables: buttonGlobalVars.border },
+                  ),
               )
             : {};
 
-    const fontVars = { ...EMPTY_FONTS, ...buttonGlobals.font, ...buttonTypeVars.fonts };
+    const fontVars = { ...EMPTY_FONTS, ...buttonGlobalVars.font, ...buttonTypeVars.fonts };
 
     const paddingHorizontal =
         buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined
             ? buttonTypeVars.padding.horizontal
-            : buttonGlobals.padding.horizontal;
+            : buttonGlobalVars.padding.horizontal;
     const fontSize =
         buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined
             ? buttonTypeVars.fonts.size
-            : buttonGlobals.font.size;
+            : buttonGlobalVars.font.size;
 
     const { minHeight, minWidth } = buttonDimensions;
     const { skipDynamicPadding = false } = buttonTypeVars;
@@ -146,7 +167,7 @@ export const generateButtonStyleProperties = (
             minWidth,
             fontSize,
             paddingHorizontal,
-            formElementVars: formElVars,
+            formElementVars: formElementVars,
             borderRadius: borderVars["radius"] ?? undefined,
             skipDynamicPadding,
         }),
@@ -159,6 +180,7 @@ export const generateButtonStyleProperties = (
         justifyContent: "center",
         touchAction: "manipulation",
         cursor: "pointer",
+        ...defaultTransition("background", "color", "border"),
         $nest: {
             [`&:not([disabled]):not(.focus-visible)`]: {
                 outline: 0,
@@ -220,7 +242,7 @@ export const generateButtonStyleProperties = (
                 ...focusAccessibleBorder,
             },
             "&[disabled]": {
-                opacity: formElVars.disabled.opacity,
+                opacity: formElementVars.disabled.opacity,
             },
             ...(buttonTypeVars.extraNested ?? {}),
         },
@@ -228,9 +250,20 @@ export const generateButtonStyleProperties = (
 
     return result;
 };
-const generateButtonClass = (buttonTypeVars: IButtonType, setZIndexOnState = false) => {
+
+const generateButtonClass = (
+    buttonTypeVars: IButtonType,
+    options?: { setZIndexOnState?: boolean; debug?: boolean | string },
+) => {
+    const { setZIndexOnState = false, debug = false } = options || {};
     const style = styleFactory(`button-${buttonTypeVars.name}`);
-    return style(generateButtonStyleProperties(buttonTypeVars, setZIndexOnState));
+    const buttonStyles = generateButtonStyleProperties({
+        buttonTypeVars,
+        setZIndexOnState,
+    });
+    const buttonClass = style(buttonStyles);
+    nestedWorkaround(`.${buttonClass}`, buttonStyles.$nest);
+    return buttonClass;
 };
 
 export default generateButtonClass;

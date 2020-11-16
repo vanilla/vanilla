@@ -16,10 +16,11 @@ import {
     fontFallbacks,
     monoFallbacks,
     IFont,
+    EMPTY_SPACING,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderStyleProperty, BorderWidthProperty } from "csstype";
-import { color, ColorHelper, percent, rgba } from "csx";
+import { color, ColorHelper, rgba } from "csx";
 import { TLength } from "typestyle/lib/types";
 import { logDebug, logError, logWarning } from "@vanilla/utils";
 import { ButtonPreset } from "@library/forms/buttonStyles";
@@ -45,16 +46,20 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         fullGutter: FULL_GUTTER,
         states: {
             hover: {
-                stateEmphasis: 0.08,
+                bgEmphasis: 0.08,
+                borderEmphasis: 0.7,
             },
             selected: {
-                stateEmphasis: 0.5,
+                bgEmphasis: 0.5,
+                borderEmphasis: 1,
             },
             active: {
-                stateEmphasis: 0.2,
+                bgEmphasis: 0.2,
+                borderEmphasis: 1,
             },
             focus: {
-                stateEmphasis: 0.15,
+                bgEmphasis: 0.15,
+                borderEmphasis: 1,
             },
         },
     });
@@ -64,13 +69,12 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const elementaryColors = {
         black: color("#000"),
         almostBlack: color("#323639"),
-        lowContrast: color("#555a62"),
         white: color("#fff"),
         transparent: rgba(0, 0, 0, 0),
     };
 
     const initialMainColors = makeThemeVars("mainColors", {
-        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.lowContrast : elementaryColors.white,
+        fg: options.preset === GlobalPreset.LIGHT ? color("#555a62") : elementaryColors.white,
         bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
         primary: colorPrimary,
         primaryContrast: elementaryColors.white, // for good contrast with text.
@@ -146,7 +150,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // You can set all of them by setting generatedMainColors.stateSecondary
     // You can set individual states with links.colors["your state"]
     // Will default to variation of links.colors.default (which is by default the secondary color)
-    Object.keys(links.colors).forEach(state => {
+    Object.keys(links.colors).forEach((state) => {
         if (state !== "default" && state !== "visited") {
             if (!links[state]) {
                 links.colors[state] =
@@ -348,7 +352,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const animation = makeThemeVars("animation", {
-        defaultTiming: ".1s",
+        defaultTiming: ".10s",
         defaultEasing: "ease-out",
     });
 
@@ -379,7 +383,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const meta = makeThemeVars("meta", {
         text: {
             size: fonts.size.small,
-            color: elementaryColors.lowContrast,
+            color: options.preset === GlobalPreset.LIGHT ? color("#767676") : elementaryColors.white,
             lineHeight: lineHeights.base,
         } as IFont,
         spacing: {
@@ -401,22 +405,22 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             opacity: 0.75,
         },
         hover: {
-            highlight: mixPrimaryAndBg(constants.states.hover.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.hover.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
         selected: {
-            highlight: mixPrimaryAndBg(constants.states.selected.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.selected.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
         active: {
-            highlight: mixPrimaryAndBg(constants.states.active.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.active.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
         focus: {
-            highlight: mixPrimaryAndBg(constants.states.focus.stateEmphasis),
+            highlight: mixPrimaryAndBg(constants.states.focus.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
@@ -518,6 +522,16 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         logError("The function 'findColorMatch' is not meant for production");
     };
 
+    const itemList = makeThemeVars("itemList", {
+        padding: {
+            ...EMPTY_SPACING,
+            top: 15,
+            right: widget.padding,
+            bottom: 16,
+            left: widget.padding,
+        },
+    });
+
     return {
         options,
         elementaryColors,
@@ -553,6 +567,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         buttonPreset,
         foundationalWidths,
         widget,
+        itemList,
     };
 });
 

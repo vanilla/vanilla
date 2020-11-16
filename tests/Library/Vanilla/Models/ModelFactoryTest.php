@@ -8,18 +8,15 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use Garden\Container\NotFoundException;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelFactory;
-use VanillaTests\BootstrapTrait;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Tests for the `ModelFactory` class.
  */
-class ModelFactoryTest extends TestCase {
-    use BootstrapTrait;
-
+class ModelFactoryTest extends BootstrapTestCase {
     const RECORD_TYPE = 'test';
     const ALIAS = 't';
 
@@ -33,8 +30,6 @@ class ModelFactoryTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setupBoostrapTrait();
-        $this->initializeDatabase();
 
         $this->factory = ModelFactory::fromContainer($this->container());
         $this->factory->addModel(self::RECORD_TYPE, TestModel::class, self::ALIAS);

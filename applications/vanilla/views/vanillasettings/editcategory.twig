@@ -69,12 +69,6 @@ dashboardHeading({
         t('The banner image to use for this category. Recommended dimensions are about 1000px by 400px or a similar ratio.')
     ) }}
 
-    {#
-        // Extended fields may be defined through some addon.
-     #}
-    {% if _ExtendedFields is defined %}
-        {{ form.simple(_ExtendedFields, []) }}
-    {% endif %}
     <li class="form-group">
         <div class="label-wrap">
             {{ form.label('Display As', 'DisplayAs') }}
@@ -83,6 +77,12 @@ dashboardHeading({
             {{ form.dropDown('DisplayAs', DisplayAsOptions, {'Wrap': true}) }}
         </div>
     </li>
+    {#
+        // Extended fields may be defined through some addon.
+     #}
+    {% if _ExtendedFields is defined %}
+        {{ form.simple(_ExtendedFields, []) }}
+    {% endif %}
     <li class="form-group">
         {{ form.toggle('HideAllDiscussions', 'Hide from the recent discussions page.') }}
     </li>
@@ -97,6 +97,11 @@ dashboardHeading({
             {{ form.toggle('CustomPermissions', 'This category has custom permissions.') }}
         </li>
     {% endif %}
+
+    <li id="Featured" class="form-group">
+        {{ form.toggle('Featured', 'Featured category.') }}
+    </li>
+
 </ul>
 <div class="CategoryPermissions">
 

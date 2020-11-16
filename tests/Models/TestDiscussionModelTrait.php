@@ -24,6 +24,7 @@ trait TestDiscussionModelTrait {
      */
     protected function setupTestDiscussionModel() {
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
+        DiscussionModel::cleanForTests();
     }
 
     /**
@@ -63,5 +64,22 @@ trait TestDiscussionModelTrait {
         TestCase::assertCount($count, $rows, "Not enough test discussions were inserted.");
 
         return $rows;
+    }
+
+    /**
+     * Assert that a count matches the database.
+     *
+     * @param int[]|true $categoryIDs The categories to check or true for all categories.
+     * @param int $actualCount The count to assert against.
+     */
+    protected function assertDiscussionCountsFromDb($categoryIDs, int $actualCount): void {
+        $this->categoryModel->SQL
+            ->select('CountDiscussions', 'sum')
+            ->from('Category');
+        if (is_array($categoryIDs)) {
+            $this->categoryModel->SQL->whereIn('CategoryID', $categoryIDs);
+        }
+        $expectedCounts = (int)$this->categoryModel->SQL->get()->value('CountDiscussions', null);
+        $this->assertSame($expectedCounts, $actualCount);
     }
 }

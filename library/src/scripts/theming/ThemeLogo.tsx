@@ -23,7 +23,7 @@ class ThemeLogo extends React.Component<IProps> {
 
         const isDesktop = this.props.type === LogoType.DESKTOP;
         const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;
-        const finalUrl = themeUrl ?? this.props.logoUrl;
+        const finalUrl = this.props.overwriteLogo ?? themeUrl ?? this.props.logoUrl;
 
         if (finalUrl) {
             content = <img className={this.props.className} src={finalUrl} />;
@@ -56,6 +56,7 @@ interface IOwnProps {
     alt: string;
     className?: string;
     type: LogoType;
+    overwriteLogo?: string; // for storybook only
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps>;

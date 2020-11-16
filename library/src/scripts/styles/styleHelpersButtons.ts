@@ -6,6 +6,7 @@
 
 import { ILinkStates } from "@library/styles/styleHelpersLinks";
 import { logDebug } from "@vanilla/utils/src/debugUtils";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {
@@ -38,14 +39,19 @@ export interface IButtonStates {
     active?: object;
 }
 
-export const allLinkStates = (styles: ILinkStates, nested?: object) => {
-    const output = allButtonStates(styles, nested, true);
+export const allLinkStates = (styles: ILinkStates, nested?: object): NestedCSSProperties => {
+    const output: NestedCSSProperties = allButtonStates(styles, nested, true);
     const visited = styles.visited !== undefined ? styles.visited : styles.noState || {};
-    output.$nest["&:visited"] = { ...visited };
+    output.$nest!["&:visited"] = { ...visited };
     return output;
 };
 
-export const allButtonStates = (styles: IButtonStates, nested?: object, isLink?: boolean, debugMode?: boolean) => {
+export const allButtonStates = (
+    styles: IButtonStates,
+    nested?: object,
+    isLink?: boolean,
+    debugMode?: boolean,
+): NestedCSSProperties => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
     const noState = styles.noState !== undefined ? styles.noState : {};
 

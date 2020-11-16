@@ -53,7 +53,7 @@ export function ThemeBuilderBreakpoints(props: IProps) {
                 <ThemeToggle
                     disabled={toggleDisabled}
                     forcedValue={isForcedOn}
-                    afterChange={value => {
+                    afterChange={(value) => {
                         if (!value) {
                             // We were turned off, so clear all of the breakpoint values.
                             setBreakpoints(undefined);

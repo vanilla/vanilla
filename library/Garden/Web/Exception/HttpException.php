@@ -11,6 +11,8 @@ namespace Garden\Web\Exception;
  * The base class for all HTTP related exceptions.
  */
 abstract class HttpException extends \Exception implements \JsonSerializable {
+    public const FIELD_DESCRIPTION = 'description';
+
     private $context;
 
     /**
@@ -91,7 +93,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
         }
         parent::__construct($message, $code);
 
-        $this->context = $context + ['description' => null];
+        $this->context = $context + [self::FIELD_DESCRIPTION => null];
     }
 
     /**
@@ -132,7 +134,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
      * @return string Returns the description of the exception or an empty string if there isn't one.
      */
     public function getDescription() {
-        return $this->context['description'];
+        return $this->context[self::FIELD_DESCRIPTION];
     }
 
     /**

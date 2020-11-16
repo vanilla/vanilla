@@ -15,8 +15,11 @@ use VanillaTests\APIv0\BaseTest;
 class ModerationControllerSmokeTest extends BaseTest {
     const FIELDS_CHECK_LIST = [
         'CountAllDiscussions',
+        // This used to have a "non-implemented" category count check.
+        // This test asserted that it basically never worked.
+        // The new test that ensures chld category counts get updated
+        // is ElasticCategorySearchTest::testCounts()
         'CountAllComments',
-        'CountCategories',
         'CountDiscussions',
         'CountComments',
         'DateInserted',
@@ -98,16 +101,15 @@ class ModerationControllerSmokeTest extends BaseTest {
         array $srcDiscussionToUpdate = []
     ) {
         self::$discussions[$discussion['discussionKey']]['CategoryID'] = self::$categories[$destCategoryKey]['CategoryID'];
-        // Right now CountDiscussions field is not updated at all  - which is wrong
-        // @todo We need to uncomment next 2 lines when bug is fixed
-        // self::updateValidValues($destCategoryKey,'CountDiscussions','++');
-        // self::updateValidValues($srcCategoryKey,'CountDiscussions','--');
+        self::updateValidValues($destCategoryKey, 'CountDiscussions', '++', false);
+        self::updateValidValues($srcCategoryKey, 'CountDiscussions', '--', false);
         self::updateValidValues($destCategoryKey, 'CountAllDiscussions', '++');
         self::updateValidValues($srcCategoryKey, 'CountAllDiscussions', '--');
         if (!empty(self::$discussions[$discussion['discussionKey']]['LastCommentID'] ?? null)) {
+            self::updateValidValues($destCategoryKey, 'CountComments', '++', false);
             self::updateValidValues($destCategoryKey, 'CountAllComments', '++');
             self::updateValidValues($srcCategoryKey, 'CountAllComments', '--');
-            //self::updateValidValues($srcCategoryKey, 'CountComments', '--', false);
+            self::updateValidValues($srcCategoryKey, 'CountComments', '--', false);
             if ($discussion['LastCommentID'] > self::$categories[$destCategoryKey]['LastCommentID']) {
                 self::updateValidValues($destCategoryKey, 'LastCommentID', $discussion['LastCommentID']);
             }
@@ -152,7 +154,7 @@ class ModerationControllerSmokeTest extends BaseTest {
             $discussion
         );
         if ($r->getStatusCode() != 200) {
-            throwException('Failed to create new discussion: ' . json_encode($discussion));
+            throw new \Exception('Failed to create new discussion: ' . json_encode($discussion), $r->getStatusCode());
         }
         $body = $r->getBody();
         if (!empty($catKey)) {
@@ -211,7 +213,7 @@ class ModerationControllerSmokeTest extends BaseTest {
             $category
         );
         if ($r->getStatusCode() != 200) {
-            throwException('Failed to create new category: ' . json_encode($category));
+            throw new \Exception('Failed to create new category: ' . json_encode($category), $r->getStatusCode());
         }
         $body = $r->getBody();
         return $body['Category'];
@@ -231,18 +233,14 @@ class ModerationControllerSmokeTest extends BaseTest {
             $comment
         );
         if ($r->getStatusCode() != 200) {
-            throwException('Failed to add new comment: ' . json_encode($comment));
+            throw new \Exception('Failed to add new comment: ' . json_encode($comment), $r->getStatusCode());
         }
         $body = $r->getBody();
         $comment = $body['Comment'];
         if (!empty($catKey)) {
             self::$discussions[$discussionKey]['LastCommentID'] = $comment['CommentID'];
             self::$discussions[$discussionKey]['DateLastComment'] = $comment['DateInserted'];
-            if (empty(self::$categories[$catKey]['LastCommentID'] ?? '')) {
-                self::updateValidValues($catKey, 'CountComments', 1, false);
-            } else {
-                self::updateValidValues($catKey, 'CountComments', '++', false);
-            }
+            self::updateValidValues($catKey, 'CountComments', '++', false);
             self::updateValidValues($catKey, 'CountAllComments', '++');
             self::updateValidValues($catKey, 'LastDateInserted', $comment['DateInserted']);
             self::updateValidValues($catKey, 'LastDiscussionID', $comment['DiscussionID']);
@@ -263,7 +261,7 @@ class ModerationControllerSmokeTest extends BaseTest {
             ['CategoryID'=>$categoryId]
         );
         if ($r->getStatusCode() != 200) {
-            throwException('Failed to get category: ' . $categoryId);
+            throw new \Exception('Failed to get category: ' . $categoryId, $r->getStatusCode());
         }
         $body = $r->getBody();
         return $body['Category'];
@@ -277,7 +275,11 @@ class ModerationControllerSmokeTest extends BaseTest {
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
             foreach (self::FIELDS_CHECK_LIST as $field) {
-                $this->assertEquals($category[$field], $cat[$field], $field.' failed on  '.$catKey);
+                $this->assertEquals(
+                    $category[$field],
+                    $cat[$field],
+                    $field.' failed on category '.$category["CategoryID"]
+                );
             }
         }
     }

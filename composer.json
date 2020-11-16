@@ -26,6 +26,12 @@
             "php": "7.2"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/vanilla/smarty.git"
+        }
+    ],
     "require": {
         "php": ">=7.2.0",
         "ext-pdo": "*",
@@ -45,10 +51,11 @@
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
         "ramsey/uuid": "^3.0",
-        "smarty/smarty": "~3.1",
+        "smarty/smarty": "3.1.36p1",
         "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
+        "vanilla/cloud-interops": "^1.0",
         "vanilla/garden-container": "^3.0.3",
         "vanilla/garden-http": "~2.1",
         "vanilla/garden-schema": "~1.10.2",
@@ -70,7 +77,12 @@
         "metasyntactical/composer-plugin-license-check": "^0.5.0",
         "nette/neon": "^3.1",
         "league/uri": "^6.2",
-        "psr/simple-cache": "^1.0"
+        "psr/simple-cache": "^1.0",
+        "webmozart/assert": "^1.9",
+        "symfony/css-selector": "^4.4",
+        "delight-im/cookie": "^3.4",
+        "dragonmantank/cron-expression": "^3.0",
+        "league/html-to-markdown": "^4.10"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",
@@ -83,7 +95,7 @@
         "roave/security-advisories": "dev-master",
         "nette/robot-loader": "^3.2",
         "johnkary/phpunit-speedtrap": "^3.2",
-        "vimeo/psalm": "^3.12",
+        "vimeo/psalm": "^3.13",
         "cache/integration-tests": "dev-master",
         "symfony/phpunit-bridge": "^5.1"
     },
@@ -106,6 +118,7 @@
         ],
         "psr-4": {
             "Vanilla\\": "library/Vanilla",
+            "Vanilla\\Cloud\\Scripts\\": "cloud/scripts/src",
             "Garden\\": "library/Garden"
         }
     },
@@ -143,12 +156,13 @@
         "merge-plugin": {
             "include": [
                 "addons/*/composer.json",
-                "plugins/*/composer.json"
+                "plugins/*/composer.json",
+                "cloud/scripts/composer.json"
             ],
             "recurse": false,
             "replace": false,
             "ignore-duplicates": false,
-            "merge-dev": true,
+            "merge-dev": false,
             "merge-extra": false,
             "merge-extra-deep": false,
             "merge-scripts": false

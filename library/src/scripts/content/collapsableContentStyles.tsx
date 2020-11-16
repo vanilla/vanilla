@@ -46,6 +46,9 @@ export const collapsableContentClasses = useThemeCache(() => {
 
     const collapserIcon = style("collapserIcon", {
         ...defaultTransition("transform"),
+        margin: "auto",
+        height: unit(globalVars.icon.sizes.default),
+        display: "block",
     });
 
     const gradient = style("gradient", {

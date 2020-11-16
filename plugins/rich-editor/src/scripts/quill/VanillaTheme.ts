@@ -80,7 +80,7 @@ export default class VanillaTheme extends ThemeBase {
         const { root } = this.quill.selection;
         const initialFocus: typeof HTMLElement.prototype.focus = root.focus;
 
-        root.focus = function(options = {}) {
+        root.focus = function (options = {}) {
             initialFocus.call(root, {
                 ...options,
                 preventScroll: true,

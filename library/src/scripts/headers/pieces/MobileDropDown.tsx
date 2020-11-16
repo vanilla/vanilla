@@ -16,7 +16,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { ChevronUpIcon, DownTriangleIcon, UpTriangleIcon } from "@library/icons/common";
+import { ChevronUpIcon, DownTriangleIcon, NBSP, UpTriangleIcon } from "@library/icons/common";
 import { panelBackgroundClasses } from "@library/layout/panelBackgroundStyles";
 import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAnimation";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
@@ -60,6 +60,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                 >
                     <span className={classNames(classes.buttonContents)}>
                         <span className={classes.title}>{this.props.title}</span>
+                        {NBSP}
                         <span className={classes.icon}>{props.icon}</span>
                     </span>
                 </Button>

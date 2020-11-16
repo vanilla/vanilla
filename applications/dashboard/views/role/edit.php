@@ -5,8 +5,8 @@ echo heading($this->title(), '', '', [], '/dashboard/role');
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<ul>
-    <li class="form-group row">
+<ul role="presentation">
+    <li class="form-group row" role="presentation">
         <div class="label-wrap">
             <?php echo $this->Form->label('Role Name', 'Name'); ?>
         </div>
@@ -14,7 +14,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Name'); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group row" role="presentation">
         <div class="label-wrap">
             <?php echo $this->Form->label('Description', 'Description'); ?>
         </div>
@@ -22,7 +22,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Description', ['MultiLine' => true]); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group row" role="presentation">
         <div class="label-wrap">
             <?php echo $this->Form->label('Default Type', 'Type');
             echo '<div class="info">'.t('Select the default type for this role, if any.').'</div>'; ?>
@@ -31,9 +31,24 @@ echo $this->Form->errors();
             <?php echo $this->Form->dropDown('Type', $this->data('_Types'), ['IncludeNull' => true]); ?>
         </div>
     </li>
-    <li class="form-group row">
-        <div class="input-wrap no-label">
-            <?php echo $this->Form->checkBox('PersonalInfo', 'RolePersonalInfo', ['value' => '1']); ?>
+    <?php if ($this->data('_roleSyncVisible')) { ?>
+    <li class="form-group row" role="presentation">
+        <div class="label-wrap-wide">
+            <?php echo $this->Form->label('SSO Role', 'Sync');
+            echo '<div class="info">'.t('SSO roles are always passed through SSO.').'</div>'; ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('Sync', '', ['Value' => 'sso']); ?>
+        </div>
+    </li>
+    <?php } ?>
+    <li class="form-group row" role="presentation">
+        <div class="label-wrap-wide">
+            <?php echo $this->Form->label('Personal Info', 'PersonalInfo');
+            echo '<div class="info">'.t('RolePersonalInfo').'</div>'; ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('PersonalInfo', '', ['value' => '1']); ?>
         </div>
     </li>
     <?php

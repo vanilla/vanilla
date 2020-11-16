@@ -25,7 +25,7 @@ export const menuState = (formatter: Formatter, activeFormats: IFormats) => {
         CodeBlockBlot.blotName,
         SpoilerLineBlot.blotName,
         ListItem.blotName,
-    ].forEach(item => {
+    ].forEach((item) => {
         if (item in activeFormats) {
             isParagraphEnabled = false;
         }

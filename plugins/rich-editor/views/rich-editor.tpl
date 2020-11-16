@@ -1,4 +1,4 @@
-<div class="richEditor isDisabled" aria-label="{t c="Type your message"}" data-id="{$editorData.editorID}" aria-describedby="{$editorData.editorDescriptionID}" role="textbox" aria-multiline="true">
+<div class="richEditor isDisabled" aria-label="{t c="Type your message"}" data-id="{$editorData.editorID}" aria-describedby="{$editorData.editorDescriptionID}" aria-multiline="true">
     <p id="{$editorData.editorDescriptionID}" class="sr-only">
         {t c="richEditor.description.title"}
         {t c="richEditor.description.paragraphMenu"}

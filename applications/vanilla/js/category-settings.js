@@ -65,10 +65,10 @@
                  * @type {number}
                  */
                 var saveWarningDelay = 1000;
-                $(".main").trigger("foggyOn");
+                $(".dashboard-main").trigger("foggyOn");
                 setTimeout(function() {
                     // Don't display unless the content area is disabled.
-                    var savePending = $(".main").first().hasClass("foggy");
+                    var savePending = $(".dashboard-main").first().hasClass("foggy");
                     if (savePending) {
                         gdn.informMessage(gdn.definition("SavePending"), {
                             CssClass: "CategorySortMessage"
@@ -92,7 +92,7 @@
                     },
                     complete: function(jqXHR, textStatus) {
                         // Remove overlay from tree controls and the "please wait" message, if present.
-                        $(".main").trigger("foggyOff");
+                        $(".dashboard-main").trigger("foggyOff");
                         $(".InformWrapper.CategorySortMessage").remove();
                     }
                 });

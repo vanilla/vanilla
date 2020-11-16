@@ -2,7 +2,11 @@
 $CountDiscussions = 0;
 $CategoryID = isset($this->_Sender->CategoryID) ? $this->_Sender->CategoryID : '';
 $OnCategories = strtolower($this->_Sender->ControllerName) == 'categoriescontroller' && !is_numeric($CategoryID);
-if ($this->Data !== FALSE) {
+$isHomePage = $this->_Sender->Data["isHomepage"] ?? false;
+$onTopLevelCategory = $this->topLevelCategoryOnly && $OnCategories && inSection("CategoryList");
+$displayModule = $isHomePage ? true : !$onTopLevelCategory;
+
+if ($this->Data !== FALSE && $displayModule) {
     foreach ($this->Data->result() as $Category) {
         $CountDiscussions = $CountDiscussions + $Category->CountDiscussions;
     }

@@ -15,49 +15,83 @@ import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import ProfileLink from "@library/navigation/ProfileLink";
+import { ExternalIcon } from "@library/icons/common";
+import { ICountResult } from "@library/search/searchTypes";
+import NumberFormatted from "@library/content/NumberFormatted";
 
 interface IProps {
-    updateUser: IUserFragment;
-    dateUpdated: string;
+    updateUser?: IUserFragment;
+    dateUpdated?: string;
     crumbs?: ICrumbString[];
     status?: PublishStatus;
     type?: string;
+    isForeign?: boolean;
+    counts?: ICountResult[];
+    extra?: React.ReactNode;
 }
 
-export class ResultMeta extends React.Component<IProps> {
-    public render() {
-        const { dateUpdated, updateUser, crumbs, status, type } = this.props;
-        const isDeleted = status === PublishStatus.DELETED;
-        const classesMetas = metasClasses();
-        return (
-            <React.Fragment>
-                {updateUser && updateUser.name && (
-                    <span className={classNames(classesMetas.meta)}>
-                        {isDeleted ? (
-                            <span className={classNames("meta-inline", "isDeleted")}>
-                                <Translate source="Deleted <0/>" c0={type} />
-                            </span>
-                        ) : (
-                            <Translate
-                                source="<0/> by <1/>"
-                                c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                                c1={
-                                    <ProfileLink
-                                        className={classesMetas.meta}
-                                        username={updateUser.name}
-                                        userID={updateUser.userID}
-                                    />
-                                }
-                            />
-                        )}
-                    </span>
-                )}
+export function ResultMeta(props: IProps) {
+    const { dateUpdated, updateUser, crumbs, status, type, isForeign, counts, extra } = props;
+    const isDeleted = status === PublishStatus.DELETED;
+    const classesMetas = metasClasses();
 
+    const typeMeta =
+        type && updateUser?.userID != null ? (
+            <Translate
+                source="<0/> by <1/>"
+                c0={type ? t(capitalizeFirstLetter(type)) : undefined}
+                c1={<ProfileLink className={classesMetas.meta} username={updateUser.name} userID={updateUser.userID} />}
+            />
+        ) : type ? (
+            t(capitalizeFirstLetter(type))
+        ) : null;
+
+    const countMeta =
+        counts &&
+        counts.length > 0 &&
+        counts.map((item, i) => {
+            let { count, labelCode } = item;
+            // labelCode returned from backend is always in plural, e.g. groups, sub-categories
+            if (count < 2) {
+                const p = /ies|s$/;
+                const m = labelCode.match(p);
+                labelCode = labelCode.replace(p, m && m[0] === "ies" ? "y" : "");
+            }
+            return count ? (
+                <span className={classesMetas.meta} key={i}>
+                    <Translate source={`<0/> ${labelCode}`} c0={<NumberFormatted value={count} />} />
+                </span>
+            ) : null;
+        });
+
+    return (
+        <React.Fragment>
+            {typeMeta && (
+                <span className={classNames(classesMetas.meta)}>
+                    {isDeleted ? (
+                        <span className={classNames("meta-inline", "isDeleted")}>
+                            <Translate source="Deleted <0/>" c0={type} />
+                        </span>
+                    ) : (
+                        typeMeta
+                    )}
+                </span>
+            )}
+
+            {isForeign && (
+                <span className={classesMetas.metaIcon}>
+                    <ExternalIcon />
+                </span>
+            )}
+
+            {dateUpdated && (
                 <span className={classesMetas.meta}>
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
-                {crumbs && crumbs.length > 0 && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
-            </React.Fragment>
-        );
-    }
+            )}
+            {countMeta}
+            {crumbs && crumbs.length > 0 && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
+            {extra}
+        </React.Fragment>
+    );
 }

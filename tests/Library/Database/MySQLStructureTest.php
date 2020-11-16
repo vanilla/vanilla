@@ -136,6 +136,7 @@ class MySQLStructureTest extends TestCase {
             ->set();
 
         // Add the index.
+        $this->st->setFullTextIndexingEnabled(true);
         $this->st
             ->table(__FUNCTION__)
             ->column("value", "text", false, "fulltext.test")
@@ -169,6 +170,7 @@ class MySQLStructureTest extends TestCase {
         }
 
         // Add the index.
+        $this->st->setFullTextIndexingEnabled(true);
         $this->st
             ->table(__FUNCTION__)
             ->column("value", "text", false, "fulltext.test")

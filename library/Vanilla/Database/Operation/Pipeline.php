@@ -24,13 +24,16 @@ class Pipeline {
 
     /**
      * Database pipeline constructor.
+     *
+     * @param callable $primaryAction
      */
-    public function __construct() {
-        $this->stack = function (Operation $databaseOperation) {
-            return call_user_func($this->primaryAction, $databaseOperation);
+    public function __construct(callable $primaryAction) {
+        $this->primaryAction = $primaryAction;
+        $this->stack = function (Operation $operation) {
+            return ($this->primaryAction)($operation);
         };
 
-        $this->postProcessStack = function (Operation $databaseOperation) {
+        $this->postProcessStack = function (Operation $operation) {
             return;
         };
     }
@@ -43,13 +46,39 @@ class Pipeline {
      */
     public function addProcessor(Processor $processor) {
         $stack = $this->stack;
-        $this->stack = function ($value) use ($processor, $stack) {
+        $this->stack = new class ($processor, $stack) {
+
+            /** @var Processor */
+            private $processor;
+
+            /** @var callable */
+            private $stack;
+
             /**
-             * Passing the stack allows a processor to control whether it will be executed before or after the rest of
-             * the stack, or to avoid processing the rest of the stack, altogether.
+             * Setup the next frame of the stack.
+             *
+             * @param Processor $processor
+             * @param callable $stack
              */
-            $result = $processor->handle($value, $stack);
-            return $result;
+            public function __construct(Processor $processor, callable $stack) {
+                $this->processor = $processor;
+                $this->stack = $stack;
+            }
+
+            /**
+             * Execute the stack.
+             *
+             * @param mixed $value
+             * @return mixed
+             */
+            public function __invoke($value) {
+                /**
+                 * Passing the stack allows a processor to control whether it will be executed before or after the rest
+                 * of the stack, or to avoid processing the rest of the stack, altogether.
+                 */
+                $result = $this->processor->handle($value, $this->stack);
+                return $result;
+            }
         };
         return $this;
     }
@@ -59,6 +88,7 @@ class Pipeline {
      *
      * @param Processor $processor
      * @return $this
+     * @deprecated Avoid using post-processors.
      */
     public function addPostProcessor(Processor $processor) {
         $stack = $this->postProcessStack;
@@ -76,20 +106,31 @@ class Pipeline {
     /**
      * Execute the processing pipeline on a database operation.
      *
-     * @param Operation $databaseOperation Context for the operation to be performed.
-     * @param callable $primaryAction A closure to perform the database operation.
+     * @param Operation $op Context for the operation to be performed.
+     * @param callable|null $primaryAction A closure to perform the database operation.
      * @param bool $executeStack Whether or not to execute the stack with the primary action.
      *
      * @return mixed
+     * @deprecated Use processOperation where possible.
      */
-    public function process(Operation $databaseOperation, callable $primaryAction, bool $executeStack = true) {
+    public function process(Operation $op, ?callable $primaryAction = null, bool $executeStack = true) {
         if (!$executeStack) {
-            return call_user_func($primaryAction, $databaseOperation);
-        } else {
-            $this->primaryAction = $primaryAction;
-            $result = call_user_func($this->stack, $databaseOperation);
-            call_user_func($this->postProcessStack, $databaseOperation);
-            return $result;
+            return call_user_func($primaryAction, $op);
         }
+
+        $result = call_user_func($this->stack, $op);
+        call_user_func($this->postProcessStack, $op);
+        return $result;
+    }
+
+    /**
+     * Execute the stack on a database operation.
+     *
+     * @param Operation $op
+     * @return mixed
+     */
+    public function processOperation(Operation $op) {
+        $result = ($this->stack)($op);
+        return $result;
     }
 }

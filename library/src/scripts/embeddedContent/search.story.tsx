@@ -27,10 +27,15 @@ import {
     TypeMemberIcon,
     TypePollsIcon,
     TypeQuestionIcon,
+    TypeGroupsIcon,
+    TypeKnowledgeBaseIcon,
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { useLayout } from "@library/layout/LayoutContext";
+import classNames from "classnames";
+import Result from "@library/result/Result";
+import { PlacesResultMeta } from "@dashboard/components/panels/registerPlaceSearchDomain";
 
 const story = storiesOf("Search", module);
 
@@ -50,9 +55,7 @@ story.add("Search Box", () => {
                 <MemoryRouter>
                     <div
                         style={{
-                            backgroundColor: globalVariables()
-                                .mixBgAndFg(0.5)
-                                .toHexString(),
+                            backgroundColor: globalVariables().mixBgAndFg(0.5).toHexString(),
                             padding: `30px 10px`,
                         }}
                     >
@@ -66,7 +69,7 @@ story.add("Search Box", () => {
                                 iconClass={classesSearch.icon}
                                 buttonLoaderClassName={classesSearch.buttonLoader}
                                 contentClass={classesSearch.content}
-                                valueContainerClasses={classesSearch.valueContainer(false)}
+                                valueContainerClasses={classNames(classesSearch.valueContainer)}
                             />
                         </div>
                     </div>
@@ -81,7 +84,25 @@ story.add("Search Results", () => {
         <StoryContent>
             <StoryHeading depth={1}>Search Results</StoryHeading>
             <ResultList
+                result={Result}
                 results={[
+                    {
+                        name: "External Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                crumbs={[{ name: "Site Node 1" }]}
+                                type={"Discussion"}
+                                isForeign={true}
+                            />
+                        ),
+                        attachments: [{ name: "My File", type: AttachmentType.WORD }],
+                        icon: <TypeDiscussionsIcon />,
+                    },
                     {
                         name: "Example search result",
                         headingLevel: 3,
@@ -247,12 +268,134 @@ story.add("Search Results", () => {
             />
             <StoryHeading>Category result (used on categories page)</StoryHeading>
             <ResultList
+                result={Result}
                 results={[
                     {
                         name: "Example category result",
                         headingLevel: 3,
                         url: "#",
                         meta: <ResultMeta dateUpdated={"2016-07-25 17:51:15"} updateUser={dummyUserFragment} />,
+                    },
+                ]}
+            />
+        </StoryContent>
+    );
+});
+
+story.add("Search Results for Places", () => {
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}> Search Results for Places</StoryHeading>
+            <ResultList
+                result={Result}
+                results={[
+                    {
+                        name: "Categories Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Categories"),
+                                    counts: [
+                                        { labelCode: "sub-categories", count: 3 },
+                                        { labelCode: "discussions", count: 30 },
+                                    ],
+                                }}
+                            />
+                        ),
+                        icon: <TypeCategoriesIcon />,
+                    },
+                    {
+                        name: "Knowledge Bases Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Knowledge Base"),
+                                    counts: [{ labelCode: "articles", count: 1201 }],
+                                }}
+                            />
+                        ),
+                        icon: <TypeKnowledgeBaseIcon />,
+                    },
+                    {
+                        name: "Groups Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Groups"),
+                                    counts: [
+                                        { labelCode: "members", count: 5002 },
+                                        { labelCode: "discussions", count: 123 },
+                                    ],
+                                }}
+                            />
+                        ),
+                        icon: <TypeGroupsIcon />,
+                    },
+                    {
+                        name: "Categories Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Categories"),
+                                    counts: [
+                                        { labelCode: "sub-categories", count: 1 },
+                                        { labelCode: "discussions", count: 0 },
+                                    ],
+                                }}
+                            />
+                        ),
+                        icon: <TypeCategoriesIcon />,
+                    },
+                    {
+                        name: "Knowledge Bases Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Knowledge Base"),
+                                    counts: [{ labelCode: "articles", count: 1 }],
+                                }}
+                            />
+                        ),
+                        icon: <TypeKnowledgeBaseIcon />,
+                    },
+                    {
+                        name: "Groups Search Result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <PlacesResultMeta
+                                searchResult={{
+                                    type: t("Groups"),
+                                    counts: [
+                                        { labelCode: "members", count: 1 },
+                                        { labelCode: "discussions", count: 1 },
+                                    ],
+                                }}
+                            />
+                        ),
+                        icon: <TypeGroupsIcon />,
                     },
                 ]}
             />

@@ -11,6 +11,8 @@ import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import { supportsFrames } from "@vanilla/library/src/scripts/embeddedContent/IFrameEmbed";
+import { forceInt } from "@vanilla/utils";
 
 export const EDITOR_SCROLL_CONTAINER_CLASS = "js-richEditorScrollContainer";
 
@@ -28,7 +30,7 @@ export default class ClipboardModule extends ClipboardBase {
         const matches = inputText.match(urlRegex);
         if (matches && matches.length > 0) {
             const ops: any[] = [];
-            matches.forEach(match => {
+            matches.forEach((match) => {
                 const split = (inputText as string).split(match);
                 const beforeLink = split.shift();
                 // We don't want to insert empty ops.
@@ -55,7 +57,38 @@ export default class ClipboardModule extends ClipboardBase {
 
         // Skip screen reader only content.
         this.addMatcher(".sr-only", () => new Delta());
+
+        // If frames are supported add their matcher.
+        if (supportsFrames()) {
+            this.addMatcher("iframe", this.iframeMatcher);
+        }
     }
+
+    /**
+     * A matcher for img tags. Converts `<img />` into an external embed (type image).
+     */
+    public iframeMatcher = (node: HTMLIFrameElement, delta: DeltaStatic) => {
+        const src = node.getAttribute("src");
+        let height = forceInt(node.getAttribute("height"), 900);
+        let width = forceInt(node.getAttribute("width"), 1600);
+        if (src) {
+            const iframeData: IEmbedValue = {
+                loaderData: {
+                    type: "link",
+                },
+                data: {
+                    embedType: "iframe",
+                    url: src,
+                    height,
+                    width,
+                },
+            };
+            return new Delta().insert({
+                [ExternalEmbedBlot.blotName]: iframeData,
+            });
+        }
+        return delta;
+    };
 
     /**
      * A matcher for img tags. Converts `<img />` into an external embed (type image).

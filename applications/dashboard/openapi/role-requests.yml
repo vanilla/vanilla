@@ -1,0 +1,230 @@
+openapi: 3.0.2
+info:
+paths:
+  /role-requests/applications:
+    post:
+      summary: Apply to a role.
+      tags:
+        - Role Requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roleID:
+                  type: integer
+                  description: The role to apply to.
+                attributes:
+                  type: object
+                  description: Custom fields for the request.
+      responses:
+        '201':
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleApplication'
+    get:
+      summary: List role applicants.
+      tags:
+        - Role Requests
+      parameters:
+        - name: roleID
+          in: query
+          description: Filter by role.
+          schema:
+            type: integer
+        - name: status
+          in: query
+          description: Filter by status.
+          schema:
+            $ref: '#/components/schemas/RoleRequestStatus'
+        - name: userID
+          in: query
+          description: Filter by user.
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Offset'
+        - name: limit
+          in: query
+          description: Desired number of items per page.
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+            minimum: 1
+        - name: sort
+          in: query
+          description: Sort the results.
+          schema:
+            type: string
+            enum:
+              - dateInserted
+              - -dateInserted
+        - $ref: '#/components/parameters/RoleRequestExpand'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/RoleApplication'
+                    - $ref: '#/components/schemas/RoleRequestExpansions'
+  /role-requests/applications/{id}:
+    get:
+      summary: Get a single application.
+      tags:
+        - Role Requests
+      parameters:
+        - $ref: '#/components/parameters/RoleRequestID'
+        - $ref: '#/components/parameters/RoleRequestExpand'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RoleApplication'
+                  - $ref: '#/components/schemas/RoleRequestExpansions'
+        '403':
+          $ref: './responses.yml#/components/responses/PermissionError'
+        '404':
+          $ref: './responses.yml#/components/responses/NotFound'
+    patch:
+      summary: Update a role application.
+      tags:
+        - Role Requests
+      parameters:
+        - $ref: '#/components/parameters/RoleRequestID'
+        - $ref: '#/components/parameters/RoleRequestExpand'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/RoleRequestStatus'
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleApplication'
+    delete:
+      summary: Delete a role application.
+      tags:
+        - Role Requests
+      parameters:
+        - $ref: '#/components/parameters/RoleRequestID'
+      responses:
+        '204':
+          description: Success
+components:
+  parameters:
+    RoleRequestID:
+      name: id
+      in: path
+      description: The ID of the request.
+      required: true
+      schema:
+        type: integer
+    RoleRequestExpand:
+      name: expand
+      description: |-
+        Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+
+        Note that only community managers can view and expand the `statusUser`.
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - all
+            - user
+            - role
+            - statusUser
+      style: form
+  schemas:
+    RoleRequestItem:
+      type: object
+      properties:
+        roleRequestID:
+          type: integer
+          description: The unique ID of the entry.
+        type:
+          $ref: '#/components/schemas/RoleRequestType'
+        roleID:
+          type: integer
+          description: The role being applied/invited to.
+        userID:
+          type: integer
+          description: The user applying/being invited.
+        status:
+          $ref: '#/components/schemas/RoleRequestStatus'
+        dateOfStatus:
+          type: integer
+          description: The date the status was changed.  Only community managers see this.
+        statusUserID:
+          type: integer
+          description: The user that last set the status. Only community managers see this.
+        dateExpires:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date the application/invitation expires.
+        attributes:
+          type: object
+      required:
+        - roleRequestID
+        - roleID
+        - userID
+        - status
+        - dateExpires
+        - attributes
+    RoleApplication:
+      allOf:
+        - $ref: '#/components/schemas/RoleRequestItem'
+        - $ref: '#/components/schemas/InsertInfo'
+        - $ref: '#/components/schemas/UpdateInfo'
+    RoleRequestStatus:
+      description: The current status of the request.
+      type: string
+      enum:
+        - pending
+        - approved
+        - denied
+    RoleRequestType:
+      description: The type of role request.
+      type: string
+      enum:
+        - application
+        - invitation
+    RoleRequestExpansions:
+      type: object
+      properties:
+        role:
+          $ref: './schemas.yml#/components/schemas/RoleFragment'
+        user:
+          $ref: './schemas.yml#/components/schemas/UserFragment'
+        statusUser:
+          $ref: './schemas.yml#/components/schemas/UserFragment'
+    RoleRequestFragment:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RoleRequestStatus'
+        dateInserted:
+          type: string
+          format: date-time
+      required:
+        - status
+        - dateInserted

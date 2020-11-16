@@ -87,7 +87,7 @@ export default class DropDownItemRadio extends React.Component<IProps, IState> {
         }
     }
 
-    private onChange = e => {
+    private onChange = (e) => {
         this.setState({
             selectedValue: e.currentTarget.value,
         });

@@ -66,6 +66,10 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
         </LinkAsButton>
     );
 
+    const subtitle = props.options?.subtitle?.content && (
+        <h2 className={classes.subtitle}>{props.options?.subtitle?.content}</h2>
+    );
+
     return (
         <div className={classes.root}>
             <Container fullGutter>
@@ -75,6 +79,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     )}
                     <div className={classes.verticalContainer}>
                         <div className={classes.content}>
+                            {options.subtitle.type === "overline" && subtitle}
                             <div className={classes.viewAllContainer}>
                                 {props.title && (
                                     <Heading className={classes.title} renderAsDepth={1}>
@@ -83,6 +88,10 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                                 )}
                                 {options.viewAll.position === "top" && viewAllButton}
                             </div>
+                            {options.subtitle.type === "standard" && subtitle}
+                            {props.options?.description && (
+                                <div className={classes.description}>{props.options.description}</div>
+                            )}
                             {!gridHasBorder && grid}
                         </div>
                         {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}

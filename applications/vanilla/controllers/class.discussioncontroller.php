@@ -79,14 +79,11 @@ class DiscussionController extends VanillaController {
     /**
      * Default single discussion display.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $DiscussionID Unique discussion ID
      * @param string $DiscussionStub URL-safe title slug
-     * @param int $Page The current page of comments
+     * @param string $Page The current page of comments
      */
-    public function index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
+    public function index($DiscussionID = 0, $DiscussionStub = '', $Page = '') {
         // Setup head
         $Session = Gdn::session();
         $this->addJsFile('jquery.autosize.min.js');
@@ -342,7 +339,7 @@ class DiscussionController extends VanillaController {
     /**
      * Get current messages.
      *
-     * @return Messages[]
+     * @return array
      */
     public function getMessages(): array {
         return $this->messages;
@@ -350,9 +347,6 @@ class DiscussionController extends VanillaController {
 
     /**
      * Display comments in a discussion since a particular CommentID.
-     *
-     * @since 2.0.0
-     * @access public
      *
      * @param int $discussionID Unique discussion ID
      * @param int $lastCommentID Only shows comments posted after this one
@@ -397,9 +391,6 @@ class DiscussionController extends VanillaController {
      * Highlight route & add common JS definitions.
      *
      * Always called by dispatcher before controller's requested method.
-     *
-     * @since 2.0.0
-     * @access public
      */
     public function initialize() {
         parent::initialize();
@@ -410,9 +401,6 @@ class DiscussionController extends VanillaController {
 
     /**
      * Display discussion page starting with a particular comment.
-     *
-     * @since 2.0.0
-     * @access public
      *
      * @param int $commentID Unique comment ID
      */
@@ -442,13 +430,9 @@ class DiscussionController extends VanillaController {
      * Users may remove announcements from being displayed for themselves only.
      * Does not affect what announcements are shown for other users.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $discussionID Unique discussion ID.
-     * @param string $TransientKey Single-use hash to prove intent.
      */
-    public function dismissAnnouncement($discussionID = '') {
+    public function dismissAnnouncement($discussionID = 0) {
         // Make sure we are posting back.
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
@@ -483,10 +467,7 @@ class DiscussionController extends VanillaController {
      * If the discussion isn't bookmarked by the user, this bookmarks it.
      * If it is already bookmarked, this unbookmarks it.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DiscussionID Unique discussion ID.
+     * @param int|null $DiscussionID Unique discussion ID.
      */
     public function bookmark($DiscussionID = null) {
         // Make sure we are posting back.
@@ -587,13 +568,10 @@ class DiscussionController extends VanillaController {
      * Announced discussions stay at the top of the discussions
      * list regardless of how long ago the last comment was.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $discussionID Unique discussion ID.
-     * @param string $TransientKey Single-use hash to prove intent.
+     * @param string $target Redirect here after announcing.
      */
-    public function announce($discussionID = '', $target = '') {
+    public function announce($discussionID = 0, $target = '') {
         $discussion = $this->DiscussionModel->getID($discussionID);
         if (!$discussion) {
             throw notFoundException('Discussion');
@@ -649,13 +627,10 @@ class DiscussionController extends VanillaController {
      * this unsinks it. Sunk discussions do not move to the top of the
      * discussion list when a new comment is added.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $discussionID Unique discussion ID.
      * @param bool $sink Whether or not to unsink the discussion.
      */
-    public function sink($discussionID = '', $sink = true, $from = 'list') {
+    public function sink($discussionID = 0, $sink = true) {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
@@ -676,7 +651,7 @@ class DiscussionController extends VanillaController {
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $target = getIncomingValue('Target', 'discussions');
-            redirectTo($target);
+            $this->setRedirectTo($target);
         }
 
         $this->sendOptions($discussion);
@@ -694,19 +669,16 @@ class DiscussionController extends VanillaController {
      * closed, this re-opens it. Closed discussions may not have new
      * comments added to them.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $DiscussionID Unique discussion ID.
-     * @param bool $Close Whether or not to close the discussion.
+     * @param int $discussionID Unique discussion ID.
+     * @param bool $close Whether or not to close the discussion.
      */
-    public function close($DiscussionID = '', $Close = true, $From = 'list') {
+    public function close($discussionID = 0, $close = true) {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
         }
 
-        $Discussion = $this->DiscussionModel->getID($DiscussionID);
+        $Discussion = $this->DiscussionModel->getID($discussionID);
 
         if (!$Discussion) {
             throw notFoundException('Discussion');
@@ -717,22 +689,22 @@ class DiscussionController extends VanillaController {
         }
 
         // Close the discussion.
-        $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
+        $this->DiscussionModel->setField($discussionID, 'Closed', $close);
 
         $attributes = $Discussion->Attributes;
         unset($Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID]);
 
         // Check if the discussion is getting closed and check if the author is closing it.
-        if ($Close) {
+        if ($close) {
             $Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
         }
 
         // Update the attributes if they changed.
         if ($attributes !== $Discussion->Attributes) {
-            $this->DiscussionModel->setProperty($DiscussionID, 'Attributes', dbencode($Discussion->Attributes));
+            $this->DiscussionModel->setProperty($discussionID, 'Attributes', dbencode($Discussion->Attributes));
         }
 
-        $Discussion->Closed = $Close;
+        $Discussion->Closed = $close;
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -742,16 +714,16 @@ class DiscussionController extends VanillaController {
 
         $this->sendOptions($Discussion);
 
-        if ($Close) {
+        if ($close) {
             require_once $this->fetchViewLocation('helper_functions', 'Discussions');
-            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", tag($Discussion, 'Closed', 'Closed'), 'Prepend');
-            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'AddClass');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID .Meta-Discussion", tag($Discussion, 'Closed', 'Closed'), 'Prepend');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID", 'Closed', 'AddClass');
         } else {
-            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Closed", null, 'Remove');
-            $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Closed', 'RemoveClass');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID .Tag-Closed", null, 'Remove');
+            $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID", 'Closed', 'RemoveClass');
         }
 
-        $this->jsonTarget("#Discussion_$DiscussionID", null, 'Highlight');
+        $this->jsonTarget("#Discussion_$discussionID", null, 'Highlight');
         $this->jsonTarget(".Discussion #Item_0", null, 'Highlight');
 
         $this->render('Blank', 'Utility', 'Dashboard');
@@ -762,12 +734,9 @@ class DiscussionController extends VanillaController {
      *
      * This is a "hard" delete - it is removed from the database.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $discussionID Unique discussion ID.
      */
-    public function delete($discussionID, $target = '') {
+    public function delete(int $discussionID, $target = '') {
         $discussion = $this->DiscussionModel->getID($discussionID);
 
         if (!$discussion) {
@@ -806,13 +775,10 @@ class DiscussionController extends VanillaController {
      * should not be able to delete a comment unless it is a draft. This is
      * a "hard" delete - it is removed from the database.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $commentID Unique comment ID.
      * @param string $transientKey Single-use hash to prove intent.
      */
-    public function deleteComment($commentID = '', $transientKey = '') {
+    public function deleteComment(int $commentID, $transientKey = '') {
         $session = Gdn::session();
         $defaultTarget = '/discussions/';
         $validCommentID = is_numeric($commentID) && $commentID > 0;
@@ -828,13 +794,20 @@ class DiscussionController extends VanillaController {
                 $defaultTarget = discussionUrl($discussion);
 
                 // Make sure comment is this user's or they have Delete permission.
+                $groupDelete = false;
                 if ($comment->InsertUserID != $session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
-                    $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
+                    if (!is_null($discussion->GroupID)) {
+                        $groupModel = new GroupModel;
+                        $groupDelete = $groupModel->canModerate($discussion->GroupID, $session->UserID);
+                    }
+                    if (!$groupDelete) {
+                        $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
+                    }
                 }
 
                 // Make sure that content can (still) be edited.
                 $editTimeout = 0;
-                if (!CommentModel::canEdit($comment, $editTimeout, $discussion)) {
+                if (!CommentModel::canEdit($comment, $editTimeout, $discussion) && !$groupDelete) {
                     $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 
@@ -870,9 +843,9 @@ class DiscussionController extends VanillaController {
      * @param int $discussionID Unique identifier, if discussion has been created.
      * @param string $discussionStub Deprecated.
      * @param int $offset
-     * @param int $limit
+     * @param int|false $limit
      */
-    public function embed($discussionID = '', $discussionStub = '', $offset = '', $limit = '') {
+    public function embed($discussionID = 0, $discussionStub = '', $offset = 0, $limit = false) {
         $this->title(t('Comments'));
 
         // Add theme data
@@ -1089,7 +1062,8 @@ body { background: transparent !important; }
 
     /**
      * Re-fetch a discussion's content based on its foreign url.
-     * @param type $discussionID
+     *
+     * @param int $discussionID
      */
     public function refetchPageInfo($discussionID) {
         // Make sure we are posting back.

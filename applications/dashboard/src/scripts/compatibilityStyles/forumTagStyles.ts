@@ -66,7 +66,7 @@ function mixinTag(selector: string, overwrite?: {}) {
         selectors.push(selector);
     }
     const vars = tagVariables();
-    selectors.map(s => {
+    selectors.map((s) => {
         cssOut(selector, {
             maxWidth: percent(100),
             display: "inline-block",

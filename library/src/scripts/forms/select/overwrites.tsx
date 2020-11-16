@@ -79,7 +79,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
     const classesTokens = tokensClasses();
 
     // We need to bind the function to the props for that component
-    const handleKeyDown = event => {
+    const handleKeyDown = (event) => {
         switch (event.key) {
             case "Enter":
             case "Spacebar":

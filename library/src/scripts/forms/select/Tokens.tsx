@@ -99,7 +99,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                     </div>
 
                     <MutationObserver
-                        onAttributeChange={e => {
+                        onAttributeChange={(e) => {
                             if (e.to && e.to !== e.from) {
                                 this.props.onChange(JSON.parse(e.to));
                             }
@@ -122,7 +122,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
         return !!this.props.isLoading && this.state.inputValue.length > 0;
     }
 
-    private handleInputChange = val => {
+    private handleInputChange = (val) => {
         this.setState({ inputValue: val });
         this.props.onInputChange?.(val);
     };
@@ -162,7 +162,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
     /**
      * Overwrite theme in Select component
      */
-    private getTheme = theme => {
+    private getTheme = (theme) => {
         return {
             ...theme,
             border: {},

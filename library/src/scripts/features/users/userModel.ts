@@ -4,17 +4,16 @@
  * @license GPL-2.0-only
  */
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IMe, IMeCounts, IUser, IUserFragment } from "@library/@types/api/users";
+import { IMe, IMeCounts, IUser, IUserFragment, IInvitees } from "@library/@types/api/users";
 import UserSuggestionModel, { IUserSuggestionState } from "@library/features/users/suggestion/UserSuggestionModel";
 import UserActions, { useUserActions } from "@library/features/users/UserActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
-import { IThemeState } from "@library/theming/themeReducer";
-import { ILocaleState } from "@library/locales/localeReducer";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -40,6 +39,15 @@ interface IUsersState {
     };
     suggestions: IUserSuggestionState;
     usersByID: Record<number, ILoadable<IUser>>;
+    usersInvitationsByID: Record<number, IInvitationState>;
+}
+
+export interface IInvitationState {
+    userIDs: number[];
+    emails: string[];
+    emailsString: string;
+    invitees: IComboBoxOption[];
+    results: ILoadable<IInvitees[]>;
 }
 
 export interface IUsersStoreState {
@@ -61,6 +69,7 @@ export const INITIAL_USERS_STATE: IUsersState = {
     },
     suggestions: suggestionReducer(undefined, "" as any),
     usersByID: {},
+    usersInvitationsByID: {},
 };
 
 export const GUEST_USER_ID = 0;
@@ -76,7 +85,7 @@ export function isUserGuest(user: IUserFragment | null | undefined) {
  */
 export const usersReducer = produce(
     reducerWithInitialState(INITIAL_USERS_STATE)
-        .case(UserActions.getMeACs.started, state => {
+        .case(UserActions.getMeACs.started, (state) => {
             state.current.status = LoadStatus.LOADING;
             return state;
         })
@@ -90,7 +99,7 @@ export const usersReducer = produce(
             state.current.error = payload.error;
             return state;
         })
-        .case(UserActions.getPermissionsACs.started, state => {
+        .case(UserActions.getPermissionsACs.started, (state) => {
             state.permissions.status = LoadStatus.LOADING;
             return state;
         })
@@ -104,7 +113,7 @@ export const usersReducer = produce(
             state.permissions.error = payload.error;
             return state;
         })
-        .case(UserActions.getCountsACs.started, state => {
+        .case(UserActions.getCountsACs.started, (state) => {
             state.countInformation.lastRequested = new Date().getTime();
             return state;
         })
@@ -130,6 +139,64 @@ export const usersReducer = produce(
             state.usersByID[userID] = {
                 status: LoadStatus.ERROR,
                 error: payload.error,
+            };
+            return state;
+        })
+        .case(UserActions.inviteUsersACs.started, (state, params) => {
+            const { userID } = params;
+            state.usersInvitationsByID[userID].results = { status: LoadStatus.LOADING };
+            return state;
+        })
+        .case(UserActions.inviteUsersACs.done, (state, payload) => {
+            const { userID } = payload.params;
+            // The data returned is currently not used
+            state.usersInvitationsByID[userID].results = {
+                status: LoadStatus.SUCCESS,
+                data: payload.result,
+            };
+            // So that after invitations are sent out, the forms are cleared
+            state.usersInvitationsByID[userID].emailsString = "";
+            state.usersInvitationsByID[userID].invitees = [];
+            return state;
+        })
+        .case(UserActions.inviteUsersACs.failed, (state, payload) => {
+            const { userID } = payload.params;
+            state.usersInvitationsByID[userID].results = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
+        .case(UserActions.updateInviteeIDsAC, (state, payload) => {
+            const { userID, IDs } = payload;
+            state.usersInvitationsByID[userID] = {
+                ...state.usersInvitationsByID[userID],
+                userIDs: [...(state.usersInvitationsByID[userID]?.userIDs ?? []), ...IDs],
+            };
+
+            return state;
+        })
+        .case(UserActions.updateInviteesAC, (state, payload) => {
+            const { userID, invitees } = payload;
+            state.usersInvitationsByID[userID] = {
+                ...state.usersInvitationsByID[userID],
+                invitees: invitees,
+            };
+            return state;
+        })
+        .case(UserActions.updateInviteeEmailsAC, (state, payload) => {
+            const { userID, emails } = payload;
+            state.usersInvitationsByID[userID] = {
+                ...state.usersInvitationsByID[userID],
+                emails: [...(state.usersInvitationsByID[userID]?.emails ?? []), ...emails],
+            };
+            return state;
+        })
+        .case(UserActions.updateInviteeEmailsStringAC, (state, payload) => {
+            const { userID, emailsString } = payload;
+            state.usersInvitationsByID[userID] = {
+                ...state.usersInvitationsByID[userID],
+                emailsString: emailsString,
             };
             return state;
         })

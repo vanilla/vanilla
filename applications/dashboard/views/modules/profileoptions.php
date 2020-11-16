@@ -4,7 +4,7 @@
 <div class="ProfileOptions">
     <?php
     if (Gdn::controller()->EditMode)  {
-        echo anchor(t('Back to Profile'), userUrl(Gdn::controller()->User), ['class' => 'ProfileButtons ProfileButtons-BackToProfile']);
+        echo anchor(t('Back to Profile'), userUrl(Gdn::controller()->User), 'ProfileButtons ProfileButtons-BackToProfile', ['role' => 'button']);
     } else {
         echo buttonGroup($this->data('MemberOptions'), 'NavButton MemberButtons').' ';
         echo $this->data('ProfileOptionsDropdown');

@@ -91,7 +91,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * @inheritDoc
      */
     public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, (newHasFocusState) => {
             if (!newHasFocusState) {
                 this.setState({ hasFocus: false });
             }
@@ -194,7 +194,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         return this.props.currentSelection;
     }
 
-    private topLevelIcons = menuActiveFormats => {
+    private topLevelIcons = (menuActiveFormats) => {
         let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
             headingMenuIcon = <Heading3Icon />;

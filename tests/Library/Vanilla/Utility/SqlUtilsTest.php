@@ -8,16 +8,13 @@
 namespace VanillaTests\Library\Vanilla\Utility;
 
 use Garden\EventManager;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\SqlUtils;
-use VanillaTests\BootstrapTrait;
-use VanillaTests\SetupTraitsTrait;
+use VanillaTests\BootstrapTestCase;
 
 /**
- * Testa for the `SqlUtils` helpers.
+ * Tests for the `SqlUtils` helpers.
  */
-class SqlUtilsTest extends TestCase {
-    use SetupTraitsTrait, BootstrapTrait;
+class SqlUtilsTest extends BootstrapTestCase {
     /**
      * @var \Gdn_MySQLStructure
      */
@@ -33,8 +30,6 @@ class SqlUtilsTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setupTestTraits();
-        $this->initializeDatabase();
 
         $this->container()->call(function (
             \Gdn_MySQLStructure $structure,

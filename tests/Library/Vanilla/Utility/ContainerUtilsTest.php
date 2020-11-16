@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
+use VanillaTests\Fixtures\Request;
 
 /**
  * Tests for the container utilities class.
@@ -51,5 +52,22 @@ class ContainerUtilsTest extends TestCase {
         $this->container->setInstance(NewClass::class, null);
         $aliased = $this->container->get(NewClass::class);
         $this->assertInstanceOf(ExtendsNewClass::class, $aliased);
+    }
+
+    /**
+     * Test `ContainerUtils::addCall()`.
+     */
+    public function testAdCall(): void {
+        $this->container->setInstance(Request::class, null);
+
+        $this->container->rule(Request::class)->setShared(true);
+        ContainerUtils::addCall($this->container, Request::class, 'setPath', ['/foo']);
+
+        /** @var Request $request */
+        $request = $this->container->get(Request::class);
+        $this->assertSame('/foo', $request->getPath());
+
+        ContainerUtils::addCall($this->container, Request::class, 'setPath', ['/bar']);
+        $this->assertSame('/bar', $request->getPath());
     }
 }

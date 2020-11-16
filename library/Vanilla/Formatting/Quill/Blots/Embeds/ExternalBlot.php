@@ -75,7 +75,7 @@ class ExternalBlot extends AbstractBlot {
      */
     public function getEmbed(): AbstractEmbed {
         $data = $this->getEmbedData();
-        return $this->embedService->createEmbedFromData($data);
+        return $this->embedService->createEmbedFromData($data, $this->parseMode === Parser::PARSE_MODE_EXTENDED);
     }
 
     /**

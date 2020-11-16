@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Database;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\Database\Operation\Pipeline;
 use VanillaTests\Fixtures\BasicPipelineModel;
 
 /**
@@ -91,6 +92,10 @@ class JsonFieldProcessorTest extends TestCase {
      */
     public function testUnpackFields(string $type, array $row, array $expected) {
         $model = new BasicPipelineModel("Example");
+        $pipeline = new Pipeline(function () use ($row) {
+            return [$row];
+        });
+        $model->setPipeline($pipeline);
         $processor = new JsonFieldProcessor();
         $processor->setFields(["attributes"]);
         $model->addPipelineProcessor($processor);
@@ -98,7 +103,7 @@ class JsonFieldProcessorTest extends TestCase {
         $operation = new Operation();
         $operation->setType($type);
         $operation->setCaller($model);
-        $result = $model->doSelectOperation($operation, [$row]);
+        $result = $model->doOperation($operation);
         $this->assertEquals([$expected], $result);
     }
 }

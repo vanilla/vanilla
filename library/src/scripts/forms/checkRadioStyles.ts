@@ -114,6 +114,9 @@ export const checkRadioClasses = useThemeCache(() => {
         cursor: "pointer",
         ...userSelect(),
         width: calc(`100% - ${unit(vars.sizing.width)}`),
+    });
+
+    const labelBold = style("labelBold", {
         ...fonts({
             weight: globalVars.fonts.weights.semiBold,
         }),
@@ -258,6 +261,7 @@ export const checkRadioClasses = useThemeCache(() => {
     return {
         root,
         label,
+        labelBold,
         labelNote,
         iconContainer,
         radioIcon,

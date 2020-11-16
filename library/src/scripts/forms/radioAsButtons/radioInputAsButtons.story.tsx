@@ -16,7 +16,7 @@ import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInput
 import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export default {
-    title: "Radio Inputs as Buttons",
+    title: "Components/Radio Input",
     parameters: {
         chromatic: {
             viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
@@ -40,7 +40,7 @@ export function RadioInputsRenderedAsButtons(props: {
         classes = radioInputAsButtonsClasses(),
     } = props;
     const [activeItem, setActiveItem] = useState("going");
-    const setData = data => {
+    const setData = (data) => {
         setActiveItem(data);
     };
 

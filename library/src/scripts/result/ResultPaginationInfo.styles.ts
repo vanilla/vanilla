@@ -11,10 +11,14 @@ export const resultPaginationInfoClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("resultPaginationInfo");
 
-    const root = style("pagination", {
-        marginLeft: "auto",
+    const root = style({
         ...fonts(globalVars.meta.text),
+        marginTop: globalVars.gutter.half,
     });
 
-    return { root };
+    const alignRight = style("alignRight", {
+        marginLeft: "auto",
+    });
+
+    return { root, alignRight };
 });

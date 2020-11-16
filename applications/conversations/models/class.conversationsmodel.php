@@ -16,7 +16,7 @@ abstract class ConversationsModel extends Gdn_Model {
     use \Vanilla\FloodControlTrait;
 
     /**
-     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     * @var \Psr\SimpleCache\CacheInterface Object used to store the FloodControl data.
      */
     protected $floodGate;
 

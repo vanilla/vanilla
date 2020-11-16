@@ -8,6 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\Search\LegacySearchAdapter;
+use Vanilla\Search\SearchResults;
+
 /**
  * Handles /search endpoint.
  */
@@ -19,20 +22,17 @@ class SearchController extends Gdn_Controller {
     /**  @var Gdn_Form */
     public $Form;
 
-    /**  @var SearchModel */
-    public $SearchModel;
+    /** @var LegacySearchAdapter */
+    private $searchAdapter;
 
     /**
      * Object instantiation & form prep.
+     *
+     * @param LegacySearchAdapter $searchAdapter
      */
-    public function __construct(SearchModel $searchModel = null) {
+    public function __construct(LegacySearchAdapter $searchAdapter) {
         parent::__construct();
-
-        // Object instantiation.
-        if ($searchModel === null) {
-            $searchModel = new SearchModel();
-        }
-        $this->SearchModel = $searchModel;
+        $this->searchAdapter = $searchAdapter;
         $form = Gdn::factory('Form');
 
         // Form prep
@@ -75,37 +75,25 @@ class SearchController extends Gdn_Controller {
         saveToConfig('Garden.Format.EmbedSize', '160x90', false);
         Gdn_Theme::section('SearchResults');
 
-        list($offset, $limit) = offsetLimit($page, c('Garden.Search.PerPage', 20));
+        [$offset, $limit] = offsetLimit($page, c('Garden.Search.PerPage', 20));
         $this->setData('_Limit', $limit);
 
-        $mode = $this->Form->getFormValue('Mode');
-        if ($mode) {
-            $this->SearchModel->ForceSearchMode = $mode;
-        }
         try {
-            $resultSet = $this->SearchModel->search($search, $offset, $limit);
+            $results = $this->searchAdapter->search(['search' => $search], $offset, $limit);
         } catch (Gdn_UserException $ex) {
             $this->Form->addError($ex);
-            $resultSet = [];
+            $results = new SearchResults([], 0, $offset, $limit);
         } catch (Exception $ex) {
             logException($ex);
             $this->Form->addError($ex);
-            $resultSet = [];
-        }
-        Gdn::userModel()->joinUsers($resultSet, ['UserID']);
-
-        // Fix up the summaries.
-        $searchTerms = explode(' ', Gdn_Format::text($search));
-        foreach ($resultSet as &$row) {
-            $row['Summary'] = searchExcerpt(htmlspecialchars(Gdn_Format::plainText($row['Summary'], $row['Format'])), $searchTerms);
-            $row['Summary'] = Emoji::instance()->translateToHtml($row['Summary']);
-            $row['Format'] = 'Html';
+            $results = new SearchResults([], 0, $offset, $limit);
         }
 
-        $this->setData('SearchResults', $resultSet, true);
+        $legacyResults = $results->asLegacyResults();
+        $this->setData('SearchResults', $results->asLegacyResults(), true);
         $this->setData('SearchTerm', Gdn_Format::text($search), true);
 
-        $this->setData('_CurrentRecords', count($resultSet));
+        $this->setData('_CurrentRecords', count($legacyResults));
 
         $this->canonicalUrl(url('search', true));
         $this->render();

@@ -14,13 +14,14 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import Translate from "@library/content/Translate";
 import { useUniqueID } from "@library/utility/idUtils";
+import { RecordID } from "@vanilla/utils";
 
 interface IProps {
     classNames?: string;
     title: string;
     items: INavigationItem[];
     url?: string;
-    recordID?: number;
+    recordID?: RecordID;
     recordType?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     accessibleViewAllMessage?: string;
@@ -29,7 +30,7 @@ interface IProps {
 
 export interface INavLinkNoItemComponentProps {
     className?: string;
-    recordID?: number;
+    recordID?: RecordID;
     recordType?: string;
 }
 export type INavLinkNoItemComponent = React.ComponentType<INavLinkNoItemComponentProps>;

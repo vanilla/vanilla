@@ -173,7 +173,7 @@ class MessagesTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testPatchSparse($field = null) {
+    public function testPatchSparse($field) {
         $this->fail(__METHOD__.' needs to be implemented');
     }
 

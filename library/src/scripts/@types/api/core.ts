@@ -5,6 +5,7 @@
 
 import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
+import { RecordID } from "@vanilla/utils";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -55,8 +56,8 @@ export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string
 export interface INavigationItem {
     name: string;
     url: string;
-    parentID: number;
-    recordID: number;
+    parentID: RecordID;
+    recordID: RecordID;
     sort: number | null;
     recordType: string;
     isLink?: boolean;
@@ -92,4 +93,14 @@ export enum PublishStatus {
     DELETED = "deleted",
     UNDELETED = "undeleted",
     PUBLISHED = "published",
+}
+
+export enum Format {
+    TEXT = "text",
+    TEXTEX = "textex",
+    MARKDOWN = "markdown",
+    WYSIWYG = "wysiwyg",
+    HTML = "html",
+    BBCODE = "bbcode",
+    RICH = "rich",
 }

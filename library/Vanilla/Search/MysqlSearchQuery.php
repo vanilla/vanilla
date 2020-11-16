@@ -31,24 +31,14 @@ class MysqlSearchQuery extends SearchQuery {
     }
 
     /**
-     * Implement abstract method
-     *
-     * @param string $text
-     * @param array $fieldNames
-     * @return $this
+     * @inheritdoc
      */
-    public function whereText(string $text, array $fieldNames = []): self {
+    public function whereText(string $text, array $fieldNames = [], string $matchMode = self::MATCH_FULLTEXT, ?string $locale = ""): self {
         return $this;
     }
 
     /**
-     * Implement abstract method
-     *
-     * @param string $attribute
-     * @param array $values
-     * @param bool $exclude
-     * @param string $filterOp
-     * @return $this
+     * @inheritdoc
      */
     public function setFilter(
         string $attribute,
@@ -73,7 +63,8 @@ class MysqlSearchQuery extends SearchQuery {
                 $sql .= empty($sql) ? '' : ' union all ';
                 $sql .= ' ( '.$subQuery.' ) ';
             }
-            $sql .= ' ORDER BY DateInserted DESC '.PHP_EOL;
+
+            $sql .= $this->getOrderBy();
             $limit = $this->getQueryParameter('limit', 100);
             $offset = $this->getQueryParameter('offset', 0);
             $sql .= ' LIMIT '.$limit;
@@ -83,12 +74,27 @@ class MysqlSearchQuery extends SearchQuery {
     }
 
     /**
+     * @return string
+     */
+    private function getOrderBy(): string {
+        $sort = $this->getQueryParameter('sort', SearchQuery::SORT_RELEVANCE);
+        $sortField = ltrim($sort, '-');
+        $direction = $sortField === $sort ? 'DESC' : 'ASC';
+        if ($sortField === SearchQuery::SORT_RELEVANCE) {
+            $sortField = 'Score';
+        }
+        return "ORDER BY " . $this->getDB()->quote($sortField) . ' ' . $direction . PHP_EOL;
+    }
+
+    /**
      * Get db driver
      *
      * @return \Gdn_SQLDriver
      */
     public function getDB() {
-        return $this->db;
+        $sql = clone $this->db;
+        $sql->reset();
+        return $sql;
     }
 
     /**

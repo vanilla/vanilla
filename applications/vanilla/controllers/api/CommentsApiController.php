@@ -11,12 +11,17 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchResultItem;
+use Vanilla\Search\SearchService;
 
 /**
  * API Controller for the `/comments` resource.
  */
 class CommentsApiController extends AbstractApiController {
 
+    use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
 
     /** @var CommentModel */
@@ -142,8 +147,7 @@ class CommentsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     protected function fullSchema() {
-        $result = $this->commentModel
-            ->schema();
+        $result = $this->commentModel->schema();
         return $result;
     }
 
@@ -154,14 +158,15 @@ class CommentsApiController extends AbstractApiController {
      * @param array $query The request query.
      * @return array
      */
-    public function get($id, array $query) {
+    public function get(int $id, array $query) {
+        $query['id'] = $id;
         $this->permission();
 
-        $this->idParamSchema();
-        $in = $this->schema([], ['CommentGet', 'in'])->setDescription('Get a comment.');
-        $out = $this->schema($this->commentSchema(), 'out');
+        $in = $this->schema($this->idParamSchema(), ['CommentGet', 'in'])->setDescription('Get a comment.');
 
         $query = $in->validate($query);
+        $commentSchema = CrawlableRecordSchema::applyExpandedSchema($this->commentSchema(), 'comment', $query['expand']);
+        $out = $this->schema($commentSchema, 'out');
 
         $comment = $this->commentByID($id);
         if (isset($comment['DiscussionID'])) {
@@ -172,8 +177,8 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->userModel->expandUsers($comment, ['InsertUserID']);
-        $comment = $this->normalizeOutput($comment);
+        $this->userModel->expandUsers($comment, $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID']));
+        $comment = $this->normalizeOutput($comment, $query['expand']);
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
@@ -190,18 +195,20 @@ class CommentsApiController extends AbstractApiController {
      * @return array The comment quote data.
      *
      * @throws NotFoundException If the record with the given ID can't be found.
-     * @throws \Exception if no session is available.
-     * @throws \Vanilla\Exception\PermissionException if the user does not have the specified permission(s).
+     * @throws \Exception Throws an exception if no session is available.
+     * @throws \Vanilla\Exception\PermissionException Throws an exception if the user does not have the specified permission(s).
      * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
      */
     public function get_quote($id) {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], ['in'])->setDescription('Get a comments embed data.');
+        $in = $this->schema([], 'in')->setDescription('Get a comments embed data.');
         $out = $this->schema($this->quoteSchema(), 'out');
 
         $comment = $this->commentByID($id);
+        $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $comment['DiscussionID'], []);
+
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
@@ -254,6 +261,8 @@ class CommentsApiController extends AbstractApiController {
 
         $comment = $this->commentByID($id);
         $comment['Url'] = commentUrl($comment);
+        $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $comment['DiscussionID'], []);
+
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
@@ -273,7 +282,10 @@ class CommentsApiController extends AbstractApiController {
     public function idParamSchema($type = 'in') {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
-                Schema::parse(['id:i' => 'The comment ID.']),
+                Schema::parse([
+                    'id:i' => 'The comment ID.',
+                    'expand' => ApiUtils::getExpandDefinition(['-insertUser']),
+                ]),
                 $type
             );
         }
@@ -320,16 +332,15 @@ class CommentsApiController extends AbstractApiController {
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
-                'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
                 'description' => 'Desired number of items per page.',
                 'default' => $this->commentModel->getDefaultLimit(),
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => ApiUtils::getMaxLimit(),
             ],
             'sort:s?' => [
-                'enum' => ApiUtils::sortEnum('dateInserted', 'commentID'),
+                'enum' => ApiUtils::sortEnum('dateInserted', 'commentID', 'dateUpdated'),
                 'default' => 'dateInserted',
             ],
             'insertUserID:i?' => [
@@ -340,15 +351,17 @@ class CommentsApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
         ], ['CommentIndex', 'in'])->requireOneOf(['commentID', 'discussionID', 'insertUserID'])->setDescription('List comments.');
-        $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
+        $commentSchema = CrawlableRecordSchema::applyExpandedSchema($this->commentSchema(), 'comment', $query['expand']);
+        $out = $this->schema([':a' => $commentSchema], 'out');
+
         if (isset($query['discussionID'])) {
             $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $query['discussionID'], $query);
         }
         $where = ApiUtils::queryToFilters($in, $query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort']);
         $rows = $this->commentModel->lookup($where, true, $limit, $offset, $orderDirection, $orderField)->resultArray();
@@ -361,7 +374,7 @@ class CommentsApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows);
@@ -383,14 +396,18 @@ class CommentsApiController extends AbstractApiController {
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
+     * @param array|string|bool $expand
+     *
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord) {
-        $normalizedRow = $this->commentModel->normalizeRow($dbRecord);
+    public function normalizeOutput(array $dbRecord, $expand = []) {
+        $normalizedRow = $this->commentModel->normalizeRow($dbRecord, $expand);
         $normalizedRow['type'] = 'comment';
         $normalizedRow['recordID'] = 'commentID';
         // Allow addons to hook into the normalization process.
-        $options = [];
+        $options = [
+            'expand' => $expand,
+        ];
         $result = $this->getEventManager()->fireFilter(
             'commentsApiController_normalizeOutput',
             $normalizedRow,
@@ -476,5 +493,48 @@ class CommentsApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Search comments.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function get_search(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this
+            ->schema([
+                'categoryID:i?' => 'The numeric ID of a category.',
+            ], 'in')
+            ->merge($this->searchSchema())
+            ->setDescription('Search comments.');
+        $query = $in->validate($query);
+
+        $searchQuery = [
+            'recordTypes' => ['comment'],
+        ];
+        if (array_key_exists('categoryID', $query)) {
+            $searchQuery['categoryID'] = $query['categoryID'];
+        }
+        [$offset, $limit] = offsetLimit(
+            "p{$query['page']}",
+            $query['limit']
+        );
+
+        $results = $this->getSearchService()->search($searchQuery, new SearchOptions($offset, $limit));
+        $commentIDs = [];
+        /** @var SearchResultItem $result */
+        foreach ($results as $result) {
+            $commentIDs[] = $result->getRecordID();
+        }
+
+        // Hit the comments API back for formatting.
+        return $this->index([
+            'commentID' => $commentIDs,
+            'expand' => $query['expand'] ?? null,
+            'limit' => $query['limit'] ?? null,
+        ]);
     }
 }

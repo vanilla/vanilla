@@ -14,6 +14,7 @@ import { borders } from "@library/styles/styleHelpersBorders";
 import { absolutePosition, margins, paddings, unit, userSelect, fonts } from "@library/styles/styleHelpers";
 import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
+import { buttonVariables } from "@library/forms/buttonStyles";
 
 export const spoilerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -58,7 +59,9 @@ export const spoilerVariables = useThemeCache(() => {
 export const spoilerCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = spoilerVariables();
-    const spoilerStyles = generateButtonStyleProperties(vars.button, false);
+    const spoilerStyles = generateButtonStyleProperties({
+        buttonTypeVars: vars.button,
+    });
     const userContentVars = userContentVariables();
     cssRule(".spoiler-icon", {
         position: "relative",
@@ -66,7 +69,7 @@ export const spoilerCSS = useThemeCache(() => {
         margin: "auto",
         width: unit(globalVars.icon.sizes.default),
         height: unit(globalVars.icon.sizes.default),
-        color: colorOut(userContentVars.blocks.fg),
+        color: "currentColor",
     });
     cssRule(".spoiler", {
         backgroundColor: important(colorOut(userContentVars.blocks.bg) as string),

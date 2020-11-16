@@ -21,6 +21,9 @@ const horizontalChevronViewBox = (centred?: boolean) => {
     return centred ? "-8 -4 30 30" : "0 0 24 24";
 };
 
+// non breaking space not just a regular space.
+export const NBSP = " ";
+
 export function RightChevronIcon(props: {
     className?: string;
     "aria-hidden"?: areaHiddenType;
@@ -309,6 +312,49 @@ export function ErrorIcon(props: { className?: string; errorMessage?: string; "a
     );
 }
 
+export function PendingIcon(props: { className?: string }) {
+    const classes = iconClasses();
+    const { className } = props;
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 17 17"
+            className={classNames(classes.standard, className)}
+            role="img"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <path
+                fill="currentColor"
+                d="M5.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+                transform="translate(1,1) scale(0.6)"
+            />
+            <circle cx="8.5" cy="8.5" r="8" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
+export function ApproveIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    const { className } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 17 17"
+            id="checkmark"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <polygon
+                points="12.136 3.139 13.25 4.253 6.211 11.292 2.75 7.83 3.863 6.717 6.211 9.064 12.136 3.139"
+                fill="currentColor"
+                transform="translate(0,1)"
+            />
+            <circle cx="8.5" cy="8.5" r="8" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
 export function InformationIcon(props: {
     className?: string;
     informationMessage?: string;
@@ -385,6 +431,7 @@ export function UpTriangleIcon(props: {
 }) {
     return (
         <DownTriangleIcon
+            className={props.className}
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             deg={180}
             translateY={-2}
@@ -409,17 +456,18 @@ export function DownTriangleIcon(props: {
         translate = `translate(0, ${props.translateY})`;
     }
 
-    const transform = [rotation, translate].filter(item => item !== undefined).join(", ");
+    const transform = [rotation, translate].filter((item) => item !== undefined).join(", ");
+    const classes = iconClasses();
 
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 8 8"
-            className={classNames("icon-triangleRight", props.className)}
+            viewBox="0 0 10 6"
+            className={classNames(props.className, classes.triangeTiny)}
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
             <title>{props.title ? props.title : `▾`}</title>
-            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" transform={transform} />
+            <polygon points="0 0 10 0 5 6 0 0" fill="currentColor" transform={transform} />
         </svg>
     );
 }
@@ -481,16 +529,23 @@ export function PlusCircleIcon(props: { className?: string; "aria-hidden"?: area
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 14 14"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
             className={classNames(classes.plusCircle, "icon-plusCircle", props.className)}
             role="img"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
             <title>{title}</title>
-            <path
-                fill="currentColor"
-                d="M14,7A7,7,0,1,1,7,0,7,7,0,0,1,14,7Zm-3.727.79a.339.339,0,0,0,.34-.338h0v-.9a.339.339,0,0,0-.339-.339H7.79V3.727a.339.339,0,0,0-.338-.34h-.9a.339.339,0,0,0-.339.339h0V6.21H3.727a.339.339,0,0,0-.34.338h0v.9a.339.339,0,0,0,.339.339H6.21v2.483a.339.339,0,0,0,.338.34h.9a.339.339,0,0,0,.339-.339h0V7.79Z"
-            />
+            <g fill="none" fillRule="evenodd">
+                <g>
+                    <g transform="translate(-969 -413) translate(970 414)">
+                        <circle cx="7" cy="7" r="7" stroke="#555A62" strokeWidth=".778" />
+                        <path fill="#555A62" d="M6.3 3.5H7.699999999999999V10.5H6.3z" />
+                        <path fill="#555A62" d="M6.3 3.5L7.7 3.5 7.7 10.5 6.3 10.5z" transform="rotate(90 7 7)" />
+                    </g>
+                </g>
+            </g>
         </svg>
     );
 }
@@ -721,6 +776,7 @@ export function HamburgerIcon(props: { className?: string; "aria-hidden"?: areaH
         </svg>
     );
 }
+
 export function DarkThemeIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; title?: string }) {
     const classes = iconClasses();
     return (
@@ -732,7 +788,7 @@ export function DarkThemeIcon(props: { className?: string; "aria-hidden"?: areaH
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
         >
             <g fill="none" fillRule="evenodd" transform="translate(2 2)">
-                <circle cx="10" cy="10" r="10" fill="#42464C" stroke="#DDDEE0" transform="rotate(-180 10 10)" />
+                <circle cx="10" cy="10" r="10" fill="#1E1E1E" stroke="#DDDEE0" transform="rotate(-180 10 10)" />
                 <path fill="#DDDEE0" d="M10 19.986V.014C15.573.288 20 4.654 20 10c0 5.346-4.428 9.712-10 9.986z" />
                 <circle cx="4.444" cy="4.444" r="3.951" stroke="#DDDEE0" transform="rotate(-90 10 4.444)" />
                 <path
@@ -1019,6 +1075,52 @@ export function NewPollIcon(props: { className?: string; "area-hidden"?: areaHid
                 strokeWidth="0.9px"
                 fillRule="evenodd"
             />
+        </svg>
+    );
+}
+
+export function ExternalIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            className={classNames(classes.external, props.className)}
+            style={{ height: 22, width: 22 }}
+            aria-hidden={props["aria-hidden"]}
+        >
+            <g fill="none" fillRule="evenodd" stroke="#555A62" strokeLinecap="round">
+                <path d="M17.274 12.111v5.614h0c0 .414-.313.749-.699.749H6.095h0c-.385 0-.698-.335-.698-.749V7.245h0c0-.413.313-.748.699-.748h5.589M11.608 12.111l6.737-6.737"></path>
+                <path strokeLinejoin="round" d="M14.602 5.374h3.743v3.743"></path>
+            </g>
+        </svg>
+    );
+}
+
+export function FeatureIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            className={classNames(classes.external, props.className)}
+            style={{ height: 24, width: 24 }}
+            aria-hidden={props["aria-hidden"]}
+        >
+            <g fill="none" fillRule="evenodd" opacity="1.0">
+                <g stroke="currentColor" strokeWidth="1.0">
+                    <g>
+                        <path
+                            d="M10 14.329L5.365 16.766 6.25 11.604 2.5 7.949 7.682 7.196 10 2.5 12.318 7.196 17.5 7.949 13.75 11.604 14.635 16.766z"
+                            transform="translate(-1167 -297) translate(1167 297)"
+                        />
+                    </g>
+                </g>
+            </g>
         </svg>
     );
 }

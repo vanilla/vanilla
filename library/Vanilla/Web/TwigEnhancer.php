@@ -107,10 +107,14 @@ class TwigEnhancer {
      */
     public function enhanceEnvironment(\Twig\Environment $twig) {
         foreach ($this->getFunctionMappings() as $key => $callable) {
-            if (is_int($key) && is_string($callable)) {
-                $key = $callable;
+            if (is_object($callable) && $callable instanceof TwigFunction) {
+                $twig->addFunction($callable);
+            } else {
+                if (is_int($key) && is_string($callable)) {
+                    $key = $callable;
+                }
+                $twig->addFunction(new TwigFunction($key, $callable));
             }
-            $twig->addFunction(new TwigFunction($key, $callable));
         }
     }
 
@@ -253,14 +257,24 @@ class TwigEnhancer {
      * Check if a user has a permission or one of a group of permissions.
      *
      * @param string $permissionName The permission name.
+     * @param int|null $id The permission ID.
      *
      * @return bool
      */
-    public function hasPermission(string $permissionName): bool {
-        if (!key_exists($permissionName, $this->permissionCache)) {
-            $this->permissionCache[$permissionName] = $this->session->checkPermission($permissionName);
+    public function hasPermission(string $permissionName, $id = null): bool {
+        $key = "$permissionName-$id";
+        if (!array_key_exists($key, $this->permissionCache)) {
+            if (!empty($id) && is_numeric($id) || is_string($id)) {
+                $category = \CategoryModel::categories($id);
+
+                // Handle checking categories with the permissionCategoryID.
+                $has = \CategoryModel::checkPermission($category, $permissionName, false);
+            } else {
+                $has = $this->session->checkPermission($permissionName, false, '', $id);
+            }
+            $this->permissionCache[$key] = $has;
         }
-        return $this->permissionCache[$permissionName];
+        return $this->permissionCache[$key];
     }
 
     /**
@@ -307,6 +321,9 @@ class TwigEnhancer {
             // Utility`
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
+            'renderHtml' => new TwigFunction('renderHtml', function (?string $body, ?string $format = null) {
+                return Gdn::formatService()->renderHTML((string)$body, $format);
+            }, ['is_safe' => ['html']]),
 
             // Application interaction.
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
@@ -327,5 +344,4 @@ class TwigEnhancer {
             'url' => [$this->request, 'url'],
         ];
     }
-
 }

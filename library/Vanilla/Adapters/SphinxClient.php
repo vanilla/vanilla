@@ -403,7 +403,7 @@ class SphinxClient {
      * @param bool $exclude
      */
     public function setFilter(string $attribute, array $values, bool $exclude = false) {
-        if (count($values)) {
+        if (count($values) > 0) {
             $this->filters[] = [
                 "type" => self::FILTER_VALUES,
                 "attr" => $attribute,
@@ -464,9 +464,9 @@ class SphinxClient {
      * Set connection timeout.
      * Note: when set to 0 there is no limit
      *
-     * @param int $timeout
+     * @param float $timeout
      */
-    public function setConnectTimeout(int $timeout) {
+    public function setConnectTimeout(float $timeout) {
         $this->timeout = $timeout;
     }
 
@@ -550,6 +550,22 @@ class SphinxClient {
     public function setFilterString(string $attribute, string $value, bool $exclude = false) {
         $this->filters[] = [
             "type" => self::FILTER_STRING,
+            "attr" => $attribute,
+            "exclude" => $exclude,
+            "value" => $value
+        ];
+    }
+
+    /**
+     * Set string attribute to filter
+     *
+     * @param string $attribute
+     * @param string[] $value
+     * @param bool $exclude
+     */
+    public function setFilterStrings(string $attribute, array $value, bool $exclude = false) {
+        $this->filters[] = [
+            "type" => self::FILTER_STRING_LIST,
             "attr" => $attribute,
             "exclude" => $exclude,
             "value" => $value
@@ -656,6 +672,15 @@ class SphinxClient {
      */
     public function setSelect(string $select) {
         $this->select = $select;
+    }
+
+    /**
+     * Set sphinx select query
+     *
+     * @param string $select
+     */
+    public function addSelect(string $select) {
+        $this->select .= ", " . $select;
     }
 
     /**

@@ -3,12 +3,15 @@
  * @license GPL-2.0-only
  */
 
+import { ILoadable } from "@library/@types/api/core";
+
 export interface IUserFragment {
     userID: number;
     name: string;
+    url?: string;
     photoUrl: string;
     dateLastActive: string | null;
-    label?: string | null;
+    label?: string;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
@@ -43,9 +46,10 @@ export interface IUser extends IUserFragment, IUserRoles {
     bypassSpam: boolean;
     banned: number;
     dateInserted: string;
-    dateUpdated: string | null;
+    dateUpdated?: string;
     hidden: boolean;
-    rankID?: number | null;
+    title?: string;
+    rankID?: number;
     rank?: {
         rankID: number;
         name: string;
@@ -53,4 +57,11 @@ export interface IUser extends IUserFragment, IUserRoles {
     };
     countDiscussions?: number;
     countComments?: number;
+}
+
+export interface IInvitees {
+    dateInserted?: string;
+    email?: string;
+    insertUserID?: number;
+    userID?: number;
 }

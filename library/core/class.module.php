@@ -121,6 +121,9 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             }
         }
         $viewPath = $this->fetchViewLocation($this->view);
+        // Check to see if there is a handler for this particular extension.
+        $viewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($viewPath, '.')));
+
         $String = '';
         ob_start();
         if (is_object($this->_Sender) && isset($this->_Sender->Data)) {
@@ -128,7 +131,12 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         } else {
             $Data = [];
         }
-        include($viewPath);
+        if ($viewHandler === null) {
+            include $viewPath;
+        } else {
+            // Use the view handler to parse the view.
+            $viewHandler->render($viewPath, $this);
+        }
         $String = ob_get_contents();
         @ob_end_clean();
         return $String;

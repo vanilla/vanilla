@@ -52,3 +52,15 @@ export function indexArrayByKey<T extends object>(
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
     return value !== null && value !== undefined;
 }
+
+export function ensureString(maybeString: any) {
+    if (typeof maybeString !== "string") throw new TypeError("Expected maybeString to have type string");
+    return maybeString;
+}
+
+export function forceInt(value: string | null, fallback: number): number {
+    let result = Number.parseInt(value ?? "", 10);
+    return Number.isNaN(result) ? fallback : result;
+}
+
+export type RecordID = string | number;

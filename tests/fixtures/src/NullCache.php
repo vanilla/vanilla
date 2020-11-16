@@ -67,7 +67,9 @@ class NullCache extends Gdn_Cache {
      * @return mixed
      */
     public function get($key, $options = []) {
-        if (is_array($key)) {
+        if (array_key_exists(Gdn_Cache::FEATURE_DEFAULT, $options)) {
+            return $options[Gdn_Cache::FEATURE_DEFAULT];
+        } else if (is_array($key)) {
             return [];
         } else {
             return Gdn_Cache::CACHEOP_FAILURE;

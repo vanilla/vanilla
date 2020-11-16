@@ -130,7 +130,7 @@ export const layoutVariables = useThemeCache(
         });
 
         // Allows to be recalculated in another layout (i.e. the three column layout)
-        const setMediaQueries = breakPoints => {
+        const setMediaQueries = (breakPoints) => {
             const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true): NestedCSSProperties => {
                 return media(
                     {
@@ -239,11 +239,11 @@ export const layoutVariables = useThemeCache(
             }
         };
 
-        const isFullWidth = currentDevice => {
+        const isFullWidth = (currentDevice) => {
             return currentDevice === Devices.DESKTOP || currentDevice === Devices.NO_BLEED;
         };
 
-        const isCompact = currentDevice => {
+        const isCompact = (currentDevice) => {
             return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
         };
 
@@ -482,7 +482,7 @@ export const generatePanelLayoutClasses = (props: {
         paddingBottom: unit(14),
     });
 
-    const layoutSpecificStyles = style => {
+    const layoutSpecificStyles = (style) => {
         const middleColumnMaxWidth = style("middleColumnMaxWidth", {
             $nest: {
                 "&.hasAdjacentPanel": {

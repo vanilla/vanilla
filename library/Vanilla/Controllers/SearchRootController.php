@@ -22,7 +22,7 @@ class SearchRootController extends PageDispatchController {
     public function index() {
         return $this
             ->useSimplePage(t('Search'))
-            ->blockRobots()
+            ->blockRobots("noindex nofollow")
             ->render()
         ;
     }

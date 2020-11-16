@@ -10,7 +10,9 @@ namespace Vanilla\Search;
 use Garden\Schema\Schema;
 use Vanilla\Adapters\SphinxClient;
 use Vanilla\Adapters\SphinxClient as SphinxAdapter;
+use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
+use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Sphinx\Search\SphinxSearchQuery;
 
 /**
@@ -54,7 +56,7 @@ class GlobalSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, array $options = []): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array {
         return [];
     }
 
@@ -65,8 +67,6 @@ class GlobalSearchType extends AbstractSearchType {
         ///
         /// Prepare data from the query.
         ///
-        $allTextQuery = $query->getQueryParameter('query');
-        $name = $query->getQueryParameter('name');
         $insertUserIDs = $query->getQueryParameter('insertUserIDs', false);
         $insertUserNames = $query->getQueryParameter('insertUserNames', false);
         if (!$insertUserIDs && $insertUserNames) {
@@ -74,53 +74,42 @@ class GlobalSearchType extends AbstractSearchType {
                 'name' => $insertUserNames,
             ])->resultArray();
             $insertUserIDs = array_column($users, 'UserID');
-        }
-        $dateInserted = $query->getQueryParameter('dateInserted');
-
-        /** @var $startDate \DateTimeImmutable|null */
-        $startDate = $dateInserted['date'][0] ?? null;
-
-        /** @var $endDate \DateTimeImmutable|null */
-        $endDate = $dateInserted['date'][1] ?? null;
-        if ($startDate && $endDate) {
-            $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());
+            $insertUserIDs[] = 0;
         }
 
-
-        $sort = $query->getQueryParameter('sort', 'relevance');
+        if ($dateInserted = $query->getQueryParameter('dateInserted')) {
+            $query->setDateFilterSchema('dateInserted', $dateInserted);
+        }
+        $types = $query->getQueryParameter('types');
 
         ///
         /// Apply the query.
         ///
 
-        if ($name) {
-            $query->whereText($name, ['name']);
-        }
-
-        if ($allTextQuery) {
-            $query->whereText($allTextQuery);
+        if (!empty($types)) {
+            $query->setFilter('type.keyword', $types);
         }
 
         if ($insertUserIDs) {
             $query->setFilter('insertUserID', $insertUserIDs);
         }
 
-        /** @psalm-suppress UndefinedClass */
-        if ($query instanceof SphinxSearchQuery) {
 
+        $locale = $query->getQueryParameter('locale');
+        if ($locale) {
+            $query->setFilter('locale', [$locale, CrawlableRecordSchema::ALL_LOCALES]);
+        }
 
-            // Sorts
-            $sortField = ltrim($sort, '-');
+        // Sorts
+        $sort = $query->getQueryParameter('sort', 'relevance');
+        $sortField = ltrim($sort, '-');
 
-            if ($sortField === SearchQuery::SORT_RELEVANCE) {
-                $query->setSort(SearchQuery::SORT_RELEVANCE);
-            } elseif ($sortField === $sort) {
-                $query->setSort(SphinxAdapter::SORT_ATTR_ASC, $sortField);
-            } else {
-                $query->setSort(SphinxAdapter::SORT_ATTR_DESC, $sortField);
-            }
+        if ($sortField === SearchQuery::SORT_RELEVANCE) {
+            $query->setSort(SearchQuery::SORT_RELEVANCE);
+        } elseif ($sortField === $sort) {
+            $query->setSort(SearchQuery::SORT_ASC, $sortField);
         } else {
-            // TODO implement for mysql.
+            $query->setSort(SearchQuery::SORT_DESC, $sortField);
         }
     }
 
@@ -166,6 +155,10 @@ class GlobalSearchType extends AbstractSearchType {
                     "-dateInserted",
                 ],
             ],
+            "locale:s?" => [
+                'description' => 'The locale articles are published in.',
+                'x-search-scope' => true
+            ],
         ]);
     }
 
@@ -174,5 +167,33 @@ class GlobalSearchType extends AbstractSearchType {
      */
     public function validateQuery(SearchQuery $query): void {
         return;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSingularLabel(): string {
+        return '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPluralLabel(): string {
+        return '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDTypes(): ?array {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function guidToRecordID(int $guid): ?int {
+        return null;
     }
 }

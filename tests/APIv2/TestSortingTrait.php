@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Allows an `AbstractResourceTest` to test API sorting.
@@ -42,29 +43,8 @@ trait TestSortingTrait {
         foreach ($fields as $field) {
             /* @var AbstractResourceTest $this */
             $actual = $this->api()->get($this->sortUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
-            static::assertSorted($actual, $field);
+            VanillaTestCase::assertSorted($actual, $field);
         }
-    }
-
-    /**
-     * Assert that a dataset is properly sorted.
-     *
-     * @param array $arr The actual array to assert.
-     * @param string $fields The fields the dataset should be sorted by.
-     */
-    public static function assertSorted(array $arr, string ...$fields): void {
-        $sorted = $arr;
-        usort($sorted, ArrayUtils::sortCallback(...$fields));
-
-        $actual = $expected = [];
-        for ($i = 0; $i < count($arr); $i++) {
-            foreach ($fields as $field) {
-                $j = trim($field, '-');
-                $actual[$i][$j] = $arr[$i][$j];
-                $expected[$i][$j] = $sorted[$i][$j];
-            }
-        }
-        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same: ".implode(', ', $fields));
     }
 
     /**

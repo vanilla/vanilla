@@ -411,58 +411,6 @@ class AddonManagerTest extends SharedBootstrapTestCase {
     }
 
     /**
-     * Assert that a deep array is a subset of another deep array.
-     *
-     * @param array $subset The subset to test.
-     * @param array $array The array to test against.
-     * @param bool $strict Whether or not to use strict comparison.
-     * @param string $message A message to display on the test.
-     */
-    protected function assertArraySubsetRecursive($subset, $array, $strict = false, $message = '') {
-        if (!is_array($subset)) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
-                1,
-                'array or ArrayAccess'
-            );
-        }
-
-        if (!is_array($array)) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or ArrayAccess'
-            );
-        }
-
-        $this->filterArraySubset($array, $subset);
-
-        $strSubset = var_export($subset, true);
-        $strArray = var_export($array, true);
-        $this->assertSame($strArray, $strSubset, $message);
-    }
-
-    /**
-     * Filter a parent array so that it doesn't include any keys that the child doesn't have.
-     *
-     * This also sorts the arrays by key so they can be compared.
-     *
-     * @param array &$parent The subset to filter.
-     * @param array &$subset The parent array.
-     */
-    private function filterArraySubset(&$parent, &$subset) {
-        $parent = array_intersect_key($parent, $subset);
-
-        ksort($parent);
-        ksort($subset);
-
-        foreach ($parent as $key => &$value) {
-            if (is_array($value) && isset($subset[$key]) && is_array($subset[$key])) {
-                // Recurse into the array.
-                $this->filterArraySubset($value, $subset[$key]);
-            }
-        }
-    }
-
-    /**
      * Wrap each element of an array in an array so that it can be used as a data provider.
      *
      * @param array $array The array to massage.

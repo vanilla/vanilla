@@ -75,12 +75,12 @@
   }
 }
 
-.main .content .control-panel {
+.dashboard-main .content .control-panel {
   display: none;
 }
 
 @include media-breakpoint-down(md) {
-  .main .content .control-panel {
+  .dashboard-main .content .control-panel {
     display: block;
   }
 }
@@ -109,7 +109,7 @@ ul {
 }
 
 // TODO: I don't know where to put this yet.
-.main {
+.dashboard-main {
   background-color: $white;
   border-left: $border-width solid $border-color;
   border-right: $border-width solid $border-color;

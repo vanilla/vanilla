@@ -34,6 +34,8 @@ class ResourceEventProcessor implements Processor {
     /** @var int Maximum number of records that can be updated at once. */
     private $updateLimit = self::MAX_UPDATE_LIMIT;
 
+    private $resourceEventClass = GenericResourceEvent::class;
+
     /**
      * DI.
      *
@@ -46,25 +48,32 @@ class ResourceEventProcessor implements Processor {
     }
 
     /**
+     * @param string $resourceEventClass
+     */
+    public function setResourceEventClass(string $resourceEventClass): void {
+        $this->resourceEventClass = $resourceEventClass;
+    }
+
+    /**
      * Clear the cache on certain operations.
      *
-     * @param Operation $databaseOperation
+     * @param Operation $operation
      * @param callable $stack
      * @return mixed|void
      */
-    public function handle(Operation $databaseOperation, callable $stack) {
-        $this->validateUpdateLimit($databaseOperation);
+    public function handle(Operation $operation, callable $stack) {
+        $this->validateUpdateLimit($operation);
         // Deletes have to be gathered before the actual record is deleted.
-        $deleteEvents = $this->getDeleteResourceEvents($databaseOperation);
+        $deleteEvents = $this->getDeleteResourceEvents($operation);
 
         // Process the stack so that we get a result.
-        $result = $stack($databaseOperation);
-        if ($databaseOperation->getType() === Operation::TYPE_INSERT) {
-            $databaseOperation->setMeta(self::META_NEW_INSERT_ID, $result);
+        $result = $stack($operation);
+        if ($operation->getType() === Operation::TYPE_INSERT) {
+            $operation->setMeta(self::META_NEW_INSERT_ID, $result);
         }
 
         // Inserts and updates have to be gathered after the records are inserted/updated.
-        $insertUpdateEvents = $this->getInsertUpdateResourceEvents($databaseOperation);
+        $insertUpdateEvents = $this->getInsertUpdateResourceEvents($operation);
 
         $allEvents = array_merge($deleteEvents, $insertUpdateEvents);
         foreach ($allEvents as $event) {
@@ -171,16 +180,21 @@ class ResourceEventProcessor implements Processor {
         $rows = $model->select($where, $operation->getOptions());
         $currentUserFragment =  $this->userModel->currentFragment();
 
+        $resourceEventClass = $this->resourceEventClass;
+
         $events = [];
         foreach ($rows as $row) {
-            $event = new GenericResourceEvent(
-                $recordType,
+            $event = new $resourceEventClass(
                 $action,
                 [
                     $recordType => $row,
                 ],
                 $currentUserFragment
             );
+            if ($event instanceof GenericResourceEvent) {
+                $event->setType($recordType);
+            }
+
             $events[] = $event;
         }
 

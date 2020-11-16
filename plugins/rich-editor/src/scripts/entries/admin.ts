@@ -22,11 +22,11 @@ function handleRichEditorInputFormatterOptions() {
 function updateRichFormValues(inputFormatter: string) {
     const richFormGroups = document.querySelectorAll(".js-richFormGroup");
     if (inputFormatter === "Rich" || inputFormatter === "rich") {
-        richFormGroups.forEach(group => {
+        richFormGroups.forEach((group) => {
             group.classList.remove("Hidden");
         });
     } else {
-        richFormGroups.forEach(group => {
+        richFormGroups.forEach((group) => {
             group.classList.add("Hidden");
         });
     }

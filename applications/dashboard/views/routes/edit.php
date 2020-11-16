@@ -10,8 +10,8 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-    <ul>
-        <li class="form-group">
+    <ul role="presentation">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Route Expression', 'Route');
                 $Attributes = ['class' => 'InputBox WideInput'];
@@ -24,7 +24,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Route', $Attributes); ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Target', 'Target'); ?>
             </div>
@@ -32,7 +32,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Target', ['class' => 'InputBox WideInput']); ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Type', 'Route Type'); ?>
             </div>

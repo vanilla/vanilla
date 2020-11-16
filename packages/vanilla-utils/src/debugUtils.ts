@@ -69,7 +69,7 @@ export function logError(...value: any[]) {
  * @param value - The value to log.
  */
 export function logWarning(...value: any[]) {
-    if (!internalDebugValue && process.env.NODE_ENV === "test") {
+    if (!internalDebugValue || process.env.NODE_ENV === "test") {
         return;
     }
     // eslint-disable-next-line no-console

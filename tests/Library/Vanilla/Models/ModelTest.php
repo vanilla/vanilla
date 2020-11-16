@@ -10,13 +10,13 @@ namespace VanillaTests\Library\Vanilla\Models;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\Model;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for the `Model` class.
  */
 class ModelTest extends TestCase {
-    use SiteTestTrait;
+    use BootstrapTrait;
 
     /**
      * @var Model
@@ -24,29 +24,22 @@ class ModelTest extends TestCase {
     protected $model;
 
     /**
-     * Install the site and set up a test table.
-     */
-    public static function setupBeforeClass(): void {
-        static::setupBeforeClassSiteTestTrait();
-
-        static::container()->call(function (
-            \Gdn_DatabaseStructure $st
-        ) {
-            $st->table('model')
-                ->primaryKey('modelID')
-                ->column('name', 'varchar(50)')
-                ->set();
-        });
-    }
-
-    /**
      * @inheritDoc
      */
     public function setUp(): void {
         $this->container()->call(function (
+            \Gdn_DatabaseStructure $st,
             \Gdn_SQLDriver $sql
         ) {
-            $sql->truncate('model');
+            if (!$st->tableExists('model')) {
+                $st
+                    ->table('model')
+                    ->primaryKey('modelID')
+                    ->column('name', 'varchar(50)')
+                    ->set();
+            } else {
+                $sql->truncate('model');
+            }
         });
 
         $this->model = $this->container()->getArgs(Model::class, ['model']);
@@ -63,6 +56,17 @@ class ModelTest extends TestCase {
 
         $this->assertSame('foo', $row['name']);
         $this->assertSame($id, $row['modelID']);
+        return $id;
+    }
+
+    /**
+     * Insert a basic test row.
+     *
+     * @param string $name
+     * @return int
+     */
+    private function insertOne(string $name = 'foo'): int {
+        $id = $this->model->insert(['name' => $name]);
         return $id;
     }
 
@@ -108,13 +112,22 @@ class ModelTest extends TestCase {
     }
 
     /**
-     * Insert a basic test row.
-     *
-     * @param string $name
-     * @return int
+     * Insert ignore should ignore duplicates.
      */
-    private function insertOne(string $name = 'foo'): int {
-        $id = $this->model->insert(['name' => $name]);
-        return $id;
+    public function testInsertIgnore(): void {
+        $id = $this->insertOne();
+        $this->model->insert(['modelID' => $id, 'name' => __FUNCTION__], [Model::OPT_IGNORE => true]);
+        $row = $this->model->selectSingle(['modelID' => $id]);
+        $this->assertNotSame(__FUNCTION__, $row['name']);
+    }
+
+    /**
+     * Replace should replace the entire row.
+     */
+    public function testReplace(): void {
+        $id = $this->insertOne();
+        $this->model->insert(['modelID' => $id, 'name' => __FUNCTION__], [Model::OPT_REPLACE => true]);
+        $row = $this->model->selectSingle(['modelID' => $id]);
+        $this->assertSame(__FUNCTION__, $row['name']);
     }
 }

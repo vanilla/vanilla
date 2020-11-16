@@ -59,6 +59,8 @@ class Gdn_PasswordHash {
             return false;
         }
 
+        $request = new Gdn_Request();
+
         switch (strtolower($method)) {
             case 'crypt':
                 $result = (crypt($password, $storedHash) === $storedHash);
@@ -93,13 +95,13 @@ class Gdn_PasswordHash {
                 $messageReset = 'You need to reset your password. 
                 This is most likely because an administrator recently changed your account information.
                 Click <a href="%s">here</a> to reset your password.';
-                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', $messageReset), $resetUrl));
+                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', $messageReset), $request->url($resetUrl)));
                 break;
             case 'random':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
                         .urlencode(Gdn::request()->get('display')) : ''));
-                $messageRandom ='Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.';
-                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', $messageRandom), $resetUrl));
+                $messageRandom ='Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to set your password.';
+                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', $messageRandom), $request->url($resetUrl)));
                 break;
             case 'smf':
                 $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);

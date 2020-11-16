@@ -26,6 +26,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     defaultValue?: IComboBoxOption;
     className?: string;
     placeholder?: string;
+    forceOpen?: boolean;
     options: IComboBoxOption[] | undefined;
     onChange: (data: IComboBoxOption) => void;
     onInputChange?: (value: string) => void;
@@ -41,6 +42,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     isClearable?: boolean;
     describedBy?: string;
     selectRef?: React.RefObject<Select>;
+    onFocus?: () => void;
 }
 
 export enum MenuPlacement {
@@ -67,7 +69,7 @@ export default function SelectOne(props: ISelectOneProps) {
     const inputID = props.inputID || id + "-input";
     const errorID = id + "-errors";
 
-    const { className, disabled, options, searchable } = props;
+    const { className, disabled, options, searchable, forceOpen } = props;
     let describedBy;
     const hasErrors = props.errors && props.errors!.length > 0;
     if (hasErrors) {
@@ -111,11 +113,14 @@ export default function SelectOne(props: ISelectOneProps) {
                     aria-describedby={describedBy}
                     isSearchable={searchable}
                     value={props.value}
-                    menuIsOpen={isFocused === false ? false : undefined}
+                    menuIsOpen={forceOpen ? true : isFocused === false ? false : undefined}
                     placeholder={props.placeholder}
                     isLoading={props.isLoading}
                     onMenuOpen={props.onMenuOpen}
-                    onFocus={() => setIsFocused(true)}
+                    onFocus={() => {
+                        setIsFocused(true);
+                        props.onFocus?.();
+                    }}
                     onBlur={() => setIsFocused(false)}
                     menuPlacement={props.menuPlacement ?? "auto"}
                     ref={props.selectRef}
@@ -155,7 +160,7 @@ function useOverrideProps(props: ISelectOneProps) {
     const customStyles = useMemo(() => {
         return {
             option: () => ({}),
-            menu: base => {
+            menu: (base) => {
                 return { ...base, backgroundColor: null, boxShadow: null };
             },
             control: () => ({
@@ -165,7 +170,7 @@ function useOverrideProps(props: ISelectOneProps) {
     }, []);
 
     // Overwrite theme in Select component
-    const getTheme = useCallback(theme => {
+    const getTheme = useCallback((theme) => {
         return {
             ...theme,
             borderRadius: {},

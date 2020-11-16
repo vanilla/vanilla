@@ -93,6 +93,7 @@ $Construct->primaryKey('CategoryID')
     ->column('LastDateInserted', 'datetime', null)
     ->column('AllowedDiscussionTypes', 'varchar(255)', null)
     ->column('DefaultDiscussionType', 'varchar(10)', null)
+    ->column('Featured', 'tinyint', '0')
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;
@@ -130,7 +131,6 @@ if ($Drop || !$CategoryExists) {
 if ($CategoryExists) {
     CategoryModel::instance()->rebuildTree();
     CategoryModel::instance()->recalculateTree();
-    unset($CategoryModel);
 }
 
 // Construct the discussion table.
@@ -151,8 +151,8 @@ $Construct
     ->column('UpdateUserID', 'int', true)
     ->column('FirstCommentID', 'int', true)
     ->column('LastCommentID', 'int', true)
-    ->column('Name', 'varchar(100)', false)
-    ->column('Body', 'text', false)
+    ->column('Name', 'varchar(100)', false, 'fulltext')
+    ->column('Body', 'text', false, 'fulltext')
     ->column('Format', 'varchar(20)', true)
     ->column('Tags', 'text', null)
     ->column('CountComments', 'int', '0')
@@ -225,7 +225,7 @@ $Construct
     ->column('InsertUserID', 'int', true, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DeleteUserID', 'int', true)
-    ->column('Body', 'text', false)
+    ->column('Body', 'text', false, 'fulltext')
     ->column('Format', 'varchar(20)', true)
     ->column('DateInserted', 'datetime', null, ['index.1', 'index'])
     ->column('DateDeleted', 'datetime', true)

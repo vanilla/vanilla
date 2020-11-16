@@ -9,21 +9,16 @@ namespace VanillaTests\Library\Vanilla\Database;
 
 use Garden\Events\ResourceEvent;
 use Garden\Events\ResourceEventLimitException;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Database\Operation;
 use Vanilla\Models\PipelineModel;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Database\ProcessorFixture;
-use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `PruneProcessor` class.
  */
-class ResourceEventProcessorTest extends TestCase {
-
-    use SiteTestTrait;
-    use SetupTraitsTrait;
+class ResourceEventProcessorTest extends SiteTestCase {
     use EventSpyTestTrait;
 
     /**
@@ -40,7 +35,7 @@ class ResourceEventProcessorTest extends TestCase {
      * Install the site and set up a test table.
      */
     public static function setupBeforeClass(): void {
-        static::setupBeforeClassSiteTestTrait();
+        parent::setUpBeforeClass();
 
         static::container()->call(function (
             \Gdn_DatabaseStructure $st
@@ -57,8 +52,6 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setupTestTraits();
-
         $this->container()->call(function (
             \Gdn_SQLDriver $sql
         ) {

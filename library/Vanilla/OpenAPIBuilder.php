@@ -128,11 +128,10 @@ class OpenAPIBuilder {
      */
     public function getFullOpenAPI(): array {
         if (!file_exists($this->cachePath)) {
-            $data = '<?php return '.var_export($this->generateFullOpenAPI(), true).";\n";
-            static::filePutContents($this->cachePath, $data);
+            FileUtils::putExport($this->cachePath, $this->generateFullOpenAPI());
         }
 
-        $result = require $this->cachePath;
+        $result = FileUtils::getExport($this->cachePath);
 
         // Reapply URL even after pulling from cache.
         // A site may be accessed from multiple URLs and share the same cache.
@@ -156,49 +155,6 @@ class OpenAPIBuilder {
         ];
 
         return $openApi;
-    }
-
-    /**
-     * A version of file_put_contents() that is multi-thread safe.
-     *
-     * @param string $filename Path to the file where to write the data.
-     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
-     * @param int $mode The permissions to set on a new file.
-     * @return boolean
-     * @category Filesystem Functions
-     * @see http://php.net/file_put_contents
-     */
-    private static function filePutContents($filename, $data, $mode = 0644) {
-        $temp = tempnam(dirname($filename), 'atomic');
-
-        if (!($fp = @fopen($temp, 'wb'))) {
-            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
-            if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("OpenAPIBuilder::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
-                return false;
-            }
-        }
-
-        fwrite($fp, $data);
-        fclose($fp);
-
-        if (!@rename($temp, $filename)) {
-            $r = @unlink($filename);
-            $r &= @rename($temp, $filename);
-            if (!$r) {
-                trigger_error("OpenAPIBuilder::filePutContents(): error writing file '$filename'", E_USER_WARNING);
-                return false;
-            }
-        }
-        if (function_exists('apc_delete_file')) {
-            // This fixes a bug with some configurations of apc.
-            apc_delete_file($filename);
-        } elseif (function_exists('opcache_invalidate')) {
-            opcache_invalidate($filename);
-        }
-
-        @chmod($filename, $mode);
-        return true;
     }
 
     /**
@@ -280,6 +236,10 @@ class OpenAPIBuilder {
             default:
                 throw new \InvalidArgumentException("Unrecognized OpenAPI file extension for $path", 500);
         }
+        if (!is_array($result)) {
+            throw new \Exception("Error parsing $path.", 500);
+        }
+
         return $result;
     }
 
@@ -295,22 +255,38 @@ class OpenAPIBuilder {
         $addonKey = $addon->getGlobalKey();
 
         if (!empty($data['paths'])) {
-            foreach ($data['paths'] as $path => $methods) {
-                foreach ($methods as $method => $operation) {
-                    if (is_array($operation) && !isset($operation['x-addon'])) {
-                        $data['paths'][$path][$method]['x-addon'] = $addonKey;
+            foreach ($data['paths'] as $path => &$methods) {
+                foreach ($methods as $method => &$operation) {
+                    if ($method === 'parameters') {
+                        $this->annotateDataset($operation, $addonKey);
+                    } elseif (is_array($operation) && !isset($operation['x-addon'])) {
+                        $operation['x-addon'] = $addonKey;
                     }
                 }
             }
         }
 
         if (!empty($data['components'])) {
-            foreach ($data['components'] as $type => $components) {
-                foreach ($components as $key => $component) {
+            foreach ($data['components'] as $type => &$components) {
+                foreach ($components as $key => &$component) {
                     if (!isset($component['x-addon'])) {
-                        $data['components'][$type][$key]['x-addon'] = $addonKey;
+                        $component['x-addon'] = $addonKey;
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Add addon annotations to an array.
+     *
+     * @param array $data
+     * @param string $addonKey
+     */
+    private function annotateDataset(array &$data, string $addonKey): void {
+        foreach ($data as $key => &$row) {
+            if (is_array($row) && !isset($row['x-addon'])) {
+                $row['x-addon'] = $addonKey;
             }
         }
     }

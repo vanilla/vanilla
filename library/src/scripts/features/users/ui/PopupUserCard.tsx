@@ -3,38 +3,44 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, {
+    DropDownOpenDirection,
+    DropDownPreferredOpenDirections,
+    FlyoutType,
+} from "@library/flyouts/DropDown";
 import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import LinkAsButton from "@library/routing/LinkAsButton";
 import { CloseCompactIcon } from "@library/icons/common";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
-import { makeProfileUrl } from "@library/utility/appUtils";
+import { getMeta, makeProfileUrl } from "@library/utility/appUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
-import { string } from "prop-types";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
 export interface IUserCardInfo {
     email: string;
     userID: number;
     name: string;
+    title?: string;
     photoUrl: string;
     dateLastActive?: string;
     dateJoined?: string;
-    label?: string | null;
+    label?: string;
     countDiscussions: number;
     countComments: number;
 }
 
 interface IProps {
+    contentID?: string;
+    handleID?: string;
     user: IUserCardInfo;
     visible?: boolean;
     buttonContent?: ReactNode | string;
@@ -112,7 +118,7 @@ function Stat(props: IStatProps) {
             })}
         >
             <div className={classes.count}>
-                <NumberFormatted value={count || 0} />
+                <NumberFormatted fallbackTag={"div"} value={count || 0} />
             </div>
             <div className={classes.statLabel}>{text}</div>
         </div>
@@ -151,20 +157,38 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible, buttonContent, openAsModal } = props;
-    const [open, toggleOpen] = useState(!!visible);
+    const { user, visible = false, buttonContent, openAsModal, contentID, handleID } = props;
+    const [open, setOpen] = useState(visible);
     const device = useDevice();
+    const toggleRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    const contentRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
+    const conversations = getMeta("context.conversationsEnabled", false);
+
+    const label = user.title ?? user.label;
 
     const userInfo: IUserFragment = {
         userID: user.userID,
         name: user.name,
         photoUrl: user.photoUrl,
         dateLastActive: user.dateLastActive || null,
-        label: user.label || null,
+        label: label,
     };
+
+    useEffect(() => {
+        if (open) {
+            toggleRef.current?.focus();
+        }
+    }, []); // on initial load
+
+    const handleVisibilityChange = useCallback(
+        (isVisible) => {
+            setOpen(isVisible);
+        },
+        [open],
+    );
 
     return (
         <DropDown
@@ -175,24 +199,38 @@ export default function PopupUserCard(props: IProps) {
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
-            onVisibilityChange={isVisible => toggleOpen(isVisible)}
+            onVisibilityChange={handleVisibilityChange}
             openAsModal={openAsModal}
+            buttonRef={toggleRef}
+            contentRef={contentRef}
+            contentID={contentID}
+            handleID={handleID}
+            openDirection={DropDownOpenDirection.AUTO}
+            preferredDirection={DropDownPreferredOpenDirections.ABOVE_CENTER}
         >
-            <Header onClick={() => toggleOpen(!open)} />
+            <Header onClick={() => handleVisibilityChange(!open)} />
 
             <UserPhoto userInfo={userInfo} size={photoSize} className={classes.userPhoto} />
 
-            <Container>
-                <Name name={user.name} />
+            <div className={classes.metaContainer}>
+                <div className={classes.row}>
+                    <Name name={user.name} />
+                </div>
                 {/* We don't  want this section to show at all if there's no label */}
-                {user.label && <Label label={user.label} />}
+                {label && (
+                    <div className={classes.row}>
+                        <Label label={label} />
+                    </div>
+                )}
 
-                <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
-                    <a className={classes.email} href={`mailto:${user.email}`}>
-                        {user.email}
-                    </a>
+                <Permission permission={"personalInfo.view"} mode={PermissionMode.GLOBAL}>
+                    <div className={classes.row}>
+                        <a className={classes.email} href={`mailto:${user.email}`}>
+                            {user.email}
+                        </a>
+                    </div>
                 </Permission>
-            </Container>
+            </div>
 
             <div className={classNames(classes.container, classes.actionContainer)}>
                 <ButtonContainer>
@@ -205,15 +243,17 @@ export default function PopupUserCard(props: IProps) {
                     </LinkAsButton>
                 </ButtonContainer>
 
-                <ButtonContainer>
-                    <LinkAsButton
-                        to={`/messages/add/${user.name}`}
-                        baseClass={ButtonTypes.STANDARD}
-                        className={classes.button}
-                    >
-                        {t("Message")}
-                    </LinkAsButton>
-                </ButtonContainer>
+                {conversations && (
+                    <ButtonContainer>
+                        <LinkAsButton
+                            to={`/messages/add/${user.name}`}
+                            baseClass={ButtonTypes.STANDARD}
+                            className={classes.button}
+                        >
+                            {t("Message")}
+                        </LinkAsButton>
+                    </ButtonContainer>
+                )}
             </div>
 
             <Container borderTop={true}>

@@ -26,7 +26,7 @@ describe("reducerRegistry", () => {
         expect(state["reducer2"]).toEqual(2);
     });
 
-    it.only("Can apply initial state", () => {
+    it("Can apply initial state", () => {
         window.__ACTIONS__ = [
             {
                 type: "update",

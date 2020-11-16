@@ -29,6 +29,7 @@
   } @else {
     @include clearfix();
   }
+  width: calc(100% + #{$gutter});
   margin-left:  ($gutter / -2);
   margin-right: ($gutter / -2);
 }

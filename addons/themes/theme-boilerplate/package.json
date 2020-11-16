@@ -1,6 +1,6 @@
 {
     "name": "@vanillaforums/theme-boilerplate",
-    "version": "3.0.3",
+    "version": "3.1.6",
     "description": "A boilerplate for Vanillaforums themes",
     "bin": {
         "boilerplate-install": "./setup/boilerplateInstall.js"
@@ -19,14 +19,17 @@
     "license": "GPL-2.0-only",
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/vanilla/themes.git"
+        "url": "git+ssh://git@github.com/vanilla/vanilla-cloud.git"
     },
     "bugs": {
-        "url": "https://github.com/vanilla/themes/issues"
+        "url": "https://github.com/vanilla/vanilla-cloud/issues"
     },
-    "homepage": "https://github.com/vanilla/themes/blob/feature/boilerplate-theme/vanilla-theme-boilerplate/guide.md",
+    "homepage": "https://github.com/vanilla/vanilla-cloud/blob/master/addons/themes/theme-boilerplate/README.md",
     "devDependencies": {
-        "@vanilla/theme-core": "^3.0.1",
+        "@vanilla/theme-core": "^3.0.4",
         "fs-extra": "^7.0.0"
+    },
+    "dependencies": {
+        "@vanilla/theme-core": "^3.1.5"
     }
 }

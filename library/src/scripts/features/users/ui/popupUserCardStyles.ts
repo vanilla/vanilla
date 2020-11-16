@@ -15,6 +15,7 @@ import {
     EMPTY_FONTS,
     EMPTY_SPACING,
     fonts,
+    margins,
     paddings,
     pointerEvents,
     singleBorder,
@@ -24,6 +25,10 @@ import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableIte
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { TextTransformProperty } from "csstype";
 import { important, percent } from "csx";
+import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
+import { nestedWorkaround } from "@dashboard/compatibilityStyles";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -40,7 +45,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const button = makeVars("button", {
         minWidth: 120,
         mobile: {
-            minWidth: 140,
+            minWidth: 0,
         },
     });
 
@@ -129,6 +134,17 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         flexWrap: "wrap",
     });
 
+    const metaContainer = style("metaContainer", {
+        ...paddings({
+            all: vars.container.spacing,
+        }),
+    });
+
+    const row = style("row", {
+        display: "flex",
+        justifyContent: "center",
+    });
+
     const actionContainer = style("actionContainer", {
         $nest: {
             "&&": {
@@ -151,9 +167,23 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         borderTop: `1px solid ${vars.containerWithBorder.color}`,
     });
 
+    const avatar = style("avatar", {
+        ...buttonResetMixin(),
+    });
+
+    // Fetch button styles
+    const buttonStyles = generateButtonStyleProperties({
+        buttonTypeVars: buttonVariables().standard,
+    });
+    // Create new class with same styles
+    const buttonClass = style(buttonStyles);
+
+    nestedWorkaround(`.${buttonClass}`, buttonStyles.$nest);
+
     const button = style(
         "button",
         {
+            maxWidth: percent(100),
             $nest: {
                 "&&": {
                     minWidth: unit(vars.button.minWidth),
@@ -163,21 +193,35 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         mediaQueries.oneColumnDown({
             $nest: {
                 "&&": {
+                    width: percent(100),
                     minWidth: unit(vars.button.mobile.minWidth),
                 },
             },
         }),
     );
 
-    const buttonContainer = style("buttonContainer", {
-        ...paddings({
-            all: vars.container.spacing,
+    const buttonContainer = style(
+        "buttonContainer",
+        {
+            maxWidth: percent(100),
+            ...paddings({
+                all: vars.container.spacing,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&&": {
+                    flexGrow: 1,
+                    flexBasis: percent(50),
+                },
+            },
         }),
-    });
+    );
 
     const name = style(
         "name",
         {
+            margin: "auto",
             fontSize: vars.name.size,
             fontWeight: vars.name.weight,
             width: percent(100),
@@ -192,7 +236,10 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         ...fonts(vars.label.font),
         ...paddings(vars.label.padding),
         ...borders(vars.label.border),
-        marginTop: unit(vars.container.spacing),
+        ...margins({
+            top: vars.container.spacing,
+            horizontal: "auto",
+        }),
     });
 
     const stat = style("stat", {
@@ -252,14 +299,15 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const email = style("email", {
         $nest: {
-            "&&&": {
+            "&&&&": {
                 ...fonts({
                     color: globalVars.mainColors.fg,
                     size: globalVars.fonts.size.small,
                     align: "center",
                 }),
                 marginTop: unit(vars.container.spacing * 1.8),
-                width: percent(100),
+                display: "inline-flex",
+                margin: "auto",
             },
             ...linkColors.$nest,
         },
@@ -267,6 +315,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const date = style("date", {
         padding: vars.buttonContainer.padding,
+        fontSize: unit(12),
     });
 
     const formElementsVars = formElementsVariables();
@@ -309,6 +358,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         label,
         stat,
         count,
+        avatar,
         header,
         section,
         email,
@@ -320,5 +370,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         userPhoto,
         actionContainer,
         link,
+        metaContainer,
+        row,
     };
 });

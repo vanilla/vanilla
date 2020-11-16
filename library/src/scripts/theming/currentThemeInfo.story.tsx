@@ -10,7 +10,7 @@ import React from "react";
 import CurrentThemeInfo from "./CurrentThemeInfo";
 import ThemePreviewCard from "./ThemePreviewCard";
 
-const story = storiesOf("Theme", module);
+const story = storiesOf("Theme UI", module);
 
 const preview: IThemePreview = {
     variables: {

@@ -27,7 +27,7 @@ export default {
     decorators: [dashboardCssDecorator],
 };
 
-function SimpleInputItems() {
+export function SimpleInputItems() {
     const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
     const [image, setImage] = useState<string | null>(null);
     return (
@@ -38,34 +38,6 @@ function SimpleInputItems() {
             </DashboardFormGroup>
             <DashboardFormGroup label="Another (fake) Label">
                 <DashboardInput inputProps={{ placeholder: "Placeholder Here" }} />
-            </DashboardFormGroup>
-            <DashboardFormGroup label="Select input">
-                <DashboardSelect
-                    options={[
-                        {
-                            label: "Development",
-                            value: 4,
-                        },
-                        {
-                            label: "Information Security",
-                            value: 7,
-                        },
-                        {
-                            label: "Internal Testing",
-                            value: 6,
-                        },
-                        {
-                            label: "Success",
-                            value: 5,
-                        },
-                        {
-                            label: "Support",
-                            value: 8,
-                        },
-                    ]}
-                    value={dropdownValue!}
-                    onChange={setDropdownValue}
-                />
             </DashboardFormGroup>
             <DashboardImageUploadGroup
                 value={image}
@@ -92,6 +64,50 @@ function SimpleInputItems() {
                 labelType={DashboardLabelType.WIDE}
             >
                 <DashboardInput inputProps={{ placeholder: "Placeholder Here" }} />
+            </DashboardFormGroup>
+        </>
+    );
+}
+
+const options = [
+    {
+        label: "Development",
+        value: 4,
+    },
+    {
+        label: "Information Security",
+        value: 7,
+    },
+    {
+        label: "Internal Testing",
+        value: 6,
+    },
+    {
+        label: "Success",
+        value: 5,
+    },
+    {
+        label: "Support",
+        value: 8,
+    },
+];
+
+export function DropDowns() {
+    const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
+    const [dropdown2Value, setDropdown2Value] = useState<IComboBoxOption | null>(options[0]);
+    const [dropdown3Value, setDropdown3Value] = useState<IComboBoxOption | null>(options[1]);
+    const [image, setImage] = useState<string | null>(null);
+    return (
+        <>
+            <DashboardFormSubheading>Dropdowns</DashboardFormSubheading>
+            <DashboardFormGroup label="Select input">
+                <DashboardSelect options={options} value={dropdownValue!} onChange={setDropdownValue} />
+            </DashboardFormGroup>
+            <DashboardFormGroup label="Select input (with value)">
+                <DashboardSelect options={options} value={dropdown2Value!} onChange={setDropdown2Value} />
+            </DashboardFormGroup>
+            <DashboardFormGroup label="Select input (opened)">
+                <DashboardSelect forceOpen options={options} value={dropdown3Value!} onChange={setDropdown3Value} />
             </DashboardFormGroup>
         </>
     );
@@ -153,6 +169,18 @@ export function RadioGroups() {
                             <DashboardCheckBox label="Option 3" disabled />
                         </DashboardCheckGroup>
                     </DashboardFormGroup>
+                </DashboardFormList>
+            </form>
+        </StoryContent>
+    );
+}
+
+export function Toggles() {
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>Toggles</StoryHeading>
+            <form>
+                <DashboardFormList>
                     <DashboardFormSubheading>Toggles</DashboardFormSubheading>
                     <DashboardFormGroup
                         labelType={DashboardLabelType.WIDE}
@@ -200,7 +228,7 @@ export function BlurEnableForm() {
                     description={
                         <Translate
                             source="When enabled, this will use custom permissions instead of the global defaults. <0>Read More</0>"
-                            c0={text => <a href="#">{text}</a>}
+                            c0={(text) => <a href="#">{text}</a>}
                         />
                     }
                 >

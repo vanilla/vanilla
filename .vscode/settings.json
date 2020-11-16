@@ -18,11 +18,26 @@
         ".htaccess.dist": true
     },
     "search.exclude": {
-        "**/*.code-search": true,
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "cloud/plugins": true,
+        "cloud/applications": true,
+        "cloud/themes": true,
+        ".idea": true,
+        "cgi-bin": true,
+        "**/bower_components": true,
+        "vendor": true,
+        "**/.phpunit.result.cache": true,
+        ".htaccess.dist": true,
         "cache": true,
         "uploads": true,
         "yarn.lock": true,
-        "composer.lock": true
+        "composer.lock": true,
+        "**/node_modules": true,
+        "dist": true
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -88,5 +103,7 @@
     "eslint.alwaysShowStatus": true,
     "phpcs.autoConfigSearch": false,
     "phpcs.enable": false,
-    "jestrunner.jestCommand": "yarn test:unit"
+    "jestrunner.jestCommand": "yarn test:unit",
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "prettier.prettierPath": "./node_modules/prettier"
 }

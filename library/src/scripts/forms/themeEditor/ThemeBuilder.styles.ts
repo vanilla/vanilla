@@ -264,7 +264,6 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const subGroupSection = style("subGroupSection", {});
     const subGroupSectionTitle = style("subGroupSectionTitle", {
-        ...fonts(vars.sectionGroupTitle.fonts),
         ...margins({
             top: 20,
             bottom: 12,

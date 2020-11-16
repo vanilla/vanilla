@@ -11,12 +11,13 @@ import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
 import { resetThemeCache } from "@library/styles/styleUtils";
 import { reinit, forceRenderStyles } from "typestyle";
 import { setMeta } from "@library/utility/appUtils";
+import { RecordID } from "@vanilla/utils";
 
 const createAction = actionCreatorFactory("@@themes");
 
 type IGetThemeResponse = ITheme;
 export interface IPatchThemeRequest {
-    themeID: string | number;
+    themeID: RecordID;
     name?: string;
     parentTheme?: string;
     parentVersion?: string;
@@ -35,7 +36,7 @@ type IGetAllThemeResponse = ITheme[];
 type IPatchThemeResponse = ITheme;
 
 interface IPutCurrentThemeRequest {
-    themeID: number | string;
+    themeID: RecordID;
     revisionID?: number;
     type: PreviewStatusType;
 }
@@ -76,7 +77,7 @@ export default class ThemeActions extends ReduxActions {
 
     public static readonly getAllThemes_ACS = createAction.async<{}, IGetAllThemeResponse, IApiError>("GET_ALL_THEMES");
 
-    public static readonly putCurrentThemeACs = createAction.async<{ themeID: number | string }, ITheme, IApiError>(
+    public static readonly putCurrentThemeACs = createAction.async<{ themeID: RecordID }, ITheme, IApiError>(
         "PUT_CURRENT",
     );
 
@@ -84,11 +85,9 @@ export default class ThemeActions extends ReduxActions {
         "PUT_PREVIEW",
     );
 
-    public static readonly deleteThemeACs = createAction.async<{ themeID: number | string }, undefined, IApiError>(
-        "DELETE",
-    );
+    public static readonly deleteThemeACs = createAction.async<{ themeID: RecordID }, undefined, IApiError>("DELETE");
 
-    public static getThemeRevisions_ACs = createAction.async<{ themeID: number | string }, IThemeRevision[], IApiError>(
+    public static getThemeRevisions_ACs = createAction.async<{ themeID: RecordID }, IThemeRevision[], IApiError>(
         "GET_THEME",
     );
 
@@ -104,7 +103,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public putCurrentTheme = (themeID: number | string) => {
+    public putCurrentTheme = (themeID: RecordID) => {
         const body = { themeID };
         const thunk = bindThunkAction(ThemeActions.putCurrentThemeACs, async () => {
             const response = await this.api.put(`/themes/current`, body);
@@ -125,7 +124,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public deleteTheme = (themeID: number | string) => {
+    public deleteTheme = (themeID: RecordID) => {
         const apiThunk = bindThunkAction(ThemeActions.deleteThemeACs, async () => {
             const response = await this.api.delete(`/themes/${themeID}`);
             return response.data;
@@ -133,7 +132,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public getThemeRevisions(themeID: number | string) {
+    public getThemeRevisions(themeID: RecordID) {
         const thunk = bindThunkAction(ThemeActions.getThemeRevisions_ACs, async () => {
             const response = await this.api.get(`/themes/${themeID}/revisions`);
             return response.data;

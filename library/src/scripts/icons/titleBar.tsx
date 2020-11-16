@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { AriaAttributes } from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
@@ -140,7 +140,7 @@ export function SettingsIcon(props: { className?: string }) {
     );
 }
 
-export function SearchIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+export function SearchIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; "aria-labelledby"?: string }) {
     const title = t("Search");
     const classes = iconClasses();
     return (
@@ -149,6 +149,8 @@ export function SearchIcon(props: { className?: string; "aria-hidden"?: areaHidd
             viewBox="0 0 13.312 13.311"
             className={classNames(classes.search, props.className)}
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            aria-label={title}
+            aria-labelledby={props["aria-labelledby"] || ""}
         >
             <title>{title}</title>
             <path

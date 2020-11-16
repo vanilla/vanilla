@@ -78,7 +78,7 @@ export function QuoteEmbed(props: IProps) {
             <EmbedContent type="Quote">
                 <article className={classes.body}>
                     <div
-                        onClick={e => {
+                        onClick={(e) => {
                             e.preventDefault();
                         }}
                     >

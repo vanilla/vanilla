@@ -23,6 +23,13 @@ Gdn::structure()
     ->column('CountAcceptedAnswers', 'int', '0')
     ->set();
 
+if ($this->questionFollowupFeatureEnabled()) {
+    Gdn::structure()
+        ->table('Category')
+        ->column('QnaFollowUpNotification', 'tinyint(1)', ['Null' => false, 'Default' => 0])
+        ->set();
+}
+
 Gdn::sql()->replace(
     'ActivityType',
     ['AllowComments' => '0', 'RouteCode' => 'question', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''],

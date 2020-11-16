@@ -11,7 +11,7 @@ import ThreeColumnLayout from "./ThreeColumnLayout";
 import PanelWidget from "./components/PanelWidget";
 
 export default {
-    title: "PanelLayout",
+    title: "Layout/PanelLayout",
     parameters: {
         chromatic: {
             viewports: Object.values(layoutVariables().panelLayoutBreakPoints),

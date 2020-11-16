@@ -8,7 +8,8 @@ import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import Parchment from "parchment";
 import Container from "quill/blots/container";
-import Quill from "quill/core";
+import Quill, { Blot } from "quill/core";
+import ExternalEmbedBlot from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -190,8 +191,15 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * @override
      */
     public split(index: number, force?: boolean) {
-        if (!force && (index === this.length() - 1 || index === 0)) {
-            return this;
+        if (!force) {
+            if (index === 0) {
+                return this;
+            }
+
+            const ownLength = this.length();
+            if (index === ownLength - 1) {
+                return this.next;
+            }
         }
         const ownItem = this.getListContent();
         const ownGroup = this.getListGroup();
@@ -219,27 +227,27 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public insertAt(index, value: string, def) {
         const isInListContent = this.getListContent() && index < this.getListContent()!.length();
 
-        // validate new line insertion position
-        if (value.includes("\n") && isInListContent) {
-            const after = this.split(index, true);
-            const targetNext = after === this ? this.next : after;
+        // handling insertion of images into lists
+        if (def && value === ExternalEmbedBlot.blotName) {
+            const embed = Parchment.create(value, def);
+            const group = this.getWrapper();
+            const secondGroup = group?.split(index);
+            secondGroup?.parent.insertBefore(embed, secondGroup);
+            return;
+        } else if (value.includes("\n") && isInListContent) {
             const isEndOfLine = index === this.length() - 1;
 
             // Break the insert up on it's newlines.
-            const inserts = value === "\n" ? [""] : value.split("\n");
+            const startsWithNewline = value.startsWith("\n");
+            const inserts = value.split("\n").filter((val) => !!val);
 
-            // condition to filter for the position of the cursor in the string.
-            // eg end of line
-            // offset
-
-            // If we split the blot, we need to remove the first newline.
-            if (this.next && targetNext === this.next && inserts[0] === "") {
-                inserts.shift();
-            }
-
-            // If the first part of the insert is not a newline, insert it into the content and pop it off.
-            if (inserts[0] && inserts[0] !== "") {
-                this.getListContent()!.insertAt(index, inserts.shift()!);
+            // If the first part of the insert is a newline, insert it into the content and pop it off.
+            const targetNext = this.split(index, startsWithNewline) as ListItemWrapper;
+            if (!startsWithNewline) {
+                const firstInsert = inserts.shift();
+                if (firstInsert) {
+                    this.getListContent()!.insertAt(index, firstInsert);
+                }
             }
 
             // Each of the rest of the inserts will get inserted on their own list
@@ -253,7 +261,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
 
             // includes conditions for the new line inserts blot
             // if the last element of the <ul> and the last charectrer in the string
-            listItems.forEach(item => {
+            listItems.forEach((item) => {
                 const clone = this.clone() as ListItemWrapper; // Clone the <li/> tag.
                 clone.appendChild(item); // Insert the <p> tag in inside of the <li/>
                 this.parent.insertBefore(clone, targetNext); // Insert the <li> inside of the <ul> or <ol>
@@ -314,7 +322,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         if (!this.getListContent()) {
             const listContent = (Parchment.create(ListItem.blotName, this.getValue()) as any) as ListItem;
 
-            this.children.forEach(child => {
+            this.children.forEach((child) => {
                 if (!(child instanceof ListGroup)) {
                     child.insertInto(listContent);
                 }
@@ -436,11 +444,13 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         const sibling = this.next;
         if (content && content.getValue().depth > 0) {
             content.updateIndentValue(0);
-            this.insertInto(targetGroup, ref);
+            if (targetGroup !== this.parent) {
+                this.insertInto(targetGroup, ref);
+            }
         }
         const group = this.getListGroup();
         if (group) {
-            group.children.forEach(child => {
+            group.children.forEach((child) => {
                 if (child instanceof ListItemWrapper) {
                     child.flattenSelfAndSiblings(targetGroup, ref);
                 }
@@ -734,7 +744,7 @@ export class ListItem extends LineBlot {
                 ? (Parchment.create(formatName, value) as Container)
                 : (formatName as Container);
         // Clone the children.
-        this.children.forEach(blot => {
+        this.children.forEach((blot) => {
             newBlock.appendChild(blot.clone());
         });
         let parentWrapper = this.parent as ListItemWrapper;

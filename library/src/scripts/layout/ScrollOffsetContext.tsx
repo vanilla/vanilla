@@ -192,7 +192,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     /**
      * Set the value items will be translated by.
      */
-    private setScrollOffset: ScollOffsetSetter = offset => {
+    private setScrollOffset: ScollOffsetSetter = (offset) => {
         window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = offset;
         this.setState({ scrollOffset: offset });
     };
@@ -200,7 +200,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     /**
      * Set the value items will be translated by.
      */
-    private setTopOffset: ScollOffsetSetter = offset => {
+    private setTopOffset: ScollOffsetSetter = (offset) => {
         this.setState({ topOffset: offset });
     };
 

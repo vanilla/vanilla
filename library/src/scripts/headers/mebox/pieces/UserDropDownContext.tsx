@@ -35,7 +35,7 @@ function UserDropDownContents(props: IProps) {
     }
 
     const getCountByName = (countName: string): number => {
-        const found = props.counts.find(count => count.name === countName);
+        const found = props.counts.find((count) => count.name === countName);
         return found ? found.count : 0;
     };
 

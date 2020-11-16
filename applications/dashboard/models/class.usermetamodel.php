@@ -13,6 +13,9 @@
  */
 class UserMetaModel extends Gdn_Model {
 
+    const SOFT_LIMIT = 100;
+    const HARD_LIMIT = 500;
+
     /** @var array Store in-memory copies of everything retrieved from and set to the DB. */
     protected static $MemoryCache;
 
@@ -61,7 +64,14 @@ class UserMetaModel extends Gdn_Model {
             $userMeta = Gdn::cache()->get($cacheKey);
 
             if ($userMeta === Gdn_Cache::CACHEOP_FAILURE) {
-                $userMeta = $this->getWhere(['UserID' => $userID], 'Name')->resultArray();
+                $userMeta = $this
+                    ->getWhere(['UserID' => $userID], 'Name', 'asc', self::HARD_LIMIT)
+                    ->resultArray()
+                ;
+                $countMetas = count($userMeta);
+                if (count($userMeta) > self::SOFT_LIMIT) {
+                    trigger_error("User meta for user $userID is at over over the limit with $countMetas meta rows");
+                }
                 $userMeta = array_column($userMeta, 'Value', 'Name');
                 Gdn::cache()->store($cacheKey, $userMeta);
             }

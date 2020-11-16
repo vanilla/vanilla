@@ -8,14 +8,12 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
-use PHPUnit\Framework\AssertionFailedError;
 use UserModel;
 use UsersApiController;
 use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
-use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -38,11 +36,6 @@ class UsersTest extends AbstractResourceTest {
     private $configuration;
 
     /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
@@ -61,13 +54,10 @@ class UsersTest extends AbstractResourceTest {
      * Disable email before running tests.
      */
     public function setUp(): void {
-        $this->backupSession();
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');
         $this->configuration->set('Garden.Email.Disabled', true);
-
-        $this->userModel = static::container()->get(UserModel::class);
 
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
@@ -79,7 +69,6 @@ class UsersTest extends AbstractResourceTest {
      */
     public function tearDown(): void {
         parent::tearDown();
-        $this->restoreSession();
     }
 
     /**

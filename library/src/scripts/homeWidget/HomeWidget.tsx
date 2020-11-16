@@ -16,7 +16,6 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 
 interface IProps {
     // Options
@@ -42,7 +41,11 @@ export function HomeWidget(props: IProps) {
 
     let extraSpacerItemCount = 0;
     if (
-        itemOptions.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE &&
+        [
+            HomeWidgetItemContentType.TITLE_BACKGROUND,
+            HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+            HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+        ].includes(itemOptions.contentType) &&
         props.itemData.length < containerOptions.maxColumnCount
     ) {
         extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;

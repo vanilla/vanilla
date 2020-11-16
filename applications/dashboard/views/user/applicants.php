@@ -60,7 +60,7 @@ if ($NumApplicants == 0) : ?>
                         <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve'), 'title' => t('Approve')]);
-                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->transientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Decline'), 'title' => t('Decline')]);
+                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->transientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Deny Applicant'), 'title' => t('Deny Applicant')]);
                         ?>
                         </div>
                     </td>

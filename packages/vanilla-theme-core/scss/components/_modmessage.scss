@@ -23,12 +23,16 @@
 
     ul {
         list-style: initial;
-        padding-inline-start: 40px;
+        padding: calc(#{$utility-baseUnitTriple} * 2);
     }
 
     ol {
         list-style: decimal;
-        padding-inline-start: 40px;
+        padding: calc(#{$utility-baseUnitTriple} * 2);
+    }
+
+    img {
+        max-width: 100%;
     }
 }
 

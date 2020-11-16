@@ -27,6 +27,8 @@ void getOptions().then(async options => {
             path.join(DIST_DIRECTORY, "admin/shared.min.js"),
         ];
 
-        await spawnChildProcess("npx", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" });
+        await spawnChildProcess("npx", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" }).catch(e => {
+            process.exit(1);
+        });
     }
 });

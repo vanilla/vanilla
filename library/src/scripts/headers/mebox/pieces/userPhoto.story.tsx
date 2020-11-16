@@ -15,7 +15,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import { UserIconTypes } from "@library/icons/titleBar";
 
 export default {
-    title: "User Photos (Avatars)",
+    title: "Components/Avatars",
 };
 
 const userDummyData = {

@@ -26,7 +26,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 import Formatter from "@rich-editor/quill/Formatter";
-import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import LinkBlot from "quill/formats/link";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 export default class KeyboardBindings {
@@ -43,6 +43,7 @@ export default class KeyboardBindings {
     constructor(private quill: Quill) {
         // Keyboard behaviours
         this.resetDefaultBindings();
+        this.addFormatEscapeHandlers();
         this.addBlockNewLineHandlers();
         this.addBlockArrowKeyHandlers();
         this.addBlockBackspaceHandlers();
@@ -294,6 +295,77 @@ export default class KeyboardBindings {
     }
 
     /**
+     * Add keyboard bindings for removing the current formatting when switching lines.
+     *
+     * Expected scenarios are explained here:
+     * @see https://github.com/vanilla/vanilla-cloud/pull/1293
+     */
+    private addFormatEscapeHandlers() {
+        // Exit a link form if you type space.
+        // https://github.com/vanilla/support/issues/1440
+        this.bindings["Link Space"] = {
+            key: 32, // Space
+            collapsed: true,
+            format: ["link"],
+            handler: (range: RangeStatic) => {
+                const [linkBlot, linkOffset] = this.quill.scroll.descendant(
+                    (blot: Blot) => blot instanceof LinkBlot,
+                    range.index - 1, // Account for the inserted space.
+                );
+
+                if (linkBlot && linkOffset === linkBlot.length() - 1) {
+                    // If our cursor is at the end of the link.
+                    this.quill.format("link", false);
+                }
+                return true;
+            },
+        };
+
+        // Prevent you from being stuck in an infinitely continuing inline code.
+        // Eg.
+        this.bindings["Inline Code End of Line Right"] = {
+            key: KeyboardModule.keys.RIGHT,
+            collapsed: true,
+            format: [CodeBlot.blotName],
+            handler: (range: RangeStatic) => {
+                const [line, lineOffset] = this.quill.getLine(range.index);
+                if (lineOffset === line.length() - 1) {
+                    this.quill.format(CodeBlot.blotName, false);
+                    this.quill.insertText(range.index, " ", Quill.sources.USER);
+                    this.quill.setSelection(range.index + 1, 0);
+                    return false; // Prevent default action.
+                }
+                return true;
+            },
+        };
+
+        // Prevent an inline code from extending from one line to another.
+        this.bindings["Inline Format End of Line Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: Formatter.INLINE_FORMAT_NAMES,
+            handler: (range: RangeStatic) => {
+                const [blot, blotOffset] = this.quill.scroll.descendant(
+                    (blot: Blot) => Formatter.INLINE_FORMAT_NAMES.includes(blot.statics.blotName),
+                    range.index - 1, // Account for the inserted newline.
+                );
+
+                if (blot && blotOffset === blot.length() - 1) {
+                    // We're at the end of line. Don't allow inline formats to pass onto the next line.
+
+                    setImmediate(() => {
+                        // Set Immediate needed to run after quill's built-in enter handler.
+                        Formatter.INLINE_FORMAT_NAMES.forEach((formatName) => {
+                            this.quill.format(formatName, false, Quill.sources.API);
+                        });
+                    });
+                }
+                return true;
+            },
+        };
+    }
+
+    /**
      * Add keyboard options.bindings that allow the user to
      */
     private addBlockNewLineHandlers() {
@@ -320,7 +392,7 @@ export default class KeyboardBindings {
                 const listItems = formatter.getListItems();
 
                 let handled = false;
-                listItems.forEach(item => {
+                listItems.forEach((item) => {
                     if (item.domNode.textContent === "") {
                         item.outdent();
                         handled = true;

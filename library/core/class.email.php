@@ -195,6 +195,19 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     /**
+     * Get the site's default sender (smtp envelope) address.
+     *
+     * @return string
+     */
+    public function getDefaultSenderAddress(): string {
+        $result = c('Garden.Email.EnvelopeAddress', '');
+        if (!$result) {
+            $result = $this->getDefaultFromAddress();
+        }
+        return $result;
+    }
+
+    /**
      * Get an address suitable for no-reply-style emails.
      *
      * @return string
@@ -209,26 +222,27 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
      * Allows the explicit definition of the email's sender address & name.
      * Defaults to the applications Configuration 'SupportEmail' & 'SupportName' settings respectively.
      *
-     * @param string $senderEmail
-     * @param string $senderName
+     * @param string $fromEmail
+     * @param string $fromName
      * @param boolean $bOverrideSender optional. default false.
      * @return Gdn_Email
      */
-    public function from($senderEmail = '', $senderName = '', $bOverrideSender = false) {
-        if ($senderEmail == '') {
-            $senderEmail = $this->getDefaultFromAddress();
+    public function from($fromEmail = '', $fromName = '', $bOverrideSender = false) {
+        if ($fromEmail == '') {
+            $fromEmail = $this->getDefaultFromAddress();
         }
 
-        if ($senderName == '') {
-            $senderName = c('Garden.Email.SupportName', c('Garden.Title', ''));
+        if ($fromName == '') {
+            $fromName = c('Garden.Email.SupportName', c('Garden.Title', ''));
         }
 
         if ($this->PhpMailer->Sender == '' || $bOverrideSender) {
-            $this->PhpMailer->Sender = $senderEmail;
+            $envelopeEmail = $bOverrideSender ? $fromEmail : $this->getDefaultSenderAddress();
+            $this->PhpMailer->Sender = $envelopeEmail;
         }
 
         ob_start();
-        $this->PhpMailer->setFrom($senderEmail, $senderName, false);
+        $this->PhpMailer->setFrom($fromEmail, $fromName, false);
         ob_end_clean();
         return $this;
     }
@@ -399,10 +413,11 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
         }
 
         if ($this->isDebug() && $this->logger instanceof Psr\Log\LoggerInterface) {
-            $payload = $this->PhpMailer->getSentMIMEMessage();
             $this->logger->info(
                 'Email Payload',
-                ['event' => 'Debug email',
+                [
+                    Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_SYSTEM,
+                    'event' => 'email_sent',
                     'timestamp' => time(),
                     'userid' => Gdn::session()->UserID,
                     'username' => Gdn::session()->User->Name ?? 'anonymous',
@@ -416,8 +431,10 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
                     'fromName' => $this->PhpMailer->FromName,
                     'sender' => $this->PhpMailer->Sender,
                     'subject' => $this->PhpMailer->Subject,
-                    'body' => $this->PhpMailer->Body,
-                    'payload' => $payload
+                    // Address data comes in an array of [address, name] items and we only need the address.
+                    'to' => array_column($this->PhpMailer->getToAddresses(), 0),
+                    'cc' => array_column($this->PhpMailer->getCcAddresses(), 0),
+                    'bcc' => array_column($this->PhpMailer->getBccAddresses(), 0),
                 ]
             );
         }

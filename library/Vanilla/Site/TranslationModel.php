@@ -15,7 +15,7 @@ use Vanilla\Contracts\Site\TranslationProviderInterface;
  */
 class TranslationModel {
     /** @var TranslationProviderInterface[] $providers */
-    private $providers;
+    private $providers = [];
 
     /**
      * Register translation provider

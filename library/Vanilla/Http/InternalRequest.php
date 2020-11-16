@@ -285,7 +285,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $path = parse_url($this->getUrl(), PHP_URL_PATH);
         $root = $this->getRoot();
 
-        if (strpos($path, $root) === 0) {
+        if (!empty($root) && strpos($path, $root) === 0) {
             $testPath = substr($path, strlen($root));
             if (empty($testPath)) {
                 $path = '/';

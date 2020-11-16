@@ -94,7 +94,9 @@ class NotificationsController extends Gdn_Controller {
             }
 
             $excerpt = '';
-            $story = $activity['Story'] ?? null;
+            $skipStory = $activity['Data']['skipStory'] ?? false;
+            $activityStory = $activity['Story'] ?? null;
+            $story = (!$skipStory) ? $activityStory : null;
             $format = $activity['Format'] ?? HtmlFormat::FORMAT_KEY;
             $excerpt = htmlspecialchars($story ? Gdn::formatService()->renderExcerpt($story, $format) : $excerpt);
             $activityClass = ' Activity-'.$activity['ActivityType'];

@@ -376,4 +376,163 @@ class ArrayUtilsTest extends TestCase {
         ];
         return $r;
     }
+
+    /**
+     * Smoke test `explodeMixed()`.
+     *
+     * @param mixed $in
+     * @param array $expected
+     * @dataProvider provideExplodeMixedTests
+     */
+    public function testExplodeMixed($in, $expected = ['a', 'b', 'c']): void {
+        $this->assertSame($expected, ArrayUtils::explodeMixed(',', $in));
+    }
+
+    /**
+     * @return array
+     */
+    public function provideExplodeMixedTests(): array {
+        $r = [
+            'array' => [['a', 'b', 'c']],
+            'csv' => ['a,b, c'],
+            'int' => [1, [1]],
+            'empty' => ['', []],
+        ];
+        return $r;
+    }
+
+    /**
+     * Test `ArrayUtils::filterCallback()`.
+     *
+     * @param array $filter
+     * @param bool $strict
+     * @param int $expectedCount
+     * @dataProvider provideFilterCallbackTests
+     */
+    public function testFilterCallback(array $filter, bool $strict, int $expectedCount): void {
+        $arr = [
+            ['id' => 1, 'a' => 'a'],
+            ['id' => 2, 'a' => 'a'],
+            ['id' => 3, 'a' => 'b'],
+        ];
+
+        $result = array_filter($arr, ArrayUtils::filterCallback($filter, $strict));
+        $this->assertCount($expectedCount, $result);
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array[]
+     */
+    public function provideFilterCallbackTests(): array {
+        $r = [
+            'id' => [['id' => '1'], false, 1],
+            'id strict' => [['id' => '1'], true, 0],
+            'id strict match' => [['id' => 1], true, 1],
+            'multi rows' => [['a' => 'a'], true, 2],
+            'multi filter' => [['a' => 'a', 'id' => 2], true, 1],
+            'no key' => [['foo' => 'a'], true, 0],
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Smoke test `ArrayUtils::camelCase()`.
+     *
+     * @param array $camel
+     * @param array $pascal
+     * @dataProvider provideCamelPascal
+     */
+    public function testCamelCase(array $camel, array $pascal): void {
+        $this->assertSame(
+            $camel,
+            ArrayUtils::camelCase($pascal)
+        );
+
+        $this->assertSame(
+            $camel,
+            ArrayUtils::camelCase($camel)
+        );
+    }
+
+    /**
+     * Smoke test `ArrayUtils::pascalCase()`.
+     *
+     * @param array $camel
+     * @param array $pascal
+     * @dataProvider provideCamelPascal
+     */
+    public function testPascalCase(array $camel, array $pascal): void {
+        $this->assertSame(
+            $pascal,
+            ArrayUtils::pascalCase($camel)
+        );
+        $this->assertSame(
+            $pascal,
+            ArrayUtils::pascalCase($pascal)
+        );
+    }
+
+    /**
+     * Data provider for pascal/camel case tests.
+     *
+     * @return \array[][]
+     */
+    public function provideCamelPascal(): array {
+        return [
+            'basic' => [
+                ['sID' => 'b', 'foo' => ['bar' => 'a']],
+                ['SID' => 'b', 'Foo' => ['Bar' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * Tests for array columning by array.
+     */
+    public function testArrayColumnArrays() {
+        $foo = [
+            'key' => 'fooKey',
+            'val' => 'fooVal'
+        ];
+        $foo2 = [
+            'key' => 'fooKey',
+            'val' => 'foo2Val'
+        ];
+        $missingKey = [
+            'val' => 'missingKeyVal',
+        ];
+
+        // By val.
+        $this->assertEquals(
+            ['fooVal' => [$foo], 'foo2Val' => [$foo2], 'missingKeyVal' => [$missingKey]],
+            ArrayUtils::arrayColumnArrays(
+                [$foo, $foo2, $missingKey],
+                null,
+                'val'
+            )
+        );
+
+        // By key.
+        $this->assertEquals(
+            ['fooKey' => [$foo, $foo2], '' => [$missingKey]],
+            ArrayUtils::arrayColumnArrays(
+                [$foo, $foo2, $missingKey],
+                null,
+                'key'
+            )
+        );
+
+        // By key extract
+        $this->assertEquals(
+            ['fooKey' => ['fooVal', 'foo2Val'], '' => ['missingKeyVal']],
+            ArrayUtils::arrayColumnArrays(
+                [$foo, $foo2, $missingKey],
+                'val',
+                'key'
+            )
+        );
+    }
 }

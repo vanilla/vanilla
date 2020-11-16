@@ -9,11 +9,14 @@
 >
     <projectFiles>
         <directory name="library" />
+        <directory name="applications/conversations" />
+        <directory name="tests" />
         <ignoreFiles>
             <directory name="library/deprecated" />
             <directory name="library/setup" />
             <directory name="library/src" />
             <directory name="vendor" />
+            <directory name="*/*/views" />
             <file name="library/core/class.memcached.php"/>
         </ignoreFiles>
     </projectFiles>

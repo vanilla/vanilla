@@ -144,7 +144,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         aria-label={""}
                         role={""}
                         onSectionRendered={this.handleOnSectionRendered}
-                        ref={gridEl => {
+                        ref={(gridEl) => {
                             this.gridEl = gridEl as Grid;
                         }}
                     />
@@ -190,7 +190,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     /**
      * Handler when new rows are rendered. We use this to figure out what category is current
      */
-    private handleOnSectionRendered = event => {
+    private handleOnSectionRendered = (event) => {
         const newRowIndex = event.rowStartIndex;
         let selectedGroupIndex = 0;
 

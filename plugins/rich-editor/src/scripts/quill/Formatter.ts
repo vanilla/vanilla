@@ -88,7 +88,7 @@ export default class Formatter {
      * Apply the paragraph line format to all lines in the range.
      */
     public paragraph = () => {
-        Formatter.BLOCK_FORMAT_NAMES.forEach(name => {
+        Formatter.BLOCK_FORMAT_NAMES.forEach((name) => {
             this.quill.formatLine(this.range.index, this.range.length, name, false, Quill.sources.API);
         });
         this.quill.update(Quill.sources.USER);
@@ -139,7 +139,7 @@ export default class Formatter {
             index: start,
             length,
         };
-        Formatter.INLINE_FORMAT_NAMES.forEach(name => {
+        Formatter.INLINE_FORMAT_NAMES.forEach((name) => {
             this.quill.formatText(start, length, name, false, Quill.sources.SILENT);
         });
         const difference = this.replaceInlineEmbeds(fullRange);
@@ -206,7 +206,7 @@ export default class Formatter {
         const listBlots = this.getListItems();
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
-        listBlots.forEach(blot => {
+        listBlots.forEach((blot) => {
             blot.indent();
             this.quill.update(Quill.sources.USER);
         });
@@ -218,7 +218,7 @@ export default class Formatter {
         const listBlots = this.getListItems();
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
-        listBlots.forEach(blot => {
+        listBlots.forEach((blot) => {
             blot.outdent();
             this.quill.update(Quill.sources.USER);
         });
@@ -245,7 +245,7 @@ export default class Formatter {
     private replaceInlineEmbeds(range: RangeStatic): number {
         const embeds = this.quill.scroll.descendants(Embed as any, range.index, range.length);
         let lengthDifference = 0;
-        embeds.forEach(embed => {
+        embeds.forEach((embed) => {
             let text = (embed.domNode as HTMLElement).innerText || "";
             // Strip 0-width whitespace.
             text = text.replace(/[\u200B-\u200D\uFEFF]/g, "");

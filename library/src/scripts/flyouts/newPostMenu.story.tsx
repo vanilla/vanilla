@@ -7,7 +7,7 @@ import { logDebug } from "@vanilla/utils";
 
 export default {
     component: NewPostMenu,
-    title: "NewPostMenu",
+    title: "Components/Post Menu",
 };
 
 const items: IAddPost[] = [

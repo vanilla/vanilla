@@ -11,7 +11,7 @@ $this->fireAs('dashboard')->fireEvent('render');
     <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $this->CssClass; ?>">
+<body id="<?php echo htmlspecialchars($this->BodyIdentifier ?? ''); ?>" class="<?php echo $this->CssClass; ?>">
 <?php $this->renderAsset('Symbols');
 
 // TODO: Pull this asset out elsewhere
@@ -114,7 +114,7 @@ Gdn_Theme::assetEnd();
                 </div>
             </div>
         </div>
-        <div class="main">
+        <div class="dashboard-main">
             <section role="main" class="content">
                 <?php $this->renderAsset('Content'); ?>
             </section>

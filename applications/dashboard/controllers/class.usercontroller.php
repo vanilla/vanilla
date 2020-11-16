@@ -31,7 +31,7 @@ class UserController extends DashboardController {
      * Configure the controller.
      *
      * @param ConfigurationInterface $config
-     * @param Gdn_UserModel $userModel
+     * @param UserModel $userModel
      */
     public function __construct(ConfigurationInterface $config = null, UserModel $userModel = null) {
         $this->config = $config instanceof ConfigurationInterface ? $config : Gdn::getContainer()->get(ConfigurationInterface::class);
@@ -57,10 +57,8 @@ class UserController extends DashboardController {
     /**
      * User management list.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $keywords Term or array of terms to filter list of users.
-     * @param int $page Page number.
+     * @param string|string[] $keywords Term or array of terms to filter list of users.
+     * @param string $page Page number.
      * @param string $order Sort order for list.
      */
     public function index($keywords = '', $page = '', $order = '') {
@@ -238,6 +236,9 @@ class UserController extends DashboardController {
             $this->Form->addError($ex);
             $this->Form->clearInputs();
         }
+
+        $this->addDefinition('ApprovedTranslation', t('Approved'));
+        $this->addDefinition('DeniedTranslation', t('Denied'));
 
         $this->setData('UserRoles', $userRoleData);
         $this->render('edit', 'user');
@@ -463,10 +464,8 @@ class UserController extends DashboardController {
     /**
      * Page thru user list.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $keywords Term or list of terms to limit search.
-     * @param int $page Page number.
+     * @param string|string[] $keywords Term or list of terms to limit search.
+     * @param string $page Page number.
      * @param string $order Sort order.
      */
     public function browse($keywords = '', $page = '', $order = '') {

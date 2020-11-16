@@ -22,9 +22,10 @@ trait SetupTraitsTrait {
     /**
      * Call the test trait methods with a given prefix.
      *
+     * @param string|object $obj
      * @param string $prefix
      */
-    private function callTestTraits(string $prefix): void {
+    private static function callTestTraits($obj, string $prefix): void {
         $calls = [];
         for ($class = new \ReflectionClass(static::class); $class->getParentClass(); $class = $class->getParentClass()) {
             $uses = $class->getTraits();
@@ -32,28 +33,42 @@ trait SetupTraitsTrait {
                 /** @var \ReflectionClass $trait */
                 $method = $prefix.$trait->getShortName();
                 foreach ([$method, StringUtils::substringRightTrim($method, 'Trait', true)] as $methodName) {
-                    if (method_exists($this, $methodName)) {
+                    if (method_exists($obj, $methodName)) {
                         array_unshift($calls, $methodName);
                     }
                 }
             }
         }
         foreach ($calls as $call) {
-            call_user_func([$this, $call]);
+            call_user_func([$obj, $call]);
         }
     }
 
     /**
      * Call all set up trait methods.
      */
-    public function setupTestTraits() {
-        $this->callTestTraits('setUp');
+    public static function setUpBeforeClassTestTraits(): void {
+        self::callTestTraits(static::class, 'setUpBeforeClass');
+    }
+
+    /**
+     * Call all set up trait methods.
+     */
+    public function setUpTestTraits(): void {
+        self::callTestTraits($this, 'setUp');
     }
 
     /**
      * Call all tear down trait methods.
      */
-    public function tearDownTestTraits() {
-        $this->callTestTraits('tearDown');
+    public function tearDownTestTraits(): void {
+        self::callTestTraits($this, 'tearDown');
+    }
+
+    /**
+     * Call all tear down trait methods.
+     */
+    public static function tearDownAfterClassTestTraits(): void {
+        self::callTestTraits(static::class, 'tearDownAfterClass');
     }
 }

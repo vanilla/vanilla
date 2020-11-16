@@ -92,7 +92,7 @@ export default class MarkdownModule {
     private canFormatRange(range: RangeStatic): boolean {
         const formats = this.quill.getFormat(range);
         let hasExistingInlineFormat = false;
-        Formatter.INLINE_FORMAT_NAMES.forEach(name => {
+        Formatter.INLINE_FORMAT_NAMES.forEach((name) => {
             if (formats[name]) {
                 hasExistingInlineFormat = true;
             }

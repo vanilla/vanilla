@@ -154,10 +154,9 @@ class LogController extends DashboardController {
     /**
      * View list of edits (edit/delete actions).
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param int $page Page number.
+     * @param string $type
+     * @param string $page Page number.
+     * @param string|false $op
      */
     public function edits($type = '', $page = '', $op = false) {
         $this->permission('Garden.Moderation.Manage');
@@ -312,11 +311,7 @@ class LogController extends DashboardController {
     /**
      * View moderation logs.
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param mixed $CategoryUrl Slug.
-     * @param int $page Page number.
+     * @param string $page Page number.
      */
     public function moderation($page = '') {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
@@ -400,9 +395,14 @@ class LogController extends DashboardController {
 
         // Grab the logs.
         $logs = array_merge($logs, $this->LogModel->getIDs($logIDs));
+        $logs = array_column($logs, null, "LogID");
 
 //      try {
         foreach ($logs as $log) {
+            if ($this->checkUserRecord($log) && $log['RecordType'] === 'Registration') {
+                $this->LogModel->delete(['LogID' => $log['LogID']]);
+                continue;
+            }
             $this->LogModel->restore($log);
         }
 //      } catch (Exception $Ex) {
@@ -419,12 +419,29 @@ class LogController extends DashboardController {
     }
 
     /**
+     * Check if a user log record already exists in user table.
+     *
+     * @param array $log
+     * @return bool If a user record already exists.
+     */
+    private function checkUserRecord(array $log): bool {
+        $isUserDuplicate = $userEmailExists = false;
+        $emailUnique = Gdn::userModel()->isEmailUnique();
+        if (isset($log['Data']['Email'])) {
+            $userLogEmail = $log['Data']['Email'];
+            $userEmailExists = Gdn::userModel()->getByEmail($userLogEmail, false, ['dataType' => DATASET_TYPE_ARRAY]);
+        }
+
+        if ($userEmailExists && $emailUnique) {
+            $isUserDuplicate = true;
+        }
+        return $isUserDuplicate;
+    }
+
+    /**
      * View spam logs.
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param int $page Page number.
+     * @param string $page Page number.
      */
     public function spam($page = '') {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false);

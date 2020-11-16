@@ -46,9 +46,7 @@ class RoutesController extends DashboardController {
     /**
      * Edit a route.
      *
-     * @since 2.0.0
-     * @access public
-     * @param string $routeIndex Name of route.
+     * @param string|false $routeIndex Name of route.
      */
     public function edit($routeIndex = false) {
         $this->permission('Garden.Settings.Manage');
@@ -112,10 +110,8 @@ class RoutesController extends DashboardController {
     /**
      * Remove a route.
      *
-     * @since 2.0.0
-     * @access public
      * @param mixed $routeIndex Name of route.
-     * @param string $transientKey Security token.
+     * @param string|false $transientKey Security token.
      */
     public function delete($routeIndex = false, $transientKey = false) {
         $this->permission('Garden.Settings.Manage');

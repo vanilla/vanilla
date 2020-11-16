@@ -4,6 +4,10 @@
  * @license GPL-2.0-only
  */
 
+// You can think of this file as patches/improvements for "style.scss". The reason it isn't in there is because some themes
+// namely the Bootstrap theme, have their own "style.scss" file and won't load it. Put any styles you wish across all themes
+// here.
+
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
 @import "../../../library/src/scss/coreVariables";

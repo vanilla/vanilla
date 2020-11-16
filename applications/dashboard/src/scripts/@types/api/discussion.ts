@@ -4,6 +4,7 @@
  */
 
 import { IUserFragment } from "@library/@types/api/users";
+import { ICrumb } from "@vanilla/library/src/scripts/navigation/Breadcrumbs";
 
 export interface IDiscussion {
     discussionID: number;
@@ -26,6 +27,7 @@ export interface IDiscussion {
     countViews: number;
     countComments: number;
     attributes: any;
+    breadcrumbs?: ICrumb[];
 }
 
 export interface IDiscussionEdit {

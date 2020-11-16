@@ -9,12 +9,12 @@ $form = $this->Form;
 echo $form->open(['class' => 'User', 'autocomplete' => 'nothanks']);
 echo $form->errors();
 ?>
-<ul>
-    <li class="form-group">
+<ul role="presentation">
+    <li class="form-group" role="presentation">
         <?php echo $form->labelWrap('Username', 'Name'); ?>
         <?php echo $form->textBoxWrap('Name'); ?>
     </li>
-    <li class="form-group">
+    <li class="form-group" role="presentation">
         <div class="label-wrap">
             <?php echo $form->label('Email', 'Email');
             if (UserModel::noEmail()) {
@@ -34,18 +34,18 @@ echo $form->errors();
     </li>
 
     <?php if ($this->data('_CanConfirmEmail')): ?>
-        <li class="User-ConfirmEmail form-group">
+        <li class="User-ConfirmEmail form-group" role="presentation">
             <div class="input-wrap no-label">
                 <?php echo $form->checkBox('ConfirmEmail', t("Email is confirmed"), ['value' => '1']); ?>
             </div>
         </li>
     <?php endif ?>
-    <li class="form-group">
+    <li class="form-group" role="presentation">
         <div class="input-wrap no-label">
             <?php echo $form->checkBox('ShowEmail', t('Email visible to other users'), ['value' => '1']); ?>
         </div>
     </li>
-    <li class="form-group">
+    <li class="form-group" role="presentation">
         <div class="input-wrap no-label">
             <?php echo $form->checkBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), ['value' => '1']); ?>
         </div>
@@ -53,7 +53,7 @@ echo $form->errors();
     <?php
     // No need to ban a new user.
     if ($editing) : ?>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="input-wrap no-label">
                 <?php echo $form->checkBox('Banned', t('Banned'), ['value' => $this->data('BanFlag')]); ?>
                 <?php if ($this->data('BannedOtherReasons')): ?>
@@ -66,20 +66,20 @@ echo $form->errors();
         </li>
     <?php endif; ?>
     <?php if (c('Garden.Profile.Locations', false)) : ?>
-        <li class="form-group User-Location">
+        <li class="form-group User-Location" role="presentation">
             <?php echo $form->labelWrap('Location', 'Location'); ?>
             <?php echo $form->textBoxWrap('Location'); ?>
         </li>
     <?php endif; ?>
     <?php if (c('Garden.Profile.Titles', false)) : ?>
-        <li class="form-group User-Title">
+        <li class="form-group User-Title" role="presentation">
             <?php echo $form->labelWrap('Title', 'Title'); ?>
             <?php echo $form->textBoxWrap('Title'); ?>
         </li>
     <?php endif; ?>
     <?php $this->fireEvent('CustomUserFields') ?>
     <?php if (count($this->data('Roles'))) : ?>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo wrap(t('Check all roles that apply to this user:'), 'span', ['class' => 'label']); ?>
             </div>
@@ -90,7 +90,7 @@ echo $form->errors();
     <?php endif;
     // Edit a user's password.
     if ($editing) : ?>
-        <li class="PasswordOptions form-group">
+        <li class="PasswordOptions form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo wrap(t('Password Options'), 'span', ['class' => 'label']); ?>
             </div>
@@ -99,7 +99,7 @@ echo $form->errors();
             </div>
         </li>
         <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
-            <li id="NewPassword">
+            <li id="NewPassword" role="presentation">
                 <div class="form-group">
                     <?php echo $form->labelWrap('New Password', 'NewPassword'); ?>
                     <?php echo $form->inputWrap('NewPassword', 'password'); ?>

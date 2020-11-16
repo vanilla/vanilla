@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Fixtures;
 
+use Gdn;
+use Gdn_Controller;
 use NewDiscussionModule;
 
 /**
@@ -18,6 +20,16 @@ class MockNewDiscussionModule extends NewDiscussionModule {
      * Override parent constructor to avoid call to Vanilla Configuration.
      */
     public function __construct() {
+        parent::__construct();
         $this->DefaultButton = false;
+    }
+
+    /**
+     * Set the sending controller.
+     *
+     * @param Gdn_Controller|null $sender
+     */
+    public function setSender($sender) {
+        $this->_Sender = $sender;
     }
 }

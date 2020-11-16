@@ -5,8 +5,9 @@
         <?php
         $Data = $this->ActivityData;
         foreach ($Data->result() as $Activity) {
+            $activityHeadlineText = Gdn::formatService()->renderPlainText($Activity['Headline'], Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
             $PhotoAnchor = anchor(
-                img($Activity['Photo'], ['class' => 'ProfilePhotoSmall']),
+                img($Activity['Photo'], ['class' => 'ProfilePhotoSmall', 'alt' => $activityHeadlineText]),
                 $Activity['PhotoUrl'], 'Photo');
 
             echo '<li class="Activity '.$Activity['ActivityType'].'">';
@@ -16,7 +17,7 @@
 
         if ($Data->numRows() >= $this->Limit) {
             ?>
-            <li class="ShowAll"><?php echo anchor(t('More…'), '/activity'); ?></li>
+            <li class="ShowAll"><?php echo anchor(t('More…'), '/activity', '', ['aria-label' => strtolower(sprintf(t('%s activities'), t('View All')))]); ?></li>
         <?php
         }
         ?>

@@ -12,6 +12,7 @@
  */
 
 use Garden\EventManager;
+use Garden\StaticCacheConfigTrait;
 use \Vanilla\Formatting;
 use \Vanilla\Formatting\Formats;
 use \Vanilla\Formatting\FormatUtil;
@@ -24,6 +25,12 @@ use Vanilla\Formatting\DateTimeFormatter;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
+
+    use StaticCacheConfigTrait;
+    const INVALID_FIRST_MENTION_CHARS = [
+        "{",
+        "}",
+    ];
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -850,10 +857,10 @@ class Gdn_Format {
         $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
         if (unicodeRegexSupport()) {
             $regex =
-                "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\{\}\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+                "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
             $regex =
-                "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\{\}\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+                "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = FormatUtil::replaceButProtectCodeBlocks(
@@ -963,12 +970,23 @@ class Gdn_Format {
     protected static function formatMentionsCallback($str) {
         $parts = preg_split('`\B@`', $str);
 
+        $partCount = count($parts);
         // We have no mentions here.
-        if (count($parts) == 1) {
+        if ($partCount == 1) {
+            return $str;
+        }
+
+        if ($partCount > self::c('Garden.Format.MaxMentions', 50)) {
+            // This post has more mentions than we can efficiently format in the current system.
             return $str;
         }
 
         foreach ($parts as $i => $str) {
+            $firstChar = substr($str, 0, 1);
+            if (in_array($firstChar, self::INVALID_FIRST_MENTION_CHARS)) {
+                $parts[$i] = "@$str";
+                continue;
+            }
             // Text before the mention.
             if ($i == 0) {
                 if (!empty($str)) {

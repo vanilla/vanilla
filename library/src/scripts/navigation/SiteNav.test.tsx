@@ -30,11 +30,7 @@ describe("<SiteNav />", () => {
         const siteNav = renderSiteNav(activeRecord);
         expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const siteNavNode = siteNav
-            .find(".isCurrent")
-            .first()
-            .parents(SiteNavNode)
-            .first();
+        const siteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(siteNavNode.props()).to.have.property("recordID", activeRecord.recordID);
         expect(siteNavNode.props()).to.have.property("recordType", activeRecord.recordType);
     });
@@ -62,22 +58,14 @@ describe("<SiteNav />", () => {
         const siteNav = renderSiteNav(firstActiveRecord);
         expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const firstSiteNavNode = siteNav
-            .find(".isCurrent")
-            .first()
-            .parents(SiteNavNode)
-            .first();
+        const firstSiteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(firstSiteNavNode.props()).to.have.property("recordID", firstActiveRecord.recordID);
         expect(firstSiteNavNode.props()).to.have.property("recordType", firstActiveRecord.recordType);
 
         siteNav.setProps({ activeRecord: secondActiveRecord });
         expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const secondSiteNavNode = siteNav
-            .find(".isCurrent")
-            .first()
-            .parents(SiteNavNode)
-            .first();
+        const secondSiteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(secondSiteNavNode.props()).to.have.property("recordID", secondActiveRecord.recordID);
         expect(secondSiteNavNode.props()).to.have.property("recordType", secondActiveRecord.recordType);
     });

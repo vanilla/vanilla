@@ -5,6 +5,8 @@
  * @license GPL-2.0-only
  */
 
+use Garden\EventManager;
+
 /**
  * Manages categories as a whole.
  *
@@ -134,6 +136,9 @@ class CategoryCollection {
         $this->categorySlugs = [];
         $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
         $this->cacheInc = null;
+        /** @var EventManager $eventManager */
+        $eventManager = \Gdn::getContainer()->get(EventManager::class);
+        $eventManager->fire('flushCategoryCache');
     }
 
     /**
@@ -221,8 +226,7 @@ class CategoryCollection {
             );
 
             $this->calculateDynamic($category);
-            $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+            $this->setLocal($category);
 
             return $category;
         } else {
@@ -236,6 +240,26 @@ class CategoryCollection {
 
             return null;
         }
+    }
+
+    /**
+     * Set a category in the local cache.
+     *
+     * @param array $category
+     */
+    public function setLocal(array $category): void {
+        $this->categories[(int)$category['CategoryID']] = $category;
+        $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+    }
+
+    /**
+     * Check whether or not the local cache has a category.
+     *
+     * @param int $id The ID of the category.
+     * @return bool
+     */
+    public function hasLocal($id): bool {
+        return isset($this->categories[$id]);
     }
 
     /**
@@ -686,7 +710,7 @@ class CategoryCollection {
                 $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
-
+            $this->calculateDynamic($category);
             $this->categories[(int)$category['CategoryID']] = $category;
             $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
             return true;
@@ -713,6 +737,14 @@ class CategoryCollection {
     public function setUserCalculator($userCalculator) {
         $this->userCalculator = $userCalculator;
         return $this;
+    }
+
+    /**
+     * Reset the local cache.
+     */
+    public function reset(): void {
+        $this->categorySlugs = [];
+        $this->categories = [];
     }
 
     /**

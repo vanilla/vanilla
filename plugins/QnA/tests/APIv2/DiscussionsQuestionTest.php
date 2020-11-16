@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Gdn;
+
 require_once(__DIR__.'/QnaTestHelperTrait.php');
 
 /**
@@ -40,6 +42,8 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
             'urlcode' => 'questiontest',
         ]);
 
+        self::setupQnAFollowUpFeature();
+
         $session->end();
     }
 
@@ -58,6 +62,17 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         $this->assertIsQuestion($body, ['status' => 'unanswered']);
 
         return $body;
+    }
+
+    /**
+     * Run a basic test of a question's HTML.
+     */
+    public function testGetQuestionHtml() {
+        $row = $this->testPostQuestion();
+        $discussionID = $row['discussionID'];
+
+        $dom = $this->bessy()->getHtml("/discussion/{$discussionID}/xxx", [], ['deliveryType' => DELIVERY_TYPE_ALL]);
+        $dom->assertCssSelectorExists('.dropdown-menu-link[href*="/discussion/qnaoptions"]');
     }
 
     /**
@@ -146,5 +161,88 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         $commentIDs = array_column($acceptedAnswers, "commentID");
         $this->assertContains($answers[0]["commentID"], $commentIDs);
         $this->assertContains($answers[1]["commentID"], $commentIDs);
+    }
+
+    /**
+     * Verifies if the number of answered questions is the same as notifications sent
+     * In real life this endpoint is supposed to be called by a cron. But the test only calls the endpoint once
+     * and it always blows the email time out threshold because tests are slow.
+     * So for now we are testing with only one discussion.
+     */
+    public function testQuestionNotifications() {
+        //make a few questions
+        $questionsCount = 1;
+        for ($i = 1; $i <= $questionsCount; $i++) {
+            $discussion = $this->api()->post('discussions/question', [
+                'categoryID' => self::$category['categoryID'],
+                'name' => 'Test question '.$i,
+                'body' => 'Content of question '.$i,
+                'format' => 'markdown',
+            ])->getBody();
+
+            // create an answer
+            $this->api()->post("comments", [
+                "body" => "Here's some answer ".$i,
+                "discussionID" => $discussion["discussionID"],
+                "format" => "Markdown",
+            ]);
+        }
+
+        $followUp = $this->api()->post('discussions/question-notifications')->getBody();
+        $this->assertEquals($questionsCount, $followUp['notificationsSent'], "Asserts if notificationsSent equals discussions created.");
+
+        // make a second call to make sure we are not spamming the user, this time it should not send notifications.
+        $followUpNoNotifications = $this->api()->post('discussions/question-notifications')->getBody();
+        $this->assertEquals(0, $followUpNoNotifications['notificationsSent']);
+    }
+
+    /**
+     * Verifies if notifications is sent when posting a discussionID
+     */
+    public function testQuestionNotificationsWithDiscussionID() {
+        //make a question
+        $discussion = $this->api()->post('discussions/question', [
+            'categoryID' => self::$category['categoryID'],
+            'name' => 'Test question',
+            'body' => 'Content of question',
+            'format' => 'markdown',
+        ])->getBody();
+
+        // create an answer
+        $this->api()->post("comments", [
+            "body" => "Here's some answer",
+            "discussionID" => $discussion["discussionID"],
+            "format" => "Markdown",
+        ]);
+
+        $followUp = $this->api()->post('discussions/question-notifications', ['discussionID' => $discussion["discussionID"]])->getBody();
+        $this->assertEquals(1, $followUp['notificationsSent'], "Asserts notificationsSent equals 1.");
+
+        // make a second call to make sure we are not spamming the user, this time it should not send notifications.
+        $followUpNoNotifications = $this->api()->post(
+            'discussions/question-notifications',
+            ['discussionID' => $discussion["discussionID"]]
+        )->getBody();
+        $this->assertEquals(0, $followUpNoNotifications['notificationsSent']);
+    }
+
+    /**
+     * Perform the setup done by QnAPlugin->structure() once the feature flag is enabled
+     */
+    private static function setupQnAFollowUpFeature() {
+        // enable feature flag
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get(\Gdn_Configuration::class);
+        $config->set('Feature.'.\QnAPlugin::FOLLOWUP_FLAG.'.Enabled', true, true, false);
+
+        // add user preference
+        $config->touch(['Preferences.Email.QuestionFollowUp' => 1]);
+
+        // add category DB column
+        // by default this is set to 0 and enabled per category, but just for testing purpose I'm setting the default to 1
+        Gdn::structure()
+            ->table('Category')
+            ->column('QnaFollowUpNotification', 'tinyint(1)', ['Null' => false, 'Default' => 1])
+            ->set();
     }
 }

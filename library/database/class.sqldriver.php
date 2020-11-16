@@ -950,7 +950,8 @@ abstract class Gdn_SQLDriver {
             $this->limit($limit, $offset);
         }
 
-        $result = $this->query($this->getSelect());
+        $sql = $this->getSelect();
+        $result = $this->query($sql);
 
         return $result;
     }
@@ -1540,7 +1541,7 @@ abstract class Gdn_SQLDriver {
     /**
      * A convenience method that calls `Gdn_SqlDriver::Like()` concatenated with an 'or.'
      *
-     * @param string $field
+     * @param string|array $field
      * @param string $match
      * @param string $side
      * @param string $op
@@ -1758,6 +1759,21 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Generate the UPDATE statement for this object.
+     *
+     * @return string
+     * @throws Exception Throws an exception when the SET OR FROM data is empty.
+     */
+    public function getUpdateSql(): string {
+        if (count($this->_Sets) == 0 || !isset($this->_Froms[0])) {
+            throw new Exception("Cannot generate UPDATE statement with missing clauses.", 400);
+        }
+
+        $sql = $this->getUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
+        return $sql;
+    }
+
+    /**
      * Perform a query on the database connection.
      *
      * @param string $sql
@@ -1851,7 +1867,12 @@ abstract class Gdn_SQLDriver {
      * @return string
      */
     public function quote($value, $type = PDO::PARAM_STR): string {
-        return $this->Database->connection()->quote($value, $type);
+        if ($value instanceof \DateTimeInterface) {
+             $value = gmdate(MYSQL_DATE_FORMAT, $value->getTimestamp());
+        }
+        $r = $this->Database->connection()->quote($value, $type);
+
+        return $r;
     }
 
     /**
@@ -1914,7 +1935,6 @@ abstract class Gdn_SQLDriver {
 
         return $this;
     }
-
 
     /**
      * Parse select information for SqlDriver::select().
@@ -1994,7 +2014,7 @@ abstract class Gdn_SQLDriver {
      * @param string $field The field being examined in the case statement.
      * @param array $options The options and results in an associative array. A
      * blank key will be the final "else" option of the case statement. eg.
-     * array('null' => 1, '' => 0) results in "when null then 1 else 0".
+     * ['null' => 1, '' => 0] results in "when null then 1 else 0".
      * @param string $alias The alias to give a column name.
      * @return $this
      */
@@ -2044,12 +2064,17 @@ abstract class Gdn_SQLDriver {
         foreach ($field as $f => $v) {
             if ($v instanceof DateTimeImmutable) {
                 $v = $v->format(MYSQL_DATE_FORMAT);
-            } elseif (is_array($v) || is_object($v)) {
+            } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiterals\SetLiteral)) {
                 throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
             }
 
             $escapedName = $this->escapeFieldReference($f, true);
-            if (in_array(substr($f, -1), ['+', '-'], true)) {
+            if (is_object($v) && $v instanceof \Vanilla\Database\SetLiterals\SetLiteral) {
+                $expr = $v->toSql($this, $escapedName);
+                if (!empty($expr)) {
+                    $this->_Sets[$escapedName] = $expr;
+                }
+            } elseif (in_array(substr($f, -1), ['+', '-'], true)) {
                 // This is an increment/decrement.
                 $op = substr($f, -1);
                 $f = substr($f, 0, -1);
@@ -2217,6 +2242,8 @@ abstract class Gdn_SQLDriver {
                 if (count($subValue) == 1) {
                     $firstVal = reset($subValue);
                     $this->where($subField, $firstVal);
+                } elseif (str_ends_with($subField, '<>')) {
+                    $this->whereNotIn(trim(\Vanilla\Utility\StringUtils::substringRightTrim($subField, '<>')), $subValue);
                 } else {
                     $this->whereIn($subField, $subValue);
                 }

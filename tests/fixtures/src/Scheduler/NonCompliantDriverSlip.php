@@ -54,9 +54,26 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * Set stack execution error message.
      *
      * @param string $msg
-     * @return bool
+     * @return DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $msg): bool {
-        return false;
+    public function setStackExecutionFailed(string $msg): DriverSlipInterface {
+        return $this;
+    }
+
+    /**
+     * Set Status
+     *
+     * @param JobExecutionStatus $status
+     * @return DriverSlipInterface
+     */
+    public function setStatus(JobExecutionStatus $status): DriverSlipInterface {
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getErrorMessage(): ?string {
+        return null;
     }
 }

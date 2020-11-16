@@ -7,10 +7,15 @@
  * @package Tagging
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Widgets\AbstractWidgetModule;
+
 /**
  * Class TagModule
  */
-class TagModule extends Gdn_Module {
+class TagModule extends AbstractWidgetModule {
+
+    const TAGS_MODULE = "Popular Tags";
 
     protected $_TagData;
 
@@ -29,6 +34,7 @@ class TagModule extends Gdn_Module {
         $this->ParentID = null;
         $this->ParentType = 'Global';
         $this->CategorySearch = c('Vanilla.Tagging.CategorySearch', false);
+        $this->moduleName = self::TAGS_MODULE;
     }
 
     /**
@@ -255,5 +261,19 @@ endforeach; ?>
         <?php
         $string = ob_get_clean();
         return $string;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetName(): string {
+        return 'Tag Cloud';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetSchema(): Schema {
+        return Schema::parse([]);
     }
 }

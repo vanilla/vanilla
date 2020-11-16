@@ -11,6 +11,7 @@
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -19,7 +20,11 @@ use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
+use Vanilla\Site\OwnSite;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
+use Webmozart\Assert\Assert;
 
 /**
  * Manages discussion comments data.
@@ -54,7 +59,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     public $pageCache;
 
     /**
-     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     * @var CacheInterface Object used to store the FloodControl data.
      */
     protected $floodGate;
 
@@ -69,6 +74,15 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /** @var UserModel */
     private $userModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var OwnSite */
+    private $ownSite;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -82,10 +96,14 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         $this->discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        $this->categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+        $this->siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+        $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
 
         $this->fireEvent('AfterConstruct');
     }
@@ -367,7 +385,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->fireEvent('BeforeGet');
         $this->SQL
             ->select('d.Name', '', 'DiscussionName')
-            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
             ->where('c.InsertUserID', $userID)
             ->orderBy('c.CommentID', 'desc')
             ->limit($limit, $offset);
@@ -401,10 +418,18 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @param int|bool $lastCommentID A hint for quicker paging.
      * @param string|null $after Only pull comments following this date.
      * @param string $order Order comments ascending (asc) or descending (desc) by ID.
+     * @param string $permission Permission to filter categories by.
      * @return Gdn_DataSet SQL results.
      */
-    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc') {
-        $perms = DiscussionModel::categoryPermissions();
+    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc', string $permission = '') {
+        // This will load all categories. (do not use unless necessary).
+        if (!empty($permission)) {
+            $categories = CategoryModel::categories();
+            $perms = CategoryModel::filterExistingCategoryPermissions($categories, $permission);
+            $perms = array_column($perms, 'CategoryID');
+        } else {
+            $perms = DiscussionModel::categoryPermissions();
+        }
 
         if (is_array($perms) && empty($perms)) {
             return new Gdn_DataSet([]);
@@ -511,11 +536,16 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
         }
 
-        $this->orderBy('c.'.$sort);
+        $query = $this->SQL;
+        if ($sort === 'dateUpdated') {
+            $this->orderBy('sortDateUpdated');
+            $query->select('c.dateUpdated, c.dateInserted', 'COALESCE', 'sortDateUpdated');
+        } else {
+            $this->orderBy('c.'.$sort);
+        }
         $orderBy = $this->orderBy();
 
-        $query = $this->SQL
-            ->select('c.*')
+        $query->select('c.*')
             ->select(['d.CategoryID', 'd.Name as DiscussionName'])
             ->from('Comment c')
             ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
@@ -693,15 +723,20 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $advancedActivity = $data;
         $advancedActivity["Data"]["Reason"] = "advanced";
         $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-
+        $isValid = true;
         // Throw an event for users to add their own events.
         $this->EventArguments["Comment"] = $comment;
         $this->EventArguments["Discussion"] = $discussion;
         $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
+        $this->EventArguments["UserModel"] = $this->userModel;
+        $this->EventArguments["IsValid"] = &$isValid;
         $this->EventArguments["MentionedUsers"] = $mentions;
         $this->EventArguments["ActivityModel"] = $activityModel;
         $this->fireEvent("BeforeNotification");
 
+        if (!$isValid) {
+            return ;
+        }
         if (\Vanilla\FeatureFlagHelper::featureEnabled("deferredNotifications")) {
             // Queue sending notifications.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
@@ -879,14 +914,21 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $result = Schema::parse([
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
-            'name:s?' => 'The name of the comment',
+            'discussionCollapseID:s?',
+            'name:s?' => [
+                'description' => 'The name of the comment',
+                'x-localize' => true,
+            ],
             'categoryID:i?' => 'The ID of the category of the comment',
-            'body:s' => 'The body of the comment.',
+            'body:s' => [
+                'description' => 'The body of the comment.',
+                'x-localize' => true,
+            ],
+            'bodyRaw:s?',
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
             'updateUserID:i|n',
-            'name:s?', // Should be represented relative to the discussion (e.g. "Re: My Discussion")
             'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'url:s?' => 'The full URL to the comment.',
@@ -922,10 +964,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Count total comments in a discussion specified by $where conditions.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param array $where Conditions
+     * @param array|false $where Conditions
      * @return object SQL result.
      */
     public function getCountWhere($where = false) {
@@ -943,22 +982,19 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Get single comment by ID. Allows you to pick data format of return value.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $commentID Unique ID of the comment.
-     * @param string $resultType Format to return comment in.
+     * @param int $id Unique ID of the comment.
+     * @param string $datasetType Format to return comment in.
      * @param array $options options to pass to the database.
      * @return mixed SQL result in format specified by $resultType.
      */
-    public function getID($commentID, $resultType = DATASET_TYPE_OBJECT, $options = []) {
+    public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $this->options($options);
 
         $this->commentQuery(false); // FALSE supresses FireEvent
         $comment = $this->SQL
-            ->where('c.CommentID', $commentID)
+            ->where('c.CommentID', $id)
             ->get()
-            ->firstRow($resultType);
+            ->firstRow($datasetType);
 
         if ($comment) {
             $this->calculate($comment);
@@ -969,11 +1005,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Get single comment by ID as SQL result data.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $commentID Unique ID of the comment.
-     * @return object SQL result.
+     * @param array $options
+     * @return Gdn_DataSet SQL result.
      */
     public function getIDData($commentID, $options = []) {
         $this->fireEvent('BeforeGetIDData');
@@ -1125,7 +1159,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $formPostValues Data from the form model.
-     * @param array $settings Currently unused.
+     * @param array|false $settings Currently unused.
      * @return int $commentID
      * @since 2.0.0
      */
@@ -1297,15 +1331,27 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * Given a database row, massage the data into a more externally-useful format.
      *
      * @param array $row
+     * @param array|string|bool $expand Expand fields.
+     *
      * @return array
      */
-    public function normalizeRow(array $row): array {
+    public function normalizeRow(array $row, $expand = []): array {
+        $rawBody = $row['Body'];
+        $format = $row['Format'];
         $this->formatField($row, "Body", $row["Format"]);
         $row['Name'] = sprintf(t('Re: %s'), $row['DiscussionName'] ?? t('Untitled'));
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes']);
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
+        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $result['recordCollapseID'] = "site{$this->ownSite->getSiteID()}_discussion{$result['discussionID']}";
+            $result['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
+            $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
+            $siteSection = $this->siteSectionModel->getSiteSectionForAttribute('allCategories', $row['CategoryID'], 'comment');
+            $result['locale'] = $siteSection->getContentLocale();
+        }
         return $result;
     }
     /**
@@ -1607,24 +1653,24 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * This is a hard delete that completely removes it from the database.
      * Events: DeleteComment, BeforeDeleteComment.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $commentID Unique ID of the comment to be deleted.
+     * @param int $id Unique ID of the comment to be deleted.
      * @param array $options Additional options for the delete.
-     * @param bool Always returns TRUE.
+     * @return bool Always returns true.
      */
-    public function deleteID($commentID, $options = []) {
-        $this->EventArguments['CommentID'] = $commentID;
+    public function deleteID($id, $options = []) {
+        Assert::integerish($id);
+        Assert::isArray($options);
 
-        $comment = $this->getID($commentID, DATASET_TYPE_ARRAY);
+        $this->EventArguments['CommentID'] = $id;
+
+        $comment = $this->getID($id, DATASET_TYPE_ARRAY);
         if (!$comment) {
             return false;
         }
         $discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Decrement the UserDiscussion comment count if the user has seen this comment
-        $offset = $this->getOffset($commentID);
+        $offset = $this->getOffset($id);
         $this->SQL->update('UserDiscussion')
             ->set('CountComments', 'CountComments - 1', false)
             ->where('DiscussionID', $comment['DiscussionID'])
@@ -1641,7 +1687,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         LogModel::insert($log, 'Comment', $comment, val('LogOptions', $options, []));
 
         // Delete the comment.
-        $this->SQL->delete('Comment', ['CommentID' => $commentID]);
+        $this->SQL->delete('Comment', ['CommentID' => $id]);
 
         // Update the comment count
         $this->updateCommentCount($discussion, ['Slave' => false]);
@@ -1652,7 +1698,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // Update the category.
         $categoryID = val('CategoryID', $discussion);
         $category = CategoryModel::categories($categoryID);
-        if ($category && $category['LastCommentID'] == $commentID) {
+        if ($category && $category['LastCommentID'] == $id) {
             $categoryModel = new CategoryModel();
             $categoryModel->setRecentPost($category['CategoryID']);
         }
@@ -1774,9 +1820,45 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     public function getCrawlInfo(): array {
         $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            '/api/v2/comments?sort=-commentID',
+            '/api/v2/comments?sort=-commentID&expand=crawl',
             'commentID'
         );
         return $r;
+    }
+
+    /**
+     * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $comment
+     * @param bool $withDomain
+     * @return string
+     */
+    public static function commentUrl($comment, $withDomain = true) {
+        if (function_exists('commentUrl')) {
+            // Legacy overrides.
+            return commentUrl($comment, $withDomain);
+        } else {
+            return self::createRawCommentUrl($comment, $withDomain);
+        }
+    }
+
+    /**
+     * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $comment
+     * @param bool $withDomain
+     * @return string
+     *
+     * @internal Don't use unless you are the global commentUrl function.
+     */
+    public static function createRawCommentUrl($comment, $withDomain = true) {
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('customCommentUrl')) {
+            return $eventManager->fireFilter('customCommentUrl', '', $comment, $withDomain);
+        }
+
+        $comment = (object)$comment;
+        $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
+        return url($result, $withDomain);
     }
 }

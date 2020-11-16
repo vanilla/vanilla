@@ -100,7 +100,7 @@ class Gdn_Theme {
         foreach ($data as $row) {
             $dataCount++;
 
-            if ($homeLinkFound && Gdn::request()->urlCompare($row['Url'], $defaultRoute) === 0) {
+            if ($homeLinkFound && Gdn::request()->urlCompare($row['Url'] ?? '', $defaultRoute) === 0) {
                 continue; // don't show default route twice.
             } else {
                 $homeLinkFound = true;
@@ -113,7 +113,7 @@ class Gdn_Theme {
                 $displayStructuredData = true;
             }
 
-            $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
+            $row['Url'] = !empty($row['Url']) ? url($row['Url']) : '#';
             $cssClass = 'CrumbLabel '.val('CssClass', $row);
             if ($dataCount == count($data)) {
                 $cssClass .= ' Last';
@@ -468,7 +468,12 @@ class Gdn_Theme {
                     return "<!-- Error: Could not render module without a Gdn_Controller instance. -->";
                 }
 
-                $module = new $name(Gdn::controller(), '');
+                if (is_a($name, \Vanilla\Web\JsInterpop\AbstractReactModule::class)) {
+                    $module = \Gdn::getContainer()->get($name);
+                } else {
+                    $module = \Gdn::getContainer()->getArgs($name, [Gdn::controller(), '']);
+                }
+
                 $module->Visible = true;
 
                 // Add properties passed in from the controller.
@@ -531,6 +536,13 @@ class Gdn_Theme {
         }
 
         return 'unknown';
+    }
+
+    /**
+     * Reset the current section.
+     */
+    public static function resetSection() {
+        self::$_Section = [];
     }
 
     /**

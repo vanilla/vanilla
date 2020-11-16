@@ -13,6 +13,7 @@ interface IProps {
     value: number;
     className?: string;
     title?: string;
+    fallbackTag?: string;
 }
 /**
  * Strip trailing 0s from a string.
@@ -38,12 +39,12 @@ export function formatNumberText(props: { value: number }) {
     const initialValue = numeral(value);
     const compactValue = stripTrailingZeros(initialValue.format("0a.0"));
     const fullValue = initialValue.format();
-    const isModified = fullValue.toString() !== initialValue.value().toString();
+    const isAbbreviated = fullValue.toString() !== initialValue.value().toString();
 
     return {
         compactValue,
         fullValue,
-        isModified,
+        isAbbreviated,
     };
 }
 
@@ -52,8 +53,8 @@ export function formatNumberText(props: { value: number }) {
  */
 export function decomposedNumberFormatted(props: IProps) {
     const formattedNumber = formatNumberText({ value: props.value });
-    const { fullValue, isModified } = formattedNumber;
-    const Tag = (isModified ? `abbr` : `span`) as "span";
+    const { fullValue, isAbbreviated } = formattedNumber;
+    const Tag = (isAbbreviated ? `abbr` : props.fallbackTag ?? `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);
     const title = props.title || fullValue;
 

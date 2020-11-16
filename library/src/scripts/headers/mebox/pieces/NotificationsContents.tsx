@@ -13,14 +13,13 @@ import { buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Loader from "@library/loaders/Loader";
-import { loaderClasses } from "@library/loaders/loaderStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { accessibleLabel, t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -153,7 +152,7 @@ function mapStateToProps(state: INotificationsStoreState) {
         ...notificationsByID,
         data:
             notificationsByID.status === LoadStatus.SUCCESS && notificationsByID.data
-                ? Object.values(notificationsByID.data).map(notification => {
+                ? Object.values(notificationsByID.data).map((notification) => {
                       return {
                           message: notification.body,
                           photo: notification.photoUrl || null,

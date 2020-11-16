@@ -14,8 +14,8 @@ use Vanilla\Contracts;
  * `yarn build:dev`.It points to the development bundle on the webpack dev server.
  */
 class HotBuildAsset implements Contracts\Web\AssetInterface {
-    /** @var string */
-    private $ip;
+
+    const DOMAIN = "https://webpack.vanilla.localhost:3030";
 
     /** @var string */
     private $section;
@@ -25,13 +25,8 @@ class HotBuildAsset implements Contracts\Web\AssetInterface {
      *
      * @param string $section The section of the site to serve. `forum`, `admin`, etc.
      * @see {https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections}
-     * @param string|null $ip The IP address to serve the build asset from.
      */
-    public function __construct(string $section, $ip = null) {
-        if ($ip === null) {
-            $ip = "127.0.0.1";
-        }
-        $this->ip = $ip;
+    public function __construct(string $section) {
         $this->section = $section;
     }
 
@@ -39,7 +34,7 @@ class HotBuildAsset implements Contracts\Web\AssetInterface {
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return "http://$this->ip:3030/$this->section-hot-bundle.js";
+        return self::DOMAIN . "/{$this->section}-hot-bundle.js";
     }
 
     /**

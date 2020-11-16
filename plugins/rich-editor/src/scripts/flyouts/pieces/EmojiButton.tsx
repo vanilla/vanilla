@@ -45,7 +45,7 @@ export class EmojiButton extends React.Component<IProps> {
         const componentClasses = classNames("richEditor-insertEmoji", classesEmoji.root, "emojiChar-" + this.emojiChar);
         return (
             <button
-                ref={elButton => {
+                ref={(elButton) => {
                     this.domButton = elButton as HTMLButtonElement;
                 }}
                 onKeyDown={this.handleKeyPress}

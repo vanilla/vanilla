@@ -51,6 +51,7 @@ export const inputCSS = () => {
         input[type= "text"],
         textarea,
         input.InputBox,
+        .file-upload-choose,
         .AdvancedSearch .InputBox,
         .AdvancedSearch select,
         select,
@@ -69,6 +70,7 @@ export const inputCSS = () => {
 
         input.SmallInput:focus,
         input.InputBox:focus,
+        .file-upload-choose:focus,
         textarea:focus
         `,
         {
@@ -92,6 +94,7 @@ export const inputCSS = () => {
     mixinInputStyles(`input[type= "text"]`);
     mixinInputStyles("textarea");
     mixinInputStyles("input.InputBox");
+    mixinInputStyles(".file-upload-choose");
     mixinInputStyles(".InputBox");
     mixinInputStyles(".InputBox.BigInput");
     mixinInputStyles("ul.token-input-list, div.Popup .Body ul.token-input-list");

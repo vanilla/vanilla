@@ -33,11 +33,32 @@ export default class EmbedInsertionModule extends Module {
      *
      * @param url - The URL to scrape.
      */
-    public scrapeMedia(url: string) {
+    public scrapeMedia(url: string, minTime?: number) {
         const formData = new FormData();
         formData.append("url", url);
 
-        const scrapePromise = api.post("/media/scrape", formData).then(result => result.data);
+        let hasMinTimePassed = minTime ? false : true;
+        if (minTime) {
+            setTimeout(() => {
+                hasMinTimePassed = true;
+            }, minTime);
+        }
+
+        const scrapePromise = api.post("/media/scrape", formData).then((result) => {
+            return new Promise<any>((resolve) => {
+                if (hasMinTimePassed) {
+                    resolve(result.data);
+                    return;
+                }
+
+                const interval = setInterval(() => {
+                    if (hasMinTimePassed) {
+                        clearInterval(interval);
+                        resolve(result.data);
+                    }
+                }, 30);
+            });
+        });
         this.createEmbed({
             loaderData: {
                 type: "link",
@@ -101,7 +122,7 @@ export default class EmbedInsertionModule extends Module {
             throw error;
         }
 
-        filesArray.forEach(file => {
+        filesArray.forEach((file) => {
             if (isFileImage(file)) {
                 this.createImageEmbed(file);
             } else {
@@ -111,7 +132,7 @@ export default class EmbedInsertionModule extends Module {
     };
 
     public createImageEmbed(file: File) {
-        const imagePromise = uploadFile(file).then(data => {
+        const imagePromise = uploadFile(file).then((data) => {
             data.embedType = "image";
             return data;
         });
@@ -121,7 +142,7 @@ export default class EmbedInsertionModule extends Module {
     public createFileEmbed(file: File) {
         const progressEventEmitter = new ProgressEventEmitter();
 
-        const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
+        const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then((data) => {
             data.embedType = "file";
             return data;
         });

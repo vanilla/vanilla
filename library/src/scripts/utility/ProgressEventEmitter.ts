@@ -9,7 +9,7 @@ export default class ProgressEventEmitter {
     private listeners: ProgressEventHandler[] = [];
 
     public emit = (event: ProgressEvent) => {
-        this.listeners.forEach(listener => {
+        this.listeners.forEach((listener) => {
             listener(event);
         });
     };
@@ -19,6 +19,6 @@ export default class ProgressEventEmitter {
     };
 
     public removeEventListener = (listener: ProgressEventHandler) => {
-        this.listeners = this.listeners.filter(registeredListener => listener !== registeredListener);
+        this.listeners = this.listeners.filter((registeredListener) => listener !== registeredListener);
     };
 }

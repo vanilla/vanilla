@@ -17,6 +17,7 @@ import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
 import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
 import { colorOut } from "@library/styles/styleHelpersColors";
+import { RecordID } from "@vanilla/utils";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -30,7 +31,7 @@ interface IProps extends INavigationTreeItem {
 }
 
 export interface IActiveRecord {
-    recordID: number;
+    recordID: RecordID;
     recordType: string;
 }
 
@@ -67,7 +68,7 @@ export default class SiteNavNode extends React.Component<IProps> {
         } else {
             linkContents = (
                 <Hoverable onHover={this.handleHover} duration={50}>
-                    {provided => (
+                    {(provided) => (
                         <SmartLink
                             {...provided}
                             onKeyDownCapture={this.handleKeyDown}
@@ -89,7 +90,7 @@ export default class SiteNavNode extends React.Component<IProps> {
 
         const childrenContents =
             collapsible &&
-            this.props.children.map(child => {
+            this.props.children.map((child) => {
                 const key = activeRecord.recordType + activeRecord.recordID + "-" + child.recordType + child.recordID;
                 return (
                     <SiteNavNode
@@ -219,7 +220,7 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Handles clicking on the chevron to toggle node
      * @param e
      */
-    private handleClick = e => {
+    private handleClick = (e) => {
         e.stopPropagation();
         this.toggle();
     };
@@ -282,7 +283,7 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Note that some of the events are on SiteNav.tsx
      * @param event
      */
-    private handleKeyDown = event => {
+    private handleKeyDown = (event) => {
         if (document.activeElement === null) {
             return;
         }

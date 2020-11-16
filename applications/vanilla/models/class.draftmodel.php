@@ -51,11 +51,11 @@ class DraftModel extends Gdn_Model {
      *
      * @param int $userID Unique ID of user that wrote the drafts.
      * @param int $offset Number of results to skip.
-     * @param int $limit Max number of drafts to return.
+     * @param int|false $limit Max number of drafts to return.
      * @param int $discussionID Limits drafts returned to a single discussion.
      * @return object Gdn_DataSet SQL results.
      */
-    public function getByUser($userID, $offset = '0', $limit = '', $discussionID = '') {
+    public function getByUser($userID, $offset = 0, $limit = false, $discussionID = 0) {
         if (!is_numeric($offset) || $offset < 0) {
             $offset = 0;
         }
@@ -83,19 +83,19 @@ class DraftModel extends Gdn_Model {
     /**
      * Gets data for a single draft.
      *
-     * @param int $draftID Unique ID of draft to get data for.
-     * @param string|false $dataSetType The format of the data.
+     * @param int $id Unique ID of draft to get data for.
+     * @param string|false $datasetType The format of the data.
      * @param array $options Not used.
      * @return array|object SQL results.
      */
-    public function getID($draftID, $dataSetType = false, $options = []) {
-        $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;
+    public function getID($id, $datasetType = false, $options = []) {
+        $datasetType = $datasetType ?: DATASET_TYPE_OBJECT;
 
         $this->draftQuery();
         return $this->SQL
-            ->where('d.DraftID', $draftID)
+            ->where('d.DraftID', $id)
             ->get()
-            ->firstRow($dataSetType);
+            ->firstRow($datasetType);
     }
 
     /**
@@ -229,20 +229,20 @@ class DraftModel extends Gdn_Model {
      *
      * This is a hard delete that completely removes it.
      *
-     * @param int $draftID Unique ID of the draft to be deleted.
+     * @param int $id Unique ID of the draft to be deleted.
      * @param array $options Not used.
      * @return bool Always returns TRUE.
      */
-    public function deleteID($draftID, $options = []) {
+    public function deleteID($id, $options = []) {
         // Get some information about this draft
         $draftUser = $this->SQL
             ->select('InsertUserID')
             ->from('Draft')
-            ->where('DraftID', $draftID)
+            ->where('DraftID', $id)
             ->get()
             ->firstRow();
 
-        $this->SQL->delete('Draft', ['DraftID' => $draftID]);
+        $this->SQL->delete('Draft', ['DraftID' => $id]);
         if (is_object($draftUser)) {
             $this->updateUser($draftUser->InsertUserID);
         }

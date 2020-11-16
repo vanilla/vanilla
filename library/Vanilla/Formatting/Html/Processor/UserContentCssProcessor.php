@@ -70,6 +70,7 @@ class UserContentCssProcessor extends HtmlProcessor {
             $this->appendClass($c, "code");
             $this->appendClass($c, "codeInline");
             $this->setAttribute($c, "spellcheck", "false");
+            $this->setAttribute($c, "tabindex", "0");
         }
     }
 

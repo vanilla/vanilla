@@ -21,6 +21,9 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
      * @param array|string|null $input The initial attributes.
      */
     public function __construct($input = null) {
+        //A value of empty string should be null.
+        $input = $input ?: null;
+
         if (is_string($input)) {
             $input = dbdecode($input);
         } elseif (empty($input)) {

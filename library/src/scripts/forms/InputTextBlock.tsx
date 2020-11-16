@@ -36,6 +36,8 @@ export interface IInputProps {
     maxLength?: number;
     className?: string;
     autoComplete?: boolean;
+    "aria-label"?: string;
+    "aria-describedby"?: string;
 }
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
@@ -84,9 +86,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
 
         return (
             <InputBlock {...blockProps} className={classNames(classesInputBlock.root, this.props.className)}>
-                {blockParams => {
+                {(blockParams) => {
                     const { labelID, errorID, hasErrors } = blockParams;
-                    let describedBy;
+                    let describedBy = inputProps["aria-describedby"];
                     if (hasErrors) {
                         describedBy = errorID;
                     }
@@ -104,6 +106,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             aria-invalid={hasErrors}
                             aria-describedby={describedBy}
                             aria-labelledby={labelID}
+                            aria-label={inputProps["aria-label"]}
                             maxLength={inputProps.maxLength}
                             onChange={this.onChange}
                             onFocus={this.onFocus}
@@ -115,6 +118,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                     ) : (
                         <TextareaAutosize
                             {...multiLineProps}
+                            async
                             id={this.id}
                             className={classNames(classes, multiLineProps.className, {
                                 [classesInputBlock.multiLine(
@@ -178,21 +182,21 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         this.inputRef.current!.select();
     }
 
-    private onChange = event => {
+    private onChange = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onChange) {
             inputProps.onChange(event);
         }
     };
 
-    private onBlur = event => {
+    private onBlur = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onBlur) {
             inputProps.onBlur(event);
         }
     };
 
-    private onFocus = event => {
+    private onFocus = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onFocus) {
             inputProps.onFocus(event);

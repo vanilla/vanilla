@@ -13,6 +13,21 @@ namespace VanillaTests\Models;
 class DiscussionModelCountsTest extends CountsTest {
 
     /**
+     * Given a discussion row, return a valid category ID, different from the original.
+     *
+     * @param array $row
+     * @return int
+     */
+    private function alternateCategoryID(array $row): int {
+        foreach ($this->categories as $category) {
+            if ($category["CategoryID"] !== $row["CategoryID"]) {
+                return $category["CategoryID"];
+            }
+        }
+        throw new \Exception("Unable to determine a new category ID.");
+    }
+
+    /**
      * Assert counts for all known records is accurate.
      */
     public function testSetupCounts() {
@@ -38,5 +53,21 @@ class DiscussionModelCountsTest extends CountsTest {
         foreach ($cats as $catID) {
             $this->assertCategoryCounts($catID);
         }
+    }
+
+    /**
+     * Verify counts after using DiscussionModel::save to move discussions between categories.
+     */
+    public function testMoveUsingSave(): void {
+        $row = current($this->discussions);
+
+        $originalCategoryID = $row["CategoryID"];
+        $newCategoryID = $this->alternateCategoryID($row);
+
+        $row["CategoryID"] = $newCategoryID;
+        $this->discussionModel->save($row);
+
+        $this->assertCategoryCounts($originalCategoryID);
+        $this->assertCategoryCounts($newCategoryID);
     }
 }

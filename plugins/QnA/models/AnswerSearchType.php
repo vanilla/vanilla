@@ -25,4 +25,25 @@ class AnswerSearchType extends CommentSearchType {
     public function getType(): string {
         return 'answer';
     }
+
+    /**
+     * @return string
+     */
+    public function getSingularLabel(): string {
+        return \Gdn::translate('Answer');
+    }
+
+    /**
+     * @return string
+     */
+    public function getPluralLabel(): string {
+        return \Gdn::translate('Answers');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDTypes(): ?array {
+        return [101];
+    }
 }

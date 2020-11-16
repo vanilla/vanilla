@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -17,6 +18,7 @@ use Vanilla\Utility\ModelUtils;
  * Utility methods useful for greating API endpoints.
  */
 class ApiUtils {
+    public const DEFAULT_LIMIT = 30;
 
     /**
      * Expand field value to indicate expanding all fields.
@@ -64,28 +66,67 @@ class ApiUtils {
      *
      * @param array $fields Valid values for the expand parameter.
      * @param bool|string $default The default value of expand.
-     * @return array
+     * @return Schema
      */
-    public static function getExpandDefinition(array $fields, $default = false) {
+    public static function getExpandDefinition(array $fields, $default = null) {
         if (!in_array(ModelUtils::EXPAND_ALL, $fields)) {
             $fields[] = ModelUtils::EXPAND_ALL;
             $fields[] = ModelUtils::EXPAND_CRAWL;
         }
 
-        $result = [
+        $negativeKeys = array_filter($fields, function ($enumVal) {
+            return stringBeginsWith($enumVal, '-');
+        });
+
+        $negativeKeysStripped = array_map(function ($enumVal) {
+            return str_replace('-', '', $enumVal);
+        }, $negativeKeys);
+
+        $enumVals = array_unique(array_merge($fields, $negativeKeysStripped));
+        $default = !empty($negativeKeysStripped) ? array_values($negativeKeysStripped) : false;
+
+        $schema = new Schema([
             'description' =>
                 'Expand associated records using one or more valid field names. A value of "'
                 . ModelUtils::EXPAND_ALL
                 . '" will expand all expandable fields.',
             'default' => $default,
             'items' => [
-                'enum' => $fields,
+                'enum' => $enumVals,
                 'type' => 'string'
             ],
+            'nullable' => true,
             'style' => 'form',
             'type' => ['boolean', 'array'],
-        ];
-        return $result;
+        ]);
+
+        $schema->addFilter('', function ($value) use ($negativeKeys) {
+            if (!is_array($value)) {
+                return $value;
+            }
+
+            foreach ($negativeKeys as $negativeKey) {
+                $negativeKeyStripped = str_replace('-', '', $negativeKey);
+                if (!in_array($negativeKey, $value) && !in_array($negativeKeyStripped, $value)) {
+                    // Add it in as a default value if it wasn't excluded.
+                    $value[] = $negativeKeyStripped;
+                }
+            }
+
+            return array_values($value);
+        });
+        return $schema;
+    }
+
+    /**
+     * Get the maximum limit for the API.
+     *
+     * @param int $default The default value to use.
+     *
+     * @return int
+     */
+    public static function getMaxLimit(int $default = 500): int {
+        return \Gdn::config('APIv2.MaxLimit', $default);
     }
 
     /**
@@ -190,11 +231,18 @@ class ApiUtils {
         }
 
         foreach ($schema['properties'] as $property => $data) {
-            if (!isset($data['x-filter']) || !array_key_exists($property, $query) || !isset($data['x-filter']['field'])) {
+            if (!isset($data['x-filter']) || !array_key_exists($property, $query)) {
                 continue;
             }
 
             $filterParam = $data['x-filter'];
+            if ($filterParam === true) {
+                $filterParam = ['field' => $property];
+            }
+
+            if (!isset($filterParam['field'])) {
+                continue;
+            }
 
             // processor($name, $value) => [$updatedName => $updatedValue]
             if (isset($filterParam['processor'])) {
@@ -245,5 +293,27 @@ class ApiUtils {
             $field = '-'.$field;
         }
         return array_merge($fields, $desc);
+    }
+
+    /**
+     * Get the database offset/limit from the querystring.
+     *
+     * This helper supports a query string with the following keys:
+     *
+     * - limit: Required.
+     * - offset: Optional.
+     * - page: Optional.
+     *
+     * @param array $query
+     * @return array
+     */
+    public static function offsetLimit(array $query): array {
+        $limit = $query['limit'];
+        if (isset($query['offset'])) {
+            $offset = $query['offset'];
+        } else {
+            $offset = $limit * (($query['page'] ?? 1) - 1);
+        }
+        return [$offset, $limit];
     }
 }

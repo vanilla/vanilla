@@ -43,7 +43,10 @@ class ResourcesApiController extends Controller {
         $this->permission('Garden.Settings.Manage');
 
         $in = Schema::parse([
-            'crawlable:b?'
+            'crawlable:b?',
+            'recordTypes:a?' => [
+                'items' => ['type' => 'string'],
+            ],
         ]);
         $query = $in->validate($query);
 
@@ -54,7 +57,12 @@ class ResourcesApiController extends Controller {
         }
 
         $r = [];
+        $allowedRecordTypes = $query['recordTypes'] ?? null;
         foreach ($models as $recordType => $model) {
+            if ($allowedRecordTypes !== null && !in_array($recordType, $allowedRecordTypes)) {
+                continue;
+            }
+
             $r[] = [
                 'recordType' => $recordType,
                 'url' => \Gdn::request()->getSimpleUrl("/api/v2/resources/$recordType"),
@@ -88,6 +96,9 @@ class ResourcesApiController extends Controller {
         if (ModelUtils::isExpandOption('crawl', $query['expand']) && $model instanceof CrawlableInterface) {
             $data['crawl'] = $model->getCrawlInfo();
             $data['crawl']['url'] = \Gdn::request()->getSimpleUrl($data['crawl']['url']);
+            if (!isset($data['crawl']['maxLimit'])) {
+                $data['crawl']['maxLimit'] = ApiUtils::getMaxLimit();
+            }
         }
 
         $out = Schema::parse([
@@ -95,7 +106,9 @@ class ResourcesApiController extends Controller {
             'crawl?' => [
                 'url:s' => ['format' => 'uri'],
                 'parameter:s',
+                'unqiueIDField:s',
                 'count:i',
+                'maxLimit:i',
                 'min' => [
                     'type' => ['integer', 'datetime'],
                 ],

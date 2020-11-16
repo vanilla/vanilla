@@ -174,7 +174,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         if (selector) {
             const selectors = selector.split(",");
             if (selectors.length && selectors.length > 0) {
-                selectors.map(s => {
+                selectors.map((s) => {
                     nestedWorkaround(trimTrailingCommas(s), $nest);
                 });
             } else {

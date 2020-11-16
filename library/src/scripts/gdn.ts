@@ -47,7 +47,7 @@ if (!("makeAccessiblePopup" in gdn)) {
             $popupEl.attr("aria-describedby", id);
         }
 
-        $.each($popupEl.find("a, input"), function(i, link) {
+        $.each($popupEl.find("a, input"), function (i, link) {
             if (link.tagName && link.tagName.toLowerCase() === "a") {
                 link.setAttribute("tabindex", "0");
             }
@@ -64,7 +64,7 @@ if (!("makeAccessiblePopup" in gdn)) {
             if (element.tagName.toLowerCase() === "a") {
                 element.setAttribute("tabindex", "0");
             }
-            element.addEventListener("keydown", e => {
+            element.addEventListener("keydown", (e) => {
                 const tabKey = 9;
                 if (e.keyCode === tabKey) {
                     if (!e.shiftKey) {

@@ -17,33 +17,48 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
+use TagModule;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Community\CategoriesModule;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\OpenAPIBuilder;
 use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
+use Vanilla\Search\SearchTypeCollectorInterface;
+use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
+use Vanilla\Web\TwigEnhancer;
+use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Widgets\WidgetService;
+use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
+use VanillaTests\Fixtures\MockEmail;
+use VanillaTests\Fixtures\MockWidgets\MockWidget1;
+use VanillaTests\Fixtures\MockWidgets\MockWidget2;
+use VanillaTests\Fixtures\MockWidgets\MockWidget3;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
@@ -55,7 +70,19 @@ use VanillaTests\Fixtures\SpyingEventManager;
  * This class is meant to be re-used. Calling {@link Bootstrap::run()} on a polluted environment should reset it.
  */
 class Bootstrap {
+    /** @deprecated */
+    public const ROLE_ADMIN = VanillaTestCase::ROLE_ADMIN;
+    /** @deprecated */
+    public const ROLE_MOD = VanillaTestCase::ROLE_MOD;
+    /** @deprecated */
+    public const ROLE_MEMBER = VanillaTestCase::ROLE_MEMBER;
+
     private $baseUrl;
+
+    /**
+     * @var TestDispatcher
+     */
+    protected $dispatcher;
 
     /**
      * Bootstrap constructor.
@@ -75,9 +102,13 @@ class Bootstrap {
      * Run the bootstrap and set the global environment.
      *
      * @param Container $container The container to bootstrap.
+     * @param bool $addons
      */
     public function run(Container $container, $addons = false) {
         $this->initialize($container);
+
+        $this->dispatcher = $container->get(TestDispatcher::class);
+
         if ($addons) {
             $this->initializeAddons($container);
         }
@@ -138,6 +169,9 @@ class Bootstrap {
             ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
+
+            ->rule(AbstractSiteProvider::class)
+            ->setClass(OwnSiteProvider::class)
 
             ->rule(SiteSectionProviderInterface::class)
             ->setFactory(function () {
@@ -238,7 +272,7 @@ class Bootstrap {
             // Database.
             ->rule('Gdn_Database')
             ->setShared(true)
-            ->setConstructorArgs([new Reference([\Gdn_Configuration::class, 'Database'])])
+            ->setConstructorArgs([self::testDbConfig()])
             ->addAlias('Database')
 
             ->rule(\Gdn_DatabaseStructure::class)
@@ -298,10 +332,10 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
-            ->rule(SearchModel::class)
-            ->setShared(true)
+            ->rule(MockEmail::class)
+            ->addAlias(\Gdn_Email::class)
 
-            ->rule(AbstractSearchDriver::class)
+            ->rule(SearchTypeCollectorInterface::class)
             ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
 
             // File base theme api provider
@@ -316,9 +350,28 @@ class Bootstrap {
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
             ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
+            ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
 
             ->rule(LogTransactionMiddleware::class)
             ->setShared(true)
+
+            ->rule('@smart-id-middleware')
+            ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
+            ->setShared(true)
+            ->setConstructorArgs(['/api/v2/'])
+            ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
+            ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
+            ->addCall('addSmartID', ['UserID', 'users', '*', new Reference('@user-smart-id-resolver')])
+
+            ->rule('@user-smart-id-resolver')
+            ->setFactory(function (Container $dic) {
+                /* @var \Vanilla\Web\UserSmartIDResolver $uid */
+                $uid = $dic->get(\Vanilla\Web\UserSmartIDResolver::class);
+                $uid->setEmailEnabled(!$dic->get(\Gdn_Configuration::class)->get('Garden.Registration.NoEmail'))
+                    ->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission('Garden.PersonalInfo.View'));
+
+                return $uid;
+            })
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
             ->addAlias('HstsModel')
@@ -351,6 +404,24 @@ class Bootstrap {
 
             ->rule('WebLinking')
             ->setClass(\Vanilla\Web\Pagination\WebLinking::class)
+            ->setShared(true)
+
+            ->rule('ViewHandler.tpl')
+            ->setClass('Gdn_Smarty')
+            ->setShared(true)
+
+            ->rule('ViewHandler.php')
+            ->setShared(true)
+
+            ->rule('ViewHandler.twig')
+            ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
+            ->setShared(true)
+
+            ->rule(TwigRenderer::class)
+            ->setShared(true)
+
+            ->rule(TwigEnhancer::class)
+            ->addCall('setCompileCacheDirectory', [PATH_CACHE . '/twig'])
             ->setShared(true)
 
             ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
@@ -402,7 +473,36 @@ class Bootstrap {
 
             ->rule(\Gdn_Form::class)
             ->addAlias('Form')
-            ;
+
+            ->rule(WidgetService::class)
+            ->addCall('registerWidget', [MockWidget1::class])
+            ->addCall('registerWidget', [MockWidget2::class])
+            ->addCall('registerWidget', [MockWidget3::class])
+            ->addCall('registerWidget', [CategoriesModule::class])
+            ->addCall('registerWidget', [TagModule::class])
+        ;
+
+        $container
+            ->rule(OpenAPIBuilder::class)
+            ->setConstructorArgs(['cachePath' => PATH_ROOT.'/tests/cache/openapi.php'])
+            ->rule(ConfigApiController::class)
+            ->setConstructorArgs(['cachePath' => PATH_ROOT.'/tests/cache/config-schema.php'])
+        ;
+    }
+
+    /**
+     * Get the default database connection arguments.
+     *
+     * @return array
+     */
+    public static function testDbConfig(): array {
+        $r = [
+            'Host' => getenv('TEST_DB_HOST') ?: 'localhost',
+            'Dbname' => getenv('TEST_DB_NAME'),
+            'User' => getenv('TEST_DB_USER'),
+            'Password' => getenv('TEST_DB_PASSWORD'),
+        ];
+        return $r;
     }
 
     private function initializeAddons(Container $dic) {
@@ -487,11 +587,13 @@ class Bootstrap {
         $baseUrl = $this->getBaseUrl();
 
         $this->setServerGlobal('X_REWRITE', true);
-        $this->setServerGlobal('REMOTE_ADDR', '::1'); // Simulate requests from local IPv6 address.
+        $this->setServerGlobal('REMOTE_ADDR', '1.2.3.4'); // Simulate a test IP address.
         $this->setServerGlobal('HTTP_HOST', parse_url($baseUrl, PHP_URL_HOST));
+        $this->setServerGlobal('SERVER_NAME', parse_url($baseUrl, PHP_URL_HOST));
         $this->setServerGlobal('SERVER_PORT', parse_url($baseUrl, PHP_URL_PORT) ?: null);
         $this->setServerGlobal('SCRIPT_NAME', parse_url($baseUrl, PHP_URL_PATH));
         $this->setServerGlobal('PATH_INFO', '');
+        $this->setServerGlobal('REQUEST_URI', '');
         $this->setServerGlobal('HTTPS', parse_url($baseUrl, PHP_URL_SCHEME) === 'https');
 
         $GLOBALS['dic'] = $container;
@@ -601,25 +703,31 @@ class Bootstrap {
     public static function registerAutoloader(): void {
         $loader = new RobotLoader();
         $loader->addDirectory(PATH_APPLICATIONS, PATH_PLUGINS);
+        $loader->ignoreDirs[] = "vendor"; // Avoid loading any lurking Composer auto-loaders.
 
         $excluded = [
             'Mustache',
             'mustache',
-            'sitehub',
+            'sitehub/modules',
             'lithecompiler',
             'lithestyleguide',
             'NBBC',
             'Warnings',
             'NBBC',
             'CustomCSS',
-            'Online'
+            'Online',
+            'infstub',
+            'hosted-job/vendor',
+            'cloudmonkey/vendor',
         ];
         foreach ($excluded as $subdir) {
             $loader->excludeDirectory(PATH_PLUGINS.'/'.$subdir);
         }
 
+
         // And set caching to the 'temp' directory
-        $loader->setTempDirectory(PATH_ROOT.'/tests/cache/autoloader');
+        $loader->setAutoRefresh(true);
+        $loader->setTempDirectory(PATH_CACHE.'/tests/autoloader');
         $loader->register();
     }
 }

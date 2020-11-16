@@ -430,6 +430,8 @@ class Gdn_Session {
                 }
 
                 if ($this->permissions->has('Garden.SignIn.Allow')) {
+                    // Fire a specific event for setting the session so that event handlers can override permissions.
+                    Gdn::getContainer()->get(\Garden\EventManager::class)->fire('gdn_session_set', $this);
                     if ($setIdentity) {
                         Gdn::authenticator()->setIdentity($this->UserID, $persist);
                         Logger::event(
@@ -660,6 +662,7 @@ class Gdn_Session {
 
         if ($foreignKey === true) {
             $forceValid = true;
+            $return = true;
         }
 
         if (!$forceValid && $validateUser && $this->UserID <= 0) {

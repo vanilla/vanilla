@@ -18,6 +18,7 @@ import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySe
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
+import { TagsInput } from "@library/features/tags/TagsInput";
 
 /**
  * Implement search filter panel for discussions
@@ -37,7 +38,7 @@ export function SearchFilterPanelCommunity() {
                         const { value } = event.target;
                         updateForm({ name: value });
                     },
-                    value: form.name,
+                    value: form.name || undefined,
                 }}
             />
             <MultiUserInput
@@ -60,11 +61,12 @@ export function SearchFilterPanelCommunity() {
             />
             <CommunityCategoryInput
                 label={t("Category")}
-                onChange={option => {
+                onChange={(option) => {
                     updateForm({ categoryOption: option });
                 }}
                 value={form.categoryOption}
             />
+
             <CheckboxGroup tight={true}>
                 <Checkbox
                     label={t("Search Subcategories")}
@@ -92,8 +94,13 @@ export function SearchFilterPanelCommunity() {
                 />
             </CheckboxGroup>
 
-            {/* Do we have a tag input in React? */}
-            {/* No API to get the data from yet. */}
+            <TagsInput
+                label={t("Tags")}
+                value={form.tagsOptions ?? []}
+                onChange={(options: IComboBoxOption[]) => {
+                    updateForm({ tagsOptions: options });
+                }}
+            />
 
             <CommunityPostTypeFilter />
         </FilterFrame>

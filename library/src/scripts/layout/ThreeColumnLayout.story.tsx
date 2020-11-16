@@ -4,7 +4,6 @@
  */
 
 import React from "react";
-import PanelLayout from "@library/layout/PanelLayout";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import ThreeColumnLayout from "./ThreeColumnLayout";
@@ -12,7 +11,7 @@ import PanelWidget from "./components/PanelWidget";
 import Container from "@library/layout/components/Container";
 
 export default {
-    title: "PanelLayout",
+    title: "Layout/Three Column Layout",
     parameters: {
         chromatic: {
             viewports: Object.values(layoutVariables().panelLayoutBreakPoints),

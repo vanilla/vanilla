@@ -37,14 +37,14 @@ export function ThemeInputText(props: IProps) {
     const hasDebounce = !!props.debounceTime;
     const debounceTime = typeof props.debounceTime === "number" ? props.debounceTime : props.debounceTime ? 250 : 0;
 
-    const { generatedValue, defaultValue, setValue } = useThemeVariableField(varKey);
+    const { generatedValue, defaultValue, setValue } = useThemeVariableField<string>(varKey);
 
     const [valid, setValid] = useState(true);
     const [focus, setFocus] = useState(false);
 
     // initial value
     useEffect(() => {
-        setValid(validation(generatedValue));
+        setValid(validation(generatedValue!));
     }, [focus, generatedValue]);
 
     // Debounced internal function for input text.
@@ -73,16 +73,16 @@ export function ThemeInputText(props: IProps) {
                 inputProps={{
                     placeholder: props.placeholder,
                     autoComplete: false,
-                    defaultValue: defaultValue,
+                    defaultValue: defaultValue ?? undefined,
                     className: classes.input,
-                    value: generatedValue,
+                    value: generatedValue ?? undefined,
                     onFocus: () => {
                         setFocus(true);
                     },
                     onBlur: () => {
                         setFocus(false);
                     },
-                    onChange: event => {
+                    onChange: (event) => {
                         _debounceInput(event.target.value);
                     },
                 }}

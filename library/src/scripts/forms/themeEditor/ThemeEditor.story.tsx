@@ -31,7 +31,7 @@ export function ThemeEditor() {
         <div style={{ maxWidth: 400, margin: "0 auto" }}>
             <ThemeBuilderContextProvider
                 rawThemeVariables={vars}
-                onChange={vars => {
+                onChange={(vars) => {
                     action("Variable Change");
                     setVars(vars);
                 }}

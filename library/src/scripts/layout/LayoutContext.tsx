@@ -94,7 +94,7 @@ export function withLayout<T extends ILayoutProps = ILayoutProps>(WrappedCompone
     const ComponentWithDevice = (props: Optionalize<T, ILayoutProps>) => {
         return (
             <LayoutContext.Consumer>
-                {context => {
+                {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
                     return <WrappedComponent device={context} {...(props as T)} />;
                 }}

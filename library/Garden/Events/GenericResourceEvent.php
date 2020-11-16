@@ -15,15 +15,9 @@ use Vanilla\Events\EventAction;
 class GenericResourceEvent extends ResourceEvent {
 
     /**
-     * Create the event.
-     *
      * @param string $type
-     * @param string $action
-     * @param array $payload
-     * @param array $sender
      */
-    public function __construct(string $type, string $action, array $payload, ?array $sender = null) {
-        parent::__construct($action, $payload, $sender);
+    public function setType(string $type): void {
         $this->type = $type;
     }
 }

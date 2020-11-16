@@ -8,7 +8,6 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { ModalView } from "@library/modal/ModalView";
 import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
-import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
 import { mountPortal } from "@vanilla/react-utils";
 
@@ -38,6 +37,7 @@ interface IProps {
     afterContent?: React.ReactNode;
     titleID?: string;
     label?: string; // Necessary if there's no proper title
+    onKeyPress?: (e) => void;
 }
 
 interface IState {
@@ -98,6 +98,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     titleID={"titleID" in this.props ? this.props.titleID : undefined}
                     label={"label" in this.props ? this.props.label : undefined}
                     isVisible={this.props.isVisible}
+                    onKeyPress={this.props.onKeyPress}
                 >
                     {this.props.children}
                 </ModalView>

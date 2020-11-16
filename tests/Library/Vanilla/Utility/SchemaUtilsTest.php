@@ -8,7 +8,9 @@
 namespace VanillaTests\Library\Vanilla\Utility;
 
 use Garden\Schema\Invalid;
+use Garden\Schema\Schema;
 use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\SchemaUtils;
@@ -85,5 +87,38 @@ class SchemaUtilsTest extends TestCase {
 
         $value = $fn('foo', $field);
         $this->assertSame('foo', $value);
+    }
+
+    /**
+     * Validating an array should work with valid data.
+     */
+    public function testValidateArrayValid(): void {
+        $schema = Schema::parse([':i']);
+        $arr = ['1', '2'];
+        SchemaUtils::validateArray($arr, $schema);
+        $this->assertSame([1, 2], $arr);
+    }
+
+    /**
+     * The validate array should throw an exception when the value isn't an array.
+     */
+    public function testValidateArrayNotArray(): void {
+        $schema  = Schema::parse([':i']);
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('is not a valid integer');
+        $arr = 'a';
+        SchemaUtils::validateArray($arr, $schema);
+    }
+
+    /**
+     * Validating an array should throw an exception for single items.
+     */
+    public function testValidateInvalidItem(): void {
+        $schema  = Schema::parse([':i']);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('is not a valid integer');
+        $arr = [1, 'a'];
+        SchemaUtils::validateArray($arr, $schema);
     }
 }

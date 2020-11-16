@@ -73,7 +73,7 @@ export default function ThemePreviewCard(props: IProps) {
                 >
                     <div className={classes.previewContainer}>
                         <div className={classes.menuBar}>
-                            {[0, 1, 2].map(key => (
+                            {[0, 1, 2].map((key) => (
                                 <span key={key} className={classes.menuBarDots}></span>
                             ))}
                         </div>

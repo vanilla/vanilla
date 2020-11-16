@@ -34,6 +34,12 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { SearchPageRoute } from "@library/search/SearchPageRoute";
+import { useRegisterLink, useSignInLink } from "@library/contexts/EntryLinkContext";
+import titleBarNavClasses from "@library/headers/titleBarNavStyles";
+import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
+import { useMeasure } from "@vanilla/react-utils/src";
+import { SkipNavLink, SkipNavContent } from "@reach/skip-nav";
+import { INavigationVariableItem } from "@library/headers/navigationVariables";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
@@ -42,10 +48,13 @@ interface IProps {
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
     isFixed?: boolean;
     useMobileBackButton?: boolean;
-    logoUrl?: string;
+    overwriteLogo?: string; // overwrite logo, used for storybook
     hasSubNav?: boolean;
     backgroundColorForMobileDropdown?: boolean; // If the left panel has a background color, we also need it here when the mobile menu's open.
     extraBurgerNavigation?: React.ReactNode;
+    forceVisibility?: boolean; // For storybook, as it will disable closing the search
+    scope?: ISearchScopeNoCompact;
+    forceMenuOpen?: INavigationVariableItem; // For storybook, will force nested menu open
 }
 
 export enum LogoAlignment {
@@ -63,6 +72,7 @@ export default function TitleBar(_props: IProps) {
         mobileDropDownContent: null,
         isFixed: true,
         useMobileBackButton: true,
+        forceVisibility: false,
         ..._props,
     };
 
@@ -70,7 +80,7 @@ export default function TitleBar(_props: IProps) {
     const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
 
     const device = useTitleBarDevice();
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(props.forceVisibility);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
@@ -84,9 +94,11 @@ export default function TitleBar(_props: IProps) {
     const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
     const isDesktopLogoCentered = vars.logo.justifyContent === LogoAlignment.CENTER;
-
     // When previewing and updating the colors live, there can be flickering of some components.
     // As a result we want to hide them on first render for these cases.
+
+    const leftAlignedLogoRef = useRef<HTMLDivElement | null>(null);
+    const logoAlignedLogoMeasure = useMeasure(leftAlignedLogoRef);
     const isPreviewing = useSelector((state: ICoreStoreState) => state.theme.forcedVariables);
     const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(!!isPreviewing);
     useEffect(() => {
@@ -96,143 +108,186 @@ export default function TitleBar(_props: IProps) {
     }, [isPreviewFirstRender]);
 
     const headerContent = (
-        <HashOffsetReporter className={classes.container}>
-            <div className={classes.bgContainer}>
-                <animated.div
-                    {...bgProps}
-                    className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
-                ></animated.div>
-                {!isPreviewFirstRender && (
+        <>
+            <HashOffsetReporter className={classes.container}>
+                <div className={classes.bgContainer}>
                     <animated.div
-                        {...bg2Props}
-                        className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
-                    >
-                        {/* Cannot be a background image there will be flickering. */}
-                        {vars.colors.bgImage && (
-                            <img
-                                src={vars.colors.bgImage}
-                                className={classes.bgImage}
-                                alt={"titleBarImage"}
-                                aria-hidden={true}
-                            />
-                        )}
-                        {vars.overlay && <div className={classes.overlay}></div>}
-                    </animated.div>
-                )}
-            </div>
-            <Container fullGutter>
-                <div className={classes.titleBarContainer}>
-                    <div className={classNames(classes.bar, { isHome: showSubNav })}>
-                        {isCompact &&
-                            (props.useMobileBackButton ? (
-                                <BackLink
-                                    hideIfNoHistory={true}
-                                    className={classes.leftFlexBasis}
-                                    linkClassName={classes.button}
-                                />
-                            ) : (
-                                <FlexSpacer className="pageHeading-leftSpacer" />
-                            ))}
-                        {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
-                            <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
-                                <span
-                                    className={classNames(isDesktopLogoCentered && classes.logoCenterer)}
-                                    ref={!isCompact && isDesktopLogoCentered ? collisionSourceRef : undefined}
-                                >
-                                    <HeaderLogo
-                                        className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                        logoClassName="titleBar-logo"
-                                        logoType={LogoType.DESKTOP}
-                                    />
-                                </span>
-                            </animated.div>
-                        )}
-                        {!isCompact && !isDesktopLogoCentered && (
-                            <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }}></div>
-                        )}
-                        {!isSearchOpen && !isCompact && (
-                            <TitleBarNav
-                                isCentered={vars.navAlignment.alignment === "center"}
-                                containerRef={
-                                    vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
-                                        ? collisionSourceRef
-                                        : undefined
-                                }
-                                className={classes.nav}
-                                linkClassName={classes.topElement}
-                                afterNode={
-                                    !isCompact &&
-                                    isDesktopLogoCentered && (
-                                        <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }}></div>
-                                    )
-                                }
-                            />
-                        )}
-                        {isCompact && (
-                            <>
-                                <Hamburger className={classes.hamburger} extraNavTop={props.extraBurgerNavigation} />
-                                {!isSearchOpen && (
-                                    <>
-                                        {isMobileLogoCentered && <FlexSpacer actualSpacer />}
-                                        <div
-                                            className={classNames(
-                                                isMobileLogoCentered && classes.logoCenterer,
-                                                logoClasses.mobileLogo,
-                                            )}
-                                        >
-                                            <animated.span {...logoProps}>
-                                                <HeaderLogo
-                                                    className={classes.logoContainer}
-                                                    logoClassName="titleBar-logo"
-                                                    logoType={LogoType.MOBILE}
-                                                />
-                                            </animated.span>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                        {!isCompact && !isDesktopLogoCentered && (
-                            <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }}></div>
-                        )}
-                        <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
-                            {!isSearchOpen && (
-                                <div className={classes.extraMeBoxIcons}>
-                                    {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                        return <ComponentName key={index} />;
-                                    })}
-                                </div>
+                        {...bgProps}
+                        className={classNames(classes.bg1, { [classes.swoop]: vars.swoop.amount > 0 })}
+                    />
+                    {!isPreviewFirstRender && (
+                        <animated.div
+                            {...bg2Props}
+                            className={classNames(classes.bg2, { [classes.swoop]: vars.swoop.amount > 0 })}
+                        >
+                            {/* Cannot be a background image there will be flickering. */}
+                            {vars.colors.bgImage && (
+                                <img src={vars.colors.bgImage} alt={"titleBarImage"} aria-hidden={true} />
                             )}
-                            <CompactSearch
-                                className={classNames(classes.compactSearch, {
-                                    isCentered: isSearchOpen,
-                                })}
-                                focusOnMount
-                                open={isSearchOpen}
-                                onSearchButtonClick={() => {
-                                    SearchPageRoute.preload();
-                                    setIsSearchOpen(true);
-                                }}
-                                onCloseSearch={() => {
-                                    setIsSearchOpen(false);
-                                }}
-                                cancelButtonClassName={classNames(classes.topElement, classes.searchCancel)}
-                                cancelContentClassName="meBox-buttonContent"
-                                buttonClass={classNames(classes.button, {
-                                    [classes.buttonOffset]: !isCompact && isGuest,
-                                })}
-                                showingSuggestions={isShowingSuggestions}
-                                onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                                onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
-                                clearButtonClass={classes.clearButtonClass}
-                            />
-                            {meBox}
-                        </ConditionalWrap>
-                    </div>
+                            {vars.overlay && <div className={classes.overlay} />}
+                        </animated.div>
+                    )}
                 </div>
-            </Container>
-        </HashOffsetReporter>
+                <Container fullGutter>
+                    <div className={classes.titleBarContainer}>
+                        <div className={classNames(classes.bar, { isHome: showSubNav })}>
+                            {isCompact &&
+                                (props.useMobileBackButton ? (
+                                    <BackLink
+                                        hideIfNoHistory={true}
+                                        className={classes.leftFlexBasis}
+                                        linkClassName={classes.button}
+                                    />
+                                ) : (
+                                    <FlexSpacer className="pageHeading-leftSpacer" />
+                                ))}
+                            {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
+                                <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
+                                    <span
+                                        className={classNames("logoAlignment", {
+                                            [classes.logoCenterer]: isDesktopLogoCentered,
+                                            [classes.logoLeftAligned]: !isDesktopLogoCentered,
+                                        })}
+                                        ref={
+                                            !isCompact && isDesktopLogoCentered
+                                                ? collisionSourceRef
+                                                : !isCompact && !isDesktopLogoCentered
+                                                ? leftAlignedLogoRef
+                                                : undefined
+                                        }
+                                    >
+                                        <>
+                                            <SkipNavLink className={classes.skipNav}>
+                                                {t("Skip to content")}
+                                            </SkipNavLink>
+
+                                            <HeaderLogo
+                                                className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                                logoClassName="titleBar-logo"
+                                                logoType={LogoType.DESKTOP}
+                                                overwriteLogo={props.overwriteLogo}
+                                            />
+                                        </>
+                                    </span>
+                                </animated.div>
+                            )}
+                            {!isCompact && !isDesktopLogoCentered && (
+                                <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }} />
+                            )}
+                            {!isSearchOpen && !isCompact && (
+                                <TitleBarNav
+                                    forceMenuOpen={props.forceMenuOpen}
+                                    isCentered={vars.navAlignment.alignment === "center"}
+                                    logoDimensions={logoAlignedLogoMeasure}
+                                    containerRef={
+                                        vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                            ? collisionSourceRef
+                                            : undefined
+                                    }
+                                    className={classes.nav}
+                                    linkClassName={classes.topElement}
+                                    afterNode={
+                                        !isCompact &&
+                                        isDesktopLogoCentered && (
+                                            <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }} />
+                                        )
+                                    }
+                                />
+                            )}
+                            {isCompact && (
+                                <>
+                                    {!isSearchOpen && (
+                                        <>
+                                            <Hamburger
+                                                className={classes.hamburger}
+                                                extraNavTop={props.extraBurgerNavigation}
+                                                showCloseIcon={false}
+                                            />
+                                            {isMobileLogoCentered && <FlexSpacer actualSpacer />}
+                                            <div
+                                                className={classNames(
+                                                    isMobileLogoCentered && classes.logoCenterer,
+                                                    logoClasses.mobileLogo,
+                                                )}
+                                            >
+                                                <animated.span className={"mobileLogoAnimated"} {...logoProps}>
+                                                    <HeaderLogo
+                                                        className={classes.logoContainer}
+                                                        logoClassName="titleBar-logo"
+                                                        logoType={LogoType.MOBILE}
+                                                        overwriteLogo={props.overwriteLogo}
+                                                    />
+                                                </animated.span>
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                            {!isCompact && !isDesktopLogoCentered && (
+                                <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }} />
+                            )}
+                            <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
+                                {!isSearchOpen && (
+                                    <div className={classes.extraMeBoxIcons}>
+                                        {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                            return <ComponentName key={index} />;
+                                        })}
+                                    </div>
+                                )}
+                                <CompactSearch
+                                    className={classNames(classes.compactSearch, {
+                                        isCentered: isSearchOpen,
+                                    })}
+                                    focusOnMount
+                                    placeholder={t("Search")}
+                                    open={isSearchOpen}
+                                    onSearchButtonClick={() => {
+                                        SearchPageRoute.preload();
+                                        setIsSearchOpen(true);
+                                    }}
+                                    onCloseSearch={() => {
+                                        setIsSearchOpen(props.forceVisibility); // will be false if not used
+                                    }}
+                                    cancelButtonClassName={classNames(
+                                        classes.topElement,
+                                        classes.searchCancel,
+                                        titleBarNavClasses().link,
+                                    )}
+                                    cancelContentClassName="meBox-buttonContent"
+                                    buttonClass={classNames(classes.button, {
+                                        [classes.buttonOffset]: !isCompact && isGuest,
+                                    })}
+                                    showingSuggestions={isShowingSuggestions}
+                                    onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                                    onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                                    buttonContentClassName={classNames(
+                                        classesMeBox.buttonContent,
+                                        "meBox-buttonContent",
+                                    )}
+                                    clearButtonClass={classes.clearButtonClass}
+                                    scope={
+                                        props.scope
+                                            ? {
+                                                  ...props.scope,
+                                              }
+                                            : undefined
+                                    }
+                                    searchCloseOverwrites={{
+                                        source: "fromTitleBar",
+                                        ...vars.stateColors,
+                                    }}
+                                    overwriteSearchBar={{
+                                        compact: isCompact,
+                                    }}
+                                />
+                                {meBox}
+                            </ConditionalWrap>
+                        </div>
+                    </div>
+                </Container>
+            </HashOffsetReporter>
+            <SkipNavContent />
+        </>
     );
 
     const { resetScrollOffset, setScrollOffset, offsetClass } = useScrollOffset();
@@ -382,20 +437,23 @@ function DesktopMeBox() {
     const classes = titleBarClasses();
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
+    const registerLink = useRegisterLink();
+    const signinLink = useSignInLink();
+
     if (isGuest) {
         return (
             <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSPARENT}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
-                    to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
+                    to={signinLink}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
                     buttonType={ButtonTypes.TRANSLUCID}
                     linkClassName={classNames(classes.register, classes.guestButton)}
-                    to={`/entry/register?target=${encodeURIComponent(window.location.href)}`}
+                    to={registerLink}
                 >
                     {t("Register")}
                 </TitleBarNavItem>
@@ -420,11 +478,12 @@ function MobileMeBox() {
     const { currentUser } = useUsersState();
     const isGuest = isUserGuest(currentUser.data);
     const classes = titleBarClasses();
+    const signinLink = useSignInLink();
     if (isGuest) {
         return (
             <SmartLink
                 className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
-                to={`/entry/signin?target=${encodeURIComponent(window.location.href)}`}
+                to={signinLink}
             >
                 <SignInIcon className={"titleBar-signInIcon"} />
             </SmartLink>

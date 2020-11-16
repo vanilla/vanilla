@@ -41,4 +41,18 @@ class MemcachedWithLocalTest extends MemcachedTest {
             $this->assertNotNull($cache);
         });
     }
+
+    /**
+     * Test that our local cache is primed when getting values.
+     */
+    public function testLocalWorks() {
+        \Gdn_Cache::trace(true);
+        $memcached = self::$memcached;
+        $memcached->store('localKey', 'hello world', [\Gdn_Cache::FEATURE_LOCAL => false]);
+        $val = $memcached->get('localKey');
+        $this->assertEquals('hello world', $val);
+        $memcached->get('localKey');
+        $memcached->get('localKey');
+        $this->assertEquals(1, \Gdn_Cache::$trackGets, "Only one actual memcached get should be done. Rest should come from local.");
+    }
 }

@@ -7,6 +7,7 @@
 namespace Garden\Events;
 
 use Vanilla\Events\EventAction;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * An event affecting a specific resource.
@@ -34,6 +35,9 @@ abstract class ResourceEvent implements \JsonSerializable {
     /** @var string */
     protected $type;
 
+    /** @var array $apiParams */
+    protected $apiParams;
+
     /**
      * Create the event.
      *
@@ -44,6 +48,9 @@ abstract class ResourceEvent implements \JsonSerializable {
     public function __construct(string $action, array $payload, ?array $sender = null) {
         $this->action = $action;
         $this->payload = $payload;
+        $this->apiParams = [
+            'expand' => [ModelUtils::EXPAND_CRAWL],
+        ];
         $this->sender = $sender;
         $this->type = $this->typeFromClass();
     }
@@ -56,7 +63,6 @@ abstract class ResourceEvent implements \JsonSerializable {
     public function getAction(): string {
         return $this->action;
     }
-
     /**
      * Get the event payload.
      *
@@ -64,6 +70,24 @@ abstract class ResourceEvent implements \JsonSerializable {
      */
     public function getPayload(): ?array {
         return $this->payload;
+    }
+
+    /**
+     * Get the event resource api params.
+     *
+     * @return array|null
+     */
+    public function getApiParams(): ?array {
+        return $this->apiParams;
+    }
+
+    /**
+     * Set event resource api additional params.
+     *
+     * @param array $params
+     */
+    public function addApiParams(array $params) {
+        $this->apiParams = array_merge($this->apiParams, $params);
     }
 
     /**
@@ -85,6 +109,24 @@ abstract class ResourceEvent implements \JsonSerializable {
     }
 
     /**
+     * Get a unique primary key for the record.
+     *
+     * @return string
+     */
+    public function getUniquePrimaryKey(): string {
+        return $this->getType() . "ID";
+    }
+
+    /**
+     * Get a unique primary key for the record.
+     *
+     * @return string|int
+     */
+    public function getUniquePrimaryKeyValue() {
+        return $this->getPayload()[$this->getType()][$this->getUniquePrimaryKey()];
+    }
+
+    /**
      * Get the full name of the event.
      *
      * @return string
@@ -98,7 +140,7 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    private function typeFromClass(): string {
+    public static function typeFromClass(): string {
         $baseName = get_called_class();
         if (($namespaceEnd = strrpos($baseName, '\\')) !== false) {
             $baseName = substr($baseName, $namespaceEnd + 1);
@@ -115,7 +157,12 @@ abstract class ResourceEvent implements \JsonSerializable {
     public function getRecordTypeAndID(): array {
         $recordType = $this->getType();
 
-        $idKey = $this->type . 'ID';
+        if ($idKey = ($this->payload['documentIdField'] ?? false)) {
+            $idKey = $this->$idKey;
+        } else {
+            $idKey = $this->type . 'ID';
+        }
+
         $payloadRecord = $this->payload[$this->type] ?? $this->payload;
         $recordID = $payloadRecord['recordID'] ?? $payloadRecord[$idKey] ?? null;
 
@@ -131,6 +178,16 @@ abstract class ResourceEvent implements \JsonSerializable {
             'action' => $this->action,
             'payload' => $this->getPayload(),
         ];
+    }
+
+    /**
+     * Get the API URL for the resource.
+     *
+     * @return string
+     */
+    public function getApiUrl() {
+        [$recordType, $recordID] = $this->getRecordTypeAndID();
+        return "/api/v2/{$recordType}s/$recordID";
     }
 
     /**

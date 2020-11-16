@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IApiError, LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -15,6 +15,8 @@ import { formatUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
 import { pageErrorMessageClasses } from "@library/errorPages/pageErrorMessageStyles";
+import { DetailedErrors } from "@library/errorPages/DetailedErrorMessages";
+import { debug } from "@vanilla/utils";
 
 export function CoreErrorMessages(props: IProps) {
     const classes = pageErrorMessageClasses();
@@ -29,6 +31,7 @@ export function CoreErrorMessages(props: IProps) {
             {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
             {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
             {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
+            {debug() && <DetailedErrors detailedErrors={error?.response?.data?.errors} />}
             {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
         </main>
     );
@@ -115,10 +118,16 @@ export function getErrorCode(errorMessageProps: IErrorMessageProps) {
     }
 }
 
+export interface IAPIErrorFragment {
+    response: {
+        status: number;
+    };
+}
+
 export interface IErrorMessageProps {
     defaultError?: string;
     error?: Partial<IError>;
-    apiError?: IApiError;
+    apiError?: IAPIErrorFragment;
 }
 
 export interface IError {
@@ -128,6 +137,7 @@ export interface IError {
     description?: ReactNode;
     actionItem?: ReactNode;
     icon?: ReactNode;
+    response?: any;
 }
 
 export enum DefaultError {

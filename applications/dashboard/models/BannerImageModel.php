@@ -48,20 +48,19 @@ class BannerImageModel {
     public function renderBanner(array $props = []): \Twig\Markup {
         $controller = \Gdn::controller();
         $defaultProps = [
-            'description' => $controller->data(
-                'Category.Description',
-                $controller->description()
-            ),
+            'description' => $controller->contextualDescription(),
             'backgroundImage' => self::getCurrentBannerImageLink(),
         ];
-        $title = $controller->data('Category.Name');
+        $title = $controller->contextualTitle();
 
         if ($title) {
               $defaultProps['title'] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
         }
 
-        //filter description before passing on to the component
-        $defaultProps['description'] = $this->formatService->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
+        //sanitize description before passing on to the component
+        /** @var $htmlSanitizer */
+        $htmlSanitizer = \Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
+        $defaultProps['description'] = $htmlSanitizer->filter($defaultProps['description']);
 
         $props = array_merge($defaultProps, $props);
         $html = "";
@@ -89,24 +88,25 @@ class BannerImageModel {
      * their own set. If no BannerImage can be found the default from the config will be returned
      *
      * @param mixed $categoryID Set an explicit category.
+     * @param int[] $seenIDs Recursion gaurd.
      *
      * @return string The category's slug on success, the default otherwise.
      */
-    public static function getBannerImageSlug($categoryID) {
+    public static function getBannerImageSlug($categoryID, array $seenIDs = []) {
         $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
         if (!$categoryID || $categoryID < 1 || !class_exists(\CategoryModel::class)) {
             return c(self::DEFAULT_CONFIG_KEY);
         }
 
         $category = \CategoryModel::categories($categoryID);
-        $slug = $category['BannerImage'];
+        $slug = $category['BannerImage'] ?? null;
 
         if (!$slug) {
-            $parentID = $category['ParentCategoryID'];
-            if ($parentID == $categoryID) {
+            $parentID = $category['ParentCategoryID'] ?? null;
+            if ($parentID == $categoryID || in_array($categoryID, $seenIDs)) {
                 $slug = c(self::DEFAULT_CONFIG_KEY);
             } else {
-                $slug = self::getBannerImageSlug($parentID);
+                $slug = self::getBannerImageSlug($parentID, array_merge($seenIDs, [$categoryID]));
             }
         }
         return $slug;

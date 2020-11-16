@@ -19,6 +19,12 @@ import { margins, negative, unit } from "@library/styles/styleHelpers";
  *      Example, if it takes 3/4 of the line height, set .75
  * @param verticalOffset - Sometimes the base line isn't centered,
  *      0 remove from top, .5 use font default, 1 remove from bottom
+ *
+ *  When "leading-trim" is supported, we can instead output:
+ *  ```
+ *      text-edge: cap alphabetic;
+ *      leading-trim: both;
+ *  ```
  */
 export function lineHeightAdjustment(
     nestedStyles?: NestedCSSProperties,

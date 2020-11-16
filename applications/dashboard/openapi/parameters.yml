@@ -28,3 +28,11 @@ components:
         type: integer
         default: 1
         minimum: 1
+    Offset:
+      name: offset
+      in: query
+      description: >
+        Similar to a page parameter, but specifies a specific numeric record offset starting at zero.
+      schema:
+        type: integer
+        minimum: 0

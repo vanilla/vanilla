@@ -11,6 +11,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Theme\ThemeFeatures;
 
@@ -87,12 +89,26 @@ class Gdn {
     protected static $_Session = null;
 
     /**
+     * @var Gdn_Controller|null
+     */
+    protected static $controller = null;
+
+    /**
      * Get the addon manager.
      *
      * @return \Vanilla\AddonManager
      */
     public static function addonManager() {
         return self::factory(self::AliasAddonManager);
+    }
+
+    /**
+     * Get the event manager.
+     *
+     * @return EventManager
+     */
+    public static function eventManager(): EventManager {
+        return self::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -158,13 +174,20 @@ class Gdn {
      * @return Gdn_Controller
      */
     public static function controller($value = null) {
-        static $controller = null;
-
         if ($value !== null) {
-            $controller = $value;
+            self::$controller = $value;
         }
 
-        return $controller;
+        return self::$controller;
+    }
+
+    /**
+     * Set the controller to an explicit value.
+     *
+     * @param Gdn_Controller|null $controller
+     */
+    public static function setController(?Gdn_Controller $controller) {
+        self::$controller = $controller;
     }
 
     /**
@@ -183,6 +206,13 @@ class Gdn {
      */
     public static function database() {
         return self::factory(self::AliasDatabase);
+    }
+
+    /**
+     * @return DateTimeFormatter
+     */
+    public static function dateTimeFormatter(): DateTimeFormatter {
+        return self::getContainer()->get(DateTimeFormatter::class);
     }
 
     /**

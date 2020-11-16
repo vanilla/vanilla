@@ -315,6 +315,7 @@ class CategoriesController extends VanillaController {
             }
             return;
         } else {
+            CategoryModel::instance()->setJoinUserCategory(true);
             $category = CategoryModel::categories($categoryIdentifier);
 
             if (empty($category)) {
@@ -333,7 +334,8 @@ class CategoriesController extends VanillaController {
             $this->setData('Category', $category, true);
 
             $this->title(Gdn::formatService()->renderPlainText(val('Name', $category, ''), HtmlFormat::FORMAT_KEY));
-            $this->description(val('Description', $category), true);
+
+            $this->description(val('Description', $category), false);
 
             switch ($category->DisplayAs) {
                 case 'Flat':
@@ -457,8 +459,8 @@ class CategoriesController extends VanillaController {
 
             // We don't wan't child categories in announcements.
             $wheres['d.CategoryID'] = $categoryID;
-            $announceData = $discussionModel->getAnnouncements($wheres, $offset, $limit);
-            $this->AnnounceData = $this->setData('Announcements', $announceData);
+            $announceData = $offset == 0 ? $discussionModel->getAnnouncements($wheres) : false;
+            $this->AnnounceData = $this->setData('Announcements', $announceData !== false ? $announceData : [], true);
             $wheres['d.CategoryID'] = $categoryIDs;
 
             // RSS should include announcements.

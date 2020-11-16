@@ -5,8 +5,10 @@
 
 import React from "react";
 import { dateTimeClasses } from "@library/content/dateTimeStyles";
-import { LoadingRectange, LoadingSpacer } from "@library/loaders/LoadingRectangle";
+import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
 import classNames from "classnames";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@vanilla/i18n/src";
 
 interface IProps {
     size?: number;
@@ -16,5 +18,14 @@ interface IProps {
 export function DateTimeCompactPlaceholder(props: IProps) {
     const classes = dateTimeClasses();
     const size = props.size ?? 38;
-    return <LoadingRectange className={classNames(classes.compactRoot, props.className)} height={size} width={size} />;
+    return (
+        <>
+            <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
+            <LoadingRectangle
+                className={classNames(classes.compactRoot, props.className, props.className)}
+                height={size}
+                width={size}
+            />
+        </>
+    );
 }

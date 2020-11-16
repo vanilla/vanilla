@@ -9,18 +9,20 @@ import {
     importantColorOut,
     unit,
     colorOut,
-    backgroundHelper,
-    ColorValues,
     absolutePosition,
     negativeUnit,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { important, percent, quote, translate } from "csx";
-import { iconClasses } from "@library/icons/iconStyles";
+import { quote, translate } from "csx";
+import { forumVariables } from "@library/forms/forumStyleVars";
+import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
 
 export const discussionCSS = () => {
-    const vars = globalVariables();
+    const globalVars = globalVariables();
+    const formVars = forumVariables();
+    const userPhotoVars = formVars.userPhoto;
 
     cssOut(
         `
@@ -29,8 +31,8 @@ export const discussionCSS = () => {
         .MessageList.Discussion
         `,
         {
-            color: colorOut(vars.mainColors.fg),
-            fontSize: unit(vars.fonts.size.medium),
+            color: colorOut(globalVars.mainColors.fg),
+            fontSize: unit(globalVars.fonts.size.medium),
         },
     );
 
@@ -44,7 +46,7 @@ export const discussionCSS = () => {
         .userContent.userContent h6
     `,
         {
-            color: colorOut(vars.mainColors.fg),
+            color: colorOut(globalVars.mainColors.fg),
         },
     );
 
@@ -65,8 +67,8 @@ export const discussionCSS = () => {
         .Item .Poll .PollOptions .PollColor.PollColor10,
     `,
         {
-            color: colorOut(vars.mainColors.primaryContrast),
-            backgroundColor: importantColorOut(vars.mixPrimaryAndBg(vars.constants.stateColorEmphasis)),
+            color: colorOut(globalVars.mainColors.primaryContrast),
+            backgroundColor: importantColorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis)),
             opacity: 1,
         },
     );
@@ -86,7 +88,7 @@ export const discussionCSS = () => {
         ".Meta.Meta-Discussion",
 
         {
-            display: vars.meta.display,
+            display: globalVars.meta.display,
         },
     );
 
@@ -94,9 +96,11 @@ export const discussionCSS = () => {
         `
         .MessageList .ItemDiscussion .Item-Header.DiscussionHeader .PhotoWrap,
         .MessageList .ItemComment .Item-Header .PhotoWrap,
-        .MessageList .ItemDiscussion .Item-Header .PhotoWrap
+        .MessageList .ItemDiscussion .Item-Header .PhotoWrap,
+        .MessageList .Item-Header .userCardWrapper-photo,
         `,
         {
+            position: "absolute",
             top: 2,
             left: 2,
         },
@@ -163,6 +167,30 @@ export const discussionCSS = () => {
     `,
         {
             marginTop: negativeUnit(2),
+        },
+    );
+
+    userCardDiscussionPlacement();
+
+    cssOut(
+        `
+        .Container .MessageList .ItemComment .Item-Header,
+        .Container .MessageList .ItemDiscussion .Item-Header
+    `,
+        paddings({
+            all: globalVars.gutter.half,
+            top: globalVars.gutter.size,
+        }),
+    );
+
+    cssOut(
+        `
+        body.Discussion .ItemDiscussion .DiscussionHeader .userCardWrapper-photo,
+        body.Discussion .MessageList .CommentHeader .userCardWrapper-photo,
+        `,
+        {
+            top: 0,
+            left: 0,
         },
     );
 };

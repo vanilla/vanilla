@@ -111,6 +111,19 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     }
 
     /**
+     * Merge another data array on top of this one.
+     *
+     * This method does a recursive merge so you can specify a deeply nested array here.
+     *
+     * @param array $data The data to merge.
+     * @return $this
+     */
+    public function mergeData(array $data): self {
+        $this->data = array_merge_recursive($this->data, $data);
+        return $this;
+    }
+
+    /**
      * Get the HTTP status.
      *
      * @return int Returns the status.

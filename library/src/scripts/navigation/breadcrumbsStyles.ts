@@ -62,7 +62,6 @@ export const breadcrumbsClasses = useThemeCache(() => {
         flexWrap: "wrap",
         $nest: {
             [`& a.${link}`]: {
-                color: colorOut(globalVars.mainColors.primary),
                 textDecoration: "underline",
             },
         },

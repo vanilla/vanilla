@@ -1,0 +1,20 @@
+{% from "@dashboard/components/macros.twig" import dashboardHeading %}
+
+{{
+    helpAsset(
+        ('Heads Up!'),
+        t(
+            'This redirect only applies if a SSO ID exists for the destination user.',
+            'This redirect only applies if a SSO ID exists for the destination user. '~
+            'Otherwise the default Vanilla user profile is shown.'
+        )~
+        '<br /><br />'~
+        t(
+            '*Allowed tag: {userID} {name} {ssoID}',
+            '*Allowed tag: {userID} {name} {ssoID}'
+        )
+    )
+}}
+
+{{ dashboardHeading({ title: Title }) }}
+{{ ConfigurationModule.render()|raw }}

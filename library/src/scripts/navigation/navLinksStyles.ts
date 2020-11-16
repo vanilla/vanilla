@@ -106,7 +106,7 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const mediaQueries = () => {
-        const oneColumn = styles => {
+        const oneColumn = (styles) => {
             return media({ maxWidth: px(breakPoints.oneColumn) }, styles);
         };
 

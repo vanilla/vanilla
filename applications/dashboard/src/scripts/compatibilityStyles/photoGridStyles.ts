@@ -36,7 +36,7 @@ export const photoGridCSS = () => {
         width: important(calc(`100% + ${unit(vars.spacer.default * 2)}`)),
     });
 
-    cssOut(`.PhotoGrid a`, {
+    cssOut(`.PhotoGrid .PhotoWrap`, {
         ...margins({
             all: importantUnit(vars.spacer.default),
         }),

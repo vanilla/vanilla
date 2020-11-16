@@ -132,7 +132,6 @@ class LocaleModel {
                 }
             }
         }
-
         return $result;
     }
 
@@ -222,7 +221,6 @@ class LocaleModel {
      * Temporarily enable a locale pack without installing it/
      *
      * @param string $localeKey The key of the folder.
-     * @throws NotFoundException
      */
     public function testLocale($localeKey) {
         $available = $this->availableLocalePacks();

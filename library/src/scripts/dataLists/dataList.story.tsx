@@ -12,7 +12,7 @@ import { DataList } from "@library/dataLists/DataList";
 import { STORY_DATE } from "@library/storybook/storyData";
 
 export default {
-    title: "Data List",
+    title: "Components/Data List",
     parameters: {},
 };
 

@@ -10,7 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
-export const panelWidgetClasses = useThemeCache(mediaQueries => {
+export const panelWidgetClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
     const style = styleFactory("panelWidget");
 

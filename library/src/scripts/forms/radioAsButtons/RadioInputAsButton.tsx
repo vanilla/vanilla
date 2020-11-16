@@ -12,10 +12,11 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { LiveMessage } from "react-aria-live";
 import { sprintf } from "sprintf-js";
+import { RecordID } from "@vanilla/utils";
 
 export interface IBaseRadioProps {
     label: string;
-    data: string | number;
+    data: RecordID;
     className?: string;
     disabled?: boolean;
     isLoading?: boolean;
@@ -45,15 +46,15 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
     const activeItem = props["activeItem"];
     const classes = props["classes"] || { item: null, input: null, label: null };
 
-    const onClick = event => {
+    const onClick = (event) => {
         props.setData(props.data);
     };
 
-    const handleOnChange = event => {
+    const handleOnChange = (event) => {
         return;
     };
 
-    const onKeyDown = event => {
+    const onKeyDown = (event) => {
         switch (event.key) {
             case "Enter":
             case "Spacebar":

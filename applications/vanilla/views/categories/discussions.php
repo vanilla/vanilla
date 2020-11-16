@@ -15,7 +15,7 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
                 continue;
 
                 $this->Category = $Category;
-                $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID];
+                $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID] ?? null;
                 $options = getOptions($Category);
 
             ?>
@@ -23,26 +23,40 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
             <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
                 <?php
                     if (!$dataDriven) {
-                        echo $options;
+                        if ($this->Category->DisplayAs === "Discussions") {
+                            echo $options;
+                        }
                     } else {
                         echo "<div class='CategoryBox-Head'>";
                     }
                 ?>
-                <h2 class="H">
-                    <?php
+                <?php if ($this->Category->DisplayAs === "Heading") : ?>
+                    <h2 class="H">
+                        <?php
+                            echo htmlspecialchars($Category->Name);
+                            Gdn::controller()->EventArguments['Category'] = $Category;
+                            Gdn::controller()->fireEvent('AfterCategoryTitle');
+                        ?>
+                    </h2>
+                <?php else: ?>
+                    <h2 class="H">
+                        <?php
                         $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$Category->Name]);
                         echo anchor(htmlspecialchars($Category->Name), categoryUrl($Category), ["aria-label" => $accessibleLabel]);
                         Gdn::controller()->EventArguments['Category'] = $Category;
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
-                    ?>
-                </h2>
+                        ?>
+                    </h2>
+                <?php endif; ?>
                 <?php
                     if ($dataDriven) {
-                        echo $options;
+                        if ($this->Category->DisplayAs === "Discussions") {
+                            echo $options;
+                        }
                         echo "</div>";
                     }
                 ?>
-                <?php if (isset($this->DiscussionData) && $this->DiscussionData->numRows() > 0) : ?>
+                <?php if (!empty($this->DiscussionData) && $this->DiscussionData->numRows() > 0) : ?>
                     <ul class="DataList Discussions">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>
                     </ul>
@@ -57,7 +71,9 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
                     <?php endif; ?>
 
                 <?php else: ?>
-                    <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+                    <?php if ($this->Category->DisplayAs === "Discussions") {
+                        echo '<div class="Empty">'.t('No discussions were found.').'</div>';
+                    } ?>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>

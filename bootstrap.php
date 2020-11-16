@@ -1,30 +1,52 @@
 <?php
 
+use Garden\ClassLocator;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\BodyFormatValidator;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Controllers\SearchRootController;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
+use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Html\HtmlEnhancer;
+use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Knowledge\Models\NavigationCacheProcessor;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
+use Vanilla\Models\ModelFactory;
+use Vanilla\Models\SiteMeta;
+use Vanilla\Models\TrustedDomainModel;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
+use Vanilla\PlainTextLengthValidator;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
+use Vanilla\Search\SearchTypeCollectorInterface;
+use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
+use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Web\Page;
+use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
+use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
+use Vanilla\Widgets\WidgetService;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -62,6 +84,9 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setAliasOf(DateTimeImmutable::class)
     ->setConstructorArgs([null, null])
 
+    ->rule(DateTimeFormatter::class)
+    ->setShared(true)
+
     // Cache
     ->rule('Gdn_Cache')
     ->setShared(true)
@@ -73,13 +98,20 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass(\Vanilla\Cache\CacheCacheAdapter::class)
 
     // Configuration
-    ->rule('Gdn_Configuration')
+    ->rule(Gdn_Configuration::class)
     ->setShared(true)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
     ->rule(\Vanilla\ImageResizer::class)
     ->addCall('setAlwaysRewriteGif', [false])
+
+    ->rule(Contracts\Site\AbstractSiteProvider::class)
+    ->setShared(true)
+    ->setClass(OwnSiteProvider::class)
+
+    ->rule(\Vanilla\Utility\Timers::class)
+    ->setShared(true)
 
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
@@ -122,6 +154,12 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Garden\Web\Cookie::class)
     ->setShared(true)
     ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
+    ->addCall('setSecure', [new \Garden\Container\Callback(function (\Psr\Container\ContainerInterface $container) {
+        $config = $container->get(Gdn_Configuration::class);
+        $request = $container->get(\Garden\Web\RequestInterface::class);
+        $secure = $config->get('Garden.ForceSSL') && $request->getScheme() === 'https';
+        return $secure;
+    })])
     ->addAlias('Cookie')
 
     // PluginManager
@@ -204,6 +242,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule('Gdn_DatabaseStructure')
     ->setClass('Gdn_MySQLStructure')
+    ->addCall("setFullTextIndexingEnabled", [new Reference(["Gdn_Configuration", "Database.FullTextIndexing"])])
     ->setShared(true)
     ->addAlias(Gdn::AliasDatabaseStructure)
     ->addAlias('MySQLStructure')
@@ -247,10 +286,12 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
     ->addCall('setHotReloadEnabled', [
         ContainerUtils::config('HotReload.Enabled'),
-        ContainerUtils::config('HotReload.IP'),
     ])
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+    // Explicitly cannot be set as shared.
+    // If instaniated too early, then the request/site sections will not be processed yet.
+    ->setShared(false)
 
     ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
     ->addAlias('HstsModel')
@@ -291,6 +332,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
+    ->setShared(true)
     ->setConstructorArgs(['/api/v2/'])
     ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
     ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
@@ -348,8 +390,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule(Model::class)
     ->setShared(true)
 
+    ->rule(TrustedDomainModel::class)
+    ->setShared(true)
+
     ->rule(Contracts\Models\UserProviderInterface::class)
     ->setClass(UserModel::class)
+
+    ->rule(BreadcrumbModel::class)
+    ->setShared(true)
 
     ->rule(Gdn_Validation::class)
     ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
@@ -361,15 +409,17 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
 
-    ->rule(SearchModel::class)
-    ->setShared(true)
-
     ->rule(SearchService::class)
     ->setShared(true)
     ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
     ->rule(AbstractSearchDriver::class)
     ->setShared(true)
+    ->rule(SearchTypeCollectorInterface::class)
     ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
+    ->setInherit(true)
+
+    ->rule(WidgetService::class)
+    ->setShared(true)
 
     ->rule('Gdn_IPlugin')
     ->setShared(true)
@@ -414,8 +464,14 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setClass('Gdn_Smarty')
     ->setShared(true)
 
+    ->rule('ViewHandler.php')
+    ->setShared(true)
+
     ->rule('ViewHandler.twig')
     ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
+    ->setShared(true)
+
+    ->rule(TwigRenderer::class)
     ->setShared(true)
 
     ->rule(TwigEnhancer::class)
@@ -474,7 +530,38 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setInherit(true)
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
     ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
+
+    // Optimizations
+    ->rule(ModelFactory::class)
+    ->setShared(true)
+    ->rule(BodyFormatValidator::class)
+    ->setShared(true)
+    ->rule(PlainTextLengthValidator::class)
+    ->setShared(true)
+    ->rule(SafeCurlHttpHandler::class)
+    ->setShared(true)
+
+    // These cannot be shared because they can be configured differently.
+    ->rule(Contracts\Formatting\FormatInterface::class)
+    ->setInherit(true)
+    ->setShared(false)
+
+    ->rule(SiteMeta::class)
+    ->setShared(true)
+    ->rule(ThemeServiceHelper::class)
+    ->setShared(true)
+    ->rule(ClassLocator::class)
+    ->setShared(true)
+    ->rule(HtmlPlainTextConverter::class)
+    ->setShared(true)
+    ->rule(FsThemeProvider::class)
+    ->setShared(true)
+    ->rule(ThemeAssetFactory::class)
+    ->setShared(true)
+    ->rule(FormatConfig::class)
+    ->setShared(true)
 ;
+
 
 // Run through the bootstrap with dependencies.
 $dic->call(function (
@@ -561,8 +648,6 @@ $dic->call(function (
         debug(true);
     }
 
-    Gdn_Cache::trace(debug()); // remove later
-
     /**
      * Extension Startup
      *
@@ -633,8 +718,29 @@ if (!defined('CLIENT_NAME')) {
 }
 
 register_shutdown_function(function () use ($dic) {
-    // Trigger SchedulerDispatch event
-    $dic->get(\Garden\EventManager::class)->fire('SchedulerDispatch');
+    $dic->call(function (
+        Gdn_Configuration $config,
+        \Garden\EventManager $eventManager,
+        \Psr\Log\LoggerInterface $log,
+        \Vanilla\Utility\Timers $timers
+    ) {
+        // Trigger SchedulerDispatch event
+        $eventManager->fire('SchedulerDispatch');
+
+        // Logs timers
+        if ($config->get('trace.timers')) {
+            $timers->stopAll();
+            $log->log(
+                \Psr\Log\LogLevel::INFO,
+                'elapsed: {request_elapsed_ms}ms, '.$timers->getLogFormatString(),
+                $timers->jsonSerialize() + [
+                    'request_elapsed_ms' => $_SERVER['REQUEST_TIME_FLOAT'] ? (int)((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000) : null,
+                    \Vanilla\Logger::FIELD_EVENT => 'app_timers',
+                    \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
+                ]
+            );
+        }
+    });
 });
 
 // Add the log decorator.

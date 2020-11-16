@@ -11,6 +11,8 @@
  * @since 2.0.17
  */
 
+use Vanilla\CurrentTimeStamp;
+
 /**
  * Handles install-side analytics gathering and sending.
  */
@@ -58,7 +60,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             array_unshift($fullMethod, "analytics");
         }
 
-        list($apiController, $apiMethod) = $fullMethod;
+        [$apiController, $apiMethod] = $fullMethod;
         $apiController = strtolower($apiController);
         $apiMethod = stringEndsWith(strtolower($apiMethod), '.json', true, true).'.json';
 
@@ -306,7 +308,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * @return bool
      */
     public static function cidrCheck($iP, $cIDR) {
-        list ($net, $mask) = explode("/", $cIDR);
+        [$net, $mask] = explode("/", $cIDR);
 
         // Allow non-standard /0 syntax
         if ($mask == 0) {
@@ -887,7 +889,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * @return int
      */
     public static function time() {
-        return time();
+        return CurrentTimeStamp::get();
     }
 
     /**
@@ -998,7 +1000,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             return 0;
         }
 
-        list($year, $month, $day, $hour, $minute) = [1, 1, 1, 0, 0];
+        [$year, $month, $day, $hour, $minute] = [1, 1, 1, 0, 0];
         if ($resolution == 'auto') {
             $timeslotLength = strlen($timeSlot);
         } else {

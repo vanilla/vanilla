@@ -7,24 +7,32 @@
 
 namespace VanillaTests\Models;
 
+use CategoryModel;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Class CategoryModelTest
  *
  * @package VanillaTests\Models
  */
-class CategoryModelTest extends TestCase {
-
-    use SiteTestTrait;
-    use ModelTestTrait;
+class CategoryModelTest extends SiteTestCase {
+    use CommunityApiTestTrait, TestCategoryModelTrait, ModelTestTrait, UsersAndRolesApiTestTrait;
 
     /**
-     * @var \CategoryModel
+     * @var array
      */
-    private $model;
+    private $category;
+
+    /**
+     * @var int
+     */
+    private $categoryID;
 
     /**
      * Set up a category model for testing.
@@ -32,12 +40,11 @@ class CategoryModelTest extends TestCase {
      * @throws \Garden\Container\ContainerException Throws container exception.
      */
     public function setUp(): void {
-        $this->setupSiteTestTrait();
-        $this->container()->call(function (
-            \CategoryModel $categoryModel
-        ) {
-            $this->model = $categoryModel;
-        });
+        parent::setUp();
+        $this->enableCaching();
+
+        $this->category = $this->insertCategories(1)[0];
+        $this->categoryID = $this->category['CategoryID'];
     }
 
     /**
@@ -49,7 +56,7 @@ class CategoryModelTest extends TestCase {
         $fn = function (&$categories) {
             $this->sortFlatCategories($categories);
         };
-        $sort = $fn->bindTo($this->model, $this->model);
+        $sort = $fn->bindTo($this->categoryModel, $this->categoryModel);
         $sort($categories);
     }
 
@@ -631,8 +638,8 @@ class CategoryModelTest extends TestCase {
      */
     public function testSearchCategories() {
         \Gdn::sql()->truncate('Category');
-        /** @var \CategoryModel $categoryModel */
-        $categoryModel = self::container()->get(\CategoryModel::class);
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
 
         $cat1 = $categoryModel->save([
             'ParentCategoryID' => -1,
@@ -680,6 +687,7 @@ class CategoryModelTest extends TestCase {
         $categoryModel->follow(\Gdn::session()->UserID, $cat2_1_followed, true);
 
         $this->assertIDsEqual([
+            -1,
             0,
             $cat1,
             $cat1_1,
@@ -696,6 +704,7 @@ class CategoryModelTest extends TestCase {
         ], $categoryModel->getSearchCategoryIDs(null, true));
 
         $this->assertIDsEqual([
+            -1,
             0,
             $cat1,
             $cat1_1,
@@ -714,6 +723,249 @@ class CategoryModelTest extends TestCase {
             // Archived not included.
         ], $categoryModel->getSearchCategoryIDs($cat1, null, true));
 
-        $this->assertIDsEqual([], $categoryModel->getSearchCategoryIDs(50000));
+        $this->assertIDsEqual([0], $categoryModel->getSearchCategoryIDs(50000));
+    }
+
+    /**
+     * Test getting multiple items from the collection.
+     */
+    public function testCollectionGetMulti() {
+        \Gdn::sql()->truncate('Category');
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+
+        $simpleGet = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'simple',
+            'UrlCode' => 'simple',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $refreshCache = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'refreshCache',
+            'UrlCode' => 'refreshCache',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $alreadyGetMulti = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'alreadyGetMulti',
+            'UrlCode' => 'alreadyGetMulti',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $fresh = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'fresh',
+            'UrlCode' => 'fresh',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        // Try and hydrate the in memory cache a bit.
+        $collection = $categoryModel->getCollection();
+        $this->assertCalculated($collection->get((int) $simpleGet));
+
+        $collection->refreshCache($refreshCache);
+        $this->assertCalculated($collection->get((int) $refreshCache));
+
+        // Load a mulit of it's own.
+        $this->assertCalculated($collection->getMulti([$alreadyGetMulti]));
+
+        // All together now.
+        $this->assertCalculated($collection->getMulti([$simpleGet, $refreshCache, $alreadyGetMulti, $fresh]));
+    }
+
+    /**
+     * Assert some categories have been calculated.
+     *
+     * @param array $categoryOrCategories
+     */
+    public function assertCalculated(array $categoryOrCategories) {
+        $categories = $categoryOrCategories;
+        if (ArrayUtils::isAssociative($categories)) {
+            $categories = [$categories];
+        }
+
+        foreach ($categories as $category) {
+            $this->assertNotNull($category['PermsDiscussionsView'] ?? null);
+            $this->assertNotNull($category['Url'] ?? null);
+            $this->assertNotNull($category['CssClass'] ?? null);
+        }
+    }
+
+    /**
+     * Verify backwards-compatible behavior of resetting a category's permissions when updating.
+     */
+    public function testSaveResetPermissions(): void {
+        $this->createRole(["name" => __FUNCTION__]);
+        $this->createPermissionedCategory(["parentCategoryID" => CategoryModel::ROOT_ID], [$this->lastRoleID]);
+
+        // Confirm the category is setup for custom permissions.
+        $original = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $original["PermissionCategoryID"]);
+
+        // Category was root-level, so should fall back to default category permissions.
+        $this->categoryModel->save([
+            "CategoryID" => $this->lastInsertedCategoryID,
+            "Name" => sha1(mt_rand()),
+            "Permissions" => null,
+        ]);
+        $result = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame(CategoryModel::ROOT_ID, $result["PermissionCategoryID"]);
+    }
+
+    /**
+     * Verify sparse updating an existing category won't unduly update its permissions.
+     */
+    public function testSavePermissionsUpdate(): void {
+        $this->createRole(["name" => __FUNCTION__]);
+        $this->createPermissionedCategory(["parentCategoryID" => CategoryModel::ROOT_ID], [$this->lastRoleID]);
+
+        // Confirm the category is setup for custom permissions.
+        $original = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $original["PermissionCategoryID"]);
+
+        // Not modifying any permission fields, so the custom-permission status should be unchanged.
+        $this->categoryModel->save([
+            "CategoryID" => $this->lastInsertedCategoryID,
+            "Name" => sha1(mt_rand()),
+        ]);
+        $result = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $result["PermissionCategoryID"]);
+    }
+
+    /**
+     * Tests for sorting an array of categories as a tree.
+     */
+    public function testSortCategoriesAsTree() {
+        $root = [
+            'Name' => 'Root',
+            'CategoryID' => -1,
+            'ParentCategoryID' => null,
+        ];
+        $cat1 = [
+            'Name' => '1',
+            'CategoryID' => 1,
+            'ParentCategoryID' => -1,
+            'Sort' => 1,
+        ];
+        $cat1_1 = [
+            'Name' => '1.1',
+            'CategoryID' => 2,
+            'ParentCategoryID' => 1,
+            'Sort' => 1,
+        ];
+        $cat1_2 = [
+            'Name' => '1.2',
+            'CategoryID' => 3,
+            'ParentCategoryID' => 1,
+            'Sort' => 2,
+        ];
+        $cat2 = [
+            'Name' => '2',
+            'CategoryID' => 4,
+            'ParentCategoryID' => -1,
+            'Sort' => 2,
+        ];
+        $catNowhere = [
+            'Name' => 'nowhere',
+            'CategoryID' => 1000,
+            'ParentCategoryID' => 1342,
+            'Sort' => -40,
+        ];
+
+        $expected = [
+            $root,
+            $cat1,
+            $cat1_1,
+            $cat1_2,
+            $cat2,
+            $catNowhere
+        ];
+
+        $in = [
+            $cat2,
+            $cat1_1,
+            $cat1_2,
+            $root,
+            $catNowhere,
+            $cat1,
+        ];
+
+        $this->assertSame($expected, CategoryModel::sortCategoriesAsTree($in));
+
+        // Test when a broken tree is passed.
+        $expected = [
+            $cat2,
+            $catNowhere,
+            $cat1_1,
+            $cat1_2,
+        ];
+
+        $in = [
+            $cat2,
+            $cat1_1,
+            $cat1_2,
+            $catNowhere,
+        ];
+
+        $this->assertSame($expected, CategoryModel::sortCategoriesAsTree($in));
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected.
+     */
+    public function testSetLocalNotFetched(): void {
+        $this->assertNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, 'Name', __FUNCTION__);
+
+        $c1 = CategoryModel::categories($this->categoryID);
+        $this->assertSame(__FUNCTION__, $c1['Name']);
+
+        // All categories should not have been fetched just to look at one.
+        $this->assertNull(CategoryModel::$Categories);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories()[$this->categoryID]['Name']);
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected with a different fetch order
+     */
+    public function testSetLocalNotFetched2(): void {
+        $this->assertNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, 'Name', __FUNCTION__);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories()[$this->categoryID]['Name']);
+
+        $this->assertSame(__FUNCTION__, CategoryModel::instance()->getCollection()->get($this->categoryID)['Name']);
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected with a different fetch order
+     */
+    public function testSetLocalFetchedGlobally(): void {
+        CategoryModel::categories();
+        CategoryModel::instance()->getCollection()->get($this->categoryID);
+        $this->assertNotNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, 'Name', __FUNCTION__);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories($this->categoryID)['Name']);
+
+        $this->assertSame(__FUNCTION__, CategoryModel::instance()->getCollection()->get($this->categoryID)['Name']);
+    }
+
+    /**
+     * This test is to protect against a brain fart in calculation logic.
+     */
+    public function testDontCorruptOtherCategoriesWithSetLocalField(): void {
+        $id = $this->insertCategories(1)[0]['CategoryID'];
+        CategoryModel::setLocalField($this->categoryID, 'Name', __FUNCTION__);
+
+        $this->assertNotSame(CategoryModel::categories($id)['Name'], __FUNCTION__);
+        $this->assertNotSame(CategoryModel::categories()[$id]['Name'], __FUNCTION__);
     }
 }

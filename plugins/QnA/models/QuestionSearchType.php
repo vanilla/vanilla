@@ -26,4 +26,25 @@ class QuestionSearchType extends DiscussionSearchType {
     public function getType(): string {
         return 'question';
     }
+
+    /**
+     * @return string
+     */
+    public function getSingularLabel(): string {
+        return \Gdn::translate('Question');
+    }
+
+    /**
+     * @return string
+     */
+    public function getPluralLabel(): string {
+        return \Gdn::translate('Questions');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDTypes(): ?array {
+        return [1];
+    }
 }

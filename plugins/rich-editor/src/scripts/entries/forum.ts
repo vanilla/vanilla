@@ -24,7 +24,7 @@ async function setupEditor() {
             body[0].classList.add("hasRichEditor");
         }
         const mountEditor = await import(/* webpackChunkName: "mountEditor" */ "@rich-editor/mountEditor");
-        editorMountPoints.forEach(mountPoint => {
+        editorMountPoints.forEach((mountPoint) => {
             if (!mountPoint.classList.contains(MOUNTED_CLASS)) {
                 mountPoint.classList.add(MOUNTED_CLASS);
                 const descriptionID = mountPoint.attributes["aria-describedby"].nodeValue || undefined;

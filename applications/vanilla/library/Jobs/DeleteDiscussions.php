@@ -8,7 +8,6 @@ namespace Vanilla\Library\Jobs;
 
 use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
@@ -42,10 +41,11 @@ class DeleteDiscussions implements LocalJobInterface {
                 [
                     "type" => "array",
                     "items" => [
-                        "type" => "integer"
-                    ]
-                ]
+                        "type" => "integer",
+                    ],
+                ],
         ]);
+
         return $schema;
     }
 
@@ -57,6 +57,7 @@ class DeleteDiscussions implements LocalJobInterface {
             return JobExecutionStatus::abandoned();
         }
         $this->discussionModel->deleteID($this->discussionArray);
+
         return JobExecutionStatus::complete();
     }
 
@@ -68,23 +69,5 @@ class DeleteDiscussions implements LocalJobInterface {
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->discussionArray = $message["discussionID"];
-    }
-
-    /**
-     * Set job priority
-     *
-     * @param JobPriority $priority
-     * @return void
-     */
-    public function setPriority(JobPriority $priority) {
-    }
-
-    /**
-     * Set job execution delay
-     *
-     * @param int $seconds
-     * @return void
-     */
-    public function setDelay(int $seconds) {
     }
 }

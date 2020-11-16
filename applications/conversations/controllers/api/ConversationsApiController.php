@@ -520,9 +520,11 @@ class ConversationsApiController extends AbstractApiController {
         } else {
             $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
         }
+
         $dbRecord['body'] = isset($dbRecord['LastBody'])
-            ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
+            ? Gdn::formatService()->renderPlainText($dbRecord['LastBody'], $dbRecord['LastFormat'])
             : t('No messages.');
+
         $dbRecord['url'] = url("/messages/{$dbRecord['ConversationID']}", true);
 
         if (array_key_exists('CountNewMessages', $dbRecord)) {

@@ -13,10 +13,10 @@
         echo plural($this->data('MaxRecipients'), "You are limited to %s recipient.", "You are limited to %s recipients.");
         echo '</div>';
     }
-
+    $userData = $this->Data('userData');
     echo '<div class="P">';
     echo $this->Form->label('Recipients', 'To');
-    echo wrap($this->Form->textBox('To', ['MultiLine' => true, 'class' => 'MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
+    echo wrap($this->Form->textBox('To', ['MultiLine' => true, 'class' => 'MultiComplete', 'data-users' => json_encode($userData)]), 'div', ['class' => 'TextBoxWrapper']);
     echo '</div>';
 
     if (c('Conversations.Subjects.Visible')) {

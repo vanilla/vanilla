@@ -9,14 +9,17 @@ namespace Vanilla\EmbeddedContent;
 use Garden\Container;
 use Garden\Schema\ValidationException;
 use League\Uri\Http;
+use Vanilla\EmbeddedContent\Embeds\BrightcoveEmbed;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
+use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
+use Vanilla\EmbeddedContent\Factories\BrightcoveEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
@@ -192,9 +195,16 @@ class EmbedService implements EmbedCreatorInterface {
             ->registerEmbed(LinkEmbed::class, LinkEmbed::TYPE)
             // Files - No factory for the file embed. Only comes from media endpoint.
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
+            // This one is extended but still gets registered
+            ->registerEmbed(IFrameEmbed::class, IFrameEmbed::TYPE)
+
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
             ->registerFilter($dic->get(QuoteEmbedFilter::class))
+
+            // BrightCove
+            ->registerFactory($dic->get(BrightcoveEmbedFactory::class))
+            ->registerEmbed(BrightcoveEmbed::class, BrightcoveEmbed::TYPE)
         ;
     }
 
@@ -274,15 +284,21 @@ class EmbedService implements EmbedCreatorInterface {
      * Implementations should be fast and capable of running in loop on every page load.
      *
      * @param array $data
+     * @param bool $allowExtendedContent Whether our not we allowed extended content.
+     * Notable iframe embeds are considered exteneded content.
+     *
      * @return AbstractEmbed
      */
-    public function createEmbedFromData(array $data): AbstractEmbed {
+    public function createEmbedFromData(array $data, bool $allowExtendedContent = false): AbstractEmbed {
         // Fallback in case we have bad data (will fallback to fallback embed).
         $type = $data['embedType'] ?? $data['type'] ?? null;
         try {
             $embedClass = $this->registeredEmbeds[$type] ?? null;
             if ($embedClass === null) {
                 return new ErrorEmbed(new \Exception("Embed class for type $type not found."), $data);
+            }
+            if ($embedClass::isExtendedContent() && !$allowExtendedContent) {
+                return new ErrorEmbed(new \Exception("Embed type $type is considered extended content and not allowed in this context."), $data);
             }
             $embed = new $embedClass($data);
             $embed = $this->filterEmbed($embed);

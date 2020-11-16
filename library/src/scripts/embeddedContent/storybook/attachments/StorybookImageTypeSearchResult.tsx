@@ -4,6 +4,7 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import React from "react";
+import Result from "@library/result/Result";
 
 const dummyUserFragment = {
     userID: 1,
@@ -16,7 +17,7 @@ export function StoryBookImageTypeSearchResult(props: {
     type: "square" | "flush" | "tall" | "wide";
     imageSet: {
         big: string;
-        flush: string;
+        medium: string;
         small: string;
     };
 }) {
@@ -36,6 +37,7 @@ export function StoryBookImageTypeSearchResult(props: {
         <>
             <StoryHeading>{`Image type: "${props.type}" with ratio (${ratio})`}</StoryHeading>
             <ResultList
+                result={Result}
                 results={[
                     {
                         name: `Example search result - Big Image {"${props.type}"} with ratio (${ratio})`,
@@ -57,7 +59,7 @@ export function StoryBookImageTypeSearchResult(props: {
                     {
                         name: `Example search result - Flush Image {"${props.type}"} with ratio (${ratio})`,
                         url: "#",
-                        image: props.imageSet.flush,
+                        image: props.imageSet.medium,
                         excerpt:
                             "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
                         meta: (

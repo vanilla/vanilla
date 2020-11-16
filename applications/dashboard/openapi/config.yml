@@ -1,0 +1,110 @@
+openapi: 3.0.2
+info:
+  description: API access to your community.
+  title: Vanilla API
+  version: '2.0'
+servers:
+  - url: /api/v2
+paths:
+  /config:
+    get:
+      summary: Get the site's config.
+      tags:
+        - Config
+      parameters:
+        - name: select
+          in: query
+          description: |
+            A CSV of config key names to select a sparse set of items. Use * as a wildcard to match multiple keys.
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Config'
+          description: Success
+    patch:
+      summary: Update one or more config settings.
+      tags:
+        - Config
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Config"
+      responses:
+        204:
+          description: Success
+components:
+  schemas:
+    Config:
+      type: object
+      properties:
+        'garden.description':
+          description: |
+            The site description usually appears in search engines. You should try having a description that is 100–150
+            characters long.
+          type: string
+          default: ''
+          maxLength: 350
+          x-key: Garden.Description
+          x-read: public
+          x-write: community.manage
+        'garden.externalUrlFormat':
+          description: |
+            The format used to generate URLs to pages from external sources, typically emails. Set this config setting
+            your site is embedded or uses a reverse proxy. Place a "%s" in the URL and it will be replaced with the path
+            being generated.
+          type: string
+          default: ''
+          example: https://example.com/community/%s
+          pattern: (^$)|(^https?://.+%s)
+          x-key: Garden.ExternalUrlFormat
+          x-read: community.manage
+        'garden.homepageTitle':
+          description: |
+            The homepage title is displayed on your home page. Pick a title that you would want to see appear in search
+            engines.
+          type: string
+          default: ''
+          example: Welcome To Our Support Community
+          maxLength: 100
+          x-key: Garden.HomepageTitle
+          x-read: public
+          x-write: community.manage
+        'garden.orgName':
+          description: |
+            Your organization name is used for SEO microdata and JSON+LD.
+          type: string
+          default: ''
+          maxLength: 50
+          x-key: Garden.OrgName
+          x-read: public
+          x-write: community.manage
+        'garden.privacy.ips':
+          description: >-
+            Anonymize IP addresses on users so they aren't tracked. You can specify "partial" to remove the last octet or
+            full to anonymize the entire IP address.
+          type: string
+          default: ''
+          enum:
+            - ''
+            - partial
+            - full
+          x-key: Garden.Privacy.IPs
+          x-read: community.manage
+        'garden.title':
+          description: |
+            The banner title appears on your site's banner and in your browser's title bar.
+          type: string
+          default: ''
+          example: Support Community
+          maxLength: 50
+          x-key: Garden.Title
+          x-read: public
+          x-write: community.manage

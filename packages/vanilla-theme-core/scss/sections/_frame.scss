@@ -30,6 +30,10 @@
     background-repeat: $body_backgroundRepeat;
 }
 
+.EmbeddedFrame.Frame {
+    min-height: initial;
+}
+
 .Frame-top {
     @if ($theme_stickFooter) {
         flex: 1 0 auto;
@@ -112,7 +116,11 @@
 
         .AdminCheck {
             padding: 0;
-            line-height: inherit;
+            height: calc(#{$global-title_fontSize} * #{$global-condensed_lineHeight});
+
+            @include maxWidth {
+                height: calc(#{$global-subTitle_fontSize} * #{$global-condensed_lineHeight});
+            }
 
             input {
                 margin: 0;

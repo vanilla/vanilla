@@ -268,11 +268,11 @@ class PagerModule extends Gdn_Module {
      * Format a URL for the pager.
      *
      * @param string $url The URL format. Use either `{Page}` or `%s` to specify the page.
-     * @param string $page The page number string.
-     * @param string $limit The limit for specifying the size.
+     * @param int $page The page number string.
+     * @param int $limit The limit for specifying the size.
      * @return string Returns a pager URL.
      */
-    public static function formatUrl($url, $page, $limit = '') {
+    public static function formatUrl($url, $page, $limit = 0) {
         // Check for new style page.
         if (strpos($url, '{Page}') !== false) {
             $r = str_replace(['{Page}', '{Size}'], [$page, $limit], $url);

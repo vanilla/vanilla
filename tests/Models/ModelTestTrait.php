@@ -7,8 +7,10 @@
 
 namespace VanillaTests\Models;
 
+use PHPUnit\Framework\TestCase;
+
 /**
- * @method assertSame(mixed $expected, mixed $actual)
+ * Basic testing utilities for models.
  */
 trait ModelTestTrait {
 
@@ -18,8 +20,8 @@ trait ModelTestTrait {
      * @param array $expectedIDs
      * @param array $actualIDs
      */
-    private function assertIDsEqual(array $expectedIDs, array $actualIDs) {
-        $this->assertSame($this->normalizeIDs($expectedIDs), $this->normalizeIDs($actualIDs));
+    protected function assertIDsEqual(array $expectedIDs, array $actualIDs) {
+        TestCase::assertSame($this->normalizeIDs($expectedIDs), $this->normalizeIDs($actualIDs));
     }
 
     /**
@@ -28,7 +30,7 @@ trait ModelTestTrait {
      * @param array $ids
      * @return array
      */
-    private function normalizeIDs(array $ids): array {
+    protected function normalizeIDs(array $ids): array {
         $fixedIDs = array_map(function ($id) {
             return (int) $id;
         }, $ids);

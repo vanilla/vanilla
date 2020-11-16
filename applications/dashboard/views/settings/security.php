@@ -35,6 +35,25 @@ echo $form->errors();
             <?php echo $form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
             </div>
         </li>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $form->label('Content Security Domains', SettingsController::CONFIG_CSP_DOMAINS); ?>
+                <div class="info">
+                    <p>
+                        <?php
+                        echo t(
+                            'You can specify a whitelist of trusted domains. (CSP)',
+                            'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe to load javascript from.'
+                        );
+                        ?>
+                    </p>
+                    <p><?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->textBox(SettingsController::CONFIG_CSP_DOMAINS, ['MultiLine' => true, "implode" => "\n"]); ?>
+            </div>
+        </li>
     </ul>
     <h2 class="subheading"><?php echo t('HTTP Strict Transport Security (HSTS) Settings'); ?></h2>
     <ul>

@@ -403,7 +403,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
         }
     };
 
-    private tabIndex = index => {
+    private tabIndex = (index) => {
         return this.props.rovingIndex === index ? 0 : -1;
     };
 
@@ -561,7 +561,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                     const tabHandler = new TabHandler(this.props.panelsRef.current);
                     const items = tabHandler.getAll(this.props.panelsRef.current);
                     if (items && items.length > 0) {
-                        items.reverse().forEach(item => {
+                        items.reverse().forEach((item) => {
                             const letter = item.dataset.firstletter || null;
                             if (letter && letter === event.key.toLowerCase()) {
                                 item.focus();

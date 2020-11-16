@@ -15,6 +15,7 @@ use Psr\Log\LogLevel;
  * A logger that can contain many loggers.
  *
  * Class Logger
+ *
  * @package Vanilla
  */
 class Logger implements LoggerInterface {
@@ -89,7 +90,7 @@ class Logger implements LoggerInterface {
             self::ERROR => LOG_ERR,
             self::CRITICAL => LOG_CRIT,
             self::ALERT => LOG_ALERT,
-            self::EMERGENCY => LOG_EMERG
+            self::EMERGENCY => LOG_EMERG,
         ];
 
         if (isset($priorities[$level])) {
@@ -100,20 +101,22 @@ class Logger implements LoggerInterface {
     }
 
     /**
-     * Add a new logger to observe messages.
+     * AddLogger
      *
-     * @param LoggerInterface $logger The logger to add.
-     * @param string $level One of the **LogLevel::*** constants.
+     * @param LoggerInterface $logger
+     * @param string|null $level
+     * @param callable $filter Signature: (int $level, string $message, array $context)
      * @return Logger Returns $this for fluent calls.
      */
-    public function addLogger(LoggerInterface $logger, $level = null) {
+    public function addLogger(LoggerInterface $logger, $level = null, callable $filter = null) {
         // Make a small attempt to prevent infinite cycles by disallowing all logger chaining.
         if ($logger instanceof Logger) {
             throw new \InvalidArgumentException("You cannot add a Logger instance to a Logger.", 500);
         }
 
         $level = $level ?: self::DEBUG;
-        $this->loggers[] = [$logger, static::levelPriority($level)];
+        $this->loggers[] = [$logger, static::levelPriority($level), $filter];
+
         return $this;
     }
 
@@ -128,6 +131,7 @@ class Logger implements LoggerInterface {
         foreach ($this->loggers as $i => $addedLogger) {
             if ($addedLogger[0] === $logger) {
                 unset($this->loggers[$i]);
+
                 return $this;
             }
         }
@@ -135,6 +139,7 @@ class Logger implements LoggerInterface {
             $class = get_class($logger);
             trigger_error("Logger $class was removed without being added.");
         }
+
         return $this;
     }
 
@@ -173,11 +178,13 @@ class Logger implements LoggerInterface {
 
         foreach ($this->loggers as $row) {
             /* @var LoggerInterface $logger */
-            list($logger, $loggerPriority) = $row;
+            [$logger, $loggerPriority, $filter] = $row;
 
             if ($loggerPriority >= $levelPriority) {
                 try {
-                    $logger->log($level, $message, $context);
+                    if ($filter === null || call_user_func($filter, $level, $message, $context)) {
+                        $logger->log($level, $message, $context);
+                    }
                 } catch (\Exception $ex) {
                     $inCall = false;
                     throw $ex;

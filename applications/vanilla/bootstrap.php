@@ -12,7 +12,10 @@ use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
 use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
+use Vanilla\Models\FragmentService;
 use Vanilla\Search\AbstractSearchDriver;
+use Vanilla\Search\SearchTypeCollectorInterface;
+use Vanilla\Widgets\WidgetService;
 
 Gdn::getContainer()
     ->rule(EmbedService::class)
@@ -36,8 +39,11 @@ Gdn::getContainer()
     ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
 
     // Search.
-    ->rule(AbstractSearchDriver::class)
+    ->rule(SearchTypeCollectorInterface::class)
     ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
     ->addCall('registerSearchType', [new Reference(CommentSearchType::class)])
 
+    ->rule(WidgetService::class)
+    ->addCall('registerWidget', [\Vanilla\Community\CategoriesModule::class])
+    ->addCall('registerWidget', [TagModule::class]);
 ;

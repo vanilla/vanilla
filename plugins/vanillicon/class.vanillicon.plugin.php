@@ -122,10 +122,10 @@ if (!function_exists('userPhotoDefaultUrl')) {
 
         switch ($type) {
             case 'v2':
-                $photoUrl = "//w$px.vanillicon.com/v2/{$hash}.svg";
+                $photoUrl = "https://w$px.vanillicon.com/v2/{$hash}.svg";
                 break;
             default:
-                $photoUrl = "//w$px.vanillicon.com/{$hash}_{$size}.png";
+                $photoUrl = "https://w$px.vanillicon.com/{$hash}_{$size}.png";
                 break;
         }
 

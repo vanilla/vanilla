@@ -42,7 +42,7 @@ class AuthenticatorCssColorValidation extends TestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         CssColorAuthenticator::resetColor();
 
         parent::tearDown();

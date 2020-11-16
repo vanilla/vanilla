@@ -89,6 +89,12 @@ export const storyBookClasses = useThemeCache(() => {
             [`a`]: {
                 textDecoration: "underline",
             },
+            [`code`]: {
+                backgroundColor: "rgba(0, 0, 0, .04)",
+                padding: ".2em .4em",
+                fontSize: "85%",
+                borderRadius: "4px",
+            },
         },
     });
 

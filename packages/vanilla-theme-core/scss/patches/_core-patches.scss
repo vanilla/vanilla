@@ -45,15 +45,17 @@ body {
     border-bottom-width: 0;
 }
 
-.Item .Author a {
-    font-size: inherit;
-    font-weight: inherit;
-    color: $component-meta_color;
+@if($staticVariables){
+    .Item .Author a {
+        font-size: inherit;
+        font-weight: inherit;
+        color: $component-meta_color;
 
-    &:focus,
-    &:hover {
-        text-decoration: $theme-link-hover_textDecoration;
-        color: $component-meta-link-hover_color;
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
     }
 }
 
@@ -174,6 +176,7 @@ body {
 
     input {
         margin: 0;
+        width: auto;
     }
 }
 

@@ -23,9 +23,7 @@ export const Legacy = storyWithConfig({}, () => {
     return <UserContent content={STORY_CONTENT_LEGACY} />;
 });
 
-Legacy.story = {
-    decorators: [legacyCssDecorator],
-};
+Legacy.decorators = [legacyCssDecorator];
 
 function makeTableStory(tableStyle: TableStyle) {
     const storyFn = storyWithConfig(
@@ -42,11 +40,9 @@ function makeTableStory(tableStyle: TableStyle) {
             return <UserContent content={STORY_CONTENT_TABLES} />;
         },
     );
-    storyFn.story = {
-        parameters: {
-            chromatic: {
-                viewports: [1200, 500],
-            },
+    storyFn.parameters = {
+        chromatic: {
+            viewports: [1200, 500],
         },
     };
     return storyFn;

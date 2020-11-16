@@ -66,7 +66,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
                                 key={index}
                                 focusNextItem={focusNextItem}
                                 focusPrevItem={focusPrevItem}
-                                ref={ref => this.menuItemRefs.push(ref)}
+                                ref={(ref) => this.menuItemRefs.push(ref)}
                                 legacyMode={this.props.legacyMode}
                             />
                         );

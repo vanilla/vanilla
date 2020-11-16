@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { logError } from "@vanilla/utils";
+import { logError, RecordID } from "@vanilla/utils";
 
 export interface IContentTranslatorProps {
     isLoading?: boolean;
@@ -25,7 +25,7 @@ export enum TranslationPropertyType {
 
 export interface ITranslationProperty {
     recordType: string; // Ex. knowledgeCategory
-    recordID?: number; // Ex. 425
+    recordID?: RecordID; // Ex. 425
     recordKey?: string; // Ex. Garden.Description
     sourceText: string; // Ex. "Howdy Stranger"
     propertyName: string; // Ex. name
@@ -38,7 +38,7 @@ export interface ITranslationPropertyValidation {
     maxLength?: number;
 }
 
-export const NullContentTranslator: React.FC<IContentTranslatorProps> = props => {
+export const NullContentTranslator: React.FC<IContentTranslatorProps> = (props) => {
     logError("Rendering a Null Content translator. Be sure to check `shouldDisplay` before rendering.");
     return null;
 };

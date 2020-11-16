@@ -29,12 +29,12 @@ function makeMentionSuggestion(username: string, dateLastActive: Moment | null =
 }
 
 function createSortTestData(basicData: SortProviderTuple[]): ISortTestData[] {
-    return basicData.map(data => {
+    return basicData.map((data) => {
         const [input, search, expected] = data;
         return {
-            input: input.map(name => makeMentionSuggestion(name)),
+            input: input.map((name) => makeMentionSuggestion(name)),
             search,
-            expected: expected.map(name => makeMentionSuggestion(name)),
+            expected: expected.map((name) => makeMentionSuggestion(name)),
         };
     });
 }
@@ -61,7 +61,7 @@ describe("UserSuggestionModel", () => {
 
             it("invalidates the previous successful username", () => {
                 const users = {
-                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
+                    data: ["test", "test2"].map((name) => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(
@@ -79,7 +79,7 @@ describe("UserSuggestionModel", () => {
 
             it("does not invalidate the previous successful username if the new one is a superset of that name", () => {
                 const users = {
-                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
+                    data: ["test", "test2"].map((name) => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(

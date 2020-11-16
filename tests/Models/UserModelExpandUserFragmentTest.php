@@ -8,14 +8,14 @@
 namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\ExpectErrorTrait;
+use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Some basic tests for the `UserModel`.
  */
 class UserModelExpandUserFragmentTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait;
+    use SiteTestTrait, ExpectExceptionTrait;
 
     /**
      * @var \UserModel

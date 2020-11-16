@@ -16,6 +16,9 @@
  */
 class BanModel extends Gdn_Model {
 
+    const CACHE_KEY = "allBans";
+    const CACHE_TTL = 60 * 30; // 30 minutes.
+
     /** Manually banned by a moderator. */
     const BAN_MANUAL = 0x1;
 
@@ -62,12 +65,32 @@ class BanModel extends Gdn_Model {
      */
     public static function &allBans() {
         if (!self::$_AllBans) {
-            self::$_AllBans = Gdn::sql()->get('Ban')->resultArray();
-            self::$_AllBans = Gdn_DataSet::index(self::$_AllBans, ['BanID']);
+            $cache = \Gdn::cache();
+            $bans = $cache->get(self::CACHE_KEY);
+            if ($bans === \Gdn_Cache::CACHEOP_FAILURE) {
+                $bans = Gdn::sql()->get('Ban')->resultArray();
+                $bans = array_column($bans, null, 'BanID');
+                $cache->store(self::CACHE_KEY, $bans, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_KEY]);
+            }
+            self::$_AllBans = $bans;
         }
-//      $AllBans =& self::$_AllBans;
         return self::$_AllBans;
     }
+
+    /**
+     * Clean the ban cache.
+     */
+    public static function clearCache() {
+        \Gdn::cache()->remove(self::CACHE_KEY);
+    }
+
+    /**
+     * Clear the cache on updates.
+     */
+    protected function onUpdate() {
+        self::clearCache();
+    }
+
 
     /**
      * Convert bans to new type.
@@ -236,6 +259,7 @@ class BanModel extends Gdn_Model {
                         ->set('CountBlockedRegistrations', 'CountBlockedRegistrations + 1', false, false)
                         ->where('BanID', $Ban['BanID'])
                         ->put();
+                    self::clearCache();
                 }
             }
         }
@@ -336,11 +360,8 @@ class BanModel extends Gdn_Model {
     /**
      * Save data about ban from form.
      *
-     * @since 2.0.18
-     * @access public
-     *
      * @param array $formPostValues
-     * @param array $settings
+     * @param array|false $settings
      */
     public function save($formPostValues, $settings = false) {
         $currentBanID = val('BanID', $formPostValues);

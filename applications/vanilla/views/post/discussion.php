@@ -20,7 +20,7 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeFormInputs');
 
     if ($this->ShowCategorySelector === true) {
-        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true];
+        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true, 'AdditionalPermissions' => ['PermsDiscussionsAdd']];
         if ($this->Context) {
             $options['Context'] = $this->Context;
         }

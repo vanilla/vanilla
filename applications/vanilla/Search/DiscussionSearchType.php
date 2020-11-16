@@ -9,14 +9,20 @@ namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Cloud\ElasticSearch\Driver\ElasticSearchQuery;
+use Vanilla\DateFilterSchema;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Search\BoostableSearchQueryInterface;
+use Vanilla\Search\CollapsableSerachQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
+use Vanilla\Models\CrawlableRecordSchema;
 
 /**
  * Search record type for a discussion.
@@ -43,6 +49,7 @@ class DiscussionSearchType extends AbstractSearchType {
      *
      * @param \DiscussionsApiController $discussionsApi
      * @param \CategoryModel $categoryModel
+     * @param \UserModel $userModel
      * @param \TagModel $tagModel
      * @param BreadcrumbModel $breadcrumbModel
      */
@@ -83,13 +90,21 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
+     * @return bool
+     */
+    public function supportsCollapsing(): bool {
+        return true;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, array $options = []): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array {
         try {
             $results = $this->discussionsApi->index([
                 'discussionID' => implode(",", $recordIDs),
                 'limit' => 100,
+                'expand' => [ModelUtils::EXPAND_CRAWL, 'tagIDs'],
             ]);
             $results = $results->getData();
 
@@ -99,8 +114,9 @@ class DiscussionSearchType extends AbstractSearchType {
                 ]);
                 $mapped['recordType'] = $this->getSearchGroup();
                 $mapped['type'] = $this->getType();
+                $mapped['legacyType'] = $this->getSingularLabel();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($mapped['categoryID']));
-                return new SearchResultItem($mapped);
+                return new DiscussionSearchResultItem($mapped);
             }, $results);
             return $resultItems;
         } catch (HttpException $exception) {
@@ -110,63 +126,39 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
-     * Check empty results.
-     * This method checks some edge cases when we know that there is no any search results possible.
-     * Ex: when categoryID or userID filer does not exists or user has no permissions to view.
-     *
-     * @param SearchQuery $query
-     * @return array|null
-     */
-    protected function skipType(SearchQuery $query): ?array {
-        $types = $query->getQueryParameter('types');
-        $type = $this->getType();
-        if ($types !== null && ((count($types) > 0) && !in_array($type, $types))) {
-            // discussions are not the part of this search query request
-            // we don't need to do anything
-            return null;
-        }
-
-        $recordTypes = $query->getQueryParameter('recordTypes');
-        if ($recordTypes !== null && ((count($recordTypes) > 0) && !in_array($this->getSearchGroup(), $recordTypes))) {
-            // discussions are not the part of this search query request
-            // we don't need to do anything
-            return null;
-        }
-
-        $categoryIDs = $this->getCategoryIDs($query);
-
-        return [
-            'types' => $types,
-            'recordTypes' => $recordTypes,
-            'categories' => $categoryIDs
-        ];
-    }
-
-    /**
      * @inheritdoc
      */
     public function applyToQuery(SearchQuery $query) {
-        $preparedIDs = $this->skipType($query);
-        if (is_null($preparedIDs)) {
-            return ;
-        }
-
         if ($query instanceof MysqlSearchQuery) {
             $query->addSql($this->generateSql($query));
         } else {
-            $query->addIndex($this->getIndex($query));
+            $query->addIndex($this->getIndex());
+
+            $locale = $query->getQueryParameter('locale');
+
+            $name = $query->getQueryParameter('name');
+            if ($name) {
+                $query->whereText($name, ['name'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+            }
+
+            $allTextQuery = $query->getQueryParameter('query');
+            if ($allTextQuery) {
+                $query->whereText($allTextQuery, ['name', 'body'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+            }
 
             if ($discussionID = $query->getQueryParameter('discussionID', false)) {
                 $query->setFilter('DiscussionID', [$discussionID]);
             };
-            $categoryIDs = $preparedIDs['categories'];
+            $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
             }
 
-            $types = $preparedIDs['types'];
-            if (!empty($types)) {
-                $query->setFilter('type', $types);
+            if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter('discussionRecency')) {
+                $query->startBoostQuery();
+                $query->boostFieldRecency('dateInserted');
+                $query->boostType($this, $this->getBoostValue());
+                $query->endBoostQuery();
             }
 
             // tags
@@ -174,11 +166,21 @@ class DiscussionSearchType extends AbstractSearchType {
             $tagNames = $query->getQueryParameter('tags', []);
             $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
             $tagOp = $query->getQueryParameter('tagOperator', 'or');
-            ;
             if (!empty($tagIDs)) {
-                $query->setFilter('Tags', $tagIDs, false, $tagOp);
+                if ($query instanceof ElasticSearchQuery) {
+                    $query->setFilter('tagIDs', $tagIDs, false, $tagOp);
+                } else {
+                    $query->setFilter('Tags', $tagIDs, false, $tagOp);
+                }
             }
         }
+    }
+
+    /**
+     * @return float|null
+     */
+    protected function getBoostValue(): ?float {
+        return 0.5;
     }
 
     /**
@@ -192,7 +194,7 @@ class DiscussionSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function getQuerySchema(): Schema {
-        return $this->schemaWithTypes(Schema::parse([
+        return Schema::parse([
             'discussionID:i?' => [
                 'x-search-scope' => true,
             ],
@@ -220,7 +222,20 @@ class DiscussionSearchType extends AbstractSearchType {
                     'enum' => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
                 ],
             ],
-        ]));
+        ]);
+    }
+
+    /**
+     * Get article boost types.
+     *
+     * @return Schema|null
+     */
+    public function getBoostSchema(): ?Schema {
+        return Schema::parse([
+            'discussionRecency:b' => [
+                'default' => true,
+            ],
+        ]);
     }
 
     /**
@@ -242,22 +257,13 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function generateSql(MysqlSearchQuery $query): string {
         /** @var \Gdn_SQLDriver $db */
-        $db = $query->getDB();
-        $db->reset();
+        $db = clone $query->getDB();
 
         $categoryIDs = $this->getCategoryIDs($query);
 
         if ($categoryIDs === []) {
             return '';
         }
-
-        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
-
-        if ($userIDs === []) {
-            return '';
-        }
-
-        $db->reset();
 
         // Build base query
         $db->from('Discussion d')
@@ -278,30 +284,20 @@ class DiscussionSearchType extends AbstractSearchType {
             $terms = $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
             $db->beginWhereGroup();
             foreach (['d.Name', 'd.Body'] as $field) {
-                $db->orWhere("$field like", $terms, false, false);
+                $db->orWhere("$field like", $terms, true, false);
             }
             $db->endWhereGroup();
         }
 
-        if ($title = $query->get('title', false)) {
-            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $title).'%'));
+        if ($name = $query->get('name', false)) {
+            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $name).'%'), true, false);
         }
 
-        if ($users = $query->get('users', false)) {
-            $author = array_column($users, 'UserID');
-            $db->where('d.InsertUserID', $author);
-        }
+        $this->applyUserIDs($db, $query, 'd');
+        $this->applyDateInsertedSql($db, $query, 'd');
 
-        if ($users = $query->get('insertUserIds', false)) {
-            $author = array_column($users, 'UserID');
-            $db->where('d.InsertUserID', $author);
-        }
-
-        if (is_array($userIDs)) {
-            $db->where('d.InsertUserID', $userIDs);
-        }
-
-        if ($discussionID = $query->get('discussionID', false)) {
+        $discussionID = $query->get('discussionID', false);
+        if ($discussionID !== false) {
             $db->where('d.DiscussionID', $discussionID);
         }
 
@@ -320,6 +316,44 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
+     * Apply the dateInserted parameters.
+     *
+     * @param \Gdn_SQLDriver $sql
+     * @param MysqlSearchQuery $query
+     * @param string $tableAlias
+     */
+    protected function applyDateInsertedSql(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias) {
+        $dateInserted = $query->getQueryParameter('dateInserted');
+
+        if ($dateInserted) {
+            $schema = new DateFilterSchema();
+            $sql->where(DateFilterSchema::dateFilterField("$tableAlias.DateInserted", $schema->validate($dateInserted)));
+        }
+    }
+
+    /**
+     * Apply the insertUsers part of the SQL query.
+     *
+     * @param \Gdn_SQLDriver $sql
+     * @param MysqlSearchQuery $query
+     * @param string $tableAlias
+     */
+    protected function applyUserIDs(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias) {
+        $insertUserIDs = $query->getQueryParameter('insertUserIDs', false);
+        $insertUserNames = $query->getQueryParameter('insertUserNames', false);
+        if (!$insertUserIDs && $insertUserNames) {
+            $users = $this->userModel->getWhere([
+                'name' => $insertUserNames,
+            ])->resultArray();
+            $insertUserIDs = array_column($users, 'UserID');
+        }
+
+        if ($insertUserIDs) {
+            $sql->where("$tableAlias.InsertUserID", $insertUserIDs);
+        }
+    }
+
+    /**
      * Get category ids from DB if query has it as a filter
      *
      * @param SearchQuery $query
@@ -332,9 +366,6 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('includeChildCategories'),
             $query->getQueryParameter('includeArchivedCategories')
         );
-        if (empty($categoryIDs)) {
-            $categoryIDs[] = 0;
-        }
         return $categoryIDs;
     }
 
@@ -354,5 +385,33 @@ class DiscussionSearchType extends AbstractSearchType {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getSingularLabel(): string {
+        return \Gdn::translate('Discussion');
+    }
+
+    /**
+     * @return string
+     */
+    public function getPluralLabel(): string {
+        return \Gdn::translate('Discussions');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDTypes(): ?array {
+        return [0];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function guidToRecordID(int $guid): ?int {
+        return ($guid - 1) / 10;
     }
 }

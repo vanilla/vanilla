@@ -27,7 +27,6 @@ export const bodyCSS = useThemeCache(() => {
             color: globalVars.mainColors.fg,
         }),
         wordBreak: "break-word",
-        overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
         $unique: true, // This doesn't refresh without this for some reason.
     };
 

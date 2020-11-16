@@ -70,7 +70,7 @@ class ModelCacheTest extends TestCase {
         $this->insertOne('bar');
 
         $hydrator = function () {
-            return $this->model->get();
+            return $this->model->select();
         };
 
         $initialResult = $this->modelCache->getCachedOrHydrate([], $hydrator);
@@ -94,12 +94,12 @@ class ModelCacheTest extends TestCase {
      * Test that we can get and invalidate from the cache.
      */
     public function testAutoInvalidation() {
-        $this->model->addPipelinePostProcessor($this->modelCache->createInvalidationProcessor());
+        $this->model->addPipelineProcessor($this->modelCache->createInvalidationProcessor());
         $fooID = $this->insertOne('foo');
         $this->insertOne('bar');
 
         $hydrator = function () {
-            return $this->model->get();
+            return $this->model->select();
         };
 
         $result = $this->modelCache->getCachedOrHydrate([], $hydrator);
@@ -132,7 +132,7 @@ class ModelCacheTest extends TestCase {
         $fooID = $this->insertOne('foo');
         $this->insertOne('bar');
 
-        $result = $this->model->get();
+        $result = $this->model->select();
         $this->assertSame(['foo', 'bar'], array_column($result, 'name'));
 
         // Insert another. This should invalidate the cache.
@@ -151,7 +151,7 @@ class ModelCacheTest extends TestCase {
         $this->assertSame(['foo update', 'bar'], array_column($result, 'name'));
 
         // Make sure where's still work.
-        $result = $this->model->get(['name' => 'bar']);
+        $result = $this->model->select(['name' => 'bar']);
         $this->assertSame(['bar'], array_column($result, 'name'));
 
         $result = $this->model->selectSingle(['modelID' => $fooID]);

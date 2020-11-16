@@ -8,6 +8,9 @@
  * @since 2.3
  */
 
+/**
+ * Class for handling nested options like in a dropdown.
+ */
 trait NestedCollection {
 
     /**
@@ -64,6 +67,9 @@ trait NestedCollection {
      * @var string The url to the display as active.
      */
     private $highlightRoute = '';
+
+    /** @var string */
+    private $highlightRouteCache = null;
 
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
@@ -541,14 +547,19 @@ trait NestedCollection {
      * @return bool Whether the current request url matches an item's link url.
      */
     private function isActive($item) {
-        if (empty($this->highlightRoute)) {
-            $highlightRoute = Gdn_Url::request(true);
-        } else {
-            $highlightRoute = url($this->highlightRoute);
+        if ($this->highlightRouteCache === null) {
+            if (empty($this->highlightRoute)) {
+                $this->highlightRouteCache = Gdn::request()->getUrl();
+            } else {
+                $this->highlightRouteCache = url($this->highlightRoute);
+            }
+            $this->highlightRouteCache = trim($this->highlightRouteCache, "/");
         }
+
         $url = $item['url'] ?? false;
         if ($url) {
-            $result = trim(url($url), '/') == trim($highlightRoute, '/');
+            $actual = trim(url($url, true), '/');
+            $result = $actual === $this->highlightRouteCache;
         } else {
             $result = false;
         }
@@ -594,7 +605,7 @@ trait NestedCollection {
      * @param array $item The item to get the sort order from.
      * @param array $items The entire list of items.
      * @param int $depth The current recursive depth used to prevent infinite recursion.
-     * @return number
+     * @return int
      */
     private function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);

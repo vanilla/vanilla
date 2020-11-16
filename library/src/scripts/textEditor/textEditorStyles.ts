@@ -7,7 +7,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { viewHeight } from "csx";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, defaultTransition, absolutePosition } from "@library/styles/styleHelpers";
+import { unit, defaultTransition, absolutePosition, borders } from "@library/styles/styleHelpers";
 
 export const textEditorVariables = useThemeCache(() => {
     const makeTextEditorVars = variableFactory("textEditor");
@@ -32,22 +32,38 @@ export const textEditorClasses = useThemeCache(() => {
     const style = styleFactory("textEditor");
     const globalVars = globalVariables();
 
-    const root = theme => {
+    const root = (theme: string, minimal?: boolean) => {
         return style({
             transition: "backgroundColor 0.25s ease",
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
-            height: viewHeight(90),
+            height: minimal ? "300px" : viewHeight(90),
             backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),
             position: "relative",
             paddingTop: unit(vars.editorPadding.padding.top),
-            paddingLeft: unit(vars.editorPadding.padding.left),
+            paddingLeft: minimal ? 0 : unit(vars.editorPadding.padding.left),
+            $nest: {
+                "& .decorationsOverviewRuler": {
+                    display: "none",
+                },
+                "& .monaco-editor .overflow-guard": {
+                    borderRadius: 6,
+                },
+                "& .monaco-editor": {
+                    borderRadius: 6,
+                },
+            },
+            ...(minimal
+                ? {
+                      ...borders(),
+                  }
+                : {}),
         });
     };
     const themeToggleIcon = style("themeToggleIcon", {
         position: "absolute",
-        zIndex: 12,
+        zIndex: 1,
         top: vars.themeToggleIcon.top,
         right: vars.themeToggleIcon.right,
         border: "none",
@@ -57,7 +73,7 @@ export const textEditorClasses = useThemeCache(() => {
         ...defaultTransition("transform"),
     });
 
-    const colorChangeOverlay = theme =>
+    const colorChangeOverlay = (theme) =>
         style("colorChangeOverlay", {
             ...absolutePosition.fullSizeOfParent(),
             backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),

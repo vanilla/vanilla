@@ -11,44 +11,45 @@
  */
 
 // Only do this once, ever.
-if (!$Drop) {
+if (empty($Drop)) {
     return;
 }
 
-$SQL = Gdn::database()->sql();
+$sql = Gdn::database()->sql();
 
 // Prep default content
-$ConversationBody = "Pssst. Hey. A conversation is a private chat between two or more members. No one can see it except the members added. You can delete this one since I&rsquo;m just a bot and know better than to talk back.";
-$SystemUserID = Gdn::userModel()->getSystemUserID();
-$TargetUserID = Gdn::session()->UserID;
-$Now = Gdn_Format::toDateTime();
-$Contributors = dbencode([$SystemUserID, $TargetUserID]);
+$conversationBody = "Pssst. Hey. A conversation is a private chat between two or more members. No one can see it ".
+    "except the members added. You can delete this one since I&rsquo;m just a bot and know better than to talk back.";
+$systemUserID = Gdn::userModel()->getSystemUserID();
+$targetUserID = Gdn::session()->UserID;
+$now = Gdn_Format::toDateTime();
+$contributors = dbencode([$systemUserID, $targetUserID]);
 
 // Insert stub conversation
-$ConversationID = $SQL->insert('Conversation', [
-    'InsertUserID' => $SystemUserID,
-    'DateInserted' => $Now,
-    'Contributors' => $Contributors,
+$conversationID = $sql->insert('Conversation', [
+    'InsertUserID' => $systemUserID,
+    'DateInserted' => $now,
+    'Contributors' => $contributors,
     'CountMessages' => 1
 ]);
 
-$MessageID = $SQL->insert('ConversationMessage', [
-    'ConversationID' => $ConversationID,
-    'Body' => t('StubConversationBody', $ConversationBody),
+$messageID = $sql->insert('ConversationMessage', [
+    'ConversationID' => $conversationID,
+    'Body' => t('StubConversationBody', $conversationBody),
     'Format' => 'Html',
-    'InsertUserID' => $SystemUserID,
-    'DateInserted' => $Now
+    'InsertUserID' => $systemUserID,
+    'DateInserted' => $now
 ]);
 
-$SQL->update('Conversation')
-    ->set('LastMessageID', $MessageID)
-    ->where('ConversationID', $ConversationID)
+$sql->update('Conversation')
+    ->set('LastMessageID', $messageID)
+    ->where('ConversationID', $conversationID)
     ->put();
 
-$SQL->insert('UserConversation', [
-    'ConversationID' => $ConversationID,
-    'UserID' => $TargetUserID,
+$sql->insert('UserConversation', [
+    'ConversationID' => $conversationID,
+    'UserID' => $targetUserID,
     'CountReadMessages' => 0,
-    'LastMessageID' => $MessageID,
-    'DateConversationUpdated' => $Now
+    'LastMessageID' => $messageID,
+    'DateConversationUpdated' => $now
 ]);

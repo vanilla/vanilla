@@ -21,6 +21,9 @@ class FormatService {
     /** @var array */
     private $formats = [];
 
+    /** @var FormatInterface[] */
+    private $formatInstances = [];
+
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
@@ -185,18 +188,14 @@ class FormatService {
      * @param Container $dic
      */
     public function registerBuiltInFormats(Container $dic) {
-        $this->registerFormat(Formats\RichFormat::FORMAT_KEY, $dic->get(Formats\RichFormat::class))
-            ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, $dic->get(Formats\HtmlFormat::class))
-            ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, $dic->get(Formats\BBCodeFormat::class))
-            ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, $dic->get(Formats\MarkdownFormat::class))
-            ->registerFormat(Formats\TextFormat::FORMAT_KEY, $dic->get(Formats\TextFormat::class))
-            ->registerFormat(Formats\TextExFormat::FORMAT_KEY, $dic->get(Formats\TextExFormat::class))
-        ;
-
-        $wysiwyg = $dic->get(Formats\WysiwygFormat::class);
-        $this
-            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, $wysiwyg)
-            ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, $wysiwyg)
+        $this->registerFormat(Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class)
+            ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, Formats\HtmlFormat::class)
+            ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, Formats\BBCodeFormat::class)
+            ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, Formats\MarkdownFormat::class)
+            ->registerFormat(Formats\TextFormat::FORMAT_KEY, Formats\TextFormat::class)
+            ->registerFormat(Formats\TextExFormat::FORMAT_KEY, Formats\TextExFormat::class)
+            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, Formats\WysiwygFormat::class)
+            ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, Formats\WysiwygFormat::class)
         ;
     }
 
@@ -204,11 +203,16 @@ class FormatService {
      * Register a format type and the class name handles it.
      *
      * @param string $formatKey
-     * @param FormatInterface $format
+     * @param FormatInterface}string $format
      *
      * @return $this For method chaining.
      */
-    public function registerFormat(string $formatKey, FormatInterface $format): FormatService {
+    public function registerFormat(string $formatKey, $format): FormatService {
+        if (is_object($format)) {
+            $this->formatInstances[$formatKey] = $format;
+            $format = get_class($format);
+        }
+
         $this->formats[$formatKey] = $format;
         return $this;
     }
@@ -224,16 +228,34 @@ class FormatService {
      */
     private function getFormatter(?string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey) ?? null;
-        $format = $this->formats[$formatKey] ?? null;
-        $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
-        if (!$format) {
-            if ($throw) {
-                throw new FormatterNotFoundException($errorMessage);
-            } else {
-                return new NotFoundFormat($formatKey);
+        $instance = $this->formatInstances[$formatKey] ?? null;
+
+        if ($instance === null) {
+            $formatClass = $this->formats[$formatKey] ?? null;
+            $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
+            if (!$formatClass) {
+                if ($throw) {
+                    throw new FormatterNotFoundException($errorMessage);
+                } else {
+                    return new NotFoundFormat($formatKey);
+                }
             }
+
+            $instance = $this->constructFormat($formatClass);
         }
 
-        return $format;
+        return $instance;
+    }
+
+    /**
+     * Constuct a formatter.
+     *
+     * @param string $formatClass
+     *
+     * @return FormatInterface
+     */
+    protected function constructFormat(string $formatClass): FormatInterface {
+        $instance = \Gdn::getContainer()->get($formatClass);
+        return $instance;
     }
 }

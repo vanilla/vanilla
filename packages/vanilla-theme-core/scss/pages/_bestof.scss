@@ -114,7 +114,7 @@ body.Section-BestOf {
             margin-right: -#{$component-base_padding};
             margin-bottom: -#{$component-base_padding};
             padding: $component-base_padding;
-            min-height: calc(#{$theme-photo_size} + #{$component-base_padding} * 2);
+            min-height: calc(#{$theme-photo_size} + #{$component-vertical_padding} * 2);
             background-color: $component-header_bg;
 
             @if ($component_borderRadius == 0) {

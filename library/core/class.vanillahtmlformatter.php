@@ -188,16 +188,15 @@ class VanillaHtmlFormatter {
             'css_expression' => 1,
             'deny_attribute' => $attributes,
             'direct_list_nest' => 1,
-            'elements' => '*-applet-button-embed-fieldset-form-iframe-input-legend-link-object-optgroup-option-script-select-style-textarea',
+            'elements' => '*-applet-button-embed-fieldset-form-input-legend-link-object-optgroup-option-script-select-style-textarea',
             'keep_bad' => 0,
             'schemes' => 'classid:clsid; href: '.$schemes.'; style: nil; *:file, http, https', // clsid allowed in class
             'unique_ids' => 1,
             'valid_xhtml' => 0
         ];
 
-        if ($allowExtended) {
-            $elements = $config['elements'] ?? null;
-            $config['elements'] = str_replace('-iframe', '', $elements);
+        if (!$allowExtended) {
+            $config['elements'] .= '-iframe-video-audio';
         }
 
         // If we don't allow URL embeds, don't allow HTML media embeds, either.

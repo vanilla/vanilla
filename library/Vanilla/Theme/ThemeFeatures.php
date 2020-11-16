@@ -34,6 +34,7 @@ class ThemeFeatures implements \JsonSerializable {
         'DisableKludgedVars' => false,
         'NewEventsPage' => false,
         SearchRootController::ENABLE_FLAG => false,
+        'EnhancedAccessibility' => false,
     ];
 
     /**
@@ -84,6 +85,7 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['NewEventsPage'] = true;
             $themeValues['UserCards'] = true;
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
+            $themeValues['EnhancedAccessibility'] = true;
         }
 
         if (FeatureFlagHelper::featureEnabled('NewEventsPage')) {
@@ -96,6 +98,10 @@ class ThemeFeatures implements \JsonSerializable {
 
         if (FeatureFlagHelper::featureEnabled('UserCards')) {
             $themeValues['UserCards'] = true;
+        }
+
+        if (FeatureFlagHelper::featureEnabled('EnhancedAccessibility')) {
+            $themeValues['EnhancedAccessibility'] = true;
         }
 
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);

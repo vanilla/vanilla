@@ -4,7 +4,7 @@ echo '<div class="DataListWrap">';
 echo '<h1 class="H">'.t('Notifications').'</h1>';
 
 if (count($this->data('Activities'))) {
-    echo '<ul class="DataList Activities Notifications">';
+    echo '<ul class="DataList Activities Notifications" role="presentation">';
     include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
     echo '</ul>';
     echo PagerModule::write(['CurrentRecords' => count($this->data('Activities'))]);

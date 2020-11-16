@@ -7,7 +7,9 @@
 namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 use Garden\EventManager;
 use Vanilla\Community\Events\CommentEvent;
@@ -15,10 +17,8 @@ use Vanilla\Community\Events\CommentEvent;
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends TestCase {
-    use SetupTraitsTrait, TestCommentModelTrait, SiteTestTrait {
-        setupBeforeClass as baseSetupBeforeClass;
-    }
+class CommentModelTest extends SiteTestCase {
+    use TestCommentModelTrait, CommunityApiTestTrait;
 
     /** @var CommentEvent */
     private $lastEvent;
@@ -32,10 +32,10 @@ class CommentModelTest extends TestCase {
      * {@inheritdoc}
      */
     public static function setupBeforeClass(): void {
-        self::baseSetupBeforeClass();
+        parent::setUpBeforeClass();
 
         // Test as an admin
-        self::container()->get('Session')->start(self::$siteInfo['adminUserID']);
+        \Gdn::session()->start(self::$siteInfo['adminUserID'], false, false);
     }
 
     /**
@@ -43,7 +43,6 @@ class CommentModelTest extends TestCase {
      */
     public function setup(): void {
         parent::setUp();
-        $this->setupTestTraits();
 
         $this->discussionModel = $this->container()->get(\DiscussionModel::class);
         // Make event testing a little easier.
@@ -58,8 +57,8 @@ class CommentModelTest extends TestCase {
     /**
      * A test listener that increments the counter.
      *
-     * @param TestEvent $e
-     * @return TestEvent
+     * @param CommentEvent $e
+     * @return CommentEvent
      */
     public function handleCommentEvent(CommentEvent $e): CommentEvent {
         $this->lastEvent = $e;
@@ -172,4 +171,76 @@ class CommentModelTest extends TestCase {
         $this->assertInstanceOf(CommentEvent::class, $this->lastEvent);
         $this->assertEquals(CommentEvent::ACTION_UPDATE, $this->lastEvent->getAction());
     }
+
+    /**
+     * Smoke test `CommentModel::getByUser()`.
+     *
+     * @param int $version
+     */
+    public function testGetByUser(int $version = 1): void {
+        $userID = \Gdn::session()->UserID;
+
+        $comments = $this->insertComments(10);
+        if ($version === 1) {
+            $actual = $this->commentModel->getByUser($userID, 10, 0);
+        } else {
+            $actual = $this->commentModel->getByUser2($userID, 10, 0);
+        }
+        foreach ($actual as $row) {
+            $this->assertEquals($userID, $row->InsertUserID);
+            $this->assertNotEmpty($row->CategoryID);
+        }
+    }
+
+    /**
+     * Smoke test `CommentModel::getByUser2()`.
+     */
+    public function testGetByUser2(): void {
+        $this->testGetByUser(2);
+    }
+
+    /**
+     * Test `CommentModel::getByUser2()` with permission.
+     */
+    public function testGetByUser2Permission(): void {
+        $adminUserID = \Gdn::session()->UserID;
+        $roles = $this->getRoles();
+        $memberRole = $roles["Member"];
+
+        // Create a member user.
+        $memberUserID = $this->userModel->save([
+            "Name" => "testgetbyuser2",
+            "Email" => __FUNCTION__ . "@example.com",
+            "Password" => "vanilla",
+            "RoleID" => $memberRole,
+        ]);
+
+        $categoryAdmin = $this->createPermissionedCategory([], [$roles["Administrator"]]);
+        $discussionAdmin = [
+            'CategoryID' => $categoryAdmin['categoryID'],
+            'Name' => __FUNCTION__ .'test discussion',
+            'Body' => 'foo foo foo',
+            'Format' => 'Text',
+            'InsertUserID' => $adminUserID
+        ];
+
+        $discussionIDAdmin = $this->discussionModel->insert($discussionAdmin);
+        $this->commentModel->save([
+            "DiscussionID" => $discussionIDAdmin,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+        ]);
+
+        // Switch to member user.
+        \Gdn::session()->start($memberUserID, false, false);
+        $this->insertComments(10);
+        $actual = $this->commentModel->getByUser2($memberUserID, 10, 0, false, null, 'desc', 'PermsDiscussionsView');
+        $countRows = $actual->numRows();
+        foreach ($actual as $row) {
+            $this->assertEquals($memberUserID, $row->InsertUserID);
+            $this->assertNotEmpty($row->CategoryID);
+        }
+        $this->assertEquals(10, $countRows);
+    }
+
 }

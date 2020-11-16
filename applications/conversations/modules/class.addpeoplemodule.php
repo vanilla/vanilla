@@ -42,19 +42,7 @@ class AddPeopleModule extends Gdn_Module {
             if (!$this->AddUserAllowed || !checkPermission('Conversations.Conversations.Add')) {
                 throw permissionException();
             }
-
-            $newRecipientUserIDs = [];
-            $newRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
-            $userModel = Gdn::factory("UserModel");
-            foreach ($newRecipients as $name) {
-                if (trim($name) != '') {
-                    $user = $userModel->getByUsername(trim($name));
-                    if (is_object($user)) {
-                        $newRecipientUserIDs[] = $user->UserID;
-                    }
-                }
-            }
-
+            $newRecipientUserIDs = explode(',', $this->Form->getFormValue('AddPeople', ''));
             if ($sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $newRecipientUserIDs)) {
                 $sender->informMessage(t('Your changes were saved.'));
             } else {

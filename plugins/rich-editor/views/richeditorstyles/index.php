@@ -1,4 +1,4 @@
-<div class="richEditor" aria-label="<?php echo t('Type your message');?>" aria-describedby="richEditor-description" role="textbox" aria-multiline="true">
+<div class="richEditor" aria-label="<?php echo t('Type your message');?>" aria-describedby="richEditor-description" aria-multiline="true">
     <p id="richEditor-description" class="sr-only">
         <?php echo t('Insert instructions for editor here'); ?>
     </p>
@@ -318,7 +318,7 @@
         <p id="tempId-insertMediaMenu-p" class="insertMedia-description">
             <?php echo t('Paste the URL of the media you want.'); ?>
         </p>
-        <input class="InputBox" placeholder="http://">
+        <input class="InputBox" placeholder="<?php echo t("Url");?>">
     </div>
 
     <div class="insertMedia-footer Footer">

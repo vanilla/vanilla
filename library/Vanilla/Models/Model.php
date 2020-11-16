@@ -22,6 +22,8 @@ class Model implements InjectableInterface {
     public const OPT_SELECT = "select";
     public const OPT_ORDER = 'order';
     public const OPT_MODE = 'mode';
+    public const OPT_REPLACE = 'replace';
+    public const OPT_IGNORE = 'ignore';
 
     /** @var \Gdn_Database */
     private $database;
@@ -144,6 +146,8 @@ class Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      * @throws ValidationException If a row fails to validate against the schema.
+     * @todo Document support for the "order" option.
+     * @todo Add support for a "page" option to set the limit.
      */
     public function select(array $where = [], array $options = []): array {
         $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
@@ -166,7 +170,7 @@ class Model implements InjectableInterface {
             ->resultArray();
 
         if (empty($selects)) {
-            $schema = Schema::parse([":a" => $this->getReadSchema()]);
+            $schema = $this->getReadSchema();
         } else {
             $selectExpressions = $sqlDriver->parseSelectExpression($selects);
             $selectFinalFieldNames = [];
@@ -174,11 +178,11 @@ class Model implements InjectableInterface {
                 $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
             }
 
-            $schema = Schema::parse([":a" => Schema::parse($selectFinalFieldNames)->add($this->getReadSchema())]);
+            $schema = Schema::parse($selectFinalFieldNames)->add($this->getReadSchema());
         }
-        // What if a processor goes here?
-
-        $result = $schema->validate($result);
+        foreach ($result as &$row) {
+            $row = $schema->validate($row);
+        }
 
         return $result;
     }
@@ -189,6 +193,7 @@ class Model implements InjectableInterface {
      * @param array $where
      * @param array $options
      * @return array
+     * @deprecated Use Model::select
      */
     public function get(array $where = [], array $options = []): array {
         return $this->select($where, $options);
@@ -238,6 +243,20 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Extract the primary key out of a row.
+     *
+     * @param array $row The row to pluck.
+     * @return array Returns an array suitable to pass as a where parameter.
+     */
+    public function pluckPrimaryWhere(array $row): array {
+        $where = [];
+        foreach ($this->getPrimaryKey() as $column) {
+            $where[$column] = $row[$column];
+        }
+        return $where;
+    }
+
+    /**
      * Select a single row.
      *
      * @param array $where Conditions for the select query.
@@ -252,7 +271,7 @@ class Model implements InjectableInterface {
      */
     public function selectSingle(array $where = [], array $options = []): array {
         $options[self::OPT_LIMIT] = 1;
-        $rows = $this->get($where, $options);
+        $rows = $this->select($where, $options);
         if (empty($rows)) {
             throw new NoResultsException("No rows matched the provided criteria.");
         }
@@ -269,8 +288,20 @@ class Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      */
     public function insert(array $set, array $options = []) {
+        $options += [
+            self::OPT_REPLACE => false,
+            self::OPT_IGNORE => false,
+        ];
+
         $set = $this->getWriteSchema()->validate($set);
-        $result = $this->createSql()->insert($this->table, $set);
+
+        $sql = $this->createSql();
+        if ($options[self::OPT_REPLACE]) {
+            $sql->options('Replace', true);
+        } elseif ($options[self::OPT_IGNORE]) {
+            $sql->options('Ignore', true);
+        }
+        $result = $sql->insert($this->table, $set);
         if ($result === false) {
             // @codeCoverageIgnoreStart
             throw new Exception("An unknown error was encountered while inserting the row.");

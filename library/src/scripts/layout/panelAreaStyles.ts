@@ -12,7 +12,7 @@ import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
-export const panelAreaClasses = useThemeCache(mediaQueries => {
+export const panelAreaClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses(mediaQueries);

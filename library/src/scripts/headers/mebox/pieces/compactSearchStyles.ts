@@ -13,10 +13,11 @@ import {
     EMPTY_BORDER,
     borderRadii,
     paddings,
+    margins,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { important, percent, px, rgba } from "csx";
+import { color, important, percent, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -73,7 +74,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
 
     const borders = makeThemeVars("borders", {
         ...EMPTY_BORDER,
-        borderRadius: globalVars.border.radius,
+        // borderRadius: globalVars.border.radius,
     });
 
     const searchBar = makeThemeVars("searchBar", {
@@ -110,8 +111,8 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
                 width: searchBar.border.width,
             },
             radius: {
-                left: important(0),
-                right: important(unit(borders.borderRadius) as string),
+                // left: important(0),
+                // right: important(unit(borders.borderRadius) as string),
             },
         },
         fonts: {
@@ -209,7 +210,7 @@ export const compactSearchClasses = useThemeCache(() => {
             "&.isCentered": {
                 margin: "auto",
             },
-            "& .suggestedTextInput-inputText": {
+            "& .suggestedTextInput-inputTextutText": {
                 borderTopRightRadius: unit(globalVars.border.radius),
                 borderBottomRightRadius: unit(globalVars.border.radius),
             },
@@ -224,7 +225,7 @@ export const compactSearchClasses = useThemeCache(() => {
         justifyContent: "center",
         width: percent(100),
         position: "relative",
-        ...borders(vars.borders),
+        // ...borders(vars.borders),
     });
 
     const close = style("close", {
@@ -232,17 +233,14 @@ export const compactSearchClasses = useThemeCache(() => {
         whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.semiBold,
         margin: 0,
+        outline: 0,
+        ...borders({
+            radius: 0,
+            color: globalVars.elementaryColors.transparent,
+        }),
         ...paddings({
             horizontal: 10,
         }),
-        ...borderRadii(
-            {
-                left: 0,
-            },
-            {
-                isImportant: true,
-            },
-        ),
     });
 
     const cancelContents = style("cancelContents", {});
@@ -254,23 +252,12 @@ export const compactSearchClasses = useThemeCache(() => {
         height: unit(formElementsVars.sizing.height),
         display: "flex",
         flexWrap: "nowrap",
+        ...margins({
+            horizontal: 1,
+        }),
     });
 
-    const valueContainer = style("valueContainer", {
-        $nest: {
-            "&&&": {
-                ...borderRadii(
-                    {
-                        left: vars.borders.radius,
-                        right: 0,
-                    },
-                    {
-                        isImportant: true,
-                    },
-                ),
-            },
-        },
-    });
+    const valueContainer = style("valueContainer", {});
 
     return {
         root,

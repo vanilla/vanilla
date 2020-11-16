@@ -15,6 +15,9 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
+import { DashboardPagerArea, DashboardToolbar, DashboardToolbarButtons } from "@dashboard/components/DashboardToolbar";
+import { DashboardPager } from "@dashboard/components/DashboardPager";
+
 const { HeadItem } = DashboardTable;
 const puppyImage = require("../../../styleguide/public/resources/images/smart-puppy.jpg");
 const chickImage = require("../../../styleguide/public/resources/images/little-chick.jpg");
@@ -40,6 +43,19 @@ formsStory.add("Tables", () =>
         return (
             <StoryContent>
                 <StoryHeading depth={1}>Dashboard Tables</StoryHeading>
+                <DashboardToolbar>
+                    <DashboardToolbarButtons>
+                        <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                            Button
+                        </Button>
+                        <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                            Button
+                        </Button>
+                    </DashboardToolbarButtons>
+                    <DashboardPagerArea>
+                        <DashboardPager page={7} pageCount={7} />
+                    </DashboardPagerArea>
+                </DashboardToolbar>
                 <DashboardTable
                     head={
                         <tr>

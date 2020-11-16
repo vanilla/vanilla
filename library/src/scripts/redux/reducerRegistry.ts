@@ -14,6 +14,8 @@ import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
 import getStore from "@library/redux/getStore";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import ConversationsModel from "@library/features/conversations/ConversationsModel";
+import { tagsReducer } from "@library/features/tags/TagsReducer";
+import { discussionsReducer } from "@library/features/discussions/discussionModel";
 
 let dynamicReducers = {};
 
@@ -37,8 +39,10 @@ export function getReducers(): ReducersMapObject<any, any> {
     return {
         // We have a few static reducers.
         users: usersReducer,
+        discussions: discussionsReducer,
         theme: themeReducer,
         locales: localeReducer,
+        tags: tagsReducer,
         notifications: new NotificationsModel().reducer,
         conversations: new ConversationsModel().reducer,
         ...dynamicReducers,

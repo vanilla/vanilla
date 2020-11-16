@@ -17,9 +17,9 @@ $CountDiscussions = 0;
 $CountDrafts = 0;
 
 if ($Session->isValid()) {
-    $CountBookmarks = $Session->User->CountBookmarks;
-    $CountDiscussions = $Session->User->CountDiscussions;
-    $CountDrafts = $Session->User->CountDrafts;
+    $CountBookmarks = $Session->User->CountBookmarks ?? 0;
+    $CountDiscussions = $Session->User->CountDiscussions ?? 0;
+    $CountDrafts = $Session->User->CountDrafts ?? 0;
 }
 
 if (!function_exists('FilterCountString')) {

@@ -18,17 +18,38 @@
         }
     }
 
-    @if $component-item_spacing == 0 AND $component_lateralBorder == true {
+    @if ($component-item_spacing == 0 and $component_lateralBorder == true) {
         .Item.CategoryHeading + .Item:not(.CategoryHeading) {
             border-top-left-radius: $component_borderRadius;
             border-top-right-radius: $component_borderRadius;
         }
     }
 
-    .CategoryHeading {
+    .Item.CategoryHeading {
         padding: 0 !important;
-        margin-bottom: $component-base_padding;
+        background: transparent;
+        box-shadow: none;
+        margin-bottom: $component-vertical_padding;
         font-size: $global-title_fontSize;
+        border-width: 0;
+
+        @if ($component_lateralBorder == true and $component-item_spacing != 0) {
+            border-left: $component_border;
+            border-right: $component_border;
+        } @else {
+            border-left-width: 0;
+            border-right-width: 0;
+        }
+
+        @if $component-item_spacing != 0 {
+            background: $component_bg;
+            padding: $component-base_padding !important;
+            box-shadow: $component_boxShadow;
+            border-radius: $component_borderRadius;
+            margin-bottom: $component-item_spacing;
+            border-top: $component_border;
+            border-bottom: $component_border;
+        }
 
         .Options {
             display: none;
@@ -40,14 +61,21 @@
     }
 
     .Item ~ .CategoryHeading {
-        margin-top: $component-base_padding;
+        margin-top: $component-vertical_padding;
 
         @if $component-item_spacing == 0 {
 
+            // simulate bottom border for previous element
             &::before {
                 content: "";
                 height: $component_borderRadius;
                 border-bottom: $component_border;
+
+                @if $component_boxShadow != none {
+                    box-shadow: $component_boxShadow, 0 #{$component_borderWidth + 2px} 0 $content_bg;
+                } @else {
+                    box-shadow: 0 #{$component_borderWidth + 2px} 0 $content_bg;
+                }
 
                 @if $component_lateralBorder == true {
                     border-left: $component_border;
@@ -57,10 +85,11 @@
                 }
 
                 background: transparent;
-                width: calc(100% - (#{$component_borderWidth} * 2));
                 position: absolute;
+                width: 100%;
+                left: 0;
                 @if ($staticVariables) {
-                    top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+                    top: calc((#{$component-vertical_padding} + #{$component_borderRadius}) * -1);
                 }
             }
         }
@@ -148,18 +177,17 @@
             color: $component-meta_color;
         }
 
-        .Meta,
-        .AuthorWrap {
+        .Meta {
             margin-left: -$utility-baseUnit;
             margin-right: -$utility-baseUnit;
+        }
 
+        .Meta,
+        .AuthorWrap {
             @include maxWidth {
-                margin-top: $utility-baseUnitDouble;
                 line-height: $component-meta_lineHeight;
             }
         }
-
-
 
         .Author .Username,
         .MItem,
@@ -280,6 +308,10 @@
         margin-right: 0;
     }
 
+    .MItem .userCardWrapper-link {
+        margin-left: $utility-baseUnit;
+    }
+
     // overwrite ideation plugin styles
     .ItemIdea.ItemIdea.ItemIdea {
         @if($staticVariables) {
@@ -379,7 +411,7 @@
     }
 }
 
-.DataList,
+.DataList:not(.CategoryList),
 .PageTitle + .ItemDiscussion {
 
     @if $component_lateralBorder == false {
@@ -393,18 +425,14 @@
 }
 
 .DataList.CategoryList {
-
-    .CategoryHeading {
-        border-top-width: 0;
+    @if $component-item_spacing == 0 {
+        .Item:not(.CategoryHeading) {
+            box-shadow: $component_boxShadow;
+        }
     }
 
     .Item[class*="Depth"] {
-
-        @if $component_lateralBorder == true {
-            padding-left: $component-base_padding !important;
-        } @else {
-            padding-left: 0 !important;
-        }
+        padding-left: $component-horizontal_padding !important;
     }
 }
 
@@ -421,9 +449,28 @@
         }
     }
 
-    //overwrite indexphoto plugin styles
-    .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto .Discussion.ItemContent {
-        padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+    .ItemDiscussion-withPhoto {
+        .Discussion.ItemContent {
+            padding-left: $theme-photo_size + $utility-baseUnitDouble;
+        }
+
+        .userCardWrapper-photo {
+            left: $utility-baseUnitDouble;
+            position: absolute;
+            top: $utility-baseUnitTriple;
+        }
+
+        &.ItemIdea {
+            .idea-counter-module {
+                position: absolute;
+                left: $theme-photo_size + $utility-baseUnitTriple;
+                top: $utility-baseUnitTriple;
+            }
+
+            .Discussion.ItemContent {
+                padding-left: $theme-photo_size + $utility-baseUnitTriple + $theme-photo_size;
+            }
+        }
     }
 }
 
@@ -471,30 +518,23 @@
             margin: 0;
             width: 100%;
             min-height: $theme-photo_size + ($utility-baseUnitDouble * 2);
-            padding-top: $utility-baseUnitDouble;
-            padding-bottom: $utility-baseUnitDouble;
+            padding: {
+                top: $component-vertical_padding;
+                bottom: calc(#{$component-vertical_padding} / 2);
+                left: $component-horizontal_padding;
+                right: $component-horizontal_padding;
+            };
 
             @if $component-item_spacing != 0 {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;
             }
 
-            @if $component_lateralBorder == true {
-                padding-left: $utility-baseUnitDouble;
-                padding-right: $utility-baseUnitDouble;
-            }
-
             .PhotoWrap {
                 margin: 0;
                 position: absolute;
-                top: $utility-baseUnitDouble;
-
-                @if $component_lateralBorder == true {
-                    left: $utility-baseUnitDouble;
-                } @else {
-                    left: 0;
-                }
-
+                top: $component-vertical_padding;
+                left: $component-horizontal_padding;
             }
         }
 
@@ -520,7 +560,7 @@
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
                 display: inline-block;
-                padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+                padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
 
                 > * {
                     display: inline;
@@ -606,14 +646,12 @@
         .Item-BodyWrap {
             border-bottom-left-radius: $component_borderRadius;
             border-bottom-right-radius: $component_borderRadius;
-
-            padding-top: $utility-baseUnitDouble;
-            padding-bottom: $utility-baseUnitDouble;
-
-            @if $component_lateralBorder == true {
-                padding-left: $utility-baseUnitDouble;
-                padding-right: $utility-baseUnitDouble;
-            }
+            padding: {
+                top: calc(#{$component-vertical_padding} / 2);
+                bottom: $component-vertical_padding;
+                left: $component-horizontal_padding;
+                right: $component-horizontal_padding;
+            };
         }
 
         .Item-Body > * {
@@ -622,6 +660,13 @@
             &:last-child {
                 margin: 0;
             }
+        }
+    }
+
+    .ItemComment {
+        .Options {
+            margin-top: $component-vertical_padding;
+            margin-right: $component-horizontal_padding;
         }
     }
 }
@@ -634,14 +679,6 @@
         .Item:first-child {
             @if $component_lateralBorder == false {
                 border-top-width: 0;
-
-                .Item-Header {
-                    padding-top: 0;
-                }
-
-                .Options {
-                    margin-top: 0;
-                }
             }
         }
     }
@@ -651,8 +688,11 @@
 .Conversations,
 .MessageList {
     clear: both;
+}
 
-    .Item.Activity {
+.Activities {
+    .ItemContent {
+        margin-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});;
 
         .Title {
 
@@ -678,18 +718,12 @@
             }
         }
     }
+}
 
-    .ItemComment .Options {
-        margin-top: $component-base_padding;
-
-        @if $component_lateralBorder == true {
-            margin-right: $component-base_padding;
-        }
-
-        @include maxWidth {
-            position: absolute;
-            right: 0;
-        }
+.Conversation {
+    .Meta {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
@@ -698,15 +732,15 @@
 
     h3,
     .Item-Body {
-        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
     }
 
     .PhotoWrap {
         position: absolute;
-        top: $component-base_padding;
+        top: $component-vertical_padding;
 
         @if $component_lateralBorder == true {
-            left: $component-base_padding;
+            left: $component-horizontal_padding;
         } @else {
             left: 0;
         }
@@ -741,13 +775,28 @@
 
     .Options {
         position: absolute;
-        right: $component-base_padding;
+        top: $component-vertical_padding;
+        right: $component-horizontal_padding;
     }
 
     .Meta {
 
         @include maxWidth {
             margin-top: 0;
+        }
+    }
+}
+
+.Group-Box.EventList {
+
+    .Item {
+
+        .Options {
+            position: initial;
+
+            .OptionsMenu {
+                order: 2;
+            }
         }
     }
 }
@@ -759,7 +808,7 @@
     }
 
     .ItemContent {
-        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
     }
 }
 
@@ -789,6 +838,10 @@
 }
 
 .CategoryBox {
+
+    .Empty {
+        @include listItem;
+    }
 
     .H {
         font-family: $global-heading_fontFamily;

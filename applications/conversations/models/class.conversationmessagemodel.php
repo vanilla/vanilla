@@ -18,10 +18,14 @@ class ConversationMessageModel extends ConversationsModel {
     private static $instance;
 
     /**
+     * @var ConversationModel
+     */
+    private $conversationModel;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
-     * @since 2.0.0
-     * @access public
+     * @param ConversationModel|null $conversationModel
      */
     public function __construct(?ConversationModel $conversationModel = null) {
         parent::__construct('ConversationMessage');
@@ -51,12 +55,14 @@ class ConversationMessageModel extends ConversationsModel {
      * @param int $conversationID Unique ID of conversation being viewed.
      * @param int $viewingUserID Unique ID of current user.
      * @param int $offset Number to skip.
-     * @param int $limit Maximum to return.
-     * @param array $wheres SQL conditions.
+     * @param int|false $limit Maximum to return.
+     * @param array|false $wheres SQL conditions.
      * @return Gdn_DataSet SQL results.
+     * @deprecated This is an old method with some poorly performing queries.
+     * @codeCoverageIgnore
      */
-    public function getRecent($conversationID, $viewingUserID, $offset = '0', $limit = '', $wheres = '') {
-        if ($limit == '') {
+    public function getRecent($conversationID, $viewingUserID, $offset = 0, $limit = false, $wheres = false) {
+        if (empty($limit)) {
             $limit = Gdn::config('Conversations.Messages.PerPage', 50);
         }
 
@@ -88,25 +94,24 @@ class ConversationMessageModel extends ConversationsModel {
     /**
      * Get the data from the model based on its primary key.
      *
-     * @param mixed $iD The value of the primary key in the database.
-     * @param string $datasetType The format of the result dataset.
+     * @param mixed $id The value of the primary key in the database.
+     * @param string|false $datasetType The format of the result dataset.
      * @param array $options Not used.
-     * @return Gdn_DataSet
+     * @return array|bool|object
      */
-    public function getID($iD, $datasetType = false, $options = []) {
-        $result = $this->getWhere(["MessageID" => $iD])->firstRow($datasetType);
+    public function getID($id, $datasetType = false, $options = []) {
+        $result = $this->getWhere(["MessageID" => $id])->firstRow($datasetType);
         return $result;
     }
 
     /**
      * Get only new messages from conversation.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $conversationID Unique ID of conversation being viewed.
      * @param int $lastMessageID Unique ID of last message to be viewed.
      * @return Gdn_DataSet SQL results.
+     * @deprecated This is an old method with some poorly performing queries.
+     * @codeCoverageIgnore
      */
     public function getNew($conversationID, $lastMessageID) {
         $session = Gdn::session();
@@ -117,6 +122,7 @@ class ConversationMessageModel extends ConversationsModel {
     /**
      * {@inheritdoc}
      * @deprecated
+     * @codeCoverageIgnore
      */
     public function getCount($wheres = []) {
         deprecated('ConversationMessageModel->getCount()', 'ConversationMessageModel->getCountByConversation()');
@@ -131,15 +137,12 @@ class ConversationMessageModel extends ConversationsModel {
     /**
      * Get number of messages in a conversation.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $conversationID Unique ID of conversation being viewed.
      * @param int $viewingUserID Unique ID of current user.
      * @param array $wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCountByConversation($conversationID, $viewingUserID, $wheres = '') {
+    public function getCountByConversation($conversationID, $viewingUserID, $wheres = []) {
         if (is_array($wheres)) {
             $this->SQL->where($wheres);
         }
@@ -151,7 +154,8 @@ class ConversationMessageModel extends ConversationsModel {
             ->join('UserConversation uc', 'c.ConversationID = uc.ConversationID and uc.UserID = '.$viewingUserID)
             ->beginWhereGroup()
             ->where('uc.DateCleared is null')
-            ->orWhere('uc.DateCleared >', 'c.DateUpdated', true, false) // Make sure that cleared conversations do not show up unless they have new messages added.
+            // Make sure that cleared conversations do not show up unless they have new messages added.
+            ->orWhere('uc.DateCleared >', 'c.DateUpdated', true, false)
             ->endWhereGroup()
             ->groupBy('cm.ConversationID')
             ->where('cm.ConversationID', $conversationID)
@@ -167,13 +171,10 @@ class ConversationMessageModel extends ConversationsModel {
     /**
      * Get number of messages that meet criteria.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param array $wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCountWhere($wheres = '') {
+    public function getCountWhere($wheres = []) {
         if (is_array($wheres)) {
             $this->SQL->where($wheres);
         }
@@ -193,13 +194,24 @@ class ConversationMessageModel extends ConversationsModel {
     /**
      * Save message from form submission.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param array $formPostValues Values submitted via form.
+     * @param array $settings
      * @return int Unique ID of message created or updated.
      */
-    public function save($formPostValues, $conversation = null, $options = []) {
+    public function save($formPostValues, $settings = []) {
+        $args = func_get_args();
+        if (count($args) > 2 || !empty($settings['ConversationID'])) {
+            deprecated(
+                'ConversationMessageModel::save($formPostValues, $conversation, $settings)',
+                'ConversationMessageModel::save($formPostValues, $settings)'
+            );
+            // Backwards compatibility for the old signature.
+            $settings = $args[2];
+            $conversation = $args[1];
+        } else {
+            $conversation = $settings['conversation'] ?? null;
+        }
+
         $session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -217,7 +229,7 @@ class ConversationMessageModel extends ConversationsModel {
         $checkFlood = true;
         // Determine if spam check should be skipped.
         if (!$session->User->Admin && !$session->checkPermission('Garden.Moderation.Manage')) {
-            $checkFlood = empty($options['NewConversation']);
+            $checkFlood = empty($settings['NewConversation']);
         }
 
         $floodCheckPassed = !$checkFlood;
@@ -389,9 +401,7 @@ class ConversationMessageModel extends ConversationsModel {
     }
 
     /**
-     * @param array $formPostValues
-     * @param bool $insert
-     * @return bool
+     * {@inheritDoc}
      */
     public function validate($formPostValues, $insert = false) {
         $valid = parent::validate($formPostValues, $insert);

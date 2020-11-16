@@ -57,7 +57,7 @@ function responsifyTable(table: HTMLTableElement) {
         const firstRow = table.querySelector("tr");
         let isAllTh = true;
         if (firstRow) {
-            Array.from(firstRow?.children).forEach(child => {
+            Array.from(firstRow?.children).forEach((child) => {
                 if (child.tagName !== "TH") {
                     isAllTh = false;
                 }
@@ -74,12 +74,12 @@ function responsifyTable(table: HTMLTableElement) {
     if (head) {
         head.classList.add("tableHead");
         // Apply labels for each table cell.
-        headLabels = Array.from(head.querySelectorAll("th")).map(th => th.innerText);
-        head.querySelectorAll("th").forEach(th => th.setAttribute("scope", "col"));
+        headLabels = Array.from(head.querySelectorAll("th")).map((th) => th.innerText);
+        head.querySelectorAll("th").forEach((th) => th.setAttribute("scope", "col"));
     }
 
     const rows = table.querySelectorAll("tbody tr");
-    rows.forEach(tr => {
+    rows.forEach((tr) => {
         // Apply a scope on existing first ths.
         const firstTh = tr.querySelector("th");
         if (firstTh) {

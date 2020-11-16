@@ -94,4 +94,23 @@ class ContainerUtils {
         $container->rule($new)
             ->addAlias($old);
     }
+
+    /**
+     * Add a call to the container, but also make that call if the container has an existing instance.
+     *
+     * Sometimes you want to add a call to a container rule, but the container may have already instantiated a shared instance.
+     * This method will let you add the rule, but also make sure the call is replicated if there is already an instance.
+     *
+     * @param Container $container The container to configure.
+     * @param string $rule The name of the rule to configure.
+     * @param string $method The name of the method to call.
+     * @param array $args The method's arguments.
+     */
+    public static function addCall(Container $container, string $rule, string $method, array $args) {
+        $container->rule($rule)->addCall($method, $args);
+        if ($container->hasInstance($rule)) {
+            $obj = $container->get($rule);
+            $container->call([$obj, $method], $args);
+        }
+    }
 }

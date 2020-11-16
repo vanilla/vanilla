@@ -14,6 +14,9 @@ import { sprintf } from "sprintf-js";
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
 
+// Absolute path pattern
+const ABSOLUTE_PATH_REGEX = /^\s*(https?:)?\/\//i;
+
 /**
  * Get a piece of metadata passed from the server.
  *
@@ -110,9 +113,10 @@ export function getSiteSection(): ISiteSection {
  * @returns Returns a URL that can be used in the APP.
  */
 export function formatUrl(path: string, withDomain: boolean = false): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
+    }
 
     // Subcommunity slug OR subcommunity
     let siteRoot = getMeta("context.basePath", "");
@@ -135,9 +139,10 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
  * No site section will be included.
  */
 export function siteUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
+    }
 
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
@@ -171,10 +176,10 @@ export function getRelativeUrl(fullUrl: string): string {
  * @returns Returns a URL that can be used for a static asset.
  */
 export function assetUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
-
+    }
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
@@ -216,8 +221,8 @@ export function onReady(callback: PromiseOrNormalCallback) {
  * @returns A Promise when the events have all fired.
  */
 export function _executeReady(): Promise<any[]> {
-    return new Promise(resolve => {
-        const handlerPromises = _readyHandlers.map(handler => handler());
+    return new Promise((resolve) => {
+        const handlerPromises = _readyHandlers.map((handler) => handler());
         const exec = () => {
             return Promise.all(handlerPromises).then(resolve);
         };
@@ -271,7 +276,7 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
     }
     await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
 
-    return { execute: siteKey => window.grecaptcha.execute(siteKey) };
+    return { execute: (siteKey) => window.grecaptcha.execute(siteKey) };
 }
 
 /**

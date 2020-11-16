@@ -451,12 +451,7 @@ if (!function_exists('categoryFilters')) {
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }
-
-        if (!empty($defaultParams)) {
-            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
-        } else {
-            $defaultUrl = $baseUrl;
-        }
+        $defaultUrl = url($baseUrl.'?'.http_build_query($defaultParams));
 
         return filtersDropDown(
             $baseUrl,
@@ -473,22 +468,15 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param string|array $category
-     * @param string|int $page The page number.
-     * @param bool $withDomain Whether to add the domain to the URL
+     * @param array|object|string|int $category A category object/array, slug, or ID.
+     * @param string|int $page The page of the categories.
+     * @param bool|string $withDomain What domain type to apply.
      * @return string The url to a category.
+     *
+     * @deprecated CategoryModel::categoryUrl
      */
     function categoryUrl($category, $page = '', $withDomain = true) {
-        if (is_string($category)) {
-            $category = CategoryModel::categories($category);
-        }
-        $category = (array)$category;
-
-        $result = '/categories/'.rawurlencode($category['UrlCode']);
-        if ($page && $page > 1) {
-            $result .= '/p'.$page;
-        }
-        return url($result, $withDomain);
+        return CategoryModel::createRawCategoryUrl($category, $page, $withDomain);
     }
 }
 
@@ -716,11 +704,11 @@ if (!function_exists('commentUrl')) {
      * @param object|array $comment
      * @param bool $withDomain
      * @return string
+     *
+     * @deprecated CommentModel::commentUrl()
      */
     function commentUrl($comment, $withDomain = true) {
-        $comment = (object)$comment;
-        $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
-        return url($result, $withDomain);
+        return CommentModel::createRawCommentUrl($comment, $withDomain);
     }
 }
 
@@ -752,9 +740,9 @@ if (!function_exists('discussionFilters')) {
         }
 
         if (!empty($defaultParams)) {
-            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+            $defaultUrl = url($baseUrl.'?'.http_build_query($defaultParams));
         } else {
-            $defaultUrl = $baseUrl;
+            $defaultUrl = url($baseUrl);
         }
 
         return filtersDropDown(
@@ -776,25 +764,11 @@ if (!function_exists('discussionUrl')) {
      * @param int|string $page
      * @param bool $withDomain
      * @return string
+     *
+     * @deprecated  DiscussionModel::discussionUrl().
      */
     function discussionUrl($discussion, $page = '', $withDomain = true) {
-        $discussion = (object)$discussion;
-        $name = Gdn_Format::url($discussion->Name);
-
-        // Disallow an empty name slug in discussion URLs.
-        if (empty($name)) {
-            $name = 'x';
-        }
-
-        $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
-
-        if ($page) {
-            if ($page > 1 || Gdn::session()->UserID) {
-                $result .= '/p'.$page;
-            }
-        }
-
-        return url($result, $withDomain);
+        return DiscussionModel::createRawDiscussionUrl($discussion, $page, $withDomain);
     }
 }
 
@@ -1399,10 +1373,20 @@ if (!function_exists('userAnchor')) {
             $options = ['Px' => $options];
         }
 
-        $px = val('Px', $options, '');
-        $name = val($px.'Name', $user, t('Unknown'));
-        $userID = $user->UserID ?? $user['UserID'] ?? $user[$px.'UserID'];
-        $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
+        $px = $options["Px"] ?? "";
+
+        if (is_array($user)) {
+            $name = $user["{$px}Name"] ?? t("Unknown");
+            $userID = $user["{$px}UserID"] ?? null;
+        } elseif (is_object($user)) {
+            $name = $user->{"{$px}Name"} ?? t("Unknown");
+            $userID = $user->{"{$px}UserID"} ?? null;
+        } else {
+            $name = t("Unknown");
+            $userID = null;
+        }
+
+        $text = $options["Text"] ?? htmlspecialchars($name); // Allow anchor text to be overridden.
 
         $attributes = [
             'class' => trim(($cssClass ?? "") . " js-userCard"),
@@ -1475,11 +1459,17 @@ if (!function_exists('userPhoto')) {
         if (is_string($options)) {
             $options = ['LinkClass' => $options];
         }
+        $px = $options["Px"] ?? "";
 
-        if ($px = val('Px', $options)) {
-            $user = userBuilder($user, $px);
+        if (is_array($user)) {
+            $name = $user["{$px}Name"] ?? t("Unknown");
+            $userID = $user["{$px}UserID"] ?? null;
+        } elseif (is_object($user)) {
+            $name = $user->{"{$px}Name"} ?? t("Unknown");
+            $userID = $user->{"{$px}UserID"} ?? null;
         } else {
-            $user = (object)$user;
+            $name = t("Unknown");
+            $userID = null;
         }
 
         $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap', 'js-userCard');
@@ -1493,7 +1483,17 @@ if (!function_exists('userPhoto')) {
             $imgClass .= " {$imgClass}Medium"; // backwards compat
         }
 
-        $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
+        if (!empty($userID)) {
+            $fullUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        }
+
+        if (!empty($fullUser)) {
+            $profileHref = url(userUrl($fullUser));
+        } else {
+            $fullUser = [];
+            $profileHref = '/renderfunctionstest/profile/';
+        }
+        $href = (val('NoLink', $options)) ? '' : ' href="'.$profileHref.'"';
         $userCssClass = val('_CssClass', $fullUser);
         if ($userCssClass) {
             $linkClass .= ' '.$userCssClass;
@@ -1502,7 +1502,6 @@ if (!function_exists('userPhoto')) {
         $linkClass = $linkClass == '' ? '' : ' class="'.$linkClass.'"';
 
         $photo = val('Photo', $fullUser, val('PhotoUrl', $user));
-        $name = val('Name', $fullUser);
         $title = htmlspecialchars(val('Title', $options, $name));
 
         if ($fullUser && $fullUser['Banned']) {
@@ -1520,11 +1519,9 @@ if (!function_exists('userPhoto')) {
             $photoUrl = UserModel::getDefaultAvatarUrl($fullUser, 'thumbnail');
         }
 
-        $href = (val('NoLink', $options)) ? '' : ' href="'.url(userUrl($fullUser)).'"';
+        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$name]);
 
-        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
-
-        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '" data-userid="'.(json_decode($user)->UserID).'">'
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '" data-userid="'.$userID.'">'
                 .img($photoUrl, ['alt' => $name, 'class' => $imgClass, 'data-fallback' => 'avatar'])
             .'</a>';
     }
@@ -1538,9 +1535,23 @@ if (!function_exists('userPhotoUrl')) {
      * @return string
      */
     function userPhotoUrl($user) {
-        $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
-        $photo = val('Photo', $user);
-        if ($fullUser && $fullUser['Banned']) {
+        if (is_numeric($user)) {
+            $user = Gdn::userModel()->getID($user, DATASET_TYPE_ARRAY);
+        } else {
+            $user = (array) $user;
+        }
+
+        if (!array_key_exists('Photo', $user) && array_key_exists('UserID', $user)) {
+            // Don't go back to the DB unless we absolutely have to.
+            $user = Gdn::userModel()->getID($user['UserID'], DATASET_TYPE_ARRAY);
+        }
+
+        if (!$user) {
+            return UserModel::getDefaultAvatarUrl($user);
+        }
+
+        $photo = $user['Photo'];
+        if ($user && $user['Banned']) {
             $photo = c('Garden.BannedPhotoSmall', c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_100.png'));
         }
 

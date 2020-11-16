@@ -14,6 +14,7 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Psr\Container\ContainerInterface;
+use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 
@@ -23,13 +24,13 @@ use Garden\CustomExceptionHandler;
 class Dispatcher {
     use MiddlewareAwareTrait;
 
-    /** @var Gdn_Locale */
+    /** @var LocaleInterface */
     private $locale;
 
     /**
      * @var array
      */
-    private $routes;
+    private $routes = [];
 
     /**
      * @var string|array|callable
@@ -44,10 +45,10 @@ class Dispatcher {
     /**
      * Dispatcher constructor.
      *
-     * @param Gdn_Locale $locale
+     * @param LocaleInterface $locale
      * @param ContainerInterface $container The container is used to fetch view handlers.
      */
-    public function __construct(Gdn_Locale $locale = null, ContainerInterface $container = null) {
+    public function __construct(LocaleInterface $locale = null, ContainerInterface $container = null) {
         $this->middleware = function (RequestInterface $request): Data {
             return $this->dispatchInternal($request);
         };
@@ -178,6 +179,7 @@ class Dispatcher {
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
+                logException($dispatchEx);
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;

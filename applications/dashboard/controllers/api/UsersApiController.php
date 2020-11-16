@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
+use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -22,6 +23,7 @@ use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -175,6 +177,30 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Check if current session user has just Profile.View perission
+     * or advanced permissions as well
+     *
+     * @return bool
+     */
+    public function checkPermission(): bool {
+        $session = $this->getSession();
+
+        $showFullSchema = false;
+        if ($session->checkPermission([
+            'Garden.Users.Add',
+            'Garden.Users.Edit',
+            'Garden.Users.Delete',
+            'Garden.PersonalInfo.View'
+        ], false)) {
+            $showFullSchema = true;
+        } else {
+            $this->permission('Garden.Profiles.View');
+        }
+
+        return $showFullSchema;
+    }
+
+    /**
      * Get a single user.
      *
      * @param int $id The ID of the user.
@@ -184,34 +210,24 @@ class UsersApiController extends AbstractApiController {
      * @throws NotFoundException If the user could not be found.
      */
     public function get($id, array $query) {
-        $session = $this->getSession();
-
-        $showFullSchema = false;
-        if ($session->checkPermission([
-            'Garden.Users.Add',
-            'Garden.Users.Edit',
-            'Garden.Users.Delete'
-        ])) {
-            $showFullSchema = true;
-        } elseif (!$session->checkPermission([
-            'Garden.Profiles.View',
-        ])) {
-            $this->permission('Garden.Profile.View');
-        }
-
+        $showFullSchema = $this->checkPermission();
 
         $this->idParamSchema();
-        $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
-        $out = $showFullSchema ? $this->schema($this->userSchema(), 'out') : $this->viewProfileSchema();
+        $in = $this->schema([
+            'expand?' => ApiUtils::getExpandDefinition([]),
+        ], ['UserGet', 'in'])->setDescription('Get a user.');
 
         $query = $in->validate($query);
+        $expand = $query['expand'] ?? [];
+        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
+        $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, 'user', $expand);
+        $out =  $this->schema($outSchema, 'out');
+
         $row = $this->userByID($id);
-        $row = $this->normalizeOutput($row);
+        $row = $this->normalizeOutput($row, $expand);
 
         $showEmail = $row['showEmail'] ?? false;
-        if (!$showEmail &&
-            !$session->checkPermission('Garden.Moderation.Manage')
-        ) {
+        if (!$showEmail && !$showFullSchema) {
             unset($row['email']);
         }
 
@@ -306,7 +322,7 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100,
+                'maximum' => ApiUtils::getMaxLimit(),
             ]
         ], 'in')->setDescription('Search for users by full or partial name matching.');
         $out = $this->schema([
@@ -493,11 +509,7 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function index(array $query) {
-        $this->permission([
-            'Garden.Users.Add',
-            'Garden.Users.Edit',
-            'Garden.Users.Delete'
-        ]);
+        $showFullSchema = $this->checkPermission();
 
         $in = $this->schema([
             'dateInserted?' => new DateFilterSchema([
@@ -533,24 +545,41 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 500,
+                'maximum' => ApiUtils::getMaxLimit(),
             ],
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
-            ]
+            ],
+            'expand?' => ApiUtils::getExpandDefinition([]),
         ], ['UserIndex', 'in'])
             ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]));
-        $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
+
+        $expand = $query['expand'] ?? [];
+        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
+        $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, 'user', $expand);
+        $out = $this->schema([':a' => $outSchema], 'out');
+
         $where = ApiUtils::queryToFilters($in, $query);
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $rows = $this->userModel->search($where, $query['sort'] ?? '', '', $limit, $offset)->resultArray();
+
+        // Join in the roles more efficiently for the index.
+        // Attempting to join roles from cache works well for single records where a user might be coming back over and over,
+        // But isn't really appropriate for iterating over lists of users where the same user will not likely be seen twice.
+        // Fetch all roles at once.
+        $this->userModel->joinRoles($rows);
+
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
-            $row = $this->normalizeOutput($row);
+            $row = $this->normalizeOutput($row, $expand);
+            $showEmail = $row['showEmail'] ?? false;
+            if (!$showEmail && !$showFullSchema) {
+                unset($row['email']);
+            }
         }
 
         $result = $out->validate($rows);
@@ -579,10 +608,13 @@ class UsersApiController extends AbstractApiController {
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
+     * @param array|string|bool $expand
+     *
      * @return array Return a Schema record.
      */
-    protected function normalizeOutput(array $dbRecord) {
-        $result = $this->userModel->normalizeRow($dbRecord, []);
+    protected function normalizeOutput(array $dbRecord, $expand = []) {
+        $result = $this->userModel->normalizeRow($dbRecord, $expand);
+        $result['url'] = $this->userModel->getProfileUrl($result);
         return $result;
     }
 
@@ -1003,9 +1035,12 @@ class UsersApiController extends AbstractApiController {
      */
     public function viewProfileSchema() {
         return $this->schema(Schema::parse([
+                'userID:i',
                 'name:s?',
+                'sortName?',
                 'email:s?',
                 'photoUrl:s?',
+                'url:s?',
                 'roles:a?',
                 'dateInserted',
                 'dateLastActive:dt',

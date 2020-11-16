@@ -16,7 +16,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
     $orphaned = !val('DiscussionExists', $Draft);
 
     $editUrl = ($isDiscussion || $orphaned) ? '/post/editdiscussion/0/'.$draftID : '/discussion/'.$discussionID.'/'.$Offset.'/#Form_Comment';
-    $deleteUrl = 'vanilla/drafts/delete/'.$draftID.'/'.Gdn::session()->transientKey().'?Target='.urlencode($this->SelfUrl);
+    $deleteUrl = 'vanilla/drafts/delete/'.$draftID.'/'.Gdn::session()->transientKey().'?Target='.urlencode('/drafts/'.$this->offset);
     ?>
     <li class="Item Draft">
         <div

@@ -104,6 +104,8 @@ export const tokensClasses = useThemeCache(() => {
                 opacity: formElVars.disabled.opacity,
             },
             "& .tokens-clear": {
+                background: 0,
+                border: 0,
                 height: unit(globalVars.icon.sizes.default),
                 width: unit(globalVars.icon.sizes.default),
                 padding: 0,

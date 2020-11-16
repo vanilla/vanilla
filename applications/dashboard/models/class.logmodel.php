@@ -8,8 +8,12 @@
  * @since 2.1
  */
 
+use Garden\EventManager;
+use Vanilla\Community\Events\CommentEvent;
+use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\PrunableTrait;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
+
 
 /**
  * Handles additional logging.
@@ -218,11 +222,11 @@ class LogModel extends Gdn_Pluggable {
                             }
                             break;
                     }
+                    if ($deleteRecord) {
+                        $model->deleteID($recordID, ['Log' => false]);
+                    }
                 }
 
-                if ($deleteRecord) {
-                    $model->deleteID($recordID, ['Log' => false]);
-                }
             }
         }
 
@@ -964,6 +968,14 @@ class LogModel extends Gdn_Pluggable {
                         }
                     }
                 } else {
+                    // Kludge, manually setting this to service a ticket because this is getting tossed in
+                    // via straight SQL instead of a model
+                    if (empty($log['RecordID']) && 'Discussion' === $log['RecordType']) {
+                        // This log entry was never in the table.
+                        if (empty($set['DateLastComment'])) {
+                            $set['DateLastComment'] = $set['DateInserted'];
+                        }
+                    }
                     $iD = Gdn::sql()
                         ->options('Replace', true)
                         ->insert($tableName, $set);
@@ -1013,7 +1025,31 @@ class LogModel extends Gdn_Pluggable {
         // Fire 'after' event
         if (isset($iD)) {
             $this->EventArguments['InsertID'] = $iD;
+
+            // Dispatch CommentEvent if it's a comment being approved
+            if ('Comment' === $log['RecordType']) {
+                $commentModel = new CommentModel();
+                $comment = $commentModel->getID($iD, DATASET_TYPE_ARRAY);
+
+                if ($comment) {
+                    $sender = $data['InsertUserID'] ? Gdn::userModel()->getFragmentByID($data['InsertUserID']) : null;
+                    $commentEvent = $commentModel->eventFromRow($comment, CommentEvent::ACTION_INSERT, $sender);
+                    $eventManager = Gdn::getContainer()->get(EventManager::class);
+                    $eventManager->dispatch($commentEvent);
+                }
+            } elseif ('Discussion' === $log['RecordType']) {
+                $discussionModel = new DiscussionModel();
+                $discussion = $discussionModel->getID($iD, DATASET_TYPE_ARRAY);
+
+                if ($discussion) {
+                    $sender = $data['InsertUserID'] ? Gdn::userModel()->getFragmentByID($data['InsertUserID']) : null;
+                    $discussionEvent = $discussionModel->eventFromRow($discussion, DiscussionEvent::ACTION_INSERT, $sender);
+                    $eventManager = Gdn::getContainer()->get(EventManager::class);
+                    $eventManager->dispatch($discussionEvent);
+                }
+            }
         }
+
         $this->fireEvent('AfterRestore');
 
         if ($deleteLog) {

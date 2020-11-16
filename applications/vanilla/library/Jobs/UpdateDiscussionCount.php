@@ -6,9 +6,10 @@
 
 namespace Vanilla\Library\Jobs;
 
+use CategoryModel;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
@@ -16,7 +17,7 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
  */
 class UpdateDiscussionCount implements LocalJobInterface {
 
-    /** @var \CategoryModel */
+    /** @var CategoryModel */
     private $categoryModel;
 
     /** @var int */
@@ -28,9 +29,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     /**
      * Initial job setup.
      *
-     * @param \CategoryModel $categoryModel
+     * @param CategoryModel $categoryModel
      */
-    public function __construct(\CategoryModel $categoryModel) {
+    public function __construct(CategoryModel $categoryModel) {
         $this->categoryModel = $categoryModel;
     }
 
@@ -42,8 +43,9 @@ class UpdateDiscussionCount implements LocalJobInterface {
     private function messageSchema(): Schema {
         $schema = Schema::parse([
             "categoryID" => ["type" => "integer"],
-            "discussion:a|n?"
+            "discussion:a|n?",
         ]);
+
         return $schema;
     }
 
@@ -52,6 +54,7 @@ class UpdateDiscussionCount implements LocalJobInterface {
      */
     public function run(): JobExecutionStatus {
         $this->categoryModel->updateDiscussionCount($this->categoryID, $this->discussion);
+
         return JobExecutionStatus::complete();
     }
 
@@ -59,28 +62,11 @@ class UpdateDiscussionCount implements LocalJobInterface {
      * Set job Message
      *
      * @param array $message
+     * @throws ValidationException On error.
      */
     public function setMessage(array $message) {
         $message = $this->messageSchema()->validate($message);
         $this->categoryID = $message["categoryID"];
         $this->discussion = $message["discussion"];
-    }
-
-    /**
-     * Set job priority
-     *
-     * @param JobPriority $priority
-     * @return void
-     */
-    public function setPriority(JobPriority $priority) {
-    }
-
-    /**
-     * Set job execution delay
-     *
-     * @param int $seconds
-     * @return void
-     */
-    public function setDelay(int $seconds) {
     }
 }

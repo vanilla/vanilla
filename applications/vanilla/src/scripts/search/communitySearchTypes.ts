@@ -11,4 +11,6 @@ export interface ICommunitySearchTypes {
     followedCategories?: boolean;
     includeChildCategories?: boolean;
     includeArchivedCategories?: boolean;
+    tags?: string[];
+    tagsOptions?: IComboBoxOption[];
 }

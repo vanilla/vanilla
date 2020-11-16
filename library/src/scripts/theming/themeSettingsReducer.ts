@@ -9,6 +9,7 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { ThemeType, ITheme } from "@library/theming/themeReducer";
+import { RecordID } from "@vanilla/utils";
 
 export interface IThemesState {
     themes: ILoadable<{
@@ -16,8 +17,8 @@ export interface IThemesState {
         templates: ITheme[];
         themes: ITheme[];
     }>;
-    applyStatus: ILoadable<{ themeID: number | string }>;
-    previewStatus: ILoadable<{ themeID: number | string }>;
+    applyStatus: ILoadable<{ themeID: RecordID }>;
+    previewStatus: ILoadable<{ themeID: RecordID }>;
     deleteThemeByID: {
         [themeID: number]: ILoadable<{}>;
     };
@@ -89,14 +90,14 @@ export const themeSettingsReducer = produce(
             if (nextState.themes.data) {
                 nextState.themes.data.currentTheme = payload.result;
 
-                nextState.themes.data.themes = nextState.themes.data.themes.map(theme => {
+                nextState.themes.data.themes = nextState.themes.data.themes.map((theme) => {
                     return {
                         ...theme,
                         current: theme.themeID === payload.result.themeID,
                     };
                 });
 
-                nextState.themes.data.templates = nextState.themes.data.templates.map(templates => {
+                nextState.themes.data.templates = nextState.themes.data.templates.map((templates) => {
                     return {
                         ...templates,
                         current: templates.themeID === payload.result.themeID,
@@ -140,7 +141,7 @@ export const themeSettingsReducer = produce(
                 status: LoadStatus.SUCCESS,
             };
             if (nextState.themes.data) {
-                nextState.themes.data.themes = nextState.themes.data?.themes.filter(existingTemplate => {
+                nextState.themes.data.themes = nextState.themes.data?.themes.filter((existingTemplate) => {
                     if (existingTemplate.themeID === payload.params.themeID) {
                         return false;
                     } else {

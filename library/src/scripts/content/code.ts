@@ -21,8 +21,7 @@ export async function highlightCodeBlocks(domNode: HTMLElement = document.body) 
     }
 
     const hljs = await importHLJS();
-    blocks.forEach(node => {
-        node.setAttribute("tabindex", "0");
+    blocks.forEach((node) => {
         hljs.highlightBlock(node);
     });
 }

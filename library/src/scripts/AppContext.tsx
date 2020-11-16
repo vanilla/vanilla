@@ -9,7 +9,7 @@ import getStore from "@library/redux/getStore";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { getMeta } from "@library/utility/appUtils";
-import React, { useMemo } from "react";
+import React, { ComponentType, useMemo } from "react";
 import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
@@ -22,6 +22,7 @@ import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContext";
+import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -29,6 +30,21 @@ interface IProps {
     noTheme?: boolean;
     noWrap?: boolean;
     errorComponent?: React.ReactNode;
+}
+
+type Composable = ComponentType | [ComponentType, { [key: string]: any }];
+
+let ExtraContextProviders: Composable[] = [];
+
+export function registerContextProvider(provider: Composable) {
+    ExtraContextProviders.unshift(provider);
+}
+
+function composeProviders(providers: Composable[], children) {
+    return providers.reverse().reduce((acc, cur) => {
+        const [Provider, props] = Array.isArray(cur) ? [cur[0], cur[1]] : [cur, {}];
+        return <Provider {...props}>{acc}</Provider>;
+    }, children);
 }
 
 /**
@@ -42,35 +58,32 @@ export function AppContext(props: IProps) {
         width: percent(100),
     });
 
-    const content = (
-        <Provider store={store}>
-            <LocaleProvider>
-                <SearchContextProvider>
-                    <ContentTranslationProvider>
-                        <LiveAnnouncer>
-                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                <ThemeProvider
-                                    disabled={props.noTheme}
-                                    errorComponent={<ErrorPage />}
-                                    themeKey={getMeta("ui.themeKey", "keystone")}
-                                    variablesOnly={props.variablesOnly}
-                                >
-                                    <FontSizeCalculatorProvider>
-                                        <SearchFormContextProvider>
-                                            <TitleBarDeviceProvider>
-                                                <BannerContextProviderNoHistory>
-                                                    <DeviceProvider>{props.children}</DeviceProvider>
-                                                </BannerContextProviderNoHistory>
-                                            </TitleBarDeviceProvider>
-                                        </SearchFormContextProvider>
-                                    </FontSizeCalculatorProvider>
-                                </ThemeProvider>
-                            </ScrollOffsetProvider>
-                        </LiveAnnouncer>
-                    </ContentTranslationProvider>
-                </SearchContextProvider>
-            </LocaleProvider>
-        </Provider>
+    const content = composeProviders(
+        [
+            [Provider, { store }],
+            LocaleProvider,
+            SearchContextProvider,
+            ContentTranslationProvider,
+            LiveAnnouncer,
+            [ScrollOffsetProvider, { scrollWatchingEnabled: false }],
+            [
+                ThemeProvider,
+                {
+                    disabled: props.noTheme,
+                    errorComponent: <ErrorPage />,
+                    themeKey: getMeta("ui.themeKey", "keystone"),
+                    variablesOnly: props.variablesOnly,
+                },
+            ],
+            FontSizeCalculatorProvider,
+            ...ExtraContextProviders,
+            SearchFormContextProvider,
+            TitleBarDeviceProvider,
+            BannerContextProviderNoHistory,
+            EntryLinkContextProvider,
+            DeviceProvider,
+        ],
+        props.children,
     );
 
     if (props.noWrap) {

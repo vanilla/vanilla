@@ -175,7 +175,7 @@ class LocalesApiController extends Controller {
      * Validator for locale field
      *
      * @param string $locale
-     * @param ValidationField $validationField
+     * @param \Garden\Schema\ValidationField $validationField
      * @return bool
      */
     public function validateLocale(string $locale, \Garden\Schema\ValidationField $validationField): bool {

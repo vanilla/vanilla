@@ -50,10 +50,38 @@ trait CommunityApiTestTrait {
                 'displayAs' => 'discussions',
                 'parentCategoryID' => $categoryID,
                 'name' => $name,
-                'urlCode' => slugify($name)
+                'urlCode' => slugify($name),
+                'featured' => false
             ];
         $result = $this->api()->post('/categories', $params)->getBody();
         $this->lastInsertedCategoryID = $result['categoryID'];
+        return $result;
+    }
+
+    /**
+     * Create a category.
+     *
+     * @param array $overrides Fields to override on the insert.
+     * @param int[] $viewRoleIDs
+     *
+     * @return array
+     */
+    public function createPermissionedCategory(array $overrides = [], array $viewRoleIDs = []): array {
+        $result = $this->createCategory(['customPermissions' => true] + $overrides);
+
+        foreach ($viewRoleIDs as $viewRoleID) {
+            // Make the cateogry and it's contents hidden to guests.
+            $this->api()->patch("/roles/$viewRoleID", [
+                'permissions' => [[
+                    "id" => $this->lastInsertedCategoryID,
+                    'type' => "category",
+                    "permissions" =>  [
+                        "discussions.view" => true
+                    ],
+                ]],
+            ]);
+        }
+
         return $result;
     }
 
@@ -65,7 +93,7 @@ trait CommunityApiTestTrait {
      * @return array
      */
     public function createDiscussion(array $overrides = []): array {
-        $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID;
+        $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID ?? -1;
 
         if ($categoryID === null) {
             throw new \Exception('Could not insert a test discussion because no category was specified.');
@@ -104,5 +132,27 @@ trait CommunityApiTestTrait {
         $result = $this->api()->post('/comments', $params)->getBody();
         $this->lastInsertCommentID = $result['commentID'];
         return $result;
+    }
+
+    /**
+     * Sort categories.
+     *
+     * @param array $categoryData Mapping of parentID => childIDs in order.
+     * @example
+     * [
+     *     -1 => [1, 4, 6],
+     *     1 => [8, 9],
+     * ]
+     */
+    public function sortCategories(array $categoryData) {
+        foreach ($categoryData as $parentID => $childKeys) {
+            $query = [
+                'ParentID' => $parentID,
+                'Subtree' => json_encode(array_map(function ($childID) {
+                    return ['CategoryID' => $childID];
+                }, $childKeys)),
+            ];
+            $this->bessy()->post("/vanilla/settings/categoriestree.json", $query);
+        }
     }
 }

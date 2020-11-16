@@ -10,9 +10,10 @@ echo '<h1 class="H HomepageTitle">'.
     $this->data('Title').
     followButton($this->data('Category.CategoryID')).
     '</h1>';
-
-$Description = $this->data('Category.Description', $this->description());
-echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
+/** @var $htmlSanitizer */
+$htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
+$Description = $htmlSanitizer->filter($this->data('Category.Description', $this->description()));
+echo wrapIf($Description, 'div', ['class' => 'P PageDescription']);
 
 $this->fireEvent('AfterPageTitle');
 

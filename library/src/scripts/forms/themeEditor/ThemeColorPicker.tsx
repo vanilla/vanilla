@@ -33,7 +33,9 @@ export function ThemeColorPicker(_props: IProps) {
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(variableKey);
+    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField<string>(
+        variableKey,
+    );
 
     const classes = colorPickerClasses();
     const colorInput = useRef<HTMLInputElement>(null);
@@ -44,11 +46,11 @@ export function ThemeColorPicker(_props: IProps) {
 
     // Track whether we have a valid color.
     // If the color is not set, we don't really care.
-    const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue);
+    const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue ?? null);
     const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? null);
 
     useEffect(() => {
-        setTextFieldValue(rawValue);
+        setTextFieldValue(rawValue ?? null);
     }, [rawValue, setTextFieldValue]);
 
     // If we have no color selected we are displaying the default and are definitely valid.
@@ -67,7 +69,7 @@ export function ThemeColorPicker(_props: IProps) {
         if (colorString === "") {
             // we are clearing our color to the default.
             setValue(colorString);
-            setLastValidColor(defaultValue);
+            setLastValidColor(defaultValue ?? null);
         } else if (stringIsValidColor(colorString)) {
             setValue(colorString); // Only set valid color if passes validation
             setLastValidColor(colorString);
@@ -77,7 +79,7 @@ export function ThemeColorPicker(_props: IProps) {
     };
 
     // Handle updates from the text field.
-    const onTextChange = e => {
+    const onTextChange = (e) => {
         const colorString = e.target.value;
         handleColorChange(colorString);
     };
@@ -108,7 +110,7 @@ export function ThemeColorPicker(_props: IProps) {
         }
     };
 
-    const defaultColorString = ensureColorHelper(generatedValue).toHexString();
+    const defaultColorString = generatedValue ? ensureColorHelper(generatedValue).toHexString() : "#fff";
     const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : defaultColorString;
 
     return (

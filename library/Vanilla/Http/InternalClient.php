@@ -12,6 +12,7 @@ use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
+use VanillaTests\TestInstallModel;
 
 /**
  * Http client for making requests internally against the dispatcher.
@@ -243,5 +244,18 @@ class InternalClient extends HttpClient {
         $previous = $session->getPermissions()->has($permission);
         $session->getPermissions()->set($permission, $value);
         return $previous;
+    }
+
+    /**
+     * Send a DELETE request to the API with a body instead of params.
+     *
+     * @param string $uri The URL or path of the request.
+     * @param array $body The querystring to add to the URL.
+     * @param array $headers The HTTP headers to add to the request.
+     * @param array $options An array of additional options for the request.
+     * @return HttpResponse Returns the {@link HttpResponse} object from the call.
+     */
+    public function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []): HttpResponse {
+        return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
     }
 }

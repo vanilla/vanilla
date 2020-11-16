@@ -25,7 +25,9 @@ interface IProps {
 export function ThemeBuilderUpload(props: IProps) {
     const { disabled, variableKey } = props;
 
-    const { rawValue, defaultValue, initialValue, error, setError, setValue } = useThemeVariableField(variableKey);
+    const { rawValue, defaultValue, initialValue, error, setError, setValue } = useThemeVariableField<string>(
+        variableKey,
+    );
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const { inputID, labelID } = useThemeBlock();
@@ -40,7 +42,7 @@ export function ThemeBuilderUpload(props: IProps) {
                     className={classes.button}
                     tabIndex={0}
                     ref={buttonRef}
-                    onKeyDown={e => {
+                    onKeyDown={(e) => {
                         if (e.key === " ") {
                             buttonRef.current?.click();
                         }
@@ -55,7 +57,7 @@ export function ThemeBuilderUpload(props: IProps) {
                         id={inputID}
                         // className={classes}
                         disabled={disabled}
-                        onChange={async event => {
+                        onChange={async (event) => {
                             const file = event.target.files && event.target.files[0];
                             if (!file) {
                                 return;
@@ -83,7 +85,7 @@ export function ThemeBuilderUpload(props: IProps) {
                 <span className={classes.optionContainer}>
                     <span className={classes.imagePreviewContainer}>
                         {(previewImage ?? rawValue) && (
-                            <img className={classes.imagePreview} src={previewImage ?? rawValue} />
+                            <img className={classes.imagePreview} src={previewImage ?? rawValue ?? undefined} />
                         )}
                     </span>
                     {isLoading ? (

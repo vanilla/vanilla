@@ -106,7 +106,7 @@ export default function registerQuill() {
         "formats/codeInline",
     ];
 
-    inlineFormatBlots.forEach(blotLookup => {
+    inlineFormatBlots.forEach((blotLookup) => {
         const BlotClass = Quill.import(blotLookup);
         BlotClass.order = [...BlotClass.order, CodeInlineBlot.blotName];
     });
@@ -121,7 +121,7 @@ export default function registerQuill() {
         "formats/strike",
     ];
 
-    blotsAllowingMentionComboBox.forEach(blotLookup => {
+    blotsAllowingMentionComboBox.forEach((blotLookup) => {
         const BlotClass = Quill.import(blotLookup);
         BlotClass.allowedChildren = [...BlotClass.allowedChildren, MentionComboBoxBlot];
     });

@@ -10,8 +10,11 @@ namespace VanillaTests;
 use Garden\Container\Container;
 use Garden\EventManager;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Http\InternalClient;
 use Vanilla\Permissions;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Allow a class to test against
@@ -21,6 +24,11 @@ trait SiteTestTrait {
         setupBeforeClass as private bootstrapBeforeClass;
         teardownAfterClass as private bootstrapAfterClass;
     }
+
+    /**
+     * @var InternalClient
+     */
+    protected $api;
 
     /**
      * @var array
@@ -64,6 +72,16 @@ trait SiteTestTrait {
     protected $roles;
 
     /**
+     * @var \UserModel
+     */
+    protected $userModel;
+
+    /**
+     * @var \RoleModel
+     */
+    protected $roleModel;
+
+    /**
      * Get the names of addons to install.
      *
      * @return string[] Returns an array of addon names.
@@ -83,7 +101,27 @@ trait SiteTestTrait {
      * Setup before each test.
      */
     public function setupSiteTestTrait(): void {
-        $this->setupBoostrapTrait();
+        $this->setUpBootstrap();
+        $this->backupSession();
+
+        // Clear out all notifications before each test.
+        static::container()->call(function (
+            \Gdn_SQLDriver $sql,
+            \UserModel $userModel,
+            \RoleModel $roleModel
+        ) {
+            $sql->truncate('Activity');
+            $this->userModel = $userModel;
+            $this->roleModel = $roleModel;
+        });
+        $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
+    }
+
+    /**
+     * Tear down before each test.
+     */
+    public function teardownSiteTest(): void {
+        $this->restoreSession();
     }
 
     /**
@@ -98,7 +136,7 @@ trait SiteTestTrait {
     /**
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
-    private static function setupBeforeClassSiteTestTrait(): void {
+    protected static function setupBeforeClassSiteTestTrait(): void {
         self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 
@@ -116,8 +154,13 @@ trait SiteTestTrait {
 
         self::preparelocales();
 
+        $dic->call(function (\Gdn_Locale $locale) {
+            $locale->set('en');
+        });
+
         // Start Authenticators
         $dic->get('Authenticator')->startAuthenticator();
+        $dic->get(\Gdn_Dispatcher::class)->start();
 
         self::$siteInfo = $result;
     }
@@ -264,11 +307,13 @@ TEMPLATE;
         $session->User = $this->sessionBak['user'];
 
         // Hack to get past private property. Don't do outside of tests.
-        $fn = function (Permissions $perms) {
-            $this->permissions = $perms;
-        };
-        $fn->bindTo($session, \Gdn_Session::class);
-        $fn($this->sessionBak['permissions']);
+        $this->callOn(
+            $session,
+            function (Permissions $perms) {
+                $this->permissions = $perms;
+            },
+            $this->sessionBak['permissions']
+        );
         $this->sessionBak = null;
     }
 
@@ -283,27 +328,22 @@ TEMPLATE;
             $sx = (string)(time() . mt_rand(1000, 9999));
         }
 
-        $this->adminID = $this->createUserFixture('Administrator', $sx);
-        $this->moderatorID = $this->createUserFixture('Moderator', $sx);
-        $this->memberID = $this->createUserFixture('Member', $sx);
+        $this->adminID = $this->createUserFixture(Bootstrap::ROLE_ADMIN, $sx);
+        $this->moderatorID = $this->createUserFixture(Bootstrap::ROLE_MOD, $sx);
+        $this->memberID = $this->createUserFixture(Bootstrap::ROLE_MEMBER, $sx);
     }
 
     /**
      * Create a test user with a given role.
      *
      * @param string $role
-     * @param string $sx
+     * @param string|null $sx
      * @return int
      */
-    protected function createUserFixture(string $role, string $sx): int {
-        $roleIDs = $this->getRoles();
-
-        if (!isset($roleIDs)) {
-            $roleIDs = array_column(
-                static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
-                'RoleID',
-                'Name'
-            );
+    protected function createUserFixture(string $role, string $sx = null): int {
+        static $count = 1;
+        if ($sx === null) {
+            $sx = $count++;
         }
 
         $row = $this->api()->post('/users', [
@@ -311,7 +351,7 @@ TEMPLATE;
             'email' => "$role.$sx@example.com",
             'password' => 'test',
             'roleID' => [
-                $roleIDs[$role],
+                $this->roleID($role),
             ],
         ]);
         return $row['userID'];
@@ -332,5 +372,96 @@ TEMPLATE;
             $this->roles = $roles;
         }
         return $this->roles;
+    }
+
+    /**
+     * Assert that a notification was inserted.
+     *
+     * @param int $userID The user that is supposed to be notified.
+     * @param array $where An additional where passed to the activity table.
+     * @return array Returns the notification row for further inspection.
+     */
+    public function assertNotification(int $userID, array $where = []): array {
+        /** @var \ActivityModel $model */
+        $model = static::container()->get(\ActivityModel::class);
+        $row = $model->getWhere(['NotifyUserID' => $userID] + $where)->firstRow(DATASET_TYPE_ARRAY);
+        TestCase::assertIsArray($row, "Notification not found.");
+        return $row;
+    }
+
+    /**
+     * Lookup the role ID for a role name.
+     *
+     * @param string $name
+     * @return int
+     */
+    protected function roleID(string $name): int {
+        if (!isset($this->getRoles()[$name])) {
+            throw new \Exception("Role not found: $name");
+        }
+
+        return $this->getRoles()[$name];
+    }
+
+    /**
+     * Define a role and set it in the role cache.
+     *
+     * @param array $role
+     * @return int
+     */
+    protected function defineRole(array $role): int {
+        $roleID = $this->roleModel->define($role);
+        if (!$roleID) {
+            throw new \Exception("Role not defined: ".$this->roleModel->Validation->resultsText());
+        }
+        if ($this->roles !== null) {
+            $this->roles[$role['Name']] = $roleID;
+        }
+        return $roleID;
+    }
+
+    /**
+     * Get the API client for internal requests.
+     *
+     * @return InternalClient Returns the API client.
+     */
+    public function api() {
+        return $this->api;
+    }
+
+    /**
+     * Insert a dummy user and return their row.
+     *
+     * By default, we use the email address as a password. This is to give the users all different passwords, but also
+     * passwords that are easy to use for tests.
+     *
+     * @param array $overrides Overrides for the user row.
+     * @return array
+     */
+    protected function insertDummyUser(array $overrides = []): array {
+        $user = $this->dummyUser($overrides);
+        $user += ['Password' => $user['Email']];
+        $userID = $this->userModel->register($user);
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+
+        return $user;
+    }
+
+    /**
+     * Make sure a user has a list of roles.
+     *
+     * @param int $userID The user to check.
+     * @param array $roles The expected roles.
+     */
+    private function assertUserHasRoles(int $userID, array $roles) {
+        $userRoles = $this->userModel->getRoleIDs($userID);
+        foreach ($roles as $role) {
+            if (!is_numeric($role)) {
+                $role = $this->roleID($role);
+            }
+
+            $this->assertContains($role, $userRoles);
+        }
     }
 }

@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { logWarning } from "@vanilla/utils";
+import { logWarning, RecordID } from "@vanilla/utils";
 import React, { useState, useContext } from "react";
 
-type RecordToggle = (recordType: string, recordID: number) => void;
+type RecordToggle = (recordType: string, recordID: RecordID) => void;
 
 interface ISiteNavCtx {
     categoryRecordType: string;
@@ -14,7 +14,7 @@ interface ISiteNavCtx {
     openItem: RecordToggle;
     closeItem: RecordToggle;
     openRecords: {
-        [recordType: string]: Set<number>;
+        [recordType: string]: Set<RecordID>;
     };
 }
 

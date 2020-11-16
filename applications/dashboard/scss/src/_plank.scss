@@ -70,46 +70,58 @@
 // Styleguide 17.1
 
 .plank {
-  display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-  min-height: $control-height;
-  background-color: $grey-lightest;
-  border: $border-width solid $border-color;
-  border-radius: 2px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    min-height: $control-height;
+    background-color: $grey-lightest;
+    border: $border-width solid $border-color;
+    border-radius: 2px;
 
-  svg {
-    height: 16px;
-    vertical-align: middle;
-  }
+    &.plank-highlight {
+        background-color: #f4fafe;
+    }
 
-  .badge {
+    svg {
+        height: 16px;
+        vertical-align: middle;
+    }
 
-  }
+    .plank-star svg {
+        height: 20px;
+        width: 20px;
+        margin-right: -4px; // Cheat it into the margin of a dropdown to the right.
+    }
+
+    .badge {
+
+    }
 }
 
 .plank-title {
-  padding: 0 $spacer / 2;
+    padding: 0 $spacer / 2;
 }
 
 .plank-options {
-  color: $grey;
-  margin-left: auto;
-  margin-top: -$border-width;
-  margin-bottom: -$border-width;
+    color: $grey;
+    margin-left: auto;
+    margin-top: -$border-width;
+    margin-bottom: -$border-width;
+    display: flex;
+    align-items: center;
 
-  .dropdown-toggle {
-    padding: 6px 10px;
-    line-height: 22px;
-  }
+    .dropdown-toggle {
+        padding: 6px 10px;
+        line-height: 22px;
+    }
 }
 
 .plank-icon {
-  color: $grey;
+    color: $grey;
 
-  &:hover {
-    fill: transparentize($body-color, .4);
-  }
+    &:hover {
+        fill: transparentize($body-color, .4);
+    }
 }
 
 // Plank Grid
@@ -165,13 +177,13 @@
 // Styleguide 17.2
 
 .plank-container-grid {
-  @extend .row;
-  padding: $spacer $spacer - 3px;
+    @extend .row;
+    padding: $spacer $spacer - 3px;
 
-  .plank-wrapper {
-    @include grid-item-large();
-    padding-left: 3px;
-    padding-right: 3px;
-  }
+    .plank-wrapper {
+        @include grid-item-large();
+        padding-left: 3px;
+        padding-right: 3px;
+    }
 }
 

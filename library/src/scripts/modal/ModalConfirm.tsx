@@ -97,7 +97,7 @@ export default class ModalConfirm extends React.Component<IProps> {
         );
     }
 
-    private handleCancel = e => {
+    private handleCancel = (e) => {
         this.props.onCancel && this.props.onCancel(e);
     };
 

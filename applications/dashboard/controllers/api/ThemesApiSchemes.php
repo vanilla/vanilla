@@ -29,9 +29,9 @@ trait ThemesApiSchemes {
     }
 
     /**
-     * @return array
+     * @return Schema
      */
-    private function assetExpandDefinition(): array {
+    private function assetExpandDefinition(): Schema {
         $assetNames = array_keys(ThemeAssetFactory::DEFAULT_ASSETS);
         $keys = array_map(function ($key) {
             return $key.'.data';

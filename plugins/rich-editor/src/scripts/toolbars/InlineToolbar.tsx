@@ -184,7 +184,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Track the menu's focus state.
      */
-    private handleFocusChange = hasFocus => {
+    private handleFocusChange = (hasFocus) => {
         this.setState({ menuHasFocus: hasFocus });
     };
 

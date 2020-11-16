@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { borders, EMPTY_BORDER, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { important, percent } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -17,9 +18,13 @@ import { important, percent } from "csx";
 
 export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("userPhoto", forcedVars);
+    const globalVars = globalVariables();
 
     const border = makeThemeVars("border", {
+        ...EMPTY_BORDER,
         radius: "50%",
+        width: 1,
+        color: globalVars.mixBgAndFg(0.5).fade(0.3),
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -32,16 +37,19 @@ export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) =
     return { border, sizing };
 });
 
-export const userPhotoMixins = vars => {
+export const userPhotoMixins = (vars = userPhotoVariables()) => {
+    // wrapper of image
     const root = {
         position: "relative",
         borderRadius: vars.border.radius,
         overflow: "hidden",
+        ...borders(vars.border),
     } as NestedCSSProperties;
 
     const photo = {
         ...objectFitWithFallback(),
         padding: important(0),
+        margin: important(0),
         $nest: {
             "&&": {
                 width: percent(100),
@@ -53,21 +61,25 @@ export const userPhotoMixins = vars => {
     const small = {
         width: unit(vars.sizing.small),
         height: unit(vars.sizing.small),
+        flexBasis: unit(vars.sizing.small),
     } as NestedCSSProperties;
 
     const medium = {
         width: unit(vars.sizing.medium),
         height: unit(vars.sizing.medium),
+        flexBasis: unit(vars.sizing.medium),
     } as NestedCSSProperties;
 
     const large = {
         width: unit(vars.sizing.large),
         height: unit(vars.sizing.large),
+        flexBasis: unit(vars.sizing.large),
     } as NestedCSSProperties;
 
     const xlarge = {
         width: unit(vars.sizing.xlarge),
         height: unit(vars.sizing.xlarge),
+        flexBasis: unit(vars.sizing.xlarge),
     };
 
     return {

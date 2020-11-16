@@ -11,6 +11,7 @@ import { IInjectableUserState, mapUsersStoreState } from "@library/features/user
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
 import classNames from "classnames";
+import { makeProfileUrl } from "@library/utility/appUtils";
 
 export interface IProps extends IInjectableUserState {
     className?: string;
@@ -23,7 +24,7 @@ export interface IProps extends IInjectableUserState {
 export class DropDownUserCard extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data!;
-        const profileLink = `${window.location.origin}/profile/${currentUser.name}`;
+        const profileLink = makeProfileUrl(currentUser.name);
         const classesUserDropDown = userDropDownClasses();
         return (
             <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>

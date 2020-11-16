@@ -28,6 +28,7 @@ final class LegacyModelUtils {
 
         $r = [
                 'url' => $url,
+                'uniqueIDField' => $parameter,
                 'parameter' => $parameter,
                 'count' => $count,
             ] + $range;

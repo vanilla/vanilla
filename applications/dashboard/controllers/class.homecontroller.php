@@ -108,7 +108,7 @@ class HomeController extends Gdn_Controller {
      */
     private function clearNavigationPreferences() {
         if (Gdn::session()->isValid()) {
-            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'] ?? '';
             $userModel = new UserModel();
             $userModel->clearSectionNavigationPreference($uri);
         }
@@ -169,7 +169,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function termsOfService() {
-        $this->canonicalUrl(url('/home/termsofservices', true));
+        $this->canonicalUrl(url('/home/termsofservice', true));
         $this->render();
     }
 

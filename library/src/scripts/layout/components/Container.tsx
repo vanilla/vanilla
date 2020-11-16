@@ -15,19 +15,22 @@ export interface IContainer {
     fullGutter?: boolean; // Use when a component wants a full mobile/desktop gutter.
     // Useful for components that don't provide their own padding.
     narrow?: boolean;
+    style?: object;
 }
 
 /*
  * Implements "Container" component used to set max width of content of page.
  */
-export function Container(props: IContainer) {
-    const { tag, children, className, fullGutter = false, narrow = false } = props;
+export const Container = React.forwardRef(function Container(props: IContainer, ref: React.Ref<HTMLElement>) {
+    const { tag, children, className, fullGutter = false, narrow = false, style = {} } = props;
 
     if (children) {
         const classes = containerClasses();
         const Tag = tag || "div";
         return (
             <Tag
+                ref={ref}
+                style={style}
                 className={classNames(classes.root, className, {
                     [classes.fullGutter]: fullGutter,
                     isNarrow: narrow,
@@ -39,6 +42,6 @@ export function Container(props: IContainer) {
     } else {
         return null;
     }
-}
+});
 
 export default Container;

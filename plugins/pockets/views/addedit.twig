@@ -1,0 +1,112 @@
+<h1>{{ Title }}</h1>
+{{ form.open() }}
+<div data-tabsReact>
+    <button data-tabButton>{{ t("Content") }}</button>
+    <button data-tabButton>{{ t("Placement & Conditions") }}</button>
+    <div data-tabPanel>
+        {{ form.errors() }}
+        <ul>
+            <li class="form-group">
+                <div class="label-wrap-wide">
+                    {{ form.label("Enable Pocket", "Enabled") }}
+                    <div class="info">{{ t("Disabled pockets will not be displayed.") }}</div>
+                </div>
+                <div class="input-wrap-right">
+                    {{ form.toggle("Enabled") }}
+                </div>
+            </li>
+            <li class="form-group">
+                <div class="label-wrap">
+                    {{ form.label("Name", "Name") }}
+                    <div class="info">{{ t(
+                            'Enter a descriptive name.',
+                            'Enter a descriptive name for the pocket. This name will not show up anywhere except when managing your pockets here so it is only used to help you remember the pocket.'
+                        ) }}
+                    </div>
+                </div>
+                {{ form.textBoxWrap('Name') }}
+            </li>
+        </ul>
+        <div data-react="PocketContentForm" data-props="{{ contentProps|default("{}") }}"></div>
+    </div>
+    <div data-tabPanel>
+        <ul>
+            <li class="form-group">
+                <div class="label-wrap">
+                    {{ form.label('Page', 'Page') }}
+                    <div
+                        class="info">{{ t('Select the location of the pocket.', 'Select the location of the pocket.') }}</div>
+                </div>
+                <div class="input-wrap">
+                    {{ form.dropdown('Page', Pages) }}
+                </div>
+            </li>
+            <li class="form-group">
+                <div class="label-wrap">
+                    {{ form.label('Location', 'Location') }}
+                    <div
+                        class="info">{{ t('Select the location of the pocket.', 'Select the location of the pocket.') }}</div>
+                </div>
+                <div class="input-wrap">
+                    {{ form.dropdown('Location', LocationsArray) }}
+                </div>
+            </li>
+            {{ fireEchoEvent("settingsController_additionalPocketFilterInputs", {form: form, Attributes: Attributes}) }}
+            <li class="js-repeat form-group">
+                {{ form.labelWrap("Repeat", "RepeatType") }}
+                <div class="input-wrap">
+                    <div>{{ form.radio('RepeatType', 'Before', {'Value': 'before', 'Default': true}) }} </div>
+                    <div>{{ form.radio('RepeatType', 'After', {'Value': 'after'}) }} </div>
+                    <div>{{ form.radio('RepeatType', 'Repeat Every', {'Value': 'every'}) }} </div>
+                    <div>{{ form.radio('RepeatType', 'Given Indexes', {'Value': 'index'}) }} </div>
+
+                    {# Options for repeat every. #}
+
+                    <div class="RepeatOptions RepeatEveryOptions padded-top">
+                        <div class="form-group">
+                            {{ form.labelWrap('Frequency', 'EveryFrequency') }}
+                            {{ form.textBoxWrap('EveryFrequency') }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.labelWrap('Begin At', 'EveryBegin') }}
+                            {{ form.textBoxWrap('EveryBegin') }}
+                        </div>
+                    </div>
+
+                    {# Options for repeat indexes. #}
+                    <div class="RepeatOptions RepeatIndexesOptions padded-top">
+                        <div class="form-group">
+                            <div class="label-wrap">
+                                {{ form.labelWrap('Indexes', 'Indexes') }}
+                                <div
+                                    class="info">{{ t('Enter a comma-delimited list of indexes, starting at 1.') }}</div>
+                            </div>
+                            {{ form.textBoxWrap('Indexes') }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="form-group">
+                {{ form.labelWrap("Conditions", "") }}
+                <div class="input-wrap">
+                    {{ form.checkbox("MobileOnly", t("Only display on mobile browsers.")) }}
+                    {{ form.checkbox("MobileNever", t("Never display on mobile browsers.")) }}
+                    {{ form.checkbox("EmbeddedNever", t("Don't display for embedded comments.")) }}
+                    {{ form.checkbox("ShowInDashboard", t("Display in dashboard. (not recommended)")) }}
+                    {{ form.checkbox("Ad", t("This pocket is an ad.") ~ ' ' ~ t("Users with the no ads permission will not see this pocket.")) }}
+                </div>
+            </li>
+            <li class="form-group">
+                <div class="label-wrap-wide">
+                    {{ form.label("Test Mode", "TestMode") }}
+                    <div class="info">{{ t('The pocket will only be displayed for pocket administrators.') }}</div>
+                </div>
+                <div class="input-wrap-right">
+                    {{ form.toggle('TestMode') }}
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{{ form.close("Save") }}
+

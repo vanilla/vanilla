@@ -16,9 +16,9 @@ interface Processor {
     /**
      * Perform actions based on a database operation.
      *
-     * @param Operation $databaseOperation
+     * @param Operation $operation
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $databaseOperation, callable $stack);
+    public function handle(Operation $operation, callable $stack);
 }

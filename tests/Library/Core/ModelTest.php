@@ -7,16 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
-use VanillaTests\BootstrapTrait;
-use VanillaTests\SetupTraitsTrait;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Tests for the `Gdn_Model` class.
  */
-class ModelTest extends TestCase {
-    use BootstrapTrait, SetupTraitsTrait;
-
+class ModelTest extends BootstrapTestCase {
     /**
      * @var \Gdn_Model
      */
@@ -27,8 +23,6 @@ class ModelTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->initializeDatabase();
-        $this->setupTestTraits();
 
         $this->container()->call(function (
             \Gdn_DatabaseStructure $st,

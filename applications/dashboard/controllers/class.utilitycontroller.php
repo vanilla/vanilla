@@ -573,10 +573,12 @@ class UtilityController extends DashboardController {
         if (!in_array($feedFormat, $validFormats)) {
             $feedFormat = 'normal';
         }
-
-        echo file_get_contents("https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
-        $this->deliveryType(DELIVERY_TYPE_NONE);
-        $this->render();
+        $url = "https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW";
+        $request = new Garden\Http\HttpClient();
+        $responseBody = $request->get($url)->getBody();
+        $this->setData('data', $responseBody);
+        $this->deliveryType(DELIVERY_TYPE_VIEW);
+        $this->render('raw', 'utility', 'dashboard');
     }
 
     /**

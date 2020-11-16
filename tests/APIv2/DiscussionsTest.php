@@ -10,13 +10,22 @@ namespace VanillaTests\APIv2;
 use CategoryModel;
 use DiscussionModel;
 use Garden\Web\Exception\ForbiddenException;
+use Gdn_Configuration;
+use Vanilla\Contracts\ConfigurationInterface;
 use VanillaTests\Models\TestDiscussionModelTrait;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait, TestDiscussionModelTrait;
+
+    use TestExpandTrait;
+    use TestPutFieldTrait;
+    use AssertLoggingTrait;
+    use TestPrimaryKeyRangeFilterTrait;
+    use TestSortingTrait;
+    use TestDiscussionModelTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -31,9 +40,21 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
         $this->sortFields = ['dateLastComment', 'dateInserted', 'discussionID'];
 
+
+
         parent::__construct($name, $data, $dataName);
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getExpandableUserFields() {
+        return [
+            'insertUser',
+            'lastUser',
+            // 'lastPost.insertUser' requires a last post and is not always present.
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -276,7 +297,7 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->assertArrayHasKey('lastUser', $rows[0]);
 
         $url = $this->baseUrl.'/'.$rows[0]['discussionID'];
-        $row = $this->api()->get($url, ['expand' => 'lastPost,lastPost.insertUser']);
+        $row = $this->api()->get($url, ['expand' => 'lastPost,lastPost.insertUser,-lastUser']);
         $this->assertArrayHasKey('insertUser', $row['lastPost']);
         $this->assertArrayNotHasKey('lastUser', $row);
     }
@@ -325,5 +346,18 @@ class DiscussionsTest extends AbstractResourceTest {
             $this->assertNotEmpty($rows);
             $this->assertSorted($rows, '-pinned', $field);
         }
+    }
+
+    /**
+     * Make sure you can pin a discussion while posting via API.
+     */
+    public function testPostAnnouncement(): void {
+        $r = $this->api()->post($this->baseUrl, ['pinned' => true] + $this->record())->getBody();
+        $this->assertTrue($r['pinned']);
+        $this->assertSame('category', $r['pinLocation']);
+
+        $r = $this->api()->post($this->baseUrl, ['pinned' => true, 'pinLocation' => 'recent'] + $this->record())->getBody();
+        $this->assertTrue($r['pinned']);
+        $this->assertSame('recent', $r['pinLocation']);
     }
 }

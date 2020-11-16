@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { ComponentClass } from "react";
-import { logWarning, logError } from "@vanilla/utils";
-import { mountReact, IComponentMountOptions } from "@vanilla/react-utils";
-import { AppContext } from "@library/AppContext";
 import { resetThemeCache } from "@library/styles/styleUtils";
+import { IComponentMountOptions, mountReact } from "@vanilla/react-utils";
+import { logDebug, logWarning } from "@vanilla/utils";
+import React from "react";
+import ReactDOM from "react-dom";
+import { forceRenderStyles } from "typestyle";
 
 let useTheme = true;
 
@@ -97,13 +97,14 @@ export function getComponent(name: string): IRegisteredComponent | undefined {
  *
  * @param parent - The parent element to search. This element is not included in the search.
  */
-export function _mountComponents(parent: Element) {
+export async function _mountComponents(parent: Element) {
+    const awaiting: Array<Promise<any>> = [];
     const parentPage = parent.querySelector("#app");
     if (parentPage instanceof HTMLElement && _pageComponent !== null) {
         mountReact(<_pageComponent />, parentPage);
     }
 
-    parent.querySelectorAll("[data-react]").forEach(node => {
+    parent.querySelectorAll("[data-react]").forEach((node) => {
         if (!(node instanceof HTMLElement)) {
             logWarning("Attempting to mount a data-react component on an invalid element", node);
             return;
@@ -118,20 +119,31 @@ export function _mountComponents(parent: Element) {
         node.innerHTML = "";
 
         const registeredComponent = getComponent(name);
+        node.removeAttribute("data-react");
+        node.removeAttribute("data-props");
 
-        if (registeredComponent) {
-            mountReact(
-                <registeredComponent.Component {...props} contents={children} />,
-                node,
-                () => {
-                    if (node.getAttribute("data-unhide") === "true") {
-                        node.removeAttribute("style");
-                    }
-                },
-                registeredComponent.mountOptions,
-            );
-        } else {
-            logError("Could not find component %s.", name);
-        }
+        awaiting.push(
+            new Promise((resolve) => {
+                if (registeredComponent) {
+                    mountReact(
+                        <registeredComponent.Component {...props} contents={children} />,
+                        node,
+                        () => {
+                            if (node.getAttribute("data-unhide") === "true") {
+                                node.removeAttribute("style");
+                            }
+                            resolve();
+                        },
+                        registeredComponent.mountOptions,
+                    );
+                } else {
+                    logDebug("Could not find component %s.", name);
+                    resolve();
+                }
+            }),
+        );
     });
+
+    await Promise.all(awaiting);
+    forceRenderStyles();
 }

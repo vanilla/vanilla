@@ -169,6 +169,10 @@
     content: $icon-quote;
 }
 
+.ReactMessage::before {
+    content: $icon-mail;
+}
+
 .ReactWarn::before {
     content: $icon-warn;
 }
@@ -269,6 +273,15 @@
     justify-content: center;
 }
 
+.SocialIcon-MicrosoftAccount {
+    background-color: $global-color_primary;
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: $global-color_primaryAlt;
+    }
+}
+
 .Methods,
 .Panel,
 .Navigation,
@@ -300,6 +313,10 @@
         content: $icon-linkedin-alt;
     }
 
+    .SocialIcon-MicrosoftAccount .Icon::before {
+        content:  $icon-windows-alt;
+    }
+
     .SocialIcon-Steam .Icon::before {
         left: 1px;
     }
@@ -322,9 +339,7 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        @if ($staticVariables) {
-            color: $global-color_primary;
-        }
+        color: $global-color_primary;
         content: $icon-star-empty;
     }
 

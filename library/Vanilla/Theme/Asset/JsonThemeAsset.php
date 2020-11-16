@@ -140,7 +140,7 @@ class JsonThemeAsset extends ThemeAsset {
         ];
 
         if ($this->includeValueInJson) {
-            $result['data'] = $this->preservedOutputDecode($this->jsonString);
+            $result['data'] = json_decode($this->jsonString);
         }
 
         return $result;

@@ -7,6 +7,7 @@
 namespace VanillaTests;
 
 use Gdn;
+use TagModel;
 
 /**
  * Class CategoryAndDiscussionApiTestTrait
@@ -16,14 +17,14 @@ use Gdn;
 trait CategoryAndDiscussionApiTestTrait {
 
     /**
-     * @var $lastInsertedCategoryID
+     * @var int|null $lastInsertedCategoryID
      */
-    private $lastInsertedCategoryID;
+    protected $lastInsertedCategoryID;
 
     /**
-     * @var $lastInsertedDiscussionID
+     * @var int|null $lastInsertedDiscussionID
      */
-    private $lastInsertedDiscussionID;
+    protected $lastInsertedDiscussionID;
 
     /**
      * Clear local info between tests.
@@ -31,6 +32,7 @@ trait CategoryAndDiscussionApiTestTrait {
     public function setUpCategoryAndDiscussionApiTestTrait(): void {
         $this->lastInsertedCategoryID = null;
         $this->lastInsertedDiscussionID = null;
+        \DiscussionModel::cleanForTests();
     }
 
     /**
@@ -65,21 +67,21 @@ trait CategoryAndDiscussionApiTestTrait {
     public function createDiscussion(array $overrides = []): array {
         /** @var \DiscussionsApiController $discussionAPIController */
         $discussionAPIController =  Gdn::getContainer()->get('DiscussionsApiController');
-        $categoryID = $body['categoryID'] ?? $this->lastInsertedCategoryID;
+        $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID;
         if (!$categoryID) {
             $category = $this->createCategory();
             $categoryID = $category['categoryID'];
         }
 
-        $body = $overrides +
+        $body = VanillaTestCase::sprintfCounter($overrides +
             [
                 'categoryID' => $categoryID,
                 'type' => null,
-                'name' => 'Discussion',
-                'body' => 'Discussion',
+                'name' => 'Discussion %s',
+                'body' => 'Discussion %s',
                 'format' => 'markdown',
 
-            ];
+            ]);
 
         $discussion = $discussionAPIController->post($body);
         $this->lastInsertedDiscussionID = $discussion['discussionID'];
@@ -88,11 +90,29 @@ trait CategoryAndDiscussionApiTestTrait {
     }
 
     /**
-     * Reset necessary tables.
+     * Create Tags.
      *
-     * @param string $name
+     * @param array $overrides
+     * @return array
      */
-    protected function resetTable(string $name): void {
-        Gdn::database()->sql()->truncate($name);
+    public function createTag(array $overrides = []): array {
+        /** @var TagModel $tagModel */
+        $tagModel = Gdn::getContainer()->get(TagModel::class);
+
+        $name = $overrides['name'] ?? uniqid('tagName_');
+        $fullName = $overrides['fullName'] ?? $name;
+        $type = $overrides['type'] ?? '';
+
+        $tag = $tagModel->save([
+            'Name' => $name,
+            'FullName' => $fullName,
+            'Type' => $type
+        ]);
+
+        if (!is_array($tag)) {
+            $tag = $tagModel->getWhere(["Name" => $name])->firstRow(DATASET_TYPE_ARRAY);
+        }
+
+        return $tag;
     }
 }

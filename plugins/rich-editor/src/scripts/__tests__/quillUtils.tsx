@@ -45,7 +45,7 @@ export function setupLegacyEditor(
     const textarea = document.getElementById("textarea") as HTMLTextAreaElement;
     textarea.value = JSON.stringify(initialValue);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         mountReact(
             <Editor isPrimaryEditor={true} isLoading={false} legacyMode={true} allowUpload={true}>
                 <EditorContent legacyTextArea={textarea} />

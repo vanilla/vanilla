@@ -8,11 +8,13 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
@@ -30,6 +32,12 @@ class ActivityModel extends Gdn_Model {
 
     /** Maximum length of activity story excerpts. */
     private const DEFAULT_EXCERPT_LENGTH = 160;
+
+    /** @var string Cache key for user notification count. */
+    private const NOTIFICATIONS_COUNT_CACHE_KEY = "notificationCount/users/%s";
+
+    /** @var int Cache time for user notification count. */
+    private const NOTIFICATION_COUNT_TTL = 10; // 10 seconds.
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
@@ -90,6 +98,9 @@ class ActivityModel extends Gdn_Model {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CacheInterface */
+    private $cache;
+
     /**
      * Defines the related database table name.
      *
@@ -119,6 +130,7 @@ class ActivityModel extends Gdn_Model {
         $this->eventDispatcher = $eventDispatcher instanceof EventDispatcherInterface ?
             $eventDispatcher : Gdn::getContainer()->get(EventDispatcherInterface::class);
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        $this->cache = \Gdn::getContainer()->get(CacheInterface::class);
     }
 
     /**
@@ -221,7 +233,7 @@ class ActivityModel extends Gdn_Model {
                 if ($user) {
                     $photo = $user['Photo'];
                     $row['PhotoUrl'] = userUrl($user);
-                    if (!$photo || stringBeginsWith($photo, 'http')) {
+                    if (!$photo || isUrl($photo)) {
                         $row['Photo'] = $photo;
                     } else {
                         $row['Photo'] = Gdn_Upload::url(changeBasename($photo, 'n%s'));
@@ -640,12 +652,12 @@ class ActivityModel extends Gdn_Model {
      * Get a particular activity record.
      *
      * @param int $activityID Unique ID of activity item.
-     * @param bool|string $dataSetType The format of the resulting data.
+     * @param bool|string $datasetType The format of the resulting data.
      * @param array $options Not used.
      * @return array|object A single SQL result.
      */
-    public function getID($activityID, $dataSetType = false, $options = []) {
-        $activity = parent::getID($activityID, $dataSetType);
+    public function getID($activityID, $datasetType = false, $options = []) {
+        $activity = parent::getID($activityID, $datasetType);
         if ($activity) {
             $this->calculateRow($activity);
             $activities = [$activity];
@@ -1028,7 +1040,7 @@ class ActivityModel extends Gdn_Model {
         $format = $isArray ? $activity['Format'] ?? null : $activity->Format ?? null;
 
         if ($story && $format) {
-            $message .= Gdn_Format::to($story, $format);
+            $message .= Gdn::formatService()->renderHTML((string)$story, $format);
         }
 
         return $message;
@@ -1341,20 +1353,30 @@ class ActivityModel extends Gdn_Model {
     /**
      * Get total unread notifications for a user.
      *
-     * @param integer $userID
+     * @param int $userID
      */
     public function getUserTotalUnread($userID) {
-        $notifications = $this->SQL
-            ->select("ActivityID", "count", "total")
-            ->from($this->Name)
-            ->where("NotifyUserID", $userID)
-            ->where("Notified", self::SENT_PENDING)
-            ->get()
-            ->resultArray();
-        if (!is_array($notifications) || !isset($notifications[0])) {
-            return 0;
+        if (!$userID) {
+            return 0; // If false or null or 0 (guest) get called, we don't have any notifications.
         }
-        return $notifications[0]["total"] ?? 0;
+        $key = sprintf(self::NOTIFICATIONS_COUNT_CACHE_KEY, $userID);
+        $notificationCount = $this->cache->get($key, null);
+        if ($notificationCount === null) {
+            $notifications = $this->SQL
+                ->select("ActivityID", "count", "total")
+                ->from($this->Name)
+                ->where("NotifyUserID", $userID)
+                ->where("Notified", self::SENT_PENDING)
+                ->get()
+                ->resultArray();
+            if (!is_array($notifications) || !isset($notifications[0])) {
+                $notificationCount = 0;
+            } else {
+                $notificationCount = $notifications[0]["total"] ?? 0;
+            }
+            $this->cache->set($key, $notificationCount, self::NOTIFICATION_COUNT_TTL);
+        }
+        return $notificationCount;
     }
 
     /**
@@ -1495,7 +1517,7 @@ class ActivityModel extends Gdn_Model {
         $emailed = $data['Emailed'];
 
         if (isset(self::$Queue[$data['NotifyUserID']][$data['ActivityType']])) {
-            list($currentData, $currentOptions) = self::$Queue[$data['NotifyUserID']][$data['ActivityType']];
+            [$currentData, $currentOptions] = self::$Queue[$data['NotifyUserID']][$data['ActivityType']];
 
             $notified = $notified ? $notified : $currentData['Notified'];
             $emailed = $emailed ? $emailed : $currentData['Emailed'];
@@ -1518,7 +1540,7 @@ class ActivityModel extends Gdn_Model {
         $this->EventArguments['Data'] = &$data;
         $this->fireEvent('BeforeCheckPreference');
         if (!empty($preference)) {
-            list($popup, $email) = self::notificationPreference($preference, $data['NotifyUserID'], 'both');
+            [$popup, $email] = self::notificationPreference($preference, $data['NotifyUserID'], 'both');
             if (!$popup && !$email) {
                 return; // don't queue if user doesn't want to be notified at all.
             }
@@ -1582,7 +1604,7 @@ class ActivityModel extends Gdn_Model {
 
         // Check the user's preference.
         if ($preference) {
-            list($popup, $email) = self::notificationPreference($preference, $activity['NotifyUserID'], 'both');
+            [$popup, $email] = self::notificationPreference($preference, $activity['NotifyUserID'], 'both');
 
             if ($popup && !$activity['Notified']) {
                 $activity['Notified'] = self::SENT_PENDING;
@@ -1773,8 +1795,8 @@ class ActivityModel extends Gdn_Model {
             $this->setField($commentActivity['ActivityID'], 'Data', $commentActivity['Data']);
         }
 
-        if ($notificationInc > 0) {
-            $countNotifications = $this->userModel->getID($activity['NotifyUserID'])->CountNotifications + $notificationInc;
+        if ($notificationInc > 0 && ($notifyUser = $this->userModel->getID($activity['NotifyUserID']))) {
+            $countNotifications = $notifyUser->CountNotifications + $notificationInc;
             $this->userModel->setField($activity['NotifyUserID'], 'CountNotifications', $countNotifications);
         }
 
@@ -1885,10 +1907,27 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     *  Fires beforeWallNotificationSend event.
+     *
+     * @param array $activity
+     * @param bool $notificationValid
+     */
+    private function verifyNotification(array $activity, bool &$notificationValid) {
+        $args = [
+            'Activity' => $activity,
+            'IsValid' => &$notificationValid,
+            'UserModel' => $this->userModel
+        ];
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
+        $eventManager->fireFilter('activityModel_beforeWallNotificationSend', $this, $args);
+    }
+
+    /**
      * Notify the user of wall comments.
      *
      * @param array $comment
-     * @param $wallPost
+     * @param array $wallPost Activity data.
      */
     protected function notifyWallComment($comment, $wallPost) {
         $notifyUser = $this->userModel->getID($wallPost['ActivityUserID']);
@@ -1906,7 +1945,11 @@ class ActivityModel extends Gdn_Model {
             'HeadlineFormat' => t('HeadlineFormat.NotifyWallComment', '{ActivityUserID,User} commented on your <a href="{Url,url}">wall</a>.')
         ];
 
-        $this->save($activity, 'WallComment');
+        $notificationValid = true;
+        $this->verifyNotification($activity, $notificationValid);
+        if ($notificationValid) {
+            $this->save($activity, 'WallComment');
+        }
     }
 
     /**
@@ -1930,7 +1973,11 @@ class ActivityModel extends Gdn_Model {
             'HeadlineFormat' => t('HeadlineFormat.NotifyWallPost', '{ActivityUserID,User} posted on your <a href="{Url,url}">wall</a>.')
         ];
 
-        $this->save($activity, 'WallComment');
+        $notificationValid = true;
+        $this->verifyNotification($activity, $notificationValid);
+        if ($notificationValid) {
+            $this->save($activity, 'WallComment');
+        }
     }
 
     /**
@@ -1943,7 +1990,7 @@ class ActivityModel extends Gdn_Model {
         $result = [];
         $options = [
             "DisableFloodControl" => true,
-            "QueueEmail" => $batchEmails,
+            "QueueEmail" => true,
         ];
 
         if (Gdn_Cache::activeEnabled()) {
@@ -2108,9 +2155,11 @@ class ActivityModel extends Gdn_Model {
         }
 
         if (!array_key_exists($key, static::$emailQueue) || !(static::$emailQueue[$key] instanceof ActivityEmail)) {
+
             $activityEmail = new ActivityEmail();
             $activityEmail->setBody($body);
             $activityEmail->setSubject($subject);
+            $activityEmail->setTitle($this->getEmailSubject($activity, []));
             $activityEmail->setActionText($activity["ActionText"] ?? t("Check it out"));
             $activityEmail->setActivityTypeID($activity["ActivityTypeID"] ?? null);
             $activityEmail->setInternalRoute($activity["Route"] ?? "");
@@ -2148,7 +2197,7 @@ class ActivityModel extends Gdn_Model {
      * @param Gdn_Email $email
      * @return integer
      */
-    private function sendEmail(Gdn_Email $email): int {
+    public function sendEmail(Gdn_Email $email): int {
         // Send the email.
         try {
             $email->send();
@@ -2214,7 +2263,7 @@ class ActivityModel extends Gdn_Model {
             $actionUrl = externalUrl($route);
             $emailTemplate = $email->getEmailTemplate()
                 ->setButton($actionUrl, $activityEmail->getActionText())
-                ->setTitle($activityEmail->getSubject());
+                ->setTitle($activityEmail->getTitle());
             if ($message = $activityEmail->getBody()) {
                 $emailTemplate->setMessage($message, true);
             }
@@ -2243,7 +2292,7 @@ class ActivityModel extends Gdn_Model {
         }
 
         $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
-        if (empty($notifyUserID)) {
+        if (!is_array($notifyUser)) {
             return null;
         }
 

@@ -46,7 +46,7 @@ export default class EmbedSelectionModule extends Module {
 
     public static clearEmbedSelections(quill: Quill) {
         const domNodes = quill.root.querySelectorAll("." + SelectableEmbedBlot.SELECTED_CLASS);
-        domNodes.forEach(node => {
+        domNodes.forEach((node) => {
             const blot = Quill.find(node);
             if (blot instanceof SelectableEmbedBlot) {
                 blot.clearSelection();

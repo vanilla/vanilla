@@ -35,7 +35,7 @@ class HeadModule extends Gdn_Module {
     /** @var string A string to be concatenated with $this->_Title. */
     protected $subtitle;
 
-    /** @var A string to be concatenated with $this->_Title if there is also a $this->_Subtitle string being concatenated. */
+    /** @var string A string to be concatenated with $this->_Title if there is also a $this->_Subtitle string being concatenated. */
     protected $titleDivider;
 
     /** @var bool  */

@@ -20,7 +20,7 @@ export const profilePageCSS = () => {
     });
 
     cssOut(`.DataList.Activities a.CommentLink, .DataList.Activities a.CommentLink:hover`, {
-        color: importantColorOut(globalVars.elementaryColors.lowContrast),
+        color: importantColorOut(globalVars.meta.text.color),
     });
 
     cssOut(`.PhotoWrap a.ChangePicture .ChangePicture-Text `, {

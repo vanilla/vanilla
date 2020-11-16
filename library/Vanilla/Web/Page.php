@@ -160,11 +160,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /**
      * Indicate to crawlers that they should not index this page.
      *
+     * @param string $content
      * @return $this Own instance for chaining.
      */
-    public function blockRobots(): self {
+    public function blockRobots($content = 'noindex'): self {
         header('X-Robots-Tag: noindex', true);
-        $this->addMetaTag(['name' => 'robots', 'content' => 'noindex']);
+        $this->addMetaTag(['name' => 'robots', 'content' => $content]);
 
         return $this;
     }

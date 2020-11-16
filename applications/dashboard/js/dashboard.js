@@ -835,9 +835,6 @@ $(document).on('contentLoad', function(e) {
      * @param element - The scope of the function.
      */
     function aceInit(element) {
-        // Editor classes
-        codeInput.init($('.js-pocket-body', element), 'html', 300);
-
         // Don't let our code editor go taller than the window length. Makes for weird scrolling.
         codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
         codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
@@ -954,7 +951,7 @@ $(document).on('contentLoad', function(e) {
         // Selectors
         var drawer = '.js-drawer';
         var drawerToggle = '.js-drawer-toggle';
-        var content = '.main-row .main';
+        var content = '.main-row .dashboard-main';
         var container = '.main-container';
 
         $(drawer, element).drawer({
@@ -1056,7 +1053,7 @@ $(document).on('contentLoad', function(e) {
      * @param element - The scope of the function.
      */
     function responsiveTablesInit(element) {
-        var containerSelector = '#main-row .main';
+        var containerSelector = '#main-row .dashboard-main';
 
         // We're in a popup.
         if (typeof(DashboardModal.activeModal) === 'object') {
@@ -1419,7 +1416,7 @@ $(document).on('contentLoad', function(e) {
         if ($(this).scrollTop() > $('header.navbar').height()) {
             $toolbar
                 .addClass(cssClass)
-                .outerWidth($('.main').outerWidth() - 2)
+                .outerWidth($('.dashboard-main').outerWidth() - 2)
                 .next('*')
                 .css('margin-top', $toolbar.outerHeight());
         } else {
@@ -1429,7 +1426,7 @@ $(document).on('contentLoad', function(e) {
     $(window).resize(function () {
         var $toolbar = $('.js-toolbar-sticky.is-stuck');
 
-        $toolbar.outerWidth($('.main').outerWidth() - 2);
+        $toolbar.outerWidth($('.dashboard-main').outerWidth() - 2);
     });
 })(jQuery);
 

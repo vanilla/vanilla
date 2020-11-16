@@ -120,7 +120,7 @@ function mapStateToProps(state: IConversationsStoreState) {
             if (conversation.unread === true) {
                 countUnread++;
             }
-            conversation.participants.forEach(participant => {
+            conversation.participants.forEach((participant) => {
                 authors.push(participant.user);
             });
 

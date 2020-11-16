@@ -48,14 +48,14 @@ describe("EmbedSelectionModule", () => {
             quill.scroll.insertBefore(embed);
             embed.select();
         });
-        [KeyboardModule.keys.UP, KeyboardModule.keys.LEFT].forEach(key => {
+        [KeyboardModule.keys.UP, KeyboardModule.keys.LEFT].forEach((key) => {
             it("can insert a newline at the beginning of the scroll", async () => {
                 embedEmbedSelectionModule.handleArrowKeyFromEmbed(key, embed);
                 expect(quill.scroll.children.head!.domNode.textContent).eq("");
             });
         });
 
-        [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].forEach(key => {
+        [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].forEach((key) => {
             it("can insert a newline at the end of the scroll", async () => {
                 embedEmbedSelectionModule.handleArrowKeyFromEmbed(key, embed);
                 expect(quill.scroll.children.tail!.domNode.textContent).eq("");

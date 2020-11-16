@@ -21,21 +21,23 @@ class RegardingModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get a single record by ID.
      *
      * @param mixed $regardingID
+     * @param string|false $datasetType
+     * @param array $options
      * @return array|bool|stdClass
      */
-    public function getID($regardingID) {
+    public function getID($regardingID, $datasetType = false, $options = []) {
         $regarding = $this->getWhere(['RegardingID' => $regardingID])->firstRow();
         return $regarding;
     }
 
     /**
+     * Get everything for the foreign ID.
      *
-     *
-     * @param string|unknown_type $foreignType
-     * @param string|unknown_type $foreignID
+     * @param string $foreignType
+     * @param string $foreignID
      * @return array|bool|stdClass
      */
     public function get($foreignType, $foreignID) {

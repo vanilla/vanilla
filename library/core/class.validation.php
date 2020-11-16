@@ -10,7 +10,10 @@
  * @since 2.0
  */
 
+use Garden\Schema\ValidationException;
 use Vanilla\Invalid;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manages data integrity validation rules.
@@ -146,8 +149,8 @@ class Gdn_Validation {
                     'Type' => 'text',
                     'Length' => ''
                 ];
-                $properties = (object)$properties;
             }
+            $properties = (object) $properties;
 
             // Create an array to hold rules for this field
             $ruleNames = [];
@@ -395,7 +398,7 @@ class Gdn_Validation {
      */
     public function getSchemaRules() {
         if (!$this->_SchemaRules) {
-            $this->applyRulesBySchema($this->_Schema);
+            $this->applyRulesBySchema();
         }
         return $this->_SchemaRules;
     }
@@ -637,6 +640,9 @@ class Gdn_Validation {
 
                 if ($index !== false) {
                     unset($this->_FieldRules[$fieldName][$index]);
+                    if (empty($this->_FieldRules[$fieldName])) {
+                        unset($this->_FieldRules[$fieldName]);
+                    }
                 }
             }
             if (array_key_exists($fieldName, $this->getSchemaRules())) {
@@ -742,6 +748,38 @@ class Gdn_Validation {
     }
 
     /**
+     * Set the validation result details.
+     *
+     * @param array $results
+     */
+    public function setResults(array $results): void {
+        $this->reset();
+        $this->addResults($results);
+    }
+
+    /**
+     * Add validation results to the existing ones.
+     *
+     * @param array|ValidationException $results
+     */
+    public function addResults($results): void {
+        if ($results instanceof ValidationException) {
+            $results = ModelUtils::validationExceptionToValidationResult($results)->_ValidationResults;
+        }
+
+        foreach ($results as $fieldName => $errors) {
+            if (!is_string($fieldName) || empty($fieldName) || !is_array($errors)) {
+                continue;
+            }
+            foreach ($errors as $errorCode) {
+                if (is_string($errorCode) && !empty($errorCode)) {
+                    $this->addValidationResult($fieldName, $errorCode);
+                }
+            }
+        }
+    }
+
+    /**
      * Get the validation results as an array of error messages.
      *
      * @return array Returns an array of error messages or an empty array if there are no errors.
@@ -799,11 +837,11 @@ class Gdn_Validation {
             if (!array_key_exists($ruleName, $this->rules)) {
                 continue;
             }
-            list($rule, $filter) = $this->rules[$ruleName];
+            [$rule, $filter] = $this->rules[$ruleName];
             $valid = $fieldValue;
 
             if (is_string($rule)) {
-                list($ruleType, $ruleValue) = explode(':', $rule, 2) + ['', ''];
+                [$ruleType, $ruleValue] = explode(':', $rule, 2) + ['', ''];
 
                 switch ($ruleType) {
                     case 'function':

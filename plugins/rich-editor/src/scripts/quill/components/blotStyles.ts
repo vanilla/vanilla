@@ -19,5 +19,4 @@ export const blotCSS = () => {
     emojiCSS();
     spoilerCSS();
     codeBlockCSS();
-    loadedCSS();
 };

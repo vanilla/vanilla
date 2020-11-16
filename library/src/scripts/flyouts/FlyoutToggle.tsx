@@ -10,9 +10,8 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import { useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { forceRenderStyles } from "typestyle";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -64,7 +63,7 @@ export default function FlyoutToggle(props: IProps) {
             onVisibilityChange && onVisibilityChange(visibility);
 
             // Kludge for interaction with old flyout system.
-            if (visibility === true && window.closeAllFlyouts) {
+            if (visibility && window.closeAllFlyouts) {
                 window.closeAllFlyouts();
             }
         },
@@ -84,9 +83,10 @@ export default function FlyoutToggle(props: IProps) {
      * Toggle Menu menu
      */
     const buttonClickHandler = useCallback(
-        (e: MouseEvent) => {
+        (e) => {
             e.stopPropagation();
             setVisibility(!isVisible);
+            e.toElement.focus();
         },
         [isVisible, setVisibility],
     );
@@ -96,7 +96,6 @@ export default function FlyoutToggle(props: IProps) {
         if (!buttonElement) {
             return;
         }
-
         buttonElement.addEventListener("click", buttonClickHandler);
         return () => {
             buttonElement.removeEventListener("click", buttonClickHandler);
@@ -104,7 +103,7 @@ export default function FlyoutToggle(props: IProps) {
     }, [buttonRef, buttonClickHandler]);
 
     const closeMenuHandler = useCallback(
-        event => {
+        (event) => {
             event.stopPropagation();
             event.preventDefault();
 
@@ -124,6 +123,13 @@ export default function FlyoutToggle(props: IProps) {
         },
         [onClose, controllerRef, buttonRef, setVisibility],
     );
+
+    const onKeyPress = (event: React.KeyboardEvent<any>) => {
+        switch (event.key) {
+            case "Escape":
+                closeMenuHandler(event);
+        }
+    };
 
     /**
      * Stop click propagation outside the flyout
@@ -201,6 +207,7 @@ export default function FlyoutToggle(props: IProps) {
                         exitHandler={closeMenuHandler}
                         elementToFocusOnExit={buttonRef.current!}
                         isVisible={isContentVisible}
+                        onKeyPress={onKeyPress}
                     >
                         {props.children(childrenData)}
                     </Modal>

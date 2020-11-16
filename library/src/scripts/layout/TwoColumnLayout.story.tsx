@@ -11,7 +11,7 @@ import PanelWidget from "./components/PanelWidget";
 import { Container } from "./components/Container";
 
 export default {
-    title: "twoColumnLayout",
+    title: "Layout/Two Column Layout",
     parameters: {
         chromatic: {
             viewports: Object.values(twoColumnLayoutVariables().breakPoints),

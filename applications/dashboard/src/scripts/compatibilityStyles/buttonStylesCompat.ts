@@ -34,14 +34,18 @@ export const buttonCSS = () => {
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button", ButtonTypes.PRIMARY);
+    mixinButton(".FormWrapper .file-upload-browse", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
+    mixinButton(".FormTitleWrapper .file-upload-browse", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Button-Controls .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".BigButton:not(.Danger)", ButtonTypes.PRIMARY);
     mixinButton(".NewConversation.NewConversation", ButtonTypes.PRIMARY);
     mixinButton(".groupToolbar .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".BoxButtons .ButtonGroup.Multi .Button.Primary", ButtonTypes.PRIMARY);
-    mixinButton(".Section-Members .Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Group-RemoveMember.Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Buttons .Group-RemoveMember.Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Buttons .Group-Leader.Group-Leader", ButtonTypes.STANDARD);
     mixinButton(".group-members-filter-box .Button.search", ButtonTypes.PRIMARY);
     mixinButton("#Form_Ban", ButtonTypes.PRIMARY);
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
@@ -66,6 +70,14 @@ export const buttonCSS = () => {
             minWidth: unit(handleSize),
         });
     }
+
+    cssOut(`.FormWrapper .file-upload-browse, .FormTitleWrapper .file-upload-browse`, {
+        marginRight: unit(0),
+    });
+
+    cssOut(`.Group-Box .BlockColumn .Buttons a:first-child`, {
+        marginRight: unit(globalVars.gutter.quarter),
+    });
 
     cssOut(`.Frame .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
         height: unit(handleSize),
@@ -185,9 +197,9 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
     selector = trimTrailingCommas(selector);
 
     if (buttonType === ButtonTypes.PRIMARY) {
-        cssOut(selector, generateButtonStyleProperties(vars.primary));
+        cssOut(selector, generateButtonStyleProperties({ buttonTypeVars: vars.primary }));
     } else if (buttonType === ButtonTypes.STANDARD) {
-        cssOut(selector, generateButtonStyleProperties(vars.standard));
+        cssOut(selector, generateButtonStyleProperties({ buttonTypeVars: vars.standard }));
     } else if (buttonType === ButtonTypes.ICON_COMPACT) {
         cssOut(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
     } else {

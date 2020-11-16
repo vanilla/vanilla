@@ -15,7 +15,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export default {
-    title: "Tabs",
+    title: "Components/Tabs",
 };
 
 export function TextEditors() {

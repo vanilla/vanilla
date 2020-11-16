@@ -64,7 +64,7 @@ export function ImageEmbed(props: IProps) {
 
             <ImageEmbedModal
                 isVisible={isOpen}
-                onSave={newValue => {
+                onSave={(newValue) => {
                     props.syncBackEmbedValue &&
                         props.syncBackEmbedValue({
                             name: newValue.alt,

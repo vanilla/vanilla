@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Theme\ThemeCache;
 use Vanilla\Theme\ThemeServiceHelper;
 
@@ -39,7 +40,15 @@ $Construct
     ->primaryKey('RoleID')
     ->column('Name', 'varchar(100)')
     ->column('Description', 'varchar(500)', true)
-    ->column('Type', [RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR], true)
+    ->column('Type', [
+        RoleModel::TYPE_GUEST,
+        RoleModel::TYPE_UNCONFIRMED,
+        RoleModel::TYPE_APPLICANT,
+        RoleModel::TYPE_MEMBER,
+        RoleModel::TYPE_MODERATOR,
+        RoleModel::TYPE_ADMINISTRATOR
+    ], true)
+    ->column('Sync', 'varchar(20)', '')
     ->column('Sort', 'int', true)
     ->column('Deletable', 'tinyint(1)', '1')
     ->column('CanSession', 'tinyint(1)', '1')
@@ -230,11 +239,60 @@ if (!$UserRoleExists) {
     }
 }
 
+$Construct
+    ->table('roleRequestMeta')
+    ->column('roleID', 'int', false, 'primary')
+    ->column('type', ['application', 'invitation'], false, 'primary')
+    ->column('name', 'varchar(150)')
+    ->column('body', 'text')
+    ->column('format', 'varchar(10)')
+    ->column('attributesSchema', 'text')
+    ->column('attributes', 'json', true)
+
+    ->column('dateInserted', 'datetime')
+    ->column('insertUserID', 'int')
+    ->column('insertIPAddress', 'ipaddress', true)
+    ->column('dateUpdated', 'datetime', true)
+    ->column('updateUserID', 'int', true)
+    ->column('updateIPAddress', 'ipaddress', true)
+    ->set($Explicit, $Drop);
+
+$Construct
+    ->table('roleRequest')
+    ->primaryKey('roleRequestID')
+    ->column('type', ['application', 'invitation'])
+    ->column('roleID', 'int', false, ['unique'])
+    ->column('userID', 'int', false, ['unique', 'key'])
+
+    ->column('status', ['pending', 'approved', 'denied'])
+    ->column('dateOfStatus', 'datetime')
+    ->column('statusUserID', 'int')
+    ->column('statusIPAddress', 'ipaddress', true)
+    ->column('dateExpires', 'datetime', true)
+    ->column('attributes', 'json', true)
+
+    ->column('dateInserted', 'datetime')
+    ->column('insertUserID', 'int')
+    ->column('insertIPAddress', 'ipaddress', true)
+    ->column('dateUpdated', 'datetime', true)
+    ->column('updateUserID', 'int', true)
+    ->column('updateIPAddress', 'ipaddress', true)
+
+    ->set($Explicit, $Drop);
+
 // User Meta Table
 $Construct->table('UserMeta')
     ->column('UserID', 'int', false, 'primary')
     ->column('Name', 'varchar(100)', false, ['primary', 'index'])
     ->column('Value', 'text', true)
+    ->set($Explicit, $Drop);
+
+// Similar to the user meta table, but without the need to cache the entire dataset.
+$Construct
+    ->table('userAttributes')
+    ->column('userID', 'int', false, 'primary')
+    ->column('key', 'varchar(100)', false, ['primary', 'index'])
+    ->column('attributes', 'json', true)
     ->set($Explicit, $Drop);
 
 // User Points Table
@@ -321,7 +379,6 @@ if (c('Garden.SSO.SynchRoles')) {
         ['RemoveEmpty' => true]
     );
 }
-
 
 $Construct->table('Session');
 
@@ -615,6 +672,11 @@ $SQL->replace('ActivityType', ['AllowComments' => '0', 'FullHeadline' => '%1$s u
 // Applicant activity
 if ($SQL->getWhere('ActivityType', ['Name' => 'Applicant'])->numRows() == 0) {
     $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'Applicant', 'FullHeadline' => '%1$s applied for membership.', 'ProfileHeadline' => '%1$s applied for membership.', 'Notify' => '1', 'Public' => '0']);
+}
+
+// roleRequest activity
+if ($SQL->getWhere('ActivityType', ['Name' => 'roleRequest'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'roleRequest', 'Notify' => '1', 'Public' => '0']);
 }
 
 $WallPostType = $SQL->getWhere('ActivityType', ['Name' => 'WallPost'])->firstRow(DATASET_TYPE_ARRAY);

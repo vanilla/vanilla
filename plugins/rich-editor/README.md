@@ -215,3 +215,109 @@ The opposite of attach. Do any cleanup from that here.
 5.  `remove(): void`
 
 Deletes the Blot and it's DOM Node. Put any cleanup from `static create()` or the constructor here.
+
+### Some Additional Notes
+
+The following excellent links should be consulted for initia:
+
+-   https://dev.to/charrondev/getting-to-know-quilljs---part-1-parchment-blots-and-lifecycle--3e76
+
+-   https://quilljs.com/docs/quickstart/
+
+### Quill formats
+
+Each document as seen in the browser is represented by a DOM, but for the
+purpose of manipulating editting process Quill uses two additional structures,
+**Blots** and **Deltas**:
+
+```
+     +---------+
+     |         |
+     |   doc   |
+     |         |
+     +---------+
+          |
+          |
+          |
+          v
+        DOM
+         ^
+         |
+         v
+        BLOTS
+         ^
+         |
+         |
+         v
+        DELTA
+```
+
+Blots is a tree-like structure that is used in place of the DOM. However, the
+changes that happen in a document are described using DELTAS, a sequence of
+low-level operations, for example
+
+```json
+{ "insert": "Block operations H2 Title here. Code Block next." },
+    { "attributes": { "header": { "level": 2, "ref": "testRef"} }, "insert": "\n" },
+    { "insert": "/**" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": " *adds locale data to the view, and adds a respond button to the discussion page." },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": " */" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "class MyThemeNameThemeHooks extends Gdn_Plugin {" },
+    { "attributes": { "codeBlock": true }, "insert": "\n\n" },
+    { "insert": "    /**" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "     * Fetches the current locale and sets the data for the theme view." },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "     * Render the locale in a smarty template using {$locale}" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "     *" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "     * @param  Controller $sender The sending controller object." },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    { "insert": "     */" },
+    { "attributes": { "codeBlock": true }, "insert": "\n" },
+    {
+        "insert":
+        "    public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {"
+    },
+```
+
+So, a document is just a blank document with an appropriate sequence of deltas
+applied to it. To see the methods that can be used on deltas, please check the file
+`quill.d.ts`.
+
+### Modules
+
+Quill is organized as a core extended with modules, and a set of APIs for
+changing and extending modules or even writing new ones. To get additional
+details on how to build a custom module, read the link:
+
+https://quilljs.com/guides/building-a-custom-module/
+
+To see how to go from a basic editor to a substantial one, consult the link
+
+https://quilljs.com/guides/cloning-medium-with-parchment/
+
+#### Clipboard
+
+An intesting and important module is `Clipboard`
+(https://quilljs.com/docs/modules/clipboard/) that controls copy-paste
+behaviour. Since a copy-paste leads to an immediate change in the document (we
+can do it manually using the provided method `dangerouslyPasteHTML`) , HTML code
+is parsed directly into deltas and applied to the document. An interesting note:
+to intercept the parsing process (to modify the deltas), checkout the method
+`convert`.
+
+It's important to keep in mind that deltas simply describes what changes
+are to be made to a document. To apply the changes to the document, e.g.
+at an appropriate place, we use the methods provided by Blots.
+
+#### ListBlot
+
+The bug fix mentioned earlier involves working with the (complicated) `ListBlot`.
+This module handles working with lists, including nested lists. To control
+the insertion of an image into a list, for example, work with the method
+`insertAt`.

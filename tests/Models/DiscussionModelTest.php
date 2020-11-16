@@ -10,19 +10,21 @@ namespace VanillaTests\Models;
 use CategoryModel;
 use DiscussionModel;
 use Garden\EventManager;
+use Garden\Events\BulkUpdateEvent;
 use Gdn;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Community\Events\DiscussionEvent;
 use VanillaTests\APIv2\TestSortingTrait;
-use VanillaTests\ExpectErrorTrait;
-use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\Bootstrap;
+use VanillaTests\EventSpyTestTrait;
+use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\SiteTestCase;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Some basic tests for the `DiscussionModel`.
  */
-class DiscussionModelTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait, TestDiscussionModelTrait, SetupTraitsTrait;
+class DiscussionModelTest extends SiteTestCase {
+    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait, TestCategoryModelTrait;
 
     /** @var DiscussionEvent */
     private $lastEvent;
@@ -38,10 +40,20 @@ class DiscussionModelTest extends TestCase {
     private $session;
 
     /**
+     * @var array
+     */
+    private $publicCategory;
+
+    /**
+     * @var array
+     */
+    private $privateCategory;
+
+    /**
      * A test listener that increments the counter.
      *
-     * @param TestEvent $e
-     * @return TestEvent
+     * @param DiscussionEvent $e
+     * @return DiscussionEvent
      */
     public function handleDiscussionEvent(DiscussionEvent $e): DiscussionEvent {
         $this->lastEvent = $e;
@@ -54,10 +66,8 @@ class DiscussionModelTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->setupTestTraits();
         $this->now = new \DateTimeImmutable();
         $this->session = Gdn::session();
-        $this->backupSession();
 
         // Make event testing a little easier.
         $this->container()->setInstance(self::class, $this);
@@ -66,15 +76,44 @@ class DiscussionModelTest extends TestCase {
         $eventManager = $this->container()->get(EventManager::class);
         $eventManager->unbindClass(self::class);
         $eventManager->addListenerMethod(self::class, "handleDiscussionEvent");
+
+        $this->publicCategory = $this->insertCategories(1, ['UrlCode' => 'public-%s'])[0];
+        $this->insertDiscussions(2, ['CategoryID' => $this->publicCategory['CategoryID']]);
+
+        $this->privateCategory = $this->insertPrivateCategory([
+            $this->roleID(Bootstrap::ROLE_ADMIN),
+            $this->roleID(Bootstrap::ROLE_MOD),
+        ], ['UrlCode' => 'private-%s']);
+        $this->insertDiscussions(3, ['CategoryID' => $this->privateCategory['CategoryID']]);
+        DiscussionModel::cleanForTests();
     }
 
     /**
-     * Restore the session after tests.
+     * Test DiscussionModel::save() merging validations.
      */
-    public function tearDown(): void {
-        parent::tearDown();
-        $this->restoreSession();
-        $this->tearDownTestTraits();
+    public function testDiscussionSaveValidationMerge(): void {
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
+        $eventManager->bind('discussionmodel_beforesavediscussion', [$this, 'handleDiscussionSaveValidationMerge']);
+
+        $discussionID = $this->discussionModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "valid discussion",
+            "Format" => "markdown",
+        ]);
+        $validationResults = $this->discussionModel->Validation->results();
+        $this->assertEmpty($discussionID);
+        $this->assertEquals($validationResults['Body'], ['test validate discussion']);
+    }
+
+    /**
+     * Handler for discussionmodel_beforesavediscussion.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function handleDiscussionSaveValidationMerge(DiscussionModel $sender, array $args): void {
+        $sender->Validation->addValidationResult('Body', 'test validate discussion');
     }
 
     /**
@@ -130,10 +169,11 @@ class DiscussionModelTest extends TestCase {
     public function testIsArchivedInvalidDate() {
         $this->discussionModel->setArchiveDate('2019-10-26');
 
-        $this->runWithExpectedError(function () {
-            $actual = $this->discussionModel->isArchived('fldjsjs');
-            $this->assertFalse($actual);
-        }, self::assertErrorNumber(E_USER_WARNING));
+        $actual = @$this->discussionModel->isArchived('fldjsjs');
+        $this->assertFalse($actual);
+
+        $this->expectWarning();
+        $this->discussionModel->isArchived('fldjsjs');
     }
 
     /**
@@ -612,13 +652,58 @@ class DiscussionModelTest extends TestCase {
     }
 
     /**
+     * Test that chaning a discussions category triggers a bulk update for all of it's comments.
+     */
+    public function testChangeTriggersBulkUpdate() {
+        $this->session->getPermissions()->setAdmin(true);
+        $discussionID = $this->discussionModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "CategoryID" => 1,
+        ]);
+        $commentModel = new \CommentModel();
+        $commentID = $commentModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            'DiscussionID' => $discussionID,
+        ]);
+        $this->clearDispatchedEvents();
+
+        // No change.
+        $this->discussionModel->save([
+            'DiscussionID' => $discussionID,
+            "Body" => "Hello world.",
+            'CategoryID' => 1,
+        ]);
+        $this->assertNoEventsDispatched(BulkUpdateEvent::class);
+
+        // Changed
+        $this->discussionModel->save([
+            'DiscussionID' => $discussionID,
+            "Body" => "Hello world.",
+            'CategoryID' => -1,
+        ]);
+        $this->assertBulkEventDispatched(new BulkUpdateEvent(
+            'comment',
+            [
+                'discussionID' => (int) $discussionID,
+            ],
+            [
+                'categoryID' => -1,
+            ]
+        ));
+    }
+
+    /**
      * Test inserting and updating a user's watch status of comments in a discussion.
      *
      * @return void
      * @throws \Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void {
-        $this->session->start(self::$siteInfo['adminUserID']);
+        $this->session->start(self::$siteInfo['adminUserID'], false, false);
 
         $countComments = 5;
         $discussion = [
@@ -772,6 +857,111 @@ class DiscussionModelTest extends TestCase {
         $this->insertDiscussions(10, $row);
 
         $rows = $this->discussionModel->getAnnouncements($row, 0, false, '-DiscussionID')->resultArray();
-        TestSortingTrait::assertSorted($rows, '-DiscussionID');
+        self::assertSorted($rows, '-DiscussionID');
+    }
+
+    /**
+     * Test DiscussionTypes()
+     */
+    public function testDiscussionTypes() {
+        $discussionTypes = $this->discussionModel::discussionTypes();
+        $this->assertSame(['Discussion' => [
+            'Singular' => 'Discussion',
+            'Plural' => 'Discussions',
+            'AddUrl' => '/post/discussion',
+            'AddText' => 'New Discussion'
+        ]], $discussionTypes);
+    }
+
+    /**
+     * An admin should be able to see everything.
+     *
+     * @return int
+     */
+    public function testDiscussionCountAsFullAdmin(): int {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_ADMIN);
+        $this->session->start($userID);
+        $adminCountAllowed = $this->discussionModel->getCount(
+            ['d.CategoryID' => [$this->publicCategory['CategoryID'], $this->privateCategory['CategoryID']]]
+        );
+        $this->assertSame(5, $adminCountAllowed);
+
+        return $adminCountAllowed;
+    }
+
+    /**
+     * A user without access to a category should not see it included in discussion counts.
+     *
+     * @param int $adminCountAllowed
+     * @depends testDiscussionCountAsFullAdmin
+     */
+    public function testDiscussionCountWithOneUnviewableCategory($adminCountAllowed): void {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
+        $this->session->start($userID);
+
+        $memberCountAllowed = $this->discussionModel->getCount(
+            ['d.CategoryID' => [$this->publicCategory['CategoryID'], $this->privateCategory['CategoryID']]]
+        );
+        $this->assertSame(2, $memberCountAllowed);
+        $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
+    }
+
+    /**
+     * Admin with no parameters provided to getCount(), as in getting recent discussions.
+     *
+     * @return int
+     */
+    public function testDiscussionCountRecentDiscussionsAdmin(): int {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_ADMIN);
+        $this->session->start($userID);
+        $allCategories = DiscussionModel::categoryPermissions();
+        $adminCountAllowed = $this->discussionModel->getCount();
+        $this->assertDiscussionCountsFromDb($allCategories, $adminCountAllowed);
+
+        return $adminCountAllowed;
+    }
+
+    /**
+     * Member with no parameters provided to getCount(), as in getting recent discussions.
+     *
+     * @param int $adminCountAllowed
+     * @depends testDiscussionCountRecentDiscussionsAdmin
+     */
+    public function testDiscussionCountRecentDiscussionsMember($adminCountAllowed): void {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
+        $this->session->start($userID);
+        $allCategories = DiscussionModel::categoryPermissions();
+        $memberCountAllowed = $this->discussionModel->getCount();
+        $this->assertDiscussionCountsFromDb($allCategories, $memberCountAllowed);
+        $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
+    }
+
+
+    /**
+     * Smoke test DiscussionModel::getByUser()
+     */
+    public function testgetByUser(): void {
+        $memberUserID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
+        $countDiscussionsMember = $this->discussionModel->getCount(['d.InsertUserID' => $memberUserID]);
+        $adminUserID = $this->createUserFixture(VanillaTestCase::ROLE_ADMIN);
+        $this->session->start($adminUserID);
+        $this->discussionModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world Admin.",
+            "Format" => "markdown",
+            "CategoryID" => $this->privateCategory['CategoryID']
+        ]);
+
+        $this->session->start($memberUserID);
+        $this->discussionModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "Hello world Member",
+            "Format" => "markdown",
+            "CategoryID" => $this->publicCategory['CategoryID']
+        ]);
+
+        $discussionsMember = $this->discussionModel->getByUser($memberUserID, 10, 0, false, $memberUserID, 'PermsDiscussionsView');
+        $discussionsMemberRows = $discussionsMember->numRows();
+        $this->assertEquals($discussionsMemberRows, $discussionsMemberRows + $countDiscussionsMember);
     }
 }

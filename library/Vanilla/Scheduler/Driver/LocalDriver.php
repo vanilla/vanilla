@@ -1,15 +1,17 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Scheduler\Driver;
 
-use Vanilla\Scheduler\Job\JobInterface;
-use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Exception;
 use Psr\Log\LoggerInterface;
+use Throwable;
+use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Scheduler\Job\JobInterface;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
@@ -25,7 +27,7 @@ class LocalDriver implements DriverInterface {
     private $logger;
 
     /**
-     * LocalDriver constructor.
+     * LocalDriver constructor
      *
      * @param LoggerInterface $logger
      */
@@ -38,19 +40,17 @@ class LocalDriver implements DriverInterface {
      *
      * @param JobInterface $job
      * @return DriverSlipInterface
-     * @throws \Exception The job class '%s' doesn't implement LocalJobInterface.
+     * @throws Exception The job class '%s' doesn't implement LocalJobInterface.
      */
     public function receive(JobInterface $job): DriverSlipInterface {
 
         if (!$job instanceof LocalJobInterface) {
             $missingInterfaceMsg = sprintf("The job class '%s' doesn't implement LocalJobInterface.", get_class($job));
             $this->logger->error($missingInterfaceMsg);
-            throw new \Exception($missingInterfaceMsg);
+            throw new Exception($missingInterfaceMsg);
         }
 
-        $localDriverSlip = new LocalDriverSlip($job);
-
-        return $localDriverSlip;
+        return new LocalDriverSlip($job);
     }
 
     /**
@@ -58,20 +58,20 @@ class LocalDriver implements DriverInterface {
      *
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
-     * @throws \Exception The class `%s` doesn't implement LocalDriverSlip.
+     * @throws Exception The class `%s` doesn't implement LocalDriverSlip.
      */
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
 
         if (!$driverSlip instanceof LocalDriverSlip) {
             $missingInterfaceMsg = sprintf("The class `%s` doesn't implement LocalDriverSlip.", get_class($driverSlip));
             $this->logger->error($missingInterfaceMsg);
-            throw new \Exception($missingInterfaceMsg);
+            throw new Exception($missingInterfaceMsg);
         }
 
         /* @var $driverSlip LocalDriverSlip */
         try {
             return $driverSlip->execute();
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $msg = $t->getMessage();
             if (strpos($msg, "File: ") !== false) {
                 $msg = "Scheduler failed to execute Job";
@@ -82,6 +82,7 @@ class LocalDriver implements DriverInterface {
 
             trigger_error($msg, E_USER_WARNING);
             $driverSlip->setStackExecutionFailed($msg);
+
             return $driverSlip->getStatus();
         }
     }
@@ -91,7 +92,7 @@ class LocalDriver implements DriverInterface {
      */
     public function getSupportedInterfaces(): array {
         return [
-            LocalJobInterface::class
+            LocalJobInterface::class,
         ];
     }
 }

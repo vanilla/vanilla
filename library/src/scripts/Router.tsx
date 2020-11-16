@@ -48,7 +48,7 @@ export function Router(props: IProps) {
     );
     if (!props.disableDynamicRouting) {
         routes = (
-            <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map(root => formatUrl(root, true))}>
+            <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}>
                 {routes}
             </LinkContextProvider>
         );

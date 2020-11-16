@@ -59,9 +59,9 @@ class MarkdownFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $value = parent::legacySpoilers($value);
-        $markdownParsed = $this->markdownParser->transform($value);
+    public function renderHtml(string $content, bool $enhance = true): string {
+        $content = parent::legacySpoilers($content);
+        $markdownParsed = $this->markdownParser->transform($content);
         return parent::renderHtml($markdownParsed, $enhance);
     }
 

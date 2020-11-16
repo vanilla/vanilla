@@ -11,9 +11,7 @@ use VanillaTests\SiteTestTrait;
  * Test {@link ConversationMessageModel}.
  */
 class ConversationMessageModelTest extends SharedBootstrapTestCase {
-    use SiteTestTrait {
-        setupBeforeClass as baseSetupBeforeClass;
-    }
+    use SiteTestTrait, \VanillaTests\SetupTraitsTrait;
 
     /**
      * @var ConversationModel
@@ -26,18 +24,28 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
     protected $conversationMessageModel;
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public static function setUpBeforeClass(): void {
-        self::baseSetupBeforeClass();
-    }
+    private $conversation;
 
     /**
      * Instantiate conversationModel & ConversationMessageModel.
      */
     public function setUp(): void {
-        $this->conversationModel = new ConversationModel();
-        $this->conversationMessageModel = new ConversationMessageModel();
+        parent::setUp();
+
+        $this->container()->call(function (
+            ConversationModel $conversationModel
+        ) {
+            $this->conversationModel = $conversationModel;
+            $this->conversationMessageModel = new ConversationMessageModel($conversationModel);
+        });
+        $this->createUserFixtures();
+
+        $id = $this->conversationModel->save([
+            'RecipientUserID' => [$this->memberID, $this->moderatorID],
+        ], [ConversationModel::OPT_CONVERSATION_ONLY => true]);
+        $this->conversation = $this->conversationModel->getID($id, DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -85,5 +93,49 @@ class ConversationMessageModelTest extends SharedBootstrapTestCase {
         $conversationID = $this->conversationModel->save($conversation);
         $conversation = $this->conversationModel->getID($conversationID, DATASET_TYPE_ARRAY);
         return $conversation;
+    }
+
+    /**
+     * Test the basic saving of a message.
+     */
+    public function testSaveMessage(): void {
+        $row = [
+            'ConversationID' => $this->conversation['ConversationID'],
+            'Body' => __FUNCTION__,
+            'Format' => 'Text',
+        ];
+        $id = $this->conversationMessageModel->save($row);
+        $message = $this->conversationMessageModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertArraySubsetRecursive($row, $message);
+    }
+
+    /**
+     * Test adding a method with the deprecated signature.
+     */
+    public function testSaveMessageDeprecated(): void {
+        $row = [
+            'ConversationID' => $this->conversation['ConversationID'],
+            'Body' => __FUNCTION__,
+            'Format' => 'Text',
+        ];
+
+        $id = @$this->conversationMessageModel->save($row, $this->conversation);
+        $message = $this->conversationMessageModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertArraySubsetRecursive($row, $message);
+    }
+
+    /**
+     * Test adding a method with the deprecated signature.
+     */
+    public function testSaveMessageDeprecatedNullConversation(): void {
+        $row = [
+            'ConversationID' => $this->conversation['ConversationID'],
+            'Body' => __FUNCTION__,
+            'Format' => 'Text',
+        ];
+
+        $id = @$this->conversationMessageModel->save($row, null, ['NewConversation' => true]);
+        $message = $this->conversationMessageModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertArraySubsetRecursive($row, $message);
     }
 }

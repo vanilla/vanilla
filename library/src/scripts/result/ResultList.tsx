@@ -8,48 +8,65 @@ import React from "react";
 import classNames from "classnames";
 import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import Translate from "@library/content/Translate";
-import Result, { IResult } from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@vanilla/i18n/src";
 import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@library/layout/components/PanelWidget";
 
 interface IProps {
     className?: string;
     searchTerm?: string;
     results: any[];
-    result?: React.ComponentClass;
+    result: React.ComponentType<any>;
     emptyMessage?: string;
     headingLevel?: 2 | 3;
+    ResultWrapper?: React.ComponentType<any>;
+    rel?: string;
 }
 
 /**
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
 export default function ResultList(props: IProps) {
-    const { className, searchTerm, results, result, emptyMessage = t("No results found."), headingLevel } = props;
+    const {
+        className,
+        searchTerm,
+        results,
+        emptyMessage = t("No results found."),
+        headingLevel,
+        ResultWrapper,
+        result,
+    } = props;
 
     const hasResults = results && results.length > 0;
+
     let content;
     const classes = searchResultsClasses(useLayout().mediaQueries);
 
     if (hasResults) {
-        const ResultComponent = result ?? Result;
+        const Result = result;
         content = results.map((result, i) => {
-            return <ResultComponent {...result} key={i} headingLevel={headingLevel} />;
+            return <Result {...result} key={i} headingLevel={headingLevel} rel={props.rel} />;
         });
-    } else if (searchTerm === undefined || searchTerm === "") {
-        content = (
-            <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>{emptyMessage}</Paragraph>
-        );
     } else {
-        content = (
-            <Paragraph className={classNames("searchResults-noResults", "isEmpty", classes.noResults)}>
+        let message =
+            searchTerm === undefined || searchTerm === "" ? (
+                emptyMessage
+            ) : (
                 <Translate source="No results for '<0/>'." c0={searchTerm} />
-            </Paragraph>
+            );
+
+        content = (
+            <PanelWidget>
+                <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>{message}</Paragraph>
+            </PanelWidget>
         );
     }
 
-    const Tag = hasResults ? `ul` : `div`;
-
-    return <Tag className={classNames("searchResults", classes.root, className)}>{content}</Tag>;
+    if (ResultWrapper) {
+        return <ResultWrapper>{content}</ResultWrapper>;
+    } else {
+        const Tag = hasResults ? `ul` : `div`;
+        return <Tag className={classNames("searchResults", classes.root, className)}>{content}</Tag>;
+    }
 }

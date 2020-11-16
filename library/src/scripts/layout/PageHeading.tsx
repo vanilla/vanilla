@@ -60,3 +60,5 @@ export function PageHeading(props: IPageHeading) {
         </div>
     );
 }
+
+export default PageHeading;

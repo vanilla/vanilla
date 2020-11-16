@@ -9,13 +9,14 @@ namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test count updating around categories, discussions, and comments.
  */
-abstract class CountsTest extends TestCase {
-    use SetupTraitsTrait, SiteTestTrait, TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
+abstract class CountsTest extends SiteTestCase {
+    use TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
      * @var array
@@ -42,8 +43,6 @@ abstract class CountsTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->initializeDatabase();
-        $this->setupTestTraits();
         $this->sql = $this->discussionModel->SQL;
 
         $this->categories = [];
@@ -87,7 +86,7 @@ abstract class CountsTest extends TestCase {
         foreach ($this->discussions as $row) {
             $this->assertDiscussionCounts($row['DiscussionID']);
         }
-//
+
         foreach ($this->categories as $categoryID => $_) {
             $this->assertCategoryCounts($categoryID);
         }

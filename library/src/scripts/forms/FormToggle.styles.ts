@@ -6,7 +6,7 @@
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
-import { borders, colorOut, defaultTransition, timedTransition } from "@library/styles/styleHelpers";
+import { borders, colorOut, flexHelper, margins, paddings } from "@library/styles/styleHelpers";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important } from "csx";
 
@@ -52,6 +52,7 @@ export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) 
 export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) => {
     const vars = formToggleVariables(forcedVars);
     const style = styleFactory("formToggle");
+    const globalVars = globalVariables(forcedVars);
 
     const well = style("well", {
         cursor: "pointer",
@@ -120,5 +121,26 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
-    return { root, well, slider };
+    const visibleLabel = style("visibleLabel", {
+        ...flexHelper().middleLeft(),
+        fontWeight: globalVars.fonts.weights.bold,
+        ...paddings({
+            right: globalVars.gutter.half,
+            vertical: globalVars.gutter.quarter,
+        }),
+        $nest: {
+            "& svg": {
+                marginLeft: 6,
+            },
+        },
+    });
+    const visibleLabelContainer = style("visibleLabelContainer", {
+        ...flexHelper().middle(),
+        justifyContent: "space-between",
+        ...margins({
+            vertical: globalVars.gutter.half,
+        }),
+    });
+
+    return { root, well, slider, visibleLabel, visibleLabelContainer };
 });

@@ -10,6 +10,10 @@
  * @since 2.0
  */
 
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
+use Vanilla\Utility\ModelUtils;
+
 /**
  * Form validation layer
  *
@@ -58,7 +62,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'textarea' => 'form-control',
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
-            'form-group' => 'form-group',
+            'form-group' => 'form-group row',
             'form-footer' => 'js-modal-footer form-footer'
         ]
     ];
@@ -147,6 +151,23 @@ class Gdn_Form extends Gdn_Pluggable {
         $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
 
         parent::__construct();
+    }
+
+    /**
+     * Checks a category against an array of permissions. Returns true if all permissions are true, otherwise, returns false.
+     *
+     * @param array $permissions
+     * @param array $category
+     * @return bool
+     */
+    public static function verifyAdditionalPermissions(array $permissions, array $category): bool {
+        $allowCategory = true;
+        foreach ($permissions as $permission) {
+            if (!isset($category[$permission]) || !$category[$permission]) {
+                $allowCategory = false;
+            }
+        }
+        return $allowCategory;
     }
 
     /**
@@ -521,6 +542,13 @@ class Gdn_Form extends Gdn_Pluggable {
                     $permissionCategory = CategoryModel::permissionCategory($category);
                     $allowedDiscussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, $category);
                     if (!array_key_exists($discussionType, $allowedDiscussionTypes)) {
+                        continue;
+                    }
+                }
+
+                // Check if any other permissions are required, and filter out the category if the user doesn't have any.
+                if (isset($options['AdditionalPermissions'])) {
+                    if (!self::verifyAdditionalPermissions($options['AdditionalPermissions'], $category)) {
                         continue;
                     }
                 }
@@ -2287,6 +2315,9 @@ PASSWORDMETER;
             $attributes = [];
         }
 
+        $shouldImplode = array_key_exists("implode", $attributes);
+        $implodeGlue = ($attributes["implode"] ?? false) ?: "\n";
+
         $multiLine = arrayValueI('MultiLine', $attributes);
 
         if ($multiLine) {
@@ -2328,6 +2359,10 @@ PASSWORDMETER;
         $return .= $this->_attributesToString($attributes);
 
         $value = arrayValueI('value', $attributes, $this->getValue($fieldName));
+        if (is_array($value) && $shouldImplode) {
+            $value = implode($implodeGlue, $value);
+        }
+
 
         $return .= $multiLine === true ? '>'.htmlentities($value, ENT_COMPAT, 'UTF-8').'</textarea>' : ' />';
 
@@ -2725,7 +2760,12 @@ PASSWORDMETER;
      * @return mixed
      */
     public function getFormValue($fieldName, $default = '') {
-        return val($fieldName, $this->formValues(), $default);
+        if (strpos($fieldName, '[') !== false) {
+            $fieldName = str_replace(['[]', '[', ']'], ['.', '.', ''], $fieldName);
+            return valr($fieldName, $this->formValues(), $default);
+        } else {
+            return val($fieldName, $this->formValues(), $default);
+        }
     }
 
     /**
@@ -3023,6 +3063,22 @@ PASSWORDMETER;
     }
 
     /**
+     * Validate the form as APIv2 would.
+     *
+     * @param bool $throw
+     *
+     * @return Validation
+     * @throws ValidationException Throws the exception if `$throw` is true.
+     */
+    public function validateApi(bool $throw = true): Validation {
+        if (!$this->_Model) {
+            return new Validation();
+        }
+
+        return ModelUtils::validationResultToValidationException($this->_Model, \Gdn::locale(), $throw);
+    }
+
+    /**
      * Set the validation results on the form.
      *
      * @param array $validationResults
@@ -3086,36 +3142,44 @@ PASSWORDMETER;
      * @param array $options Additional options to pass into the form.
      *  - Wrap: A two item array specifying the text to wrap the form in.
      *  - ItemWrap: A two item array specifying the text to wrap each form item in.
+     *  - NameFormat: A sprintf format that wil apply to each control name. Useful for prefixes or object nesting.
+     *  - ForceLabelWrap: True for dashboard forms that must have a `.label-wrap` label.
      * @return string
      */
     public function simple($schema, $options = []) {
-        $result = valr('Wrap.0', $options, '<ul>');
+        $options = array_change_key_case($options) + [
+            'wrap' => ['<ul>', '</ul>'],
+            'itemwrap' => ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"],
+            'nameformat' => null,
+        ];
+
+        $result = $options['wrap'][0];
 
         foreach ($schema as $index => $row) {
             if (is_string($row)) {
                 $row = ['Name' => $index, 'Control' => $row];
             }
 
-            if (!isset($row['Name'])) {
-                $row['Name'] = $index;
-            }
-            if (!isset($row['Options'])) {
-                $row['Options'] = [];
-            }
+            $row += [
+                'Name' => $index,
+                'Options' => [],
+                'Control' => 'TextBox',
+            ];
 
-            touchValue('Control', $row, 'TextBox');
+            if (!empty($options['nameformat'])) {
+                $row['Name'] = sprintf($options['nameformat'], $row['Name']);
+            }
 
             if (strtolower($row['Control']) === 'react') {
                 $result .= $this->react($row['Name'], $row['Component']);
                 continue;
-            } elseif (strtolower($row['Control']) === 'imageUploadReact') {
+            } elseif (strtolower($row['Control']) === 'imageuploadreact') {
                 $result .= $this->imageUploadReact($row['Name'], $row['Label'], $row['Description'] ?? '');
                 continue;
             } elseif (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
             } else {
-                $defaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];
-                $itemWrap = val('ItemWrap', $row, val('ItemWrap', $options, $defaultWrap));
+                $itemWrap = val('ItemWrap', $row, $options['itemwrap']);
             }
 
             $result .= $itemWrap[0];
@@ -3141,21 +3205,27 @@ PASSWORDMETER;
             if (arrayValueI('id', $row['Options'])) {
                 $labelOptions['for'] = arrayValueI('id', $row['Options']);
             }
+            $control = strtolower($row['Control']);
+
             if ($description) {
-                $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions).$description, 'div', ['class' => 'label-wrap']);
+                $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions) . $description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions), 'div', ['class' => 'label-wrap']);
             }
 
-            switch (strtolower($row['Control'])) {
+            switch ($control) {
                 case 'categorydropdown':
                     $result .= $this->label($labelCode, $row['Name'])
                         .$description
                         .$this->categoryDropDown($row['Name'], $row['Options']);
                     break;
                 case 'checkbox':
-                    $result .= $labelWrap
-                        .wrap($this->checkBox($row['Name'], $labelCode, $row['Options']), 'div', ['class' => 'input-wrap']);
+                    $result .= ($description ? $labelWrap : '')
+                        .wrap(
+                            $this->checkBox($row['Name'], $labelCode, $row['Options']),
+                            'div',
+                            ['class' => 'input-wrap'.(($description ? '' : ' no-label'))]
+                        );
                     break;
                 case 'toggle':
                     $result .= $this->toggle($row['Name'], $labelCode, $row['Options'], $description);
@@ -3196,8 +3266,40 @@ PASSWORDMETER;
             }
             $result .= $itemWrap[1];
         }
-        $result .= valr('Wrap.1', $options, '</ul>');
+        $result .= $options['wrap'][1];
         return $result;
+    }
+
+    /**
+     * Render a basic schema as defined by the `BasicSchemaSchema`.
+     *
+     * @param array $schema The schema array to render.
+     * @param array $options Additional options to pass along to `Gdn_Form::simple()`.
+     * @return string Returns a string containing form HTML.
+     */
+    public function renderSchema(array $schema, array $options = []): string {
+        $simple = [];
+        foreach ($schema['properties'] as $key => $prop) {
+            $control = $prop['x-control'] ?? ($prop['type'] === 'boolean' ? 'checkbox' : 'textbox');
+            $opts = [];
+
+            if ($control === 'textarea') {
+                $control = 'textbox';
+                $opts['Multiline'] = true;
+            }
+
+            $row = [
+                'LabelCode' => isset($prop['x-label']) ? '@'.$prop['x-label'] : self::labelCode($key),
+                'Control' => $control,
+                'Description' => $prop['description'],
+                'Options' => $opts,
+            ];
+
+            $simple[$key] = $row;
+        }
+
+        $str = $this->simple($simple, $options);
+        return $str;
     }
 
     /**

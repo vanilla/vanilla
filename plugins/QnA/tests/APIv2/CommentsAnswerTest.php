@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\CurrentTimeStamp;
+
 require_once(__DIR__.'/QnaTestHelperTrait.php');
 
 /**
@@ -50,14 +52,30 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
     protected function createQuestion() {
         $record = [
             'categoryID' => self::$category['categoryID'],
-            'name' => 'Test Question For Answer',
-            'body' => 'Hello world!',
+            'name' => 'Test Question For Answer %s',
+            'body' => 'Hello world! %s',
             'format' => 'markdown',
         ];
-        $response = $this->api()->post('discussions/question', $record);
+        $response = $this->api()->post('discussions/question', self::sprintfCounter($record));
         $this->assertEquals(201, $response->getStatusCode());
 
         return $response->getBody();
+    }
+
+    /**
+     * Create a set of QnA discussions covering the range of answered statuses ('unanswered', 'answered', 'accepted', 'rejected').
+     *
+     * @return array The set of questions
+     */
+    public function createQuestionSet() {
+        $questionSet = [
+            $this->createQuestion(),
+            $this->testResetAnswer(),
+            $this->testAcceptAnswer(),
+            $this->testRejectAnswer(),
+        ];
+
+        return $questionSet;
     }
 
     /**
@@ -127,6 +145,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
     /**
      * Test accepting an answer.
      *
+     * @return array Returns the updated question.
      * @depends testPostAnswer
      */
     public function testAcceptAnswer() {
@@ -142,11 +161,14 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         $updatedQuestion = $this->getQuestion($question['discussionID']);
         $this->assertIsQuestion($updatedQuestion, ['status' => 'accepted']);
+
+        return $updatedQuestion;
     }
 
     /**
      * Test rejecting an answer.
      *
+     * @return array Returns the updated question.
      * @depends testPostAnswer
      */
     public function testRejectAnswer() {
@@ -162,11 +184,14 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         $updatedQuestion = $this->getQuestion($question['discussionID']);
         $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+
+        return $updatedQuestion;
     }
 
     /**
      * Test accepting and then setting back an answer to pending.
      *
+     * @return array Returns the updated question.
      * @depends testPostAnswer
      */
     public function testResetAnswer() {
@@ -186,6 +211,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         $updatedQuestion = $this->getQuestion($question['discussionID']);
         $this->assertIsQuestion($updatedQuestion, ['status' => 'answered']);
+
+        return $updatedQuestion;
     }
 
     /**
@@ -248,10 +275,13 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      */
     public function testAnsweredQuestionDates() {
 
+        // Mock the current time.
+        CurrentTimeStamp::mockTime('Dec 1 2010');
+
         $question = $this->createQuestion();
         $this->assertIsQuestion($question, ['dateAccepted' => null]);
 
-        $answer= $this->testPostAnswer($question['discussionID']);
+        $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
             'status' => 'accepted',
@@ -285,5 +315,18 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         $this->assertIsQuestion($unansweredQuestion, ['dateAccepted' => null]);
         $this->assertIsQuestion($unansweredQuestion, ['dateAnswered' => null]);
+    }
+
+    /**
+     * Test getting all unanswered questions as we do for the 'discussions/unanswered' endpoint.
+     * This should get all (and only) questions with a status of 'unanswered' and 'rejected'.
+     */
+    public function testGetAllUnansweredQuestions() {
+        $this->createQuestionSet();
+        $unansweredQuestions = $this->bessy()->get("discussions/unanswered")->data("Discussions")->resultArray();
+
+        foreach ($unansweredQuestions as $question) {
+            $this->assertContains(strtolower($question['QnA']), ["unanswered", "rejected"]);
+        }
     }
 }

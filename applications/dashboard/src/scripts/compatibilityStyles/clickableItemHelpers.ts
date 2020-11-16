@@ -60,7 +60,7 @@ export const mixinClickInput = (selector: string, overwriteColors?: {}, overwrit
         }
         nestedWorkaround(trimTrailingCommas(selector), linkColors.$nest);
     } else {
-        selectors.map(s => {
+        selectors.map((s) => {
             if (linkColors.color !== undefined) {
                 cssOut(selector, {
                     color: linkColors.color,

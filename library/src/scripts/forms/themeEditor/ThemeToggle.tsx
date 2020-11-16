@@ -29,7 +29,7 @@ export function ThemeToggle(props: IProps) {
             slim
             enabled={value}
             disabled={disabled}
-            onChange={newValue => {
+            onChange={(newValue) => {
                 setValue(newValue);
                 afterChange?.(newValue);
             }}

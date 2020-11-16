@@ -10,8 +10,8 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-    <ul>
-        <li class="form-group">
+    <ul role="presentation">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Appearance', 'CssClass'); ?>
             </div>
@@ -24,7 +24,7 @@ echo $this->Form->errors();
                 ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
             <?php echo $this->Form->label('Message', 'Content'); ?>
             <?php echo wrap(t("This field partially supports HTML."), 'div', ['class' => 'info']); ?>
@@ -33,7 +33,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Content', ['MultiLine' => TRUE]); ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Page', 'Location'); ?>
             </div>
@@ -41,7 +41,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->dropDown('Location', $this->data('Locations')); ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Position', 'AssetTarget'); ?>
             </div>
@@ -49,7 +49,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->dropDown('AssetTarget', $this->AssetData); ?>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Category', 'CategoryID'); ?>
             </div>
@@ -60,10 +60,10 @@ echo $this->Form->errors();
                 </div>
             </div>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <?php echo $this->Form->toggle('AllowDismiss', 'Dismissible', ['value' => '1'], 'Allow users to dismiss this message.'); ?>
         </li>
-        <li class="form-group">
+        <li class="form-group" role="presentation">
             <?php echo $this->Form->toggle('Enabled', 'Enabled', ['value' => '1'], 'An enabled message will be visible on the site.'); ?>
         </li>
     </ul>

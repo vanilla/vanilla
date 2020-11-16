@@ -5,7 +5,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
@@ -46,7 +45,7 @@ class TokensApiController extends AbstractApiController {
      * Revoke an access token.
      *
      * @param int $id
-     * @throws ClientException if current user isn't authorized to delete the token.
+     * @throws ClientException Throws an exception if current user isn't authorized to delete the token.
      */
     public function delete($id) {
         $this->idParamSchema()->setDescription('Revoke an access token.');
@@ -65,8 +64,7 @@ class TokensApiController extends AbstractApiController {
      *
      * @param int|string|array $token Full token row.
      * @param bool $throw Should relevant exceptions be thrown on an error?
-     * @throws ClientException if the token has been revoked.
-     * @throws ClientException if the token has expired.
+     * @throws ClientException Throws an exception if the token has been revoked or has expired.
      * @return bool
      */
     public function isActiveToken($token, $throw = false) {
@@ -132,7 +130,7 @@ class TokensApiController extends AbstractApiController {
      *
      * @param int $id
      * @param array $query
-     * @throws NotFoundException if this is not an active token.
+     * @throws NotFoundException Throws an exception if this is not an active token.
      * @return array
      */
     public function get($id, array $query) {
@@ -285,7 +283,7 @@ class TokensApiController extends AbstractApiController {
      * Get an access token by its numeric ID.
      *
      * @param int $accessTokenID
-     * @throws NotFoundException when the token cannot be located by its ID.
+     * @throws NotFoundException Throws an exception when the token cannot be located by its ID.
      * @return array
      */
     protected function token($accessTokenID) {
@@ -300,7 +298,7 @@ class TokensApiController extends AbstractApiController {
      * Validate the transient key for the current request.
      *
      * @param string $transientKey
-     * @throws ClientException
+     * @throws ClientException Throws an exception when the transient key is invalid.
      */
     public function validateTransientKey($transientKey) {
         if ($this->getSession()->transientKey() === false) {
@@ -310,5 +308,14 @@ class TokensApiController extends AbstractApiController {
         if ($this->getSession()->transientKey() != $transientKey) {
             throw new ClientException('Invalid transient key.', 401);
         }
+    }
+
+    /**
+     * Get the access token model dependency.
+     *
+     * @return AccessTokenModel
+     */
+    public function getAccessTokenModel(): AccessTokenModel {
+        return $this->accessTokenModel;
     }
 }

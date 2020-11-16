@@ -118,7 +118,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 onItemClick={this.onItemClick}
                 mentionProps={this.createMentionProps(data)}
                 matchedString={lastSuccessfulUsername || ""}
-                activeItemId={activeSuggestionID}
+                activeItemID={activeSuggestionID}
                 id={this.ID}
                 loaderID={this.loaderID}
                 showLoader={isLoading}
@@ -355,7 +355,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 }
 
-const withRedux = connect(UserSuggestionModel.mapStateToProps, dispatch => ({
+const withRedux = connect(UserSuggestionModel.mapStateToProps, (dispatch) => ({
     suggestionActions: new UserSuggestionActions(dispatch, apiv2),
 }));
 

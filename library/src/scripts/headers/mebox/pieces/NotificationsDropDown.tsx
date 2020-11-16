@@ -42,7 +42,8 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
         const classesHeader = titleBarClasses();
         return (
             <DropDown
-                id={this.id}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
                 name={t("Notifications")}
                 renderLeft={true}
                 buttonClassName={classesHeader.button}
@@ -61,7 +62,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

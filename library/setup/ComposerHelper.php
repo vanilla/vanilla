@@ -23,7 +23,7 @@ class ComposerHelper {
     /**
      * Clear the addon manager cache.
      */
-    private static function clearAddonManagerCache() {
+    public static function clearAddonManagerCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
         $paths = array_merge(
@@ -42,7 +42,7 @@ class ComposerHelper {
     /**
      * Clear the twig cache.
      */
-    private static function clearTwigCache() {
+    public static function clearTwigCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
         // Clear twig cache if it exists.

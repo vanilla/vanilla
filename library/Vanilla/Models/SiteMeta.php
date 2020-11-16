@@ -11,6 +11,8 @@ use Garden\Web\RequestInterface;
 use Gdn;
 use Gdn_Session;
 use UserModel;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
@@ -40,8 +42,14 @@ class SiteMeta implements \JsonSerializable {
     /** @var bool */
     private $translationDebugModeEnabled;
 
+    /** @var bool */
+    private $conversationsEnabled;
+
     /** @var string */
     private $siteTitle;
+
+    /** @var UserModel $userModel */
+    private $userModel;
 
     /** @var string[] */
     private $allowedExtensions;
@@ -122,6 +130,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var FormatService */
     private $formatService;
 
+    /** @var bool */
+    private $supportsSearchScope;
+
+    /** @var string */
+    private $defaultSearchScope;
+
     /**
      * SiteMeta constructor.
      *
@@ -133,6 +147,8 @@ class SiteMeta implements \JsonSerializable {
      * @param ThemeService $themeService
      * @param Gdn_Session $session
      * @param FormatService $formatService
+     * @param UserModel $userModel
+     * @param AddonManager $addonManager
      */
     public function __construct(
         RequestInterface $request,
@@ -142,7 +158,9 @@ class SiteMeta implements \JsonSerializable {
         ThemeFeatures $themeFeatures,
         ThemeService $themeService,
         Gdn_Session $session,
-        FormatService $formatService
+        FormatService $formatService,
+        UserModel $userModel,
+        AddonManager $addonManager
     ) {
         $this->host = $request->getHost();
 
@@ -154,6 +172,7 @@ class SiteMeta implements \JsonSerializable {
         $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
         $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
+        $this->conversationsEnabled = $addonManager->isEnabled('conversations', Addon::TYPE_ADDON);
 
         $this->featureFlags = $config->get('Feature', []);
         $this->themeFeatures = $themeFeatures;
@@ -180,6 +199,7 @@ class SiteMeta implements \JsonSerializable {
         $this->cacheBuster = $deploymentCacheBuster->value();
 
         $this->session = $session;
+        $this->userModel = $userModel;
 
         //Sign Out URL
         $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
@@ -193,7 +213,9 @@ class SiteMeta implements \JsonSerializable {
         $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
         $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
         $this->desktopThemeKey = $config->get('Garden.Theme', ThemeService::FALLBACK_THEME_KEY);
-        $this->themePreview =  $themeService->getPreviewTheme();
+        $this->themePreview = $themeService->getPreviewTheme();
+        $this->defaultSearchScope = $config->get('Search.DefaultScope', 'site');
+        $this->supportsSearchScope = (bool) $config->get('Search.SupportsScope', false);
 
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
@@ -232,6 +254,7 @@ class SiteMeta implements \JsonSerializable {
                 'assetPath' => $this->assetPath,
                 'debug' => $this->debugModeEnabled,
                 'translationDebug' => $this->translationDebugModeEnabled,
+                'conversationsEnabled' => $this->conversationsEnabled,
                 'cacheBuster' => $this->cacheBuster,
                 'staticPathFolder' => $this->staticPathFolder,
                 'dynamicPathFolder' => $this->dynamicPathFolder,
@@ -249,6 +272,11 @@ class SiteMeta implements \JsonSerializable {
                 'bannerImage' => $this->bannerImage,
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
                 'fallbackAvatar' => UserModel::getDefaultAvatarUrl(),
+                'currentUser' => $this->userModel->currentFragment(),
+            ],
+            'search' => [
+                'defaultScope' => $this->defaultSearchScope,
+                'supportsScope' => $this->supportsSearchScope,
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,

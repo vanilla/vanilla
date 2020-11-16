@@ -56,7 +56,7 @@ class QueryString extends React.Component<IProps> {
                 continue;
             }
 
-            if (defaults[key] === value) {
+            if (key !== "scope" && defaults[key] === value) {
                 continue;
             }
 

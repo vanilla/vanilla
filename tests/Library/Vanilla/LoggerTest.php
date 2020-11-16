@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Psr\Log\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
 use VanillaTests\BootstrapTrait;
@@ -79,9 +80,11 @@ class LoggerTest extends LoggerInterfaceTest {
     }
 
     /**
-     * @return \Psr\Log\Test\LoggerInterface
+     * Get the logger that will be tested.
+     *
+     * @return LoggerInterface
      */
-    function getLogger() {
+    public function getLogger() {
         return $this->logger->parent;
     }
 
@@ -92,7 +95,7 @@ class LoggerTest extends LoggerInterfaceTest {
      *
      * @return string[]
      */
-    function getLogs() {
+    public function getLogs() {
         return $this->logger->logs;
     }
 }

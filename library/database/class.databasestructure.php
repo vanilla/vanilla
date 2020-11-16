@@ -13,6 +13,15 @@
  * Used by any given database driver to build, modify, and create tables and views.
  */
 abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
+
+    public const KEY_TYPE_FULLTEXT = "fulltext";
+
+    public const KEY_TYPE_INDEX = "index";
+
+    public const KEY_TYPE_PRIMARY = "primary";
+
+    public const KEY_TYPE_UNIQUE = "unique";
+
     /**
      * @var int The maximum number of rows allowed for an alter table.
      */
@@ -52,6 +61,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
     /** @var string The name of the storage engine for this table. */
     protected $_TableStorageEngine;
+
+    /** @var bool */
+    private $fullTextIndexingEnabled = false;
 
     /**
      * The constructor for this class. Automatically fills $this->ClassName.
@@ -199,7 +211,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         foreach ($keyTypes as $keyType1) {
             $parts = explode('.', $keyType1, 2);
 
-            if (in_array($parts[0], ['primary', 'key', 'index', 'unique', 'fulltext', false])) {
+            if (in_array($parts[0], $this->validKeyTypes())) {
                 $keyTypes1[] = $keyType1;
             }
         }
@@ -334,6 +346,23 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
     }
 
+    /**
+     * Is full-text indexing of columns allowed?
+     *
+     * @return bool
+     */
+    public function isFullTextIndexingEnabled(): bool {
+        return $this->fullTextIndexingEnabled;
+    }
+
+    /**
+     * Should full-text indexing of columns be allowed?
+     *
+     * @param bool $fullTextIndexing
+     */
+    public function setFullTextIndexingEnabled(bool $fullTextIndexing): void {
+        $this->fullTextIndexingEnabled = $fullTextIndexing;
+    }
 
     /**
      * Load the schema for this table from the database.
@@ -627,9 +656,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Specifies the name of the view to create or modify.
      *
      * @param string $name The name of the view.
-     * @param string $query Query to create as the view. Typically this can be generated with the $Database object.
+     * @param string $sql Query to create as the view. Typically this can be generated with the $Database object.
      */
-    public function view($name, $query) {
+    public function view($name, $sql) {
         trigger_error(errorMessage('The selected database engine can not create or modify views.', $this->ClassName, 'View'), E_USER_ERROR);
     }
 
@@ -701,5 +730,24 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      */
     public function getIssues() {
         return $this->issues;
+    }
+
+    /**
+     * Get all valid key types.
+     *
+     * @return array
+     */
+    private function validKeyTypes(): array {
+        $result = [
+            self::KEY_TYPE_PRIMARY,
+            self::KEY_TYPE_INDEX,
+            self::KEY_TYPE_UNIQUE,
+            'key',
+            false
+        ];
+        if ($this->isFullTextIndexingEnabled()) {
+            $result[] = self::KEY_TYPE_FULLTEXT;
+        }
+        return $result;
     }
 }

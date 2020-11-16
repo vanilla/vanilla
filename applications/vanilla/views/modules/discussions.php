@@ -13,7 +13,7 @@ if (!isset($this->Prefix))
         }
         if ($this->data('Discussions')->numRows() >= $this->Limit) {
             ?>
-            <li class="ShowAll"><?php echo anchor(t('More…'), 'discussions'); ?></li>
+            <li class="ShowAll"><?php echo anchor(t('More…'), 'discussions', '', ['aria-label' => strtolower(sprintf(t('%s discussions'), t('View all')))]); ?></li>
         <?php } ?>
     </ul>
 </div>

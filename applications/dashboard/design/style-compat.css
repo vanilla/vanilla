@@ -786,6 +786,79 @@ body.Categories.isMobile .PageControls.Top {
   box-sizing: border-box;
 }
 
+.label-wrap img {
+  max-width: 50%;
+  max-height: 180px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.form-group {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.FormWrapper .file-upload {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  position: relative;
+  width: 100%;
+  font-weight: 400;
+  min-height: 36px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+.FormWrapper .file-upload input {
+  padding: 0;
+  margin: 0;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  width: 0;
+}
+.FormWrapper .file-upload input:disabled, .FormWrapper .file-upload input.disabled {
+  opacity: 0;
+}
+.FormWrapper .file-upload-browse {
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+      touch-action: manipulation;
+  min-width: 96px;
+  line-height: 36px;
+  height: 36px;
+  font-weight: 400;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #fff;
+  color: #555a62;
+  border-width: 1px;
+  border-radius: 6px;
+  border-style: solid;
+  border-color: #d6d7d9;
+  -webkit-order: -1;
+      -ms-flex-order: -1;
+          order: -1;
+  margin-right: 6px;
+}
+.FormWrapper .file-upload-choose {
+  line-height: 36px;
+  height: 36px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif;
+}
+
 .checkbox-box {
   display: none;
 }
@@ -1507,18 +1580,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
 }
 
-.embedVideo-scrim {
-  content: "";
-  display: block;
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-}
-
 .embedVideo-ratio {
   position: relative;
   display: block;
@@ -1554,7 +1615,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   border: none;
 }
 
-.embedVideo-playIcon {
+.embedVideo-playIconWrap {
   position: absolute;
   top: 0;
   left: 0;
@@ -1563,6 +1624,12 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: auto;
   width: 80px;
   height: 80px;
+  display: block;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  border-radius: 50%;
+}
+
+.embedVideo-playIcon {
   color: white;
 }
 
@@ -1876,6 +1943,21 @@ body.isMobile .Popup.hasRichEditor .Border {
   padding-left: 24px;
 }
 
+.embedIFrame {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+.embedIFrame .embedIFrame-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -1900,6 +1982,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: block;
   max-width: 100%;
   margin: auto;
+  box-shadow: none !important;
 }
 .embedGiphy .embedGiphy-iframe {
   position: absolute;

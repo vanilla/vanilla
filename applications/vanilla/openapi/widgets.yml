@@ -1,0 +1,57 @@
+openapi: 3.0.2
+info:
+paths:
+  /widgets:
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Widget'
+                type: array
+          description: Success
+      tags:
+        - Widgets
+      summary: Get all widgets registered
+  /widgets/{name}:
+    get:
+      parameters:
+        - description: Name of the widget.
+          name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Widget'
+          description: Success
+      tags:
+      - Widgets
+      summary: Get widget by name.
+components:
+  schemas:
+    Widget:
+      properties:
+        widgetID:
+          description: The id of the widget.
+          type: string
+        name:
+          description: The name of the widget.
+          type: string
+        widgetClass:
+          description: The class of the widget.
+          type: string
+        schema:
+          description: The widget form schema.
+          type: object
+      required:
+        - name
+        - schema
+      type: object
+

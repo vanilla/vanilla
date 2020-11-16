@@ -18,13 +18,13 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     cssRule(".Arrow.SpFlyoutHandle::before", { display: important("none") });
 
     const cogWheels = scope.querySelectorAll(".Arrow.SpFlyoutHandle:not(.compatIcons)");
-    cogWheels.forEach(wheel => {
+    cogWheels.forEach((wheel) => {
         wheel.classList.add("compatIcons");
         ReactDOM.render(<DropDownMenuIcon />, wheel);
     });
 
     const docLinks = scope.querySelectorAll("a.documentationLink");
-    docLinks.forEach(doc => {
+    docLinks.forEach((doc) => {
         doc.classList.add("compatIcons");
         ReactDOM.render(<DocumentationIcon />, doc);
     });
@@ -36,7 +36,7 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
 
     const bookmarks = scope.querySelectorAll(".Bookmark:not(.compatIcons)");
     const bookmarkLinkClass = iconClasses().bookmark();
-    bookmarks.forEach(bookmark => {
+    bookmarks.forEach((bookmark) => {
         bookmark.classList.add(bookmarkLinkClass);
         bookmark.classList.add("compatIcons");
         ReactDOM.render(<BookmarkIcon />, bookmark);

@@ -1294,7 +1294,7 @@ class ImportModel extends Gdn_Model {
         if ($result === false) {
             $ex = new Exception($mysqli->error);
             $mysqli->close();
-            throw new $ex;
+            throw $ex;
         }
         $mysqli->close();
     }

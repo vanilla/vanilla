@@ -94,7 +94,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPresetInit = makeThemeVars("standard", {
         preset: {
             style: ButtonPreset.OUTLINE,
-            border: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
+            borders: globalVars.mixBgAndFg(vars.constants.borderMixRatio),
         },
     });
 
@@ -104,7 +104,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             bg:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
                     ? globalVars.mainColors.bg
-                    : standardPresetInit.preset.border,
+                    : standardPresetInit.preset.borders,
             fg:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
                     ? globalVars.mainColors.fg
@@ -123,9 +123,9 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const standardPreset = makeThemeVars("standard", {
         preset: {
             ...standardPresetInit2.preset,
-            border:
+            borders:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
-                    ? standardPresetInit2.preset.border
+                    ? standardPresetInit2.preset.borders
                     : standardPresetInit2.preset.bg,
             borderState:
                 standardPresetInit.preset.style === ButtonPreset.OUTLINE
@@ -144,7 +144,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         borders: {
             ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
-            color: standardPreset.preset.border,
+            color: standardPreset.preset.borders,
         },
         state: {
             borders: {
@@ -170,7 +170,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const primaryPresetInit2 = makeThemeVars("primary", {
         preset: {
             ...primaryPresetInit.preset,
-            border: primaryPresetInit.preset.bg,
+            borders: primaryPresetInit.preset.bg,
             bg:
                 primaryPresetInit.preset.style === ButtonPreset.SOLID
                     ? globalVars.mainColors.primary
@@ -187,7 +187,14 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const primaryPreset = makeThemeVars("primary", {
         preset: {
             ...primaryPresetInit2.preset,
-            borderState: primaryPresetInit2.preset.bgState,
+            borders:
+                primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? globalVars.mixBgAndFg(vars.constants.borderMixRatio)
+                    : primaryPresetInit2.preset.bg,
+            borderState:
+                primaryPresetInit.preset.style === ButtonPreset.OUTLINE
+                    ? primaryPresetInit2.preset.fgState
+                    : primaryPresetInit2.preset.bgState,
         },
     });
 
@@ -201,7 +208,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         borders: {
             ...globalVars.borderType.formElements.buttons,
             radius: buttonGlobals.border.radius,
-            color: primaryPreset.preset.border,
+            color: primaryPreset.preset.borders,
         },
         state: {
             colors: {
@@ -381,8 +388,8 @@ export const buttonSizing = (props: {
         minHeight: unit(height),
         minWidth: minWidth ? unit(minWidth) : undefined,
         fontSize: unit(fontSize),
-        padding: `0px ${px(paddingHorizontal + paddingOffsets.right ?? 0)} 0px ${px(
-            paddingHorizontal + paddingOffsets.left ?? 0,
+        padding: `0px ${px(paddingHorizontal + (paddingOffsets.right || 0) ?? 0)} 0px ${px(
+            paddingHorizontal + (paddingOffsets.left || 0) ?? 0,
         )}`,
         lineHeight: unit(height - borderWidth * 2),
     };
@@ -399,6 +406,7 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     color: "inherit",
     textDecoration: important("none"),
     textAlign: "inherit",
+    overflowWrap: "break-word",
 });
 
 export const overwriteButtonClass = (
@@ -409,7 +417,9 @@ export const overwriteButtonClass = (
     const buttonVars = merge(buttonTypeVars, overwriteVars);
     // append names for debugging purposes
     buttonVars.name = `${buttonTypeVars.name}-${overwriteVars.name}`;
-    return generateButtonClass(buttonVars, setZIndexOnState);
+    return generateButtonClass(buttonVars, {
+        setZIndexOnState,
+    });
 };
 
 export const buttonClasses = useThemeCache(() => {
@@ -476,6 +486,8 @@ export const buttonUtilityClasses = useThemeCache(() => {
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
             height: vars.sizing.compactHeight,
+            width: vars.sizing.compactHeight,
+            minWidth: vars.sizing.compactHeight,
         }),
     );
 
@@ -570,4 +582,17 @@ export const buttonLoaderClasses = useThemeCache(() => {
 
     const svg = style("svg", spinnerLoaderAnimationProperties());
     return { root, svg, reducedPadding };
+});
+
+export const buttonLabelWrapClass = useThemeCache(() => {
+    const style = styleFactory("buttonLabelWrap");
+    const root = style({
+        maxWidth: percent(100),
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+    });
+
+    return {
+        root,
+    };
 });

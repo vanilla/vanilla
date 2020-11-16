@@ -4,6 +4,7 @@
  */
 
 import qs from "qs";
+import { ensureString } from "@vanilla/utils";
 
 /**
  * Represent pages potentially returned from a Link header.
@@ -43,7 +44,7 @@ export default class SimplePagerModel {
     public static parseLinkHeader(header: string, param: string, limitParam?: string): ILinkPages {
         const result = {} as ILinkPages;
 
-        header.split(",").map(link => {
+        header.split(",").map((link) => {
             link = link.trim();
 
             // Needs to fit our expected format.
@@ -66,12 +67,12 @@ export default class SimplePagerModel {
 
             // Grab the next or prev page number.
             if (searchParameters[param]) {
-                result[rel] = parseInt(searchParameters[param], 10);
+                result[rel] = parseInt(ensureString(searchParameters[param]), 10);
             }
 
             // Grab the limit from the current link.
             if (limitParam && searchParameters[limitParam]) {
-                result.limit = searchParameters[param];
+                result.limit = parseInt(ensureString(searchParameters[param]), 10);
             }
         });
 

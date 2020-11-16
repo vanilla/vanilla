@@ -64,7 +64,7 @@ describe("KeyboardBindings", () => {
     }
 
     describe("handleMultilineEnter", () => {
-        LINE_FORMATS.forEach(format => {
+        LINE_FORMATS.forEach((format) => {
             it(format, () => itMultilineEnterFor(format));
         });
     });
@@ -176,13 +176,13 @@ describe("KeyboardBindings", () => {
         }
 
         describe("insertNewLineBeforeRange", () => {
-            MULTI_LINE_FORMATS.forEach(format => {
+            MULTI_LINE_FORMATS.forEach((format) => {
                 it(format, () => itInsertNewlineBefore(format));
             });
         });
 
         describe("insertNewLineAfterRange", () => {
-            MULTI_LINE_FORMATS.forEach(format => {
+            MULTI_LINE_FORMATS.forEach((format) => {
                 it(format, () => itInsertNewlineAfter(format));
             });
         });
@@ -211,7 +211,7 @@ describe("KeyboardBindings", () => {
     }
 
     describe("back space to delete empty blot", () => {
-        MULTI_LINE_FORMATS.forEach(format => {
+        MULTI_LINE_FORMATS.forEach((format) => {
             it(format, () => itBackspaceToClearEmptyFor(format));
         });
     });
@@ -233,7 +233,7 @@ describe("KeyboardBindings", () => {
     }
 
     describe("back space to clear first blot formatting", () => {
-        MULTI_LINE_FORMATS.forEach(format => {
+        MULTI_LINE_FORMATS.forEach((format) => {
             it(format, () => itBackSpaceAtStartFor(format));
         });
     });

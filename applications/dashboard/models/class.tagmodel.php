@@ -58,7 +58,7 @@ class TagModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param bool $settings
-     * @return bool|unknown
+     * @return bool
      * @throws Exception
      */
     public function save($formPostValues, $settings = false) {
@@ -370,12 +370,13 @@ class TagModel extends Gdn_Model {
             $now = Gdn_Format::toDateTime();
 
             // Insert new tags
-            foreach($tagsToAdd as $tagID) {
+            foreach ($tagsToAdd as $key => $tagID) {
+                $categoryID = $validTags[$tagID]['CategoryID'] ?? $validTags[$key]['CategoryID'];
                 $this->SQL
                     ->options('Ignore', true)
                     ->insert(
                         'TagDiscussion',
-                        ['DiscussionID' => $discussionID, 'TagID' => $tagID, 'DateInserted' => $now, 'CategoryID' => $validTags[$tagID]['CategoryID']]
+                        ['DiscussionID' => $discussionID, 'TagID' => $tagID, 'DateInserted' => $now, 'CategoryID' => $categoryID]
                     );
             }
 
@@ -669,14 +670,76 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Expand tagIDs
+     *
+     * @param array $rows
+     */
+    public function expandTagIDs(array &$rows) {
+        if (count($rows) === 0) {
+            return;
+        }
+
+        reset($rows);
+        $single = is_string(key($rows));
+
+        if ($single) {
+            $discussionIDs = [$rows['DiscussionID']] ?? null;
+        } else {
+            $discussionIDs = array_column($rows, 'DiscussionID');
+        }
+
+        $tags = $this->getDiscussionsTagIDs($discussionIDs);
+        if (count($tags) === 0) {
+            return;
+        }
+
+
+        $populate = function (array &$row, array $tags) {
+            $discussionID = $row['DiscussionID'] ?? null;
+            foreach ($tags as $tag) {
+                $tagDiscussionID = $tag['DiscussionID'] ?? null;
+                $tagID = $tag['TagID'] ?? null;
+                if ($tagDiscussionID === $discussionID) {
+                    $row['tagIDs'][] = $tagID;
+                }
+            }
+        };
+
+        if ($single) {
+            $populate($rows, $tags);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row, $tags);
+            }
+        }
+    }
+
+    /**
+     * Get TagIDs for a group of discussions.
+     *
+     * @param array $discussionIDs
+     * @return array
+     */
+    public function getDiscussionsTagIDs(array $discussionIDs): array {
+        $tagIDs = $this->SQL
+            ->select('td.TagID, td.DiscussionID')
+            ->from('TagDiscussion td')
+            ->join('Discussion d', 'd.DiscussionID = td.DiscussionID')
+            ->whereIn('td.DiscussionID', $discussionIDs)
+            ->get()->resultArray();
+
+        return $tagIDs;
+    }
+
+    /**
      *
      *
      * @param $tag
      * @return bool
      */
     public static function validateTag($tag) {
-        // Tags can't contain commas.
-        if (preg_match('`,`', $tag)) {
+        // Tags can't contain commas or underscores.
+        if (preg_match('/[,_]/', $tag)) {
             return false;
         }
         return true;
@@ -786,5 +849,83 @@ class TagModel extends Gdn_Model {
      */
     public static function tagSlug($str) {
         return rawurldecode(Gdn_Format::url($str));
+    }
+
+
+    /**
+     * Search results for tagging autocomplete.
+     *
+     * @param string $q
+     * @param bool $id
+     * @param bool $parent
+     * @param string $type
+     * @param array $options
+     * @return array
+     */
+    public function search($q = '', $id = false, $parent = false, $type = 'default', array $options = []) {
+        // Allow per-category tags
+        $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
+        if ($categorySearch) {
+            $categoryID = $options['categoryID'] ?? null;
+        }
+
+        if ($parent && !is_numeric($parent)) {
+            $parent = Gdn::sql()->getWhere('Tag', ['Name' => $parent])->value('TagID', -1);
+        }
+
+        $query = $q;
+        $data = [];
+        $database = Gdn::database();
+        if ($query || $parent || $type !== 'default') {
+            $tagQuery = Gdn::sql()
+                ->select('*')
+                ->from('Tag')
+                ->limit(20);
+
+            if ($query) {
+                $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');
+            }
+
+            if ($type === 'default') {
+                $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
+                $tagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
+            } elseif ($type) {
+                $tagQuery->where('Type', $type);
+            }
+
+            // Allow per-category tags
+            if ($categorySearch) {
+                $tagQuery->where('CategoryID', $categoryID);
+            }
+
+            if ($parent) {
+                $tagQuery->where('ParentTagID', $parent);
+            }
+
+            // Run tag search query
+            $tagData = $tagQuery->get();
+
+            $extraFields = $options['extraFields'] ?? false;
+
+            foreach ($tagData as $tag) {
+                if ($extraFields) {
+                    $type = $tag->Type ?? '';
+                    $id = $tag->TagID ?? null;
+                    $data[] = [
+                        'id' => $id,
+                        'name' => $tag->Name,
+                        'fullName' => $tag->FullName,
+                        'type' => $type
+                    ];
+                } else {
+                    $data[] = [
+                        'id' => $id ? $tag->TagID : $tag->Name,
+                        'name' => $tag->FullName]
+                    ;
+                }
+            }
+        }
+        $database->closeConnection();
+        return $data;
     }
 }

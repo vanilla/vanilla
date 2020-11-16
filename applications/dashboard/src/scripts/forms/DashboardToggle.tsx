@@ -42,7 +42,7 @@ export function DashboardToggle(props: IProps) {
                         type="checkbox"
                         className={classNames(visibility().visuallyHidden, "toggle-input")}
                         checked={props.checked}
-                        onChange={event => props.onChange(!!event.target.checked)}
+                        onChange={(event) => props.onChange(!!event.target.checked)}
                     />
                     <div className="toggle-well" />
                     <div className="toggle-slider" />

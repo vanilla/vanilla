@@ -6,57 +6,87 @@
 
 namespace VanillaTests\Models;
 
-use VanillaTests\SharedBootstrapTestCase;
-use VanillaTests\SiteTestTrait;
+use League\Uri\Http;
+use Vanilla\Utility\ModelUtils;
+use VanillaTests\Bootstrap;
+use VanillaTests\SiteTestCase;
 use Garden\EventManager;
 use Vanilla\Dashboard\Events\UserEvent;
+use \UserModel;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Test {@link UserModel}.
  */
-class UserModelTest extends SharedBootstrapTestCase {
-    use SiteTestTrait {
-        setupBeforeClass as baseSetupBeforeClass;
-    }
-
+class UserModelTest extends SiteTestCase {
     /** @var UserEvent */
     private $lastEvent;
 
     /**
-     * @var \UserModel
+     * @var int
      */
-    private $userModel;
+    private $ssoRoleID1;
 
     /**
-     * {@inheritdoc}
+     * @var int
      */
-    public static function setupBeforeClass(): void {
-        self::baseSetupBeforeClass();
-    }
+    private $ssoRoleID2;
 
     /**
-     * Setup
+     * @inheritDoc
      */
     public function setup(): void {
-        $this->userModel = $this->container()->get(\UserModel::class);
+        parent::setUp();
+
         // Make event testing a little easier.
         $this->container()->setInstance(self::class, $this);
         $this->lastEvent = null;
-        /** @var EventManager */
-        $eventManager = $this->container()->get(EventManager::class);
-        $eventManager->unbindClass(self::class);
-        $eventManager->addListenerMethod(self::class, "handleUserEvent");
+
+        $this->container()->call(function (
+            EventManager $eventManager
+        ) {
+            $eventManager->unbindClass(self::class);
+            $eventManager->addListenerMethod(self::class, "handleUserEvent");
+        });
+
+        // Add a couple of test SSO roles.
+        $this->ssoRoleID1 = $this->defineRole(['Name' => 'SSO 1', 'Sync' => 'sso']);
+        $this->ssoRoleID2 = $this->defineRole(['Name' => 'SSO 2', 'Sync' => 'sso']);
+
+        $this->createUserFixtures();
     }
 
     /**
      * A test listener that increments the counter.
      *
-     * @param TestEvent $e
-     * @return TestEvent
+     * @param UserEvent $e
+     * @return UserEvent
      */
     public function handleUserEvent(UserEvent $e): UserEvent {
         $this->lastEvent = $e;
         return $e;
+    }
+
+    /**
+     * Create a dummy user for testing.
+     *
+     * @param array $overrides
+     * @return array
+     */
+    protected function dummyUser(array $overrides = []): array {
+        $user = self::sprintfCounter(array_replace(
+            ['Name' => 'user%s', 'Email' => "user%s@example.com", 'Password' => 'foo123'],
+            $overrides
+        ));
+        return $user;
+    }
+
+    /**
+     * Make sure the setup fixtures work.
+     */
+    public function testSetUp() {
+        $this->assertIsInt($this->ssoRoleID1);
+        $this->assertIsInt($this->ssoRoleID2);
     }
 
     /**
@@ -145,5 +175,222 @@ class UserModelTest extends SharedBootstrapTestCase {
         }
 
         $this->assertTrue($result, "Failed to only return users in the specific role.");
+    }
+
+    /**
+     * I should be able to save an absolute list of role IDs.
+     */
+    public function testSaveRoles() {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER, __FUNCTION__);
+        $roleIDs = $this->userModel->getRoleIDs($userID);
+        $this->assertSame([$this->roleID(Bootstrap::ROLE_MEMBER)], $roleIDs, 'The test user doesn\'t have the right roles.');
+
+        $setRoleIDs = [$this->roleID(Bootstrap::ROLE_ADMIN)];
+        $this->userModel->saveRoles($userID, $setRoleIDs, [\UserModel::OPT_LOG_ROLE_CHANGES => true]);
+        $newRoleIDs = $this->userModel->getRoleIDs($userID);
+        $this->assertSame($setRoleIDs, $newRoleIDs);
+
+        $this->assertLog(['event' => 'role_add', 'role' => Bootstrap::ROLE_ADMIN]);
+        $this->assertLog(['event' => 'role_remove', 'role' => Bootstrap::ROLE_MEMBER]);
+    }
+
+    /**
+     * I should be able to add roles.
+     */
+    public function testAddRoles(): int {
+        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER, __FUNCTION__);
+
+        $this->userModel->addRoles($userID, [$this->roleID(Bootstrap::ROLE_ADMIN)], true);
+        $newRoleIDs = $this->userModel->getRoleIDs($userID);
+        $this->assertEqualsCanonicalizing(
+            [$this->roleID(Bootstrap::ROLE_MEMBER), $this->roleID(Bootstrap::ROLE_ADMIN)],
+            $newRoleIDs
+        );
+
+        $this->assertLog(['event' => 'role_add', 'role' => Bootstrap::ROLE_ADMIN]);
+
+        return $userID;
+    }
+
+    /**
+     * I should be able to remove roles from a user.
+     *
+     * @param int $userID
+     * @depends testAddRoles
+     */
+    public function testRemoveRoles(int $userID): void {
+        $this->userModel->removeRoles($userID, [$this->roleID(Bootstrap::ROLE_MEMBER)], true);
+
+        $newRoleIDs = $this->userModel->getRoleIDs($userID);
+        $this->assertEqualsCanonicalizing(
+            [$this->roleID(Bootstrap::ROLE_ADMIN)],
+            $newRoleIDs
+        );
+        $this->assertLog(['event' => 'role_remove', 'role' => Bootstrap::ROLE_MEMBER]);
+    }
+
+    /**
+     * Test UserModel->getInvitationCount
+     */
+    public function testGetInvitationCount(): void {
+        \Gdn::config()->set('Garden.Registration.Method', 'Invitation');
+
+        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER, __FUNCTION__);
+        $actual = $this->userModel->getInvitationCount($userID);
+        $this->assertEquals(0, $actual);
+    }
+
+    /**
+     * Don't remove roles that are not the same sync type specified in the options.
+     */
+    public function testSaveRolesDontRemoveSync(): void {
+        $this->userModel->saveRoles($this->memberID, [$this->ssoRoleID1], [\UserModel::OPT_ROLE_SYNC => ['sso']]);
+        $roleIDs = $this->userModel->getRoleIDs($this->memberID);
+        $this->assertSame([$this->roleID(Bootstrap::ROLE_MEMBER), $this->ssoRoleID1], $roleIDs);
+    }
+
+    /**
+     * You can overwrite the default sync type with an empty string.
+     */
+    public function testRoleSyncWithMultipleValues(): void {
+        $this->userModel->saveRoles($this->memberID, [$this->ssoRoleID1], [\UserModel::OPT_ROLE_SYNC => ['sso', '']]);
+        $roleIDs = $this->userModel->getRoleIDs($this->memberID);
+        $this->assertSame([$this->ssoRoleID1], $roleIDs);
+    }
+
+    /**
+     * You can switch a role sync and it should change, but leave the original intact.
+     */
+    public function testRoleSyncSwitch(): void {
+        $this->userModel->saveRoles($this->memberID, [$this->ssoRoleID1], [\UserModel::OPT_ROLE_SYNC => ['sso']]);
+        $this->userModel->saveRoles($this->memberID, [$this->ssoRoleID2], [\UserModel::OPT_ROLE_SYNC => ['sso']]);
+        $roleIDs = $this->userModel->getRoleIDs($this->memberID);
+        $this->assertSame([$this->roleID(Bootstrap::ROLE_MEMBER), $this->ssoRoleID2], $roleIDs);
+    }
+
+    /**
+     * You should be able to control the role sync behavior through `UserModel::save()`.
+     */
+    public function testRoleSyncThroughUserSave(): void {
+        $r = $this->userModel->save([
+            'UserID' => $this->memberID,
+            'RoleID' => [$this->ssoRoleID1],
+        ], [
+            UserModel::OPT_SAVE_ROLES => true,
+            UserModel::OPT_ROLE_SYNC => ['sso'],
+        ]);
+
+        $roleIDs = $this->userModel->getRoleIDs($this->memberID);
+        $this->assertSame([$this->roleID(Bootstrap::ROLE_MEMBER), $this->ssoRoleID1], $roleIDs);
+    }
+
+    /**
+     * Make sure the user model can insert and update without corrupting the validation.
+     */
+    public function testValidationCorruption(): void {
+        $user = $this->dummyUser();
+
+        $id = $this->userModel->save($user);
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+        $this->assertGreaterThan(0, $id);
+
+        // Here we shouldn't get an email or password required error.
+        $r = $this->userModel->save(['UserID' => $id, 'Name' => $user['Name'].'Updated']);
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+        $this->assertNotFalse($r);
+
+        // Here we should get an email required error.
+        $user2 = $this->dummyUser();
+        unset($user2['Email']);
+        $id2 = $this->userModel->save($user2);
+        $this->expectExceptionMessage('email is required');
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+    }
+
+    /**
+     * Make sure the username is required on inserts.
+     */
+    public function testUsernameRequiredOnInsert(): void {
+        $user = $this->dummyUser();
+        unset($user['Name']);
+        $id = $this->userModel->save($user);
+        $this->expectExceptionMessage('name is required');
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+    }
+
+    /**
+     * Test that a welcome email was properly sent.
+     */
+    public function testWelcomeEmailQuery(): void {
+        $userID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $this->userModel->sendWelcomeEmail($userID, $user['Password'], 'Add');
+        $email = $this->assertEmailSentTo($user['Email']);
+        parse_str(Http::createFromString($email->template->getButtonUrl())->getQuery(), $query);
+        $this->assertArraySubsetRecursive(
+            [
+                'vn_medium' => 'email',
+                'vn_campaign' => 'welcome',
+                'vn_source' => 'add',
+            ],
+            $query
+        );
+    }
+
+    /**
+     * Test UserModel::searchByName().
+     */
+    public function testSearchByName(): void {
+        $userA = [
+            "Name" => "test_userSearch",
+            "Email" => "test_userSearch@example.com",
+            "Password" => "vanilla"
+        ];
+
+        $userB = [
+            "Name" => "testuserSearch",
+            "Email" => "testuserSearch@example.com",
+            "Password" => "vanilla"
+        ];
+        $userIDA = $this->userModel->save($userA);
+        $this->userModel->save($userB);
+
+        $result = $this->userModel->searchByName($userA['Name'].'*');
+        $row = $result->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($userIDA, $row['UserID']);
+        $this->assertEquals(1, $result->numRows());
+    }
+
+    /**
+     * Test `UserModel::saveIP()`.
+     *
+     * @param string $ip
+     * @param bool $expected
+     * @dataProvider provideSaveIPTests
+     */
+    public function testSaveIP(string $ip, bool $expected) {
+        $id = $this->createUserFixture(self::ROLE_MEMBER);
+
+        $r = $this->userModel->saveIP($id, $ip);
+        $this->assertSame($expected, $r);
+        $this->assertSame($expected, $r);
+        $ips = $this->userModel->getIPs($id);
+
+        if ($expected) {
+            $this->assertContains($ip, $ips);
+        } else {
+            $this->assertNotContains($ip, $ips);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideSaveIPTests(): array {
+        $r = [
+            ['127.3.3.1', true],
+            ['0.0.0.0', false],
+        ];
+        return array_column($r, null, 0);
     }
 }

@@ -942,11 +942,11 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * @access protected
      * @param int $fileID
-     * @param int $foreignID
-     * @param string $foreignType Lowercase.
+     * @param int|null $foreignID
+     * @param string|null $foreignType Lowercase.
      * @return bool Whether attach was successful.
      */
-    protected function attachEditorUploads($fileID, $foreignID, $foreignType) {
+    protected function attachEditorUploads(int $fileID, ?int $foreignID, ?string $foreignType) {
         // Save data to database using model with media table
         $model = new MediaModel();
         $media = $model->getID($fileID, DATASET_TYPE_ARRAY);
@@ -971,12 +971,10 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Remove file from filesystem, and clear db entry.
      *
-     * @param type $mediaID
-     * @param type $foreignID
-     * @param type $foreignType
+     * @param int $mediaID
      * @return boolean
      */
-    protected function deleteEditorUploads($mediaID, $foreignID = '', $foreignType = '') {
+    protected function deleteEditorUploads(int $mediaID) {
         // Save data to database using model with media table
         $model = new MediaModel();
         $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
@@ -989,7 +987,6 @@ class EditorPlugin extends Gdn_Plugin {
             try {
                 $model->deleteID($mediaID, ['deleteFile' => true]);
             } catch (Exception $e) {
-                die($e->getMessage());
                 return false;
             }
             return true;
@@ -1020,8 +1017,8 @@ class EditorPlugin extends Gdn_Plugin {
         }
         
         if (count($mediaIds)) {
-            foreach ($mediaIds as $mediaId) {
-                $this->attachEditorUploads($mediaId, $id, $type);
+            foreach ($mediaIds as $mediaID) {
+                $this->attachEditorUploads($mediaID, $id, $type);
             }
         }
 
@@ -1031,8 +1028,8 @@ class EditorPlugin extends Gdn_Plugin {
         $removeMediaIds = array_filter($removeMediaIds);
 
         if (count($removeMediaIds)) {
-            foreach ($removeMediaIds as $mediaId) {
-                $this->deleteEditorUploads($mediaId, $id, $type);
+            foreach ($removeMediaIds as $mediaID) {
+                $this->deleteEditorUploads($mediaID);
             }
         }
     }

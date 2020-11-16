@@ -7,6 +7,8 @@
 
 namespace Vanilla;
 
+use Psr\SimpleCache\CacheInterface;
+
 /**
  * Utility methods for models that want to implement flood control.
  *

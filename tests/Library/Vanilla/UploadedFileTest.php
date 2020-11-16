@@ -11,23 +11,13 @@ use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for uploaded files.
  */
-class UploadedFileTest extends TestCase {
-
-    use BootstrapTrait;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setupBoostrapTrait();
-    }
-
+class UploadedFileTest extends BootstrapTestCase {
     /**
      * Test that various internal IPs cannot be redirected too.
      *

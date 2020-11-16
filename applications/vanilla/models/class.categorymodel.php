@@ -11,13 +11,33 @@
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Permissions;
+use Vanilla\Scheduler\Job\CallbackJob;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Utility\ModelUtils;
+use Webmozart\Assert\Assert;
+use Garden\Events\EventFromRowInterface;
+use Vanilla\Contracts\Models\CrawlableInterface;
+use Garden\Events\ResourceEvent;
+use \Vanilla\Community\Events\CategoryEvent;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Models\BannerImageModel;
 
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\CrawlableInterface {
+class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface {
+
+    private const ADJUST_COUNT_DECREMENT = "decrement";
+
+    private const ADJUST_COUNT_INCREMENT = "increment";
 
     /** Cache key. */
     const CACHE_KEY = 'Categories';
@@ -46,13 +66,17 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     const DISPLAY_DISCUSSIONS = 'Discussions';
     const DISPLAY_NESTED = 'Categories';
 
-    /**
-     * @var CategoryModel $instance;
-     */
-    private static $instance;
+    /** @var int The tippy-top of the category tree. */
+    public const ROOT_ID = -1;
+
+    /** @var bool Was a cache-clearing job scheduled? */
+    private static $isClearScheduled = false;
 
     /** @var bool Whether to allow the calculation of Headings in the `calculateDisplayAs` method */
     private static $stopHeadingsCalculation = false;
+
+    /** @var array An array of fields to set locally after a category is fetched. */
+    private static $toLazySet = [];
 
     /**
      * @var CategoryCollection $collection;
@@ -73,10 +97,10 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
     /** @var array Valid values => labels for DisplayAs column. */
     private static $displayAsOptions = [
-        'Discussions' => self::DISPLAY_DISCUSSIONS,
-        'Categories' => self::DISPLAY_NESTED,
-        'Flat' => self::DISPLAY_FLAT,
-        'Heading' => self::DISPLAY_HEADING
+         self::DISPLAY_DISCUSSIONS => 'Discussions',
+         self::DISPLAY_NESTED => 'Nested',
+         self::DISPLAY_FLAT => 'Flat',
+         self::DISPLAY_HEADING => 'Heading',
     ];
 
     /** @var bool Whether or not to explicitly shard the categories cache. */
@@ -93,6 +117,12 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
      */
     private $joinUserCategory = false;
 
+    /** @var Permissions */
+    private $guestPermissions;
+
+    /** @var Schema */
+    private $schemaInstance;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -106,15 +136,36 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     }
 
     /**
+     * Get the scope for a knowledge base.
+     *
+     * @param int $categoryID
+     *
+     * @return string
+     */
+    public function getRecordScope(int $categoryID): string {
+        if (!$this->guestPermissions) {
+            if (!\Gdn::config('Garden.Installed')) {
+                // Everything is "public" until the site is actually setup.
+                // This ensures initial site records are created properly.
+                return CrawlableRecordSchema::SCOPE_PUBLIC;
+            }
+
+            $this->guestPermissions = Gdn::userModel()->getGuestPermissions();
+        }
+
+        $permissionCategoryID = self::permissionCategory($categoryID)['CategoryID'];
+        $guestCanView = $this->guestPermissions->has('Vanilla.Discussions.View', $permissionCategoryID);
+        return $guestCanView ? CrawlableRecordSchema::SCOPE_PUBLIC : CrawlableRecordSchema::SCOPE_RESTRICTED;
+    }
+
+
+    /**
      * The shared instance of this object.
      *
      * @return CategoryModel Returns the instance.
      */
     public static function instance() {
-        if (self::$instance === null) {
-            self::$instance = new CategoryModel();
-        }
-        return self::$instance;
+        return \Gdn::getContainer()->get(CategoryModel::class);
     }
 
 
@@ -123,10 +174,10 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
      *
      * @param array $permissionCategory The permission category of the category.
      * @param array $category The category we're checking the permission on.
+     * @param Gdn_Controller $sender
      * @return array The allowed discussion types on the category.
-     * @throws Exception
      */
-    public static function allowedDiscussionTypes($permissionCategory, $category = []) {
+    public static function allowedDiscussionTypes($permissionCategory, $category = [], $sender = null) {
         $permissionCategory = self::permissionCategory($permissionCategory);
         $allowed = val('AllowedDiscussionTypes', $permissionCategory);
         $allTypes = DiscussionModel::discussionTypes();
@@ -138,6 +189,7 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
         Gdn::pluginManager()->EventArguments['AllowedDiscussionTypes'] = &$allowedTypes;
         Gdn::pluginManager()->EventArguments['Category'] = $category;
         Gdn::pluginManager()->EventArguments['PermissionCategory'] = $permissionCategory;
+        Gdn::pluginManager()->EventArguments['sender'] = $sender;
         Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('AllowedDiscussionTypes');
 
         return $allowedTypes;
@@ -190,6 +242,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
      * @param bool|null $addUserCategory
      */
     private function calculateUser(array &$category, $addUserCategory = null) {
+        if ($category['UserCalculated'] ?? false) {
+            // Don't recalculate categories that have already been calculated.
+            return;
+        }
+        $category['UserCalculated'] = true;
         // Kludge to make sure that the url is absolute when reaching the user's screen (or API).
         $category['Url'] = self::categoryUrl($category, '', true);
 
@@ -269,40 +326,33 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
         ?bool $includeChildCategories = null,
         ?bool $includeArchivedCategories = null
     ): array {
-        $categoryFilter = [];
+        $categoryFilter = [
+            'forceArrayReturn' => true,
+        ];
         if (!$includeArchivedCategories) {
-            $categoryFilter['Archived'] = false;
+            $categoryFilter['filterArchivedCategories'] = true;
         }
 
-        $allPermissionCategories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
-        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
-        $this->eventManager->fire('AllowedCategories', $this, ['CategoriesID' => &$allPermissionCategoryIDs]);
-
-        $allPermissionCategories = array_intersect_key($allPermissionCategories, array_flip($allPermissionCategoryIDs));
+        $resultIDs = $this->getVisibleCategoryIDs($categoryFilter);
 
         if ($followedCategories) {
-            $allPermissionCategories = array_filter($allPermissionCategories, function ($category) {
-                return $category['Followed'];
-            });
+            $followedCategories = $this->getFollowed(\Gdn::session()->UserID);
+            $followCategoryIDs = array_column($followedCategories, 'CategoryID');
+            $resultIDs = array_intersect($resultIDs, $followCategoryIDs);
         }
-
-        $allPermissionCategoryIDs = array_keys($allPermissionCategories);
 
         if ($categoryID !== null) {
-            $resultIDs = [$categoryID];
             if ($includeChildCategories) {
-                $subcategories = CategoryModel::getSubtree($categoryID);
-                $resultIDs = array_merge($resultIDs, array_column($subcategories, 'CategoryID'));
+                $subcategories = CategoryModel::getSubtree($categoryID, true);
+                $selectedCategoryIDs = array_column($subcategories, 'CategoryID');
+            } else {
+                $selectedCategoryIDs = [$categoryID];
             }
-            $resultIDs = array_intersect($allPermissionCategoryIDs, $resultIDs);
-        } else {
-            $resultIDs = $allPermissionCategoryIDs;
+            $resultIDs = array_intersect($selectedCategoryIDs, $resultIDs);
         }
 
-        if (!empty($resultIDs)) {
-            // Make sure 0 (allowing other record types) makes it in.
-            $resultIDs[] = 0;
-        }
+        // Make sure 0 (allowing other record types) makes it in.
+        $resultIDs[] = 0;
 
         return $resultIDs;
     }
@@ -355,7 +405,7 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
         $categories = array_merge([], $sql->get()->resultArray());
         $categories = Gdn_DataSet::index($categories, 'CategoryID');
 
-        $this->sortFlatCategories($categories);
+        $this::sortFlatCategories($categories);
 
         return $categories;
     }
@@ -519,15 +569,30 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
      *
      * @param array $options
      *   - filterHideDiscussions (bool): Filter out categories with a truthy HideAllDiscussions column?
+     *   - filterArchivedCategories (bool): Filter out categories that are archived.
+     *   - forceArrayReturn (bool): Force an array return value.
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = []) {
-        $categories = self::categories();
         $unfiltered = true;
+
+        if ($options['forceArrayReturn'] ?? false) {
+            // We want to get the categories back no matter what.
+            $unfiltered = false;
+        }
+
+        if ($this->eventManager->hasHandler('getAlternateVisibleCategories')) {
+            $categories = $this->eventManager->fireFilter('getAlternateVisibleCategories', []);
+            $unfiltered = false;
+        } else {
+            $categories = self::categories();
+        }
+
         $result = [];
 
         // Options
         $filterHideDiscussions = $options['filterHideDiscussions'] ?? false;
+        $filterArchivedCategories = $options['filterArchivedCategories'] ?? false;
 
         foreach ($categories as $categoryID => $category) {
             if ($filterHideDiscussions && ($category['HideAllDiscussions'] ?? false)) {
@@ -535,11 +600,17 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
                 continue;
             }
 
-            if ($category['PermsDiscussionsView']) {
-                $result[] = $category;
-            } elseif ($unfiltered) {
+            if ($filterArchivedCategories && ($category['Archived'] ?? false)) {
                 $unfiltered = false;
+                continue;
             }
+
+            if (!$category['PermsDiscussionsView']) {
+                $unfiltered = false;
+                continue;
+            }
+
+            $result[] = $category;
         }
 
         if ($unfiltered) {
@@ -548,6 +619,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
         // Allow addons to modify the visible categories.
         $result = $this->eventManager->fireFilter('categoryModel_visibleCategories', $result);
+
+        if (is_array($result)) {
+            // Sort the tree.
+            $result = self::sortCategoriesAsTree($result);
+        }
 
         return $result;
     }
@@ -690,6 +766,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
         if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
             $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
         }
+
+        $set = self::$toLazySet[$category['CategoryID']] ?? null;
+        if ($set !== null) {
+            $category = array_replace($category, $set);
+        }
     }
 
     /**
@@ -764,11 +845,29 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     }
 
     /**
+     * Clear individual category and collection data caches.
      *
+     * @param bool $schedule Should the action be deferred as a scheduled job?
      */
-    public static function clearCache() {
-        Gdn::cache()->remove(self::CACHE_KEY);
-        self::instance()->collection->flushCache();
+    public static function clearCache(bool $schedule = false) {
+        $doClear = function () {
+            Gdn::cache()->remove(self::CACHE_KEY);
+            self::instance()->collection->flushCache();
+        };
+
+        if ($schedule) {
+            if (self::$isClearScheduled !== true) {
+                /** @var SchedulerInterface $scheduler */
+                $scheduler = Gdn::getContainer()->get(SchedulerInterface::class);
+                $scheduler->addJob(
+                    CallbackJob::class,
+                    ["callback" => $doClear]
+                );
+                self::$isClearScheduled = true;
+            }
+        } else {
+            $doClear();
+        }
     }
 
     /**
@@ -969,6 +1068,23 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             // Reindex the result.  array_intersect leaves the original, potentially incomplete, numeric indexes.
             return array_values(array_intersect($categoryIDs, $permissionCategoryIDs));
         }
+    }
+
+    /**
+     * Filter a set of categories to only ones the user can view.
+     *
+     * @param array $categories Full category records.
+     * @param string $permission Permission to filter categories by.
+     * @return array
+     */
+    public static function filterExistingCategoryPermissions(array $categories, $permission = 'PermsDiscussionsView'): array {
+        $result = [];
+        foreach ($categories as $category) {
+            if ($category[$permission] ?? false) {
+                $result[] = $category;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1341,7 +1457,7 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
      * @param int $points The number of points to give.
      * @param string $source The source of the points.
      * @param int $categoryID The category to give the points for.
-     * @param int $timestamp The time the points were given.
+     * @param int|false $timestamp The time the points were given.
      */
     public static function givePoints($userID, $points, $source = 'Other', $categoryID = 0, $timestamp = false) {
         // Figure out whether or not the category tracks points seperately.
@@ -1912,16 +2028,65 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Delete a category.
      *
-     * @param int $categoryID The ID of the category to delete.
+     * @param int $id The ID of the category to delete.
      * @param array $options An array of options to affect the behavior of the delete.
      *
      * - **newCategoryID**: The new category to point discussions to.
      * @return bool Returns **true** on success or **false** otherwise.
      */
-    public function deleteID($categoryID, $options = []) {
-        $result = $this->deleteAndReplace($categoryID, val('newCategoryID', $options));
+    public function deleteID($id, $options = []) {
+        $result = $this->deleteAndReplace($id, val('newCategoryID', $options));
         return $result;
     }
+
+    /**
+     * Normalize a database record to match the Schema definition.
+     *
+     * @param array $dbRecord Database record.
+     * @param array|string|bool $expand Expand options.
+     *
+     * @return array Return a Schema record.
+     */
+    public function normalizeRow(array $dbRecord, $expand = []) {
+        if ($dbRecord['CategoryID'] === -1) {
+            $dbRecord['Url'] = url('/categories');
+            $dbRecord['DisplayAs'] = 'Discussions';
+        }
+
+        if ($dbRecord['ParentCategoryID'] <= 0) {
+            $dbRecord['ParentCategoryID'] = null;
+        }
+        $dbRecord['CustomPermissions'] = ($dbRecord['PermissionCategoryID'] === $dbRecord['CategoryID']);
+        $dbRecord['Description'] = $dbRecord['Description'] ?: '';
+        $dbRecord['DisplayAs'] = strtolower($dbRecord['DisplayAs']);
+
+        if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
+            $dbRecord['Children'] = array_map([$this, 'normalizeRow'], $dbRecord['Children']);
+        }
+
+        $dbRecord['isArchived'] = $dbRecord['Archived'];
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+
+        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $schemaRecord['scope'] = $this->getRecordScope($schemaRecord['categoryID']);
+            $schemaRecord['excerpt'] = $schemaRecord['description'];
+            $schemaRecord['image'] = null;
+
+            // Some plugins may create a different "type" field on the category. Our crawler is not aware of this, so we override it for the moment.
+            $schemaRecord['type'] = 'category';
+            /** @var SiteSectionModel $siteSectionModel */
+            $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+            $siteSection = $siteSectionModel->getSiteSectionForAttribute('allCategories', $dbRecord['CategoryID'], 'comment');
+            $schemaRecord['locale'] = $siteSection->getContentLocale();
+        }
+
+        $schemaRecord['iconUrl'] = $dbRecord['Photo'] ? (
+            Gdn_UploadImage::url($dbRecord['Photo']) ?: null // In case false is returned.
+        ) : null;
+        $schemaRecord['bannerUrl'] = BannerImageModel::getBannerImageSlug($dbRecord['CategoryID']) ?: null;
+        return $schemaRecord;
+    }
+
 
     /**
      * Delete a category.
@@ -2048,8 +2213,16 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             $recursionLevel--;
         }
 
+        $eventCategory = self::categories($category->CategoryID);
+        $deleteEvent = $this->eventFromRow(
+            $eventCategory,
+            ResourceEvent::ACTION_DELETE,
+            Gdn::userModel()->currentFragment()
+        );
+
         // Delete the category
         $this->SQL->delete('Category', ['CategoryID' => $category->CategoryID]);
+        $this->eventManager->dispatch($deleteEvent);
 
         // Make sure to reorganize the categories after deletes
         if ($recursionLevel === 0) {
@@ -2077,15 +2250,13 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Get data for a single category selected by ID. Disregards permissions.
      *
-     * @since 2.0.0
-     *
-     * @param int $categoryID The unique ID of category we're getting data for.
+     * @param int $id The unique ID of category we're getting data for.
      * @param string $datasetType Not used.
      * @param array $options Not used.
      * @return object|array SQL results.
      */
-    public function getID($categoryID, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
-        $category = $this->SQL->getWhere('Category', ['CategoryID' => $categoryID])->firstRow($datasetType);
+    public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
+        $category = $this->SQL->getWhere('Category', ['CategoryID' => $id])->firstRow($datasetType);
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
             setValue('AllowedDiscussionTypes', $category, dbdecode(val('AllowedDiscussionTypes', $category)));
         }
@@ -2096,16 +2267,16 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Get list of categories (respecting user permission).
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param string $orderFields Ignored.
      * @param string $orderDirection Ignored.
-     * @param int $limit Ignored.
-     * @param int $offset Ignored.
+     * @param int|false $limit Ignored.
+     * @param int|false $pageNumber Ignored.
      * @return Gdn_DataSet SQL results.
+     *@since 2.0.0
+     * @access public
+     *
      */
-    public function get($orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+    public function get($orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
         $this->SQL
             ->select('c.ParentCategoryID, c.CategoryID, c.TreeLeft, c.TreeRight, c.Depth, c.Name, c.Description, c.CountDiscussions, c.AllowDiscussions, c.UrlCode')
             ->from('Category c')
@@ -2357,9 +2528,9 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Get a list of categories, considering several filters
      *
-     * @param array $restrictIDs Optional list of category ids to mask the dataset
-     * @param string $permissions Optional permission to require. Defaults to Vanilla.Discussions.View.
-     * @param array $excludeWhere Exclude categories with any of these flags
+     * @param array|false $restrictIDs Optional list of category ids to mask the dataset
+     * @param string|false $permissions Optional permission to require. Defaults to Vanilla.Discussions.View.
+     * @param array|false $excludeWhere Exclude categories with any of these flags
      * @return \Gdn_DataSet
      */
     public function getFiltered($restrictIDs = false, $permissions = false, $excludeWhere = false) {
@@ -2637,6 +2808,10 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
         if (!is_array($category) && !is_object($category)) {
             $category = self::categories($category);
+        }
+
+        if (empty($category)) {
+            return self::categories(-1);
         }
 
         $permissionCategory = self::categories(val('PermissionCategoryID', $category));
@@ -2937,12 +3112,14 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Create a new category collection tied to this model.
      *
+     * @param Gdn_SQLDriver|null $sql
+     * @param Gdn_Cache|null $cache
      * @return CategoryCollection Returns a new collection.
      */
     public function createCollection(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null) {
         if ($sql === null) {
             $sql = $this->SQL;
-    }
+        }
         if ($cache === null) {
             $cache = Gdn::cache();
         }
@@ -2957,6 +3134,91 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             $this->calculateUser($category);
         });
         return $collection;
+    }
+
+    /**
+     * @return CategoryCollection
+     */
+    public function getCollection(): CategoryCollection {
+        return $this->collection;
+    }
+
+    /**
+     * Sort a list of categories as if they were a tree and were flattened.
+     * Any categories that could not be resolved into the tree are added at the end.
+     *
+     * @param array $categories The categories input.
+     *
+     * @return array The sorted categories.
+     */
+    public static function sortCategoriesAsTree(array $categories): array {
+        $categoriesByID = [];
+        $categoryIDsByParentID = [];
+        foreach ($categories as $category) {
+            $categoryID = $category['CategoryID'];
+            $parentCategoryID = $category['ParentCategoryID'];
+            $categoriesByID[$categoryID] = $category;
+            if ($parentCategoryID !== null) {
+                $categoryIDsByParentID[$parentCategoryID][] = $categoryID;
+            }
+        }
+
+        $result = [];
+        $seenRoots = [];
+        $pushChildren = function (int $rootID) use ($categoriesByID, $categoryIDsByParentID, &$seenRoots, &$pushChildren, &$result) {
+            if (in_array($rootID, $seenRoots)) {
+                // Protect against categories that recurse onto themselves.
+                return;
+            }
+            $seenRoots[] = $rootID;
+
+            // Push the category itself.
+            $rootCategory = $categoriesByID[$rootID] ?? null;
+            if ($rootCategory !== null) {
+                $result[] = $rootCategory;
+            }
+
+            // Get all of the child categories.
+            $childIDs = $categoryIDsByParentID[$rootID] ?? [];
+            $childCategories = [];
+            foreach ($childIDs as $childID) {
+                $child = $categoriesByID[$childID] ?? null;
+                if ($child !== null) {
+                    $childCategories[] = $child;
+                }
+            }
+
+            // Sort the children
+            usort($childCategories, function (array $catA, array $catB) {
+                return ($catA['Sort'] ?? 0) <=> ($catB['Sort'] ?? 0);
+            });
+
+            // Apply all of the children in order.
+            foreach ($childCategories as $childCategory) {
+                $pushChildren($childCategory['CategoryID']);
+            }
+        };
+
+        $pushChildren(-1);
+
+        // Check for any categories that weren't pushed and add them at the end.
+        $pushedIDs = array_column($result, 'CategoryID');
+        $allIDs = array_column($categories, 'CategoryID');
+        $notPushedIDs = array_diff($allIDs, $pushedIDs);
+        $notPushedCategories = [];
+        foreach ($notPushedIDs as $notPushedID) {
+            $notPushedCategories[] = $categoriesByID[$notPushedID];
+        }
+        // Sort the not pushed categories.
+        usort($notPushedCategories, function (array $catA, array $catB) {
+            return ($catA['Sort'] ?? 0) <=> ($catB['Sort'] ?? 0);
+        });
+
+        foreach ($notPushedCategories as $notPushedCategory) {
+            $result[] = $notPushedCategory;
+        }
+
+        return $result;
     }
 
     /**
@@ -2981,39 +3243,40 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Saves the category.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param array $FormPostValue The values being posted back from the form.
-     * @param array|false $Settings Additional settings to affect saving.
+     * @param array $formPostValues The values being posted back from the form.
+     * @param array|false $settings Additional settings to affect saving.
      * @return int ID of the saved category.
      */
-    public function save($FormPostValues, $Settings = false) {
+    public function save($formPostValues, $settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
         // Get data from form
-        $CategoryID = val('CategoryID', $FormPostValues);
-        $NewName = val('Name', $FormPostValues, '');
-        $UrlCode = val('UrlCode', $FormPostValues, '');
-        $AllowDiscussions = val('AllowDiscussions', $FormPostValues, 1);
-        $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues) || is_array(val('Permissions', $FormPostValues));
-        $CustomPoints = val('CustomPoints', $FormPostValues, null);
+        $CategoryID = val('CategoryID', $formPostValues);
+        $NewName = val('Name', $formPostValues, '');
+        $UrlCode = val('UrlCode', $formPostValues, '');
+        $AllowDiscussions = val('AllowDiscussions', $formPostValues, 1);
+        $CustomPermissions = (bool)val('CustomPermissions', $formPostValues) || is_array(val('Permissions', $formPostValues));
+        $CustomPoints = val('CustomPoints', $formPostValues, null);
 
-        if (isset($FormPostValues['AllowedDiscussionTypes']) && is_array($FormPostValues['AllowedDiscussionTypes'])) {
-            $FormPostValues['AllowedDiscussionTypes'] = dbencode($FormPostValues['AllowedDiscussionTypes']);
+        if (isset($formPostValues['AllowedDiscussionTypes']) && is_array($formPostValues['AllowedDiscussionTypes'])) {
+            $formPostValues['AllowedDiscussionTypes'] = dbencode($formPostValues['AllowedDiscussionTypes']);
         }
 
         // Is this a new category?
         $Insert = $CategoryID > 0 ? false : true;
         if ($Insert) {
-            $this->addInsertFields($FormPostValues);
+            $this->addInsertFields($formPostValues);
         }
 
-        $this->addUpdateFields($FormPostValues);
+        // Kludge to allow resetting an existing category's permissions as part of an update.
+        $resetPermissions = !$Insert && array_key_exists("Permissions", $formPostValues)
+            && $formPostValues["Permissions"] === null;
+
+        $this->addUpdateFields($formPostValues);
 
         // Add some extra validation to the url code if one is provided.
-        if ($Insert || array_key_exists('UrlCode', $FormPostValues)) {
+        if ($Insert || array_key_exists('UrlCode', $formPostValues)) {
             $this->Validation->applyRule('UrlCode', 'Required');
             $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
@@ -3033,26 +3296,29 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             if ($this->SQL->get()->numRows()) {
                 $this->Validation->addValidationResult('UrlCode', 'The specified url code is already in use by another category.');
             }
+        } else {
+            // Prevent validation from a previous save.
+            $this->Validation->unapplyRule('UrlCode');
         }
 
-        if (isset($FormPostValues['ParentCategoryID'])) {
-            if (empty($FormPostValues['ParentCategoryID'])) {
-                $FormPostValues['ParentCategoryID'] = -1;
+        if (isset($formPostValues['ParentCategoryID'])) {
+            if (empty($formPostValues['ParentCategoryID'])) {
+                $formPostValues['ParentCategoryID'] = -1;
             } else {
-                $parent = CategoryModel::categories($FormPostValues['ParentCategoryID']);
+                $parent = CategoryModel::categories($formPostValues['ParentCategoryID']);
                 if (!$parent) {
-                    $FormPostValues['ParentCategoryID'] = -1;
+                    $formPostValues['ParentCategoryID'] = -1;
                 }
             }
         }
 
-        //	Prep and fire event.
-        $this->EventArguments['FormPostValues'] = &$FormPostValues;
+        // Prep and fire event.
+        $this->EventArguments['FormPostValues'] = &$formPostValues;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('BeforeSaveCategory');
 
         // Validate the form posted values.
-        if ($this->validate($FormPostValues, $Insert)) {
+        if ($this->validate($formPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
             $Fields = $this->coerceData($Fields);
             unset($Fields['CategoryID']);
@@ -3104,9 +3370,9 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
                 if ($CustomPermissions) {
                     $permissionModel = Gdn::permissionModel();
 
-                    if (is_array(val('Permissions', $FormPostValues))) {
+                    if (is_array(val('Permissions', $formPostValues))) {
                         // The permissions were posted in an API format provided by settings/getcategory
-                        $permissions = val('Permissions', $FormPostValues);
+                        $permissions = val('Permissions', $formPostValues);
                         foreach ($permissions as &$perm) {
                             $perm['JunctionTable'] = 'Category';
                             $perm['JunctionColumn'] = 'PermissionCategoryID';
@@ -3114,10 +3380,10 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
                         }
                     } else {
                         // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
-                        $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, []), ['JunctionID' => $CategoryID]);
+                        $permissions = $permissionModel->pivotPermissions(val('Permission', $formPostValues, []), ['JunctionID' => $CategoryID]);
                     }
 
-                    if ($Settings['overWrite'] ?? empty($Settings)) {
+                    if ($settings['overWrite'] ?? empty($settings)) {
                         $permissionModel->saveAll($permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
                     } else {
                         foreach ($permissions as $perm) {
@@ -3141,7 +3407,7 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
                         self::clearCache();
                     }
-                } elseif (!$Insert) {
+                } elseif (!$Insert && $resetPermissions) {
                     // Figure out my parent's permission.
                     $NewPermissionID = $this->SQL
                         ->select('p.PermissionCategoryID')
@@ -3171,6 +3437,17 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
 
             // Force the user permissions to refresh.
             Gdn::userModel()->clearPermissions();
+            $this->guestPermissions = null;
+
+            $this->recalculateTree();
+
+            // Dispatch resource events.
+            $this->dispatchInsertUpdateEvent($CategoryID, $Insert ? ResourceEvent::ACTION_INSERT : ResourceEvent::ACTION_UPDATE);
+            if ($Insert && isset($formPostValues['ParentCategoryID']) && $formPostValues['ParentCategoryID'] > -1) {
+                $parentID = $formPostValues['ParentCategoryID'];
+                // Counts are updated.
+                $this->dispatchInsertUpdateEvent($parentID, ResourceEvent::ACTION_UPDATE);
+            }
 
             // Let the world know we succeeded in our mission.
             $this->EventArguments['CategoryID'] = $CategoryID;
@@ -3249,12 +3526,12 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Set a property on a category.
      *
-     * @param int $iD
+     * @param int $rowID
      * @param array|string $property
      * @param bool|false $value
      * @return array|string
      */
-    public function setField($iD, $property, $value = false) {
+    public function setField($rowID, $property, $value = false) {
         if (!is_array($property)) {
             $property = [$property => $value];
         }
@@ -3263,10 +3540,11 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
             $property['AllowedDiscussionTypes'] = dbencode($property['AllowedDiscussionTypes']);
         }
 
-        $this->SQL->put($this->Name, $property, ['CategoryID' => $iD]);
+        $this->SQL->put($this->Name, $property, ['CategoryID' => $rowID]);
 
         // Set the cache.
-        self::setCache($iD, $property);
+        self::setCache($rowID, $property);
+        $this->dispatchInsertUpdateEvent($rowID, ResourceEvent::ACTION_UPDATE);
 
         return $property;
     }
@@ -3274,22 +3552,26 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Set a property of a currently-loaded category in memory.
      *
-     * @param $iD
-     * @param $property
-     * @param $value
+     * @param int $id
+     * @param string $property
+     * @param string|int|bool $value
      * @return bool
      */
-    public static function setLocalField($iD, $property, $value) {
-        // Make sure the field is here.
-        if (!self::$Categories === null) {
-            self::categories(-1);
+    public static function setLocalField($id, $property, $value): void {
+        // Make sure the change will be applied to the collection if it's there.
+        // If it isn't there then `toLazySet` will take care of it later.
+        // https://github.com/vanilla/support/issues/2923
+        $collection = self::instance()->getCollection();
+        if ($collection->hasLocal($id)) {
+            $c = $collection->get($id);
+            $c[$property] = $value;
+            self::instance()->getCollection()->setLocal($c);
         }
 
-        if (isset(self::$Categories[$iD])) {
-            self::$Categories[$iD][$property] = $value;
-            return true;
+        if (isset(self::$Categories[$id])) {
+            self::$Categories[$id][$property] = $value;
         }
-        return false;
+        self::$toLazySet[$id][$property] = $value;
     }
 
     /**
@@ -3493,18 +3775,44 @@ class CategoryModel extends Gdn_Model implements \Vanilla\Contracts\Models\Crawl
     /**
      * Build URL to a category page.
      *
-     * @param $category
-     * @param string $page
-     * @param bool|true $withDomain
+     * @param array|object|string|int $category A category object/array, slug, or ID.
+     * @param string|int $page The page of the categories.
+     * @param bool|string $withDomain What domain type to apply.
+     *
      * @return string
      */
     public static function categoryUrl($category, $page = '', $withDomain = true) {
-        if (function_exists('CategoryUrl')) {
+        if (function_exists('categoryUrl')) {
             return categoryUrl($category, $page, $withDomain);
+        } else {
+            return self::createRawCategoryUrl($category, $page, $withDomain);
+        }
+    }
+
+    /**
+     * Do NOT CALL THIS DIRECTLY.
+     * It only exists to break an infinite loop between the global categoryUrl and CategoryModel::categoryUrl functions.
+     *
+     * @param array|object|string|int $category A category object/array, slug, or ID.
+     * @param string|int $page The page of the categories.
+     * @param bool|string $withDomain What domain type to apply.
+     *
+     * @internal Don't use unless you are the global categoryUrl function.
+     *
+     * @return string
+     */
+    public static function createRawCategoryUrl($category, $page = '', $withDomain = true) {
+        if (empty($category)) {
+            return url('/categories', $withDomain);
+        }
+        // Custom category url's through events.
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('customCategoryUrl')) {
+            return $eventManager->fireFilter('customCategoryUrl', '', $category, $page, $withDomain);
         }
 
         if (is_string($category)) {
-            $category = CategoryModel::categories($category);
+            $category = self::categories($category);
         }
         $category = (array)$category;
 
@@ -3571,15 +3879,23 @@ join {$px}Category c
 set c.Depth = p.Depth + 1
 where p.Depth = :depth;
 SQL;
+        $updatedCounts = false;
 
         for ($i = 1; $i < 25; $i++) {
             $this->Database->query($sql, ['depth' => $i]);
 
             if (val('RowCount', $this->Database->LastInfo) == 0) {
                 break;
-    }
+            } else {
+                $updatedCounts = true;
             }
         }
+
+        if ($updatedCounts) {
+            $this->collection->flushCache();
+            self::clearCache();
+        }
+    }
 
     /**
      * Return a flattened version of a tree.
@@ -3809,8 +4125,6 @@ SQL;
                     $parent = static::categories($category['ParentCategoryID']);
                     self::calculate($category);
                     $category['Parent'] = $parent;
-//                } else {
-//                    $parent = null;
                 }
             }
             if (in_array('breadcrumbs', $expand)) {
@@ -3856,7 +4170,7 @@ SQL;
      * Sorts child categories alphabetically if the parent display type is 'Flat'
      * @param array $categories
      */
-    protected function sortFlatCategories(array &$categories): void {
+    public static function sortFlatCategories(array &$categories): void {
         $categories = array_column($categories, null, 'CategoryID');
 
         uasort($categories, function ($a, $b) use ($categories) {
@@ -3874,10 +4188,196 @@ SQL;
     public function getCrawlInfo(): array {
         $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            '/api/v2/categories',
+            '/api/v2/categories?sort=-categoryID&expand=crawl',
             'categoryID'
         );
         $r['min'] = max($r['min'], 1); // kludge around root category
         return $r;
+    }
+
+    /**
+     * Update operations for when a discussion is added to a category.
+     *
+     * @param array $discussion
+     */
+    public function onDiscussionAdd(array $discussion): void {
+        $discussion = array_change_key_case($discussion, CASE_LOWER);
+        $primaryCategoryID = $discussion["categoryid"] ?? null;
+
+        Assert::integerish($primaryCategoryID, "CategoryID must be an integer.");
+
+        $this->adjustPostCounts($discussion, self::ADJUST_COUNT_INCREMENT);
+        $this->refreshAggregateRecentPost($primaryCategoryID, true);
+    }
+
+    /**
+     * Update operations for when a discussion is removed from a category.
+     *
+     * @param array $discussion
+     */
+    public function onDiscussionRemove(array $discussion): void {
+        $discussion = array_change_key_case($discussion, CASE_LOWER);
+        $primaryCategoryID = $discussion["categoryid"] ?? null;
+
+        Assert::integerish($primaryCategoryID, "CategoryID must be an integer.");
+
+        $this->adjustPostCounts($discussion, self::ADJUST_COUNT_DECREMENT);
+        $this->refreshAggregateRecentPost($primaryCategoryID, true);
+    }
+
+    /**
+     * Given a discussion, adjust the counts of a category and its ancestors.
+     *
+     * @param array $discussion
+     * @param string $mode
+     */
+    private function adjustPostCounts(array $discussion, string $mode = self::ADJUST_COUNT_INCREMENT): void {
+        $discussion = array_change_key_case($discussion, CASE_LOWER);
+        $discussionID = $discussion["discussionid"] ?? null;
+        $primaryCategoryID = $discussion["categoryid"] ?? null;
+        $countComments = $discussion["countcomments"] ?? 0;
+
+        Assert::integerish($discussionID, "DiscussionID must be an integer.");
+        Assert::integerish($primaryCategoryID, "CategoryID must be an integer.");
+        Assert::integerish($countComments, "CountComments must be an integer.");
+        Assert::oneOf(
+            $mode,
+            [self::ADJUST_COUNT_INCREMENT, self::ADJUST_COUNT_DECREMENT],
+            "Invalid count adjustment mode: {$mode}"
+        );
+
+        $categoryIDs = array_column(
+            $this->collection->getAncestors($primaryCategoryID, true),
+            "CategoryID"
+        );
+
+        $op = $mode === self::ADJUST_COUNT_DECREMENT ? "-" : "+";
+
+        $this->SQL->put(
+            $this->Name,
+            [
+                "CountDiscussions{$op}" => 1,
+                "CountComments{$op}" => $countComments,
+            ],
+            ["CategoryID" => $primaryCategoryID]
+        );
+
+        $this->SQL
+            ->put(
+                $this->Name,
+                [
+                    "CountAllDiscussions{$op}" => 1,
+                    "CountAllComments{$op}" => $countComments,
+                ],
+                ["CategoryID" => $categoryIDs]
+            );
+
+        foreach ($categoryIDs as $categoryID) {
+            $this->dispatchInsertUpdateEvent($categoryID, ResourceEvent::ACTION_UPDATE);
+        }
+        self::clearCache(true);
+    }
+
+    /**
+     * Output schema.
+     *
+     * @return Schema
+     */
+    public function schema(): Schema {
+        if (!$this->schemaInstance) {
+            $this->schemaInstance = Schema::parse([
+                'categoryID:i' => 'The ID of the category.',
+                'name:s' => [
+                    'description' => 'The name of the category.',
+                    'x-localize' => true,
+                ],
+                'description:s|n' => [
+                    'description' => 'The description of the category.',
+                    'minLength' => 0,
+                    'x-localize' => true,
+                ],
+                'parentCategoryID:i|n' => 'Parent category ID.',
+                'customPermissions:b' => 'Are custom permissions set for this category?',
+                'isArchived:b' => 'The archived state of this category.',
+                'urlcode:s' => 'The URL code of the category.',
+                'url:s' => 'The URL to the category.',
+                'displayAs:s' => [
+                    'description' => 'The display style of the category.',
+                    'enum' => ['categories', 'discussions', 'flat', 'heading'],
+                    'default' => 'discussions'
+                ],
+                'iconUrl:s|n?',
+                'dateInserted:dt?',
+                'bannerUrl:s|n?',
+                'countCategories:i' => 'Total number of child categories.',
+                'countDiscussions:i' => 'Total discussions in the category.',
+                'countComments:i' => 'Total comments in the category.',
+                'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
+                'countAllComments:i' => 'Total of all comments in a category and its children.',
+                'followed:b?' => 'Is the category being followed by the current user?',
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
+                'featured:b?' => 'Featured category.',
+            ]);
+        }
+        return $this->schemaInstance;
+    }
+
+    /**
+     * Dispatch an insert/update event for a particular categoryID.
+     *
+     * @param int $categoryID
+     * @param string $type One of the resource event types.
+     */
+    private function dispatchInsertUpdateEvent(int $categoryID, string $type) {
+        // Dispatch resource events.
+        $category = self::categories($categoryID);
+        if ($category) {
+            $this->eventManager->dispatch(
+                $this->eventFromRow(
+                    $category,
+                    $type,
+                    Gdn::userModel()->currentFragment()
+                )
+            );
+        }
+    }
+
+    /**
+     * Generate a comment event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     * @param array|null $sender
+     *
+     * @return ResourceEvent
+     */
+    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+        Gdn::userModel()->expandUsers($row, ["InsertUserID"]);
+        $category = $this->normalizeRow($row);
+        $category = $this->schema()->validate($category);
+
+        if ($sender) {
+            $senderSchema = new UserFragmentSchema();
+            $sender = $senderSchema->validate($sender);
+        }
+
+        $result = new CategoryEvent(
+            $action,
+            ["category" => $category],
+            $sender
+        );
+        return $result;
+    }
+
+    /**
+     * Reset all local variables used for internal caching.
+     */
+    public static function reset(): void {
+        self::$Categories = null;
+        self::$isClearScheduled = false;
+        self::$stopHeadingsCalculation = false;
+        self::$ShardCache = false;
+        self::$toLazySet = [];
+        self::instance()->getCollection()->reset();
     }
 }

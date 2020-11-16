@@ -66,11 +66,16 @@ export const searchInFilterClasses = useThemeCache(() => {
     const input = style("input", {});
 
     // Style "button"
-    const labelStateStyles = generateButtonStyleProperties(buttonVariables().radio);
+    const labelStateStyles = generateButtonStyleProperties({
+        buttonTypeVars: buttonVariables().radio,
+    });
     nestedWorkaround(`.${label}`, labelStateStyles.$nest);
 
     // Style states on actual radio button
-    const hiddenInputStates = generateButtonStyleProperties(buttonVariables().radio, false, ` + .${label}`);
+    const hiddenInputStates = generateButtonStyleProperties({
+        buttonTypeVars: buttonVariables().radio,
+        stateSuffix: ` + .${label}`,
+    });
     nestedWorkaround(`.${input}`, hiddenInputStates.$nest);
 
     const separator = style("separator", {

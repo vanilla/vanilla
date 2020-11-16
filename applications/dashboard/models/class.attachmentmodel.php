@@ -158,10 +158,10 @@ class AttachmentModel extends Gdn_Model {
      * @see Gdn_Model::GetID
      */
 
-    public function getID($iD, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+    public function getID($id, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
         $datasetType = DATASET_TYPE_ARRAY;
 
-        $row = (array)parent::getID($iD, $datasetType, $options);
+        $row = (array)parent::getID($id, $datasetType, $options);
         $this->calculateRow($row);
         return $row;
     }

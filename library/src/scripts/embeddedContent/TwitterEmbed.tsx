@@ -54,7 +54,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
             <EmbedContent
                 type={props.embedType}
                 isSmall
-                className={twitterLoaded ? undefined : visibility().displayNone}
+                className={twitterLoaded ? undefined : visibility().visuallyHidden}
             >
                 <div
                     className={classNames("js-twitterCard", classes.card)}
@@ -118,7 +118,7 @@ export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript(TWITTER_SCRIPT);
-        const promises = tweets.map(contentElement => {
+        const promises = tweets.map((contentElement) => {
             return renderTweet(contentElement as HTMLElement);
         });
 

@@ -23,21 +23,6 @@
     });
 
     /**
-     * Improve keyboard actions on button-style elements for added accessibility.
-     */
-    $(document).delegate("[role=button]", "keydown", function(event) {
-        var $button = $(this);
-        var ENTER_KEY = 13;
-        var SPACE_KEY = 32;
-        var isActiveElement = document.activeElement === $button[0];
-        var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
-        if (isActiveElement && isSpaceOrEnter) {
-            event.preventDefault();
-            $button.click();
-        }
-    });
-
-    /**
      * Document ready handler. Runs only the first time the page is loaded.
      */
     $(function() {
@@ -60,7 +45,7 @@
 
         $handles.each(function() {
             $handles
-                .find(".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)")
+                .find(".FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)")
                 .each(function() {
                     $(this)
                         .attr("tabindex", "0")
@@ -81,6 +66,8 @@
             });
 
             $(this).attr("data-is-kludged", "true");
+            $(this).attr("role", "button");
+            $(this).attr("tabIndex", "0");
         });
 
         if (USE_NEW_FLYOUTS) {
@@ -174,10 +161,12 @@
         var $toggleFlyout = $elem.closest(".ToggleFlyout");
         var href = $elem.attr("href");
         var progressClass = $elem.hasClass("Bookmark") ? "Bookmarking" : "InProgress";
+        var ariaPressed = $elem.attr("aria-pressed");
 
         // If empty, or starts with a fragment identifier, do not send
         // an async request.
         if (!href || href.trim().indexOf("#") === 0) return;
+
         gdn.disable(this, progressClass);
         e.stopPropagation();
 
@@ -188,6 +177,9 @@
             dataType: "json",
             complete: function() {
                 gdn.enable($elem.get(0));
+                if (typeof ariaPressed !== 'undefined') {
+                    $elem.attr("aria-pressed", !ariaPressed);
+                }
                 $elem.removeClass(progressClass);
                 $elem.attr("href", href);
                 $flyout = $toggleFlyout.find(".Flyout");
@@ -201,6 +193,14 @@
 
                 var informed = gdn.inform(json);
                 gdn.processTargets(json.Targets, $elem, $parent);
+
+                // return focus to element
+                // this is necessary because the element got re-rendered
+                // select element by href because classes got manipulated
+                if ($parent.length > 0) {
+                    $parent.find('[href="'+href+'"]').focus();
+                }
+
                 // If there is a redirect url, go to it.
                 if (json.RedirectTo) {
                     setTimeout(function() {

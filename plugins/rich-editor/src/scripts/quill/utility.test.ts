@@ -106,7 +106,7 @@ describe("getMentionRange", () => {
             ]);
         });
 
-        validIndexes.forEach(index => {
+        validIndexes.forEach((index) => {
             it(prettyNewline(description) + index, () => {
                 expect(getMentionRange(quill, { index, length: 0 })).deep.equals({ index: 0, length: index });
             });
@@ -126,7 +126,7 @@ describe("getMentionRange", () => {
             ]);
         });
 
-        validIndexes.forEach(index => {
+        validIndexes.forEach((index) => {
             it(prettyNewline(description) + index, () => {
                 expect(getMentionRange(quill, { index, length: 0 })).deep.equals({
                     index: 2,
@@ -152,7 +152,7 @@ describe("getMentionRange", () => {
             ]);
         });
 
-        validIndexes.forEach(index => {
+        validIndexes.forEach((index) => {
             it(prettyNewline(description) + index, () => {
                 expect(getMentionRange(quill, { index, length: 0 })).deep.equals({
                     index: 6,

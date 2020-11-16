@@ -28,7 +28,7 @@ export const themeDropDownClasses = useThemeCache(() => {
                         ...(builderVariables.border as IGlobalBorderStyles),
                         radius: builderVariables.wrap.borderRadius,
                     },
-                    {} as IGlobalBorderStyles,
+                    {},
                 ),
             },
             "&&& .hasFocus .inputBlock-inputText": {
@@ -58,7 +58,7 @@ export const themeDropDownClasses = useThemeCache(() => {
                         ...(builderVariables.border as IGlobalBorderStyles),
                         radius: builderVariables.wrap.borderRadius,
                     },
-                    {} as IGlobalBorderStyles,
+                    {},
                 ),
                 $nest: {
                     "&:hover, &:focus, &:active, &.focus-visible": {

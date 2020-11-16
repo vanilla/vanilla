@@ -12,6 +12,11 @@ import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/cor
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { CloseTinyIcon } from "@library/icons/common";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     title: string;
@@ -19,6 +24,7 @@ interface IProps {
     activeRecord: IActiveRecord;
     afterNavSections?: React.ReactNode;
     isNestable: boolean;
+    onClose?: () => void;
 }
 
 export function DropDownPanelNav(props: IProps) {
@@ -38,12 +44,23 @@ export function DropDownPanelNav(props: IProps) {
 
     return (
         <>
-            <hr className={classes.separator} />
             <Heading
                 title={props.title}
                 className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
                 aria-hidden={parentNavItems.length > 0}
-            />
+            >
+                <div className={classes.headingContentContainer}>
+                    <div className={classes.headingTitleContainer}> {props.title} </div>
+                    <Button
+                        className={classes.closeButton}
+                        onClick={props.onClose}
+                        baseClass={ButtonTypes.ICON_COMPACT}
+                    >
+                        <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                        <CloseTinyIcon />
+                    </Button>
+                </div>
+            </Heading>
             <div className={classNames(classes.panel, classes.panelFirst)} aria-hidden={parentNavItems.length > 0}>
                 <PanelNavItems
                     activeRecord={props.activeRecord}
@@ -53,6 +70,7 @@ export function DropDownPanelNav(props: IProps) {
                     popParentItem={popParentItem}
                     pushParentItem={pushParentItem}
                     canGoBack={false}
+                    onClose={props.onClose}
                     // The first page gets the extra sections.
                     extraSections={props.afterNavSections}
                 />
@@ -81,6 +99,7 @@ export function DropDownPanelNav(props: IProps) {
                             popParentItem={popParentItem}
                             pushParentItem={pushParentItem}
                             canGoBack={parent !== null}
+                            onClose={props.onClose}
                             nestedTitle={parent?.name}
                         />
                     );

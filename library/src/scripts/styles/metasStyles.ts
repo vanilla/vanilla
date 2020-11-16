@@ -19,7 +19,7 @@ export const metasVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("color", {
-        fg: globalVars.elementaryColors.lowContrast,
+        fg: globalVars.meta.text.color,
         hover: {
             fg: globalVars.links.colors.active,
         },
@@ -122,6 +122,18 @@ export const metasClasses = useThemeCache(() => {
 
     const root = style(metaContainerStyles());
     const meta = style("meta", metaItemStyle());
+    const metaLink = style("meta", { ...metaItemStyle(), fontWeight: globalVars.fonts.weights.semiBold });
+
+    const metaIcon = style("metaIcon", {
+        ...metaItemStyle(),
+        maxHeight: 14,
+        $nest: {
+            "& svg": {
+                display: "inline-block",
+                marginBottom: -6,
+            },
+        },
+    });
 
     // Get styles of meta, without the margins
     const metaStyle = style("metaStyles", {
@@ -142,6 +154,8 @@ export const metasClasses = useThemeCache(() => {
     return {
         root,
         meta,
+        metaLink,
+        metaIcon,
         metaStyle,
         draftStatus,
         noUnderline,

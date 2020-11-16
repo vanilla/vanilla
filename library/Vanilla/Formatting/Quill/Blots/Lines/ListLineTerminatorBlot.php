@@ -82,16 +82,14 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      * @return NestingParentInterface
      */
     private function getTargetNestingParent(NestableItemInterface $nestable): ?NestingParentInterface {
-        if ($nestable->getNestingDepth() === $this->getNestingDepth() + 1) {
+        $lastIndex = count($this->nestedGroups) - 1;
+        $lastNestedItem = $this->nestedGroups[$lastIndex] ?? null;
+        if ($lastNestedItem !== null && $nestable->getNestingDepth() > $lastNestedItem->getNestingDepth()) {
+            return $lastNestedItem;
+        } else if ($nestable->getNestingDepth() > $this->getNestingDepth()) {
             return $this;
         } else {
-            $lastIndex = count($this->nestedGroups) - 1;
-            $lastNestedItem = $this->nestedGroups[$lastIndex] ?? null;
-            if ($lastNestedItem !== null && $nestable->getNestingDepth() === $lastNestedItem->getNestingDepth() + 1) {
-                return $lastNestedItem;
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -129,7 +127,7 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     public function canNest(BlotGroup $blotGroup): bool {
         $mainBlot = $blotGroup->getMainBlot();
         $targetNestingParent = $this->getTargetNestingParent($blotGroup);
-        return $targetNestingParent && $targetNestingParent->getNestingDepth() + 1 === $mainBlot->getNestingDepth();
+        return $targetNestingParent && $targetNestingParent->getNestingDepth() < $mainBlot->getNestingDepth();
     }
 
     /**

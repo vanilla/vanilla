@@ -8,11 +8,12 @@ import { Optionalize } from "@library/@types/utils";
 import React, { useEffect, useState } from "react";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
+import { RecordID } from "@vanilla/utils";
 
 export interface IRadioGroupProps {
     setData: (data: any) => void;
     groupID?: string;
-    activeItem?: string | number;
+    activeItem?: RecordID;
     buttonActiveClass?: string;
     buttonClass?: string;
     classes: IRadioInputAsButtonClasses;
@@ -49,7 +50,7 @@ export function withRadioGroup<T extends IRadioGroupProps = IRadioGroupProps>(
     const ComponentWithRadioGroup = (props: Optionalize<T, IRadioGroupProps>) => {
         return (
             <RadioGroupContext.Consumer>
-                {context => {
+                {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
                     return <WrappedComponent {...context} {...(props as T)} />;
                 }}

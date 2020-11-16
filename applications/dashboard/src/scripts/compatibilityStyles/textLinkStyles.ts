@@ -51,10 +51,14 @@ export const textLinkCSS = () => {
     // Links that have FG color by default but regular state colors.
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
     mixinTextLinkNoDefaultLinkAppearance(`
-        .Content .DataList a,
+        .Content .DataList .DiscussionMeta a,
+        .Content .DataList .Item-BodyWrap a,
+        .Content .DataList .CommentMeta a,
         .Content .DataList-Search a,
         .Content .Breadcrumbs a,
-        .Content .MessageList a,
+        .Content .MessageList .DiscussionMeta a,
+        .Content .MessageList .Item-BodyWrap a,
+        .Content .MessageList .CommentMeta a,
         .Content .DataTableWrap a,
         .Content .Container .Frame-contentWrap .ChildCategories a,
         .Content .Item.Application .Meta a,
@@ -73,6 +77,7 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(`.Container a.UserLink`);
     mixinTextLinkNoDefaultLinkAppearance(`.DataTable a.CommentDate`);
     mixinTextLinkNoDefaultLinkAppearance(`.DataTable.DiscussionsTable a.Title`);
+    mixinTextLinkNoDefaultLinkAppearance(`.DataTable .Meta .MItem`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .InThisConversation a`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .PanelInThisDiscussion a`);
 
@@ -85,9 +90,13 @@ export const textLinkCSS = () => {
     cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Username`, {
         fontWeight: globalVars.fonts.weights.semiBold,
     });
+
+    cssOut(`.BreadcrumbsBox .Breadcrumbs a`, {
+        marginRight: "0.5ex",
+    });
 };
 
-export const mixinTextLinkNoDefaultLinkAppearance = selector => {
+export const mixinTextLinkNoDefaultLinkAppearance = (selector) => {
     const globalVars = globalVariables();
     mixinClickInput(selector, { default: globalVars.mainColors.fg, textDecoration: "none" });
 };

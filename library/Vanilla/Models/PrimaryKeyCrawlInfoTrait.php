@@ -34,9 +34,11 @@ trait PrimaryKeyCrawlInfoTrait {
      *
      * @param string $url
      * @param string $parameter
+     * @param string $uniqueIDField A uniqueID field that may be different from the parameter.
+     *
      * @return array
      */
-    protected function getCrawlInfoFromPrimaryKey(string $url, string $parameter): array {
+    protected function getCrawlInfoFromPrimaryKey(string $url, string $parameter, string $uniqueIDField = null): array {
         $pk = $this->getPrimaryKey();
         if (count($pk) !== 1) {
             throw new \InvalidArgumentException(__METHOD__.' is only valid on models with one primary key column.', 500);
@@ -52,6 +54,7 @@ trait PrimaryKeyCrawlInfoTrait {
         $r = [
                 'url' => $url,
                 'parameter' => $parameter,
+                'uniqueIDField' => $uniqueIDField ?? $parameter,
                 'count' => $count,
             ] + $range;
         return $r;

@@ -76,7 +76,7 @@ export default class SyntaxModule extends Module {
             this.quill.update(Quill.sources.USER);
             const selection = this.quill.getSelection();
             const codeBlocks = (this.quill.scroll.descendants(
-                blot => blot instanceof CodeBlockBlot,
+                (blot) => blot instanceof CodeBlockBlot,
                 0,
                 this.quill.scroll.length() - 1,
             ) as any) as CodeBlockBlot[];
@@ -85,7 +85,7 @@ export default class SyntaxModule extends Module {
                 return; // Nothing to do here.
             }
 
-            codeBlocks.forEach(code => {
+            codeBlocks.forEach((code) => {
                 code.highlight();
             });
             this.quill.update(Quill.sources.SILENT);

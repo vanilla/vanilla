@@ -5,6 +5,9 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Contracts\ConfigurationInterface;
+use Webmozart\Assert\Assert;
+
 /**
  * Handles access tokens.
  *
@@ -12,8 +15,15 @@
  * methods most of the time.
  */
 class AccessTokenModel extends Gdn_Model {
+
     use \Vanilla\PrunableTrait;
     use \Vanilla\TokenSigningTrait;
+
+    const TYPE_SYSTEM = "system-access";
+    const CONFIG_SYSTEM_TOKEN = "APIv2.SystemAccessToken";
+
+    /** @var ConfigurationInterface */
+    private $config;
 
     /**
      * Construct an {@link AccessToken} object.
@@ -28,6 +38,40 @@ class AccessTokenModel extends Gdn_Model {
         $this->tokenIdentifier = 'access token';
         $this->setPruneAfter('1 day')
             ->setPruneField('DateExpires');
+        $this->config = \Gdn::getContainer()->get(ConfigurationInterface::class);
+    }
+
+    /**
+     * Ensure there is one single system-access token in the configuration.
+     * This is meant to be run frequently in order to have effective use.
+     */
+    public function ensureSingleSystemToken(): void {
+        $systemUserID = $this->config->get('Garden.SystemUserID', null);
+
+        // Definitely shouldn't happen.
+        // Ensured to exist in the dashboard structure.
+        Assert::integerish($systemUserID);
+
+        // Get existing tokens.
+        $existingTokens = $this->getWhere([
+            'UserID' => $systemUserID,
+            'Type' => self::TYPE_SYSTEM,
+        ])->resultArray();
+
+        // Issue a new token.
+        $newToken = $this->issue(
+            $systemUserID,
+            '1 month', // Long expiration, but get's revoked frequently.
+            self::TYPE_SYSTEM
+        );
+
+        // Save the new token into the config for access by orch or for system recovery.
+        $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken);
+
+        // Revoke all previous tokens.
+        foreach ($existingTokens as $existingToken) {
+            $this->revoke($existingToken['AccessTokenID']);
+        }
     }
 
     /**
@@ -88,13 +132,13 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * Get an access token by its numeric ID.
      *
-     * @param int $accessTokenID
+     * @param int $id
      * @param string $datasetType
      * @param array $options
      * @return array|bool
      */
-    public function getID($accessTokenID, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
-        $row = $this->getWhere(['AccessTokenID' => $accessTokenID])->firstRow($datasetType);
+    public function getID($id, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+        $row = $this->getWhere(['AccessTokenID' => $id])->firstRow($datasetType);
         return $row;
     }
 
@@ -281,7 +325,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function trim($accessToken) {
         if (strpos($accessToken, '.') !== false) {
-            list($_, $token) = explode('.', $accessToken);
+            [$_, $token] = explode('.', $accessToken);
             return $token;
         }
         return $accessToken;

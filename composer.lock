@@ -160,27 +160,27 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "fa4e95ff5a7f1d62c3fbc05c32729b7f3ca14b52"
+                "reference": "48212cdc0a79051d50d7fc2f0645c5a321caf926"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/fa4e95ff5a7f1d62c3fbc05c32729b7f3ca14b52",
-                "reference": "fa4e95ff5a7f1d62c3fbc05c32729b7f3ca14b52",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/48212cdc0a79051d50d7fc2f0645c5a321caf926",
+                "reference": "48212cdc0a79051d50d7fc2f0645c5a321caf926",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1"
+                "php": "^7.1|^8.0"
             },
             "replace": {
                 "mtdowling/cron-expression": "^1.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "^0.11",
-                "phpunit/phpunit": "^6.4|^7.0"
+                "phpstan/phpstan": "^0.11|^0.12",
+                "phpunit/phpunit": "^7.0|^8.0|^9.0"
             },
             "type": "library",
             "autoload": {
@@ -210,7 +210,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-08-21T02:30:13+00:00"
+            "time": "2020-10-13T01:26:01+00:00"
         },
         {
             "name": "fig/event-dispatcher-util",
@@ -2181,57 +2181,6 @@
             "time": "2020-08-17T21:51:54+00:00"
         },
         {
-            "name": "vanilla/garden-cli",
-            "version": "v3.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/garden-cli.git",
-                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-cli/zipball/5106872feeebcc52512d26abeccc6e4939b1b022",
-                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=7.2",
-                "psr/log": "^1.0"
-            },
-            "require-dev": {
-                "ergebnis/composer-normalize": "^2.8",
-                "phpdocumentor/reflection-docblock": "^4.3",
-                "phpunit/phpunit": "^8",
-                "vanilla/garden-container": "^3.0",
-                "vanilla/standards": "^1.3",
-                "vimeo/psalm": "^3.16"
-            },
-            "suggest": {
-                "ext-pdo": "Required for the DbUtils class.",
-                "phpdocumentor/reflection-docblock": "Required for the CliApplication functionality.",
-                "vanilla/garden-container": "Required for the CliApplication functionality."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Garden\\Cli\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Todd Burry",
-                    "email": "todd@vanillaforums.com"
-                }
-            ],
-            "description": "A full-featured, yet ridiculously simple commandline parser for your next php cli script. Stop fighting with getopt().",
-            "time": "2020-10-17T19:57:09+00:00"
-        },
-        {
             "name": "vanilla/garden-container",
             "version": "v3.0.4",
             "source": {
@@ -2983,17 +2932,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-cache/integration-tests.git",
-                "reference": "e023fbe54c9821dfefbe04db0074ee8682f7f577"
+                "reference": "eda2e6b8bc5abcd623c8047e2345cda38dd6479e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-cache/integration-tests/zipball/e023fbe54c9821dfefbe04db0074ee8682f7f577",
-                "reference": "e023fbe54c9821dfefbe04db0074ee8682f7f577",
+                "url": "https://api.github.com/repos/php-cache/integration-tests/zipball/eda2e6b8bc5abcd623c8047e2345cda38dd6479e",
+                "reference": "eda2e6b8bc5abcd623c8047e2345cda38dd6479e",
                 "shasum": ""
             },
             "require": {
                 "cache/tag-interop": "^1.0",
-                "php": "^5.4|^7",
+                "php": ">=5.5.9",
                 "psr/cache": "~1.0"
             },
             "conflict": {
@@ -3004,7 +2953,7 @@
                 "illuminate/cache": "^5.4|^5.5|^5.6",
                 "mockery/mockery": "^1.0",
                 "symfony/cache": "^3.4.31|^4.3.4|^5.0",
-                "symfony/phpunit-bridge": "^4.4",
+                "symfony/phpunit-bridge": "^5.1",
                 "tedivm/stash": "^0.14"
             },
             "type": "library",
@@ -3037,7 +2986,7 @@
                 "psr6",
                 "test"
             ],
-            "time": "2019-08-05T15:47:01+00:00"
+            "time": "2020-11-03T12:52:23+00:00"
         },
         {
             "name": "cache/tag-interop",
@@ -4836,12 +4785,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "327370943772f9917bc2dc2aa4263db2d572a112"
+                "reference": "a7ebffcf8b453dcf36a9461cb7845885cb95d315"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/327370943772f9917bc2dc2aa4263db2d572a112",
-                "reference": "327370943772f9917bc2dc2aa4263db2d572a112",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/a7ebffcf8b453dcf36a9461cb7845885cb95d315",
+                "reference": "a7ebffcf8b453dcf36a9461cb7845885cb95d315",
                 "shasum": ""
             },
             "conflict": {
@@ -4857,7 +4806,7 @@
                 "bagisto/bagisto": "<0.1.5",
                 "barrelstrength/sprout-base-email": "<1.2.7",
                 "barrelstrength/sprout-forms": "<3.9",
-                "baserproject/basercms": ">=4,<=4.3.6",
+                "baserproject/basercms": ">=4,<=4.3.6|>=4.4,<4.4.1",
                 "bolt/bolt": "<3.7.1",
                 "brightlocal/phpwhois": "<=4.2.5",
                 "buddypress/buddypress": "<5.1.2",
@@ -4941,7 +4890,7 @@
                 "magento/magento1ee": ">=1,<1.14.4.3",
                 "magento/product-community-edition": ">=2,<2.2.10|>=2.3,<2.3.2-p.2",
                 "marcwillmann/turn": "<0.3.3",
-                "mediawiki/core": ">=1.31,<1.31.4|>=1.32,<1.32.4|>=1.33,<1.33.1",
+                "mediawiki/core": ">=1.31,<1.31.9|>=1.32,<1.32.4|>=1.33,<1.33.3|>=1.34,<1.34.3|>=1.34.99,<1.35",
                 "mittwald/typo3_forum": "<1.2.1",
                 "monolog/monolog": ">=1.8,<1.12",
                 "namshi/jose": "<2.2",
@@ -4956,7 +4905,8 @@
                 "onelogin/php-saml": "<2.10.4",
                 "oneup/uploader-bundle": "<1.9.3|>=2,<2.1.5",
                 "openid/php-openid": "<2.3",
-                "openmage/magento-lts": "<19.4.6|>=20,<20.0.2",
+                "openmage/magento-lts": "<19.4.8|>=20,<20.0.4",
+                "orchid/platform": ">=9,<9.4.4",
                 "oro/crm": ">=1.7,<1.7.4",
                 "oro/platform": ">=1.7,<1.7.4",
                 "padraic/humbug_get_contents": "<1.1.2",
@@ -4975,9 +4925,11 @@
                 "phpwhois/phpwhois": "<=4.2.5",
                 "phpxmlrpc/extras": "<0.6.1",
                 "pimcore/pimcore": "<6.3",
+                "pocketmine/pocketmine-mp": "<3.15.4",
                 "prestashop/autoupgrade": ">=4,<4.10.1",
                 "prestashop/contactform": ">1.0.1,<4.3",
                 "prestashop/gamification": "<2.3.2",
+                "prestashop/productcomments": ">=4,<4.2",
                 "prestashop/ps_facetedsearch": "<3.4.1",
                 "privatebin/privatebin": "<1.2.2|>=1.3,<1.3.2",
                 "propel/propel": ">=2-alpha.1,<=2-alpha.7",
@@ -4991,9 +4943,9 @@
                 "scheb/two-factor-bundle": ">=0,<3.26|>=4,<4.11",
                 "sensiolabs/connect": "<4.2.3",
                 "serluck/phpwhois": "<=4.2.6",
-                "shopware/core": "<=6.3.1",
-                "shopware/platform": "<=6.3.1",
-                "shopware/shopware": "<5.3.7",
+                "shopware/core": "<=6.3.2",
+                "shopware/platform": "<=6.3.2",
+                "shopware/shopware": "<5.6.9",
                 "silverstripe/admin": ">=1.0.3,<1.0.4|>=1.1,<1.1.1",
                 "silverstripe/assets": ">=1,<1.4.7|>=1.5,<1.5.2",
                 "silverstripe/cms": "<4.3.6|>=4.4,<4.4.4",
@@ -5025,7 +4977,7 @@
                 "sylius/grid": ">=1,<1.1.19|>=1.2,<1.2.18|>=1.3,<1.3.13|>=1.4,<1.4.5|>=1.5,<1.5.1",
                 "sylius/grid-bundle": ">=1,<1.1.19|>=1.2,<1.2.18|>=1.3,<1.3.13|>=1.4,<1.4.5|>=1.5,<1.5.1",
                 "sylius/resource-bundle": "<1.3.14|>=1.4,<1.4.7|>=1.5,<1.5.2|>=1.6,<1.6.4",
-                "sylius/sylius": "<1.3.16|>=1.4,<1.4.12|>=1.5,<1.5.9|>=1.6,<1.6.5",
+                "sylius/sylius": "<1.6.9|>=1.7,<1.7.9|>=1.8,<1.8.3",
                 "symbiote/silverstripe-multivaluefield": ">=3,<3.0.99",
                 "symbiote/silverstripe-versionedfiles": "<=2.0.3",
                 "symfony/cache": ">=3.1,<3.4.35|>=4,<4.2.12|>=4.3,<4.3.8",
@@ -5138,7 +5090,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-10-19T07:02:45+00:00"
+            "time": "2020-11-16T22:01:59+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -6097,6 +6049,57 @@
                 }
             ],
             "time": "2020-07-12T23:59:07+00:00"
+        },
+        {
+            "name": "vanilla/garden-cli",
+            "version": "v3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-cli.git",
+                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-cli/zipball/5106872feeebcc52512d26abeccc6e4939b1b022",
+                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.8",
+                "phpdocumentor/reflection-docblock": "^4.3",
+                "phpunit/phpunit": "^8",
+                "vanilla/garden-container": "^3.0",
+                "vanilla/standards": "^1.3",
+                "vimeo/psalm": "^3.16"
+            },
+            "suggest": {
+                "ext-pdo": "Required for the DbUtils class.",
+                "phpdocumentor/reflection-docblock": "Required for the CliApplication functionality.",
+                "vanilla/garden-container": "Required for the CliApplication functionality."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Cli\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A full-featured, yet ridiculously simple commandline parser for your next php cli script. Stop fighting with getopt().",
+            "time": "2020-10-17T19:57:09+00:00"
         },
         {
             "name": "vanilla/standards",

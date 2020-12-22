@@ -152,6 +152,6 @@ class Deprecation {
      * @return string
      */
     private static function extractFileNameFromFrame(array $frame): string {
-        return str_replace(PATH_ROOT, '', $frame['file']);
+        return preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $frame['file'], 1);
     }
 }

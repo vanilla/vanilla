@@ -303,7 +303,7 @@ if (!function_exists('decho')) {
 
             $backtrace = 'Line '.$stack[0]['line'].' in '.$stack[0]['file']."\n";
             if (defined('PATH_ROOT')) {
-                $backtrace = str_replace(PATH_ROOT, '', $backtrace);
+                $backtrace = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $backtrace, 1);
             }
 
             echo '<pre style="text-align: left; padding: 0 4px;">'.$backtrace.$prefix;

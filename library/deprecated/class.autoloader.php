@@ -448,7 +448,7 @@ class Gdn_Autoloader {
 
         // Determine cache root on-disk location
         $hits = 0;
-        str_replace(PATH_ROOT, '', $searchPath, $hits);
+        preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $searchPath, 1, $hits);
         $mapRootLocation = PATH_CACHE;
 
         // Build a unique identifier that refers to this map (same map type, context, extension, and cachefile location)

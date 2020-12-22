@@ -567,7 +567,7 @@ if (!function_exists('formatStackTrace')) {
                     continue;
                 }
 
-                $relativePath = ltrim(str_replace(PATH_ROOT, null, $trace['file']), '/');
+                $relativePath = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', null, $trace['file'], 1);
                 $buffer = '- '.$relativePath.':'.$trace['line'];
 
                 if (isset($trace['function'])) {

@@ -84,7 +84,7 @@ Vanilla releases are built using [Phing](https://www.phing.info/) to create a pr
 ./bin/release
 ```
 
-The following dependenies are all required for building a release.
+The following dependencies are all required for building a release.
 
 -   `node`
 -   `yarn`

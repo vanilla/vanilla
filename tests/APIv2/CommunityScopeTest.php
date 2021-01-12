@@ -19,7 +19,7 @@ class CommunityScopeTest extends AbstractAPIv2Test {
 
     use CommunityApiTestTrait;
 
-    protected static $addons = ['vanilla', 'groups'];
+    protected static $addons = ['vanilla'];
 
 
     /**

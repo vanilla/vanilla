@@ -85,6 +85,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param CategoryModel $categoryModel
      * @param AnswerModel $questionModel
      */
     public function __construct(

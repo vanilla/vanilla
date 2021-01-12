@@ -5,12 +5,15 @@
  */
 
 import { percent, calc, linearGradient, ColorHelper } from "csx";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
-import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { Mixins } from "@library/styles/Mixins";
 
 export const panelAreaClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
@@ -19,48 +22,48 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
 
     const root = style({
         width: percent(100),
-        ...paddings({
+        ...Mixins.padding({
             horizontal: globalVariables().widget.padding,
             vertical: globalVariables().widget.padding / 5,
         }),
-        $nest: {
-            "& .heading": {
-                $nest: lineHeightAdjustment(),
+        ...{
+            ".heading": {
+                ...lineHeightAdjustment(),
             },
             [`&.inheritHeight > .${classesPanelWidget.root}`]: {
                 flexGrow: 1,
             },
             "&.hasNoVerticalPadding": {
-                ...paddings({ vertical: 0 }),
+                ...Mixins.padding({ vertical: 0 }),
             },
             "&.hasNoHorizontalPadding": {
-                ...paddings({ horizontal: 0 }),
+                ...Mixins.padding({ horizontal: 0 }),
             },
             "&.isSelfPadded": {
-                ...paddings({ all: 0 }),
+                ...Mixins.padding({ all: 0 }),
             },
             ...mediaQueries({
                 [LayoutTypes.TWO_COLUMNS]: {
                     oneColumnDown: {
-                        ...paddings({
+                        ...Mixins.padding({
                             horizontal: 0,
                         }),
                     },
                 },
                 [LayoutTypes.THREE_COLUMNS]: {
                     oneColumnDown: {
-                        ...paddings({
+                        ...Mixins.padding({
                             horizontal: 0,
                         }),
                     },
                 },
-            }).$nest,
+            }),
         },
     });
 
     const overflowFull = useThemeCache((offset: number) =>
         style("overflowFull", {
-            height: calc(`100vh - ${unit(offset)}`),
+            height: calc(`100vh - ${styleUnit(offset)}`),
             overflow: "auto",
             position: "relative",
             minHeight: 100,
@@ -84,7 +87,11 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             right: 0,
             position: "absolute",
             height: 50,
-            background: linearGradient("to top", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
+            background: linearGradient(
+                "to top",
+                ColorsUtils.colorOut(gradientColor.fade(0))!,
+                ColorsUtils.colorOut(gradientColor)!,
+            ),
             width: percent(100),
         });
     });
@@ -99,7 +106,11 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             right: 0,
             position: "absolute",
             height: 50,
-            background: linearGradient("to bottom", colorOut(gradientColor.fade(0))!, colorOut(gradientColor)!),
+            background: linearGradient(
+                "to bottom",
+                ColorsUtils.colorOut(gradientColor.fade(0))!,
+                ColorsUtils.colorOut(gradientColor)!,
+            ),
             width: percent(100),
         });
     });

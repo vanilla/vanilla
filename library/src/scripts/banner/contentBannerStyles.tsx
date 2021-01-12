@@ -3,14 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { bannerVariables, bannerClasses, BannerAlignment } from "@library/banner/bannerStyles";
 import clamp from "lodash/clamp";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { EMPTY_SPACING } from "@library/styles/styleHelpers";
 import merge from "lodash/merge";
 import clone from "lodash/clone";
 import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
+import { Variables } from "@library/styles/Variables";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
@@ -36,15 +37,12 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
     });
 
     const contentContainer = makeVars("contentContainer", {
-        padding: {
-            ...EMPTY_SPACING,
-        },
+        padding: Variables.spacing({}),
         mobile: {
-            padding: {
-                ...EMPTY_SPACING,
+            padding: Variables.spacing({
                 top: 0,
                 bottom: 0,
-            },
+            }),
         },
     });
 
@@ -65,10 +63,10 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
                 },
             },
             logo: {
-                height: minHeight - normalBannerVars.logo.padding.all * 2,
+                height: minHeight - (normalBannerVars.logo.padding.all as number) * 2,
                 width: "auto",
                 mobile: {
-                    height: minHeightMobile - normalBannerVars.logo.padding.all * 2,
+                    height: minHeightMobile - (normalBannerVars.logo.padding.all as number) * 2,
                 },
             },
             spacing: {

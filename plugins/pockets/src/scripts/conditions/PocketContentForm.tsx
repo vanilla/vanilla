@@ -42,7 +42,7 @@ const widgetsApi: ILookupApi = {
 
 export function PocketContentForm(props: IProps) {
     const { initialWidgetParameters, initialBody } = props;
-    const initialValue = props.format === "widget" ? props.widgetID : "raw";
+    const initialValue = props.format === "widget" && props.widgetID ? props.widgetID : "raw";
     const [typeOption, setTypeOption] = useState<IComboBoxOption | null>(
         initialValue === "raw"
             ? {
@@ -57,13 +57,13 @@ export function PocketContentForm(props: IProps) {
 
     useEffect(() => {
         setValues(initialWidgetParameters ?? {});
-        setMountCounter(mountCounter + 1);
-    }, [initialWidgetParameters, setMountCounter]);
+        setMountCounter((value) => value + 1);
+    }, [initialWidgetParameters]);
 
     useEffect(() => {
         setBody(initialBody ?? "");
-        setMountCounter(mountCounter + 1);
-    }, [initialBody, setMountCounter]);
+        setMountCounter((value) => value + 1);
+    }, [initialBody]);
 
     return (
         <>
@@ -85,7 +85,6 @@ export function PocketContentForm(props: IProps) {
                             setTypeOption(val);
                         }}
                         isClearable={false}
-                        initialValue={initialValue}
                         onInitialValueLoaded={setTypeOption}
                         value={typeOption?.value ?? initialValue}
                         api={widgetsApi}

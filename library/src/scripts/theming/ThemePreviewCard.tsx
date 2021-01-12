@@ -9,8 +9,8 @@ import { themeCardClasses } from "./themePreviewCardStyles";
 import Button from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import classNames from "classnames";
@@ -433,20 +433,20 @@ function calculateVars(preview?: IThemePreview) {
     let globalFg = preview?.variables?.globalFg ? color(preview?.variables?.globalFg) : gVars.mainColors.fg;
     // Add a little opacity to the FG so it doesn't stick out so much.
     // Normal text isn't nearly so thick.
-    globalFg = modifyColorBasedOnLightness({ color: globalFg, weight: 0.3 }) as ColorHelper;
+    globalFg = ColorsUtils.modifyColorBasedOnLightness({ color: globalFg, weight: 0.3 }) as ColorHelper;
 
     const globalPrimary = preview?.variables?.globalPrimary
         ? color(preview?.variables?.globalPrimary)
         : gVars.mainColors.primary;
     const titleBarBg = preview?.variables?.titleBarBg ? color(preview?.variables?.titleBarBg) : globalPrimary;
-    const splashBg = modifyColorBasedOnLightness({ color: globalPrimary, weight: 0.12, inverse: true });
+    const splashBg = ColorsUtils.modifyColorBasedOnLightness({ color: globalPrimary, weight: 0.12, inverse: true });
     const titleBarFg = preview?.variables?.titleBarFg ?? titleVars.colors.fg;
     return {
-        globalFg: colorOut(globalFg),
-        globalBg: colorOut(globalBg),
-        globalPrimary: colorOut(globalPrimary),
-        splashBg: colorOut(splashBg),
-        titleBarBg: colorOut(titleBarBg),
-        titleBarFg: colorOut(titleBarFg),
+        globalFg: ColorsUtils.colorOut(globalFg),
+        globalBg: ColorsUtils.colorOut(globalBg),
+        globalPrimary: ColorsUtils.colorOut(globalPrimary),
+        splashBg: ColorsUtils.colorOut(splashBg),
+        titleBarBg: ColorsUtils.colorOut(titleBarBg),
+        titleBarFg: ColorsUtils.colorOut(titleBarFg),
     };
 }

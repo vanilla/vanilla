@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { ISelectLookupProps, SelectLookup } from "@vanilla/library/src/scripts/forms/select/SelectLookup";

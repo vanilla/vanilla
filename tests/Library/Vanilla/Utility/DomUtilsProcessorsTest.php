@@ -34,7 +34,8 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($input, $dom->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
-        $dom->applyProcessors([StripImagesProcessor::class]);
+        $processor = new StripImagesProcessor();
+        $processor->processDocument($dom);
 
         $actual = $dom->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
@@ -53,7 +54,8 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($input, $dom->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
-        $dom->applyProcessors([StripEmbedsProcessor::class]);
+        $processor = new StripEmbedsProcessor();
+        $processor->processDocument($dom);
         $actual = $dom->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -66,14 +68,14 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
      * @param string $expected
      * @dataProvider provideTrimWordsTests
      */
-    public function testTrimWords($wordCount, $html, $expected): void {
+    public function testTrimWords(?int $wordCount, $html, $expected): void {
         $domDocument = new HtmlDocument($html);
 
         // This assertion tests against bugs in the HtmlDocument class itself.
         $this->assertHtmlStringEqualsHtmlString($html, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
 
-        $trimWordsProcessor = empty($wordCount) ? new TrimWordsProcessor($domDocument) : new TrimWordsProcessor($domDocument, $wordCount);
-        $domDocument->applyProcessors([$trimWordsProcessor]);
+        $trimWordsProcessor = new TrimWordsProcessor($wordCount);
+        $trimWordsProcessor->processDocument($domDocument);
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -88,13 +90,20 @@ class DomUtilsProcessorsTest extends DomUtilsTest {
      * @dataProvider providePregReplaceCallbackTests
      */
     public function testPregReplaceCallback($expectedCount, string $patternText, string $input, string $expected): void {
-        $domDocument = new HtmlDocument($input);
-        $this->assertHtmlStringEqualsHtmlString($input, $domDocument->getInnerHtml(), "The HtmlDocument didn't parse the string properly.");
-        $pregReplaceCallbackProcessor = new PregReplaceCallbackProcessor($domDocument, ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'], function (array $matches): string {
-            return '***';
-        });
-        $domDocument->applyProcessors([$pregReplaceCallbackProcessor]);
-        $actual = $domDocument->getInnerHtml();
+        $dom = new HtmlDocument($input);
+        $this->assertHtmlStringEqualsHtmlString(
+            $input,
+            $dom->getInnerHtml(),
+            "The HtmlDocument didn't parse the string properly."
+        );
+        $processor = new PregReplaceCallbackProcessor(
+            ['`(?<![\pL\pN])'.$patternText.'(?![\pL\pN])`isu'],
+            function (array $matches): string {
+                return '***';
+            }
+        );
+        $processor->processDocument($dom);
+        $actual = $dom->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 }

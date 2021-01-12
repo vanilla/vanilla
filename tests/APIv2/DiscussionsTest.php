@@ -26,6 +26,7 @@ class DiscussionsTest extends AbstractResourceTest {
     use TestPrimaryKeyRangeFilterTrait;
     use TestSortingTrait;
     use TestDiscussionModelTrait;
+    use TestFilterDirtyRecordsTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -359,5 +360,30 @@ class DiscussionsTest extends AbstractResourceTest {
         $r = $this->api()->post($this->baseUrl, ['pinned' => true, 'pinLocation' => 'recent'] + $this->record())->getBody();
         $this->assertTrue($r['pinned']);
         $this->assertSame('recent', $r['pinLocation']);
+    }
+
+    /**
+     * Ensure that there are dirtyRecords for a specific resource.
+     */
+    protected function triggerDirtyRecords() {
+        $discussion = $this->insertDiscussions(2);
+        $ids = array_column($discussion, 'DiscussionID');
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = \Gdn::getContainer()->get(DiscussionModel::class);
+        foreach ($ids as $id) {
+            $discussionModel->setField($id, 'Announce', 1);
+        }
+    }
+
+    /**
+     * Get the resource type.
+     *
+     * @return array
+     */
+    protected function getResourceInformation(): array {
+        return [
+            "resourceType" => "discussion",
+            "primaryKey" => "discussionID"
+        ];
     }
 }

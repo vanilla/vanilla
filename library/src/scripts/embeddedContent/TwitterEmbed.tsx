@@ -4,7 +4,7 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import { visibility } from "@library/styles/styleHelpers";

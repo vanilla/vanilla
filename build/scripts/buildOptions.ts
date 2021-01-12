@@ -32,6 +32,11 @@ yargs
         default: false,
         boolean: true,
     })
+    .options("circular", {
+        alias: "c",
+        default: false,
+        boolean: true,
+    })
     .options("low-memory", {
         default: false,
         boolean: true,
@@ -54,6 +59,7 @@ export interface IBuildOptions {
     phpConfig: any;
     devIp: string;
     debug: boolean;
+    circular: boolean;
 }
 
 /**
@@ -106,5 +112,6 @@ export async function getOptions(): Promise<IBuildOptions> {
         install: yargs.argv.install as boolean,
         devIp,
         debug: yargs.argv.debug as boolean,
+        circular: yargs.argv.circular as boolean,
     };
 }

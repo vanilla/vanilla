@@ -4,9 +4,10 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumVariables } from "@library/forms/forumStyleVars";
-import { absolutePosition, unit } from "@library/styles/styleHelpers";
+import { absolutePosition } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
@@ -23,7 +24,7 @@ export function blockColumnCSS() {
         flexWrap: "wrap",
         flexDirection: "column",
         justifyContent: "space-between",
-        minHeight: unit(userPhotoSizing.medium),
+        minHeight: styleUnit(userPhotoSizing.medium),
     });
 
     const paddingTop: number = parseInt(`${layoutVars.cell.paddings.vertical}`) ?? 0;
@@ -36,9 +37,9 @@ export function blockColumnCSS() {
         .BlockColumn .Block.Wrap .idea-counter-module.idea-counter-module
         `,
         {
-            width: unit(userPhotoSizing.medium),
-            height: unit(userPhotoSizing.medium),
-            ...absolutePosition.topLeft(paddingTop, calc(`${unit(paddingLeft)} / 2`)),
+            width: styleUnit(userPhotoSizing.medium),
+            height: styleUnit(userPhotoSizing.medium),
+            ...absolutePosition.topLeft(paddingTop, calc(`${styleUnit(paddingLeft)} / 2`)),
         },
     );
 }

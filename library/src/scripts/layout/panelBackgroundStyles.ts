@@ -4,24 +4,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { calc, color, percent } from "csx";
-
-export const panelBackgroundVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("panelBackground");
-
-    const config = makeThemeVars("config", {
-        render: false,
-    });
-
-    const colors = makeThemeVars("colors", {
-        backgroundColor: color("#f4f6f9"),
-    });
-
-    return { config, colors };
-});
+import { calc, percent } from "csx";
+import { panelBackgroundVariables } from "./PanelBackground.variables";
 
 export const panelBackgroundClasses = useThemeCache(() => {
     const style = styleFactory("panelBackground");
@@ -35,20 +24,20 @@ export const panelBackgroundClasses = useThemeCache(() => {
         left: 0,
         height: percent(100),
 
-        width: calc(`50% - ${unit(layoutVars.middleColumn.paddedWidth / 2 + globalVars.gutter.size * 2 - 20)}`),
-        minWidth: unit(
+        width: calc(`50% - ${styleUnit(layoutVars.middleColumn.paddedWidth / 2 + globalVars.gutter.size * 2 - 20)}`),
+        minWidth: styleUnit(
             layoutVars.panel.paddedWidth +
                 layoutVars.gutter.full -
                 layoutVars.panelLayoutSpacing.withPanelBackground.gutter,
         ),
-        backgroundColor: colorOut(vars.colors.backgroundColor),
+        backgroundColor: ColorsUtils.colorOut(vars.colors.backgroundColor),
         zIndex: 0,
     });
 
     const backgroundColor = style("hasBackgroundColor", {
-        $nest: {
+        ...{
             "&&": {
-                backgroundColor: colorOut(panelBackgroundVariables().colors.backgroundColor),
+                backgroundColor: ColorsUtils.colorOut(panelBackgroundVariables().colors.backgroundColor),
             },
         },
     });

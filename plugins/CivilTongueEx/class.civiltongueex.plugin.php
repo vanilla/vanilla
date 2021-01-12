@@ -141,20 +141,26 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
         $comments = val('Comments', $sender->Data);
         if ($comments) {
-            $result =& $comments->result();
-            foreach ($result as &$row) {
-                $value = $this->replace(val('Story', $row));
-                setValue('Story', $row, $value);
+            if (is_array($comments)) {
+                $result = $comments;
+            } elseif ($comments instanceof Gdn_DataSet) {
+                $result =& $comments->result();
+            } else {
+                $result = null;
+            }
+            if ($result) {
+                foreach ($result as &$row) {
+                    $value = $this->replace(val('Story', $row));
+                    setValue('Story', $row, $value);
 
-                $value = $this->replace(val('DiscussionName', $row));
-                setValue('DiscussionName', $row, $value);
+                    $value = $this->replace(val('DiscussionName', $row));
+                    setValue('DiscussionName', $row, $value);
 
-                $value = $this->replace(val('Body', $row));
-                setValue('Body', $row, $value);
-
+                    $value = $this->replace(val('Body', $row));
+                    setValue('Body', $row, $value);
+                }
             }
         }
-
     }
 
     /**

@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { extendItemContainer, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { percent, px } from "csx";
 
@@ -19,7 +20,7 @@ export const insertMediaClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        ...paddings({
+        ...Mixins.padding({
             left: vars.flyout.padding.horizontal,
             right: vars.flyout.padding.horizontal,
             bottom: vars.flyout.padding.vertical * 2,
@@ -27,7 +28,7 @@ export const insertMediaClasses = useThemeCache(() => {
     });
 
     const insert = style("insert", {
-        $nest: {
+        ...{
             "&&&": {
                 // Nest deeper to override margins from the forum.
                 width: percent(100),

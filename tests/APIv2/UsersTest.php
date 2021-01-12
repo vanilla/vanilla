@@ -10,16 +10,20 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use UserModel;
 use UsersApiController;
+use Vanilla\Events\DirtyRecordTrait;
 use Vanilla\Events\EventAction;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait;
+    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait,
+        TestFilterDirtyRecordsTrait, UsersAndRolesApiTestTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
@@ -303,7 +307,7 @@ class UsersTest extends AbstractResourceTest {
         ];
         $actual = $response->getBody();
 
-        $this->assertSame($expected, $actual);
+        $this->assertArraySubsetRecursive($expected, $actual);
     }
 
     /**
@@ -727,5 +731,26 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('countComments', $response);
 
         $this->assertArrayNotHasKey('banned', $response);
+    }
+
+    /**
+     * Ensure that there are dirtyRecords for a specific resource.
+     */
+    protected function triggerDirtyRecords() {
+        $this->resetTable('dirtyRecord');
+        $user = $this->createUser();
+        $this->givePoints($user["userID"], 10);
+    }
+
+    /**
+     * Get the resource type.
+     *
+     * @return array
+     */
+    protected function getResourceInformation(): array {
+        return [
+            "resourceType" => "user",
+            "primaryKey" => "userID"
+        ];
     }
 }

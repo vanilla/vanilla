@@ -9,7 +9,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { MemoryRouter } from "react-router";
 import { BannerContextProvider } from "@library/banner/BannerContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
-import TitleBar, { LogoAlignment } from "@library/headers/TitleBar";
+import TitleBar from "@library/headers/TitleBar";
 import { sampleImages } from "@library/embeddedContent/storybook/attachments/sampleAttachmentImages";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { capitalizeFirstLetter } from "@vanilla/utils";

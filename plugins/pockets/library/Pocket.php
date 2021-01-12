@@ -142,7 +142,7 @@ class Pocket {
 
         // Check to see if the page matches.
         $page = $this->Page ?? '';
-        $homepageMatches = strtolower($page) === 'home' && $data['isHomepage'];
+        $homepageMatches = (strtolower($page) === 'home' || strtolower($page) === 'sitehome') && $data['isHomepage'];
         $pageMatches = $homepageMatches || strtolower($page) === strtolower($data['PageName']);
         if ($page && !$pageMatches) {
             // A page is set, but we don't match it.

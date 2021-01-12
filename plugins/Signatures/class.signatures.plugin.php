@@ -652,7 +652,8 @@ EOT;
                 ]);
             }
 
-            $userSignature = Gdn_Format::to($signature, $sigFormat);
+            //$userSignature = Gdn_Format::to($signature, $sigFormat);
+            $userSignature = \Gdn::formatService()->renderHTML($signature, strtolower($sigFormat));
 
             // Restore original config.
             if (!$allowEmbeds) {

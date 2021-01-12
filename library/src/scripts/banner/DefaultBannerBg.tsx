@@ -4,7 +4,8 @@
  */
 import React from "react";
 import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
-import { colorOut } from "@library/styles/styleHelpers";
+import { ensureColorHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useLayout } from "@library/layout/LayoutContext";
 
@@ -74,7 +75,7 @@ export function DefaultBannerBg(props: IProps) {
                 </clipPath>
             </defs>
             <g style={{ isolation: "isolate" }}>
-                <path fill={colorOut(vars.outerBackground.color)} d="M-0 0H1600V250H-0z" />
+                <path fill={ColorsUtils.colorOut(vars.outerBackground.color)} d="M-0 0H1600V250H-0z" />
                 <path
                     fill="url(#a)"
                     fillRule="evenodd"
@@ -118,7 +119,7 @@ export function DefaultBannerBg(props: IProps) {
                 />
                 <g
                     fill="none"
-                    stroke={colorOut(vars.outerBackground.color.darken("50%"))}
+                    stroke={ColorsUtils.colorOut(ensureColorHelper(vars.outerBackground.color!).darken("50%"))}
                     strokeDasharray="1,11"
                     strokeLinecap="round"
                     strokeLinejoin="round"

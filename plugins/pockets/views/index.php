@@ -44,7 +44,7 @@ echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/
 
                 echo '</div>';
                 echo '</td>';
-                echo '<td><pre style="white-space: pre-wrap;">', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</pre></td>';
+                echo '<td>' . $PocketRow['RenderedSummary'] . '</td>';
                 echo '<td class="options"><div class="btn-group">';
                 echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal js-full-height-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
                 echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon js-modal-confirm', ['aria-label' => t('Delete'), 'title' => t('Delete')]);

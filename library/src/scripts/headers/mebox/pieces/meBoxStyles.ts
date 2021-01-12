@@ -5,10 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allButtonStates, colorOut, debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
@@ -25,20 +27,20 @@ export const meBoxClasses = useThemeCache(() => {
             ...debug.name(),
             display: "flex",
             alignItems: "center",
-            height: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
         },
         mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
     const buttonContent = style("buttonContent", {
         ...flex.middle(),
-        width: unit(formVars.sizing.height),
-        maxWidth: unit(formVars.sizing.height),
-        flexBasis: unit(formVars.sizing.height),
-        height: unit(titleBarVars.meBox.sizing.buttonContents),
-        borderRadius: unit(globalVars.border.radius),
+        width: styleUnit(formVars.sizing.height),
+        maxWidth: styleUnit(formVars.sizing.height),
+        flexBasis: styleUnit(formVars.sizing.height),
+        height: styleUnit(titleBarVars.meBox.sizing.buttonContents),
+        borderRadius: styleUnit(globalVars.border.radius),
     });
 
     return {

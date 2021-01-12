@@ -10,7 +10,7 @@ import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import { navLinksClasses, navLinksVariables } from "@library/navigation/navLinksStyles";
 import { ILinkListData } from "@library/@types/api/core";
 import NavLinks, { INavLinkNoItemComponent } from "@library/navigation/NavLinks";
 import Container from "@library/layout/components/Container";
@@ -39,6 +39,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const groupLevel = Math.min((this.props.depth || 2) + 1, 6);
         const classes = navLinksClasses();
         const ungroupedTitle = this.props.ungroupedTitle || t("Overview");
+        const columns = navLinksVariables().columns.desktop;
 
         if (ungrouped.length > 0 || grouped.length > 0) {
             const ungroupedContent =
@@ -64,7 +65,9 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                             accessibleViewAllMessage={this.props.accessibleViewAllMessage}
                             classNames={grouped.length - 1 === i ? "isLast" : ""}
                         />
-                        {this.separator(i % 2 === 0 ? classes.separatorOdd : "")}
+
+                        {columns === 2 && this.separator(i % 2 === 0 ? classes.separatorOdd : "")}
+                        {columns === 3 && this.separator((i + 1) % 3 !== 0 ? classes.separatorOdd : "")}
                     </React.Fragment>
                 );
             });

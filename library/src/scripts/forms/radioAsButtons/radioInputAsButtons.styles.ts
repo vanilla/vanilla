@@ -4,14 +4,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { unit, srOnly, margins, negativeUnit } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { negativeUnit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { buttonVariables } from "@library/forms/buttonStyles";
-import { nestedWorkaround } from "@dashboard/compatibilityStyles";
+import { buttonVariables } from "@library/forms/Button.variables";
 import { calc } from "csx";
 
 export const radioInputAsButtonsClasses = useThemeCache(() => {
@@ -28,14 +30,14 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         position: "relative",
         alignItems: "center",
         justifyContent: "flex-start",
-        ...margins({
+        ...Mixins.margin({
             horizontal: negativeUnit(globalVars.gutter.half),
             vertical: negativeUnit(globalVars.gutter.half),
         }),
         ...mediaQueries.xs({
             flexWrap: "wrap",
             justifyContent: "stretch",
-            width: calc(`100% + ${unit(globalVars.gutter.size)}`),
+            width: calc(`100% + ${styleUnit(globalVars.gutter.size)}`),
         }),
     });
 
@@ -43,7 +45,7 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         "item",
 
         {
-            ...margins({
+            ...Mixins.margin({
                 all: globalVars.gutter.half,
             }),
         },
@@ -56,6 +58,7 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         }),
     );
 
+    const labelStateStyles = generateButtonStyleProperties({ buttonTypeVars: buttonVariables().primary });
     const label = style("label", {
         ...userSelect(),
         display: "inline-flex",
@@ -63,19 +66,19 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         cursor: "pointer",
         textAlign: "center",
         justifyContent: "center",
+        ...labelStateStyles,
     });
-
-    const labelStateStyles = generateButtonStyleProperties({ buttonTypeVars: buttonVariables().primary });
-    nestedWorkaround(`.${label}`, labelStateStyles.$nest);
 
     const hiddenInputStates = generateButtonStyleProperties({
         buttonTypeVars: buttonVariables().primary,
         stateSuffix: ` + .${label}`,
     });
+
     const input = style("input", {
-        ...srOnly(),
+        ...Mixins.absolute.srOnly(),
+        ...hiddenInputStates,
     });
-    nestedWorkaround(`.${input}`, hiddenInputStates.$nest);
+
     return {
         root,
         items,

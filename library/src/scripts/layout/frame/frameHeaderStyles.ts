@@ -5,11 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { appearance, colorOut, paddings, singleBorder, unit, margins, flexHelper } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { appearance, singleBorder, flexHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, em, percent } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const frameHeaderClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -23,18 +27,18 @@ export const frameHeaderClasses = useThemeCache(() => {
         alignItems: "center",
         flexWrap: "nowrap",
         width: percent(100),
-        color: colorOut(vars.colors.fg),
+        color: ColorsUtils.colorOut(vars.colors.fg),
         zIndex: 1,
         borderBottom: singleBorder(),
-        ...paddings({
+        ...Mixins.padding({
             top: 4,
             right: vars.footer.spacing,
             bottom: 4,
             left: vars.footer.spacing,
         }),
-        $nest: {
-            "& .button + .button": {
-                marginLeft: unit(12 - formElVars.border.width),
+        ...{
+            ".button + .button": {
+                marginLeft: styleUnit(12 - formElVars.border.width),
             },
         },
     });
@@ -62,32 +66,32 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexGrow: 1,
         margin: 0,
         textOverflow: "ellipsis",
-        width: calc(`100% - ${unit(formElVars.sizing.height)}`),
-        flexBasis: calc(`100% - ${unit(formElVars.sizing.height)}`),
+        width: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
+        flexBasis: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: unit(globalVars.fonts.size.large),
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     const headingMinimal = style("headingMinimal", {
         ...flexHelper().middle(),
-        ...paddings({ horizontal: 24 }),
-        $nest: {
+        ...Mixins.padding({ horizontal: 24 }),
+        ...{
             "& *": {
                 textTransform: "uppercase",
-                fontSize: unit(globalVars.fonts.size.small),
+                fontSize: styleUnit(globalVars.fonts.size.small),
             },
         },
     });
 
     const left = style("left", {
-        fontSize: unit(vars.header.fontSize),
+        fontSize: styleUnit(vars.header.fontSize),
     });
 
     const centred = style("centred", {
         textAlign: "center",
         textTransform: "uppercase",
-        fontSize: unit(globalVars.fonts.size.small),
-        color: colorOut(globalVars.mixBgAndFg(0.6)),
+        fontSize: styleUnit(globalVars.fonts.size.small),
+        color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
         fontWeight: globalVars.fonts.weights.semiBold,
     });
 
@@ -95,9 +99,9 @@ export const frameHeaderClasses = useThemeCache(() => {
 
     const leftSpacer = style("leftSpacer", {
         display: "block",
-        height: unit(spacerWidth),
-        flexBasis: unit(spacerWidth),
-        width: unit(spacerWidth),
+        height: styleUnit(spacerWidth),
+        flexBasis: styleUnit(spacerWidth),
+        width: styleUnit(spacerWidth),
     });
 
     const action = style("action", {
@@ -106,18 +110,18 @@ export const frameHeaderClasses = useThemeCache(() => {
         justifyContent: "center",
         position: "relative",
         flexShrink: 1,
-        height: unit(formElVars.sizing.height),
-        width: unit(formElVars.sizing.height),
-        flexBasis: unit(formElVars.sizing.height),
-        color: colorOut(vars.colors.fg),
+        height: styleUnit(formElVars.sizing.height),
+        width: styleUnit(formElVars.sizing.height),
+        flexBasis: styleUnit(formElVars.sizing.height),
+        color: ColorsUtils.colorOut(vars.colors.fg),
         transform: `translateX(10px)`,
         marginLeft: "auto",
-        $nest: {
+        ...{
             "&:not(.focus-visible)": {
                 outline: 0,
             },
             "&:hover, &:focus, &.focus-visible": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
         },
     });
@@ -129,24 +133,24 @@ export const frameHeaderClasses = useThemeCache(() => {
     const close = style("close", {
         ...appearance(),
         cursor: "pointer",
-        height: unit(formElVars.sizing.height),
-        width: unit(formElVars.sizing.height),
-        flexBasis: unit(formElVars.sizing.height),
+        height: styleUnit(formElVars.sizing.height),
+        width: styleUnit(formElVars.sizing.height),
+        flexBasis: styleUnit(formElVars.sizing.height),
         padding: 0,
         border: 0,
     });
 
     const closeMinimal = style("closeMinimal", {
-        color: colorOut(globalVars.mixBgAndFg(0.6)),
+        color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
         position: "absolute",
         top: 0,
         bottom: 0,
-        ...margins({ vertical: "auto" }),
-        right: unit(6),
+        ...Mixins.margin({ vertical: "auto" }),
+        right: styleUnit(6),
     });
 
     const categoryIcon = style("categoryIcon", {
-        flexBasis: unit(18),
+        flexBasis: styleUnit(18),
         marginRight: 0,
         opacity: 0.8,
     });

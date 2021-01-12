@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { SearchService } from "@library/search/SearchService";
 import { onReady, t } from "@library/utility/appUtils";
 import { TypeMemberIcon } from "@library/icons/searchIcons";
 import { ISearchForm } from "@library/search/searchTypes";
@@ -20,7 +20,7 @@ export function registerMemberSearchDomain() {
             // User doesn't have permission to search members.
             return;
         }
-        SearchFormContextProvider.addPluggableDomain({
+        SearchService.addPluggableDomain({
             key: "members",
             name: t("Members"),
             sort: 4,

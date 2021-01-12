@@ -5,7 +5,6 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { forceRenderStyles } from "typestyle";
 import { ReactElement } from "react";
 
 export interface IComponentMountOptions {
@@ -13,6 +12,7 @@ export interface IComponentMountOptions {
     clearContents?: boolean;
     widgetResolver?: IWidgetResolver;
     bypassPortalManager?: boolean;
+    unmountBeforeRender?: boolean;
 }
 
 export interface IWidgetOptions {
@@ -110,7 +110,9 @@ export function mountReact(
         const doRender = () => {
             ReactDOM.render(<PortalContext>{component}</PortalContext>, target, callback);
         };
-        ReactDOM.unmountComponentAtNode(target);
+        if (options?.unmountBeforeRender) {
+            ReactDOM.unmountComponentAtNode(target);
+        }
         setImmediate(doRender);
         return;
     }
@@ -138,7 +140,6 @@ export function mountReact(
                 target.remove();
             }
         }
-        forceRenderStyles();
         callback && callback();
     });
 }
@@ -180,7 +181,6 @@ export function mountReactMultiple(components: IMountable[], callback?: () => vo
                 target.remove();
             }
         });
-        forceRenderStyles();
         callback && callback();
     });
 }

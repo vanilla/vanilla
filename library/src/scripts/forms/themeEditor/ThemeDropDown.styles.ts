@@ -4,11 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
-import { borders, colorOut, flexHelper, fonts, unit } from "@library/styles/styleHelpers";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const themeDropDownClasses = useThemeCache(() => {
     const style = styleFactory("themeDropDown");
@@ -17,13 +22,13 @@ export const themeDropDownClasses = useThemeCache(() => {
 
     const root = style({
         width: percent(100),
-        background: colorOut(globalVars.mainColors.bg),
-        $nest: {
-            "& .input-wrap-right": {
+        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        ...{
+            ".input-wrap-right": {
                 width: percent(100),
             },
-            "& .SelectOne__menu": {
-                ...borders(
+            ".SelectOne__menu": {
+                ...Mixins.border(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),
                         radius: builderVariables.wrap.borderRadius,
@@ -33,47 +38,47 @@ export const themeDropDownClasses = useThemeCache(() => {
             },
             "&&& .hasFocus .inputBlock-inputText": {
                 borderRadius: builderVariables.wrap.borderRadius,
-                borderColor: colorOut(globalVars.mainColors.primary),
+                borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
                 cursor: "pointer",
             },
-            "& .suggestedTextInput-option": {
+            ".suggestedTextInput-option": {
                 width: percent(100),
                 textAlign: "left",
-                minHeight: unit(builderVariables.input.height),
+                minHeight: styleUnit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
             },
-            "& .suggestedTextInput-head": {
+            ".suggestedTextInput-head": {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-valueContainer.suggestedTextInput-valueContainer": {
-                minHeight: unit(builderVariables.input.height),
+            ".suggestedTextInput-valueContainer.suggestedTextInput-valueContainer": {
+                minHeight: styleUnit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
-                backgroundColor: colorOut(globalVars.elementaryColors.white),
+                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
                 fontSize: "inherit",
-                ...borders(
+                ...Mixins.border(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),
                         radius: builderVariables.wrap.borderRadius,
                     },
                     {},
                 ),
-                $nest: {
+                ...{
                     "&:hover, &:focus, &:active, &.focus-visible": {
                         borderRadius: builderVariables.wrap.borderRadius,
-                        borderColor: colorOut(globalVars.mainColors.primary),
+                        borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
                         cursor: "pointer",
                     },
                 },
             },
-            "& .SelectOne__indicators": {
-                height: unit(builderVariables.input.height),
-                width: unit(builderVariables.input.height),
+            ".SelectOne__indicators": {
+                height: styleUnit(builderVariables.input.height),
+                width: styleUnit(builderVariables.input.height),
             },
-            "& .SelectOne__single-value.SelectOne__single-value": {
-                ...fonts(builderVariables.input.fonts),
+            ".SelectOne__single-value.SelectOne__single-value": {
+                ...Mixins.font(builderVariables.input.fonts),
             },
         },
     });

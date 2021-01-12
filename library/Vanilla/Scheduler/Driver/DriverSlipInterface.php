@@ -13,13 +13,34 @@ use Vanilla\Scheduler\Job\JobExecutionStatus;
  * Interface DriverJobInterface
  */
 interface DriverSlipInterface {
-    
+
     /**
      * Get the job Id
      *
      * @return string The job Id
      */
     public function getId(): string;
+
+    /**
+     * Get TrackingId
+     *
+     * @return string|null
+     */
+    public function getTrackingId(): ?string;
+
+    /**
+     * Set TrackingId
+     *
+     * @param string $trackingId
+     */
+    public function setTrackingId(string $trackingId): void;
+
+    /**
+     * GetType
+     *
+     * @return string
+     */
+    public function getType(): string;
 
     /**
      * Execute
@@ -37,10 +58,12 @@ interface DriverSlipInterface {
     public function setStatus(JobExecutionStatus $status): DriverSlipInterface;
 
     /**
-     * Get the job status
+     * GetStatus
+     *
+     * @param bool $forceUpdate Forcely update the status when possible
+     * @return JobExecutionStatus
      */
-    public function getStatus(): JobExecutionStatus;
-
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus;
 
     /**
      * @return array

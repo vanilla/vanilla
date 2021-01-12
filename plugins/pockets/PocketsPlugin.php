@@ -5,6 +5,7 @@
  */
 
 use Vanilla\Addons\Pockets\PocketsModel;
+use Vanilla\Widgets\WidgetFactory;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -204,6 +205,8 @@ class PocketsPlugin extends Gdn_Plugin {
         $model = new PocketsModel();
         $pocketData = $model->getAll();
 
+        /** @var WidgetService $widgetService */
+        $widgetService = \Gdn::getContainer()->get(WidgetService::class);
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
             $mobileOnly = $pocketRow['MobileOnly'];
@@ -260,6 +263,18 @@ class PocketsPlugin extends Gdn_Plugin {
             }
 
             $pocketRow['Meta'] = $meta;
+
+            if ($pocketRow['Format'] === PocketsModel::FORMAT_WIDGET && ($pocketRow['WidgetID'] ?? false)) {
+                $widgetFactory = $widgetService->getFactoryByID($pocketRow['WidgetID']);
+                if ($widgetFactory !== null) {
+                    $pocketRow['RenderedSummary'] = $widgetFactory->renderWidgetSummary($pocketRow['WidgetParameters'] ?? []);
+                }
+            }
+            // If there was no widget
+            if (!isset($pocketRow['RenderedSummary'])) {
+                $bodyContent = nl2br(htmlspecialchars(substr($pocketRow['Body'], 0, 200)));
+                $pocketRow['RenderedSummary'] = '<pre style="white-space: pre-wrap;">' . $bodyContent . '</pre>';
+            }
         }
 
         $sender->setData('PocketData', $pocketData);
@@ -436,7 +451,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 'initialBody' => $pocket['Body'] ?? '',
                 'format' => strtolower($pocket['Format']),
             ];
-            $sender->setData('contentProps', json_encode($contentProps, JSON_UNESCAPED_UNICODE));
+            $sender->setData('contentProps', json_encode($contentProps, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
         } else {
             // Default the repeat.
             $form->setValue('RepeatType', Pocket::REPEAT_ONCE);
@@ -552,10 +567,18 @@ class PocketsPlugin extends Gdn_Plugin {
             $roles = $roleModel->getByUserID($userID)->resultArray();
             $this->userRoleIDs = array_column($roles, 'RoleID');
         } else {
-            $this->userRoleIDs = [RoleModel::GUEST_ID];
+            $roles = $roleModel->getByType('guest')->resultArray();
+            $this->userRoleIDs = array_column($roles, 'RoleID');
         }
 
         return $this->userRoleIDs;
+    }
+
+    /**
+     * @param array|null $roleIDs
+     */
+    public function setUserRoleIDs(?array $roleIDs): void {
+        $this->userRoleIDs = $roleIDs;
     }
 
     /**

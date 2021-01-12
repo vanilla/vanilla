@@ -118,7 +118,6 @@
         ],
         "psr-4": {
             "Vanilla\\": "library/Vanilla",
-            "Vanilla\\Cloud\\Scripts\\": "cloud/scripts/src",
             "Garden\\": "library/Garden"
         }
     },

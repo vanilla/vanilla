@@ -479,7 +479,19 @@ class TagModel extends Gdn_Model {
         $insert_tag_ids = array_diff_key($tag_ids, $current_tags);
         // Figure out the tags we need to remove.
         $delete_tag_ids = array_diff_key($current_tags, $tag_ids);
+
         $now = Gdn_Format::toDateTime();
+
+        // Handle moving a discussion to a new category.
+        foreach ($current_tags as $tag) {
+            if ($tag['CategoryID'] !== -1 && $tag['CategoryID'] !== $category_id) {
+                unset($delete_tag_ids[$tag['TagID']]);
+                $this->SQL->update('TagDiscussion')
+                    ->set('CategoryID', $category_id)
+                    ->where('DiscussionID', $discussion_id)
+                    ->put();
+            }
+        }
 
         // Insert the new tag mappings.
         foreach ($insert_tag_ids as $tag_id => $bool) {

@@ -5,9 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumVariables } from "@library/forms/forumStyleVars";
 
 export const ideaCSS = () => {
@@ -19,7 +20,7 @@ export const ideaCSS = () => {
         .idea-counter-module .idea-counter-box
         `,
         {
-            backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+            backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
         },
     );
 
@@ -29,7 +30,7 @@ export const ideaCSS = () => {
         .idea-counter-module .arrow::after
     `,
         {
-            borderColor: colorOut(globalVars.mixBgAndFg(0.75)),
+            borderColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.75)),
         },
     );
 
@@ -39,12 +40,12 @@ export const ideaCSS = () => {
         .idea-counter-module .uservote .arrow::after
     `,
         {
-            borderColor: colorOut(globalVars.mixPrimaryAndBg(0.2)),
+            borderColor: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(0.2)),
         },
     );
 
     cssOut(`.idea-counter-module .score`, {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`.idea-counter-module`, {
@@ -60,8 +61,8 @@ export const ideaCSS = () => {
         .MessageList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto
     `,
         {
-            width: unit(forumVars.countBox.width),
-            height: unit(forumVars.countBox.height),
+            width: styleUnit(forumVars.countBox.width),
+            height: styleUnit(forumVars.countBox.height),
         },
     );
 };

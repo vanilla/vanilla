@@ -48,6 +48,7 @@ export interface ISearchResult {
     type: string;
     score?: number;
     breadcrumbs: ICrumb[];
+    labelCodes?: string[];
     status?: PublishStatus;
     image?: {
         url: string;

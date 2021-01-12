@@ -5,21 +5,16 @@
  * @license GPL-2.0-only
  */
 
-import {
-    absolutePosition,
-    colorOut,
-    ColorValues,
-    importantUnit,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, importantUnit, singleBorder } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { forumVariables } from "@library/forms/forumStyleVars";
 import { userPhotoMixins } from "@library/headers/mebox/pieces/userPhotoStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const tableCSS = () => {
     const vars = globalVariables();
@@ -41,7 +36,7 @@ export const tableCSS = () => {
         .DataTable .Block.Wrap .Meta
         `,
         {
-            width: calc(`100% - ${unit(userPhotoSizing.medium + margin)}`),
+            width: calc(`100% - ${styleUnit(userPhotoSizing.medium + margin)}`),
             marginTop: 0,
         },
     );
@@ -68,8 +63,8 @@ export const tableCSS = () => {
         {
             ...mixins.root,
             ...absolutePosition.topLeft(),
-            width: unit(userPhotoSizing.medium),
-            height: unit(userPhotoSizing.medium),
+            width: styleUnit(userPhotoSizing.medium),
+            height: styleUnit(userPhotoSizing.medium),
         },
     );
 
@@ -91,7 +86,7 @@ export const tableCSS = () => {
         .DataTableWrap.GroupWrap thead td,
     `,
         {
-            ...paddings({
+            ...Mixins.padding({
                 vertical: vars.gutter.size,
                 horizontal: importantUnit(vars.gutter.half),
             }),
@@ -108,8 +103,8 @@ export const tableCSS = () => {
         .DataTable tbody td.FirstUser a
         `,
         {
-            color: colorOut(vars.mainColors.fg),
-            fontSize: unit(vars.meta.text.size),
+            color: ColorsUtils.colorOut(vars.mainColors.fg),
+            fontSize: styleUnit(vars.meta.text.size),
             textDecoration: important("none"),
         },
     );
@@ -124,18 +119,18 @@ export const tableCSS = () => {
     });
 
     cssOut(`.Groups .DataTable td .Wrap, .DataTable td .Wrap`, {
-        ...paddings({
+        ...Mixins.padding({
             vertical: layoutVars.cell.paddings.vertical,
-            left: calc(`${unit(layoutVars.cell.paddings.horizontal)} / 2`),
-            right: calc(`${unit(layoutVars.cell.paddings.horizontal)} / 2`),
+            left: calc(`${styleUnit(layoutVars.cell.paddings.horizontal)} / 2`),
+            right: calc(`${styleUnit(layoutVars.cell.paddings.horizontal)} / 2`),
         }),
     });
 
     cssOut(
         `.Groups .DataTable .Excerpt, .Groups .DataTable .CategoryDescription, .DataTable .Excerpt, .DataTable .CategoryDescription`,
         {
-            color: colorOut(vars.mainColors.fg),
-            fontSize: unit(vars.fonts.size.medium),
+            color: ColorsUtils.colorOut(vars.mainColors.fg),
+            fontSize: styleUnit(vars.fonts.size.medium),
         },
     );
 
@@ -144,6 +139,6 @@ export const tableCSS = () => {
     });
 
     cssOut(`.DataTable .DiscussionName .Title`, {
-        width: calc(`100% - ${unit(vars.icon.sizes.default * 2 + vars.gutter.quarter)}`),
+        width: calc(`100% - ${styleUnit(vars.icon.sizes.default * 2 + vars.gutter.quarter)}`),
     });
 };

@@ -7,11 +7,15 @@
 import React, { useRef, useState } from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
+import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
 import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { IMegaMenuHandle, TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
+import { formatUrl, siteUrl } from "@library/utility/appUtils";
+import { useLocation } from "react-router";
+import { useMeasure } from "@vanilla/react-utils";
+import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -23,7 +27,6 @@ export interface ITitleBarNavProps {
     containerRef?: React.RefObject<HTMLElement | null>;
     isCentered?: boolean;
     afterNode?: React.ReactNode;
-    logoDimensions?: DOMRect;
     forceMenuOpen?: INavigationVariableItem; // For storybook, will force nested menu open
 }
 
@@ -32,11 +35,18 @@ export interface ITitleBarNavProps {
  */
 export default function TitleBarNav(props: ITitleBarNavProps) {
     const { navigationItems } = navigationVariables();
-    const [active, setActive] = useState<INavigationVariableItem>();
-    const [currentNavElement, setCurrentNavElement] = useState<HTMLElement>();
+
+    const location = useLocation();
+
+    const [menuItem, setMenuItem] = useState<HTMLElement>();
     const [expanded, setExpanded] = useState<INavigationVariableItem>();
 
     const megaMenuRef = useRef<IMegaMenuHandle>(null);
+    const firstItemRef = useRef<HTMLAnchorElement>();
+
+    const active = expanded && expanded.children?.length && expanded;
+
+    const firstItemDimensions = useMeasure(firstItemRef as any);
 
     const classes = titleBarNavClasses();
     const dataLength = Object.keys(navigationItems).length;
@@ -46,15 +56,19 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
         }
 
         function onActive(element) {
-            setActive(item);
-            setCurrentNavElement(element);
+            setExpanded(item);
+            setMenuItem(element);
         }
 
-        function onMouseOutOrBlur() {
-            setActive(undefined);
+        function onFocus(element) {
+            if (expanded !== item) setExpanded(undefined);
         }
 
-        function onKeyDown(event: React.KeyboardEvent) {
+        function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+            const target = event.target as HTMLElement;
+            const listItem = target.closest("li");
+            const nextSibling = listItem?.nextSibling as HTMLElement;
+            const previousSibling = listItem?.previousSibling as HTMLElement;
             switch (event.key) {
                 case "Enter":
                 case " ":
@@ -63,20 +77,46 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                     onActive(event.target);
                     megaMenuRef.current?.focusFirstItem();
                     break;
+                case "ArrowUp":
+                    event.preventDefault();
+                    setExpanded(undefined);
+                    break;
+                case "ArrowRight":
+                    event.preventDefault();
+                    nextSibling?.querySelector<HTMLAnchorElement>("a")?.focus();
+                    break;
+                case "ArrowLeft":
+                    event.preventDefault();
+                    previousSibling?.querySelector<HTMLAnchorElement>("a")?.focus();
+                    break;
             }
         }
+
+        /**
+         * Checks if we're on the current page
+         * Note that won't work with non-canonical URLHeaderLogo.tsx
+         */
+        const isCurrentPage = (): boolean => {
+            if (location && location.pathname) {
+                return siteUrl(window.location.pathname) === formatUrl(item.url, true);
+            } else {
+                return false;
+            }
+        };
 
         const component = (
             <TitleBarNavItem
                 to={item.url}
+                ref={(ref) => {
+                    if (key === 0) firstItemRef.current = ref!;
+                }}
+                isActive={active ? active === item : isCurrentPage()}
                 className={classNames({
                     [classes.lastItem]: dataLength === key,
                     [classes.firstItem]: key === 0,
-                    [classes.linkActive]: expanded === item,
                 })}
-                onMouseOver={onActive}
-                onMouseOut={onMouseOutOrBlur}
-                onBlur={onMouseOutOrBlur}
+                onMouseEnter={(event) => onActive(event.target)}
+                onFocus={(event) => onFocus(event.target)}
                 onKeyDown={onKeyDown}
                 linkClassName={props.linkClassName}
                 key={key}
@@ -110,23 +150,19 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
             >
                 <ul className={classNames(props.listClassName, classes.items)}>
                     {props.children ? props.children : content}
-                    <>
-                        {props.excludeExtraNavItems ??
-                            TitleBarNav.extraNavItems.map((ComponentClass, i) => {
-                                return <ComponentClass key={i} />;
-                            })}
-                    </>
+                    {props.excludeExtraNavItems ??
+                        TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                            return <ComponentClass key={i} />;
+                        })}
                 </ul>
                 {props.afterNode}
             </div>
             <TitleBarMegaMenu
-                forceMenuOpen={props.forceMenuOpen}
                 ref={megaMenuRef}
-                logoDimensions={props.logoDimensions}
-                active={active}
-                onOpen={(item) => setExpanded(item)}
+                leftOffset={firstItemDimensions.left}
+                menuItem={menuItem}
+                expanded={expanded}
                 onClose={() => setExpanded(undefined)}
-                currentNavElement={currentNavElement}
             />
         </>
     );

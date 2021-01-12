@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import TextEditor from "@vanilla/library/src/scripts/textEditor/TextEditor";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";

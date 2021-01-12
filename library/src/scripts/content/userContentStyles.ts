@@ -4,27 +4,22 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    margins,
-    paddings,
-    unit,
-    EMPTY_BORDER,
-    singleBorder,
-    visibility,
-    srOnly,
-} from "@library/styles/styleHelpers";
+import { singleBorder } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { CSSObject } from "@emotion/css";
+import { TLength } from "@library/styles/styleShim";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { em, important, percent, px, border } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
-import { cssOut } from "@dashboard/compatibilityStyles";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { media } from "typestyle";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { media } from "@library/styles/styleShim";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 export enum TableStyle {
@@ -34,32 +29,92 @@ export enum TableStyle {
     VERTICAL_BORDER_STRIPED = "verticalBorderStriped",
 }
 
+/**
+ * @varGroup userContent
+ * @commonTitle User Content
+ */
 export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("userContent", forcedVars);
     const globalVars = globalVariables(forcedVars);
     const { mainColors } = globalVars;
 
+    /**
+     * @varGroup userContent.fonts
+     */
     const fonts = makeThemeVars("fonts", {
+        /**
+         * @var userContent.fonts.size
+         * @description Default font size for user content.
+         */
         size: globalVars.fonts.size.large,
+
+        /**
+         * @varGroup userContent.fonts.headings
+         * @commonDescription These are best specified as a relative units. (Eg. "1.5em", "2em").
+         */
         headings: {
+            /**
+             * @var userContent.fonts.headings.h1
+             */
             h1: "2em",
+            /**
+             * @var userContent.fonts.headings.h2
+             */
             h2: "1.5em",
+            /**
+             * @var userContent.fonts.headings.h3
+             */
             h3: "1.25em",
+            /**
+             * @var userContent.fonts.headings.h4
+             */
             h4: "1em",
+            /**
+             * @var userContent.fonts.headings.h5
+             */
             h5: ".875em",
+            /**
+             * @var userContent.fonts.headings.h6
+             */
             h6: ".85em",
         },
     });
 
+    /**
+     * @varGroup userContent.tables
+     * @title User Content - Tables
+     */
     const tableInit = makeThemeVars("tables", {
+        /**
+         * @var userContent.tables.style
+         * @description Choose a preset for the table styles.
+         * @type string
+         * @enum horizontalBorder|horizontalBorderStriped|verticalBorder|verticalBorderStriped
+         */
         style: TableStyle.HORIZONTAL_BORDER_STRIPED,
-        borders: {
-            ...EMPTY_BORDER,
-            ...globalVars.border,
-        },
+        /**
+         * @varGroup userContent.tables.borders
+         * @title User Content - Tables - Borders
+         * @expand border
+         */
+        borders: globalVars.border,
+
         cell: {
+            /**
+             * @var userContent.tables.cell.alignment
+             * @title Cell Alignment
+             * @description Choose the alignment of table cells.
+             * @type string
+             * @enum "center" | "left" | "right",
+             */
             alignment: "left" as "center" | "left" | "right",
         },
+
+        /**
+         * @var userContent.tables.mobileBreakpoint
+         * @title Mobile Breakpoint
+         * @description The device width (pixels) where the table switches to a mobile layout.
+         */
         mobileBreakpoint: 600,
     });
 
@@ -86,39 +141,138 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
         bg: globalVars.mixBgAndFg(0.035),
     });
 
+    /**
+     * @varGroup userContent.embeds
+     * @title User Content - Embeds
+     */
     const embeds = makeThemeVars("embeds", {
+        /**
+         * @var userContent.embeds.bg
+         * @title Background
+         * @type string
+         * @format hex-color
+         */
         bg: mainColors.bg,
+        /**
+         * @var userContent.embeds.fg
+         * @title Text Color
+         * @type string
+         * @format hex-color
+         */
         fg: mainColors.fg,
+
+        /**
+         * @var userContent.embeds.borderRadius
+         * @title Border Radius
+         * @description Border radius of an embed in pixels.
+         * @type string|number
+         */
         borderRadius: px(2),
     });
 
+    /**
+     * @varGroup userContent.code
+     * @title User Content - Code
+     * @commonDescription Applies to inline and block style code items.
+     */
     const code = makeThemeVars("code", {
+        /**
+         * @var userContent.code.fontSize
+         * @type string|number
+         */
         fontSize: em(0.85),
+        /**
+         * @var userContent.code.borderRadius
+         * @type string|number
+         */
         borderRadius: 2,
     });
 
+    /**
+     * @varGroup userContent.codeInline
+     * @title User Content - Code (Inline)
+     * @commonDescription Applies only to inline code elements. Not Blocks.
+     */
     const codeInline = makeThemeVars("codeInline", {
+        /**
+         * @var userContent.codeInline.borderRadius
+         * @type string|number
+         */
         borderRadius: code.borderRadius,
+
+        // TODO: replace with Variables.spacing()
         paddingVertical: em(0.2),
+        // TODO: replace with Variables.spacing()
         paddingHorizontal: em(0.4),
+
+        /**
+         * @var userContent.codeInline.fg
+         * @title Text Color
+         * @type string
+         * @format hex-color
+         */
         fg: blocks.fg,
+        /**
+         * @var userContent.codeInline.bg
+         * @title Background
+         * @type string
+         * @format hex-color
+         */
         bg: blocks.bg,
     });
 
+    /**
+     * @varGroup userContent.codeBlock
+     * @title User Content - Code (Block)
+     * @commonDescription Applies only to code block elements. Not inline code.
+     */
     const codeBlock = makeThemeVars("codeBlock", {
+        /**
+         * @var userContent.codeBlock.borderRadius
+         * @type string|number
+         */
         borderRadius: globalVars.border.radius,
+
+        // TODO: replace with Variables.spacing()
         paddingVertical: fonts.size,
+        // TODO: replace with Variables.spacing()
         paddingHorizontal: fonts.size,
+
+        /**
+         * @var userContent.codeBlock.lineHeight
+         * @type number
+         */
         lineHeight: 1.45,
+        /**
+         * @var userContent.codeBlock.fg
+         * @title Text Color
+         * @type string
+         * @format hex-color
+         */
         fg: blocks.fg,
+        /**
+         * @var userContent.codeBlock.bg
+         * @title Background
+         * @type string
+         * @format hex-color
+         */
         bg: blocks.bg,
     });
 
+    /**
+     * @varGroup userContent.list
+     * @title User Content - Lists
+     */
     const list = makeThemeVars("list", {
-        spacing: {
+        /**
+         * @varGroup userContent.list.spacing
+         * @title User Content - List - Spacing
+         * @expand spacing
+         */
+        spacing: Variables.spacing({
             top: em(0.5),
             left: em(2),
-        },
+        }),
         listDecoration: {
             minWidth: em(2),
         },
@@ -153,13 +307,13 @@ export const userContentClasses = useThemeCache(() => {
     const vars = userContentVariables();
     const globalVars = globalVariables();
 
-    const listItem: NestedCSSProperties = {
+    const listItem: CSSObject = {
         position: "relative",
-        ...margins({
+        ...Mixins.margin({
             top: vars.list.spacing.top,
             left: vars.list.spacing.left,
         }),
-        $nest: {
+        ...{
             "&:first-child": {
                 marginTop: 0,
             },
@@ -169,15 +323,15 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): NestedCSSProperties => {
+    const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): CSSObject => {
         return {
-            marginTop: unit(vars.spacing.base),
+            marginTop: styleUnit(vars.spacing.base),
             fontSize,
-            $nest: lineHeightAdjustment(),
+            ...lineHeightAdjustment(),
         };
     };
 
-    const headings: NestedCSSSelectors = {
+    const headings: CSSObject = {
         "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h1),
         "& h2:not(.heading)": headingStyle("h2", vars.fonts.headings.h2),
         "& h3:not(.heading)": headingStyle("h3", vars.fonts.headings.h3),
@@ -186,49 +340,20 @@ export const userContentClasses = useThemeCache(() => {
         "& h6:not(.heading)": headingStyle("h6", vars.fonts.headings.h6),
     };
 
-    const lists: NestedCSSSelectors = {
-        ["& ol"]: {
+    const lists: CSSObject = {
+        ["& ol, & ul"]: {
             listStylePosition: "inside",
-            margin: `0 0 1em 3em`,
-            padding: 0,
-            $nest: {
-                [`& li`]: {
-                    listStyle: "decimal",
-                },
-                [`& ol li`]: {
-                    listStyle: "lower-alpha",
-                },
-                [`& ol ol li`]: {
-                    listStyle: "lower-roman",
-                },
-                [`& ol ol ol li`]: {
-                    listStyle: "decimal",
-                },
-                [`& ol ol ol ol li`]: {
-                    listStyle: "lower-alpha",
-                },
-                [`& ol ol ol ol ol li`]: {
-                    listStyle: "lower-roman",
-                },
-                [`& ol ol ol ol ol ol li`]: {
-                    listStyle: "decimal",
-                },
-                [`& ol, & ul`]: {
-                    margin: vars.list.nestedList.margin,
-                },
-            },
-        },
-        ["& ul"]: {
-            listStylePosition: "inside",
-            listStyle: "disc",
             margin: `1em 0 1em 2em`,
             padding: 0,
-            $nest: {
-                [`& li`]: {
+        },
+        ["& ul"]: {
+            listStyle: "disc",
+            ...{
+                [`& > li`]: {
                     listStyle: "none",
                     position: "relative",
                 },
-                [`& li::before`]: {
+                [`& > li::before`]: {
                     fontFamily: `'Arial', serif`,
                     content: `"•"`,
                     position: "absolute",
@@ -239,9 +364,37 @@ export const userContentClasses = useThemeCache(() => {
                 },
             },
         },
+        ["& ol"]: {
+            ...{
+                [`& > li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol > li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol > li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol > li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol ol ol ol > li`]: {
+                    listStyle: "lower-alpha",
+                },
+                [`& ol ol ol ol ol > li`]: {
+                    listStyle: "lower-roman",
+                },
+                [`& ol ol ol ol ol ol > li`]: {
+                    listStyle: "decimal",
+                },
+                [`& ol, & ul`]: {
+                    margin: vars.list.nestedList.margin,
+                },
+            },
+        },
         [`& li`]: {
             margin: `5px 0`,
-            $nest: {
+            ...{
                 [`&, & *:first-child`]: {
                     marginTop: 0,
                 },
@@ -252,29 +405,27 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const paragraphSpacing: NestedCSSSelectors = {
+    const paragraphSpacing: CSSObject = {
         "& > p": {
             marginTop: 0,
             marginBottom: 0,
-            $nest: {
+            ...{
                 "&:not(:first-child)": {
                     marginTop: vars.blocks.margin * 0.5,
                 },
                 "&:first-child": {
-                    $nest: lineHeightAdjustment(),
+                    ...lineHeightAdjustment(),
                 },
             },
         },
 
-        "&& > *:not(:last-child)": {
+        "&& > *:not(:last-child):not(.embedResponsive)": {
             marginBottom: vars.blocks.margin,
         },
 
         "&& > *:first-child": {
-            $unique: true, // Required to prevent collapsing in with some other variable.
             marginTop: 0,
-
-            $nest: {
+            ...{
                 "&::before": {
                     marginTop: 0,
                 },
@@ -282,51 +433,51 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const linkStyle = {
         "& a": {
-            color: colorOut(linkColors.color as string),
+            color: ColorsUtils.colorOut(linkColors.color as string),
         },
         "& a:hover": {
-            color: colorOut(globalVars.links.colors.hover),
+            color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             textDecoration: "underline",
         },
         "& a:focus": {
-            color: colorOut(globalVars.links.colors.focus),
+            color: ColorsUtils.colorOut(globalVars.links.colors.focus),
             textDecoration: "underline",
         },
         "& a.focus-visible": {
-            color: colorOut(globalVars.links.colors.keyboardFocus),
+            color: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
             textDecoration: "underline",
         },
         "& a:active": {
-            color: colorOut(globalVars.links.colors.active),
+            color: ColorsUtils.colorOut(globalVars.links.colors.active),
             textDecoration: "underline",
         },
     };
 
-    const codeStyles: NestedCSSSelectors = {
-        "& .code": {
+    const codeStyles: CSSObject = {
+        ".code": {
             position: "relative",
             fontSize: vars.code.fontSize,
             fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
             maxWidth: percent(100),
             overflowX: "auto",
             margin: 0,
-            color: colorOut(vars.blocks.fg),
-            backgroundColor: colorOut(vars.blocks.bg),
+            color: ColorsUtils.colorOut(vars.blocks.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.blocks.bg),
             border: "none",
         },
         "&& .codeInline": {
             whiteSpace: "normal",
-            ...paddings({
+            ...Mixins.padding({
                 top: vars.codeInline.paddingVertical,
                 bottom: vars.codeInline.paddingVertical,
                 left: vars.codeInline.paddingHorizontal,
                 right: vars.codeInline.paddingHorizontal,
             }),
-            color: colorOut(vars.codeInline.fg),
-            backgroundColor: colorOut(vars.codeInline.bg),
+            color: ColorsUtils.colorOut(vars.codeInline.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.codeInline.bg),
             borderRadius: vars.codeInline.borderRadius,
             // We CAN'T use display: `inline` & position: `relative` together.
             // This causes the cursor to disappear in a contenteditable.
@@ -341,9 +492,9 @@ export const userContentClasses = useThemeCache(() => {
             borderRadius: vars.codeBlock.borderRadius,
             flexShrink: 0, // Needed so code blocks don't collapse in the editor.
             whiteSpace: "pre",
-            color: colorOut(vars.codeBlock.fg),
-            backgroundColor: colorOut(vars.codeBlock.bg),
-            ...paddings({
+            color: ColorsUtils.colorOut(vars.codeBlock.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
+            ...Mixins.padding({
                 top: vars.codeBlock.paddingVertical,
                 bottom: vars.codeBlock.paddingVertical,
                 left: vars.codeBlock.paddingHorizontal,
@@ -356,53 +507,67 @@ export const userContentClasses = useThemeCache(() => {
     // These are temporarily kludged here due to lack of time.
     // They should be fully converted in the future but at the moment
     // Only the bare minimum is convverted in order to make the colors work.
-    const spoilersAndQuotes: NestedCSSSelectors = {
-        "& .embedExternal-content": {
+    const spoilersAndQuotes: CSSObject = {
+        ".embedExternal-content": {
             borderRadius: vars.embeds.borderRadius,
-            $nest: {
+            ...{
                 "&::after": {
                     borderRadius: vars.embeds.borderRadius,
                 },
             },
         },
-        "& .embedText-content": {
-            background: colorOut(vars.embeds.bg),
-            color: colorOut(vars.embeds.fg),
+        ".embedText-content": {
+            background: ColorsUtils.colorOut(vars.embeds.bg),
+            color: ColorsUtils.colorOut(vars.embeds.fg),
             overflow: "hidden",
             ...shadowOrBorderBasedOnLightness(
                 globalVars.body.backgroundImage.color,
-                borders({
+                Mixins.border({
                     color: vars.embeds.fg.fade(0.3),
                 }),
                 shadowHelper().embed(),
             ),
         },
-        [`& .embedText-title,
-          & .embedLink-source,
-          & .embedLink-excerpt`]: {
-            color: colorOut(vars.blocks.fg),
+        [`.embedText-title,
+          .embedLink-source,
+          .embedLink-excerpt`]: {
+            color: ColorsUtils.colorOut(vars.blocks.fg),
         },
-        "& .metaStyle": {
+        ".metaStyle": {
             opacity: 0.8,
         },
-        "& .embedLoader-box": {
-            background: colorOut(vars.embeds.bg),
-            ...borders({
+        ".embedLoader-box": {
+            background: ColorsUtils.colorOut(vars.embeds.bg),
+            ...Mixins.border({
                 color: vars.embeds.fg.fade(0.3),
             }),
         },
     };
 
-    const blockQuoteVars = blockQuoteVariables();
-
-    const blockquotes: NestedCSSSelectors = {
-        ".blockquote": {
-            color: colorOut(blockQuoteVars.colors.fg),
+    const embeds: CSSObject = {
+        "&& .embedExternal": {
+            marginBottom: vars.blocks.margin,
+        },
+        [`&& .float-left,
+          && .float-right`]: {
+            marginBottom: "0 !important",
+        },
+        [`&& .float-left .embedExternal-content,
+          && .float-right .embedExternal-content`]: {
+            marginBottom: vars.blocks.margin,
         },
     };
 
-    const tables: NestedCSSSelectors = {
-        "& .tableWrapper": {
+    const blockQuoteVars = blockQuoteVariables();
+
+    const blockquotes: CSSObject = {
+        ".blockquote": {
+            color: ColorsUtils.colorOut(blockQuoteVars.colors.fg),
+        },
+    };
+
+    const tables: CSSObject = {
+        ".tableWrapper": {
             overflowX: "auto",
             width: percent(100),
         },
@@ -416,7 +581,7 @@ export const userContentClasses = useThemeCache(() => {
         "& > .tableWrapper td, & > .tableWrapper th": {
             overflowWrap: "break-word",
             minWidth: 80,
-            ...paddings({
+            ...Mixins.padding({
                 vertical: 6,
                 horizontal: 12,
             }),
@@ -437,7 +602,7 @@ export const userContentClasses = useThemeCache(() => {
         },
         "& > .tableWrapper tr:nth-child(even)": vars.tables.striped
             ? {
-                  background: colorOut(vars.tables.stripeColor),
+                  background: ColorsUtils.colorOut(vars.tables.stripeColor),
               }
             : {},
         "& > .tableWrapper th, & > .tableWrapper thead td": {
@@ -445,12 +610,12 @@ export const userContentClasses = useThemeCache(() => {
         },
 
         // Mobile table styles.
-        "& .mobileTableHead": {
+        ".mobileTableHead": {
             display: "none",
         },
     };
 
-    const outerBorderMixin = (): NestedCSSProperties => {
+    const outerBorderMixin = (): CSSObject => {
         return {
             borderRadius: vars.tables.outerBorderRadius,
             borderTop: vars.tables.horizontalBorders.enabled
@@ -473,8 +638,8 @@ export const userContentClasses = useThemeCache(() => {
     const tableOuterRadiusQuery = media(
         { minWidth: vars.tables.mobileBreakpoint + 1 },
         {
-            $nest: {
-                "& .tableWrapper": outerBorderMixin(),
+            ...{
+                ".tableWrapper": outerBorderMixin(),
                 "& > .tableWrapper thead tr:first-child > *, & > .tableWrapper tbody:first-child tr:first-child > *": {
                     // Get rid of the outer border radius.
                     borderTop: "none",
@@ -498,11 +663,11 @@ export const userContentClasses = useThemeCache(() => {
     const tableMobileQuery = media(
         { maxWidth: vars.tables.mobileBreakpoint },
         {
-            $nest: {
-                "& .tableWrapper .tableHead": {
-                    ...srOnly(),
+            ...{
+                ".tableWrapper .tableHead": {
+                    ...Mixins.absolute.srOnly(),
                 },
-                "& .tableWrapper tr": {
+                ".tableWrapper tr": {
                     display: "block",
                     flexWrap: "wrap",
                     width: percent(100),
@@ -510,39 +675,39 @@ export const userContentClasses = useThemeCache(() => {
                     marginBottom: vars.blocks.margin,
                     ...outerBorderMixin(),
                 },
-                "& .tableWrapper tr .mobileStripe": vars.tables.striped
+                ".tableWrapper tr .mobileStripe": vars.tables.striped
                     ? {
                           borderTop: "none",
                           borderBottom: "none",
-                          background: colorOut(vars.tables.stripeColor),
+                          background: ColorsUtils.colorOut(vars.tables.stripeColor),
                       }
                     : {
                           borderTop: "none",
                           borderBottom: "none",
                       },
                 // First row.
-                "& .tableWrapper tr > *:first-child": {
+                ".tableWrapper tr > *:first-child": {
                     borderTop: "none",
                 },
                 // Last row.
-                "& .tableWrapper tr > *:last-child": {
+                ".tableWrapper tr > *:last-child": {
                     borderBottom: "none",
                 },
-                "& .tableWrapper .mobileTableHead": {
+                ".tableWrapper .mobileTableHead": {
                     borderBottom: "none",
                 },
-                "& .tableWrapper .mobileTableHead + *": {
+                ".tableWrapper .mobileTableHead + *": {
                     marginTop: -6,
                     borderTop: "none",
                 },
-                "& .tableWrapper tr > *": {
+                ".tableWrapper tr > *": {
                     width: percent(100),
                     wordWrap: "break-word",
                     display: "block",
                     borderLeft: "none",
                     borderRight: "none",
                 },
-                "& .tableWrapper tr > :not(.mobileTableHead)": {
+                ".tableWrapper tr > :not(.mobileTableHead)": {
                     borderRight: "none",
                 },
             },
@@ -558,8 +723,8 @@ export const userContentClasses = useThemeCache(() => {
             wordBreak: "break-word",
             lineHeight: globalVars.lineHeights.base,
             fontSize: vars.fonts.size,
-            marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
-            $nest: {
+            marginTop: lineHeightAdjustment()["::before"]?.marginTop,
+            ...{
                 // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
                 "& iframe": {
                     width: percent(100),
@@ -570,6 +735,7 @@ export const userContentClasses = useThemeCache(() => {
                 ...paragraphSpacing,
                 ...codeStyles,
                 ...spoilersAndQuotes,
+                ...embeds,
                 ...blockquotes,
                 ...linkStyle,
             },
@@ -592,7 +758,7 @@ export const userContentCSS = () => {
         .Container .userContent h5,
         .Container .userContent h6`,
         {
-            color: colorOut(globalVars.mainColors.fg),
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         },
     );
 };

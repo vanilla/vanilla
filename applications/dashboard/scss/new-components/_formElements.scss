@@ -92,14 +92,15 @@ $fontSize-small     : 12px !default;
     }
 }
 
-.form-group {
-    margin: {
-        top: $utility-baseUnit;
-        bottom: $utility-baseUnit;
-    };
-}
-
 .FormWrapper {
+
+    .form-group {
+        margin: {
+            top: $utility-baseUnit;
+            bottom: $utility-baseUnit;
+        };
+    }
+
     .file-upload {
         display: flex;
         align-items: flex-start;

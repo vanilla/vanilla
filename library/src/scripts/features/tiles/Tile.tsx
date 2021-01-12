@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import { tileClasses } from "@library/features/tiles/tileStyles";
+import { tileClasses } from "@library/features/tiles/Tile.classes";
 
 interface IProps {
     icon: string;

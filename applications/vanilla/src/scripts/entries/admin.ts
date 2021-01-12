@@ -5,7 +5,7 @@
 
 import { onReady, onContent } from "@library/utility/appUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper({ forDashboard: true }).option);
 
 onReady(handleImageUploadInputDisplay);

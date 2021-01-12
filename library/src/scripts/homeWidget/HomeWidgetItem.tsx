@@ -20,6 +20,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import classNames from "classnames";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
+import { ArrowIcon } from "@library/icons/common";
 
 export interface IHomeWidgetItemProps {
     // Content
@@ -30,6 +31,8 @@ export interface IHomeWidgetItemProps {
     description?: string;
     metas?: string;
     counts?: ICountResult[];
+    callToAction?: string;
+    url?: string;
 
     // Layout options
     options?: IHomeWidgetItemOptions;
@@ -42,6 +45,8 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const imageUrl = props.imageUrl ?? options.defaultImageUrl;
     const iconUrl = props.iconUrl ?? options.defaultIconUrl;
     const hasMetas = props.counts && options.display.counts;
+    const isChatBubble = [HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType);
+    const hasCTA = props.callToAction && isChatBubble;
     const classesMeta = metasClasses();
 
     return (
@@ -69,10 +74,17 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 
                 {isAbsoluteContent ? <HomeWidgetAbsoluteContent {...props} /> : <HomeWidgetStaticContent {...props} />}
             </div>
-            {(!isAbsoluteContent || hasMetas) && (
+            {!isChatBubble && (!isAbsoluteContent || hasMetas) && (
                 <div className={classNames(classesMeta.root, classes.metas)}>
                     {hasMetas && <ResultMeta counts={props.counts} />}
                 </div>
+            )}
+
+            {[HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType) && (
+                <a href={props.url} className={classes.callToAction}>
+                    {props.callToAction}
+                    <ArrowIcon />
+                </a>
             )}
         </SmartLink>
     );
@@ -91,6 +103,7 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps) {
                 HomeWidgetItemContentType.TITLE_DESCRIPTION,
                 HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
                 HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+                HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
             ].includes(options.contentType) && (
                 <TruncatedText maxCharCount={160} tag={"div"} className={classes.description}>
                     {props.description}
@@ -108,9 +121,11 @@ function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
     return (
         <>
             <div className={classes.absoluteContent}>
-                <Heading depth={3} className={classes.absoluteName}>
-                    {props.name}
-                </Heading>
+                {!options.name.hidden && (
+                    <Heading depth={3} className={classes.absoluteName}>
+                        {props.name}
+                    </Heading>
+                )}
                 <div>
                     <span className={getButtonStyleFromBaseClass(options.viewMore?.buttonType)}>{t(viewMoreCode)}</span>
                 </div>

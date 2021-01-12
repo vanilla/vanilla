@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { keyframes } from "typestyle";
+import { keyframes } from "@library/styles/styleShim";
 
 export const standardAnimations = () => {
     return {
         fadeIn: keyframes({
-            $debugName: "animation-fadeIn",
+            label: "animation-fadeIn",
             "0%": { opacity: 0 },
             "100%": { opacity: 1 },
         }),

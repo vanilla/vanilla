@@ -23,7 +23,7 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 import "@library/theming/reset";
 import { t, formatUrl } from "@library/utility/appUtils";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
@@ -41,9 +41,11 @@ import {
     useSearchScope,
 } from "@library/features/search/SearchScopeContext";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { SearchBarPresets } from "@library/banner/bannerStyles";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import History from "history";
+import { Backgrounds } from "@library/layout/Backgrounds";
+import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 
 interface IProps {
     placeholder?: string;
@@ -54,6 +56,7 @@ function SearchPage(props: IProps) {
         form,
         updateForm,
         search,
+        searchInDomain,
         results,
         getDomains,
         getCurrentDomain,
@@ -63,14 +66,16 @@ function SearchPage(props: IProps) {
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
 
+    const currentDomain = getCurrentDomain();
+
     const debouncedSearch = useCallback(
         debounce(() => {
             search();
+            currentDomain.extraSearchAction?.();
         }, 800),
         [search],
     );
 
-    const currentDomain = getCurrentDomain();
     let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
     const lastScope = useLastValue(scope);
     if (currentDomain.isIsolatedType()) {
@@ -113,8 +118,9 @@ function SearchPage(props: IProps) {
         // Trigger new search
         if (needsResearch || (lastScope && lastScope !== scope)) {
             search();
+            currentDomain.extraSearchAction?.();
         }
-    }, [search, needsResearch, lastScope, scope]);
+    }, [search, needsResearch, lastScope, scope, currentDomain]);
 
     const domains = getDomains();
     const sortedNonIsolatedDomains = domains
@@ -187,7 +193,7 @@ function SearchPage(props: IProps) {
                                             activeItem={form.domain}
                                             filters={sortedNonIsolatedDomains.map((domain) => {
                                                 return {
-                                                    label: domain.name,
+                                                    label: domain.getName?.() || domain.name,
                                                     icon: domain.icon,
                                                     data: domain.key,
                                                 };
@@ -203,6 +209,7 @@ function SearchPage(props: IProps) {
                                                 })}
                                         />
                                     )}
+                                    {PlacesSearchTypeFilter.searchTypes.length > 0 && currentDomain.heading}
                                 </PanelWidget>
                                 {isCompact && (
                                     <PanelWidgetHorizontalPadding>
@@ -267,7 +274,10 @@ function useInitialQueryParamSync() {
                 queryForm[key] = parseInt(value, 10);
             }
 
-            // For testing only
+            if (key.toLocaleLowerCase() === "search") {
+                queryForm["query"] = queryForm[key];
+            }
+
             if (key === "discussionID") {
                 queryForm.domain = "discussions";
             }
@@ -295,6 +305,7 @@ function useInitialQueryParamSync() {
 export default function ExportedSearchPage(props: IProps) {
     return (
         <LayoutProvider type={LayoutTypes.TWO_COLUMNS}>
+            <Backgrounds />
             <SearchPage {...props} />
         </LayoutProvider>
     );

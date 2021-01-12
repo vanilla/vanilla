@@ -10,7 +10,7 @@ import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export function HelpIcon(props: { className?: string }) {
     const title = t("Help");
@@ -248,9 +248,9 @@ interface IUserIconType {
 
 const userIconStyles = (type: UserIconTypes): IUserIconType => {
     const mainColors = globalVariables().mainColors;
-    const fg = colorOut(mainColors.fg) as string;
-    const bg = colorOut(mainColors.bg) as string;
-    const primary = colorOut(mainColors.primary) as string;
+    const fg = ColorsUtils.colorOut(mainColors.fg) as string;
+    const bg = ColorsUtils.colorOut(mainColors.bg) as string;
+    const primary = ColorsUtils.colorOut(mainColors.primary) as string;
 
     const styles: IUserIconType = {
         head: {

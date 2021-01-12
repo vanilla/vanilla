@@ -5,19 +5,15 @@
  * @license GPL-2.0-only
  */
 
-import {
-    importantColorOut,
-    unit,
-    colorOut,
-    absolutePosition,
-    negativeUnit,
-    paddings,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { quote, translate } from "csx";
 import { forumVariables } from "@library/forms/forumStyleVars";
 import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
+import { Mixins } from "@library/styles/Mixins";
 
 export const discussionCSS = () => {
     const globalVars = globalVariables();
@@ -31,8 +27,8 @@ export const discussionCSS = () => {
         .MessageList.Discussion
         `,
         {
-            color: colorOut(globalVars.mainColors.fg),
-            fontSize: unit(globalVars.fonts.size.medium),
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
         },
     );
 
@@ -46,7 +42,7 @@ export const discussionCSS = () => {
         .userContent.userContent h6
     `,
         {
-            color: colorOut(globalVars.mainColors.fg),
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         },
     );
 
@@ -67,8 +63,10 @@ export const discussionCSS = () => {
         .Item .Poll .PollOptions .PollColor.PollColor10,
     `,
         {
-            color: colorOut(globalVars.mainColors.primaryContrast),
-            backgroundColor: importantColorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis)),
+            color: ColorsUtils.colorOut(globalVars.mainColors.primaryContrast),
+            backgroundColor: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(globalVars.constants.stateColorEmphasis), {
+                makeImportant: true,
+            }),
             opacity: 1,
         },
     );
@@ -127,8 +125,8 @@ export const discussionCSS = () => {
         `,
         {
             opacity: 1,
-            width: unit(24),
-            height: unit(24),
+            width: styleUnit(24),
+            height: styleUnit(24),
             display: "block",
             position: "relative",
         },
@@ -153,9 +151,9 @@ export const discussionCSS = () => {
             ...absolutePosition.topLeft("50%", "50%"),
             content: quote(``),
             display: "block",
-            width: unit(12),
-            height: unit(16),
-            fontSize: unit(12),
+            width: styleUnit(12),
+            height: styleUnit(16),
+            fontSize: styleUnit(12),
             transform: translate(`-50%`, `-50%`),
         },
     );
@@ -177,7 +175,7 @@ export const discussionCSS = () => {
         .Container .MessageList .ItemComment .Item-Header,
         .Container .MessageList .ItemDiscussion .Item-Header
     `,
-        paddings({
+        Mixins.padding({
             all: globalVars.gutter.half,
             top: globalVars.gutter.size,
         }),

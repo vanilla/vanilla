@@ -44,13 +44,13 @@ export function SearchInFilter(props: IProps) {
         >
             <>
                 {filters.map((filter, i) => {
-                    return <RadioInputAsButton key={i} {...filter} />;
+                    return <RadioInputAsButton buttonAutoMinWidth={true} key={i} {...filter} />;
                 })}
                 {endFilters.length > 0 && (
                     <>
                         <span className={classes.separator} role="separator" />
                         {endFilters.map((filter, i) => {
-                            return <RadioInputAsButton key={i} {...filter} />;
+                            return <RadioInputAsButton buttonAutoMinWidth={true} key={i} {...filter} />;
                         })}
                     </>
                 )}

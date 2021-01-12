@@ -5,9 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { borders, paddings, singleBorder, unit, userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX, percent, px, important } from "csx";
 import { modalVariables } from "@library/modal/modalStyles";
@@ -41,7 +44,7 @@ export const toolTipClasses = useThemeCache(() => {
     const noPointerContent = style("content", {
         position: "relative",
         display: "inline-flex",
-        $nest: {
+        ...{
             "& *": {
                 pointerEvents: "none",
             },
@@ -61,14 +64,14 @@ export const toolTipClasses = useThemeCache(() => {
 
     const box = style("box", {
         position: "absolute",
-        fontSize: unit(globalVars.fonts.size.medium),
-        minWidth: unit(vars.sizes.min),
-        maxWidth: unit(vars.sizes.max),
-        color: colorOut(globalVars.mainColors.fg),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        minWidth: styleUnit(vars.sizes.min),
+        maxWidth: styleUnit(vars.sizes.max),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         lineHeight: globalVars.lineHeights.base,
-        ...borders(),
-        ...paddings({
+        ...Mixins.border(),
+        ...Mixins.padding({
             all: globalVars.fonts.size.medium,
         }),
         ...shadow.dropDown(),
@@ -81,10 +84,10 @@ export const toolTipClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        width: unit(vars.nub.width * 2),
-        height: unit(vars.nub.width * 2),
+        width: styleUnit(vars.nub.width * 2),
+        height: styleUnit(vars.nub.width * 2),
         transform: translateX("-50%"),
-        marginLeft: unit(vars.nub.width),
+        marginLeft: styleUnit(vars.nub.width),
         pointerEvents: "none",
         zIndex: modalVariables().sizing.zIndex + 2,
         ...userSelect(),
@@ -93,8 +96,8 @@ export const toolTipClasses = useThemeCache(() => {
     const nub = style("nub", {
         position: "relative",
         display: "block",
-        width: unit(vars.nub.width),
-        height: unit(vars.nub.width),
+        width: styleUnit(vars.nub.width),
+        height: styleUnit(vars.nub.width),
         borderTop: singleBorder({
             width: globalVars.border.width,
         }),
@@ -102,9 +105,9 @@ export const toolTipClasses = useThemeCache(() => {
             width: globalVars.border.width,
         }),
         boxShadow: globalVars.overlay.dropShadow,
-        background: colorOut(globalVars.mainColors.bg),
+        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         zIndex: 1,
-        $nest: {
+        ...{
             [`&.isUp`]: {
                 transform: `rotate(-45deg)`,
             },

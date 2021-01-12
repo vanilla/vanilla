@@ -18,7 +18,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
-import { IInjectableUserState } from "@library/features/users/userModel";
+import { IInjectableUserState } from "@library/features/users/userTypes";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";

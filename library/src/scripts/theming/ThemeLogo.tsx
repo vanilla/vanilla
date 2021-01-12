@@ -7,7 +7,7 @@ import { VanillaLogo } from "@library/icons/titleBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 
 export enum LogoType {
     DESKTOP = "logo",

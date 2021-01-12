@@ -748,7 +748,7 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
             }
 
-            if ($this->Form->getFormValue("CustomPermissions", false) === false) {
+            if ($this->Form->getFormValue("CustomPermissions", null) === false) {
                 $this->Form->setFormValue("Permissions", null);
             }
 

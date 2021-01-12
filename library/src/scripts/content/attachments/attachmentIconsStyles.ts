@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { componentThemeVariables, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, px } from "csx";
 
 export const attachmentIconVariables = useThemeCache(() => {
@@ -48,7 +49,7 @@ export const attachmentIconsClasses = useThemeCache(() => {
         justifyContent: "flex-end",
         width: calc(`100% + ${px(vars.spacing.default * 2)}`),
         overflow: "hidden",
-        ...margins({
+        ...Mixins.margin({
             top: -vars.spacing.default,
             left: -vars.spacing.default,
             right: globalVars.meta.spacing.default,

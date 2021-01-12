@@ -14,12 +14,17 @@ import { metasClasses } from "@library/styles/metasStyles";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
+import { PlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];
     name: string;
     dateUpdated: string;
+    labels?: string[];
     url: string;
+    type?: string;
+    isFirst?: boolean;
 }
 
 interface IProps extends OptionProps<ISearchOptionData> {
@@ -33,10 +38,32 @@ export default function SearchOption(props: IProps) {
     const data = props.data.data;
 
     if (data) {
-        const { dateUpdated, crumbs, url } = data;
+        const label = props.label;
+        const m = label.match(/places___(.+)___/);
+        let placesListingLabel;
+        if (m) {
+            placesListingLabel = m[1];
+        }
+
+        const { dateUpdated, crumbs, url, labels } = data;
         const hasLocationData = crumbs && crumbs.length > 0;
         const classesMetas = metasClasses();
-        return (
+
+        return m ? (
+            <>
+                {data.isFirst && <div className={searchBarClasses().firstItemBorderTop}></div>}
+                <PlacesSearchListingItem
+                    className={classNames("suggestedTextInput-item", { [`${classesMetas.inlineBlock}`]: true })}
+                    embedLinkClassName={classNames("suggestedTextInput-option", {
+                        isSelected,
+                        isFocused,
+                    })}
+                    name={placesListingLabel}
+                    type={data.type}
+                    url={data.url}
+                />
+            </>
+        ) : (
             <li className="suggestedTextInput-item">
                 <SmartLink
                     {...(innerProps as any)}
@@ -45,8 +72,8 @@ export default function SearchOption(props: IProps) {
                     // The SmartLink will navigate to the result itself.
                     onClick={undefined}
                     to={url}
-                    title={props.label}
-                    aria-label={props.label}
+                    title={label}
+                    aria-label={label}
                     className={classNames("suggestedTextInput-option", {
                         isSelected,
                         isFocused,
@@ -57,6 +84,12 @@ export default function SearchOption(props: IProps) {
                     </span>
                     <span className="suggestedTextInput-main">
                         <span className={classNames("isFlexed", classesMetas.root)}>
+                            {labels &&
+                                labels.map((label) => (
+                                    <span key={label} className={classesMetas.metaLabel}>
+                                        {label}
+                                    </span>
+                                ))}
                             {dateUpdated && (
                                 <span className={classesMetas.meta}>
                                     <DateTime className={classesMetas.meta} timestamp={dateUpdated} />

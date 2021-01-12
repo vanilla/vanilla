@@ -6,8 +6,10 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,33 +52,33 @@ export const dayPickerClasses = useThemeCache(() => {
 
     // From third party, so we're targetting them this way
     const root = style({
-        $nest: {
-            "& .DayPicker-wrapper": {
+        ...{
+            ".DayPicker-wrapper": {
                 padding: 0,
             },
-            "& .DayPicker-Month": {
-                margin: unit(vars.spacing.padding),
+            ".DayPicker-Month": {
+                margin: styleUnit(vars.spacing.padding),
             },
-            "& .DayPicker-Day": {
-                borderRadius: unit(vars.border.radius),
-                padding: unit(vars.spacing.padding),
+            ".DayPicker-Day": {
+                borderRadius: styleUnit(vars.border.radius),
+                padding: styleUnit(vars.spacing.padding),
                 whiteSpace: "nowrap",
-                $nest: {
+                ...{
                     "&:hover": {
                         backgroundColor: vars.colors.hover.bg.toString(),
                     },
                 },
             },
-            "& .DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
+            ".DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
                 backgroundColor: vars.colors.selected.color.toString(),
-                $nest: {
+                ...{
                     "&:hover": {
                         backgroundColor: vars.colors.selected.color.toString(),
                     },
                 },
             },
-            "& .DayPicker-Day.DayPicker-Day--today": {
-                color: colorOut(vars.colors.today),
+            ".DayPicker-Day.DayPicker-Day--today": {
+                color: ColorsUtils.colorOut(vars.colors.today),
             },
         },
     });
@@ -84,14 +86,14 @@ export const dayPickerClasses = useThemeCache(() => {
     const header = style("header", {
         display: "flex",
         alignItems: "center",
-        height: unit(vars.sizing.height),
-        paddingLeft: unit(vars.spacing.padding),
-        marginTop: unit(vars.spacing.padding),
+        height: styleUnit(vars.sizing.height),
+        paddingLeft: styleUnit(vars.spacing.padding),
+        marginTop: styleUnit(vars.spacing.padding),
     });
 
     const title = style("title", {
         flex: 1,
-        padding: unit(vars.spacing.padding),
+        padding: styleUnit(vars.spacing.padding),
     });
 
     const navigation = style("navigation", {

@@ -9,7 +9,7 @@ import { useSpring, animated, interpolate, useChain } from "react-spring";
 import NewPostBackground from "./NewPostBackground";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { newPostBackgroundVariables } from "./newPostBackgroundStyles";
-import { colorOut } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { useTrail } from "react-spring";
 import { t } from "@vanilla/i18n";
 import { TabHandler } from "@vanilla/dom-utils";
@@ -260,8 +260,10 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
     const bgVars = newPostBackgroundVariables();
     const bgTransition = useSpring({
         ref: backgroundRef,
-        backgroundColor: state.open ? colorOut(bgVars.container.color.open) : colorOut(bgVars.container.color.close),
-        from: { backgroundColor: colorOut(bgVars.container.color.close) },
+        backgroundColor: state.open
+            ? ColorsUtils.colorOut(bgVars.container.color.open)
+            : ColorsUtils.colorOut(bgVars.container.color.close),
+        from: { backgroundColor: ColorsUtils.colorOut(bgVars.container.color.close) },
         config: { duration: bgVars.container.duration },
     });
 

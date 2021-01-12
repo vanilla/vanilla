@@ -3,30 +3,31 @@
  * @license GPL-2.0-only
  */
 
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, paddings, spinnerLoader, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { calc } from "csx";
-import { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
 
 export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("titleBarMegaMenu", forcedVars);
-    const globalVars = globalVariables();
 
     const options = makeThemeVars("options", {});
-
-    const wrapper = makeThemeVars("wrapper", {
-        shadow: "0 5px 5px 0 rgba(0, 0, 0, 0.3)",
-    });
 
     const colors = makeThemeVars("colors", {
         fg: "#555a62",
         bg: "#fff",
     });
 
+    const wrapper = makeThemeVars("wrapper", {
+        shadow: "0 5px 5px 0 rgba(0, 0, 0, 0.3)",
+        backgroundColor: colors.bg,
+    });
+
     const spacing = makeThemeVars("spacing", {
-        menuItemSpacer: unit(10),
+        menuItemSpacer: styleUnit(10),
     });
 
     return {
@@ -46,7 +47,7 @@ export default useThemeCache(() => {
         position: "fixed",
         left: 0,
         right: 0,
-        background: colorOut(vars.colors.bg),
+        backgroundColor: vars.wrapper.backgroundColor,
         boxShadow: vars.wrapper.shadow,
         overflow: "hidden",
         transition: "height 200ms",
@@ -58,58 +59,47 @@ export default useThemeCache(() => {
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
+        paddingBottom: 20,
+        ...Mixins.margin({
+            //horizontal: -vars.spacing.menuItemSpacer,
+        }),
     });
 
     const menuItem = style("menuItem", {
-        paddingTop: unit(20),
-        paddingBottom: 0,
-        paddingRight: vars.spacing.menuItemSpacer,
-        paddingLeft: titleBarNavigationVariables().padding.horizontal * 3,
-        width: calc(`20% - ${vars.spacing.menuItemSpacer}`),
+        ...Mixins.padding({
+            horizontal: vars.spacing.menuItemSpacer,
+            top: 20,
+        }),
+        flex: 1,
+        flexBasis: 160,
+    });
 
-        $nest: {
-            "&:last-of-type": {
-                paddingRight: 0,
-            },
-        },
+    const fillerItem = style("fillerItem", {
+        flex: 1,
+        flexBasis: 160,
     });
 
     const menuItemTitle = style("menuItemTitle", {
         display: "block",
         fontWeight: globalVars.fonts.weights.bold,
-        fontSize: unit(globalVars.fonts.size.medium),
-        lineHeight: unit(`${globalVars.fonts.size.medium * 1.25}`),
-        marginBottom: unit(12),
-        color: colorOut(vars.colors.fg),
-
-        $nest: {
-            "&.displayAsLink": {
-                fontWeight: globalVars.fonts.weights.normal,
-                color: colorOut(vars.colors.fg),
-            },
-
-            "&.displayAsLink:hover": {
-                color: colorOut(globalVars.links.colors.hover),
-            },
-        },
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
+        marginBottom: styleUnit(12),
+        color: ColorsUtils.colorOut(vars.colors.fg),
     });
 
     const menuItemChild = style("menuItemChild", {
-        fontSize: unit(14),
-        lineHeight: unit(`${globalVars.fonts.size.medium * 1.25}`),
-        marginBottom: unit(12),
+        fontSize: styleUnit(14),
+        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
+        marginBottom: styleUnit(12),
         listStyle: "none",
-        $nest: {
+        ...{
             a: {
-                color: colorOut(vars.colors.fg),
+                color: ColorsUtils.colorOut(vars.colors.fg),
             },
 
             "a:hover": {
-                color: colorOut(globalVars.links.colors.hover),
-            },
-
-            "&:last-of-type": {
-                paddingBottom: unit(20),
+                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             },
         },
     });
@@ -117,6 +107,7 @@ export default useThemeCache(() => {
     return {
         wrapper,
         menuItem,
+        fillerItem,
         container,
         menuItemTitle,
         menuItemChild,

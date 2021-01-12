@@ -7,12 +7,40 @@
 .embedImage {
     width: 100%;
     max-width: 100%;
-    display: inline-block;
+    display: block;
+
+    @include mediaQuery-embedDesktop {
+        &:after {
+            // Prevents paragraphs from collapsing borders with images.
+            // This way the margin for the paragraph aligns with the image.
+            content: "";
+            display: block;
+            height: 1px;
+        }
+
+        &.display-small .embedExternal-content {
+            max-width: calc(33.333% - 1px);
+        }
+
+        &.display-medium .embedExternal-content {
+            max-width: calc(66.666% - 1px);
+        }
+
+        &.float-left .embedExternal-content {
+            float: left;
+            margin-right: 20px;
+        }
+
+        &.float-right .embedExternal-content {
+            float: right;
+            margin-left: 20px;
+        }
+    }
 }
 
 .Message img .embedImage-img, // Compatibility
 .embedImage-img {
-    display: inline-flex;
+    display: inline-flex; // https://github.com/vanilla/support/issues/3336
     position: relative;
     margin: {
         left: auto;
@@ -36,16 +64,6 @@
 }
 
 .embedImage-link {
-    display: inline-flex;
+    display: inline-flex; // https://github.com/vanilla/support/issues/3336
     flex-direction: column;
-}
-
-.richEditor .embedImage-img {
-    &:hover {
-        box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5);
-    }
-}
-
-.richEditor .embed-isSelected .embedImage-img {
-    box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color;
 }

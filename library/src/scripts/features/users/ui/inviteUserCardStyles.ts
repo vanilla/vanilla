@@ -3,11 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { percent } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -55,7 +56,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         "button",
         {},
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&&": {
                     width: vars.button.mobile.width,
                 },
@@ -70,19 +71,19 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
             justifyContent: "flex-end",
             paddingTop: vars.buttonGroup.padding.top,
             paddingBottom: vars.buttonGroup.padding.bottom,
-            $nest: {
+            ...{
                 "&>*:first-child": {
-                    marginRight: unit(20),
+                    marginRight: styleUnit(20),
                 },
             },
         },
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&&": {
                     justifyContent: "space-between",
                 },
                 "&>*:first-child": {
-                    marginRight: unit(0),
+                    marginRight: styleUnit(0),
                 },
             },
         }),
@@ -95,7 +96,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const textbox = style("textbox", {});
 
     const users = style("users", {
-        maxHeight: unit(100),
+        maxHeight: styleUnit(100),
         overflowY: "scroll",
     });
 

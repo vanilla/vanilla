@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 
 export const smartAlignClasses = useThemeCache(() => {

@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";

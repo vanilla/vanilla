@@ -3,22 +3,42 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { createContext, PropsWithChildren, ReactNode, useRef, useState } from "react";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
+import classNames from "classnames";
 
-interface IProps {
-    children: React.ReactNode;
+interface IEmbedMenuContext {
+    selected: string | undefined;
+    setSelected(name: string | undefined);
 }
 
+export const EmbedMenuContext = createContext<IEmbedMenuContext>({
+    selected: undefined,
+    setSelected: () => {},
+});
+
+interface IProps {}
+
 /**
- * A class for rendering Giphy embeds.
+ * Renders an embed menu and manages it's context.
  */
-export function EmbedMenu(props: IProps) {
+export function EmbedMenu(props: PropsWithChildren<IProps>) {
+    const { children } = props;
     const classes = embedMenuClasses();
+    const [selected, setSelected] = useState<string | undefined>();
+    const menuRef = useRef<HTMLDivElement | null>(null);
     return (
-        <EditorEventWall>
-            <div className={classes.root}>{props.children}</div>
-        </EditorEventWall>
+        <EmbedMenuContext.Provider value={{ selected, setSelected }}>
+            <EditorEventWall>
+                <div
+                    role="toolbar"
+                    ref={menuRef}
+                    className={classNames({ [classes.root]: true, isOpened: selected != null })}
+                >
+                    {children}
+                </div>
+            </EditorEventWall>
+        </EmbedMenuContext.Provider>
     );
 }

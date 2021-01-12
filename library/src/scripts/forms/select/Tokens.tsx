@@ -17,7 +17,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import MutationObserver from "react-mutation-observer";
 
 export interface ITokenProps extends IOptionalComponentID {
-    label: string;
+    label: string | null;
     labelNote?: string;
     disabled?: boolean;
     className?: string;
@@ -25,6 +25,7 @@ export interface ITokenProps extends IOptionalComponentID {
     options: IComboBoxOption[] | undefined;
     isLoading?: boolean;
     value: IComboBoxOption[];
+    onFocus?: () => void;
     onChange: (tokens: IComboBoxOption[]) => void;
     onInputChange?: (value: string) => void;
     menuPlacement?: string;
@@ -61,10 +62,12 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                         [classes.withIndicator]: this.props.showIndicator,
                     })}
                 >
-                    <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
-                        <span className={classesInputBlock.labelText}>{this.props.label}</span>
-                        <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
-                    </label>
+                    {this.props.label !== null && (
+                        <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
+                            <span className={classesInputBlock.labelText}>{this.props.label}</span>
+                            <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+                        </label>
+                    )}
 
                     <div
                         className={classNames(classesInputBlock.inputWrap, classes.inputWrap, {
@@ -175,6 +178,9 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
      * Set class for focus
      */
     private onFocus = () => {
+        if (this.props.onFocus) {
+            this.props.onFocus();
+        }
         this.setState({
             focus: true,
         });

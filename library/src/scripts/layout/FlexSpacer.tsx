@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { flexHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 
 interface IProps {
     className?: string;
@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const flexSpacer = style({
-    $debugName: "flexSpacer",
+    label: "flexSpacer",
     flex: 1,
 });
 

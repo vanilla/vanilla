@@ -10,3 +10,9 @@ $embed-mobileBreakpoint: 550px !default;
         @content;
     }
 }
+
+@mixin mediaQuery-embedDesktop {
+    @media (min-width: $embed-mobileBreakpoint) {
+        @content;
+    }
+}

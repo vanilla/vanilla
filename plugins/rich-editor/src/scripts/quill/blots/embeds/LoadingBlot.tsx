@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { t } from "@library/utility/appUtils";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import { escapeHTML, setData, getData } from "@vanilla/dom-utils";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
@@ -74,7 +74,7 @@ export default class LoadingBlot extends SelectableEmbedBlot {
                 progressEventEmitter={value.loaderData.progressEventEmitter}
             />,
             div,
-            () => div.classList.remove(FOCUS_CLASS),
+            () => div.classList.remove(EMBED_FOCUS_CLASS),
         );
         return div;
     }
@@ -84,11 +84,11 @@ export default class LoadingBlot extends SelectableEmbedBlot {
      */
     private static createImageLoader() {
         const div = super.create();
-        div.classList.remove(FOCUS_CLASS);
+        div.classList.remove(EMBED_FOCUS_CLASS);
         div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
         div.innerHTML = `<div class='embedLoader'>
-                            <div class='embedLoader-box ${FOCUS_CLASS}' aria-label='${t(
+                            <div class='embedLoader-box ${EMBED_FOCUS_CLASS}' aria-label='${t(
             "Loading...",
         )}'><div class='embedLoader-loader'></div>
                             </div>
@@ -101,12 +101,12 @@ export default class LoadingBlot extends SelectableEmbedBlot {
      */
     private static createLinkLoader(linkText: string) {
         const div = super.create();
-        div.classList.remove(FOCUS_CLASS);
+        div.classList.remove(EMBED_FOCUS_CLASS);
         div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
 
         const sanitizedText = escapeHTML(linkText);
-        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}">${sanitizedText}&nbsp;<span aria-hidden="true" class='embedLinkLoader-loader'></span></a>`;
+        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${EMBED_FOCUS_CLASS}">${sanitizedText}&nbsp;<span aria-hidden="true" class='embedLinkLoader-loader'></span></a>`;
         return div;
     }
 }

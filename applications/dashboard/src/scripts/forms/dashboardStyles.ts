@@ -3,7 +3,8 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 
 export const dashboardClasses = useThemeCache(() => {
@@ -24,7 +25,7 @@ export const dashboardClasses = useThemeCache(() => {
     });
 
     const selectOne = style("selectOne", {
-        $nest: {
+        ...{
             [`&.SelectOne__value-container.inputText.inputText`]: {
                 fontSize: "inherit",
             },

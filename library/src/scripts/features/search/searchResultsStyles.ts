@@ -6,25 +6,18 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
-import {
-    absolutePosition,
-    colorOut,
-    EMPTY_FONTS,
-    EMPTY_SPACING,
-    fonts,
-    margins,
-    negativeUnit,
-    objectFitWithFallback,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, important, percent, viewHeight } from "csx";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { negativeUnit, objectFitWithFallback, singleBorder } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { calc, important, percent } from "csx";
 import { BorderBottomProperty } from "csstype";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
+import { TLength } from "@library/styles/styleShim";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -35,13 +28,12 @@ export const searchResultsVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        font: {
-            ...EMPTY_FONTS,
+        font: Variables.font({
             color: colors.fg,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
-        },
+        }),
     });
 
     const excerpt = makeThemeVars("excerpt", {
@@ -57,7 +49,7 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const icon = makeThemeVars("icon", {
         size: 26,
-        bg: colorOut(globalVars.mixBgAndFg(0.1)),
+        bg: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
     });
 
     const separator = makeThemeVars("separatort", {
@@ -115,7 +107,7 @@ export const searchResultsClasses = useThemeCache((mediaQueries) => {
                 },
             },
         }),
-    } as NestedCSSProperties);
+    });
 
     const noResults = style("noResults", {
         fontSize: globalVars.userContent.font.sizes.default,
@@ -152,16 +144,16 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const style = styleFactory("searchResult");
     const metaVars = metasVariables();
 
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
 
     const title = style("title", {
         display: "block",
-        ...fonts(vars.title.font),
+        ...Mixins.font(vars.title.font),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
-        paddingRight: unit(24),
-        $nest: linkColors.$nest,
+        paddingRight: styleUnit(24),
+        ...linkColors,
     });
 
     // This is so 100% is the space within the padding of the root element
@@ -170,7 +162,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         alignItems: "stretch",
         justifyContent: "space-between",
         width: percent(100),
-        color: colorOut(vars.title.font.color),
+        color: ColorsUtils.colorOut(vars.title.font.color),
         ...mediaQueries({
             [LayoutTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
@@ -188,22 +180,22 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const root = style({
         display: "block",
         width: percent(100),
-        ...paddings(vars.spacing.padding),
+        ...Mixins.padding(vars.spacing.padding),
     });
 
     const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
-    const iconWidth = hasIcon ? vars.icon.size + vars.spacing.padding.left : 0;
+    const iconWidth = hasIcon ? vars.icon.size + (vars.spacing.padding.left as number) : 0;
 
     const mainCompactStyles = {
-        $nest: {
+        ...{
             "&.hasMedia": {
                 width: percent(100),
             },
             "&.hasIcon": {
-                width: calc(`100% - ${unit(iconWidth)}`),
+                width: calc(`100% - ${styleUnit(iconWidth)}`),
             },
             "&.hasMedia.hasIcon": {
-                width: calc(`100% - ${unit(iconWidth)}`),
+                width: calc(`100% - ${styleUnit(iconWidth)}`),
             },
         },
     };
@@ -211,15 +203,15 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const main = style("main", {
         display: "block",
         width: percent(100),
-        $nest: {
+        ...{
             "&.hasMedia": {
-                width: calc(`100% - ${unit(mediaWidth)}`),
+                width: calc(`100% - ${styleUnit(mediaWidth)}`),
             },
             "&.hasIcon": {
-                width: calc(`100% - ${unit(iconWidth)}`),
+                width: calc(`100% - ${styleUnit(iconWidth)}`),
             },
             "&.hasMedia.hasIcon": {
-                width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
+                width: calc(`100% - ${styleUnit(mediaWidth + iconWidth)}`),
             },
             ...mediaQueries({
                 [LayoutTypes.TWO_COLUMNS]: {
@@ -228,7 +220,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
                 [LayoutTypes.THREE_COLUMNS]: {
                     oneColumnDown: mainCompactStyles,
                 },
-            }).$nest,
+            }),
         },
     });
 
@@ -237,8 +229,8 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     });
 
     const compactMediaElement = style("compactMediaElement", {
-        $nest: {
-            [`& .${image}`]: {
+        ...{
+            [`.${image}`]: {
                 position: important("absolute"),
             },
         },
@@ -246,24 +238,24 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
 
     const mediaElement = style("mediaElement", {
         position: "relative",
-        width: unit(vars.mediaElement.width),
-        height: unit(vars.mediaElement.height),
+        width: styleUnit(vars.mediaElement.width),
+        height: styleUnit(vars.mediaElement.height),
         overflow: "hidden",
-        $nest: {
+        ...{
             [`&.${compactMediaElement}`]: {
                 overflow: "hidden",
                 position: "relative",
-                marginTop: unit(globalVars.gutter.size),
+                marginTop: styleUnit(globalVars.gutter.size),
                 paddingTop: percent(vars.mediaElement.compact.ratio),
                 width: percent(100),
             },
         },
     });
 
-    const attachmentCompactStyles: NestedCSSProperties = {
+    const attachmentCompactStyles: CSSObject = {
         flexWrap: "wrap",
         width: percent(100),
-        marginTop: unit(12),
+        marginTop: styleUnit(12),
     };
 
     const attachments = style("attachments", {
@@ -280,22 +272,22 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     });
 
     const metas = style("metas", {
-        marginTop: unit(2),
-        ...margins({
+        marginTop: styleUnit(2),
+        ...Mixins.margin({
             left: -metaVars.spacing.default,
         }),
-        width: calc(`100% + ${unit(metaVars.spacing.default * 2)}`),
+        width: calc(`100% + ${styleUnit(metaVars.spacing.default * 2)}`),
     });
 
     const compactExcerpt = style("compactExcerpt", {});
 
     const excerpt = style("excerpt", {
-        marginTop: unit(vars.excerpt.margin),
-        color: colorOut(vars.excerpt.fg),
+        marginTop: styleUnit(vars.excerpt.margin),
+        color: ColorsUtils.colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
-        $nest: {
+        ...{
             [`&.${compactExcerpt}`]: {
-                ...margins({
+                ...Mixins.margin({
                     top: globalVars.gutter.size,
                     left: iconWidth,
                 }),
@@ -304,29 +296,29 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     });
 
     const link = style("link", {
-        color: colorOut(globalVars.mainColors.fg),
-        $nest: linkColors.$nest,
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ...linkColors,
     });
 
     const afterExcerptLink = style("afterExcerptLink", {
-        ...fonts(globalVars.meta.text),
-        $nest: linkColors.$nest,
+        ...Mixins.font(globalVars.meta.text),
+        ...linkColors,
     });
 
     const iconWrap = style("iconWrap", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colorOut(vars.icon.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.icon.bg),
         borderRadius: "50%",
-        width: unit(vars.icon.size),
-        height: unit(vars.icon.size),
+        width: styleUnit(vars.icon.size),
+        height: styleUnit(vars.icon.size),
         cursor: "pointer",
     });
 
     const commentWrap = style("commentWrap", {
         display: "flex",
-        marginTop: unit(globalVars.gutter.size),
+        marginTop: styleUnit(globalVars.gutter.size),
     });
 
     return {

@@ -45,5 +45,11 @@ Gdn::getContainer()
 
     ->rule(WidgetService::class)
     ->addCall('registerWidget', [\Vanilla\Community\CategoriesModule::class])
-    ->addCall('registerWidget', [TagModule::class]);
 ;
+
+
+if (Gdn::config('Tagging.Discussions.Enabled', false)) {
+    Gdn::getContainer()
+        ->rule(WidgetService::class)
+        ->addCall('registerWidget', [TagModule::class]);
+}

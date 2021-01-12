@@ -9,8 +9,11 @@ namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Garden\Web\Exception\HttpException;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\Models\CrawlableInterface;
+use Vanilla\DateFilterSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelFactory;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\Controller;
@@ -25,12 +28,19 @@ class ResourcesApiController extends Controller {
     private $factory;
 
     /**
+     * @var DirtyRecordModel
+     */
+    private $dirtyRecordModel;
+
+    /**
      * ResourcesApiController constructor.
      *
      * @param ModelFactory $factory
+     * @param DirtyRecordModel $dirtyRecordModel
      */
-    public function __construct(ModelFactory $factory) {
+    public function __construct(ModelFactory $factory, DirtyRecordModel $dirtyRecordModel) {
         $this->factory = $factory;
+        $this->dirtyRecordModel = $dirtyRecordModel;
     }
 
     /**
@@ -84,7 +94,10 @@ class ResourcesApiController extends Controller {
 
         $in = Schema::parse([
             'expand?' => ApiUtils::getExpandDefinition(['crawl']),
+            'dirtyRecords:b?',
+            'dateInserted?' => new DateFilterSchema(),
         ]);
+        $date = $query['dateInserted'] ?? '';
         $query = $in->validate($query);
 
         $model = $this->factory->get($recordType);
@@ -93,9 +106,16 @@ class ResourcesApiController extends Controller {
         $data = [
             'recordType' => $recordType,
         ];
+
         if (ModelUtils::isExpandOption('crawl', $query['expand']) && $model instanceof CrawlableInterface) {
             $data['crawl'] = $model->getCrawlInfo();
             $data['crawl']['url'] = \Gdn::request()->getSimpleUrl($data['crawl']['url']);
+            if (isset($query['dirtyRecords'])) {
+                $data['crawl']['url'] .= "&dirtyRecords=true";
+            }
+            if (isset($date)) {
+                $data['crawl']['url'] .= "&dateInserted={$date}";
+            }
             if (!isset($data['crawl']['maxLimit'])) {
                 $data['crawl']['maxLimit'] = ApiUtils::getMaxLimit();
             }
@@ -120,5 +140,31 @@ class ResourcesApiController extends Controller {
         $data = $out->validate($data);
 
         return new Data($data);
+    }
+
+    /**
+     * The `DELETE /resources/dirty-records` endpoint.
+     *
+     * @param string $recordType
+     * @param array $query
+     */
+    public function delete_dirtyRecords(string $recordType, array $query = []) {
+        $this->permission('Garden.Settings.Manage');
+
+        $in = Schema::parse([
+            'dateInserted' => new DateFilterSchema([
+                'description' => '',
+                'x-filter' => [
+                    'field' => 'dateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+        ]);
+
+        $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
+        $where['recordType'] = $recordType;
+
+        $this->dirtyRecordModel->delete($where);
     }
 }

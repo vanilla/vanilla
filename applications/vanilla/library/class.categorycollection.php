@@ -6,6 +6,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Models\DirtyRecordModel;
 
 /**
  * Manages categories as a whole.
@@ -13,6 +14,8 @@ use Garden\EventManager;
  * This is a bridge class to aid in refactoring. This functionality will be rolled into the {@link CategoryModel}.
  */
 class CategoryCollection {
+
+    use \Vanilla\Events\DirtyRecordTrait;
 
     /**
      * @var string The cache key prefix that stores categories by ID.
@@ -451,13 +454,14 @@ class CategoryCollection {
             'collapsecategories' => false,
             'permission' => 'PermsDiscussionsView'
         ];
+        $dirtyRecords = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         $options = array_change_key_case($options) ?: [];
         $options = $options + $defaultOptions ;
 
         $currentDepth = 1;
         $parents = [$parentID];
         for ($i = 0; $i < $options['maxdepth']; $i++) {
-            $children = $this->getChildrenByParents($parents, $options['permission']);
+            $children = $this->getChildrenByParents($parents, $options['permission'], [DirtyRecordModel::DIRTY_RECORD_OPT => $dirtyRecords]);
             if (empty($children)) {
                 break;
             }
@@ -546,13 +550,20 @@ class CategoryCollection {
      *
      * @param int[] $parentIDs The IDs of the parent categories.
      * @param string $permission The name of the permission to check.
+     * @param array $options
      * @return array Returns an array of child categories.
      */
-    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView') {
+    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView', array $options = []) {
         if (!$this->cache instanceof Gdn_Dirtycache) {
             $select = 'CategoryID';
         } else {
             $select = '*';
+        }
+
+        $dirtyRecords = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+
+        if ($dirtyRecords) {
+            $this->joinDirtyRecordTable($this->sql, 'CategoryID', 'category');
         }
 
         $data = $this

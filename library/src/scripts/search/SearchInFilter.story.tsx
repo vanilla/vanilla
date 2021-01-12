@@ -15,7 +15,6 @@ import {
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
 import SearchContext from "@library/contexts/SearchContext";
 import { MemoryRouter } from "react-router";
@@ -30,7 +29,7 @@ interface IProps {
 
 const dummmyFilters: ISearchInButton[] = [
     {
-        label: t("All Content"),
+        label: t("All"),
         icon: <TypeAllIcon />,
         data: "all",
     },

@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 

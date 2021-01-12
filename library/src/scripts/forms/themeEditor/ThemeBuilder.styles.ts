@@ -4,24 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { color, percent } from "csx";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import {
-    colorOut,
-    margins,
-    negativeUnit,
-    paddings,
-    unit,
-    sticky,
-    flexHelper,
-    importantUnit,
-} from "@library/styles/styleHelpers";
-import { TextTransformProperty } from "csstype";
+import { negativeUnit, flexHelper, importantUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
 import { toolTipClasses } from "@library/toolTip/toolTipStyles";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const themeBuilderVariables = () => {
     const inputVars = inputVariables();
@@ -38,35 +31,35 @@ export const themeBuilderVariables = () => {
         color: mainColors.primary,
     };
 
-    const defaultFont = {
+    const defaultFont = Variables.font({
         color: mainColors.fg,
         family: fontFamily,
-    };
+    });
 
     const label = {
         width: 160,
-        fonts: {
+        fonts: Variables.font({
             ...defaultFont,
             size: 13,
             weight: 600,
-        },
+        }),
     };
     const title = {
-        fonts: {
+        fonts: Variables.font({
             ...defaultFont,
             size: 16,
             weight: 700,
-            transform: "uppercase" as TextTransformProperty,
-        },
+            transform: "uppercase",
+        }),
     };
     const sectionTitle = {
-        fonts: {
+        fonts: Variables.font({
             family: fontFamily,
             color: color("#757e8c"),
             size: 12,
-            transform: "uppercase" as TextTransformProperty,
+            transform: "uppercase",
             weight: 600,
-        },
+        }),
     };
     const sectionGroupTitle = {
         fonts: {
@@ -77,12 +70,12 @@ export const themeBuilderVariables = () => {
         },
     };
     const errorMessage = {
-        fonts: {
+        fonts: Variables.font({
             family: fontFamily,
             color: color("#d0021b"),
             size: 12,
             weight: 600,
-        },
+        }),
     };
     const border = {
         ...inputVars.border,
@@ -107,11 +100,11 @@ export const themeBuilderVariables = () => {
     const input = {
         height: 29, // Odd to allow perfect centring of spinner buttons.
         width: panel.width - 2 * panel.padding - undo.width - label.width,
-        fonts: {
+        fonts: Variables.font({
             ...defaultFont,
             size: 14,
             lineHeight: 1.5,
-        },
+        }),
     };
 
     return {
@@ -153,26 +146,33 @@ export const themeBuilderClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const root = style({
-        maxWidth: unit(themeEditorVariables().panel.width),
-        backgroundColor: colorOut(vars.panel.bg),
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        maxWidth: styleUnit(themeEditorVariables().panel.width),
+        backgroundColor: ColorsUtils.colorOut(vars.panel.bg),
         minHeight: percent(100),
         maxHeight: percent(100),
         overflow: "auto",
-        ...fonts(vars.defaultFont),
-        ...paddings({
-            vertical: unit(vars.panel.padding),
+        ...Mixins.font(vars.defaultFont),
+        ...Mixins.padding({
+            vertical: styleUnit(vars.panel.padding),
         }),
+    });
+
+    const panelGroup = style("panelGroup", {
+        flex: 1,
     });
 
     const block = style("block", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        marginBottom: unit(8),
-        ...paddings({
-            horizontal: unit(vars.panel.padding),
+        marginBottom: styleUnit(8),
+        ...Mixins.padding({
+            horizontal: styleUnit(vars.panel.padding),
         }),
-        $nest: {
+        ...{
             "&.checkBoxBlock + .checkBoxBlock": {
                 marginTop: negativeUnit(8),
             },
@@ -180,23 +180,23 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const label = style("label", {
-        width: unit(vars.label.width),
+        width: styleUnit(vars.label.width),
         display: "flex",
         alignItems: "center",
-        flexBasis: unit(vars.label.width),
+        flexBasis: styleUnit(vars.label.width),
         flexGrow: 1,
         fontWeight: 600,
-        height: unit(vars.input.height),
-        ...fonts(vars.label.fonts),
+        height: styleUnit(vars.input.height),
+        ...Mixins.font(vars.label.fonts),
     });
 
     const undoWrap = style("undoWrap", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: unit(24),
-        height: unit(vars.input.height),
-        flexBasis: unit(24),
+        width: styleUnit(24),
+        height: styleUnit(vars.input.height),
+        flexBasis: styleUnit(24),
     });
 
     const inputWrap = style("inputWrap", {
@@ -204,8 +204,8 @@ export const themeBuilderClasses = useThemeCache(() => {
         flexWrap: "wrap",
         alignItems: "stretch",
         justifyContent: "flex-end",
-        width: unit(vars.input.width),
-        flexBasis: unit(vars.input.width),
+        width: styleUnit(vars.input.width),
+        flexBasis: styleUnit(vars.input.width),
         position: "relative",
     });
 
@@ -218,25 +218,25 @@ export const themeBuilderClasses = useThemeCache(() => {
         flexWrap: "wrap",
         alignItems: "stretch",
         justifyContent: "flex-start",
-        width: unit(vars.input.width),
-        flexBasis: unit(vars.input.width),
-        ...fonts(vars.input.fonts),
+        width: styleUnit(vars.input.width),
+        flexBasis: styleUnit(vars.input.width),
+        ...Mixins.font(vars.input.fonts),
         fontWeight: 600,
         height: vars.input.height,
         paddingBottom: 4,
     });
 
     const title = style("title", {
-        ...fonts(vars.title.fonts),
+        ...Mixins.font(vars.title.fonts),
         textAlign: "center",
-        marginBottom: unit(20),
-        ...paddings({
-            horizontal: unit(vars.panel.padding),
+        marginBottom: styleUnit(20),
+        ...Mixins.padding({
+            horizontal: styleUnit(vars.panel.padding),
         }),
-        marginTop: unit(20),
-        paddingTop: unit(20),
+        marginTop: styleUnit(20),
+        paddingTop: styleUnit(20),
         borderTop: `solid #c1cbd7 1px`,
-        $nest: {
+        ...{
             "&:first-child": {
                 marginTop: 0,
                 paddingTop: 0,
@@ -247,29 +247,29 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const section = style("section", {
         borderTop: `solid #c1cbd7 1px`,
-        marginTop: unit(32),
+        marginTop: styleUnit(32),
     });
 
     const sectionTitle = style("sectionTitle", {
-        ...fonts(vars.sectionTitle.fonts),
+        ...Mixins.font(vars.sectionTitle.fonts),
         textAlign: "center",
-        ...margins({
+        ...Mixins.margin({
             top: 6,
             bottom: 14,
         }),
-        ...paddings({
-            horizontal: unit(vars.panel.padding),
+        ...Mixins.padding({
+            horizontal: styleUnit(vars.panel.padding),
         }),
     });
 
     const subGroupSection = style("subGroupSection", {});
     const subGroupSectionTitle = style("subGroupSectionTitle", {
-        ...margins({
+        ...Mixins.margin({
             top: 20,
             bottom: 12,
         }),
-        ...paddings({
-            horizontal: unit(vars.panel.padding),
+        ...Mixins.padding({
+            horizontal: styleUnit(vars.panel.padding),
         }),
     });
 
@@ -283,8 +283,8 @@ export const themeBuilderClasses = useThemeCache(() => {
     const error = style("error", {
         width: percent(100),
         display: "block",
-        ...fonts(vars.errorMessage.fonts),
-        ...margins({
+        ...Mixins.font(vars.errorMessage.fonts),
+        ...Mixins.margin({
             vertical: 4,
         }),
     });
@@ -294,8 +294,8 @@ export const themeBuilderClasses = useThemeCache(() => {
     const colorErrorMessage = style("colorErrorMessage", {
         width: percent(100),
         display: "block",
-        ...fonts(vars.errorMessage.fonts),
-        ...margins({
+        ...Mixins.font(vars.errorMessage.fonts),
+        ...Mixins.margin({
             vertical: 4,
         }),
         paddingRight: percent(27),
@@ -305,9 +305,9 @@ export const themeBuilderClasses = useThemeCache(() => {
     const blockInfo = style("blockInfo", {
         ...flexHelper().middle(),
         marginLeft: globalVars.gutter.half,
-        $nest: {
+        ...{
             "&:hover": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
         },
     });
@@ -324,7 +324,7 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const documentationIconLink = style("documentationIconLink", {
-        ...clickableItemStates({ skipDefault: true }),
+        ...Mixins.clickable.itemState({ skipDefault: true }),
         color: "inherit",
         display: "flex",
         alignItems: "center",
@@ -333,21 +333,21 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const docBlockTextContainer = style("docBlockTextContainer", {
         display: "block",
-        ...fonts({
+        ...Mixins.font({
             size: 12,
             color: globalVars.meta.text.color,
             lineHeight: globalVars.meta.text.lineHeight,
         }),
         padding: 0,
-        ...margins({
-            top: unit(-3),
+        ...Mixins.margin({
+            top: styleUnit(-3),
             bottom: 8,
         }),
     });
 
     const small = style("small", {
-        $nest: {
-            [`& .${toolTipClasses().noPointerTrigger}`]: {
+        ...{
+            [`.${toolTipClasses().noPointerTrigger}`]: {
                 minWidth: 20,
                 minHeight: 20,
             },
@@ -355,11 +355,12 @@ export const themeBuilderClasses = useThemeCache(() => {
     });
 
     const iconLink = style("iconLink", {
-        marginLeft: unit(8),
+        marginLeft: styleUnit(8),
     });
 
     return {
         root,
+        panelGroup,
         block,
         label,
         undoWrap,

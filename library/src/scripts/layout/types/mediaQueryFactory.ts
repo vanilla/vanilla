@@ -1,4 +1,4 @@
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { logError } from "@vanilla/utils";
 import {
     IAllLayoutMediaQueries,
@@ -28,8 +28,8 @@ Declare media query styles like this:
 */
 export const mediaQueryFactory = (mediaQueriesByType, type): IMediaQueryFunction => {
     // The following function is the one called in component styles.
-    return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries): NestedCSSProperties => {
-        let output = { $nest: {} };
+    return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries): CSSObject => {
+        let output = {};
         Object.keys(mediaQueriesForAllLayouts).forEach((layoutName) => {
             // Check if we're in the correct layout before applying
             if (layoutName === type) {
@@ -44,7 +44,7 @@ export const mediaQueryFactory = (mediaQueriesByType, type): IMediaQueryFunction
                 if (stylesByMediaQuery) {
                     Object.keys(stylesByMediaQuery).forEach((queryName) => {
                         const query: ILayoutMediaQueryFunction = mediaQueries[queryName];
-                        const styles: NestedCSSProperties = stylesByMediaQuery[queryName];
+                        const styles: CSSObject = stylesByMediaQuery[queryName];
                         if (!query) {
                             logError(
                                 `Error calculating media queries: \nThe styles provided were not in a valid media query.\nYou likely forgot to wrap your styles in the key of the proper media query.\nMedia queries available: ${JSON.stringify(
@@ -53,12 +53,7 @@ export const mediaQueryFactory = (mediaQueriesByType, type): IMediaQueryFunction
                                 JSON.stringify(stylesByMediaQuery),
                             );
                         } else {
-                            output = {
-                                $nest: {
-                                    ...output.$nest,
-                                    ...query(styles as any).$nest,
-                                },
-                            };
+                            output = query(styles as any);
                         }
                     });
                 }

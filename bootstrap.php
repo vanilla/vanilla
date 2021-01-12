@@ -17,6 +17,8 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
 use Vanilla\Knowledge\Models\NavigationCacheProcessor;
+use Vanilla\Metadata\Parser\JsonLDParser;
+use Vanilla\Metadata\Parser\OpenGraphParser;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
@@ -24,6 +26,7 @@ use Vanilla\Models\ModelFactory;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\PageScraper;
 use Vanilla\Permissions;
 use Vanilla\PlainTextLengthValidator;
 use Vanilla\Search\AbstractSearchDriver;
@@ -356,6 +359,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
         "/api/v2/",
         ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
     ])
+    ->setShared(true)
 
     ->rule(\Vanilla\OpenAPIBuilder::class)
     ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
@@ -488,10 +492,23 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
 
+    ->rule(\Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory::class)
+    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client'), 'pageScraper' => new Reference('@scrape-page-scraper')])
+    ->rule('@scrape-http-client')
+    ->setClass(\Garden\Http\HttpClient::class)
+    ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\CookiePassMiddleware::class)])
+
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
+
+    ->rule('@scrape-page-scraper')
+    ->setClass(\Vanilla\PageScraper::class)
+    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
+    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
+    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
 
     ->rule(Garden\Http\HttpClient::class)
     ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])

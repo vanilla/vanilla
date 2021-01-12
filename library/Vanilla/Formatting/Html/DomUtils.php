@@ -101,14 +101,16 @@ final class DomUtils {
 
     /**
      * Search and replace dom text while preserving html tags.
+     * Setting $escapeHtml to false will return HTML.
      *
      * @param DOMDocument $dom
      * @param string|string[] $pattern Regex pattern.
      * @param callable $callback Callback function.
+     * @param bool $escapeHtml To return unescaped html.
      * @param array $attributes The attributes to search for.
      * @return int Return the number of replacements.
      */
-    public static function pregReplaceCallback(DOMDocument $dom, $pattern, callable $callback, array $attributes = self::TEXT_ATTRIBUTES): int {
+    public static function pregReplaceCallback(DOMDocument $dom, $pattern, callable $callback, bool $escapeHtml = true, array $attributes = self::TEXT_ATTRIBUTES): int {
         $xpath = new \DOMXPath($dom);
         $xpathQuery = $xpath->query('//text() | //@'.implode(' | //@', $attributes));
         $replacementCount = 0;
@@ -117,10 +119,34 @@ final class DomUtils {
                 $replaced = preg_replace_callback($pattern, $callback, $node->nodeValue, $limit = -1, $count);
                 if ($count > 0 && $replaced !== $node->nodeValue) {
                     $replacementCount += $count;
-                    $node->nodeValue = $replaced;
+                    $hasTags = preg_match("/<[^<]+>/", $replaced, $match) != 0;
+                    if (!$escapeHtml && $hasTags) {
+                        $nodeReplaced = (new DomUtils)->setInnerHTML($node, $replaced);
+                        if (!$nodeReplaced) {
+                            $replacementCount--;
+                        }
+                    } else {
+                        $node->nodeValue = $replaced;
+                    }
                 }
             }
         }
         return $replacementCount;
+    }
+
+
+    /**
+     * Sets inner html of an existing node.
+     *
+     * @param \DOMNode $node
+     * @param string $content Content to add to the dom.
+     * @return \DOMText|bool
+     */
+    public function setInnerHTML(\DOMNode $node, string $content) {
+        $fragment = $node->ownerDocument->createDocumentFragment();
+        $fragment->appendXML($content);
+        $newNode = $node->ownerDocument->importNode($fragment, true);
+        $nodeReplaced = $node->parentNode->replaceChild($newNode, $node);
+        return $nodeReplaced;
     }
 }

@@ -5,161 +5,38 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import {
     absolutePosition,
     borderRadii,
-    borders,
-    colorOut,
     defaultTransition,
-    EMPTY_BORDER,
     flexHelper,
-    fonts,
     getVerticalPaddingForTextInput,
-    IBorderRadiusValue,
     importantUnit,
-    IStateColors,
-    margins,
-    paddings,
     singleBorder,
-    unit,
     userSelect,
 } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { calc, important, percent, px, translateX } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { buttonGlobalVariables, buttonResetMixin } from "@library/forms/buttonStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { buttonGlobalVariables } from "@library/forms/Button.variables";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
-import { IThemeVariables } from "@library/theming/themeReducer";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
-import { SearchBarPresets } from "@library/banner/bannerStyles";
-
-export const searchBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const globalVars = globalVariables(forcedVars);
-    const formElementVars = formElementsVariables(forcedVars);
-    const makeThemeVars = variableFactory("searchBar", forcedVars);
-
-    const search = makeThemeVars("search", {
-        minWidth: 109,
-        fullBorderRadius: {
-            extraHorizontalPadding: 10, // Padding when you have fully rounded border radius. Will be applied based on the amount of border radius. Set to "undefined" to turn off
-        },
-        compact: {
-            minWidth: formElementVars.sizing.height,
-        },
-    });
-
-    const placeholder = makeThemeVars("placeholder", {
-        color: formElementVars.placeholder.color,
-    });
-
-    const heading = makeThemeVars("heading", {
-        margin: 12,
-    });
-
-    const border = makeThemeVars("border", {
-        ...EMPTY_BORDER,
-        color: globalVars.border.color,
-        width: globalVars.border.width,
-        radius: globalVars.borderType.formElements.default.radius,
-        inset: false, // indents border in to make sure we have contrast with background
-    });
-
-    const sizingInit = makeThemeVars("sizing", {
-        height: formElementVars.sizing.height,
-    });
-
-    const sizing = makeThemeVars("sizing", {
-        height: sizingInit.height,
-        heightMinusBorder: sizingInit.height - border.width * 2,
-    });
-
-    const input = makeThemeVars("input", {
-        fg: globalVars.mainColors.fg,
-        bg: globalVars.mainColors.bg,
-    });
-
-    const searchIcon = makeThemeVars("searchIcon", {
-        gap: 40,
-        height: 13,
-        width: 14,
-        fg: input.fg.fade(0.7),
-        padding: {
-            right: 5,
-        },
-    });
-
-    const results = makeThemeVars("results", {
-        fg: globalVars.mainColors.fg,
-        bg: globalVars.mainColors.bg,
-        borderRadius: globalVars.border.radius,
-    });
-
-    const scope = makeThemeVars("scope", {
-        width: 142,
-        padding: 18,
-        compact: {
-            padding: 12,
-            width: 58,
-        },
-    });
-
-    const scopeIcon = makeThemeVars("scopeIcon", {
-        width: 10,
-        ratio: 6 / 10,
-    });
-
-    const stateColorsInit = makeThemeVars("stateColors", {
-        allStates: globalVars.mainColors.primary,
-        hoverOpacity: globalVars.constants.states.hover.borderEmphasis,
-    });
-
-    const stateColors: IStateColors = makeThemeVars("stateColors", {
-        ...stateColorsInit,
-        hover: stateColorsInit.allStates.fade(stateColorsInit.hoverOpacity), // This needs to be a mix and not an opacity so we can overlay the borders and not have the two borders mix together
-        focus: stateColorsInit.allStates,
-        active: stateColorsInit.allStates,
-    });
-
-    // Used when `SearchBarPresets.NO_BORDER` is active
-    const noBorder = makeThemeVars("noBorder", {
-        offset: 1,
-    });
-
-    // Used when `SearchBarPresets.BORDER` is active
-    const withBorder = makeThemeVars("withBorder", {
-        borderColor: globalVars.border.color,
-    });
-
-    const options = makeThemeVars("options", {
-        compact: false,
-        preset: SearchBarPresets.NO_BORDER,
-    });
-
-    return {
-        search,
-        noBorder,
-        withBorder,
-        searchIcon,
-        sizing,
-        placeholder,
-        input,
-        heading,
-        results,
-        border,
-        scope,
-        scopeIcon,
-        stateColors,
-        options,
-    };
-});
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { IBorderRadiusValue } from "@library/styles/cssUtilsTypes";
+import { searchBarVariables } from "./SearchBar.variables";
 
 export interface ISearchBarOverwrites {
     borderRadius?: IBorderRadiusValue;
@@ -195,7 +72,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
 
     const verticalPadding = getVerticalPaddingForTextInput(
         vars.sizing.height,
-        inputVars.font.size,
+        inputVars.font.size as number,
         formElementVars.border.width * 2,
     );
     const calculatedHeight = vars.sizing.height - verticalPadding * 2 - formElementVars.border.width * 2;
@@ -211,22 +88,26 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
 
     const root = style({
         cursor: "pointer",
-        $nest: {
-            "& .searchBar__placeholder": {
-                color: colorOut(vars.placeholder.color),
+        ...{
+            ".searchBar__placeholder": {
+                color: ColorsUtils.colorOut(vars.placeholder.color),
                 margin: "auto",
-                height: unit(calculatedHeight),
-                lineHeight: unit(calculatedHeight),
+                height: styleUnit(calculatedHeight),
+                lineHeight: styleUnit(calculatedHeight),
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
                 top: 0,
                 transform: "none",
                 cursor: "text",
+                // Needed otherwise you can't use copy/paste in the context menu.
+                // @see https://github.com/JedWatson/react-select/issues/612
+                // @see https://github.com/vanilla/support/issues/3252
+                pointerEvents: "none",
             },
 
-            "& .suggestedTextInput-valueContainer": {
-                $nest: {
+            ".suggestedTextInput-valueContainer": {
+                ...{
                     [`.${classesInputBlock.inputText}`]: {
                         height: "auto",
                     },
@@ -235,13 +116,13 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                     },
                 },
             },
-            "& .searchBar-submitButton": {
+            ".searchBar-submitButton": {
                 position: "relative",
-                minWidth: unit(scopeMinWidth + 2),
-                flexBasis: unit(scopeMinWidth),
-                minHeight: unit(vars.sizing.height),
-                margin: unit(-1),
-                $nest: {
+                minWidth: styleUnit(scopeMinWidth + 2),
+                flexBasis: styleUnit(scopeMinWidth),
+                minHeight: styleUnit(vars.sizing.height),
+                margin: styleUnit(-1),
+                ...{
                     "&:hover, &:focus": {
                         zIndex: 2,
                     },
@@ -252,129 +133,128 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 borderTopRightRadius: importantUnit(borderRadius),
                 paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
             },
-            "& .wrap__control": {
+            ".wrap__control": {
                 width: percent(100),
             },
-            "& .searchBar__control": {
+            ".searchBar__control": {
                 border: 0,
-                backgroundColor: colorOut(globalVars.elementaryColors.transparent),
+                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.transparent),
                 width: percent(100),
                 flexBasis: percent(100),
-                $nest: {
+                ...{
                     "&.searchBar__control--is-focused": {
                         boxShadow: "none",
                     },
                 },
             },
-            "& .searchBar__value-container": {
+            ".searchBar__value-container": {
                 position: "static",
                 overflow: "auto",
                 cursor: "text",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
-                fontSize: unit(inputVars.font.size),
-                height: unit(calculatedHeight),
-                $nest: {
+                lineHeight: styleUnit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                fontSize: styleUnit(inputVars.font.size),
+                height: styleUnit(calculatedHeight),
+                ...{
                     "& > div": {
                         width: percent(100),
                     },
                 },
             },
-            "& .searchBar__indicators": {
+            ".searchBar__indicators": {
                 display: "none",
             },
-            "& .searchBar__input": {
+            ".searchBar__input": {
                 width: percent(100),
             },
-            "& .searchBar__input input": {
+            ".searchBar__input input": {
                 height: "auto",
                 minHeight: 0,
                 width: important(`100%`),
                 borderRadius: important(0),
-                lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
+                lineHeight: styleUnit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
             },
             ...mediaQueries.oneColumnDown({
-                $nest: {
-                    "& .searchBar-submitButton": {
+                ...{
+                    ".searchBar-submitButton": {
                         minWidth: 0,
                     },
                 },
             }),
         },
-    } as NestedCSSProperties);
+    });
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const searchResultsStyles = {
         title: {
-            ...fonts({
+            ...Mixins.font({
                 size: globalVars.fonts.size.large,
                 weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
-        } as NestedCSSProperties,
+        },
         meta: {
-            ...fonts(globalVars.meta.text),
-        } as NestedCSSProperties,
+            ...Mixins.font(globalVars.meta.text),
+        },
         excerpt: {
-            marginTop: unit(searchResultsVariables().excerpt.margin),
-            ...fonts({
+            marginTop: styleUnit(searchResultsVariables().excerpt.margin),
+            ...Mixins.font({
                 size: globalVars.fonts.size.medium,
                 color: vars.results.fg,
                 lineHeight: globalVars.lineHeights.excerpt,
             }),
-        } as NestedCSSProperties,
+        },
     };
 
     const results = style("results", {
         position: "absolute",
         width: percent(100),
-        backgroundColor: colorOut(vars.results.bg),
-        color: colorOut(vars.results.fg),
+        backgroundColor: ColorsUtils.colorOut(vars.results.bg),
+        color: ColorsUtils.colorOut(vars.results.fg),
         ...borderRadii({
             all: Math.min(parseInt(borderRadius.toString()), 6),
         }),
-        $nest: {
+        ...{
             "&:empty": {
                 display: important("none"),
             },
-            "& .suggestedTextInput__placeholder": {
-                color: colorOut(formElementVars.placeholder.color),
+            ".suggestedTextInput__placeholder": {
+                color: ColorsUtils.colorOut(formElementVars.placeholder.color),
             },
-            "& .suggestedTextInput-noOptions": {
+            ".suggestedTextInput-noOptions": {
                 padding: px(12),
             },
-            "& .suggestedTextInput-head": {
+            ".suggestedTextInput-head": {
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
-            "& .suggestedTextInput-option": suggestedTextStyleHelper().option,
-            "& .suggestedTextInput-menuItems": {
+            ".suggestedTextInput-option": suggestedTextStyleHelper().option,
+            ".suggestedTextInput-menuItems": {
                 margin: 0,
                 padding: 0,
             },
-            "& .suggestedTextInput-item": {
+            ".suggestedTextInput-item": {
                 listStyle: "none",
-                $nest: {
+                ...{
                     "& + .suggestedTextInput-item": {
                         borderTop: `solid 1px ${globalVars.border.color.toString()}`,
                     },
                 },
             },
-            "& .suggestedTextInput-title": {
+            ".suggestedTextInput-title": {
                 ...searchResultsStyles.title,
             },
-
-            "& .suggestedTextInput-title .suggestedTextInput-searchingFor": {
+            ".suggestedTextInput-title .suggestedTextInput-searchingFor": {
                 fontWeight: globalVars.fonts.weights.normal,
             },
         },
-    });
+    } as CSSObject);
 
     const resultsAsModal = style("resultsAsModal", {
         position: "absolute",
-        top: unit(vars.sizing.height),
+        top: styleUnit(vars.sizing.height),
         left: 0,
         overflow: "hidden",
         boxSizing: "border-box",
@@ -386,27 +266,27 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         position: "relative",
         display: "flex",
         boxSizing: "border-box",
-        height: unit(vars.sizing.height),
-        width: unit(vars.sizing.height),
-        color: colorOut(globalVars.mixBgAndFg(0.78)),
-        transform: translateX(`${unit(4)}`),
-        $nest: {
+        height: styleUnit(vars.sizing.height),
+        width: styleUnit(vars.sizing.height),
+        color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.78)),
+        transform: translateX(`${styleUnit(4)}`),
+        ...{
             "&, &.buttonIcon": {
                 border: "none",
                 boxShadow: "none",
             },
             "&:hover": {
-                color: colorOut(vars.stateColors.hover),
+                color: ColorsUtils.colorOut(vars.stateColors.hover),
             },
             "&:focus": {
-                color: colorOut(vars.stateColors.focus),
+                color: ColorsUtils.colorOut(vars.stateColors.focus),
             },
         },
     });
 
     const mainConditionalStyles = isInsetBordered
         ? {
-              padding: `0 ${unit(borderVars.width)}`,
+              padding: `0 ${styleUnit(borderVars.width)}`,
           }
         : {};
 
@@ -415,7 +295,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         position: "relative",
         borderRadius: 0,
         ...mainConditionalStyles,
-        $nest: {
+        ...{
             "&&.withoutButton.withoutScope": {
                 ...borderRadii({
                     right: borderRadius,
@@ -455,55 +335,55 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               height: calc(`100% - 2px`),
               minHeight: calc(`100% - 2px`),
               width: calc(`100% - 2px`),
-              margin: unit(1),
+              margin: styleUnit(1),
           }
         : {
               height: percent(100),
           };
 
     const valueContainer = style("valueContainer", {
-        $nest: {
+        ...{
             "&&&": {
                 ...valueContainerConditionalStyles,
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: colorOut(vars.input.bg),
-                color: colorOut(vars.input.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.input.bg),
+                color: ColorsUtils.colorOut(vars.input.fg),
                 cursor: "text",
                 flexWrap: "nowrap",
                 justifyContent: "flex-start",
                 borderRadius: 0,
                 zIndex: isInsetBordered ? 2 : undefined,
                 ...defaultTransition("border-color"),
-                ...borders({
+                ...Mixins.border({
                     color: borderColor,
                 }),
                 ...borderRadii({
                     all: borderRadius,
                 }),
-            } as NestedCSSProperties,
+            },
             "&&&:not(.isFocused)": {
-                borderColor: isInsetBordered ? colorOut(vars.input.bg) : vars.border.color,
+                borderColor: isInsetBordered ? ColorsUtils.colorOut(vars.input.bg) : vars.border.color,
             },
             "&&&:not(.isFocused).isHovered": {
-                borderColor: colorOut(vars.stateColors.hover),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.hover),
             },
             [`&&&&.isFocused .${main}`]: {
-                borderColor: colorOut(vars.stateColors.hover),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.hover),
             },
 
             // -- Text Input Radius --
             // Both sides round
             "&&.inputText.withoutButton.withoutScope": {
-                paddingLeft: unit(vars.searchIcon.gap),
+                paddingLeft: styleUnit(vars.searchIcon.gap),
                 ...borderRadii({
                     all: borderRadius,
                 }),
             },
             // Right side flat
             "&&.inputText.withButton.withoutScope": {
-                paddingLeft: unit(vars.searchIcon.gap),
-                paddingRight: unit(vars.searchIcon.gap),
+                paddingLeft: styleUnit(vars.searchIcon.gap),
+                paddingRight: styleUnit(vars.searchIcon.gap),
                 ...borderRadii({
                     left: borderRadius,
                     right: 0,
@@ -512,10 +392,10 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             [`&&.inputText.withButton.withoutScope .${clear}`]: {
                 ...absolutePosition.topRight(),
                 bottom: 0,
-                ...margins({
+                ...Mixins.margin({
                     vertical: "auto",
                 }),
-                transform: translateX(unit(vars.border.width * 2)),
+                transform: translateX(styleUnit(vars.border.width * 2)),
             },
             // Both sides flat
             "&&.inputText.withButton.withScope": {
@@ -525,7 +405,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             },
             // Left side flat
             "&&.inputText.withoutButton.withScope:not(.compactScope)": {
-                paddingRight: unit(vars.searchIcon.gap),
+                paddingRight: styleUnit(vars.searchIcon.gap),
             },
             "&&.inputText.withoutButton.withScope": {
                 ...borderRadii({
@@ -534,11 +414,11 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 }),
             },
         },
-    } as NestedCSSProperties);
+    } as CSSObject);
 
     // Has a search button attached.
     const compoundValueContainer = style("compoundValueContainer", {
-        $nest: {
+        ...{
             "&&": {
                 borderTopRightRadius: important(0),
                 borderBottomRightRadius: important(0),
@@ -565,7 +445,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               bottom: 0,
               margin: "auto 0",
               height: percent(90),
-              width: unit(borderVars.width),
+              width: styleUnit(borderVars.width),
               borderRight: singleBorder({
                   color: borderVars.color,
               }),
@@ -578,10 +458,10 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         alignItems: "stretch",
         justifyContent: "flex-start",
         position: "relative",
-        backgroundColor: colorOut(vars.input.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.input.bg),
         width: percent(100),
         height: percent(100),
-        $nest: {
+        ...{
             "&&.withoutButton.withoutScope": {
                 ...borderRadii({
                     all: borderRadius,
@@ -603,16 +483,16 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 display: "none",
             },
             [`&.hasFocus .${valueContainer}`]: {
-                borderColor: colorOut(vars.stateColors.focus),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.focus),
             },
         },
     });
 
     // special selector
     const heading = style("heading", {
-        $nest: {
+        ...{
             "&&": {
-                marginBottom: unit(vars.heading.margin),
+                marginBottom: styleUnit(vars.heading.margin),
             },
         },
     });
@@ -621,7 +501,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
 
     const iconContainer = (alignRight?: boolean) => {
         const { compact = false } = overwrites || {};
-        const horizontalPosition = unit(compact ? vars.scope.compact.padding : vars.scope.padding);
+        const horizontalPosition = styleUnit(compact ? vars.scope.compact.padding : vars.scope.padding);
 
         const conditionalStyle = alignRight
             ? {
@@ -644,29 +524,29 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             justifyContent: "center",
             zIndex: 5,
             outline: 0,
-            color: colorOut(vars.searchIcon.fg),
-            $nest: {
+            color: ColorsUtils.colorOut(vars.searchIcon.fg),
+            ...{
                 [`.${icon}`]: {
-                    width: unit(vars.searchIcon.width),
-                    height: unit(vars.searchIcon.height),
+                    width: styleUnit(vars.searchIcon.width),
+                    height: styleUnit(vars.searchIcon.height),
                 },
                 [`&&& + .searchBar-valueContainer`]: {
-                    paddingLeft: unit(vars.searchIcon.gap),
+                    paddingLeft: styleUnit(vars.searchIcon.gap),
                 },
                 "&:hover": {
-                    color: colorOut(vars.stateColors.hover),
+                    color: ColorsUtils.colorOut(vars.stateColors.hover),
                 },
                 "&:focus": {
-                    color: colorOut(vars.stateColors.focus),
+                    color: ColorsUtils.colorOut(vars.stateColors.focus),
                 },
             },
         });
     };
 
     const iconContainerBigInput = style("iconContainerBig", {
-        $nest: {
+        ...{
             "&&": {
-                height: unit(vars.sizing.height),
+                height: styleUnit(vars.sizing.height),
             },
         },
     });
@@ -675,32 +555,32 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        $nest: {
+        ...{
             "&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(vars.stateColors.focus),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.focus),
             },
             "&&": {
                 position: "relative",
             },
-            "& .searchBar__menu-list": {
-                maxHeight: calc(`100vh - ${unit(titleBarVars.sizing.height)}`),
+            ".searchBar__menu-list": {
+                maxHeight: calc(`100vh - ${styleUnit(titleBarVars.sizing.height)}`),
                 width: percent(100),
             },
-            "& .searchBar__input": {
-                color: colorOut(globalVars.mainColors.fg),
+            ".searchBar__input": {
+                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
                 width: percent(100),
                 display: important("block"),
-                $nest: {
+                ...{
                     input: {
                         width: important(percent(100).toString()),
                         lineHeight: globalVars.lineHeights.base,
                     },
                 },
             },
-            "& .suggestedTextInput-menu": {
-                borderRadius: unit(globalVars.border.radius),
-                marginTop: unit(-formElementVars.border.width),
-                marginBottom: unit(-formElementVars.border.width),
+            ".suggestedTextInput-menu": {
+                borderRadius: styleUnit(globalVars.border.radius),
+                marginTop: styleUnit(-formElementVars.border.width),
+                marginBottom: styleUnit(-formElementVars.border.width),
             },
             "&:empty": {
                 display: "none",
@@ -714,11 +594,10 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         height: calc("100%"),
         justifyContent: "center",
         alignItems: "stretch",
-
-        $nest: {
-            "& .selectBox-dropDown": {
+        ...{
+            ".selectBox-dropDown": {
                 position: "relative",
-                padding: isInsetBordered ? unit(vars.border.width) : undefined,
+                padding: isInsetBordered ? styleUnit(vars.border.width) : undefined,
                 width: percent(100),
                 height: percent(100),
             },
@@ -732,7 +611,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               left: 0,
               height: calc(`100% - 2px`),
               width: calc(`100% - 2px`),
-              margin: unit(vars.noBorder.offset),
+              margin: styleUnit(vars.noBorder.offset),
           }
         : {
               width: percent(100),
@@ -746,12 +625,12 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         lineHeight: "2em",
         flexWrap: "nowrap",
         ...scopeToggleConditionalStyles,
-        ...borders({
+        ...Mixins.border({
             color: borderColor,
         }),
         ...userSelect(),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...paddings({
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        ...Mixins.padding({
             horizontal: compact ? vars.scope.compact.padding : vars.scope.padding,
         }),
         outline: 0,
@@ -759,25 +638,25 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             left: borderRadius,
             right: 0,
         }),
-        $nest: {
-            [`& .${selectBoxClasses().buttonIcon}`]: {
-                width: unit(vars.scopeIcon.width),
-                flexBasis: unit(vars.scopeIcon.width),
-                height: unit(vars.scopeIcon.width * vars.scopeIcon.ratio),
+        ...{
+            [`.${selectBoxClasses().buttonIcon}`]: {
+                width: styleUnit(vars.scopeIcon.width),
+                flexBasis: styleUnit(vars.scopeIcon.width),
+                height: styleUnit(vars.scopeIcon.width * vars.scopeIcon.ratio),
                 margin: "0 0 0 auto",
-                color: colorOut(vars.input.fg),
+                color: ColorsUtils.colorOut(vars.input.fg),
             },
             "&:focus, &:hover, &:active, &.focus-visible": {
                 zIndex: 3,
             },
             "&:hover": {
-                borderColor: colorOut(vars.stateColors.hover),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.hover),
             },
             "&:active": {
-                borderColor: colorOut(vars.stateColors.active),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.active),
             },
             "&:focus, &.focus-visible": {
-                borderColor: colorOut(vars.stateColors.focus),
+                borderColor: ColorsUtils.colorOut(vars.stateColors.focus),
             },
 
             // Nested above doesn't work
@@ -788,7 +667,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 display: "none",
             },
         },
-    } as NestedCSSProperties);
+    } as CSSObject);
 
     const scopeLabelWrap = style("scopeLabelWrap", {
         display: "flex",
@@ -796,57 +675,57 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         whiteSpace: "nowrap",
         overflow: "hidden",
         lineHeight: 2,
-        color: colorOut(vars.input.fg),
+        color: ColorsUtils.colorOut(vars.input.fg),
     });
 
     const scope = style("scope", {
         position: "relative",
-        minHeight: unit(vars.sizing.height),
-        width: unit(compact ? vars.scope.compact.width : vars.scope.width),
-        flexBasis: unit(compact ? vars.scope.compact.width : vars.scope.width),
+        minHeight: styleUnit(vars.sizing.height),
+        width: styleUnit(compact ? vars.scope.compact.width : vars.scope.width),
+        flexBasis: styleUnit(compact ? vars.scope.compact.width : vars.scope.width),
         display: "flex",
         alignItems: "stretch",
         justifyContent: "flex-start",
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        paddingRight: isInsetBordered ? unit(vars.border.width) : undefined,
-        transform: isOuterBordered ? translateX(unit(vars.border.width)) : undefined,
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        paddingRight: isInsetBordered ? styleUnit(vars.border.width) : undefined,
+        transform: isOuterBordered ? translateX(styleUnit(vars.border.width)) : undefined,
         zIndex: isOuterBordered ? 2 : undefined,
         ...borderRadii({
             left: borderRadius,
             right: 0,
         }),
-        $nest: {
+        ...{
             [`
                 &.isOpen .${scopeSeparator},
-                &.isActive .${scopeSeparator},
+                &.isActive .${scopeSeparator}
             `]: {
                 display: "none",
             },
-            [`& .${scopeSelect}`]: {
+            [`.${scopeSelect}`]: {
                 ...borderRadii({
                     left: borderRadius,
                     right: 0,
                 }),
             },
-            [`& .selectBox-dropDown`]: {
+            [`.selectBox-dropDown`]: {
                 ...borderRadii({
                     left: borderRadius,
                     right: 0,
                 }),
             },
-            [`& .${scopeToggle}`]: {
+            [`.${scopeToggle}`]: {
                 ...borderRadii({
                     left: borderRadius,
                     right: 0,
                 }),
             },
             [`&.isCompact .${scopeToggle}`]: {
-                paddingLeft: unit(12),
-                paddingRight: unit(12),
+                paddingLeft: styleUnit(12),
+                paddingRight: styleUnit(12),
             },
             [`& + .${main}`]: {
-                maxWidth: calc(`100% - ${unit(compact ? vars.scope.compact.width : vars.scope.width)}`),
-                flexBasis: calc(`100% - ${unit(compact ? vars.scope.compact.width : vars.scope.width)}`),
+                maxWidth: calc(`100% - ${styleUnit(compact ? vars.scope.compact.width : vars.scope.width)}`),
+                flexBasis: calc(`100% - ${styleUnit(compact ? vars.scope.compact.width : vars.scope.width)}`),
             },
         },
     });
@@ -865,15 +744,15 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     });
 
     const closeButton = style("closeButton", {
-        marginLeft: unit(6),
+        marginLeft: styleUnit(6),
         borderRadius: "6px",
     });
 
     const compactIcon = style("compactIcon", {
-        $nest: {
+        ...{
             "&&": {
-                width: unit(vars.searchIcon.width),
-                height: unit(vars.searchIcon.height),
+                width: styleUnit(vars.searchIcon.width),
+                height: styleUnit(vars.searchIcon.height),
             },
         },
     });
@@ -881,7 +760,11 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const standardContainer = style("standardContainer", {
         display: "block",
         position: "relative",
-        height: unit(vars.sizing.height),
+        height: styleUnit(vars.sizing.height),
+    });
+
+    const firstItemBorderTop = style("firstItemBorderTop", {
+        borderTop: `solid 1px ${globalVars.border.color.toString()}`,
     });
 
     return {
@@ -912,5 +795,6 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         main,
         compactIcon,
         standardContainer,
+        firstItemBorderTop,
     };
 });

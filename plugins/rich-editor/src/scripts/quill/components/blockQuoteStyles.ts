@@ -4,14 +4,17 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssRule } from "typestyle";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { cssRule } from "@library/styles/styleShim";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
-import { paddings, unit, userSelect } from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { Mixins } from "@library/styles/Mixins";
 
 export const blockQuoteVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -33,8 +36,8 @@ export const blockQuoteCSS = useThemeCache(() => {
     const vars = blockQuoteVariables();
     cssRule(".blockquote", {
         display: "block",
-        margin: unit(0),
-        ...paddings({
+        margin: styleUnit(0),
+        ...Mixins.padding({
             all: 3,
             left: 18,
         }),
@@ -46,16 +49,16 @@ export const blockQuoteCSS = useThemeCache(() => {
         verticalAlign: "middle",
     });
     cssRule(".blockquote-content", {
-        $nest: {
+        ...{
             "& > *:first-child": {
-                marginTop: unit(0),
+                marginTop: styleUnit(0),
             },
             "& > *:last-child": {
-                marginBottom: unit(0),
+                marginBottom: styleUnit(0),
             },
         },
     });
     cssOut(`.embedLink-excerpt`, {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 });

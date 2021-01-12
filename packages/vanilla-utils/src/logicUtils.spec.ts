@@ -5,7 +5,7 @@
 
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
-import { flattenObject, spaceshipCompare } from "./logicUtils";
+import { flattenObject, spaceshipCompare, unflattenObject } from "./logicUtils";
 chai.use(asPromised);
 
 describe("spaceshipCompare()", () => {
@@ -23,22 +23,27 @@ describe("spaceshipCompare()", () => {
 });
 
 describe("flattenObject()", () => {
-    it("flattens objects", () => {
-        const initial = {
-            key1: "val1",
-            nested: {
-                nestedKey: "val2",
-                array1: ["one", "two", "three"],
-            },
-        };
+    const nested = {
+        key1: "val1",
+        nested: {
+            nestedKey: "val2",
+            array1: ["one", "two", "three"],
+        },
+    };
 
-        const expected = {
-            key1: "val1",
-            "nested.nestedKey": "val2",
-            "nested.array1.0": "one",
-            "nested.array1.1": "two",
-            "nested.array1.2": "three",
-        };
-        expect(flattenObject(initial)).deep.equal(expected);
+    const flattened = {
+        key1: "val1",
+        "nested.nestedKey": "val2",
+        "nested.array1.0": "one",
+        "nested.array1.1": "two",
+        "nested.array1.2": "three",
+    };
+
+    it("flattens objects", () => {
+        expect(flattenObject(nested)).deep.equal(flattened);
+    });
+
+    it("unflattens objects", () => {
+        expect(unflattenObject(flattened)).deep.equal(nested);
     });
 });

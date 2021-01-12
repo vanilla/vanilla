@@ -10,7 +10,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import gdn from "@library/gdn";
 
 export default {

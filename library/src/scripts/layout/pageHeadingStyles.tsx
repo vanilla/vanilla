@@ -5,9 +5,10 @@
  */
 
 import { em, percent, px } from "csx";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const pageHeadingVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -63,7 +64,7 @@ export const pageHeadingClasses = useThemeCache(() => {
             "actions",
             {
                 display: "flex",
-                marginLeft: unit(vars.cta.margin),
+                marginLeft: styleUnit(vars.cta.margin),
                 position: "relative",
                 alignSelf: "flex-start",
                 zIndex: 1,
@@ -71,7 +72,7 @@ export const pageHeadingClasses = useThemeCache(() => {
             fontSize
                 ? {
                       top: ".5em",
-                      fontSize: unit(fontSize),
+                      fontSize: styleUnit(fontSize),
                       transform: `translateY(-50%)`,
                   }
                 : {},
@@ -80,8 +81,8 @@ export const pageHeadingClasses = useThemeCache(() => {
 
     const link = style("link", {
         display: "block",
-        height: unit(globalVars.icon.sizes.default),
-        width: unit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
+        width: styleUnit(globalVars.icon.sizes.default),
         color: "inherit",
     });
 
@@ -97,7 +98,7 @@ export const pageHeadingClasses = useThemeCache(() => {
     const lineHeightCentering = (lineHeight: number) => {
         // px value of line height
         return style("lineHeightCentering", {
-            top: unit(lineHeight / 2),
+            top: styleUnit(lineHeight / 2),
             transform: `translateY(-50%)`,
         });
     };

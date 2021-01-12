@@ -24,7 +24,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * {@inheritdoc}
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'qna'];
+        self::$addons = ['vanilla', 'qna', 'groups'];
         parent::setupBeforeClass();
 
         /**
@@ -291,7 +291,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $body = $response->getBody();
 
         $answeredQuestion = $this->getQuestion($question['discussionID']);
-
+        $dateAnswered = $answeredQuestion['attributes']['question']['dateAnswered'];
+        $this->assertEquals($answer['dateInserted'], $dateAnswered);
         $this->assertIsQuestion($answeredQuestion, ['dateAccepted' => $body['dateInserted']]);
         $this->assertIsQuestion($answeredQuestion, ['dateAnswered' => $body['dateInserted']]);
     }

@@ -4,13 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, unit, sticky, colorOut, negativeUnit } from "@library/styles/styleHelpers";
+import { absolutePosition, flexHelper, sticky, negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, viewHeight } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 
 export const compactMeBoxVariables = useThemeCache(() => {
     const themeVars = variableFactory("compactMeBox");
@@ -48,30 +51,30 @@ export const compactMeBoxClasses = useThemeCache(() => {
     });
 
     const closeModal = style("closeModal", {
-        $nest: {
+        ...{
             "&&": {
                 ...absolutePosition.topRight(),
-                width: unit(vars.tab.width),
-                height: unit(vars.tab.height),
+                width: styleUnit(vars.tab.width),
+                height: styleUnit(vars.tab.height),
             },
         },
     });
 
     const tabList = style("tabList", sticky(), {
         top: 0,
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
-        paddingRight: unit(vars.tab.width),
-        height: unit(vars.tab.height),
-        flexBasis: unit(vars.tab.width),
+        paddingRight: styleUnit(vars.tab.width),
+        height: styleUnit(vars.tab.height),
+        flexBasis: styleUnit(vars.tab.width),
         color: globalVars.mainColors.fg.toString(),
     });
 
     const tabButtonContent = style("tabButtonContent", {
         ...flexHelper().middle(),
         position: "relative",
-        width: unit(vars.tab.width),
-        height: unit(vars.tab.height),
+        width: styleUnit(vars.tab.width),
+        height: styleUnit(vars.tab.height),
     });
 
     const tabPanels = style("tabPanels", {

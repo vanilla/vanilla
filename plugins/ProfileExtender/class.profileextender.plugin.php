@@ -8,6 +8,10 @@
  * @package ProfileExtender
  */
 
+use Garden\Container\Container;
+use Garden\EventManager;
+use Vanilla\Web\APIExpandMiddleware;
+
 /**
  * Plugin to add additional fields to user profiles.
  *
@@ -23,12 +27,7 @@
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
-
-    public function base_render_before($sender) {
-        if ($sender->MasterView == 'admin') {
-            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
-        }
-    }
+    const FIELD_EXTENDED = "extended";
 
     /** @var array */
     public $MagicLabels = ['Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Instagram', 'Website', 'Real Name'];
@@ -60,6 +59,43 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
     /** @var array */
     public $ProfileFields = [];
+
+    /**
+     * Hook in before content is rendered.
+     *
+     * @param mixed $sender
+     */
+    public function base_render_before($sender) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        }
+    }
+
+    /**
+     * Modify container rules.
+     *
+     * @param Container $dic
+     */
+    public function container_init(Container $dic): void {
+        $dic->rule(APIExpandMiddleware::class)
+            ->addCall(
+                "addExpandField",
+                [
+                    self::FIELD_EXTENDED,
+                    [
+                        "firstInsertUser.extended" => "firstInsertUserID",
+                        "insertUser.extended" => "insertUserID",
+                        "lastInsertUser.extended" => "lastInsertUserID",
+                        "lastPost.insertUser.extended" => "lastPost.insertUserID",
+                        "lastUser.extended" => "lastUserID",
+                        "updateUser.extended" => "updateUserID",
+                        "user.extended" => "userID",
+                        self::FIELD_EXTENDED => "userID",
+                    ],
+                    [$this, "getUserProfileValuesChecked"],
+                ]
+            );
+    }
 
     /**
      * Change config settings based on whether Profile Extender fields duplicate built-in fields.
@@ -323,14 +359,13 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      */
     private function profileFields($Sender, $stripBuiltinFields = false) {
 
-        /** @var \Garden\EventManager $eventManager */
-        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        /** @var EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
         // Retrieve user's existing profile fields
         $this->ProfileFields = $this->getProfileFields($stripBuiltinFields);
         $this->ProfileFields = $eventManager->fireFilter("modifyProfileFields", $this->ProfileFields);
         // Get user-specific data
-        $this->UserFields = Gdn::userModel()->getMeta($Sender->Form->getValue('UserID'), 'Profile.%', 'Profile.');
-        $this->UserFields = $eventManager->fireFilter("modifyUserFields", $this->UserFields);
+        $this->UserFields = $this->getUserProfileValues([$Sender->Form->getValue('UserID')]);
 
         $this->fireEvent('beforeGetProfileFields');
         // Fill in user data on form
@@ -620,28 +655,31 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_afterInsertUser_handler(\UserModel $sender, array $args) {
-        $this->updateUserFields($args['InsertUserID'], $args['RegisteringUser']);
+        if (!empty($args['RegisteringUser'])) {
+            $this->updateUserFields($args['InsertUserID'], $args['RegisteringUser']);
+        }
     }
 
     /**
      * Update user with new profile fields.
      *
-     * @param $userID int
-     * @param $fields array
+     * @param int $userID The user ID to update.
+     * @param array $fields Key/value pairs of fields to update.
      */
-    protected function updateUserFields($userID, $fields) {
+    public function updateUserFields($userID, $fields) {
         // Confirm we have submitted form values
         if (is_array($fields)) {
             // Retrieve whitelist & user column list
-            $allowedFields = $this->getProfileFields();
+            $allowedFields = array_column(
+                $this->getProfileFields(),
+                null,
+                'Name'
+            );
             $columns = Gdn::sql()->fetchColumns('User');
 
             foreach ($fields as $name => $field) {
-                // Whitelist
-                $allowedFieldNames = array_map(function ($field) {
-                    return isset($field['Name']) ? $field['Name'] : null;
-                }, $allowedFields);
-                if (!in_array($name, $allowedFieldNames)) {
+                // Whitelist.
+                if (!isset($allowedFields[$name])) {
                     unset($fields[$name]);
                     continue;
                 }
@@ -649,21 +687,30 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 if (in_array($name, $columns)) {
                     unset($fields[$name]);
                 }
-                //Allowed checkboxes should be 1 or 0
+
+                // Allowed checkboxes should be 1 or 0.
                 if ($allowedFields[$name]['FormType'] === 'CheckBox') {
                     $fields[$name] = $field == true ? 1 : 0;
                 }
-
-                // Set values
             }
 
-            // Update UserMeta if any made it thru
+            // Update UserMeta if any made it through.
             if (count($fields)) {
                 Gdn::userModel()->setMeta($userID, $fields, 'Profile.');
             }
         }
     }
 
+    /**
+     * Get the profile extender fields for a single user.
+     *
+     * @param int $userID
+     * @return array
+     */
+    public function getUserFields(int $userID): array {
+        $values = $this->getUserProfileValues([$userID]);
+        return $values[$userID] ?? [];
+    }
 
     /**
      * Endpoint to export basic user data along with all custom fields into CSV.
@@ -821,6 +868,47 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         if ($updateRequired) {
             Gdn::config()->saveToConfig('ProfileExtender.Fields', array_values($profileFields));
         }
+    }
+
+    /**
+     * Get the extended values associated with a user.
+     *
+     * @param int[] $userIDs
+     */
+    public function getUserProfileValues(array $userIDs): array {
+        $result = Gdn::userModel()->getMeta($userIDs, "Profile.%", "Profile.");
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
+        $result = $eventManager->fireFilter("modifyUserFields", $result);
+        return $result;
+    }
+
+    /**
+     * Get the extended values, but make sure they are defined and cast them to their correct types.
+     *
+     * @param array $userIDs
+     * @return array
+     */
+    public function getUserProfileValuesChecked(array $userIDs): array {
+        $values = $this->getUserProfileValues($userIDs);
+        $fields = array_column($this->getProfileFields(), null, 'Name');
+        $utc = new DateTimeZone('UTC');
+        foreach ($values as $id => &$row) {
+            $row = array_intersect_key($row, $fields);
+            foreach ($row as $key => &$value) {
+                switch ($fields[$key]['FormType'] ?? 'TextBox') {
+                    case 'CheckBox':
+                        $value = (bool)$value;
+                        break;
+                    case 'DateOfBirth':
+                        try {
+                            $value = new DateTimeImmutable($value, $utc);
+                        } catch (\Exception $ex) {
+                            $value = null;
+                        }
+                }
+            }
+        }
+        return $values;
     }
 }
 

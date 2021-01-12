@@ -23,7 +23,6 @@ use Vanilla\Scheduler\Driver\LocalDriver;
 use Vanilla\Scheduler\DummyScheduler;
 use Vanilla\Scheduler\SchedulerInterface;
 use VanillaTests\Fixtures\NullCache;
-use VanillaTests\Fixtures\OfflineNullCache;
 use VanillaTests\SetsGeneratorTrait;
 use VanillaTests\SiteTestTrait;
 
@@ -34,19 +33,17 @@ class SchedulerTestCase extends TestCase {
     use SiteTestTrait;
     use SetsGeneratorTrait;
 
-    const DISPATCH_EVENT = 'dispatchEvent';
-    const DISPATCHED_EVENT = 'dispatchedEvent';
+    const DISPATCH_EVENT = 'SchedulerDispatch';
+    const DISPATCHED_EVENT = 'SchedulerDispatched';
 
     /**
      * Get a new, cleanly-configured container.
-     *
-     * @param bool $onlineCache
      *
      * @return Container
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    protected function getConfiguredContainer($onlineCache = true) {
+    protected function getConfiguredContainer(): Container {
         $container = new Container();
 
         $container
@@ -78,24 +75,20 @@ class SchedulerTestCase extends TestCase {
             ->setClass(NullCache::class)
         ;
 
-        if (!$onlineCache) {
-            $container->rule(Gdn_Cache::class)->setClass(OfflineNullCache::class);
-        }
-
+        /** @var Gdn_Configuration $config */
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.CronMinimumTimeSpan', 0, true, false);
+        $config->loadArray([], 'voidConfig');
+        $config->autoSave(false);
+        $config->set('Garden.Scheduler.CronMinimumTimeSpan', 0);
 
+        /** @var SchedulerInterface $dummyScheduler */
         $dummyScheduler = $container->get(SchedulerInterface::class);
-        $this->assertTrue(get_class($dummyScheduler) == DummyScheduler::class);
 
         $bool = $dummyScheduler->addDriver(LocalDriver::class);
         $this->assertTrue($bool);
 
-        $bool = $dummyScheduler->setDispatchEventName(self::DISPATCH_EVENT);
-        $this->assertTrue($bool);
-
-        $bool = $dummyScheduler->setDispatchedEventName(self::DISPATCHED_EVENT);
-        $this->assertTrue($bool);
+        $dummyScheduler->setDispatchEventName(self::DISPATCH_EVENT);
+        $dummyScheduler->setDispatchedEventName(self::DISPATCHED_EVENT);
 
         return $container;
     }

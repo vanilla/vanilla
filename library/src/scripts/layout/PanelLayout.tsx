@@ -8,7 +8,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useMemo, useRef } from "react";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { useBannerContext } from "@library/banner/BannerContext";
 import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
 import { logError } from "@vanilla/utils";
@@ -104,9 +104,7 @@ function PanelLayout(props: IPanelLayoutProps) {
 
     const overflowOffset = sidePanelDistanceFromTop - topOffset - (bannerRect?.height ?? 0);
 
-    const panelOffsetClass = useMemo(() => style({ top: overflowOffset, $debugName: "stickyOffset" }), [
-        overflowOffset,
-    ]);
+    const panelOffsetClass = useMemo(() => style({ top: overflowOffset, label: "stickyOffset" }), [overflowOffset]);
 
     // Calculate some rendering variables.
 

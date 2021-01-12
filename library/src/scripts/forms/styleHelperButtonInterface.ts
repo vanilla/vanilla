@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { IBorderStyles } from "@library/styles/styleHelpersBorders";
-import { IFont } from "@library/styles/styleHelpersTypography";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { NestedCSSSelectors, TLength } from "typestyle/lib/types";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { IBorderStyles, IFont } from "@library/styles/cssUtilsTypes";
+import { CSSObject } from "@emotion/css";
+import { TLength } from "@library/styles/styleShim";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ColorHelper } from "csx";
 
 export interface IButtonType {
     name: ButtonTypes | string;
@@ -17,8 +17,8 @@ export interface IButtonType {
         style: ButtonPreset;
     };
     colors?: {
-        bg?: ColorValues;
-        fg?: ColorValues;
+        bg?: ColorHelper | string;
+        fg?: ColorHelper | string;
     };
     borders?: IBorderStyles;
     sizing?: {
@@ -33,44 +33,44 @@ export interface IButtonType {
     fonts?: IFont;
     state?: {
         colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
+            fg?: ColorHelper | string;
+            bg?: ColorHelper | string;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     hover?: {
         colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
+            fg?: ColorHelper | string;
+            bg?: ColorHelper | string;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     focus?: {
         colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
+            fg?: ColorHelper | string;
+            bg?: ColorHelper | string;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     active?: {
         colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
+            fg?: ColorHelper | string;
+            bg?: ColorHelper | string;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     focusAccessible?: {
         colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
+            fg?: ColorHelper | string;
+            bg?: ColorHelper | string;
         };
         borders?: IBorderStyles;
         fonts?: IFont;
     };
     skipDynamicPadding?: boolean;
-    extraNested?: NestedCSSSelectors; // special case CSS
+    extraNested?: CSSObject; // special case CSS
 }

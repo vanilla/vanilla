@@ -23,6 +23,7 @@ interface IProps {
     updateUser?: IUserFragment;
     dateUpdated?: string;
     crumbs?: ICrumbString[];
+    labels?: string[];
     status?: PublishStatus;
     type?: string;
     isForeign?: boolean;
@@ -31,7 +32,7 @@ interface IProps {
 }
 
 export function ResultMeta(props: IProps) {
-    const { dateUpdated, updateUser, crumbs, status, type, isForeign, counts, extra } = props;
+    const { dateUpdated, updateUser, labels, crumbs, status, type, isForeign, counts, extra } = props;
     const isDeleted = status === PublishStatus.DELETED;
     const classesMetas = metasClasses();
 
@@ -66,6 +67,13 @@ export function ResultMeta(props: IProps) {
 
     return (
         <React.Fragment>
+            {labels &&
+                labels.map((label) => (
+                    <span className={classesMetas.metaLabel} key={label}>
+                        {label}
+                    </span>
+                ))}
+
             {typeMeta && (
                 <span className={classNames(classesMetas.meta)}>
                     {isDeleted ? (

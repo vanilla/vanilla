@@ -5,7 +5,7 @@
 
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import { makeStorybookDecorator } from "@library/makeStorybookDecorator";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
@@ -14,14 +14,14 @@ const customViewports = {
     panelLayout_withBleed: {
         name: "Panel Layout - Full",
         styles: {
-            width: unit(panelLayoutBreakPoints.noBleed + 100), // 100 is arbitrary. We just want more than being right up to the minimum margin
+            width: styleUnit(panelLayoutBreakPoints.noBleed + 100), // 100 is arbitrary. We just want more than being right up to the minimum margin
             height: "1000px",
         },
     },
     panelLayout_noBleed: {
         name: "Panel Layout - Minimum Margin",
         styles: {
-            width: unit(panelLayoutBreakPoints.noBleed),
+            width: styleUnit(panelLayoutBreakPoints.noBleed),
             height: "1000px",
         },
     },
@@ -29,21 +29,21 @@ const customViewports = {
     panelLayout_twoColumns: {
         name: "Panel Layout - Two Columns",
         styles: {
-            width: unit(panelLayoutBreakPoints.twoColumn),
+            width: styleUnit(panelLayoutBreakPoints.twoColumn),
             height: "1000px",
         },
     },
     panelLayout_oneColumn: {
         name: "Panel Layout - One Columns",
         styles: {
-            width: unit(panelLayoutBreakPoints.oneColumn),
+            width: styleUnit(panelLayoutBreakPoints.oneColumn),
             height: "1000px",
         },
     },
     panelLayout_xs: {
         name: "Panel Layout - Extra Small",
         styles: {
-            width: unit(panelLayoutBreakPoints.xs),
+            width: styleUnit(panelLayoutBreakPoints.xs),
             height: "1000px",
         },
     },

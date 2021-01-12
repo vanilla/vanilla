@@ -4,8 +4,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, paddings, unit } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 
 export const rolesClasses = useThemeCache(() => {
     const style = styleFactory("roles");
@@ -13,11 +15,11 @@ export const rolesClasses = useThemeCache(() => {
     const metaVars = globalVars.meta;
 
     const role = style({
-        ...borders({ color: metaVars.text.color, radius: 3 }),
-        ...paddings({
+        ...Mixins.border({ color: metaVars.text.color, radius: 3 }),
+        ...Mixins.padding({
             horizontal: 4,
         }),
-        $nest: {
+        ...{
             "&&": {
                 fontSize: metaVars.text.size,
                 lineHeight: globalVars.lineHeights.condensed,

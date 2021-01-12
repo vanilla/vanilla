@@ -39,4 +39,11 @@ interface JobDescriptorInterface {
      * @return int
      */
     public function getDelay(): int;
+
+    /**
+     * GetHash
+     *
+     * @return string
+     */
+    public function getHash(): string;
 }

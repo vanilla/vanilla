@@ -4,8 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -22,7 +23,7 @@ export const insertLinkClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
-        maxWidth: unit(vars.insertLink.width),
+        maxWidth: styleUnit(vars.insertLink.width),
         width: percent(100),
         paddingLeft: 0,
         overflow: "hidden",
@@ -30,12 +31,12 @@ export const insertLinkClasses = useThemeCache(() => {
 
     const input = style("input", {
         zIndex: 2,
-        $nest: {
+        ...{
             "&, &.InputBox": {
                 border: important("0"),
                 marginBottom: important("0"),
                 flexGrow: 1,
-                maxWidth: calc(`100% - ${unit(vars.menuButton.size - (vars.menuButton.size - 12) / 2)}`), // 12 is from the size set SCSS file.
+                maxWidth: calc(`100% - ${styleUnit(vars.menuButton.size - (vars.menuButton.size - 12) / 2)}`), // 12 is from the size set SCSS file.
             },
         },
     });

@@ -5,22 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    margins,
-    paddings,
-    unit,
-    fonts,
-    extendItemContainer,
-    EMPTY_FONTS,
-    singleBorder,
-    EMPTY_SPACING,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
-import { media } from "typestyle";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { extendItemContainer, singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { percent } from "csx";
+import { media } from "@library/styles/styleShim";
+import { CSSObject } from "@emotion/css";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
@@ -28,40 +22,37 @@ export const navLinksVariables = useThemeCache(() => {
 
     const item = makeThemeVars("item", {
         fontSize: globalVars.fonts.size.large,
-        padding: {
-            ...EMPTY_SPACING,
+        padding: Variables.spacing({
             vertical: globalVars.spacer.size * 2,
             horizontal: containerVariables().spacing.padding * 2,
-        },
-        paddingMobile: {
-            ...EMPTY_SPACING,
+        }),
+        paddingMobile: Variables.spacing({
             horizontal: 0,
-        },
+        }),
     });
 
     const linksWithHeadings = makeThemeVars("linksWithHeadings", {
         paddings: {
-            horizontal: item.padding.horizontal / 2,
+            horizontal: (item.padding.horizontal as number) / 2,
         },
     });
 
     const title = makeThemeVars("title", {
-        font: {
-            ...EMPTY_FONTS,
+        font: Variables.font({
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.bold,
             lineHeight: globalVars.lineHeights.condensed,
-        },
+            color: undefined,
+        }),
         maxWidth: percent(100),
         margins: {
             bottom: globalVars.gutter.size,
         },
         mobile: {
-            font: {
-                ...EMPTY_FONTS,
-                fontSize: globalVars.fonts.size.large,
-                fontWeight: globalVars.fonts.weights.bold,
-            },
+            font: Variables.font({
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.bold,
+            }),
         },
     });
 
@@ -74,9 +65,9 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
-    const viewAllLinkColors = clickableItemStates();
+    const viewAllLinkColors = Mixins.clickable.itemState();
+
     const viewAll = makeThemeVars("viewAll", {
-        color: viewAllLinkColors.color,
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
         margins: {
@@ -85,7 +76,8 @@ export const navLinksVariables = useThemeCache(() => {
         paddings: {
             top: globalVars.gutter.size,
         },
-        $nest: viewAllLinkColors.$nest,
+        icon: false,
+        ...viewAllLinkColors,
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -99,6 +91,7 @@ export const navLinksVariables = useThemeCache(() => {
     const separator = makeThemeVars("separator", {
         height: 1,
         bg: globalVars.mixBgAndFg(0.3),
+        hidden: false,
     });
 
     const breakPoints = makeThemeVars("breakPoints", {
@@ -107,7 +100,7 @@ export const navLinksVariables = useThemeCache(() => {
 
     const mediaQueries = () => {
         const oneColumn = (styles) => {
-            return media({ maxWidth: px(breakPoints.oneColumn) }, styles);
+            return media({ maxWidth: breakPoints.oneColumn }, styles);
         };
 
         return { oneColumn };
@@ -134,9 +127,9 @@ export const navLinksClasses = useThemeCache(() => {
 
     const root = style(
         {
-            ...paddings({
+            ...Mixins.padding({
                 ...vars.item.padding,
-                horizontal: vars.item.padding.horizontal / 2,
+                horizontal: (vars.item.padding.horizontal as number) / 2,
             }),
             display: "flex",
             flexDirection: "column",
@@ -145,9 +138,9 @@ export const navLinksClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({
             width: percent(100),
-            ...paddings({
+            ...Mixins.padding({
                 ...vars.item.paddingMobile,
-                horizontal: vars.item.paddingMobile.horizontal / 2,
+                horizontal: (vars.item.paddingMobile.horizontal as number) / 2,
             }),
         }),
     );
@@ -160,115 +153,133 @@ export const navLinksClasses = useThemeCache(() => {
 
     const item = style("item", {
         display: "block",
-        fontSize: unit(vars.item.fontSize),
-        marginTop: unit(vars.spacing.margin),
-        marginBottom: unit(vars.spacing.margin),
+        fontSize: styleUnit(vars.item.fontSize),
+        marginTop: styleUnit(vars.spacing.margin),
+        marginBottom: styleUnit(vars.spacing.margin),
     });
 
     const title = style("title", {
-        $nest: {
+        ...{
             "&&": {
                 display: "block",
-                ...fonts(vars.title.font),
+                ...Mixins.font(vars.title.font),
                 maxWidth: percent(100),
-                ...margins(vars.title.margins),
-                ...mediaQueries.oneColumn(fonts(vars.title.mobile.font)),
+                ...Mixins.margin(vars.title.margins),
+                ...mediaQueries.oneColumn(Mixins.font(vars.title.mobile.font)),
             },
         },
     });
 
     const topTitle = style("topTitle", {
-        $nest: {
+        ...{
             "&&": {
-                ...margins({
+                ...Mixins.margin({
                     vertical: vars.item.padding.vertical,
                     top: vars.item.padding.top,
                     bottom: 0,
                 }),
-                ...paddings({ horizontal: vars.item.padding.horizontal / 2 }),
+                ...Mixins.padding({ horizontal: (vars.item.padding.horizontal as number) / 2 }),
                 width: "100%",
             },
         },
     });
 
-    const linkColors = clickableItemStates({
-        default: globalVars.mainColors.fg,
+    const linkColors = Mixins.clickable.itemState({
+        default: vars.link.fg,
     });
 
     const link = style("link", {
         display: "block",
-        ...fonts({
+        ...Mixins.font({
             size: vars.link.fontSize,
             lineHeight: vars.link.lineHeight,
+            weight: vars.link.fontWeight,
             // @ts-ignore
             color: linkColors.color,
         }),
-        $nest: linkColors.$nest as NestedCSSProperties,
-    } as NestedCSSProperties);
+        ...linkColors,
+    });
 
     const viewAllItem = style("viewAllItem", {
         display: "block",
-        fontSize: unit(vars.item.fontSize),
-        ...margins(vars.viewAll.margins),
-        ...paddings(vars.viewAll.paddings),
+        fontSize: styleUnit(vars.item.fontSize),
+        ...Mixins.margin(vars.viewAll.margins),
+        ...Mixins.padding(vars.viewAll.paddings),
     });
 
-    const viewAllLinkColors = clickableItemStates({
+    const viewAllLinkColors = Mixins.clickable.itemState({
         default: globalVars.mainColors.primary,
     });
 
-    const noItemLink = style("noItemLink", { ...clickableItemStates(), marginTop: globalVars.gutter.quarter });
+    const noItemLink = style("noItemLink", { ...Mixins.clickable.itemState(), marginTop: globalVars.gutter.quarter });
 
     const viewAll = style("viewAll", {
         display: "block",
-        ...fonts({
-            weight: vars.viewAll.fontWeight,
-            size: vars.viewAll.fontSize,
+        ...Mixins.font({
+            weight: vars.viewAll.fontWeight as number,
+            size: vars.viewAll.fontSize as number,
             // @ts-ignore
             color: vars.viewAll.color,
         }),
-        $nest: viewAllLinkColors.$nest,
+        ...{
+            ...viewAllLinkColors,
+            span: {
+                marginRight: vars.viewAll.icon ? 10 : undefined,
+            },
+        },
     });
 
     const linksWithHeadings = style(
         "linksWithHeadings",
         {
-            ...paddings(vars.linksWithHeadings.paddings),
-            ...extendItemContainer(vars.item.padding.horizontal + vars.linksWithHeadings.paddings.horizontal),
+            ...Mixins.padding(vars.linksWithHeadings.paddings),
+            ...extendItemContainer(
+                (vars.item.padding.horizontal as number) + vars.linksWithHeadings.paddings.horizontal,
+            ),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            ...extendItemContainer(vars.item.paddingMobile.horizontal + vars.linksWithHeadings.paddings.horizontal),
+            ...extendItemContainer(
+                (vars.item.paddingMobile.horizontal as number) + vars.linksWithHeadings.paddings.horizontal,
+            ),
         }),
     );
 
     const separator = style(
         "separator",
         {
-            display: "block",
+            display: vars.separator.hidden ? "none" : "block",
             width: percent(100),
 
             // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
+            borderLeft: "none",
+            borderRight: "none",
+            borderTop: "none",
             borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
+            ...{
+                "&:last-child": {
+                    display: "none",
+                },
+            },
         },
-        mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
+        mediaQueries.oneColumn(Mixins.margin({ horizontal: vars.item.paddingMobile.horizontal })),
     );
 
     const separatorIndependant = style(
         "separatorIndependant",
         {
             display: "block",
-            ...extendItemContainer(vars.item.padding.horizontal),
+            ...extendItemContainer(vars.item.padding.horizontal as number),
 
             // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
             borderBottom: singleBorder({ color: vars.separator.bg, width: vars.separator.height }),
         },
-        mediaQueries.oneColumn(margins({ horizontal: vars.item.paddingMobile.horizontal })),
+        mediaQueries.oneColumn(Mixins.margin({ horizontal: vars.item.paddingMobile.horizontal })),
         mediaQueries.oneColumn({
-            ...extendItemContainer(vars.item.paddingMobile.horizontal),
+            ...extendItemContainer(vars.item.paddingMobile.horizontal as number),
         }),
     );
 

@@ -15,13 +15,36 @@
  */
 class GooglePrettifyPlugin extends Gdn_Plugin {
 
+    /** @var array The list of allowed languages. */
+    private const LANGUAGES = [
+        'apollo' => 'apollo',
+        'clj' => 'clj',
+        'css' => 'css',
+        'go' => 'go',
+        'hs' => 'hs',
+        'lisp' => 'lisp',
+        'lua' => 'lua',
+        'ml' => 'ml',
+        'n' => 'n',
+        'proto' => 'proto',
+        'scala' => 'scala',
+        'sql' => 'sql',
+        'text' => 'tex',
+        'vb' => 'visual basic',
+        'vhdl' => 'vhdl',
+        'wiki' => 'wiki',
+        'xq' => 'xq',
+        'yaml' => 'yaml'
+    ];
+
     /**
      * Add Prettify to page text.
      */
     public function addPretty($sender) {
         $sender->Head->addTag('script', ['type' => 'text/javascript', '_sort' => 100], $this->getJs());
         $sender->addJsFile('prettify.js', 'plugins/GooglePrettify', ['_sort' => 101]);
-        if ($language = c('Plugins.GooglePrettify.Language')) {
+        $language = c('Plugins.GooglePrettify.Language');
+        if ($language && in_array($language, self::LANGUAGES)) {
             $sender->addJsFile("lang-$language.js", 'plugins/GooglePrettify', ['_sort' => 102]);
         }
     }
@@ -50,7 +73,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         if (c('Plugins.GooglePrettify.LineNumbers')) {
             $class .= ' linenums';
         }
-        if ($language = c('Plugins.GooglePrettify.Language')) {
+        $language = c('Plugins.GooglePrettify.Language');
+        if ($language && in_array($language, self::LANGUAGES)) {
             $class .= " lang-$language";
         }
 
@@ -137,29 +161,13 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * @param unknown_type $args
      */
     public function settingsController_googlePrettify_create($sender, $args) {
+        $sender->Request->isAuthenticatedPostback(true);
+        $sender->permission('Garden.Settings.Manage');
+
         $cf = new ConfigurationModule($sender);
         $cssUrl = asset('/plugins/GooglePrettify/design/prettify.css', true);
 
-        $languages = [
-            'apollo' => 'apollo',
-            'clj' => 'clj',
-            'css' => 'css',
-            'go' => 'go',
-            'hs' => 'hs',
-            'lisp' => 'lisp',
-            'lua' => 'lua',
-            'ml' => 'ml',
-            'n' => 'n',
-            'proto' => 'proto',
-            'scala' => 'scala',
-            'sql' => 'sql',
-            'text' => 'tex',
-            'vb' => 'visual basic',
-            'vhdl' => 'vhdl',
-            'wiki' => 'wiki',
-            'xq' => 'xq',
-            'yaml' => 'yaml'
-        ];
+        $languages = self::LANGUAGES;
 
         $cf->initialize([
             'Plugins.GooglePrettify.LineNumbers' => ['Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false],

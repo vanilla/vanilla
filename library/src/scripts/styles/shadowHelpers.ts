@@ -4,13 +4,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { ColorValues, isLightColor } from "@library/styles/styleHelpersColors";
-import { borders } from "@library/styles/styleHelpersBorders";
-import { unit } from "@library/styles/styleHelpers";
+import { TLength } from "@library/styles/styleShim";
+import { CSSObject } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { styleUnit } from "@library/styles/styleUnit";
 
 interface IShadowSizing {
     horizontalOffset: number;
@@ -74,45 +76,45 @@ export const shadowHelper = useThemeCache(() => {
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.widget;
         return {
-            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
-                opacity,
-            )}`,
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.fade(opacity)}`,
         };
     };
 
     const embedHover = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.widgetHover;
         return {
-            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor
-                .darken(0.5)
-                .fade(opacity)}`,
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.darken(0.5).fade(opacity)}`,
         };
     };
 
     const dropDown = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.dropDown;
         return {
-            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
-                opacity,
-            )}`,
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.fade(opacity)}`,
         };
     };
 
     const floatingButton = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.floatingButton;
         return {
-            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
-                opacity,
-            )}`,
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.fade(opacity)}`,
         };
     };
 
     const modal = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.modal;
         return {
-            boxShadow: `${horizontalOffset} ${unit(verticalOffset)} ${unit(blur)} ${unit(spread)} ${baseColor.fade(
-                opacity,
-            )}`,
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.fade(opacity)}`,
         };
     };
 
@@ -141,25 +143,25 @@ export const shadowHelper = useThemeCache(() => {
 });
 
 export const shadowOrBorderBasedOnLightness = (
-    referenceColor?: ColorValues,
-    borderStyles?: object,
-    shadowStyles?: object,
+    referenceColor?: ColorHelper | string,
+    borderStyles?: CSSObject,
+    shadowStyles?: CSSObject,
     flip?: boolean,
-): NestedCSSProperties => {
+): CSSObject => {
     const globalVars = globalVariables();
     if (!referenceColor) {
         referenceColor = globalVars.mainColors.bg;
     }
 
     if (!borderStyles) {
-        borderStyles = borders();
+        borderStyles = Mixins.border();
     }
 
     if (!shadowStyles) {
         shadowStyles = shadowHelper().dropDown();
     }
 
-    if (referenceColor instanceof ColorHelper && isLightColor(referenceColor) && !flip) {
+    if (referenceColor instanceof ColorHelper && ColorsUtils.isLightColor(referenceColor) && !flip) {
         // Shadow for light colors
         return shadowStyles;
     } else {

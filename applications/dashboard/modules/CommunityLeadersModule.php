@@ -35,6 +35,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
 
     public $contentType = self::CONTENT_TYPE_ICON;
     public $borderType = 'none';
+    public $name = null;
     public $maxColumnCount = 5;
     public $iconProps = [
         'border' => [
@@ -60,6 +61,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
             'contentType' => $this->contentType,
             'display' => $this->display,
             'borderType' => $this->borderType,
+            'name' => $this->name,
             'alignment' => 'center',
         ];
         if (!empty($this->iconProps)) {
@@ -100,7 +102,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
             'to' => userUrl($user),
             'iconUrl' => $user['Photo'],
             'name' => $user['Name'],
-            'description' => $user['Title'] ?? null,
+            'description' => $user['Label'] ?? null,
             'counts' => [
                 [
                     'labelCode' => 'Points',
@@ -178,6 +180,8 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
 
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
+            self::widgetSubtitleSchema(),
+            self::widgetDescriptionSchema(),
             self::widgetColumnSchema(),
             $ownSchema
         );

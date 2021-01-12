@@ -8,13 +8,14 @@ import { AppearanceProperty, PointerEventsProperty, UserSelectProperty } from "c
 import { important } from "csx";
 import { styleFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { CSSObject } from "@emotion/css";
 
-export const userSelect = (value: UserSelectProperty = "none", isImportant: boolean = false) => {
+export const userSelect = (value: UserSelectProperty = "none", isImportant: boolean = false): CSSObject => {
     const val = (isImportant ? important(value) : value) as any;
     return {
-        "-webkit-user-select": val,
-        "-moz-user-select": val,
-        "-ms-user-select": val,
+        WebkitUserSelect: val,
+        MozUserSelect: val,
+        msUserSelect: val,
         userSelect: val,
     };
 };

@@ -4,22 +4,16 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { cssRule } from "typestyle";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { borders } from "@library/styles/styleHelpersBorders";
-import {
-    absolutePosition,
-    margins,
-    paddings,
-    singleLineEllipsis,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { cssRule } from "@library/styles/styleShim";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { absolutePosition, singleLineEllipsis, userSelect } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { calc, percent } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const atMentionVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -80,8 +74,8 @@ export const atMentionCSS = useThemeCache(() => {
     const vars = atMentionVariables();
     cssRule(".atMentionList", {
         position: "absolute",
-        width: unit(vars.sizing.width),
-        transform: `translateY(${unit(vars.positioning.offset)})`,
+        width: styleUnit(vars.sizing.width),
+        transform: `translateY(${styleUnit(vars.positioning.offset)})`,
     });
 
     cssRule(".atMentionList-suggestion", {
@@ -96,12 +90,12 @@ export const atMentionCSS = useThemeCache(() => {
     });
 
     cssRule(".atMentionList-items", {
-        $nest: {
+        ...{
             "&.atMentionList-items": {
                 display: "block",
-                ...paddings(vars.user.padding),
+                ...Mixins.padding(vars.user.padding),
                 overflow: "auto",
-                maxHeight: unit(vars.sizing.maxHeight),
+                maxHeight: styleUnit(vars.sizing.maxHeight),
             },
             "&.isHidden": {
                 display: "none",
@@ -110,12 +104,12 @@ export const atMentionCSS = useThemeCache(() => {
     });
 
     cssRule(".atMentionList-item", {
-        $nest: {
+        ...{
             "&.atMentionList-item": {
                 marginBottom: 0,
             },
             "&.isActive .atMentionList-suggestion": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
             },
         },
     });
@@ -131,20 +125,20 @@ export const atMentionCSS = useThemeCache(() => {
         width: percent(100),
         boxSizing: "border-box",
         overflow: "hidden",
-        lineHeight: unit(vars.avatar.width),
-        ...paddings({
+        lineHeight: styleUnit(vars.avatar.width),
+        ...Mixins.padding({
             vertical: vars.user.padding.vertical,
             horizontal: vars.user.padding.horizontal,
         }),
     });
 
     cssRule(".atMentionList-photoWrap", {
-        marginRight: unit(vars.avatar.margin),
+        marginRight: styleUnit(vars.avatar.margin),
     });
 
     cssRule(".atMentionList-photo", {
-        width: unit(vars.avatar.width),
-        height: unit(vars.avatar.width),
+        width: styleUnit(vars.avatar.width),
+        height: styleUnit(vars.avatar.width),
     });
 
     cssRule(".atMentionList-userName", {
@@ -153,7 +147,7 @@ export const atMentionCSS = useThemeCache(() => {
         overflow: "hidden",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis",
-        maxWidth: calc(`100% - ${unit(vars.avatar.margin + vars.avatar.width)}`),
+        maxWidth: calc(`100% - ${styleUnit(vars.avatar.margin + vars.avatar.width)}`),
     });
 
     cssRule(".atMentionList-mark", {

@@ -5,14 +5,16 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { containerMainMediaQueries, containerMainStyles } from "@library/layout/components/containerStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, important, percent, px } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
-import { media } from "typestyle";
+import { CSSObject } from "@emotion/css";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { calc, important, percent } from "csx";
+import { styleUnit } from "@library/styles/styleUnit";
+import { media } from "@library/styles/styleShim";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { Mixins } from "@library/styles/Mixins";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -32,84 +34,84 @@ export const forumLayoutVariables = useThemeCache(() => {
     });
 
     const mediaQueries = () => {
-        const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const noBleed = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(panel.paddedWidth),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.oneColumn + 1) : undefined,
+                    maxWidth: panel.paddedWidth,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.oneColumn + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const noBleedDown = (styles: NestedCSSProperties) => {
+        const noBleedDown = (styles: CSSObject) => {
             return noBleed(styles, false);
         };
 
-        const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const oneColumn = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.oneColumn),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.tablet + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.oneColumn,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.tablet + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumnDown = (styles: NestedCSSProperties) => {
+        const oneColumnDown = (styles: CSSObject) => {
             return oneColumn(styles, false);
         };
 
-        const tablet = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const tablet = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.tablet),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.mobile + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.tablet,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.mobile + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const tabletDown = (styles: NestedCSSProperties) => {
+        const tabletDown = (styles: CSSObject) => {
             return tablet(styles, false);
         };
 
-        const mobile = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const mobile = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.mobile),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.xs + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.mobile,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.xs + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const aboveMobile = (styles: NestedCSSProperties) => {
+        const aboveMobile = (styles: CSSObject) => {
             return media(
                 {
-                    minWidth: px(foundationalWidths.breakPoints.mobile + 1),
+                    minWidth: foundationalWidths.breakPoints.mobile + 1,
                 },
                 styles,
             );
         };
 
-        const mobileDown = (styles: NestedCSSProperties) => {
+        const mobileDown = (styles: CSSObject) => {
             return mobile(styles, false);
         };
 
-        const xs = (styles: NestedCSSProperties) => {
+        const xs = (styles: CSSObject) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.xs),
+                    maxWidth: foundationalWidths.breakPoints.xs,
                 },
                 styles,
             );
         };
 
-        const aboveXs = (styles: NestedCSSProperties) => {
+        const aboveXs = (styles: CSSObject) => {
             return media(
                 {
-                    minWidth: px(foundationalWidths.breakPoints.xs + 1),
+                    minWidth: foundationalWidths.breakPoints.xs + 1,
                 },
                 styles,
             );
@@ -144,7 +146,7 @@ export const forumLayoutVariables = useThemeCache(() => {
     });
 
     const main = makeThemeVars("main", {
-        width: calc(`100% - ${unit(panel.paddedWidth + gutter.mainGutterOffset)}`),
+        width: calc(`100% - ${styleUnit(panel.paddedWidth + gutter.mainGutterOffset)}`),
         topSpacing: 40,
     });
 
@@ -174,16 +176,16 @@ export const forumLayoutCSS = () => {
     cssOut(
         `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
         mediaQueries.tablet({
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: globalVars.gutter.half,
             }),
         }),
     );
 
-    cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles() as NestedCSSProperties);
+    cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles());
 
     cssOut(`.Frame-content .HomepageTitle`, {
-        $nest: lineHeightAdjustment(),
+        ...lineHeightAdjustment(),
     });
 
     cssOut(
@@ -192,12 +194,12 @@ export const forumLayoutCSS = () => {
             display: "flex",
             flexWrap: "nowrap",
             justifyContent: "space-between",
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: globalVars.gutter.half,
             }),
-            $nest: {
+            ...{
                 "& > *": {
-                    ...paddings({
+                    ...Mixins.padding({
                         horizontal: globalVars.gutter.half,
                     }),
                 },
@@ -207,7 +209,7 @@ export const forumLayoutCSS = () => {
             flexWrap: important("wrap"),
         }),
         mediaQueries.tablet({
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: 0,
             }),
         }),
@@ -216,8 +218,8 @@ export const forumLayoutCSS = () => {
     cssOut(
         `.Panel`,
         {
-            width: unit(vars.panel.paddedWidth),
-            ...paddings({
+            width: styleUnit(vars.panel.paddedWidth),
+            ...Mixins.padding({
                 vertical: globalVars.gutter.half,
             }),
         },
@@ -229,8 +231,8 @@ export const forumLayoutCSS = () => {
     cssOut(
         `.Content.MainContent`,
         {
-            width: unit(vars.main.width),
-            ...paddings({
+            width: styleUnit(vars.main.width),
+            ...Mixins.padding({
                 all: globalVars.gutter.half,
             }),
         },
@@ -244,12 +246,12 @@ export const forumLayoutCSS = () => {
     cssOut(`.Frame-row`, {
         display: "flex",
         flexWrap: "nowrap",
-        ...paddings({
+        ...Mixins.padding({
             all: globalVars.gutter.half,
         }),
-        $nest: {
+        ...{
             "& > *": {
-                ...paddings({
+                ...Mixins.padding({
                     horizontal: globalVars.gutter.half,
                 }),
             },

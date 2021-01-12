@@ -5,23 +5,18 @@
  * @license GPL-2.0-only
  */
 
-import {
-    colorOut,
-    unit,
-    userSelect,
-    importantColorOut,
-    modifyColorBasedOnLightness,
-    isLightColor,
-} from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { important } from "csx";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
     const mainColors = globalVars.mainColors;
-    const primary = colorOut(mainColors.primary);
+    const primary = ColorsUtils.colorOut(mainColors.primary);
 
     mixinClickInput(
         `
@@ -35,7 +30,7 @@ export const paginationCSS = () => {
             },
             allStates: {
                 ...userSelect(),
-                backgroundColor: colorOut(mainColors.fg.fade(0.05)),
+                backgroundColor: ColorsUtils.colorOut(mainColors.fg.fade(0.05)),
             },
         },
     );
@@ -50,12 +45,12 @@ export const paginationCSS = () => {
         },
         {
             default: {
-                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
                 cursor: "pointer",
                 ...userSelect(),
             },
             allStates: {
-                backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+                backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
                 ...userSelect(),
             },
         },
@@ -73,8 +68,12 @@ export const paginationCSS = () => {
 
     cssOut(`.Pager span`, {
         cursor: important("default"),
-        backgroundColor: importantColorOut(mainColors.bg),
-        color: importantColorOut(globalVars.links.colors.default),
+        backgroundColor: ColorsUtils.colorOut(mainColors.bg, {
+            makeImportant: true,
+        }),
+        color: ColorsUtils.colorOut(globalVars.links.colors.default, {
+            makeImportant: true,
+        }),
         opacity: 0.5,
     });
 
@@ -82,14 +81,14 @@ export const paginationCSS = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: unit(16),
+        marginBottom: styleUnit(16),
     });
 
     cssOut(`.MorePager`, {
         textAlign: "right",
-        $nest: {
+        ...{
             "& a": {
-                color: colorOut(mainColors.primary),
+                color: ColorsUtils.colorOut(mainColors.primary),
             },
         },
     });
@@ -105,10 +104,10 @@ export const paginationCSS = () => {
     });
 
     cssOut(`.Pager.NumberedPager > a.Highlight`, {
-        color: colorOut(isLightColor(mainColors.fg) ? mainColors.fg.fade(0.85) : mainColors.fg),
+        color: ColorsUtils.colorOut(ColorsUtils.isLightColor(mainColors.fg) ? mainColors.fg.fade(0.85) : mainColors.fg),
         pointerEvents: "none",
-        backgroundColor: colorOut(
-            modifyColorBasedOnLightness({
+        backgroundColor: ColorsUtils.colorOut(
+            ColorsUtils.modifyColorBasedOnLightness({
                 color: mainColors.bg,
                 weight: 0.05,
             }),

@@ -194,7 +194,7 @@ class Bootstrap {
             ->setClass(\Vanilla\Site\ApplicationProvider::class)
             ->addCall('add', [new Reference(
                 \Vanilla\Site\Application::class,
-                ['garden', ['api', 'entry', 'sso', 'utility']]
+                ['garden', ['api', 'entry', 'sso', 'utility', 'robots.txt', 'robots']]
             )])
             ->setShared(true)
 
@@ -351,6 +351,7 @@ class Bootstrap {
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
             ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
             ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
 
             ->rule(LogTransactionMiddleware::class)
             ->setShared(true)
@@ -386,6 +387,13 @@ class Bootstrap {
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
             ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
+
+            ->rule(\Vanilla\Web\APIExpandMiddleware::class)
+            ->setConstructorArgs([
+                "/api/v2/",
+                ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
+            ])
+            ->setShared(true)
 
             ->rule('@view-application/json')
             ->setClass(\Vanilla\Web\JsonView::class)

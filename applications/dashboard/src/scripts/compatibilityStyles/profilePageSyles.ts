@@ -5,22 +5,27 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, colorOut, importantColorOut, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
+import { absolutePosition, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { important } from "csx";
 
 export const profilePageCSS = () => {
     const globalVars = globalVariables();
 
     cssOut(`body.Section-Profile .Gloss, body.Section-Profile .Profile-rank`, {
-        color: colorOut(globalVars.mainColors.primary),
-        borderColor: colorOut(globalVars.mainColors.primary),
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
     });
 
     cssOut(`.DataList.Activities a.CommentLink, .DataList.Activities a.CommentLink:hover`, {
-        color: importantColorOut(globalVars.meta.text.color),
+        color: ColorsUtils.colorOut(globalVars.meta.text.color, {
+            makeImportant: true,
+        }),
     });
 
     cssOut(`.PhotoWrap a.ChangePicture .ChangePicture-Text `, {
@@ -28,17 +33,19 @@ export const profilePageCSS = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: importantColorOut(globalVars.elementaryColors.black.fade(0.4)),
+        background: ColorsUtils.colorOut(globalVars.elementaryColors.black.fade(0.4), {
+            makeImportant: true,
+        }),
         ...userSelect(),
     });
     cssOut(`.PhotoWrap a.ChangePicture:not(:hover) .ChangePicture-Text `, {
-        ...srOnly(), // still visible to screen readers
+        ...Mixins.absolute.srOnly(),
     });
 
     cssOut(`.PhotoWrap a.ChangePicture`, {
         background: important("none"),
         textDecoration: "none",
-        color: colorOut(globalVars.elementaryColors.white),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
         display: important("flex"),
         alignItems: "center",
         justifyContent: "center",
@@ -52,8 +59,8 @@ export const profilePageCSS = () => {
     cssOut(`.PhotoWrap a.ChangePicture .icon`, {
         display: "inline-block",
         verticalAlign: "middle",
-        fontSize: unit(20),
-        color: colorOut(globalVars.elementaryColors.white),
-        marginRight: unit(10),
+        fontSize: styleUnit(20),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+        marginRight: styleUnit(10),
     });
 };

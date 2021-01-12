@@ -5,21 +5,16 @@
  */
 
 import { percent, px, calc, quote, rgba } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import {
-    absolutePosition,
-    colorOut,
-    flexHelper,
-    negative,
-    paddings,
-    unit,
-    userSelect,
-    isLightColor,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { absolutePosition, flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { LogoAlignment } from "@library/headers/TitleBar";
+import { LogoAlignment } from "@library/headers/LogoAlignment";
+import { Mixins } from "@library/styles/Mixins";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
@@ -75,6 +70,7 @@ const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
+
     const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("titleBarNav");
@@ -83,10 +79,10 @@ const titleBarNavClasses = useThemeCache(() => {
         {
             ...flex.middleLeft(),
             position: "relative",
-            height: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
         },
         mediaQueries.compact({
-            height: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
@@ -94,7 +90,7 @@ const titleBarNavClasses = useThemeCache(() => {
         "navigation",
         titleBarVars.logo.doubleLogoStrategy === "hidden" || titleBarVars.logo.justifyContent === LogoAlignment.CENTER
             ? {
-                  marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
+                  marginLeft: styleUnit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
               }
             : {},
     );
@@ -108,8 +104,8 @@ const titleBarNavClasses = useThemeCache(() => {
         "items",
         {
             ...flex.middleLeft(),
-            height: unit(titleBarVars.sizing.height),
-            ...paddings(vars.padding),
+            height: styleUnit(titleBarVars.sizing.height),
+            ...Mixins.padding(vars.padding),
         },
         mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
@@ -120,30 +116,30 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const link = style("link", {
         ...userSelect(),
-        color: colorOut(titleBarVars.colors.fg),
+        color: ColorsUtils.colorOut(titleBarVars.colors.fg),
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: unit(vars.item.size),
+        minHeight: styleUnit(vars.item.size),
         textDecoration: "none",
         alignSelf: "center",
-        paddingLeft: unit(vars.navLinks.padding.left),
-        paddingRight: unit(vars.navLinks.padding.right),
-        fontSize: unit(vars.navLinks.fontSize),
-        $nest: {
+        paddingLeft: styleUnit(vars.navLinks.padding.left),
+        paddingRight: styleUnit(vars.navLinks.padding.right),
+        fontSize: styleUnit(vars.navLinks.fontSize),
+        ...{
             "&.focus-visible": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
             "&:focus": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
             "&:hover": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
         },
     });
@@ -151,19 +147,19 @@ const titleBarNavClasses = useThemeCache(() => {
     const offsetWidth = vars.linkActive.offset * 2;
 
     const linkActive = style("linkActive", {
-        $nest: {
+        ...{
             "&:after": {
                 ...absolutePosition.topLeft(
-                    `calc(50% - ${unit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
+                    `calc(50% - ${styleUnit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
                 ),
-                maxWidth: unit(vars.linkActive.maxWidth),
+                maxWidth: styleUnit(vars.linkActive.maxWidth),
                 content: quote(""),
-                height: unit(vars.linkActive.height),
+                height: styleUnit(vars.linkActive.height),
                 left: percent(50),
-                marginLeft: unit(negative(vars.linkActive.offset)),
-                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${unit(offsetWidth)}`),
-                backgroundColor: colorOut(vars.linkActive.bg),
-                transform: `translate(-50%, ${unit(titleBarVars.sizing.height / 2)})`,
+                marginLeft: styleUnit(negative(vars.linkActive.offset)),
+                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${styleUnit(offsetWidth)}`),
+                transform: `translate(-50%, ${styleUnit(titleBarVars.sizing.height / 2)})`,
+                backgroundColor: ColorsUtils.colorOut(vars.linkActive.bg),
             },
         },
     });
@@ -176,8 +172,9 @@ const titleBarNavClasses = useThemeCache(() => {
         zIndex: 2,
     });
     const navContiner = style("navContiner", {
-        paddingBottom: unit(vars.navPadding.padding.bottom),
+        paddingBottom: styleUnit(vars.navPadding.padding.bottom),
     });
+
     const navLinks = style("navLinks", {});
 
     return {
@@ -187,7 +184,6 @@ const titleBarNavClasses = useThemeCache(() => {
         items,
         link,
         linkActive,
-        // linkContent,
         lastItem,
         firstItem,
         navLinks,

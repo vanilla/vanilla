@@ -123,6 +123,9 @@ class TestDispatcher {
             $request->setPath($path);
         }
 
+        // Kludge to ensure the path can be reloaded from the environment args.
+        $request->setURI($request->getPath());
+
         if ($method === 'POST') {
             $session->validateTransientKey(true);
             $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);

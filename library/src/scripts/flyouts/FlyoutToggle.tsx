@@ -12,7 +12,6 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { forceRenderStyles } from "typestyle";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
@@ -156,10 +155,6 @@ export default function FlyoutToggle(props: IProps) {
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });
-    useEffect(() => {
-        // Prevent flashing on the first render
-        forceRenderStyles();
-    }, []);
 
     const childrenData: IFlyoutToggleChildParameters = {
         id: contentID,

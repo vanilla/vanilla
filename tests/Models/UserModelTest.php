@@ -14,11 +14,13 @@ use Garden\EventManager;
 use Vanilla\Dashboard\Events\UserEvent;
 use \UserModel;
 use VanillaTests\VanillaTestCase;
+use ActivityModel;
 
 /**
  * Test {@link UserModel}.
  */
 class UserModelTest extends SiteTestCase {
+
     /** @var UserEvent */
     private $lastEvent;
 
@@ -32,6 +34,24 @@ class UserModelTest extends SiteTestCase {
      */
     private $ssoRoleID2;
 
+    /** @var ActivityModel */
+    private $activityModel;
+
+    /** @var \DiscussionModel */
+    private $discussionModel;
+
+    /** @var \CommentModel */
+     private $commentModel;
+
+    /** @var \ConversationModel */
+    private $conversationModel;
+
+    /** @var \ConversationMessageModel */
+    private $conversationMessageModel;
+
+    /** @var \Gdn_Configuration */
+    private $config;
+
     /**
      * @inheritDoc
      */
@@ -43,11 +63,23 @@ class UserModelTest extends SiteTestCase {
         $this->lastEvent = null;
 
         $this->container()->call(function (
-            EventManager $eventManager
+            EventManager $eventManager,
+            \Gdn_Configuration $config
         ) {
             $eventManager->unbindClass(self::class);
             $eventManager->addListenerMethod(self::class, "handleUserEvent");
+            $this->config = $config;
         });
+
+        $this->config->set([
+            // Relax username validation.
+            'Garden.User.ValidationRegexPattern' => '`^[a-zA-Z0-9_ ]*$`'
+        ], null);
+        $this->activityModel = $this->container()->get(ActivityModel::class);
+        $this->discussionModel = $this->container()->get(\DiscussionModel::class);
+        $this->commentModel = $this->container()->get(\CommentModel::class);
+        $this->conversationModel = $this->container()->get(\ConversationModel::class);
+        $this->conversationMessageModel = $this->container()->get(\ConversationMessageModel::class);
 
         // Add a couple of test SSO roles.
         $this->ssoRoleID1 = $this->defineRole(['Name' => 'SSO 1', 'Sync' => 'sso']);
@@ -175,6 +207,32 @@ class UserModelTest extends SiteTestCase {
         }
 
         $this->assertTrue($result, "Failed to only return users in the specific role.");
+    }
+
+    /**
+     * Test UserModel::search().
+     */
+    public function testSearch(): void {
+        $userA = [
+            "Name" => "user_a",
+            "Email" => "testuser1@example.com",
+            "Password" => "vanilla"
+        ];
+
+        $userB = [
+            "Name" => "user a",
+            "Email" => "testuser2@example.com",
+            "Password" => "vanilla"
+        ];
+
+        $userIDA = $this->userModel->save($userA);
+        $this->userModel->save($userB);
+
+
+        $result = $this->userModel->search($userA['Name']);
+        $row = $result->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($userIDA, $row['UserID']);
+        $this->assertEquals(1, $result->numRows());
     }
 
     /**
@@ -392,5 +450,83 @@ class UserModelTest extends SiteTestCase {
             ['0.0.0.0', false],
         ];
         return array_column($r, null, 0);
+    }
+
+    /**
+     * Test UserModel::Merge().
+     */
+    public function testMergeUsers(): void {
+        // User to merge
+        $oldUser = $this->dummyUser();
+        $newUser = $this->dummyUser();
+        // Random conversation user.
+        $randomUser = $this->dummyUser();
+
+        $oldUserID = $this->userModel->save($oldUser);
+        $newUserID = $this->userModel->save($newUser);
+        $randomUserID = $this->userModel->save($randomUser);
+
+        // Create an activity for old user.
+        $this->activityModel->save([
+            "ActivityUserID" => $oldUserID,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_SKIPPED,
+            "NotifyUserID" => $randomUserID
+        ]);
+
+        // Create a discussion for old user.
+        $discussionID = $this->discussionModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => "valid discussion",
+            "Format" => "markdown",
+            "InsertUserID" => $oldUserID
+        ]);
+
+        // Save counts before merging users.
+        $discussionCountBefore = $this->discussionModel->getCount(['d.InsertUserID' => $newUserID]);
+        $commentCountBefore = $this->commentModel->getCountWhere(['DiscussionID' => $discussionID, 'InsertUserID' => $newUserID]);
+
+        $commentID = $this->commentModel->save([
+            "DiscussionID" => $discussionID,
+            "Body" => "Hello world.",
+            "Format" => "Text",
+            "InsertUserID" => $oldUserID
+        ]);
+
+        // Update User's comment count.
+        $this->commentModel->save2([$commentID], true, true, false);
+
+        // Create a conversation for old user.
+        $conversationID = $this->conversationModel->save([
+            "Format" => "Text",
+            "Body" => "Creating conversation",
+            "InsertUserID" => $oldUserID,
+            "RecipientUserID" => [$randomUserID]]);
+
+        $conversation = $this->conversationModel->getID($conversationID, DATASET_TYPE_ARRAY);
+
+        $this->conversationMessageModel->save([
+            "ConversationID" => $conversation["ConversationID"],
+            "Format" => "Text",
+            "Body" => "This is a test message"
+        ]);
+
+        $activityCountBeforeOldUser = $this->activityModel->getCount($oldUserID);
+
+        // Merge the 2 users.
+        $result = $this->userModel->merge($oldUserID, $newUserID);
+
+        // Verify all counts are correct after merging the users.=
+        $activityCountAfter = $this->activityModel->getCount($newUserID);
+        $this->assertEquals($activityCountBeforeOldUser, $activityCountAfter);
+        $discussionCountAfter = $this->discussionModel->getCount(['d.InsertUserID' => $newUserID]);
+        $commentCountAfter = $this->commentModel->getCountWhere(['DiscussionID' => $discussionID, 'InsertUserID' => $newUserID]);
+        $actualDiscussionCount = $result['After']['NewUser']['CountDiscussions'];
+        $actualCommentCount = $result['After']['NewUser']['CountComments'];
+        $this->assertEquals($discussionCountBefore + $discussionCountAfter, $actualDiscussionCount);
+        $this->assertEquals($commentCountBefore + $commentCountAfter, $actualCommentCount);
+        $this->assertNotEmpty($result['MergeID']);
     }
 }

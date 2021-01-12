@@ -94,6 +94,7 @@ class PageScraper {
         $info['Url'] = $url;
         $info['Title'] = htmlEntityDecode($info['Title']);
         $info['Description'] = htmlEntityDecode($info['Description']);
+        $info['isCacheable'] = empty($response->getHeader('x-no-cache'));
 
         return $info;
     }

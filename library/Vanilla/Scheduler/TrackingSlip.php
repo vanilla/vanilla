@@ -7,10 +7,13 @@
 
 namespace Vanilla\Scheduler;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Logger;
 use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Meta\SchedulerJobMeta;
 
 /**
  * Class TrackingSlip
@@ -32,10 +35,23 @@ class TrackingSlip implements TrackingSlipInterface {
      */
     protected $jobDescriptor;
 
-    /**
-     * @var SchedulerJobMeta
-     */
-    protected $schedulerJobMeta;
+    /* @var float */
+    protected $timerStart = null;
+
+    /* @var float */
+    protected $timerStop = null;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var ConfigurationInterface */
+    protected $config;
+
+    /** @var string */
+    protected $trackingId;
+
+    /** @var int */
+    protected $duplication = 0;
 
     /**
      * TrackingSlip constructor
@@ -43,16 +59,24 @@ class TrackingSlip implements TrackingSlipInterface {
      * @param string $jobInterface
      * @param DriverSlipInterface $driverSlip
      * @param JobDescriptorInterface $jobDescriptor
+     * @param LoggerInterface $logger
+     * @param ConfigurationInterface $config
      */
     public function __construct(
         string $jobInterface,
         DriverSlipInterface $driverSlip,
-        JobDescriptorInterface $jobDescriptor
+        JobDescriptorInterface $jobDescriptor,
+        LoggerInterface $logger,
+        ConfigurationInterface $config
     ) {
         $this->jobInterface = $jobInterface;
         $this->driverSlip = $driverSlip;
         $this->jobDescriptor = $jobDescriptor;
-        $this->schedulerJobMeta = new SchedulerJobMeta($this);
+        $this->logger = $logger;
+        $this->config = $config;
+
+        $this->trackingId = uniqid((gethostname() ?: 'unknown')."::", true);
+        $this->driverSlip->setTrackingId($this->trackingId);
     }
 
     /**
@@ -61,11 +85,16 @@ class TrackingSlip implements TrackingSlipInterface {
      * @return string
      */
     public function getId(): string {
-        $class = $this->jobInterface;
-        $type = $this->jobDescriptor->getJobType();
-        $id = $this->driverSlip->getId();
+        return $this->driverSlip->getId();
+    }
 
-        return "{$class}-{$type}-{$id}";
+    /**
+     * GetType
+     *
+     * @return string
+     */
+    public function getType(): string {
+        return $this->driverSlip->getType();
     }
 
     /**
@@ -75,7 +104,7 @@ class TrackingSlip implements TrackingSlipInterface {
      * @return string
      */
     public function getTrackingId(): string {
-        return uniqid((gethostname() ?: 'unknown')."::", true);
+        return $this->trackingId;
     }
 
     /**
@@ -101,7 +130,7 @@ class TrackingSlip implements TrackingSlipInterface {
      *
      * @return string
      */
-    public function getJobInterface() {
+    public function getJobInterface(): string {
         return $this->jobInterface;
     }
 
@@ -122,18 +151,88 @@ class TrackingSlip implements TrackingSlipInterface {
     }
 
     /**
-     * @return SchedulerJobMeta
-     */
-    public function getSchedulerJobMeta(): SchedulerJobMeta {
-        return $this->schedulerJobMeta;
-    }
-
-    /**
      * Get the Error Message (if exists)
      *
      * @return string|null
      */
     public function getErrorMessage(): ?string {
         return $this->driverSlip->getErrorMessage();
+    }
+
+    /**
+     * Set Init
+     */
+    public function start(): void {
+        $this->timerStart = microtime(true);
+    }
+
+    /**
+     * Set End
+     */
+    public function stop(): void {
+        $this->timerStop = microtime(true);
+    }
+
+    /**
+     * Get elapsed Milliseconds
+     *
+     * @return int|null
+     */
+    public function getElapsedMs(): ?int {
+        return ($this->timerStop !== null && $this->timerStart !== null) ? (int)(($this->timerStop - $this->timerStart) * 1000) : 0;
+    }
+
+    /**
+     * Log
+     *
+     * @return bool
+     */
+    public function log(): bool {
+
+        if (!$this->config->get('Garden.Scheduler.Log', false)) {
+            return false;
+        }
+
+        $values = [
+            'trackingId' => $this->getTrackingId(),
+            'type' => $this->getType(),
+            'jobId' => $this->getId(),
+            'status' => $this->getStatus()->getStatus(),
+            'elapsedMs' => $this->getElapsedMs(),
+        ];
+
+        if ($this->getErrorMessage()) {
+            $values['errorMessage'] = $this->getErrorMessage();
+        }
+
+        $this->logger->log(
+            LogLevel::INFO,
+            '',
+            [
+                '_id' => 'scheduler::'.$this->getTrackingId(),
+                '_version' => microtime(true) * 1000000,
+                'scheduler' => $values,
+                Logger::FIELD_EVENT => 'scheduler',
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * GetDuplication
+     *
+     * @return int
+     */
+    public function getDuplication(): int {
+        return $this->duplication;
+    }
+
+    /**
+     * IncrementDuplication
+     */
+    public function incrementDuplication(): void {
+        $this->duplication++;
     }
 }

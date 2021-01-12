@@ -5,12 +5,12 @@
  */
 
 import React from "react";
-import { unit } from "@library/styles/styleHelpers";
-import { TLength } from "typestyle/lib/types";
+import { styleUnit } from "@library/styles/styleUnit";
+import { TLength } from "@library/styles/styleShim";
 import { t } from "@library/utility/appUtils";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { PaddingProperty } from "csstype";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import classNames from "classnames";
@@ -47,7 +47,7 @@ export default class Loader extends React.Component<IProps, IState> {
                 <ConditionalWrap
                     condition={!!this.props.padding || !!this.props.size}
                     className={classNames(
-                        this.props.padding && style({ padding: unit(this.props.padding) }),
+                        this.props.padding && style({ padding: styleUnit(this.props.padding) }),
                         this.props.size && loaderClasses().loaderContainer(this.props.size),
                     )}
                 >

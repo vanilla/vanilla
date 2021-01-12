@@ -13,17 +13,17 @@
  */
 export class FocusWatcher {
     /**
-     * @param rootNode - The root dom node to watch on.
+     * @param watchedNode - The watched dom node.
      * @param callback - A callback for when the tree focuses and blurs.
      */
-    public constructor(private rootNode: Element, private changeHandler: (hasFocus: boolean) => void) {}
+    public constructor(private watchedNode: Element, private changeHandler: (hasFocus: boolean) => void) {}
 
     /**
      * Register the event listeners from this class.
      */
     public start = () => {
-        this.rootNode.addEventListener("focusout", this.handleFocusOut, true);
-        this.rootNode.addEventListener("focusin", this.handleFocusIn, true);
+        this.watchedNode.addEventListener("focusout", this.handleFocusOut, true);
+        this.watchedNode.addEventListener("focusin", this.handleFocusIn, true);
         document.addEventListener("click", this.handleClick);
     };
 
@@ -31,8 +31,8 @@ export class FocusWatcher {
      * Remove the event listeners from this class.
      */
     public stop = () => {
-        this.rootNode.removeEventListener("focusout", this.handleFocusOut, true);
-        this.rootNode.removeEventListener("focusin", this.handleFocusIn, true);
+        this.watchedNode.removeEventListener("focusout", this.handleFocusOut, true);
+        this.watchedNode.removeEventListener("focusin", this.handleFocusIn, true);
         document.removeEventListener("click", this.handleClick);
     };
 
@@ -66,9 +66,9 @@ export class FocusWatcher {
      */
     private checkDomTreeWasClicked(clickedElement: Element) {
         return (
-            this.rootNode &&
+            this.watchedNode &&
             clickedElement &&
-            (this.rootNode.contains(clickedElement as Element) || this.rootNode === clickedElement)
+            (this.watchedNode.contains(clickedElement as Element) || this.watchedNode === clickedElement)
         );
     }
 
@@ -76,7 +76,7 @@ export class FocusWatcher {
      * Determine if the currently focused element is somewhere inside of (or the same as)
      * a given Element.
      *
-     * @param rootNode - The root node to look in.
+     * @param watchedNode - The watched node to look in.
      */
     private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean) => void) {
         setTimeout(() => {
@@ -96,15 +96,19 @@ export class FocusWatcher {
             }
 
             if (activeElement !== null) {
+                const isWatchedInBody = document.body.contains(this.watchedNode);
+                const isFocusedInBody = document.body.contains(activeElement);
+                const isModal = document.getElementById("modals")?.contains(activeElement);
                 const hasFocus =
-                    this.rootNode &&
+                    this.watchedNode &&
                     activeElement &&
-                    (activeElement === this.rootNode || this.rootNode.contains(activeElement));
+                    (activeElement === this.watchedNode || this.watchedNode.contains(activeElement));
 
                 // We will only invalidate based on something actually getting focus.
                 // Make sure we are still mounted before calling this.
                 // It could happen that our flyout is unmounted in between the setTimeout call.
-                if (document.body.contains(this.rootNode)) {
+                // We might have focused on a modal which can't be in the watched tree.
+                if (isWatchedInBody && isFocusedInBody && !isModal) {
                     callback(!!hasFocus);
                 }
             }

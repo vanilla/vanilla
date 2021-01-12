@@ -26,6 +26,8 @@ interface IProps {
     // Content
     title?: string;
     itemData: IHomeWidgetItemProps[];
+    callToAction?: string;
+    url?: string;
 }
 
 export function HomeWidget(props: IProps) {

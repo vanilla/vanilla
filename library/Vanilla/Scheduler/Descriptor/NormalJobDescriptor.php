@@ -7,6 +7,7 @@
 
 namespace Vanilla\Scheduler\Descriptor;
 
+use Throwable;
 use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobPriority;
 
@@ -26,6 +27,9 @@ class NormalJobDescriptor implements JobDescriptorInterface {
 
     /** @var int */
     protected $delay;
+
+    /** @var string|null */
+    protected $hash = null;
 
     /**
      * NormalJobDescriptor constructor
@@ -108,5 +112,25 @@ class NormalJobDescriptor implements JobDescriptorInterface {
      */
     public function getDelay(): int {
         return $this->delay;
+    }
+
+    /**
+     * GetHash
+     *
+     * @return string
+     */
+    public function getHash(): string {
+        if ($this->hash === null) {
+            try {
+                $serialize = serialize($this->getMessage());
+            } catch (Throwable $t) {
+                $serialize = uniqid('unserializable', true);
+            }
+            $seed = $this->getJobType().'::'.$serialize;
+
+            $this->hash = sha1($seed).'::'.md5($seed);
+        }
+
+        return $this->hash;
     }
 }

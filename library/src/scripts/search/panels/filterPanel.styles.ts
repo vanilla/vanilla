@@ -3,8 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { fonts, paddings, srOnly, unit } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
@@ -15,11 +18,11 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const header = style(
         "header",
         {
-            marginBottom: unit(globalVars.gutter.size * 1.5),
-            $nest: {
+            marginBottom: styleUnit(globalVars.gutter.size * 1.5),
+            ...{
                 "&&": {
                     border: 0,
-                    ...paddings({
+                    ...Mixins.padding({
                         horizontal: 0,
                         bottom: 0,
                     }),
@@ -29,16 +32,16 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
         mediaQueries({
             [LayoutTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
-                    ...srOnly(),
+                    ...Mixins.absolute.srOnly(),
                 },
             },
         }),
     );
 
     const body = style("body", {
-        $nest: {
+        ...{
             "&&": {
-                ...paddings({
+                ...Mixins.padding({
                     horizontal: 0,
                 }),
             },
@@ -46,11 +49,11 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     });
 
     const footer = style("body", {
-        $nest: {
+        ...{
             "&&": {
                 border: 0,
-                marginTop: unit(globalVars.gutter.size),
-                ...paddings({
+                marginTop: styleUnit(globalVars.gutter.size),
+                ...Mixins.padding({
                     horizontal: 0,
                 }),
             },
@@ -58,9 +61,9 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     });
 
     const title = style("title", {
-        $nest: {
+        ...{
             "&&": {
-                ...fonts({
+                ...Mixins.font({
                     size: globalVars.fonts.size.large,
                     weight: globalVars.fonts.weights.bold,
                 }),

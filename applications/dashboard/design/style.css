@@ -957,6 +957,10 @@ a.Small img {
   padding: 10px;
 }
 
+.DismissMessage img {
+  max-width: 100%;
+}
+
 .DismissMessage.Info {
   background: #f3f4f8;
   border: 1px solid #ddd;
@@ -1938,6 +1942,10 @@ td.CheckBoxColumn {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
   filter: alpha(opacity=100);
   opacity: 1;
+}
+
+.Item.Read .Title, .Item.Read .BlockTitle {
+  font-weight: normal;
 }
 
 .Item.Checked {

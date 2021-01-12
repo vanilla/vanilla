@@ -28,6 +28,9 @@ abstract class AbstractEmbed implements \JsonSerializable {
     /** @var array */
     protected $data = [];
 
+    /** @var bool */
+    protected $cacheable = true;
+
     /**
      * Determine if this embed is considered extended content.
      *
@@ -183,5 +186,19 @@ abstract class AbstractEmbed implements \JsonSerializable {
         ]);
 
         return $this->schema()->merge($baseSchema);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCacheable(): bool {
+        return $this->cacheable;
+    }
+
+    /**
+     * @param bool $cacheable
+     */
+    public function setCacheable(bool $cacheable): void {
+        $this->cacheable = $cacheable;
     }
 }

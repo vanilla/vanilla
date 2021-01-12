@@ -6,16 +6,18 @@
 
 import React, { useEffect } from "react";
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, SearchBarPresets } from "@library/banner/bannerStyles";
+import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
@@ -23,7 +25,7 @@ import { contentBannerClasses, contentBannerVariables } from "@library/banner/co
 import { useComponentDebug } from "@vanilla/react-utils";
 import { useLayout } from "@library/layout/LayoutContext";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { IBorderRadiusValue, unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import SmartLink from "@library/routing/links/SmartLink";
 
@@ -40,6 +42,7 @@ export interface IBannerProps {
     isContentBanner?: boolean;
     scope?: ISearchScopeNoCompact;
     initialQuery?: string; // prepopulate text input
+    hideSearch?: boolean;
 }
 
 /**
@@ -80,8 +83,8 @@ export default function Banner(props: IBannerProps) {
     logoImageSrc = logoImageSrc ? assetUrl(logoImageSrc) : null;
 
     // Search placement
-    const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch;
-    const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch;
+    const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch && !props.hideSearch;
+    const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch && !props.hideSearch;
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
@@ -111,7 +114,7 @@ export default function Banner(props: IBannerProps) {
                 scope={props.scope}
                 initialQuery={props.initialQuery}
                 overwriteSearchBar={{
-                    borderRadius: unit(vars.searchBar.border.radius),
+                    borderRadius: styleUnit(vars.searchBar.border.radius),
                     preset: vars.presets.input.preset,
                     compact: !!rightImageSrc || device === Devices.MOBILE || device === Devices.XS,
                 }}

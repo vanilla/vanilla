@@ -45,6 +45,46 @@ final class HtmlUtils {
     }
 
     /**
+     * Get all unique classes from dom node.
+     *
+     * @param \DOMElement $domNode The dom node.
+     *
+     * @return array
+     */
+    public static function getClasses(\DOMElement $domNode): array {
+        $result = [];
+        if ($classes = $domNode->getAttribute('class')) {
+            $result = explode(" ", $classes);
+        }
+        return array_unique($result);
+    }
+
+    /**
+     * Check if class exists in class array
+     *
+     * @param \DOMElement $domElement The domNode to check.
+     * @param string $className The class name to look for.
+     * @return bool
+     */
+    public static function hasClass(\DOMElement $domElement, string $className): bool {
+        $classes = self::getClasses($domElement);
+        return in_array($className, $classes);
+    }
+
+    /**
+     * Append class to dom node.
+     *
+     * @param \DOMElement $domNode
+     * @param string $className
+     */
+    public static function appendClass(\DOMElement $domNode, string $className) {
+        $classes = self::getClasses($domNode);
+        $classes[] = $className;
+        $classes = array_unique($classes);
+        $domNode->setAttribute('class', implode(" ", $classes));
+    }
+
+    /**
      * Join some group of CSS class names.
      *
      * @param mixed[] $args Multiple CSS class names to join together. Items may be string or null.

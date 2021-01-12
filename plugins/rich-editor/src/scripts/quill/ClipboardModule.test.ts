@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
@@ -333,7 +333,7 @@ describe("ClipboardModule", () => {
                 OpUtils.op("Nested"),
                 OpUtils.list(ListType.BULLETED),
                 OpUtils.op("b"),
-                OpUtils.list(ListType.ORDERED),
+                OpUtils.list(ListType.BULLETED),
             ]);
         });
     });
@@ -361,7 +361,7 @@ Hello<iframe type="text/html" width="${width}" height="${height}" src="${frameSr
             await waitFor(() => {
                 const frameHtml = quill.scroll.domNode.querySelector("iframe")?.outerHTML;
                 expect(frameHtml).equal(
-                    `<iframe src="https://www.example.com/embed/M7lc1UVf-VE?origin=http://example.com" class="embedIFrame-iframe" frameborder="0"></iframe>`,
+                    `<iframe sandbox="allow-same-origin allow-scripts allow-forms" src="https://www.example.com/embed/M7lc1UVf-VE?origin=http://example.com" class="embedIFrame-iframe" frameborder="0"></iframe>`,
                 );
                 expect(quill.getContents().ops?.[1]).deep.equals({
                     insert: {

@@ -6,7 +6,7 @@
 
 import React from "react";
 import { storyBookClasses, storyBookVariables } from "@library/storybook/StoryBookStyles";
-import { margins, negative } from "@library/styles/styleHelpers";
+import { negative } from "@library/styles/styleHelpers";
 
 /**
  * Separator, for react storybook.

@@ -64,11 +64,14 @@ class RichFormat extends BaseFormat {
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
+
             $blotGroups = $this->parser->parse(
                 $operations,
                 $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
             );
-            return $this->renderer->render($blotGroups);
+            $html = $this->renderer->render($blotGroups);
+            $html = $this->applyHtmlProcessors($html);
+            return $html;
         } catch (\Throwable $e) {
             $this->logBadInput($e);
             if ($throw) {

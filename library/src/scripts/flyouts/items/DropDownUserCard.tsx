@@ -7,7 +7,8 @@
 import React from "react";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import SmartLink from "@library/routing/links/SmartLink";
-import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
+import { mapUsersStoreState } from "@library/features/users/userModel";
+import { IInjectableUserState } from "@library/features/users/userTypes";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
 import classNames from "classnames";

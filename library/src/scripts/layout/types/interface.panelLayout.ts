@@ -1,4 +1,4 @@
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import {
     IThreeColumnLayoutMediaQueries,
     IThreeColumnLayoutMediaQueryStyles,
@@ -19,25 +19,25 @@ export enum fallbackLayoutVariables {
 }
 
 export interface IPanelLayoutMediaQueryStyles {
-    noBleed?: NestedCSSProperties;
-    noBleedDown?: NestedCSSProperties;
-    oneColumn?: NestedCSSProperties;
-    oneColumnDown?: NestedCSSProperties;
-    aboveOneColumn?: NestedCSSProperties;
-    twoColumns?: NestedCSSProperties;
-    twoColumnsDown?: NestedCSSProperties;
-    xs?: NestedCSSProperties;
+    noBleed?: CSSObject;
+    noBleedDown?: CSSObject;
+    oneColumn?: CSSObject;
+    oneColumnDown?: CSSObject;
+    aboveOneColumn?: CSSObject;
+    twoColumns?: CSSObject;
+    twoColumnsDown?: CSSObject;
+    xs?: CSSObject;
 }
 
 export interface IPanelLayoutMediaQueries {
-    noBleed: (styles: NestedCSSProperties) => NestedCSSProperties;
-    oneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
-    oneColumnDown: (styles: NestedCSSProperties) => NestedCSSProperties;
-    aboveOneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
-    twoColumns: (styles: NestedCSSProperties) => NestedCSSProperties;
-    twoColumnsDown: (styles: NestedCSSProperties) => NestedCSSProperties;
-    noBleedDown: (styles: NestedCSSProperties) => NestedCSSProperties;
-    xs: (styles: NestedCSSProperties) => NestedCSSProperties;
+    noBleed: (styles: CSSObject) => CSSObject;
+    oneColumn: (styles: CSSObject) => CSSObject;
+    oneColumnDown: (styles: CSSObject) => CSSObject;
+    aboveOneColumn: (styles: CSSObject) => CSSObject;
+    twoColumns: (styles: CSSObject) => CSSObject;
+    twoColumnsDown: (styles: CSSObject) => CSSObject;
+    noBleedDown: (styles: CSSObject) => CSSObject;
+    xs: (styles: CSSObject) => CSSObject;
 }
 
 export type IAllMediaQueries = IThreeColumnLayoutMediaQueries | ITwoColumnLayoutMediaQueries | IPanelLayoutMediaQueries;
@@ -65,10 +65,10 @@ export interface IAllLayoutMediaQueries {
     [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
 }
 
-export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
+export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => CSSObject;
 
 export type IAllLayoutDevices = twoColumnLayoutDevices | fallbackLayoutVariables;
 
 export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries | {};
 
-export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => NestedCSSProperties;
+export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => CSSObject;

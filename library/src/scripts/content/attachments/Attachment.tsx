@@ -15,9 +15,10 @@ import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 
 export interface IFileAttachment {
     name: string; // File name

@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { color, ColorHelper } from "csx";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { TLength } from "typestyle/lib/types";
+import { ColorHelper } from "csx";
+import { TLength } from "@library/styles/styleShim";
 import { MarginProperty, MarginTopProperty } from "csstype";
 
 export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {

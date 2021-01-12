@@ -16,7 +16,7 @@ import {
     Heading4Icon,
     Heading5Icon,
 } from "@library/icons/editorIcons";
-import { srOnly } from "@library/styles/styleHelpers";
+import { Mixins } from "@library/styles/Mixins";
 import { t } from "@library/utility/appUtils";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
@@ -29,7 +29,7 @@ import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
@@ -163,7 +163,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 </button>
                 <div
                     id={this.menuID}
-                    className={classNames(this.dropDownClasses, this.isMenuVisible ? "" : style(srOnly()))}
+                    className={classNames(
+                        this.dropDownClasses,
+                        this.isMenuVisible ? "" : style(Mixins.absolute.srOnly()),
+                    )}
                     style={this.toolbarStyles}
                     role="menu"
                 >

@@ -641,23 +641,24 @@ class ProfileController extends Gdn_Controller {
         if (!$session->isValid()) {
             redirectTo('/entry/signin?Target='.$request->getUrl());
         }
-
         $this->editMode(false);
 
         // check if first parameter is a page parameter
         // correct parameters values
-        if ($page === $this->User->Name) {
+        if (is_object($this->User) && $this->User->Name === $page) {
             $userReference = $page;
             $page = 'p1';
         }
-
-
         $this->getUserInfo($userReference, $username, $userID, $this->Form->authenticatedPostBack());
-        $this->setTabView('Invitations');
-
         // Determine if is own profile
         $this->isOwnProfile = $session->User->UserID === $this->User->UserID;
 
+        if (!$this->isOwnProfile) {
+            if (!$session->checkPermission('Garden.Moderation.Manage')) {
+                throw permissionException();
+            }
+        }
+        $this->setTabView('Invitations');
         // Determine offset from $page
         list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30), true);
         $page = pageNumber($offset, $limit);
@@ -1152,12 +1153,18 @@ class ProfileController extends Gdn_Controller {
      * Gets or sets a user's preference. This method is meant for ajax calls.
      *
      * @param string|false $key The name of the preference.
+     * @throws Gdn_UserException Invalid preference passed.
      */
     public function preference($key = false) {
         $this->permission('Garden.SignIn.Allow');
 
         if ($this->Form->authenticatedPostBack()) {
             $data = $this->Form->formValues();
+            foreach ($data as $pref => $value) {
+                if (preg_match("`[^A-Z0-9\.]`i", $pref) || preg_match("`[^A-Z0-9\.]`i", $value)) {
+                    throw new Gdn_UserException("Improperly formatted Preference.", 422);
+                }
+            }
             Gdn::userModel()->savePreference(Gdn::session()->UserID, $data);
         } else {
             $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
@@ -1827,8 +1834,9 @@ EOT;
                 $this->addProfileTab(t('Activity'), $activityUrl, 'Activity', sprite('SpActivity').' '.t('Activity'));
             }
 
+            $ownProfile = $this->User->UserID == $session->UserID;
             // Show notifications?
-            if ($this->User->UserID == $session->UserID) {
+            if ($ownProfile) {
                 $notifications = t('Notifications');
                 $notificationsHtml = sprite('SpNotifications').' '.$notifications;
                 $countNotifications = $session->User->CountNotifications;
@@ -1839,8 +1847,9 @@ EOT;
                 $this->addProfileTab($notifications, 'profile/notifications', 'Notifications', $notificationsHtml);
             }
 
+            $displayInvitations = $ownProfile || $session->checkPermission('Garden.Moderation.Manage');
             // Show invitations?
-            if (c('Garden.Registration.Method') == 'Invitation') {
+            if (c('Garden.Registration.Method') == 'Invitation' && $displayInvitations) {
                 $this->addProfileTab(t('Invitations'), 'profile/invitations/p1/'.$this->User->Name, 'InvitationsLink', sprite('SpInvitations').' '.t('Invitations'));
             }
 

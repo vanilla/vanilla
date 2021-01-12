@@ -4,11 +4,11 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import React, { useLayoutEffect } from "react";
 import { useThrowError } from "@vanilla/react-utils";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 
 interface IProps extends IBaseEmbedProps {
     sessionId: string;

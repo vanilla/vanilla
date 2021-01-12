@@ -12,16 +12,16 @@ interface IProps {
     onClick(): void;
 }
 
-export function ThemeButton(_props: IProps) {
+export const ThemeButton = React.forwardRef(function ThemeButton(_props: IProps, ref: React.Ref<HTMLButtonElement>) {
     const { disabled, label, onClick } = _props;
 
     return (
         <>
             <div className={themeButtonClasses().root}>
-                <button disabled={disabled} onClick={onClick}>
+                <button disabled={disabled} onClick={onClick} ref={ref}>
                     {label}
                 </button>
             </div>
         </>
     );
-}
+});

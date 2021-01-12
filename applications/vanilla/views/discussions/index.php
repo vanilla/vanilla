@@ -56,6 +56,7 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
     <ul class="DataList Discussions">
         <?php include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
     </ul>
+    <?php $this->fireEvent('AfterDiscussionsList'); ?>
     <?php
 
     echo '<div class="PageControls Bottom">';
@@ -66,5 +67,6 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 } else {
     ?>
     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+    <?php $this->fireEvent('AfterDiscussionsList'); ?>
 <?php
 }

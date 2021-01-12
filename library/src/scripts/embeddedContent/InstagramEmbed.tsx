@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { ensureScript } from "@vanilla/dom-utils";
 import { useThrowError } from "@vanilla/react-utils";
+import { InstagramPlaceholder } from "@library/embeddedContent/InstagramEmbedPlaceholder";
 
 interface IProps extends IBaseEmbedProps {
     version: number;
@@ -24,26 +25,23 @@ interface IProps extends IBaseEmbedProps {
 export function InstagramEmbed(props: IProps): JSX.Element {
     const throwError = useThrowError();
     useLayoutEffect(() => {
-        void convertInstagramEmbeds().catch(throwError);
-    });
+        convertInstagramEmbeds().catch(throwError);
+    }, [throwError]);
 
     const permaLink = `https://www.instagram.com/p/${props.postID}`;
+
+    const link = (
+        <a href={permaLink} rel="nofollow noreferrer ugc">
+            {permaLink}
+        </a>
+    );
 
     return (
         <EmbedContainer>
             <EmbedContent type={props.embedType}>
                 <div className="embedExternal embedInstagram">
                     <div className="embedExternal-content">
-                        <blockquote
-                            className="instagram-media"
-                            data-instgrm-captioned
-                            data-instgrm-permalink={permaLink}
-                            data-instgrm-version={props.version}
-                        >
-                            <a href={permaLink} rel="nofollow noreferrer ugc">
-                                {permaLink}
-                            </a>
-                        </blockquote>
+                        <InstagramPlaceholder postID={props.postID} />
                     </div>
                 </div>
             </EmbedContent>
@@ -60,6 +58,6 @@ async function convertInstagramEmbeds() {
             throw new Error("The Instagram post failed to load");
         }
 
-        window.instgrm.Embeds.process();
+        return window.instgrm.Embeds.process();
     }
 }

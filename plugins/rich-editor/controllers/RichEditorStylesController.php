@@ -6,11 +6,31 @@
  */
 
 class RichEditorStylesController extends VanillaController {
+    /**
+     * Renders the rich text editor.
+     */
     public function index() {
         $this->render();
     }
 
-    public function rendered() {
+    /**
+     * Renders embeds.
+     */
+    public function embeds() {
+        $this->render();
+    }
+
+    /**
+     * Renders common rich text formatting.
+     */
+    public function formatting() {
+        $this->render();
+    }
+
+    /**
+     * Renders images with various size and placement options.
+     */
+    public function images() {
         $this->render();
     }
 }

@@ -12,4 +12,4 @@ addComponent("pocket-multi-role-input", PocketMultiRoleInput);
 
 // Do something to prevent crash here.
 addComponent("pocket-category-input", PocketCategoryInput);
-addComponent("PocketContentForm", PocketContentForm, { bypassPortalManager: true });
+addComponent("PocketContentForm", PocketContentForm, { bypassPortalManager: true, unmountBeforeRender: true });

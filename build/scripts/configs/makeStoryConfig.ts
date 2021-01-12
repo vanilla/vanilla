@@ -30,7 +30,17 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
     baseStorybookConfig.module?.rules.push({
         test: /\.scss$/,
         use: [
-            "style-loader",
+            {
+                loader: "style-loader",
+                options: {
+                    injectType: "singletonStyleTag",
+                    insert: function insertAtTop(element: HTMLElement) {
+                        const parent = document.head;
+                        parent.prepend(element);
+                    },
+                },
+            },
+
             {
                 loader: "css-loader",
                 options: {

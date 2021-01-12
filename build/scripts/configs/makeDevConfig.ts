@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-const ReactRefreshPlugin = require("react-refresh-webpack-plugin");
+const ReactRefreshPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
@@ -20,7 +20,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = sectionEntries;
-    baseConfig.devtool = "cheap-source-map";
+    baseConfig.devtool = "cheap-module-source-map";
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
@@ -40,7 +40,11 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         },
     };
     baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
-    baseConfig.plugins!.push(new ReactRefreshPlugin());
+    baseConfig.plugins!.push(
+        new ReactRefreshPlugin({
+            forceEnable: true,
+        }),
+    );
 
     return baseConfig;
 }

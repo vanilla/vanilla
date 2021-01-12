@@ -13,4 +13,8 @@ export class SearchActions {
     public static performSearchACs = createAction.async<ISearchRequestQuery, ISearchResults, IApiError>("SEARCH");
     public static updateSearchFormAC = createAction<Partial<ISearchForm>>("UPDATE_FORM");
     public static resetFormAC = createAction("RESET_FORM");
+
+    public static performDomainSearchACs = createAction.async<ISearchRequestQuery, ISearchResults, IApiError>(
+        "DOMAIN_SEARCH",
+    );
 }

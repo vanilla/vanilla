@@ -10,9 +10,10 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
 import Banner, { IBannerProps } from "@library/banner/Banner";
-import { BannerAlignment, bannerVariables, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
+import { BannerAlignment, bannerVariables, SearchPlacement } from "@library/banner/bannerStyles";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { STORY_LOGO_BLACK, STORY_LOGO_WHITE } from "@library/storybook/storyData";
 import { LayoutProvider } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
@@ -609,7 +610,6 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-
                 spacing: {
                     padding: {
                         top: 87,

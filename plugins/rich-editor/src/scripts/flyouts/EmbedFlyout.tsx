@@ -26,7 +26,7 @@ import classNames from "classnames";
 import debounce from "lodash/debounce";
 import KeyboardModule from "quill/modules/keyboard";
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { isURL } from "validator";
 
 interface IProps {

@@ -3,30 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    borders,
-    colorOut,
-    EMPTY_BORDER,
-    EMPTY_FONTS,
-    EMPTY_SPACING,
-    fonts,
-    margins,
-    paddings,
-    pointerEvents,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { absolutePosition, pointerEvents, singleBorder } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { TextTransformProperty } from "csstype";
 import { important, percent } from "csx";
-import { buttonResetMixin, buttonVariables } from "@library/forms/buttonStyles";
-import { nestedWorkaround } from "@dashboard/compatibilityStyles";
+import { buttonVariables } from "@library/forms/Button.variables";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
@@ -59,27 +49,24 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const label = makeVars("label", {
-        border: {
-            ...EMPTY_BORDER,
+        border: Variables.border({
             color: globalVars.mainColors.primary,
             radius: 3,
-        },
-        padding: {
-            ...EMPTY_SPACING,
+        }),
+        padding: Variables.spacing({
             vertical: 2,
             horizontal: 10,
-        },
-        font: {
-            ...EMPTY_FONTS,
+        }),
+        font: Variables.font({
             color: globalVars.mainColors.primary,
             size: 10,
-            transform: "uppercase" as TextTransformProperty,
-        },
+            transform: "uppercase",
+        }),
     });
 
     const containerWithBorder = makeVars("containerWithBorder", {
-        color: colorOut(globalVars.border.color),
-        ...paddings({
+        color: ColorsUtils.colorOut(globalVars.border.color),
+        ...Mixins.padding({
             horizontal: container.spacing * 2,
             vertical: container.spacing * 4,
         }),
@@ -98,7 +85,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const email = makeVars("email", {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     return {
@@ -119,7 +106,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
     const style = styleFactory("popupUserCard");
     const vars = userCardVariables();
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const mediaQueries = layoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
@@ -128,14 +115,14 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         flexDirection: "row",
         alignItems: "stretch",
         justifyContent: "center",
-        ...paddings({
+        ...Mixins.padding({
             all: vars.container.spacing,
         }),
         flexWrap: "wrap",
     });
 
     const metaContainer = style("metaContainer", {
-        ...paddings({
+        ...Mixins.padding({
             all: vars.container.spacing,
         }),
     });
@@ -146,19 +133,19 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const actionContainer = style("actionContainer", {
-        $nest: {
+        ...{
             "&&": {
-                ...paddings({
+                ...Mixins.padding({
                     horizontal: vars.actionContainer.spacing,
                     top: vars.container.spacing,
                     bottom: vars.actionContainer.spacing * 2 - vars.container.spacing,
                 }),
                 ...mediaQueries.oneColumnDown({
-                    ...paddings({
+                    ...Mixins.padding({
                         vertical: vars.actionContainer.spacing * 2 - vars.container.spacing,
                         horizontal: vars.actionContainer.spacing,
                     }),
-                }).$nest,
+                }),
             },
         },
     });
@@ -178,23 +165,21 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     // Create new class with same styles
     const buttonClass = style(buttonStyles);
 
-    nestedWorkaround(`.${buttonClass}`, buttonStyles.$nest);
-
     const button = style(
         "button",
         {
             maxWidth: percent(100),
-            $nest: {
+            ...{
                 "&&": {
-                    minWidth: unit(vars.button.minWidth),
+                    minWidth: styleUnit(vars.button.minWidth),
                 },
             },
         },
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&&": {
                     width: percent(100),
-                    minWidth: unit(vars.button.mobile.minWidth),
+                    minWidth: styleUnit(vars.button.mobile.minWidth),
                 },
             },
         }),
@@ -204,12 +189,12 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         "buttonContainer",
         {
             maxWidth: percent(100),
-            ...paddings({
+            ...Mixins.padding({
                 all: vars.container.spacing,
             }),
         },
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&&": {
                     flexGrow: 1,
                     flexBasis: percent(50),
@@ -233,10 +218,10 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     );
 
     const label = style("label", {
-        ...fonts(vars.label.font),
-        ...paddings(vars.label.padding),
-        ...borders(vars.label.border),
-        ...margins({
+        ...Mixins.padding(vars.label.padding),
+        ...Mixins.font(vars.label.font),
+        ...Mixins.border(vars.label.border),
+        ...Mixins.margin({
             top: vars.container.spacing,
             horizontal: "auto",
         }),
@@ -251,14 +236,14 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const statLabel = style("statLabel", {
-        marginTop: unit(2),
-        marginBottom: unit(3),
-        ...fonts({
+        marginTop: styleUnit(2),
+        marginBottom: styleUnit(3),
+        ...Mixins.font({
             size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         ...mediaQueries.oneColumnDown({
-            ...fonts({
+            ...Mixins.font({
                 size: globalVars.fonts.size.medium,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
@@ -267,7 +252,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const statLeft = style("statLeft", {
         borderRight: singleBorder({}),
-        ...paddings({
+        ...Mixins.padding({
             vertical: vars.container.spacing,
             right: globalVars.spacer.size / 2,
             left: globalVars.spacer.size,
@@ -275,7 +260,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const statRight = style("statRight", {
-        ...paddings({
+        ...Mixins.padding({
             vertical: vars.container.spacing,
             right: globalVars.spacer.size,
             left: globalVars.spacer.size / 2,
@@ -283,8 +268,8 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const count = style("count", {
-        marginTop: unit(3),
-        ...fonts({
+        marginTop: styleUnit(3),
+        ...Mixins.font({
             size: vars.count.size,
             lineHeight: globalVars.lineHeights.condensed,
         }),
@@ -292,42 +277,42 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const header = style("header", {
         position: "relative",
-        height: unit(vars.header.height),
+        height: styleUnit(vars.header.height),
     });
 
     const section = style("section", {});
 
     const email = style("email", {
-        $nest: {
+        ...{
             "&&&&": {
-                ...fonts({
+                ...Mixins.font({
                     color: globalVars.mainColors.fg,
                     size: globalVars.fonts.size.small,
                     align: "center",
                 }),
-                marginTop: unit(vars.container.spacing * 1.8),
                 display: "inline-flex",
                 margin: "auto",
+                marginTop: styleUnit(vars.container.spacing * 1.8),
             },
-            ...linkColors.$nest,
+            ...linkColors,
         },
     });
 
     const date = style("date", {
         padding: vars.buttonContainer.padding,
-        fontSize: unit(12),
+        fontSize: styleUnit(12),
     });
 
     const formElementsVars = formElementsVariables();
 
     const close = style("close", {
-        $nest: {
+        ...{
             "&&&": {
                 ...absolutePosition.topRight(),
-                width: unit(formElementsVars.sizing.height),
-                height: unit(formElementsVars.sizing.height),
+                width: styleUnit(formElementsVars.sizing.height),
+                height: styleUnit(formElementsVars.sizing.height),
                 ...mediaQueries.oneColumnDown({
-                    height: unit(formElementsVars.sizing.height),
+                    height: styleUnit(formElementsVars.sizing.height),
                 }),
             },
         },
@@ -341,7 +326,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const link = style("link", {
         color: "inherit",
         fontSize: "inherit",
-        $nest: {
+        ...{
             "&.isLoading": {
                 cursor: important("wait"),
                 ...pointerEvents("auto"),

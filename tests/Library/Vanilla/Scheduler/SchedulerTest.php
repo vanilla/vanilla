@@ -26,8 +26,6 @@ use VanillaTests\Fixtures\Scheduler\ThrowableDriver;
 use VanillaTests\Fixtures\Scheduler\ThrowableEchoJob;
 use VanillaTests\Fixtures\Scheduler\VoidDriver;
 
-use PHPUnit\Framework\Error\Deprecated;
-
 /**
  * Class SchedulerTest
  */
@@ -376,6 +374,36 @@ final class SchedulerTest extends SchedulerTestCase {
             $this->assertTrue($trackingSlips[0]->getStatus()->is($stackExecutionError));
             $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($stackExecutionError));
             $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
+        });
+
+        $eventManager->fire(self::DISPATCH_EVENT);
+    }
+
+    /**
+     * Test dispatching 3 Jobs, 2 of them are duplicates
+     *
+     * @throws ContainerException On error.
+     * @throws NotFoundException On error.
+     */
+    public function testDuplicatedJob() {
+        $container = $this->getConfiguredContainer();
+
+        /** @var $eventManager EventManager */
+        $eventManager = $container->get(EventManager::class);
+
+        /* @var $dummyScheduler SchedulerInterface */
+        $dummyScheduler = $container->get(SchedulerInterface::class);
+
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['a' => 'a']));
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['b' => 'b']));
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['a' => 'a']));
+
+        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
+            /** @var $trackingSlips TrackingSlip[] */
+            $this->assertEquals(2, count($trackingSlips));
+            $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::complete()));
+            $this->assertEquals(1, $trackingSlips[0]->getDuplication());
+            $this->assertTrue($trackingSlips[1]->getStatus()->is(JobExecutionStatus::complete()));
         });
 
         $eventManager->fire(self::DISPATCH_EVENT);

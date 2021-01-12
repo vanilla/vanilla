@@ -5,26 +5,26 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, unit } from "@library/styles/styleHelpers";
-
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 
 export const bestOfCSS = () => {
     const globalVars = globalVariables();
 
     cssOut(`body.Section-BestOf .Container .FilterMenu li.Active a`, {
-        color: colorOut(globalVars.mainColors.fg),
-        borderColor: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        borderColor: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`body.Section-BestOf .Tile`, {
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        color: colorOut(globalVars.mainColors.fg),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`body.Section-BestOf .Tile .Title, body.Section-BestOf .Tile .Title a`, {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`body.Section-BestOf .Tile .Message`, {
@@ -37,8 +37,8 @@ export const bestOfCSS = () => {
     body.Section-BestOf .Item .Author a
     `,
         {
-            color: colorOut(globalVars.links.colors.default),
-            fontSize: unit(globalVars.meta.text.size),
+            color: ColorsUtils.colorOut(globalVars.links.colors.default),
+            fontSize: styleUnit(globalVars.meta.text.size),
         },
     );
 
@@ -48,7 +48,7 @@ export const bestOfCSS = () => {
     body.Section-BestOf .Item .Author a:hover,
     `,
         {
-            color: colorOut(globalVars.links.colors.hover),
+            color: ColorsUtils.colorOut(globalVars.links.colors.hover),
         },
     );
 
@@ -58,7 +58,7 @@ export const bestOfCSS = () => {
     body.Section-BestOf .Item .Author a:focus,
     `,
         {
-            color: colorOut(globalVars.links.colors.focus),
+            color: ColorsUtils.colorOut(globalVars.links.colors.focus),
         },
     );
 
@@ -68,7 +68,7 @@ export const bestOfCSS = () => {
     body.Section-BestOf .Item .Author a:active
     `,
         {
-            color: colorOut(globalVars.links.colors.active),
+            color: ColorsUtils.colorOut(globalVars.links.colors.active),
         },
     );
 };

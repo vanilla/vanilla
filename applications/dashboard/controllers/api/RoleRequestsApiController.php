@@ -159,10 +159,9 @@ class RoleRequestsApiController extends Controller {
      * Apply to a role.
      *
      * @param array $body
-     * @param array $query
      * @return Data
      */
-    public function post_applications(array $body, array $query = []): Data {
+    public function post_applications(array $body): Data {
         $this->permission('Garden.SignIn.Allow');
 
         $in = Schema::parse(
@@ -170,6 +169,7 @@ class RoleRequestsApiController extends Controller {
         )
             ->add($this->requestModel->getWriteSchema())
             ->setField('properties.attributes', ['type' => 'object']);
+
         $body = $in->validate($body);
         $body += [
             'type' => RoleRequestModel::TYPE_APPLICATION,
@@ -178,7 +178,7 @@ class RoleRequestsApiController extends Controller {
         ];
 
         $id = $this->requestModel->insert($body);
-        $result = $this->getInternal($id, $query);
+        $result = $this->getInternal($id);
 
         return $result;
     }
@@ -188,6 +188,9 @@ class RoleRequestsApiController extends Controller {
      *
      * @param array $query
      * @return Data
+     * @throws HttpException Failed API call.
+     * @throws PermissionException Failed Permissions.
+     * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
     public function index(array $query = []): Data {
         $this->permission('Garden.SignIn.Allow');
@@ -301,6 +304,10 @@ class RoleRequestsApiController extends Controller {
      * @param array $body
      * @param array $query
      * @return Data
+     * @throws NoResultsException No role request found.
+     * @throws PermissionException User does not have permission to assign roles or update applications.
+     * @throws \Garden\Schema\ValidationException Data passed to API is invalid.
+     * @throws HttpException Failed API call.
      */
     public function patch_applications(int $roleRequestID, array $body, array $query = []): Data {
         $this->permission('Garden.Community.Manage');
@@ -338,6 +345,8 @@ class RoleRequestsApiController extends Controller {
      * @param int $roleRequestID
      * @param array $query
      * @return Data
+     * @throws NoResultsException Failed to retrieve results.
+     * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
     protected function getInternal(int $roleRequestID, array $query = []): Data {
         $in = Schema::parse([

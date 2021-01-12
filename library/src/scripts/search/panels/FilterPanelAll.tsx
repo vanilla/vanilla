@@ -10,8 +10,8 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchFormContext";
-import { t } from "@vanilla/i18n/src";
+import { useSearchForm } from "@library/search/SearchContext";
+import { t } from "@vanilla/i18n";
 import React from "react";
 
 interface IProps {}

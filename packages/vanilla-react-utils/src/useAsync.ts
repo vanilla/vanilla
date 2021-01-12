@@ -5,7 +5,7 @@
  */
 
 import { DependencyList, useEffect } from "react";
-import { FnReturningPromise, useAsyncFn } from ".";
+import { FnReturningPromise, useAsyncFn } from "./useAsyncFn";
 
 /**
  * Uses an async function executed automatically.

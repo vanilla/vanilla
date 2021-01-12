@@ -197,10 +197,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * @return array
      */
     private function normalizeAndValidate(array $row): array {
-        $schema = new VanillaMediaSchema(true);
-        $result = VanillaMediaSchema::normalizeFromDbRecord($row);
-        $result = $schema->validate($result);
-        return $result;
+        return VanillaMediaSchema::normalizeFromDbRecord($row);
     }
 
     /**

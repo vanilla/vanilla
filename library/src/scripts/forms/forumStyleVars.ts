@@ -5,10 +5,11 @@
 
 // This file is a WIP. It's currently only used for the image size, but it doesn't hurt anything to have it here.
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -48,11 +49,11 @@ export const forumVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             },
             meta: {
                 colors: {
-                    noState: colorOut(globalVars.mainColors.fg),
-                    focus: colorOut(globalVars.links.colors.focus),
-                    keyboardFocus: colorOut(globalVars.links.colors.keyboardFocus),
-                    hover: colorOut(globalVars.links.colors.hover),
-                    active: colorOut(globalVars.links.colors.active),
+                    noState: ColorsUtils.colorOut(globalVars.mainColors.fg),
+                    focus: ColorsUtils.colorOut(globalVars.links.colors.focus),
+                    keyboardFocus: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
+                    hover: ColorsUtils.colorOut(globalVars.links.colors.hover),
+                    active: ColorsUtils.colorOut(globalVars.links.colors.active),
                 },
             },
         },

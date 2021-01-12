@@ -1,0 +1,119 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VariableParser applies varGroup prefixes and common descriptions: varGroupPrefixes expansions 1`] = `
+Array [
+  Object {
+    "description": "My Description
+DESCRIPTION",
+    "key": "thing.var1",
+    "title": "PREFIX - Variable 1",
+    "type": "string",
+  },
+  Object {
+    "description": "My Description 2
+DESCRIPTION",
+    "key": "thing.var2",
+    "title": "PREFIX - Variable 2",
+    "type": "string",
+  },
+]
+`;
+
+exports[`VariableParser can handle type expanders: font expansions 1`] = `
+Array [
+  Object {
+    "commonTitle": "Thing Font",
+    "description": "Text color",
+    "expand": "font",
+    "key": "thing.font.color",
+    "title": "Thing Font - Color",
+    "type": "string",
+  },
+  Object {
+    "commonTitle": "Thing Font",
+    "description": "Text size",
+    "expand": "font",
+    "key": "thing.font.size",
+    "title": "Thing Font - Size",
+    "type": "number",
+  },
+]
+`;
+
+exports[`VariableParser can parse a single file 1`] = `
+Object {
+  "errors": Array [],
+  "variableGroups": Array [
+    Object {
+      "commonTitle": "Banner",
+      "description": "Control different variants for the banner. These options can affect multiple parts of the banner at once.",
+      "key": "banner.options",
+      "title": "Banner",
+    },
+  ],
+  "variables": Array [
+    Object {
+      "description": "When disabled the banner will not appear at all.",
+      "key": "banner.options.enabled",
+      "title": "Banner - Enabled",
+      "type": "boolean",
+    },
+    Object {
+      "description": "Align the banner",
+      "enum": Array [
+        "center",
+        "left",
+        "right",
+      ],
+      "key": "banner.options.alignment",
+      "title": "Banner - Alignment",
+      "type": "string",
+    },
+    Object {
+      "description": "Align the banner on mobile. Defaults to match desktop alignment.",
+      "enum": Array [
+        "center",
+        "left",
+        "right",
+      ],
+      "key": "banner.options.mobileAlignment",
+      "title": "Banner - Alignment (Mobile)",
+      "type": "string",
+    },
+    Object {
+      "description": undefined,
+      "key": "banner.options.hideDescription",
+      "title": "Banner - Hide Description",
+      "type": "boolean",
+    },
+    Object {
+      "description": undefined,
+      "key": "banner.options.hideTitle",
+      "title": "Banner - Hide Title",
+      "type": "boolean",
+    },
+    Object {
+      "description": undefined,
+      "key": "banner.options.hideSearch",
+      "title": "Banner - Hide SearchBar",
+      "type": "boolean",
+    },
+    Object {
+      "description": "Place the search bar in different parts of the banner.",
+      "enum": Array [
+        "middle",
+        "bottom",
+      ],
+      "key": "banner.options.searchPlacement",
+      "title": "Banner - SearchBar Placement",
+      "type": "string",
+    },
+    Object {
+      "description": "When set turn the title into a link to this url.",
+      "key": "banner.options.url",
+      "title": "Banner - Title Url",
+      "type": "string",
+    },
+  ],
+}
+`;

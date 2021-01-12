@@ -7,7 +7,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import uniqueId from "lodash/uniqueId";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
@@ -58,7 +58,7 @@ export default class ErrorBlot extends SelectableEmbedBlot {
         if (!data.error) {
             return;
         }
-        domNode.classList.remove(FOCUS_CLASS);
+        domNode.classList.remove(EMBED_FOCUS_CLASS);
         domNode.removeAttribute("tabindex");
 
         if (data.type === ErrorBlotType.FILE) {

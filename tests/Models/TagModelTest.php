@@ -17,15 +17,21 @@ class TagModelTest extends TestCase {
 
     use SiteTestTrait;
     use ModelTestTrait;
+    use TestCategoryModelTrait;
 
     /** @var \TagModel */
     private $tagModel;
+
+    /** @var \DiscussionModel */
+    private $discussionModel;
 
     /**
      * @inheritdoc
      */
     public function setUp(): void {
         $this->setupSiteTestTrait();
+        $this->discussionModel = self::container()->get(\DiscussionModel::class);
+        $this->categoryModel = self::container()->get(\CategoryModel::class);
         $this->tagModel = self::container()->get(\TagModel::class);
         $this->tagModel->SQL->truncate('Tag');
     }
@@ -47,5 +53,25 @@ class TagModelTest extends TestCase {
         ]);
 
         $this->assertIDsEqual([$tag1, $tag2], $this->tagModel->getTagIDsByName(['Test1', 'Test2']));
+    }
+
+    /**
+     * Test persistence of tag on a moved discussion.
+     */
+    public function testSaveMovedDiscussion() {
+        $categories = $this->insertCategories(2);
+        $taggedDiscussionID = $this->discussionModel->save([
+            'Name' => "TagTest",
+            'CategoryID' => $categories[0]['CategoryID'],
+            'Body' => "TagTest",
+            'Format' => 'Text',
+            'DateInserted' => TestDate::mySqlDate(),
+            'Tags' => 'xxx'
+        ]);
+
+        $this->api()->patch('/discussions/'.$taggedDiscussionID, ['CategoryID' => $categories[1]['CategoryID']]);
+        $tagInfo = $this->tagModel->getDiscussionTags($taggedDiscussionID);
+        $tagName = $tagInfo[''][0]['Name'];
+        $this->assertSame('xxx', $tagName);
     }
 }

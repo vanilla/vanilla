@@ -23,7 +23,6 @@ export interface ILookupApi {
 export interface ISelectLookupProps extends Omit<ISelectOneProps, "options" | "value"> {
     api: ILookupApi;
     value: any;
-    initialValue?: any;
     onInitialValueLoaded?: (option: IComboBoxOption) => void;
 }
 
@@ -33,9 +32,9 @@ export interface ISelectLookupProps extends Omit<ISelectOneProps, "options" | "v
 export function SelectLookup(props: ISelectLookupProps) {
     const { value, api } = props;
     const [ownQuery, setQuery] = useState<string | number>("");
-
-    const [options, currentOption] = useApiLookup(api, value, ownQuery, props.initialValue, props.onInitialValueLoaded);
-    const isLoading = (!!props.initialValue && !currentOption) || options === null;
+    const [initialValue] = useState(value);
+    const [options, currentOption] = useApiLookup(api, value, ownQuery, initialValue, props.onInitialValueLoaded);
+    const isLoading = (!!initialValue && !currentOption) || options === null;
     return (
         <>
             <SelectOne

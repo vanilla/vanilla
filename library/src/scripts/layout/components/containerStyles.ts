@@ -4,12 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -39,7 +41,7 @@ export const containerVariables = useThemeCache(() => {
     };
 });
 
-export const containerMainStyles = (): NestedCSSProperties => {
+export const containerMainStyles = (): CSSObject => {
     const vars = containerVariables();
     return {
         display: "flex",
@@ -47,16 +49,14 @@ export const containerMainStyles = (): NestedCSSProperties => {
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: unit(vars.sizing.full + vars.spacing.padding * 2),
+        maxWidth: styleUnit(vars.sizing.full + vars.spacing.padding * 2),
         marginLeft: "auto",
         marginRight: "auto",
-        ...paddings({
+        ...Mixins.padding({
             horizontal: vars.spacing.padding,
         }),
-        $nest: {
-            "&.isNarrow": {
-                maxWidth: vars.sizing.narrowContentSize,
-            },
+        "&.isNarrow": {
+            maxWidth: vars.sizing.narrowContentSize,
         },
     };
 };
@@ -65,7 +65,7 @@ export function containerMainMediaQueries() {
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = containerVariables();
     return mediaQueries.oneColumnDown({
-        ...paddings({
+        ...Mixins.padding({
             horizontal: vars.spacing.mobile.padding,
         }),
     });
@@ -81,12 +81,12 @@ export const containerClasses = useThemeCache(() => {
         "fullGutter",
         {
             ...containerMainStyles(),
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: vars.spacing.padding * 2,
             }),
         },
         mediaQueries.oneColumnDown({
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: vars.spacing.mobile.padding * 2,
             }),
         }),

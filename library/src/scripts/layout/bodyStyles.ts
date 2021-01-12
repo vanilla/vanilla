@@ -4,60 +4,57 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
-import { cssRule, style } from "typestyle";
-import { colorOut, backgroundHelper, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { cssRule, style } from "@library/styles/styleShim";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
 
     cssRule("html", {
-        "-ms-overflow-style": "-ms-autohiding-scrollbar",
+        msOverflowStyle: "-ms-autohiding-scrollbar",
     });
 
-    const htmlBodyMixin: NestedCSSProperties = {
-        background: colorOut(globalVars.body.backgroundImage.color),
-        ...fonts({
+    const htmlBodyMixin: CSSObject = {
+        background: ColorsUtils.colorOut(globalVars.body.backgroundImage.color),
+        ...Mixins.font({
             size: globalVars.fonts.size.medium,
             family: globalVars.fonts.families.body,
             color: globalVars.mainColors.fg,
         }),
         wordBreak: "break-word",
-        $unique: true, // This doesn't refresh without this for some reason.
     };
 
-    cssRule("html", htmlBodyMixin);
-    const bodyClass = style({
-        ...htmlBodyMixin,
-        $debugName: "vanillaBodyReset",
-    });
+    const bodyClass = style({ ...htmlBodyMixin, label: "vanillaBodyReset" });
     document.body.classList.add(bodyClass);
 
     cssRule("*", {
         // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-        "-webkit-overflow-scrolling": "touch",
+        WebkitOverflowScrolling: "touch",
     });
 
     cssRule("h1, h2, h3, h4, h5, h6", {
         display: "block",
         lineHeight: globalVars.lineHeights.condensed,
-        ...margins({
+        ...Mixins.margin({
             all: 0,
         }),
-        ...paddings({
+        ...Mixins.padding({
             all: 0,
         }),
     });
 
     cssRule("p", {
-        ...margins({
+        ...Mixins.margin({
             all: 0,
         }),
-        ...paddings({
+        ...Mixins.padding({
             all: 0,
         }),
     });
@@ -73,8 +70,8 @@ export const bodyCSS = useThemeCache(() => {
     });
 
     cssRule("button", {
-        "-webkit-appearance": "none",
-        "-moz-appearance": "none",
+        WebkitAppearance: "none",
+        MozAppearance: "none",
     });
 
     cssRule(".page-minHeight", {
@@ -84,15 +81,15 @@ export const bodyCSS = useThemeCache(() => {
     });
 
     cssRule(`input[type="number"]`, {
-        [`-webkit-appearance`]: "none",
-        [`-moz-appearance`]: "textfield",
-        $nest: {
+        WebkitAppearance: "none",
+        MozAppearance: "textfield",
+        ...{
             [`&::-webkit-inner-spin-button`]: {
-                [`-webkit-appearance`]: "none",
+                WebkitAppearance: "none",
                 margin: 0,
             },
             [`&::-webkit-outer-spin-button`]: {
-                [`-webkit-appearance`]: "none",
+                WebkitAppearance: "none",
                 margin: 0,
             },
         },
@@ -127,7 +124,7 @@ export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        backgroundHelper(source.backgroundImage),
+        Mixins.background(source.backgroundImage),
     );
 
     return { root };

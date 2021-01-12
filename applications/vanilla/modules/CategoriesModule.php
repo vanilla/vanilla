@@ -60,7 +60,7 @@ class CategoriesModule extends AbstractHomeWidgetModule {
      * @return array|null
      */
     protected function getData(): ?array {
-        $contextualCategoryID = $this->currentSiteSection->getAttributes()['CategoryID'] ?? -1;
+        $contextualCategoryID = $this->currentSiteSection->getAttributes()['categoryID'] ?? -1;
         $apiParams = array_merge([
             'limit' => 10,
             'featured' => true,

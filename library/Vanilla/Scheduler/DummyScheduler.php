@@ -31,6 +31,7 @@ use Vanilla\Scheduler\Job\JobTrackingIdAwareInterface;
 use Vanilla\Scheduler\Job\JobTypeAwareInterface;
 use Vanilla\Scheduler\Meta\SchedulerControlMeta;
 use Vanilla\Scheduler\Meta\SchedulerMetaDao;
+use Vanilla\Utility\Timers;
 
 /**
  * DummyScheduler
@@ -43,67 +44,47 @@ class DummyScheduler implements SchedulerInterface {
     protected const CRON_LOCK_KEY = 'CRON_LOCK';
     protected const CRON_MINIMUM_TIME_SPAN = 60;
 
-    /**
-     * @var JobExecutionType
-     */
+    /** @var JobExecutionType */
     protected $executionType;
 
-    /**
-     * @var TrackingSlip[]
-     */
+    /** @var TrackingSlip[] */
     protected $trackingSlips = [];
 
-    /**
-     * @var Container
-     */
+    /** @var Container */
     protected $container;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var DriverInterface[]
-     */
+    /** @var DriverInterface[] */
     protected $drivers = [];
 
-    /**
-     * @var EventManager
-     */
+    /** @var EventManager */
     protected $eventManager = null;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $dispatchEventName = null;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $dispatchedEventName = null;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $finalizeRequest = true;
 
     /** @var bool */
     protected $logErrorsAsWarnings = false;
 
-    /**
-     * @var SchedulerMetaDao
-     */
+    /** @var SchedulerMetaDao */
     protected $schedulerMetaDao;
 
-    /**
-     * @var Gdn_Cache
-     */
+    /** @var Gdn_Cache */
     protected $cache;
-    /**
-     * @var ConfigurationInterface
-     */
+
+    /** @var ConfigurationInterface */
     protected $config;
+
+    /** @var Timers */
+    protected $timers;
 
     /**
      * DummyScheduler constructor.
@@ -114,6 +95,7 @@ class DummyScheduler implements SchedulerInterface {
      * @param SchedulerMetaDao $schedulerMetaDao
      * @param Gdn_Cache $cache
      * @param ConfigurationInterface $config
+     * @param Timers $timers
      */
     public function __construct(
         ContainerInterface $container,
@@ -121,7 +103,8 @@ class DummyScheduler implements SchedulerInterface {
         EventManager $eventManager,
         SchedulerMetaDao $schedulerMetaDao,
         Gdn_Cache $cache,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        Timers $timers
     ) {
         $this->logger = $logger;
         $this->container = $container;
@@ -129,6 +112,7 @@ class DummyScheduler implements SchedulerInterface {
         $this->schedulerMetaDao = $schedulerMetaDao;
         $this->cache = $cache;
         $this->config = $config;
+        $this->timers = $timers;
         $this->executionType = JobExecutionType::normal();
     }
 
@@ -190,82 +174,8 @@ class DummyScheduler implements SchedulerInterface {
      */
     public function setDispatchEventName(string $eventName): bool {
         $this->dispatchEventName = $eventName;
-
-        // Hook to process all jobs when the $eventName is fired
         $this->eventManager->bind($this->dispatchEventName, function () {
-
-            if (count($this->trackingSlips) == 0) {
-                // If there is nothing to do -> return false
-                if ($this->dispatchedEventName != null) {
-                    $this->eventManager->fire($this->dispatchedEventName, $this->trackingSlips);
-                }
-
-                return false;
-            }
-
-            /**
-             * Silently avoid race condition for CronJobs
-             * --
-             * If the execution type is CRON, we want to avoid a race conditions and as a consequence
-             * triggering more than once the execution of a Job on the same time frame.
-             * The time frame is defined by 'Garden.Scheduler.CronMinimumTimeSpan'
-             * Default: self::CRON_MINIMUM_TIME_SPAN
-             */
-            if ($this->executionType->is(JobExecutionType::cron())) {
-                $shouldAbort = false;
-                $minTime = $this->config->get('Garden.Scheduler.CronMinimumTimeSpan', self::CRON_MINIMUM_TIME_SPAN);
-
-                if ($this->cache->activeEnabled()) {
-                    // If we have cache, we rely on its atomic mechanism
-                    if ($this->cache->add(self::CRON_LOCK_KEY, uniqid(), [Gdn_Cache::FEATURE_EXPIRY => $minTime])
-                        !== Gdn_Cache::CACHEOP_SUCCESS
-                    ) {
-                        $shouldAbort = true;
-                    }
-                } else {
-                    $schedulerControlMeta = $this->schedulerMetaDao->getControl();
-                    if ($schedulerControlMeta !== null) {
-                        if (time() < $schedulerControlMeta->getLockTime() + $minTime) {
-                            $shouldAbort = true;
-                        }
-                    }
-                }
-
-                if ($shouldAbort) {
-                    /** @var TrackingSlip $trackingSlip */
-                    foreach ($this->generateTrackingSlips() as $trackingSlip) {
-                        $schedulerMeta = $trackingSlip->getSchedulerJobMeta();
-                        $schedulerMeta->setStatus(JobExecutionStatus::abandoned());
-                        $this->schedulerMetaDao->putJob($schedulerMeta);
-                    }
-
-                    return false;
-                }
-
-                $this->schedulerMetaDao->putControl(new SchedulerControlMeta());
-            }
-
-            /**
-             * Release the Request before dispatching Jobs
-             */
-            if ($this->getFinalizeRequest()) {
-                // Finish Flushes all response data to the client
-                // so that job payloads can run without affecting the browser experience
-                session_write_close();
-
-                // We assume fastCgi. If that fails, go old-school.
-                if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
-                    // need to calculate content length *after* URL rewrite!
-                    if (headers_sent() === false) {
-                        header("Content-length: ".ob_get_length());
-                    }
-                    ob_end_flush();
-                }
-            }
-
-            $this->dispatchAll();
-
-            return true;
+            $this->dispatchedEventHandler();
         });
 
         return true;
@@ -338,6 +248,14 @@ class DummyScheduler implements SchedulerInterface {
      * @throws Exception Missing driver to handle the job class `%s`.
      */
     public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface {
+        $hash = $jobDescriptor->getHash();
+        for ($index = 0; $index < count($this->trackingSlips); $index++) {
+            if ($this->trackingSlips[$index]->getDescriptor()->getHash() === $hash) {
+                $this->trackingSlips[$index]->incrementDuplication();
+
+                return $this->trackingSlips[$index];
+            }
+        }
 
         if (!$this->container->has($jobDescriptor->getJobType())) {
             $missingJobMsg = "The class `{$jobDescriptor->getJobType()}` cannot be found.";
@@ -373,13 +291,13 @@ class DummyScheduler implements SchedulerInterface {
             if ($job instanceof $jobInterface) {
                 $driverSlip = $driver->receive($job);
 
-                $trackingSlip = new TrackingSlip($jobInterface, $driverSlip, $jobDescriptor);
+                $trackingSlip = new TrackingSlip($jobInterface, $driverSlip, $jobDescriptor, $this->logger, $this->config);
 
                 if ($job instanceof JobTrackingIdAwareInterface) {
                     $job->setTrackingId($trackingSlip->getTrackingId());
                 }
 
-                $this->schedulerMetaDao->putJob($trackingSlip->getSchedulerJobMeta());
+                $trackingSlip->log();
                 $this->trackingSlips[] = $trackingSlip;
 
                 return $trackingSlip;
@@ -392,6 +310,110 @@ class DummyScheduler implements SchedulerInterface {
     }
 
     /**
+     * Get finalize request
+     *
+     * @return bool
+     */
+    public function getFinalizeRequest(): bool {
+        return $this->finalizeRequest;
+    }
+
+    /**
+     * Set finalize request
+     *
+     * @param bool $finalizeRequest
+     */
+    public function setFinalizeRequest(bool $finalizeRequest): void {
+        $this->finalizeRequest = $finalizeRequest;
+    }
+
+    /**
+     * @param JobExecutionType $executionType
+     */
+    public function setExecutionType(JobExecutionType $executionType): void {
+        $this->executionType = $executionType;
+    }
+
+    /**
+     * DispatchedEventHandler
+     *
+     * @return bool
+     * @throws Exception On error.
+     */
+    protected function dispatchedEventHandler() {
+        if (count($this->trackingSlips) == 0) {
+            // If there is nothing to do -> return false
+            if ($this->dispatchedEventName != null) {
+                $this->eventManager->fire($this->dispatchedEventName, $this->trackingSlips);
+            }
+
+            return false;
+        }
+
+        /**
+         * Silently avoid race condition for CronJobs
+         * --
+         * If the execution type is CRON, we want to avoid a race conditions and as a consequence
+         * triggering more than once the execution of a Job on the same time frame.
+         * The time frame is defined by 'Garden.Scheduler.CronMinimumTimeSpan'
+         * Default: self::CRON_MINIMUM_TIME_SPAN
+         */
+        if ($this->executionType->is(JobExecutionType::cron())) {
+            $shouldAbort = false;
+            $minTime = $this->config->get('Garden.Scheduler.CronMinimumTimeSpan', self::CRON_MINIMUM_TIME_SPAN);
+
+            if ($this->cache->activeEnabled()) {
+                // If we have cache, we rely on its atomic mechanism
+                if ($this->cache->add(self::CRON_LOCK_KEY, uniqid(), [Gdn_Cache::FEATURE_EXPIRY => $minTime])
+                    !== Gdn_Cache::CACHEOP_SUCCESS
+                ) {
+                    $shouldAbort = true;
+                }
+            } else {
+                $schedulerControlMeta = $this->schedulerMetaDao->getControl();
+                if ($schedulerControlMeta !== null) {
+                    if (time() < $schedulerControlMeta->getLockTime() + $minTime) {
+                        $shouldAbort = true;
+                    }
+                }
+            }
+
+            if ($shouldAbort) {
+                for ($index = 0; $index < count($this->trackingSlips); $index++) {
+                    $this->trackingSlips[$index]->getDriverSlip()->setStatus(JobExecutionStatus::abandoned());
+                    $this->trackingSlips[$index]->log();
+                }
+
+                return false;
+            }
+
+            $this->schedulerMetaDao->putControl(new SchedulerControlMeta());
+        }
+
+        /**
+         * Release the Request before dispatching Jobs
+         */
+        if ($this->getFinalizeRequest()) {
+            // Finish Flushes all response data to the client
+            // so that job payloads can run without affecting the browser experience
+            session_write_close();
+
+            // We assume fastCgi. If that fails, go old-school.
+            if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
+                // need to calculate content length *after* URL rewrite!
+                if (headers_sent() === false) {
+                    header("Content-length: ".ob_get_length());
+                }
+                ob_end_flush();
+            }
+        }
+
+        $this->dispatchAll();
+
+        return true;
+    }
+
+    /**
      * Dispatch all jobs
      *
      * @return void
@@ -400,7 +422,8 @@ class DummyScheduler implements SchedulerInterface {
     protected function dispatchAll() {
         /** @var TrackingSlip $trackingSlip */
         foreach ($this->generateTrackingSlips() as $trackingSlip) {
-            $schedulerMeta = $trackingSlip->getSchedulerJobMeta();
+            $this->timers->start(lcfirst($this->dispatchEventName));
+            $trackingSlip->start();
             try {
                 $driverSlip = $trackingSlip->getDriverSlip();
                 $jobDescriptor = $trackingSlip->getDescriptor();
@@ -413,7 +436,6 @@ class DummyScheduler implements SchedulerInterface {
                     $jobInterface = $trackingSlip->getJobInterface();
                     $this->drivers[$jobInterface]->execute($driverSlip);
                 }
-                $schedulerMeta->setJobId($trackingSlip->getId());
             } catch (Throwable $t) {
                 $msg = $t->getMessage();
                 if (strpos($msg, "File: ") !== false) {
@@ -430,11 +452,12 @@ class DummyScheduler implements SchedulerInterface {
                 if ($this->logErrorsAsWarnings) {
                     trigger_error($msg, E_USER_ERROR);
                 }
+
                 $this->logger->error($msg);
             } finally {
-                $schedulerMeta->setStatus($trackingSlip->getStatus());
-                $schedulerMeta->setErrorMessage($trackingSlip->getErrorMessage());
-                $this->schedulerMetaDao->putJob($schedulerMeta);
+                $trackingSlip->stop();
+                $trackingSlip->log();
+                $this->timers->stop(lcfirst($this->dispatchEventName));
             }
         }
 
@@ -446,7 +469,7 @@ class DummyScheduler implements SchedulerInterface {
     /**
      * Tracking slip generator.
      */
-    private function generateTrackingSlips() {
+    protected function generateTrackingSlips() {
         // Ensure we're starting at the start.
         reset($this->trackingSlips);
         while (($key = key($this->trackingSlips)) !== null) {
@@ -458,34 +481,6 @@ class DummyScheduler implements SchedulerInterface {
         }
         // Reset the internal pointer to hopefully avoid unexpected behavior.
         reset($this->trackingSlips);
-    }
-
-    /**
-     * Whether or not to finalize the request and flush output buffers.
-     *
-     * In a web request, you probably want to flush buffers,
-     * however in other environments, it's best not to flush buffers you didn't start.
-     *
-     * @return bool
-     */
-    public function getFinalizeRequest(): bool {
-        return $this->finalizeRequest;
-    }
-
-    /**
-     * Set the finalize request flag.
-     *
-     * @param bool $finalizeRequest
-     */
-    public function setFinalizeRequest(bool $finalizeRequest): void {
-        $this->finalizeRequest = $finalizeRequest;
-    }
-
-    /**
-     * @param JobExecutionType $executionType
-     */
-    public function setExecutionType(JobExecutionType $executionType): void {
-        $this->executionType = $executionType;
     }
 
     /**

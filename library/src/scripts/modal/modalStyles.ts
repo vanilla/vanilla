@@ -4,15 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, colorOut, margins, sticky, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { sticky } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { cssRule } from "typestyle";
+import { CSSObject } from "@emotion/css";
+import { cssRule } from "@library/styles/styleShim";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
@@ -55,13 +59,13 @@ export const modalVariables = useThemeCache(() => {
     const header = makeThemeVars("header", {
         minHeight: 60,
         verticalPadding: 12,
-        boxShadow: `0 1px 2px 0 ${colorOut(globalVars.overlay.bg)}`,
+        boxShadow: `0 1px 2px 0 ${ColorsUtils.colorOut(globalVars.overlay.bg)}`,
     });
 
     const footer = makeThemeVars("footer", {
         minHeight: header.minHeight,
         verticalPadding: header.verticalPadding,
-        boxShadow: `0 -1px 2px 0 ${colorOut(globalVars.overlay.bg)}`,
+        boxShadow: `0 -1px 2px 0 ${ColorsUtils.colorOut(globalVars.overlay.bg)}`,
     });
 
     const fullScreenTitleSpacing = makeThemeVars("fullScreenModalTitle", {
@@ -94,7 +98,7 @@ export const modalClasses = useThemeCache(() => {
         // When nesting our modals on top we need to be higher.
     });
 
-    const overlayMixin: NestedCSSProperties = {
+    const overlayMixin: CSSObject = {
         position: "fixed",
         // Viewport units are useful here because
         // we're actually fine this being taller than the initially visible viewport.
@@ -109,16 +113,16 @@ export const modalClasses = useThemeCache(() => {
 
     const overlayScrim = style("overlayScrim", {
         ...overlayMixin,
-        background: colorOut(vars.colors.overlayBg),
+        background: ColorsUtils.colorOut(vars.colors.overlayBg),
     });
 
     const overlayContent = style("overlayContent", {
         ...overlayMixin,
     });
 
-    const sidePanelMixin: NestedCSSProperties = {
-        left: unit(vars.dropDown.padding),
-        width: calc(`100% - ${unit(vars.dropDown.padding)}`),
+    const sidePanelMixin: CSSObject = {
+        left: styleUnit(vars.dropDown.padding),
+        width: calc(`100% - ${styleUnit(vars.dropDown.padding)}`),
         display: "flex",
         flexDirection: "column",
         top: 0,
@@ -127,8 +131,8 @@ export const modalClasses = useThemeCache(() => {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         maxWidth: 400,
-        $nest: {
-            [`& .${dropDownClasses().action}`]: {
+        ...{
+            [`.${dropDownClasses().action}`]: {
                 fontWeight: globalVars.fonts.weights.normal,
             },
         },
@@ -139,23 +143,23 @@ export const modalClasses = useThemeCache(() => {
         flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: unit(vars.sizing.height),
+        maxHeight: styleUnit(vars.sizing.height),
         zIndex: 1,
-        backgroundColor: colorOut(vars.colors.bg),
-        color: colorOut(vars.colors.fg),
+        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+        color: ColorsUtils.colorOut(vars.colors.fg),
         position: "fixed",
         top: percent(50),
         left: percent(50),
         bottom: "initial",
         overflow: "hidden",
-        borderRadius: unit(vars.border.radius),
+        borderRadius: styleUnit(vars.border.radius),
         // NOTE: This transform can cause issues if anything inside of us needs fixed positioning.
         // See http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/
         // See also https://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/#introduction
         // This is why fullscreen unsets the transforms.
         transform: translate(`-50%`, `-50%`),
-        ...margins({ all: "auto" }),
-        $nest: {
+        ...Mixins.margin({ all: "auto" }),
+        ...{
             "&&.isFullScreen": {
                 width: percent(100),
                 height: percent(100),
@@ -170,26 +174,37 @@ export const modalClasses = useThemeCache(() => {
                 right: 0,
             },
             "&.isXL": {
-                width: unit(vars.sizing.xl),
+                width: styleUnit(vars.sizing.xl),
                 height: percent(100),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
             "&.isLarge": {
-                width: unit(vars.sizing.large),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
+                width: styleUnit(vars.sizing.large),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
             "&.isMedium": {
-                width: unit(vars.sizing.medium),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
+                width: styleUnit(vars.sizing.medium),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
             "&.isSmall": {
-                width: unit(vars.sizing.small),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
+                width: styleUnit(vars.sizing.small),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
             "&&&.isSidePanelRight": {
                 ...sidePanelMixin,
                 right: 0,
                 left: "initial",
+            },
+            "&&&.isSidePanelRightLarge": {
+                ...sidePanelMixin,
+                right: 0,
+                left: "initial",
+                width: styleUnit(vars.sizing.xl),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
+                height: percent(100),
+                maxHeight: percent(100),
+                top: 0,
+                bottom: 0,
             },
             "&&&.isSidePanelLeft": {
                 ...sidePanelMixin,
@@ -203,21 +218,21 @@ export const modalClasses = useThemeCache(() => {
                 width: percent(100),
                 marginBottom: "auto",
                 transform: "none",
-                maxHeight: calc(`100% - ${unit(globalVars.gutter.size)}`),
+                maxHeight: calc(`100% - ${styleUnit(globalVars.gutter.size)}`),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
                 border: "none",
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
-                ...borders(globalVars.borderType.modals),
+                ...Mixins.border(globalVars.borderType.modals),
             },
-            "& .form-group": {
-                marginLeft: unit(-16),
-                marginRight: unit(-16),
+            ".form-group": {
+                marginLeft: styleUnit(-16),
+                marginRight: styleUnit(-16),
             },
         },
-    } as NestedCSSProperties);
+    });
 
     const scroll = style("scroll", {
         // ...absolutePosition.fullSizeOfParent(),
@@ -238,19 +253,19 @@ export const modalClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            height: unit(titleBarVars.sizing.height),
-            minHeight: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
+            minHeight: styleUnit(titleBarVars.sizing.height),
             zIndex: 2,
-            background: colorOut(vars.colors.bg),
-            $nest: {
+            background: ColorsUtils.colorOut(vars.colors.bg),
+            ...{
                 "&.noShadow": {
                     boxShadow: "none",
                 },
             },
         },
         mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
-            minHeight: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
+            minHeight: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
@@ -262,6 +277,12 @@ export const modalClasses = useThemeCache(() => {
         maxHeight: percent(100),
         minHeight: percent(0),
         width: percent(100),
+        ...{
+            ".frame": {
+                maxHeight: "100%",
+                flex: 1,
+            },
+        },
     });
 
     return {

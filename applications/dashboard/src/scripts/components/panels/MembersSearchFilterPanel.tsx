@@ -7,7 +7,7 @@ import React from "react";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { t } from "@vanilla/i18n";
-import { useSearchForm } from "@library/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import Permission, { PermissionMode } from "@library/features/users/Permission";

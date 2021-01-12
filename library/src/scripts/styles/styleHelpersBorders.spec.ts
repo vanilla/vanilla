@@ -4,17 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import {
-    IBorderRadiusOutput,
-    IBorderRadiusValue,
-    IRadiusShorthand,
-    standardizeBorderRadius,
-    borders,
-} from "@library/styles/styleHelpersBorders";
+import { standardizeBorderRadius } from "@library/styles/styleHelpersBorders";
 import { expect } from "chai";
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { IBorderRadiusOutput, IBorderRadiusValue, IRadiusShorthand } from "@library/styles/cssUtilsTypes";
+import { Mixins } from "@library/styles/Mixins";
 
 describe("styleHelperBorders", () => {
     describe("standardizeBorderRadius", () => {
@@ -215,7 +211,7 @@ describe("styleHelperBorders", () => {
     });
 
     describe("borders", () => {
-        const defaultColor = colorOut(globalVariables().border.color);
+        const defaultColor = ColorsUtils.colorOut(globalVariables().border.color);
         it("Returns default values when there are no arguments", () => {
             const input = {};
 
@@ -238,7 +234,7 @@ describe("styleHelperBorders", () => {
                 borderTopWidth: "1px",
             };
 
-            expect(borders(input)).deep.eq(expected);
+            expect(Mixins.border(input)).deep.eq(expected);
         });
 
         it("Works with some minimal values", () => {
@@ -267,7 +263,7 @@ describe("styleHelperBorders", () => {
                 borderTopWidth: input.width,
             };
 
-            expect(borders(input)).deep.eq(expected);
+            expect(Mixins.border(input)).deep.eq(expected);
         });
     });
 });

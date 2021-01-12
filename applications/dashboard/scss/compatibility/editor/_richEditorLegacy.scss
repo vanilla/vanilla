@@ -72,6 +72,25 @@ body {
         }
     }
 
+    .embedResponsive {
+        margin-bottom: 0 !important;
+    }
+
+    .float-left, .float-right {
+        // Remove margin of the containing div and instead add margin to the floating element.
+        margin: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+
+        .embedExternal-content {
+            margin-bottom: $global-block_margin;
+        }
+    }
+
+    .embedExternal {
+        margin-bottom: $global-block_margin;
+    }
+
     &,
     h1,
     h2,

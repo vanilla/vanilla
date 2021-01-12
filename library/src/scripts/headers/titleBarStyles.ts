@@ -9,23 +9,19 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     allButtonStates,
-    borders,
     BorderType,
-    colorOut,
     flexHelper,
-    modifyColorBasedOnLightness,
-    offsetLightness,
     pointerEvents,
     singleBorder,
     sticky,
-    unit,
     userSelect,
-    EMPTY_FONTS,
-    isLightColor,
     negativeUnit,
-    paddings,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import {
     calc,
     ColorHelper,
@@ -37,343 +33,15 @@ import {
     translate,
     translateX,
     translateY,
-    viewHeight,
     viewWidth,
 } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
-import { media } from "typestyle";
-import { LogoAlignment } from "./TitleBar";
-import { BackgroundProperty } from "csstype";
-import { IThemeVariables } from "@library/theming/themeReducer";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-
-export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const globalVars = globalVariables(forcedVars);
-    const formElementVars = formElementsVariables(forcedVars);
-    const makeThemeVars = variableFactory("titleBar", forcedVars);
-
-    const sizing = makeThemeVars("sizing", {
-        height: 48,
-        spacer: 12,
-        mobile: {
-            height: 44,
-            width: formElementVars.sizing.height,
-        },
-    });
-
-    const spacing = makeThemeVars("spacing", {
-        padding: {
-            top: 0, // This is to add extra padding under the content of the title bar.
-            bottom: 0, // This is to add extra padding under the content of the title bar.
-        },
-    });
-
-    // Note that this overlay will go on top of the bg image, if you have one.
-    const overlay = makeThemeVars("overlay", {
-        background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
-    });
-
-    const colorsInit = makeThemeVars("colors", {
-        fg: globalVars.mainColors.primaryContrast,
-        bg: globalVars.mainColors.primary,
-        bgImage: null as string | null,
-    });
-
-    const colors = makeThemeVars("colors", {
-        ...colorsInit,
-        state: {
-            bg: isLightColor(colorsInit.bg) ? rgba(0, 0, 0, 0.1) : rgba(255, 255, 255, 0.1),
-            fg: colorsInit.fg,
-        },
-    });
-
-    const border = makeThemeVars("border", {
-        type: BorderType.NONE,
-        color: globalVars.border.color,
-        width: globalVars.border.width,
-    });
-
-    //Set bottom border of the bar container div
-    const barBorder = makeThemeVars("barBorder", {
-        type: BorderType.NONE,
-        color: globalVars.border.color,
-        width: globalVars.border.width,
-    });
-
-    // sizing.height gives you the height of the contents of the titleBar.
-    // If spacing.paddingBottom is set, this value will be different than the height. To be used if you need to get the full height, not just the contents height.
-    const fullHeight =
-        sizing.height + spacing.padding.bottom + spacing.padding.top + border.type == BorderType.SHADOW_AS_BORDER
-            ? border.width
-            : 0;
-
-    const swoopInit = makeThemeVars("swoop", {
-        amount: 0,
-    });
-
-    const swoop = makeThemeVars("swoop", {
-        ...swoopInit,
-        swoopOffset: (16 * swoopInit.amount) / 50,
-    });
-
-    const fullBleed = makeThemeVars("fullBleed", {
-        enabled: false,
-        startingOpacity: 0,
-        endingOpacity: 0.15, // Scale of 0 -> 1 where 1 is opaque.
-        bgColor: colors.bg,
-    });
-
-    // Fix up the ending opacity so it is always darker than the starting one.
-    fullBleed.endingOpacity = Math.max(fullBleed.startingOpacity, fullBleed.endingOpacity);
-
-    const guest = makeThemeVars("guest", {
-        spacer: 8,
-    });
-
-    const buttonSize = globalVars.buttonIcon.size;
-    const button = makeThemeVars("button", {
-        borderRadius: globalVars.border.radius,
-        size: buttonSize,
-        guest: {
-            minWidth: 86,
-        },
-        mobile: {
-            fontSize: 16,
-            width: buttonSize,
-        },
-        state: {
-            bg: colors.state.bg,
-        },
-    });
-
-    const generatedColors = makeThemeVars("generatedColors", {
-        state: offsetLightness(colors.bg, 0.04), // Default state color change
-    });
-
-    const linkButtonDefaults: IButtonType = {
-        name: ButtonTypes.TITLEBAR_LINK,
-        colors: {
-            bg: rgba(0, 0, 0, 0),
-            fg: colors.fg,
-        },
-        fonts: {
-            ...EMPTY_FONTS,
-            color: colors.fg,
-        },
-        sizing: {
-            minWidth: unit(globalVars.icon.sizes.large),
-            minHeight: unit(globalVars.icon.sizes.large),
-        },
-        padding: {
-            horizontal: 6,
-        },
-        borders: {
-            style: "none",
-            color: rgba(0, 0, 0, 0),
-        },
-        hover: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        focus: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        active: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-    };
-    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
-
-    const count = makeThemeVars("count", {
-        size: 18,
-        fontSize: 10,
-        fg: globalVars.mainColors.bg,
-        bg: globalVars.mainColors.primary,
-    });
-
-    const dropDownContents = makeThemeVars("dropDownContents", {
-        minWidth: 350,
-        maxHeight: viewHeight(90),
-    });
-
-    const endElements = makeThemeVars("endElements", {
-        flexBasis: buttonSize * 4,
-        mobile: {
-            flexBasis: button.mobile.width - 20,
-        },
-    });
-
-    const compactSearch = makeThemeVars("compactSearch", {
-        bg: fullBleed.enabled ? colors.bg.fade(0.2) : globalVars.mainColors.secondary,
-        fg: colors.fg,
-        mobile: {
-            width: button.mobile.width,
-        },
-    });
-
-    const buttonContents = makeThemeVars("buttonContents", {
-        state: {
-            bg: button.state.bg,
-        },
-    });
-
-    const signIn = makeThemeVars("signIn", {
-        fg: colors.fg,
-        bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.1, inverse: true }),
-        hover: {
-            bg: modifyColorBasedOnLightness({ color: globalVars.mainColors.primary, weight: 0.2, inverse: true }),
-        },
-    });
-
-    const resister = makeThemeVars("register", {
-        fg: colors.bg,
-        bg: colors.fg,
-        borderColor: colors.bg,
-        states: {
-            bg: colors.fg.fade(0.9),
-        },
-    });
-
-    const mobileDropDown = makeThemeVars("mobileDropdown", {
-        height: px(sizing.mobile.height),
-    });
-
-    const meBox = makeThemeVars("meBox", {
-        sizing: {
-            buttonContents: formElementVars.sizing.height,
-        },
-    });
-
-    const bottomRow = makeThemeVars("bottomRow", {
-        bg: modifyColorBasedOnLightness({ color: colors.bg, weight: 0.1 }).desaturate(0.2, true),
-    });
-
-    // Note that the logo defined here is the last fallback. If set through the dashboard, it will overwrite these values.
-    const logo = makeThemeVars("logo", {
-        doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
-        offsetRight: globalVars.gutter.size,
-        justifyContent: LogoAlignment.LEFT,
-        maxHeight: undefined,
-        maxWidth: 200,
-        heightOffset: sizing.height / 3,
-        tablet: {},
-        desktop: {
-            url: undefined,
-        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
-        mobile: {
-            url: undefined,
-            maxWidth: undefined,
-            maxHeight: undefined,
-            heightOffset: sizing.mobile.height / 4,
-        }, // add "url" if you want to set in theme. Use full path eg. "/addons/themes/myTheme/design/myLogo.png"
-        offsetVertical: {
-            amount: 0,
-            mobile: {
-                amount: 0,
-            },
-        },
-    });
-
-    const navAlignment = makeThemeVars("navAlignment", {
-        alignment: "left" as "left" | "center",
-    });
-
-    if (logo.justifyContent === LogoAlignment.CENTER) {
-        // Forced to the left because they can't both be in the center.
-        navAlignment.alignment = "left";
-    }
-
-    const mobileLogo = makeThemeVars("mobileLogo", {
-        justifyContent: LogoAlignment.CENTER,
-    });
-
-    const breakpoints = makeThemeVars("breakpoints", {
-        compact: 800,
-    });
-
-    const mediaQueries = () => {
-        const full = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
-            return media(
-                {
-                    minWidth: px(breakpoints.compact + 1),
-                },
-                styles,
-            );
-        };
-
-        const compact = (styles: NestedCSSProperties) => {
-            return media(
-                {
-                    maxWidth: px(breakpoints.compact),
-                },
-                styles,
-            );
-        };
-
-        return {
-            full,
-            compact,
-        };
-    };
-
-    const cancelButtonInit = makeThemeVars("closeButtonInit", {
-        allStates: colors.fg,
-        hoverOpacity: globalVars.constants.states.hover.borderEmphasis,
-    });
-
-    const stateColors = makeThemeVars("stateColors", {
-        hover: cancelButtonInit.allStates.mix(colorsInit.bg, cancelButtonInit.hoverOpacity), // This needs to be a mix and not an opacity so we can overlay the borders and not have the two borders mix together
-        focus: cancelButtonInit.allStates,
-        active: cancelButtonInit.allStates,
-    });
-
-    return {
-        fullBleed,
-        barBorder,
-        border,
-        sizing,
-        colors,
-        overlay,
-        signIn,
-        resister,
-        guest,
-        button,
-        linkButton,
-        count,
-        dropDownContents,
-        endElements,
-        compactSearch,
-        buttonContents,
-        mobileDropDown,
-        meBox,
-        bottomRow,
-        logo,
-        mediaQueries,
-        breakpoints,
-        navAlignment,
-        mobileLogo,
-        spacing,
-        swoop,
-        fullHeight,
-        stateColors,
-    };
-});
+import { titleBarVariables } from "./TitleBar.variables";
 
 export const titleBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -383,7 +51,7 @@ export const titleBarClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("titleBar");
 
-    const getBorderVars = (): NestedCSSProperties => {
+    const getBorderVars = (): CSSObject => {
         switch (vars.border.type) {
             case BorderType.BORDER:
                 return {
@@ -406,54 +74,31 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
-    const getBarBorderVars = (): NestedCSSProperties => {
-        switch (vars.barBorder.type) {
-            case BorderType.BORDER:
-                return {
-                    borderBottom: singleBorder({
-                        color: vars.barBorder.color,
-                        width: vars.barBorder.width,
-                    }),
-                };
-            case BorderType.SHADOW:
-                return {
-                    boxShadow: shadowHelper().embed(globalVars.elementaryColors.black).boxShadow,
-                };
-            case BorderType.SHADOW_AS_BORDER:
-                // Note that this is empty because this option is set on the background elsewhere.
-                return {};
-            case BorderType.NONE:
-                return {};
-            default:
-                return {};
-        }
-    };
-
     const root = style({
         maxWidth: percent(100),
-        color: colorOut(vars.colors.fg),
+        color: ColorsUtils.colorOut(vars.colors.fg),
         position: "relative",
         ...getBorderVars(),
-        $nest: {
-            "& .searchBar__control": {
+        ...{
+            ".searchBar__control": {
                 color: vars.colors.fg.toString(),
                 cursor: "pointer",
             },
-            "& .searchBar__placeholder": {
+            ".searchBar__placeholder": {
                 textAlign: "left",
                 color: vars.colors.fg.fade(0.8).toString(),
             },
-            [`& .${backLinkClasses().link}`]: {
-                $nest: {
+            [`.${backLinkClasses().link}`]: {
+                ...{
                     "&, &:hover, &:focus, &:active": {
-                        color: colorOut(vars.colors.fg),
+                        color: ColorsUtils.colorOut(vars.colors.fg),
                     },
                 },
             },
         },
         ...(vars.swoop.amount
             ? {
-                  $nest: {
+                  ...{
                       "& + *": {
                           // Offset the next element to account for the swoop. (next element should go under the swoop slightly).
                           marginTop: -vars.swoop.swoopOffset,
@@ -468,7 +113,7 @@ export const titleBarClasses = useThemeCache(() => {
         left: 0,
         margin: `0 auto`,
         position: `absolute`,
-        height: calc(`80% - ${unit(vars.border.width + 1)}`),
+        height: calc(`80% - ${styleUnit(vars.border.width + 1)}`),
         transform: translateX(`-10vw`),
         width: `120vw`,
         borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
@@ -478,28 +123,28 @@ export const titleBarClasses = useThemeCache(() => {
 
     const shadowAsBorder =
         vars.border.type === BorderType.SHADOW_AS_BORDER
-            ? { boxShadow: `0 ${unit(vars.border.width)} 0 ${colorOut(vars.border.color)}` }
+            ? { boxShadow: `0 ${styleUnit(vars.border.width)} 0 ${ColorsUtils.colorOut(vars.border.color)}` }
             : {};
 
     const bg1 = style("bg1", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
-        // backgroundColor: colorOut(vars.colors.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.fullBleed.enabled ? vars.fullBleed.bgColor : vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
-        $nest: {
-            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        ...{
+            [`&.${swoop}`]: swoopStyles,
         },
     });
 
     const bg2 = style("bg2", {
         willChange: "opacity",
         ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: colorOut(vars.colors.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
-        $nest: {
-            [`&.${swoop}`]: swoopStyles as NestedCSSProperties,
+        ...{
+            [`&.${swoop}`]: swoopStyles,
         },
     });
 
@@ -507,16 +152,14 @@ export const titleBarClasses = useThemeCache(() => {
         position: "relative",
         height: percent(100),
         width: percent(100),
-        paddingTop: unit(vars.spacing.padding.top),
-        paddingBottom: unit(vars.spacing.padding.bottom),
+        ...Mixins.padding(vars.spacing.padding),
     });
 
     const bgContainer = style("bgContainer", {
         ...absolutePosition.fullSizeOfParent(),
         height: percent(100),
         width: percent(100),
-        paddingTop: unit(vars.spacing.padding.top),
-        paddingBottom: unit(vars.spacing.padding.bottom),
+        ...Mixins.padding(vars.spacing.padding),
         boxSizing: "content-box",
         overflow: "hidden",
     });
@@ -559,14 +202,13 @@ export const titleBarClasses = useThemeCache(() => {
     const bar = style(
         "bar",
         {
-            ...getBarBorderVars(),
             display: "flex",
             justifyContent: "flex-start",
             flexWrap: "nowrap",
             alignItems: "center",
             height: px(vars.sizing.height),
             width: percent(100),
-            $nest: {
+            ...{
                 "&.isHome": {
                     justifyContent: "space-between",
                 },
@@ -577,13 +219,13 @@ export const titleBarClasses = useThemeCache(() => {
 
     const logoOffsetDesktop = vars.logo.offsetVertical.amount
         ? {
-              transform: translateY(`${unit(vars.logo.offsetVertical.amount)}`),
+              transform: translateY(`${styleUnit(vars.logo.offsetVertical.amount)}`),
           }
         : {};
 
     const logoOffsetMobile = vars.logo.offsetVertical.mobile.amount
         ? {
-              transform: translateY(`${unit(vars.logo.offsetVertical.mobile.amount)}`),
+              transform: translateY(`${styleUnit(vars.logo.offsetVertical.mobile.amount)}`),
           }
         : {};
 
@@ -592,20 +234,20 @@ export const titleBarClasses = useThemeCache(() => {
         {
             display: "inline-flex",
             alignSelf: "center",
-            color: colorOut(vars.colors.fg),
-            marginRight: unit(vars.logo.offsetRight),
+            color: ColorsUtils.colorOut(vars.colors.fg),
+            marginRight: styleUnit(vars.logo.offsetRight),
             justifyContent: vars.logo.justifyContent,
             ...logoOffsetDesktop,
             maxHeight: percent(100),
-            $nest: {
+            ...{
                 "&&": {
-                    color: colorOut(vars.colors.fg),
+                    color: ColorsUtils.colorOut(vars.colors.fg),
                 },
                 "&.focus-visible": {
-                    $nest: {
+                    ...{
                         "&.headerLogo-logoFrame": {
                             outline: `5px solid ${vars.buttonContents.state.bg}`,
-                            background: colorOut(vars.buttonContents.state.bg),
+                            background: ColorsUtils.colorOut(vars.buttonContents.state.bg),
                             borderRadius: vars.button.borderRadius,
                         },
                     },
@@ -614,7 +256,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
         mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
-            marginRight: unit(0),
+            marginRight: styleUnit(0),
             ...logoOffsetMobile,
         }),
     );
@@ -636,7 +278,7 @@ export const titleBarClasses = useThemeCache(() => {
             color: "inherit",
             flexGrow: 1,
             justifyContent: vars.navAlignment.alignment === "left" ? "flex-start" : "center",
-            $nest: {
+            ...{
                 "&.titleBar-guestNav": {
                     flex: "initial",
                 },
@@ -649,9 +291,9 @@ export const titleBarClasses = useThemeCache(() => {
         "locales",
         {
             height: px(vars.sizing.height),
-            $nest: {
+            ...{
                 "&.buttonAsText": {
-                    $nest: {
+                    ...{
                         "&:hover": {
                             color: "inherit",
                         },
@@ -680,11 +322,11 @@ export const titleBarClasses = useThemeCache(() => {
             alignItems: "center",
             justifyContent: "center",
             marginLeft: "auto",
-            minWidth: unit(formElementVars.sizing.height),
+            minWidth: styleUnit(formElementVars.sizing.height),
             flexBasis: px(formElementVars.sizing.height),
             maxWidth: percent(100),
-            height: unit(vars.sizing.height),
-            $nest: {
+            height: styleUnit(vars.sizing.height),
+            ...{
                 "&.isOpen": {
                     flex: 1,
                 },
@@ -697,9 +339,9 @@ export const titleBarClasses = useThemeCache(() => {
         "compactSearchResults",
         {
             position: "absolute",
-            top: unit(formElementVars.sizing.height + 2),
+            top: styleUnit(formElementVars.sizing.height + 2),
             width: percent(100),
-            $nest: {
+            ...{
                 "&:empty": {
                     display: "none",
                 },
@@ -708,16 +350,16 @@ export const titleBarClasses = useThemeCache(() => {
         layoutVariables()
             .mediaQueries()
             .xs({
-                $nest: {
+                ...{
                     "&&&": {
                         width: viewWidth(100),
-                        left: calc(`50% + ${unit(40)}`), // This is not arbitrary, it's based on the hamburger placement, but because of the way it's calculated, it makes for a messy calculation. We need to refactor it.
+                        left: calc(`50% + ${styleUnit(40)}`), // This is not arbitrary, it's based on the hamburger placement, but because of the way it's calculated, it makes for a messy calculation. We need to refactor it.
                         transform: translateX("-50%"),
                         borderTopRightRadius: 0,
                         borderTopLeftRadius: 0,
                     },
-                    "& .suggestedTextInput-option": {
-                        ...paddings({
+                    ".suggestedTextInput-option": {
+                        ...Mixins.padding({
                             horizontal: 21,
                         }),
                     },
@@ -730,7 +372,7 @@ export const titleBarClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-end",
         marginLeft: "auto",
-        $nest: {
+        ...{
             [`& + .${compactSearch}`]: {
                 marginLeft: 0,
             },
@@ -749,7 +391,7 @@ export const titleBarClasses = useThemeCache(() => {
             borderRadius: px(vars.button.borderRadius),
         },
         mediaQueries.compact({
-            fontSize: px(vars.button.mobile.fontSize),
+            // fontSize: px(vars.button.mobile.fontSize),
         }),
     );
 
@@ -775,48 +417,48 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
-            color: colorOut(vars.colors.fg),
-            $nest: {
+            color: ColorsUtils.colorOut(vars.colors.fg),
+            ...{
                 "&&": {
                     ...allButtonStates(
                         {
                             allStates: {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                color: ColorsUtils.colorOut(vars.colors.fg),
+                                ...{
+                                    ".meBox-buttonContent": {
+                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
                                     },
                                 },
                             },
                             keyboardFocus: {
                                 outline: 0,
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        borderColor: colorOut(vars.colors.fg),
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                color: ColorsUtils.colorOut(vars.colors.fg),
+                                ...{
+                                    ".meBox-buttonContent": {
+                                        borderColor: ColorsUtils.colorOut(vars.colors.fg),
+                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
                                     },
                                 },
                             },
                         },
                         {
-                            "& .meBox-buttonContent": {
-                                ...borders({
+                            ".meBox-buttonContent": {
+                                ...Mixins.border({
                                     width: 1,
                                     color: rgba(0, 0, 0, 0),
                                 }),
                             },
                             "&.isOpen": {
-                                color: colorOut(vars.colors.fg),
-                                $nest: {
-                                    "& .meBox-buttonContent": {
-                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                color: ColorsUtils.colorOut(vars.colors.fg),
+                                ...{
+                                    ".meBox-buttonContent": {
+                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
                                     },
                                     "&:focus": {
-                                        color: colorOut(vars.colors.fg),
+                                        color: ColorsUtils.colorOut(vars.colors.fg),
                                     },
                                     "&.focus-visible": {
-                                        color: colorOut(vars.colors.fg),
+                                        color: ColorsUtils.colorOut(vars.colors.fg),
                                     },
                                 },
                             },
@@ -846,9 +488,9 @@ export const titleBarClasses = useThemeCache(() => {
         ...buttonResetMixin(),
         ...userSelect(),
         height: px(formElementVars.sizing.height),
-        $nest: {
+        ...{
             "&.focus-visible": {
-                $nest: {
+                ...{
                     "&.meBox-buttonContent": {
                         borderRadius: px(vars.button.borderRadius),
                         backgroundColor: vars.buttonContents.state.bg.toString(),
@@ -860,10 +502,12 @@ export const titleBarClasses = useThemeCache(() => {
 
     const tabButtonActive = {
         color: globalVars.mainColors.primary.toString(),
-        $nest: {
+        ...{
             ".titleBar-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: colorOut(modifyColorBasedOnLightness({ color: vars.colors.fg, weight: 1 })),
+                backgroundColor: ColorsUtils.colorOut(
+                    ColorsUtils.modifyColorBasedOnLightness({ color: vars.colors.fg, weight: 1 }),
+                ),
                 borderRadius: px(vars.button.borderRadius),
             },
         },
@@ -873,7 +517,7 @@ export const titleBarClasses = useThemeCache(() => {
         display: "block",
         height: percent(100),
         padding: px(0),
-        $nest: {
+        ...{
             "&:active": tabButtonActive,
             "&:hover": tabButtonActive,
             "&:focus": tabButtonActive,
@@ -881,10 +525,10 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const dropDownContents = style("dropDownContents", {
-        $nest: {
+        ...{
             "&&&": {
-                minWidth: unit(vars.dropDownContents.minWidth),
-                maxHeight: unit(vars.dropDownContents.maxHeight),
+                minWidth: styleUnit(vars.dropDownContents.minWidth),
+                maxHeight: styleUnit(vars.dropDownContents.maxHeight),
             },
         },
     });
@@ -920,42 +564,42 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const signIn = style("signIn", {
-        marginLeft: unit(vars.guest.spacer),
-        marginRight: unit(vars.guest.spacer),
-        $nest: {
+        marginLeft: styleUnit(vars.guest.spacer),
+        marginRight: styleUnit(vars.guest.spacer),
+        ...{
             "&&&": {
-                color: colorOut(vars.signIn.fg),
-                borderColor: colorOut(vars.colors.fg),
+                color: ColorsUtils.colorOut(vars.signIn.fg),
+                borderColor: ColorsUtils.colorOut(vars.colors.fg),
             },
         },
     });
 
     const register = style("register", {
-        marginLeft: unit(vars.guest.spacer),
-        marginRight: unit(vars.guest.spacer),
-        backgroundColor: colorOut(vars.resister.bg),
-        $nest: {
+        marginLeft: styleUnit(vars.guest.spacer),
+        marginRight: styleUnit(vars.guest.spacer),
+        backgroundColor: ColorsUtils.colorOut(vars.resister.bg),
+        ...{
             "&&": {
                 // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
                 ...allButtonStates({
                     allStates: {
-                        borderColor: colorOut(vars.resister.borderColor),
-                        color: colorOut(vars.resister.fg),
+                        borderColor: ColorsUtils.colorOut(vars.resister.borderColor),
+                        color: ColorsUtils.colorOut(vars.resister.fg),
                     },
                     noState: {
-                        backgroundColor: colorOut(vars.resister.bg),
+                        backgroundColor: ColorsUtils.colorOut(vars.resister.bg),
                     },
                     hover: {
-                        color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg),
+                        color: ColorsUtils.colorOut(vars.resister.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.resister.states.bg),
                     },
                     focus: {
-                        color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg),
+                        color: ColorsUtils.colorOut(vars.resister.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.resister.states.bg),
                     },
                     active: {
-                        color: colorOut(vars.resister.fg),
-                        backgroundColor: colorOut(vars.resister.states.bg),
+                        color: ColorsUtils.colorOut(vars.resister.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.resister.states.bg),
                     },
                 }),
             },
@@ -964,7 +608,6 @@ export const titleBarClasses = useThemeCache(() => {
 
     const clearButtonClass = style("clearButtonClass", {
         // opacity: 0.7,
-        // $nest: {
         //     "&:hover, &:focus": {
         //         opacity: 1,
         //     },
@@ -972,14 +615,14 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const guestButton = style("guestButton", {
-        minWidth: unit(vars.button.guest.minWidth),
-        borderRadius: unit(vars.button.borderRadius),
+        minWidth: styleUnit(vars.button.guest.minWidth),
+        borderRadius: styleUnit(vars.button.borderRadius),
     });
 
     const desktopNavWrap = style("desktopNavWrap", {
         position: "relative",
         flexGrow: 1,
-        $nest: addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any,
+        ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
     });
 
     const logoCenterer = style("logoCenterer", {
@@ -998,13 +641,13 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const hamburger = style("hamburger", {
-        marginRight: unit(12),
+        marginRight: styleUnit(12),
         marginLeft: negativeUnit(globalVars.buttonIcon.offset),
-        $nest: {
+        ...{
             "&&": {
                 ...allButtonStates({
                     allStates: {
-                        color: colorOut(vars.colors.fg),
+                        color: ColorsUtils.colorOut(vars.colors.fg),
                     },
                 }),
             },
@@ -1031,29 +674,31 @@ export const titleBarClasses = useThemeCache(() => {
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
-    const titleBarContainer = style("titleBarContainer", {});
+    const titleBarContainer = style("titleBarContainer", {
+        ...Mixins.border(vars.titleBarContainer.border),
+    });
 
     const skipNav = style("skipNav", {
         position: "absolute",
-        backgroundColor: colorOut(globalVars.mainColors.bg),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         color: "gray",
         border: 0,
-        borderRadius: unit(6),
+        borderRadius: styleUnit(6),
         clip: "rect(0 0 0 0)",
-        height: unit(0),
-        width: unit(0),
-        margin: unit(-1),
+        height: styleUnit(0),
+        width: styleUnit(0),
+        margin: styleUnit(-1),
         padding: 0,
         overflow: "hidden",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        $nest: {
+        ...{
             "&:focus, &:active": {
                 // This is over the icon and we want it to be a little further to the left of the main nav
-                left: unit(-40),
-                width: unit(144),
-                height: unit(38),
+                left: styleUnit(-40),
+                width: styleUnit(144),
+                height: styleUnit(38),
                 clip: "auto",
             },
         },
@@ -1135,18 +780,18 @@ export const titleBarLogoClasses = useThemeCache(() => {
     const mobileLogoStyles = {
         display: "flex",
         justifyContent: vars.mobileLogo.justifyContent,
-        maxHeight: unit(getLogoMaxHeight(vars, true)),
-        maxWidth: unit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
+        maxHeight: styleUnit(getLogoMaxHeight(vars, true)),
+        maxWidth: styleUnit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
     };
 
     const logo = style(
         "logo",
         {
             display: "block",
-            maxHeight: unit(getLogoMaxHeight(vars, false)),
-            maxWidth: unit(vars.logo.maxWidth),
+            maxHeight: styleUnit(getLogoMaxHeight(vars, false)),
+            maxWidth: styleUnit(vars.logo.maxWidth),
             width: "auto",
-            $nest: {
+            ...{
                 "&.isCentred": {
                     margin: "auto",
                 },
@@ -1177,25 +822,25 @@ export const addGradientsToHintOverflow = (width: number | string, color: ColorH
             ...absolutePosition.topRight(),
             background: linearGradient(
                 "right",
-                `${colorOut(color.fade(0))} 0%`,
-                `${colorOut(color.fade(0.3))} 20%`,
-                `${colorOut(color)} 90%`,
+                `${ColorsUtils.colorOut(color.fade(0))} 0%`,
+                `${ColorsUtils.colorOut(color.fade(0.3))} 20%`,
+                `${ColorsUtils.colorOut(color)} 90%`,
             ),
         },
         "&:before": {
             ...absolutePosition.topLeft(),
             background: linearGradient(
                 "left",
-                `${colorOut(color.fade(0))} 0%`,
-                `${colorOut(color.fade(0.3))} 20%`,
-                `${colorOut(color)} 90%`,
+                `${ColorsUtils.colorOut(color.fade(0))} 0%`,
+                `${ColorsUtils.colorOut(color.fade(0.3))} 20%`,
+                `${ColorsUtils.colorOut(color)} 90%`,
             ),
         },
         "&:before, &:after": {
             ...pointerEvents(),
             content: quote(``),
             height: percent(100),
-            width: unit(width),
+            width: styleUnit(width),
             zIndex: 1,
         },
     };

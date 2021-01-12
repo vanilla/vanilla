@@ -5,10 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import { allLinkStates, colorOut, negative, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, negative } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 
 export const reactionsCSS = () => {
     const vars = globalVariables();
@@ -19,9 +21,9 @@ export const reactionsCSS = () => {
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "flex-start",
-        marginLeft: important(unit(negative(vars.meta.spacing.default)) as string),
-        width: calc(`100% + ${unit(vars.meta.spacing.default * 2)}`),
-        padding: unit(vars.meta.spacing.default),
+        marginLeft: important(styleUnit(negative(vars.meta.spacing.default)) as string),
+        width: calc(`100% + ${styleUnit(vars.meta.spacing.default * 2)}`),
+        padding: styleUnit(vars.meta.spacing.default),
     });
 
     cssOut(
@@ -33,8 +35,8 @@ export const reactionsCSS = () => {
         .MessageList .Reactions .ReactButton
     `,
         {
-            fontSize: unit(vars.meta.text.size),
-            margin: unit(vars.meta.spacing.default),
+            fontSize: styleUnit(vars.meta.text.size),
+            margin: styleUnit(vars.meta.spacing.default),
             textDecoration: "none",
         },
     );
@@ -48,19 +50,19 @@ export const reactionsCSS = () => {
     });
 
     cssOut(`.Reactions .ReactButton`, {
-        color: colorOut(vars.meta.colors.fg),
+        color: ColorsUtils.colorOut(vars.meta.colors.fg),
         ...allLinkStates({
             // noState: {
-            //     color: colorOut(vars.links.colors.default),
+            //     color: ColorsUtils.colorOut(vars.links.colors.default),
             // },
             hover: {
-                color: colorOut(vars.links.colors.hover),
+                color: ColorsUtils.colorOut(vars.links.colors.hover),
             },
             focus: {
-                color: colorOut(vars.links.colors.focus),
+                color: ColorsUtils.colorOut(vars.links.colors.focus),
             },
             active: {
-                color: colorOut(vars.links.colors.active),
+                color: ColorsUtils.colorOut(vars.links.colors.active),
             },
         }),
     });

@@ -6,7 +6,7 @@
 
 import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";

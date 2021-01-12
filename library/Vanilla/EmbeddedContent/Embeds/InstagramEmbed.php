@@ -61,11 +61,7 @@ class InstagramEmbed extends AbstractEmbed {
      */
     protected function schema(): Schema {
         return Schema::parse([
-            "height:i?",
-            "width:i?",
-            "photoUrl:s?",
             "postID:s",
-            "version:i",
         ]);
     }
 

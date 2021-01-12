@@ -103,7 +103,10 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
             'body' => $scraped['Description'] ?? null,
             'photoUrl' => !empty($images) ? $images[0] : null,
         ];
-        return new LinkEmbed($data);
+        $linkEmbed = new LinkEmbed($data);
+        $linkEmbed->setCacheable(!empty($scraped['isCacheable']));
+
+        return $linkEmbed;
     }
 
     /**

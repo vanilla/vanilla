@@ -5,7 +5,7 @@
 
 import React, { useContext, useDebugValue } from "react";
 import { logWarning } from "@vanilla/utils";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 
 type ScollOffsetSetter = (offset: number) => void;
 
@@ -100,7 +100,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
             transition: "transform 0.3s ease",
             willChange: "transform",
             transform: isScrolledOff ? `translateY(-${scrollOffset}px)` : "none",
-            $debugName: "offsetClass",
+            label: "offsetClass",
         });
 
         // Render out the context with all values and methods.

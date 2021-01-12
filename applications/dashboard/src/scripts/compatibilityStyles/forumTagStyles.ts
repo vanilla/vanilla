@@ -5,17 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import {
-    borders,
-    paddings,
-    fonts,
-    colorOut,
-    defaultTransition,
-    margins,
-    userSelect,
-    negative,
-} from "@library/styles/styleHelpers";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { defaultTransition, userSelect, negative } from "@library/styles/styleHelpers";
+import { Mixins } from "@library/styles/Mixins";
+import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { tagVariables } from "@library/styles/tagStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important, percent } from "csx";
@@ -28,7 +21,7 @@ export const forumTagCSS = () => {
         .TagCloud
     `,
         {
-            ...margins({
+            ...Mixins.margin({
                 vertical: negative(vars.margin.vertical),
                 horizontal: negative(vars.margin.horizontal),
             }),
@@ -74,12 +67,12 @@ function mixinTag(selector: string, overwrite?: {}) {
             textDecoration: important("none"),
             textOverflow: "ellipsis",
             ...userSelect(),
-            ...paddings(vars.padding),
-            ...borders(vars.border),
-            ...fonts(vars.font),
+            ...Mixins.padding(vars.padding),
+            ...Mixins.border(vars.border),
+            ...Mixins.font(vars.font),
             ...defaultTransition("border"),
-            ...margins(vars.margin),
+            ...Mixins.margin(vars.margin),
+            ...vars.nested,
         });
-        nestedWorkaround(trimTrailingCommas(s), vars.$nest);
     });
 }

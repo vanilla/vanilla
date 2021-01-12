@@ -9,26 +9,16 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import {
-    backgroundHelper,
-    borders,
-    BorderType,
-    EMPTY_BACKGROUND,
-    EMPTY_FONTS,
-    EMPTY_SPACING,
-    extendItemContainer,
-    fonts,
-    IBackground,
-    ISpacing,
-    IFont,
-    margins,
-    paddings,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { BorderType, extendItemContainer } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { IFont, IBackground, ISpacing } from "@library/styles/cssUtilsTypes";
+import { Variables } from "@library/styles/Variables";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
@@ -45,6 +35,7 @@ export interface IHomeWidgetContainerOptions {
     };
     description?: string;
     headerAlignment?: "left" | "center";
+    contentAlignment?: "flex-start" | "center";
 }
 
 interface IViewAll {
@@ -64,12 +55,8 @@ export const homeWidgetContainerVariables = useThemeCache(
         let options = makeVars(
             "options",
             {
-                outerBackground: {
-                    ...EMPTY_BACKGROUND,
-                },
-                innerBackground: {
-                    ...EMPTY_BACKGROUND,
-                },
+                outerBackground: Variables.background({}),
+                innerBackground: Variables.background({}),
                 borderType: BorderType.NONE as BorderType | "navLinks",
                 maxWidth: layoutVariables().contentWidth,
                 viewAll: {
@@ -86,15 +73,12 @@ export const homeWidgetContainerVariables = useThemeCache(
                 subtitle: {
                     type: "standard" as "standard" | "overline",
                     content: undefined as string | undefined,
-                    font: {
-                        ...EMPTY_FONTS,
-                    },
-                    padding: {
-                        ...EMPTY_SPACING,
-                    },
+                    padding: Variables.spacing({}),
+                    font: Variables.font({}),
                 },
                 description: undefined as string | undefined,
                 headerAlignment: "left" as "left" | "center",
+                contentAlignment: "flex-start" as "flex-start" | "center",
             },
             optionOverrides,
         );
@@ -117,6 +101,7 @@ export const homeWidgetContainerVariables = useThemeCache(
             {
                 ...options,
                 innerBackground: {
+                    ...options.innerBackground,
                     color: options.borderType !== BorderType.NONE ? globalVars.body.backgroundImage.color : undefined,
                 },
             },
@@ -124,9 +109,7 @@ export const homeWidgetContainerVariables = useThemeCache(
         );
 
         const title = makeVars("title", {
-            font: {
-                ...EMPTY_FONTS,
-            },
+            font: Variables.font({}),
         });
 
         const navPaddings = navLinksVariables().item.padding;
@@ -136,59 +119,53 @@ export const homeWidgetContainerVariables = useThemeCache(
         const needsSpacing =
             options.outerBackground.color || options.outerBackground.image || options.borderType === "navLinks";
         const spacing = makeVars("spacing", {
-            padding: {
-                ...EMPTY_SPACING,
+            padding: Variables.spacing({
                 top: needsSpacing ? globalVars.gutter.size * 2 : globalVars.gutter.size,
                 bottom: needsSpacing ? globalVars.gutter.size * bottomMultiplier : 0,
-            },
+            }),
         });
 
         const itemSpacing = makeVars("itemSpacing", {
-            ...EMPTY_SPACING,
             horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
             vertical: globalVars.gutter.size / 2,
             mobile: {
-                ...EMPTY_SPACING,
                 horizontal: options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
             },
         });
 
-        const horizontalSpacing = itemSpacing.horizontal / 2; // Cut in half to account for grid item spacing.
-        const horizontalSpacingMobile = itemSpacing.mobile.horizontal / 2; // Cut in half to account for grid item spacing.
+        const horizontalSpacing = (itemSpacing.horizontal as number) / 2; // Cut in half to account for grid item spacing.
+        const horizontalSpacingMobile = (itemSpacing.mobile.horizontal as number) / 2; // Cut in half to account for grid item spacing.
 
         const grid = makeVars("grid", {
-            padding: {
-                ...EMPTY_SPACING,
+            padding: Variables.spacing({
                 horizontal: horizontalSpacing,
                 vertical: itemSpacing.vertical,
-            },
+            }),
             paddingMobile: {
                 horizontal: horizontalSpacingMobile,
             },
         });
 
         const gridItem = makeVars("gridItem", {
-            padding: {
-                ...EMPTY_SPACING,
+            padding: Variables.spacing({
                 horizontal: horizontalSpacing,
                 vertical: itemSpacing.vertical,
-            },
-            paddingMobile: {
-                ...EMPTY_SPACING,
+            }),
+            paddingMobile: Variables.spacing({
                 horizontal: horizontalSpacingMobile,
-            },
+            }),
         });
 
         const description = makeVars("description", {
-            font: {
-                ...EMPTY_FONTS,
-            },
-            padding: {
-                ...EMPTY_SPACING,
-                horizontal: calc(`${unit(gridItem.padding.horizontal * 2)}`),
-                vertical: calc(`${unit(gridItem.padding.vertical)}`),
+            font: Variables.font({}),
+            padding: Variables.spacing({
+                horizontal: calc(`${styleUnit((gridItem.padding.horizontal as number) * 2)}`),
+                vertical: calc(`${styleUnit(gridItem.padding.vertical)}`),
                 top: options.subtitle.content && options.subtitle.type === "standard" ? 0 : undefined,
-            },
+            }),
+            paddingMobile: Variables.spacing({
+                horizontal: gridItem.padding.horizontal,
+            }),
         });
 
         const mobileMediaQuery = layoutVariables().mediaQueries().oneColumnDown;
@@ -203,29 +180,29 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const vars = homeWidgetContainerVariables(optionOverrides);
 
     const root = style({
-        ...backgroundHelper(vars.options.outerBackground ?? {}),
+        ...Mixins.background(vars.options.outerBackground ?? {}),
     });
 
     // For navLinks style only.
     const separator = style("separator", {});
 
-    const contentMixin: NestedCSSProperties = {
-        ...paddings({
+    const contentMixin: CSSObject = {
+        ...Mixins.padding({
             vertical: vars.itemSpacing.vertical,
         }),
         ...(vars.options.borderType === "navLinks"
             ? extendItemContainer(navLinksVariables().linksWithHeadings.paddings.horizontal)
-            : extendItemContainer(vars.itemSpacing.horizontal)),
+            : extendItemContainer(vars.itemSpacing.horizontal as number)),
     };
 
     const verticalContainer = style("verticalContainer", {
-        ...paddings(vars.spacing.padding),
+        ...Mixins.padding(vars.spacing.padding),
     });
 
     const container = style("container", {
-        $nest: {
+        ...{
             "&&": {
-                maxWidth: unit(vars.options.maxWidth),
+                maxWidth: styleUnit(vars.options.maxWidth),
                 margin: "0 auto",
                 width: "100%",
             },
@@ -236,20 +213,20 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const borderedContent = style("borderedContent", {
         ...contentMixin,
-        ...paddings({
+        ...Mixins.padding({
             top: 0,
             horizontal: vars.itemSpacing.horizontal,
         }),
     });
 
-    const borderStyling: NestedCSSProperties = (() => {
+    const borderStyling: CSSObject = (() => {
         switch (vars.options.borderType) {
             case BorderType.NONE:
                 return {};
             case BorderType.BORDER:
                 return {
                     borderRadius: globalVars.border.radius,
-                    ...borders(),
+                    ...Mixins.border(),
                 };
             case BorderType.SHADOW:
                 return {
@@ -264,18 +241,18 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const grid = style(
         "grid",
         {
-            ...backgroundHelper(vars.options.innerBackground),
+            ...Mixins.background(vars.options.innerBackground),
             display: "flex",
             alignItems: "stretch",
-            justifyContent: "flex-start",
+            justifyContent: vars.options.contentAlignment ?? "flex-start",
             flexWrap: "wrap",
-            ...paddings(vars.grid.padding),
+            ...Mixins.padding(vars.grid.padding),
         },
         borderStyling,
-        vars.mobileMediaQuery(paddings(vars.grid.paddingMobile)),
+        vars.mobileMediaQuery(Mixins.padding(vars.grid.paddingMobile)),
     );
 
-    const itemMixin: NestedCSSProperties = {
+    const itemMixin: CSSObject = {
         flex: 1,
         flexBasis: percent(100 / vars.options.maxColumnCount),
     };
@@ -284,16 +261,16 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const gridItemSpacer = style("gridItemSpacer", {
         ...itemMixin,
-        minWidth: unit(homeWidgetItemVariables().sizing.minWidth),
+        minWidth: styleUnit(homeWidgetItemVariables().sizing.minWidth),
     });
 
     const gridItemContent = style(
         "gridItemContent",
         {
-            ...paddings(vars.gridItem.padding),
+            ...Mixins.padding(vars.gridItem.padding),
             height: percent(100),
         },
-        vars.mobileMediaQuery(paddings(vars.gridItem.paddingMobile)),
+        vars.mobileMediaQuery(Mixins.padding(vars.gridItem.paddingMobile)),
     );
 
     const gridItemWidthConstraint = useThemeCache((maxWidth: number) =>
@@ -308,32 +285,32 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: vars.grid.padding.horizontal,
             }),
         },
-        vars.mobileMediaQuery(paddings(vars.grid.paddingMobile)),
+        vars.mobileMediaQuery(Mixins.padding(vars.grid.paddingMobile)),
     );
 
     const title = style(
         "title",
         {
             flex: 1,
-            ...fonts(vars.title.font),
-            ...paddings({
+            ...Mixins.font(vars.title.font),
+            ...Mixins.padding({
                 horizontal: vars.gridItem.padding.horizontal,
             }),
             textAlign: vars.options.headerAlignment,
         },
         vars.mobileMediaQuery(
-            paddings({
+            Mixins.padding({
                 horizontal: vars.gridItem.paddingMobile.horizontal,
             }),
         ),
     );
 
     const subtitle = style("subtitle", {
-        ...fonts({
+        ...Mixins.font({
             ...vars.options.subtitle.font,
             color: vars.options.subtitle.font.color
                 ? vars.options.subtitle.font.color
@@ -357,23 +334,28 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
                 ? 1
                 : undefined,
         }),
-        ...paddings({
+        ...Mixins.padding({
             ...vars.options.subtitle.padding,
-            horizontal: vars.gridItem.padding.horizontal * 2,
+            horizontal: (vars.gridItem.padding.horizontal as number) * 2,
             top: vars.options.subtitle.padding.top ?? 12,
             bottom: vars.options.subtitle.padding.bottom ?? 20,
         }),
         textAlign: vars.options.headerAlignment,
     });
 
-    const description = style("description", {
-        ...paddings(vars.description.padding),
-        textAlign: vars.options.headerAlignment,
-    });
+    const description = style(
+        "description",
+        {
+            ...Mixins.padding(vars.description.padding),
+            ...Mixins.font(vars.description.font),
+            textAlign: vars.options.headerAlignment,
+        },
+        vars.mobileMediaQuery(Mixins.padding(vars.description.paddingMobile)),
+    );
     const viewAll = style("viewAll", {
-        $nest: {
+        ...{
             "&&": {
-                ...margins({
+                ...Mixins.margin({
                     horizontal: vars.options.borderType === "navLinks" ? 0 : vars.gridItem.padding.horizontal,
                 }),
             },
@@ -387,7 +369,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...contentMixin,
         paddingTop: 0,
         marginTop: -vars.itemSpacing.vertical,
-        $nest: {
+        ...{
             [`.${borderedContent} + &`]: {
                 marginTop: 0,
             },

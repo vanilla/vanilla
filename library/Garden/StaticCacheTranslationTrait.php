@@ -28,6 +28,9 @@ trait StaticCacheTranslationTrait {
      * @return string
      */
     protected static function f(string $key, $default) {
+        if ($key === '') {
+            return '';
+        }
         return Gdn::translate($key, $default);
     }
 }

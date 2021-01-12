@@ -53,15 +53,33 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /** @var string|null */
     public $headerAlignment = null;
 
+    /** @var string|null */
+    public $contentAlignment = null;
+
+    /**
+     * @var string|null Defines content width.
+     */
+    public $maxWidth = null;
+
     /**
     * @var object|null Whether counts or description is rendered.
     */
     public $display = null;
 
     /**
+     * @var object|null Item name styling options.
+     */
+    public $name = null;
+
+    /**
      * @var string|null Explicitly pass border type.
      */
     public $borderType = null;
+
+    /**
+     * @var array|null The container options for the widget.
+     */
+    public $containerOptions = [];
 
     /**
      * @return array|null
@@ -83,6 +101,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
             'contentType' => $this->contentType,
             'display' => $this->display,
             'borderType' => $this->borderType,
+            'name' => $this->name,
         ];
         if (!empty($this->iconProps)) {
             $options['iconProps'] = $this->iconProps;
@@ -94,12 +113,16 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      * @return array
      */
     protected function getContainerOptions(): array {
-        return [
+        $this->containerOptions = [
             'maxColumnCount' => $this->maxColumnCount,
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'headerAlignment' => $this->headerAlignment,
+            'contentAlignment' => $this->contentAlignment,
+            'maxWidth' => $this->maxWidth,
         ];
+
+        return $this->containerOptions;
     }
 
     /**
@@ -165,10 +188,10 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 'borderType:s?',
                 'maxWidth:s?',
                 'viewAll?' => Schema::parse([
-                    'position:s',
-                    'to:s',
-                    'name:s',
-                    'displayType:s',
+                    'position:s?',
+                    'to:s?',
+                    'name:s?',
+                    'displayType:s?',
                 ]),
                 'maxColumnCount:i?',
                 'subtitle?' => Schema::parse([
@@ -183,6 +206,9 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 'headerAlignment:s?' => [
                     'enum' => ['center', 'left']
                 ],
+                'contentAlignment:s?' => [
+                    'enum' => ['center', 'flex-start']
+                ],
             ]),
             'itemOptions' => Schema::parse([
                 'borderType:s?',
@@ -193,6 +219,11 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 'display:?' => Schema::parse([
                     'description:b',
                     'counts:b',
+                ]),
+                'name:?' => Schema::parse([
+                    'hidden:b?',
+                    'font:o?',
+                    'states:o?',
                 ]),
                 'justifyContent:s?',
                 'alignment:s?',
@@ -206,6 +237,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                     ],
                     'background:o?',
                     'border:o?',
+                    'size:i?',
                 ]),
             ]),
             'itemData:a' => Schema::parse([
@@ -266,12 +298,16 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     }
 
     /**
+     * Get schema for the number of columns.
+     *
+     * @param int $defaultMaxColumns
+     *
      * @return Schema
      */
-    public static function widgetColumnSchema(): Schema {
+    public static function widgetColumnSchema(int $defaultMaxColumns = 3): Schema {
         return Schema::parse([
             'maxColumnCount:i?' => [
-                'default' => 3,
+                'default' => $defaultMaxColumns,
                 'x-control' => SchemaForm::dropDown(
                     new FormOptions('Max Columns', 'Set the maximum number of columns for the widget.'),
                     new StaticFormChoices(['1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5])

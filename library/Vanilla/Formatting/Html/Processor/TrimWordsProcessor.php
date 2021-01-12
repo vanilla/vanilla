@@ -22,8 +22,7 @@ class TrimWordsProcessor extends HtmlProcessor {
      * @param HtmlDocument $document
      * @param ?int $wordCount
      */
-    public function __construct(HtmlDocument $document, ?int $wordCount = null) {
-        parent::__construct($document);
+    public function __construct(?int $wordCount = null) {
         $this->setWordCount($wordCount);
     }
 
@@ -41,21 +40,24 @@ class TrimWordsProcessor extends HtmlProcessor {
     /**
      * Process Html document.
      *
+     * @param HtmlDocument $document
      * @return HtmlDocument
      */
-    public function processDocument(): HtmlDocument {
-        $this->applyTrimWords();
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        $this->applyTrimWords($document);
+        return $document;
     }
 
     /**
      * Apply DomUtils::trimWords()
+     *
+     * @param HtmlDocument $document
      */
-    public function applyTrimWords() {
+    public function applyTrimWords(HtmlDocument $document) {
         if (empty($this->wordCount)) {
-            DomUtils::trimWords($this->document->getDom());
+            DomUtils::trimWords($document->getDom());
         } else {
-            DomUtils::trimWords($this->document->getDom(), $this->wordCount);
+            DomUtils::trimWords($document->getDom(), $this->wordCount);
         }
     }
 }

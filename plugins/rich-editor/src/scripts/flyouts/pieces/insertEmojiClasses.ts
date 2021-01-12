@@ -5,8 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { appearance, buttonStates, colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { appearance, buttonStates } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { viewHeight } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
@@ -20,51 +23,49 @@ export const insertEmojiClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: unit(globalVars.icon.sizes.default),
+        fontSize: styleUnit(globalVars.icon.sizes.default),
         textAlign: "center",
         overflow: "hidden",
         border: 0,
         opacity: globalVars.states.text.opacity,
         cursor: "pointer",
-        borderRadius: unit(3),
+        borderRadius: styleUnit(3),
         background: "transparent",
-        $nest: {
-            ...buttonStates(
-                {
-                    allStates: {
-                        outline: 0,
-                    },
-                    hover: {
-                        opacity: 1,
-                    },
-                    focus: {
-                        opacity: 1,
-                    },
-                    active: {
-                        opacity: 1,
-                    },
-                    keyboardFocus: {
-                        backgroundColor: colorOut(globalVars.states.hover.highlight),
-                    },
+        ...buttonStates(
+            {
+                allStates: {
+                    outline: 0,
                 },
-                {
-                    ".fallBackEmoji": {
-                        display: "block",
-                        margin: "auto",
-                    },
-                    ".safeEmoji": {
-                        display: "block",
-                        height: unit(globalVars.icon.sizes.default),
-                        width: unit(globalVars.icon.sizes.default),
-                        margin: "auto",
-                    },
+                hover: {
+                    opacity: 1,
                 },
-            ),
-        },
+                focus: {
+                    opacity: 1,
+                },
+                active: {
+                    opacity: 1,
+                },
+                keyboardFocus: {
+                    backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
+                },
+            },
+            {
+                ".fallBackEmoji": {
+                    display: "block",
+                    margin: "auto",
+                },
+                ".safeEmoji": {
+                    display: "block",
+                    height: styleUnit(globalVars.icon.sizes.default),
+                    width: styleUnit(globalVars.icon.sizes.default),
+                    margin: "auto",
+                },
+            },
+        ),
     });
 
     const body = style("body", {
-        height: unit(vars.emojiBody.height),
+        height: styleUnit(vars.emojiBody.height),
         maxHeight: viewHeight(80),
     });
 

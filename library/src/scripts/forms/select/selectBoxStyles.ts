@@ -5,9 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -20,10 +21,10 @@ export const selectBoxClasses = useThemeCache(() => {
         textAlign: "left",
         maxWidth: percent(100),
         border: 0,
-        $nest: {
+        ...{
             "&.minimalStyles": {
                 justifyContent: "center",
-                $nest: {
+                ...{
                     ".selectBox-buttonIcon": {
                         marginRight: 0,
                     },
@@ -41,7 +42,7 @@ export const selectBoxClasses = useThemeCache(() => {
         maxWidth: percent(100),
         lineHeight: globalVars.lineHeights.condensed,
         paddingLeft: px(13.5),
-        $nest: {
+        ...{
             "&[disabled]": {
                 opacity: 1,
             },
@@ -86,8 +87,8 @@ export const selectBoxClasses = useThemeCache(() => {
     });
 
     const offsetPadding = style("offsetPadding", {
-        paddingTop: unit(0),
-        paddingBottom: unit(0),
+        paddingTop: styleUnit(0),
+        paddingBottom: styleUnit(0),
     });
 
     return {

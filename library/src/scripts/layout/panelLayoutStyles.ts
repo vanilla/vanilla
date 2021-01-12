@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { calc, important, percent, px, viewHeight } from "csx";
-import { cssRule, media } from "typestyle";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, important, percent, viewHeight } from "csx";
+import { cssRule, media } from "@library/styles/styleShim";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { margins, paddings } from "@library/styles/styleHelpersSpacing";
-import { sticky, unit } from "@library/styles/styleHelpers";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { sticky } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { panelBackgroundVariables } from "@library/layout/PanelBackground.variables";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import {
     fallbackLayoutVariables,
@@ -20,6 +21,7 @@ import {
     IPanelLayoutVariables,
 } from "@library/layout/types/interface.panelLayout";
 import { logError } from "@vanilla/utils";
+import { Mixins } from "@library/styles/Mixins";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;
@@ -131,76 +133,76 @@ export const layoutVariables = useThemeCache(
 
         // Allows to be recalculated in another layout (i.e. the three column layout)
         const setMediaQueries = (breakPoints) => {
-            const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true): NestedCSSProperties => {
+            const noBleed = (styles: CSSObject, useMinWidth: boolean = true): CSSObject => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.noBleed),
-                        minWidth: useMinWidth ? px(breakPoints.twoColumns + 1) : undefined,
+                        maxWidth: breakPoints.noBleed,
+                        minWidth: useMinWidth ? breakPoints.twoColumns + 1 : undefined,
                     },
                     styles,
                 );
             };
 
-            const noBleedDown = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const noBleedDown = (styles: CSSObject): CSSObject => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.noBleed),
+                        maxWidth: breakPoints.noBleed,
                     },
                     styles,
                 );
             };
 
-            const twoColumnsDown = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const twoColumnsDown = (styles: CSSObject): CSSObject => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.twoColumns),
+                        maxWidth: breakPoints.twoColumns,
                     },
                     styles,
                 );
             };
 
-            const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const twoColumns = (styles: CSSObject, useMinWidth: boolean = true) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.twoColumns),
-                        minWidth: useMinWidth ? px(breakPoints.oneColumn + 1) : undefined,
+                        maxWidth: breakPoints.twoColumns,
+                        minWidth: useMinWidth ? breakPoints.oneColumn + 1 : undefined,
                     },
                     styles,
                 );
             };
 
-            const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const oneColumn = (styles: CSSObject, useMinWidth: boolean = true) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.oneColumn),
-                        minWidth: useMinWidth ? px(breakPoints.xs + 1) : undefined,
+                        maxWidth: breakPoints.oneColumn,
+                        minWidth: useMinWidth ? breakPoints.xs + 1 : undefined,
                     },
                     styles,
                 );
             };
 
-            const oneColumnDown = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const oneColumnDown = (styles: CSSObject): CSSObject => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.oneColumn),
+                        maxWidth: breakPoints.oneColumn,
                     },
                     styles,
                 );
             };
 
-            const aboveOneColumn = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const aboveOneColumn = (styles: CSSObject): CSSObject => {
                 return media(
                     {
-                        minWidth: px(breakPoints.oneColumn + 1),
+                        minWidth: breakPoints.oneColumn + 1,
                     },
                     styles,
                 );
             };
 
-            const xs = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const xs = (styles: CSSObject): CSSObject => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.xs),
+                        maxWidth: breakPoints.xs,
                     },
                     styles,
                 );
@@ -314,11 +316,11 @@ export const generatePanelLayoutClasses = (props: {
     });
 
     const root = style({
-        ...margins(vars.panelLayoutSpacing.margin),
+        ...Mixins.margin(vars.panelLayoutSpacing.margin),
         width: percent(100),
-        $nest: {
+        ...{
             [`&.noBreadcrumbs > .${main}`]: {
-                paddingTop: unit(globalVars.gutter.size),
+                paddingTop: styleUnit(globalVars.gutter.size),
                 ...mediaQueries({
                     [LayoutTypes.THREE_COLUMNS]: {
                         oneColumnDown: {
@@ -328,25 +330,25 @@ export const generatePanelLayoutClasses = (props: {
                 }),
             },
             "&.hasTopPadding": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
+                paddingTop: styleUnit(vars.panelLayoutSpacing.extraPadding.top),
             },
             "&.hasTopPadding.noBreadcrumbs": {
-                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                paddingTop: styleUnit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
             },
             "&.hasLargePadding": {
-                ...paddings(vars.panelLayoutSpacing.largePadding),
+                ...Mixins.padding(vars.panelLayoutSpacing.largePadding),
             },
             ...mediaQueries({
                 [LayoutTypes.THREE_COLUMNS]: {
                     oneColumnDown: {
-                        $nest: {
+                        ...{
                             "&.hasTopPadding.noBreadcrumbs": {
-                                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                                paddingTop: styleUnit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
                             },
                         },
                     },
                 },
-            }).$nest,
+            }),
         },
     });
 
@@ -359,9 +361,9 @@ export const generatePanelLayoutClasses = (props: {
 
     const panel = style("panel", {
         width: percent(100),
-        $nest: {
+        ...{
             [`& > .panelArea:first-child .panelList`]: {
-                marginTop: unit(
+                marginTop: styleUnit(
                     (globalVars.fonts.size.title * globalVars.lineHeights.condensed) / 2 -
                         globalVariables().fonts.size.medium / 2,
                 ),
@@ -371,7 +373,7 @@ export const generatePanelLayoutClasses = (props: {
 
     const top = style("top", {
         width: percent(100),
-        marginBottom: unit(globalVars.gutter.half),
+        marginBottom: styleUnit(globalVars.gutter.half),
     });
 
     const container = style("container", {
@@ -392,19 +394,19 @@ export const generatePanelLayoutClasses = (props: {
 
     const leftColumn = style("leftColumn", {
         position: "relative",
-        width: unit(vars.panel.paddedWidth),
-        flexBasis: unit(vars.panel.paddedWidth),
-        minWidth: unit(vars.panel.paddedWidth),
-        paddingRight: unit(offset),
+        width: styleUnit(vars.panel.paddedWidth),
+        flexBasis: styleUnit(vars.panel.paddedWidth),
+        minWidth: styleUnit(vars.panel.paddedWidth),
+        paddingRight: styleUnit(offset),
     });
 
     const rightColumn = style("rightColumn", {
         position: "relative",
-        width: unit(vars.panel.paddedWidth),
-        flexBasis: unit(vars.panel.paddedWidth),
-        minWidth: unit(vars.panel.paddedWidth),
+        width: styleUnit(vars.panel.paddedWidth),
+        flexBasis: styleUnit(vars.panel.paddedWidth),
+        minWidth: styleUnit(vars.panel.paddedWidth),
         overflow: "initial",
-        paddingLeft: unit(offset),
+        paddingLeft: styleUnit(offset),
     });
 
     const mainColumn = style("mainColumn", {
@@ -412,11 +414,11 @@ export const generatePanelLayoutClasses = (props: {
         flexGrow: 1,
         width: percent(100),
         maxWidth: percent(100),
-        paddingBottom: unit(vars.panelLayoutSpacing.extraPadding.bottom),
+        paddingBottom: styleUnit(vars.panelLayoutSpacing.extraPadding.bottom),
         ...mediaQueries({
             [LayoutTypes.THREE_COLUMNS]: {
                 oneColumnDown: {
-                    ...paddings({
+                    ...Mixins.padding({
                         left: important(0),
                         right: important(0),
                     }),
@@ -426,10 +428,10 @@ export const generatePanelLayoutClasses = (props: {
     });
 
     const mainColumnMaxWidth = style("mainColumnMaxWidth", {
-        $nest: {
+        ...{
             "&.hasAdjacentPanel": {
-                flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
-                maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
+                flexBasis: calc(`100% - ${styleUnit(vars.panel.paddedWidth)}`),
+                maxWidth: calc(`100% - ${styleUnit(vars.panel.paddedWidth)}`),
 
                 ...mediaQueries({
                     [LayoutTypes.THREE_COLUMNS]: {
@@ -441,8 +443,8 @@ export const generatePanelLayoutClasses = (props: {
                 }),
             },
             "&.hasTwoAdjacentPanels": {
-                flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
-                maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
+                flexBasis: calc(`100% - ${styleUnit(vars.panel.paddedWidth * 2)}`),
+                maxWidth: calc(`100% - ${styleUnit(vars.panel.paddedWidth * 2)}`),
                 ...mediaQueries({
                     [LayoutTypes.THREE_COLUMNS]: {
                         oneColumnDown: {
@@ -460,7 +462,6 @@ export const generatePanelLayoutClasses = (props: {
     const isSticky = style("isSticky", {
         ...sticky(),
         height: percent(100),
-        $unique: true,
         ...mediaQueries({
             [LayoutTypes.THREE_COLUMNS]: {
                 oneColumnDown: {
@@ -470,7 +471,7 @@ export const generatePanelLayoutClasses = (props: {
                     bottom: "auto",
                 },
             },
-        }).$nest,
+        }),
     });
 
     // To remove when we have overlay styles converted
@@ -479,15 +480,15 @@ export const generatePanelLayoutClasses = (props: {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        paddingBottom: unit(14),
+        paddingBottom: styleUnit(14),
     });
 
     const layoutSpecificStyles = (style) => {
         const middleColumnMaxWidth = style("middleColumnMaxWidth", {
-            $nest: {
+            ...{
                 "&.hasAdjacentPanel": {
-                    flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
-                    maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
+                    flexBasis: calc(`100% - ${styleUnit(vars.panel.paddedWidth)}`),
+                    maxWidth: calc(`100% - ${styleUnit(vars.panel.paddedWidth)}`),
                     ...mediaQueries({
                         [LayoutTypes.THREE_COLUMNS]: {
                             oneColumnDown: {
@@ -498,8 +499,8 @@ export const generatePanelLayoutClasses = (props: {
                     }),
                 },
                 "&.hasTwoAdjacentPanels": {
-                    flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
-                    maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
+                    flexBasis: calc(`100% - ${styleUnit(vars.panel.paddedWidth * 2)}`),
+                    maxWidth: calc(`100% - ${styleUnit(vars.panel.paddedWidth * 2)}`),
                     ...mediaQueries({
                         [LayoutTypes.THREE_COLUMNS]: {
                             oneColumnDown: {
@@ -514,19 +515,19 @@ export const generatePanelLayoutClasses = (props: {
 
         const leftColumn = style("leftColumn", {
             position: "relative",
-            width: unit(vars.panel.paddedWidth),
-            flexBasis: unit(vars.panel.paddedWidth),
-            minWidth: unit(vars.panel.paddedWidth),
-            paddingRight: offset ? unit(offset) : undefined,
+            width: styleUnit(vars.panel.paddedWidth),
+            flexBasis: styleUnit(vars.panel.paddedWidth),
+            minWidth: styleUnit(vars.panel.paddedWidth),
+            paddingRight: offset ? styleUnit(offset) : undefined,
         });
 
         const rightColumn = style("rightColumn", {
             position: "relative",
-            width: unit(vars.panel.paddedWidth),
-            flexBasis: unit(vars.panel.paddedWidth),
-            minWidth: unit(vars.panel.paddedWidth),
+            width: styleUnit(vars.panel.paddedWidth),
+            flexBasis: styleUnit(vars.panel.paddedWidth),
+            minWidth: styleUnit(vars.panel.paddedWidth),
             overflow: "initial",
-            paddingRight: offset ? unit(offset) : undefined,
+            paddingRight: offset ? styleUnit(offset) : undefined,
         });
 
         return {

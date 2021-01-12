@@ -15,6 +15,7 @@ use OpenStack\Metric\v1\Gnocchi\Models\Resource;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Models\DirtyRecordModel;
 use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
@@ -195,6 +196,30 @@ trait EventSpyTestTrait {
     }
 
     /**
+     * Assert that a specific event was not dispatched.
+     *
+     * @param array $eventProperties
+     */
+    public function assertEventNotDispatched(array $eventProperties = []) {
+        /** @var ResourceEvent[] $events */
+        $events = $this->getEventManager()->getDispatchedEvents();
+
+        $eventDispatched = false;
+        if ($eventProperties) {
+            foreach ($events as $event) {
+                $type = $eventProperties["type"] ?? '';
+                $action = $eventProperties["action"] ?? '';
+                if ($event->getType() === $type &&
+                    $event->getAction() === $action
+                ) {
+                    $eventDispatched = true;
+                }
+            }
+        }
+        TestCase::assertEquals(false, $eventDispatched, 'No events were supposed to be dispatched.');
+    }
+
+    /**
      * @param BulkUpdateEvent $updateEvent
      */
     public function assertBulkEventDispatched(BulkUpdateEvent $updateEvent) {
@@ -256,7 +281,7 @@ trait EventSpyTestTrait {
     }
 
     /**
-     * Generate an excepected event.
+     * Generate an expected event.
      *
      * @param string $type
      * @param string $action
@@ -287,5 +312,19 @@ trait EventSpyTestTrait {
      */
     private function getCurrentUser() {
         return \Gdn::userModel()->currentFragment();
+    }
+
+    /**
+     * Test a correct dirty record is inserted.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     */
+    public function assertDirtyRecordInserted(string $recordType, int $recordID) {
+        /** @var DirtyRecordModel $dirtyRecordModel */
+        $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
+        $record = $dirtyRecordModel->select(["recordType" => $recordType, "recordID" => $recordID]);
+        $this->assertEquals($recordID, $record[0]["recordID"]);
+        $this->resetTable('dirtyRecord');
     }
 }

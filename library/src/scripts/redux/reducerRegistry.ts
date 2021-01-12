@@ -8,7 +8,8 @@
  */
 
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
-import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
+import { usersReducer } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import { Reducer, ReducersMapObject, combineReducers } from "redux";
 import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
 import getStore from "@library/redux/getStore";
@@ -40,11 +41,11 @@ export function getReducers(): ReducersMapObject<any, any> {
         // We have a few static reducers.
         users: usersReducer,
         discussions: discussionsReducer,
-        theme: themeReducer,
         locales: localeReducer,
         tags: tagsReducer,
         notifications: new NotificationsModel().reducer,
         conversations: new ConversationsModel().reducer,
+        theme: themeReducer,
         ...dynamicReducers,
     };
 }

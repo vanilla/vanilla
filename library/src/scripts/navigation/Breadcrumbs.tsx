@@ -7,7 +7,7 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import Breadcrumb from "@library/navigation/Breadcrumb";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import classNames from "classnames";
 import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 

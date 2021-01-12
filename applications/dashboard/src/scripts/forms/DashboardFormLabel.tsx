@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 

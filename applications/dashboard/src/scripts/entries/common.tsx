@@ -12,7 +12,7 @@ import { themePreviewToastReducer } from "@library/features/toaster/themePreview
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { mountPortal } from "@vanilla/react-utils";
 import { roleReducer } from "@dashboard/roles/roleReducer";
-import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { SearchService } from "@library/search/SearchService";
 import { TypeGroupsIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { PLACES_GROUP_TYPE } from "@vanilla/library/src/scripts/search/searchConstants";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";

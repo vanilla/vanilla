@@ -19,11 +19,13 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
+use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
@@ -47,6 +49,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     use FormatFieldTrait;
 
     use UpdateMediaTrait;
+
+    use LegacyDirtyRecordTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
@@ -72,6 +76,13 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /** @var string for type discussion */
     const DISCUSSION_TYPE = 'Discussion';
 
+    /** @var string announced discussion */
+    const ANNOUNCEMENT_LABEL = 'Announcement';
+
+    /** @var string closed discussion */
+    const CLOSED_LABEL = 'Closed';
+
+    /** @var string record type */
     public const RECORD_TYPE = "discussion";
 
     /** @var CategoryModel */
@@ -820,6 +831,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false, $expand = true) {
+        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         // Add backwards compatibility for the old way getWhere() was called.
         if (is_numeric($orderFields)) {
             deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
@@ -874,6 +889,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $sql = $this->SQL;
 
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('d');
+        }
+
         // Build up the base query. Self-join for optimization.
         $sql->select('d.DiscussionID')
             ->from('Discussion d')
@@ -925,6 +944,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $this->EventArguments['SQL'] = $sql;
         $this->fireEvent('BeforeGetSubQuery');
         $sql->where($safeWheres);
+
         $subQuery = $sql->getSelect(true);
 
         $sql->reset();
@@ -957,6 +977,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         );
 
         $data = $sql->query($finalQuery);
+
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -1379,6 +1400,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @return Gdn_DataSet SQL result.
      */
     public function getAnnouncements($wheres = [], $offset = 0, $limit = false, $orderBy = null) {
+        $joinDirtyRecords = $wheres[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
         if ($limit === false) {
@@ -1417,6 +1442,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->SQL->whereIn('d.CategoryID', $categoryID);
         } elseif ($categoryID > 0) {
             $this->SQL->where('d.CategoryID', $categoryID);
+        }
+
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('d');
         }
 
         $announcementIDs = $this->SQL->get()->resultArray();
@@ -1864,6 +1893,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->SQL->whereIn('c.CategoryID', $perms);
         }
 
+        if ($wheres[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false) {
+            $this->applyDirtyWheres('d');
+        }
+
         return $this->SQL
             ->select('d.DiscussionID', 'count', 'CountDiscussions')
             ->from('Discussion d')
@@ -2191,6 +2224,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->EventArguments['SetField'] = $property;
         }
 
+        $this->addDirtyRecord('discussion', $rowID);
         parent::setField($rowID, $property, $value);
         $this->fireEvent('AfterSetField');
     }
@@ -2292,6 +2326,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         } else {
             // Add the update fields.
             $this->addUpdateFields($formPostValues);
+            $this->EventArguments['oldDiscussion'] = $this->getID($formPostValues['DiscussionID']);
         }
 
         // Pinned-to-Announce translation
@@ -3803,8 +3838,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $row['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
             $type = $row['Type'] ?? '';
             $row['Type'] = ($type === self::REDIRECT_TYPE) ? self::DISCUSSION_TYPE : $type;
-            $siteSection = $this->siteSectionModel->getSiteSectionForAttribute('allCategories', $row['CategoryID'], 'discussion');
+            $siteSection = $this->siteSectionModel
+                ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
             $row['locale'] = $siteSection->getContentLocale();
+
+            if ($row['Closed'] ?? false) {
+                $row['labelCodes'][] = self::CLOSED_LABEL;
+            }
+
+            if ($row['pinned'] ?? false) {
+                $row['labelCodes'][] = self::ANNOUNCEMENT_LABEL;
+            }
         }
 
         $scheme = new CamelCaseScheme();
@@ -3901,6 +3945,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
             'format:s?' => 'Format of the discussion',
             'tagIDs:a?' => ['items' => ['type' => 'integer']],
+            'labelCodes:a?' => ['items' => ['type' => 'string']],
             'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
             'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
         ]);

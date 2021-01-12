@@ -469,6 +469,12 @@ if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
     saveToConfig('Vanilla.Comment.MaxLength', DiscussionModel::MAX_POST_LENGTH);
 }
 
+$Construct->table('dirtyRecord')
+    ->column('recordType', 'varchar(50)', false, ['primary', 'index.recordType'])
+    ->column('recordID', 'int', false, ['primary'])
+    ->column('dateInserted', 'datetime', false, ['index.recordType'])
+    ->set();
+
 // Add stub content
 include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 

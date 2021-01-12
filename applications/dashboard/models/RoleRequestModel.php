@@ -141,6 +141,9 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
             } else {
                 $validation->addError('roleRequestID', 'missingField', ['messageCode' => '{field} is required.']);
             }
+        } elseif (Operation::TYPE_INSERT === $op->getType()) {
+            // Get a potential current item by secondary key.
+            $current = $this->select(['roleID' => $op->getSetItem('roleID'), 'userID' => $op->getSetItem('userID')])[0] ?? null;
         }
 
         // Add some handling for a developer-friendly ttl that will set the date expires.
@@ -189,6 +192,15 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
             }
         }
 
+        $allowReApply = !empty($meta['attributes']['allowReapply']);
+        if ($op->getType() === Operation::TYPE_INSERT && $allowReApply && isset($current)) {
+            $op->setType(Operation::TYPE_UPDATE);
+            $op->setWhere([
+                'roleID' => $op->getSetItem('roleID'),
+                'type' => $op->getSetItem('type'),
+                'userID' => $op->getSetItem('userID')]);
+        }
+
         // You are only allowed to update one request at a time.
         if ($op->getType() === Operation::TYPE_UPDATE && isset($current)) {
             $meta = $this->metaModel->selectSingle(['type' => $current['type'], 'roleID' => $current['roleID']]);
@@ -226,12 +238,13 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
             $notification = [
                 'ActivityType' => 'roleRequest',
                 'ActivityUserID' => $op->getSetItem('statusUserID'),
-                'HeadlineFormat' => $meta['attributes']['notification']['name'] ?? t('You\'ve been added to the <b>{Data.role}</b> role.'),
+                'HeadlineFormat' => $meta['attributes']['notification'][self::STATUS_APPROVED]['name'] ??
+                    t('You\'ve been added to the <b>{Data.role}</b> role.'),
                 'RecordType' => 'role',
                 'RecordID' => $set['roleID'],
-                'Route' => $meta['attributes']['notification']['url'] ?? '/',
-                'Story' => $meta['attributes']['notification']['body'] ?? t('Your application has been approved.'),
-                'Format' => $meta['attributes']['notification']['format'] ?? 'markdown',
+                'Route' => $meta['attributes']['notification'][self::STATUS_APPROVED]['url'] ?? '/',
+                'Story' => $meta['attributes']['notification'][self::STATUS_APPROVED]['body'] ?? t('Your application has been approved.'),
+                'Format' => $meta['attributes']['notification'][self::STATUS_APPROVED]['format'] ?? 'markdown',
                 'NotifyUserID' => $set['userID'],
                 'Data' => ['role' => $role['Name'] ?? 'Unknown'],
                 'Notified' => \ActivityModel::SENT_PENDING,
@@ -240,6 +253,30 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
             $this->activityModel->save($notification, false, ['Force' => true]);
         }
 
+        $notifyDenied = $meta['attributes']['notifyDenied'] ?? false;
+        if (self::STATUS_DENIED === $op->getSetItem('status')
+            && in_array($op->getType(), [Operation::TYPE_INSERT, Operation::TYPE_UPDATE])
+            && $notifyDenied
+        ) {
+            $set = $op->getSet() + ($current ?? []);
+            $role = $this->roleModel->getID($set['roleID'], DATASET_TYPE_ARRAY);
+            $notification = [
+                'ActivityType' => 'roleRequest',
+                'ActivityUserID' => $op->getSetItem('statusUserID'),
+                'HeadlineFormat' => $meta['attributes']['notification'][self::STATUS_DENIED]['name'] ??
+                    t('You\'re application to the <b>{Data.role}</b> role was denied.'),
+                'RecordType' => 'role',
+                'RecordID' => $set['roleID'],
+                'Route' => $meta['attributes']['notification'][self::STATUS_DENIED]['url'] ?? '/',
+                'Story' => $meta['attributes']['notification'][self::STATUS_DENIED]['body'] ?? t('Your application has been denied.'),
+                'Format' => $meta['attributes']['notification'][self::STATUS_DENIED]['format'] ?? 'markdown',
+                'NotifyUserID' => $set['userID'],
+                'Data' => ['role' => $role['Name'] ?? 'Unknown'],
+                'Notified' => \ActivityModel::SENT_PENDING,
+                'Emailed' => \ActivityModel::SENT_PENDING,
+            ];
+            $this->activityModel->save($notification, false, ['Force' => true]);
+        }
         return $result;
     }
 

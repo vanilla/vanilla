@@ -7,7 +7,9 @@ import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/Se
 
 export interface ICommunitySearchTypes {
     categoryID?: number;
+    categoryIDs?: number[];
     categoryOption?: IComboBoxOption<number>;
+    categoryOptions?: IComboBoxOption[];
     followedCategories?: boolean;
     includeChildCategories?: boolean;
     includeArchivedCategories?: boolean;

@@ -109,7 +109,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string|bool $value The value of the option you want to update.
      */
     public function setFormatOption($formatOption, $value) {
-        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'ByLine', 'FormatStyle'];
+        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'FormatStyle'];
 
         if (in_array($formatOption, $allowedOptions)) {
             $this->formatOptions[$formatOption] = $value;
@@ -274,14 +274,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             'WrapPHP' => true,
             'SafePHP' => true,
             'Headings' => true,
-            'ByLine' => true,
             'FormatStyle' => 'Array'
         ];
         $options = array_merge($defaults, $options);
         $variableName = val('VariableName', $options);
         $wrapPHP = val('WrapPHP', $options, true);
         $safePHP = val('SafePHP', $options, true);
-        $byLine = val('ByLine', $options, false);
         $headings = val('Headings', $options, true);
         $formatStyle = val('FormatStyle', $options);
         $formatter = "Format{$formatStyle}Assignment";
@@ -319,13 +317,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             }
 
             $formatter($lines, $prefix, $value);
-        }
-
-        if ($byLine) {
-            $session = Gdn::session();
-            $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
-            $lines[] = '';
-            self::formatComment('Last edited by '.$user.' ('.remoteIp().') '.Gdn_Format::toDateTime(), $lines);
         }
 
         $result = implode(PHP_EOL, $lines);
@@ -840,7 +831,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $fileContents = $this->format($data, [
             'VariableName' => $group,
             'Headers' => true,
-            'ByLine' => true,
             'WrapPHP' => true
         ]);
 

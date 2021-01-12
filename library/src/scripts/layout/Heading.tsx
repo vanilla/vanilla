@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import { cx } from "@library/styles/styleShim";
 
 export interface ICommonHeadingProps {
     id?: string;
@@ -40,16 +41,15 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
         <Tag
             {...restProps}
             ref={ref}
-            className={classNames(
-                "heading",
-                `heading-${finalRenderDepth}`,
+            className={cx(
                 {
                     [classes.pageTitle]: isPageTitle,
                     [classes.largeTitle]: isLarge,
                     [classes.subTitle]: isSubTitle,
                     [classes.componentSubTitle]: isComponentSubTitle,
                 },
-
+                "heading",
+                `heading-${finalRenderDepth}`,
                 className,
             )}
         >

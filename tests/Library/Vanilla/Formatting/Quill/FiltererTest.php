@@ -37,12 +37,16 @@ class FiltererTest extends MinimalContainerTestCase {
      *
      * @param string $input
      * @param string $output
+     * @param bool $disableUrlEmbeds
      *
      * @dataProvider provideIO
      */
-    public function testFilterer(string $input, string $output) {
+    public function testFilterer(string $input, string $output, bool $disableUrlEmbeds = false): void {
         /** @var Filterer $filterer */
         $filterer = self::container()->get(Filterer::class);
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get('Config');
+        $config->set('Garden.Format.DisableUrlEmbeds', $disableUrlEmbeds, true, false);
 
         $filteredOutput = $filterer->filter($input);
 
@@ -116,23 +120,71 @@ JSON;
 ]
 JSON;
 
+        $videoEmbed = <<<JSON
+[
+  {
+    "insert": {
+      "embed-external": {
+        "data": {
+          "height": 270,
+          "width": 480,
+          "photoUrl": "https:\/\/i.ytimg.com\/vi\/rIaz-l1Kf8w\/hqdefault.jpg",
+          "videoID": "rIaz-l1Kf8w",
+          "showRelated": false,
+          "start": 0,
+          "url": "https:\/\/www.youtube.com\/watch?v=rIaz-l1Kf8w",
+          "embedType": "youtube",
+          "name": "Scrum vs Kanban - What's the Difference?",
+          "frameSrc": "https:\/\/www.youtube.com\/embed\/rIaz-l1Kf8w?feature=oembed&autoplay=1"
+        },
+        "loaderData": {
+          "type": "link",
+          "link": "https:\/\/www.youtube.com\/watch?v=rIaz-l1Kf8w"
+        }
+      }
+    }
+  }
+]
+JSON;
+
+        $videoOutput = <<<JSON
+[
+  {
+    "attributes": {
+      "link": "https:\/\/www.youtube.com\/watch?v=rIaz-l1Kf8w"
+    },
+    "insert": "https:\/\/www.youtube.com\/watch?v=rIaz-l1Kf8w"
+  }
+]
+JSON;
+
+
         return [
             [
                 "[$loadingEmbed, {\"insert\":\"\\n\"}]",
-                "[{\"insert\":\"\\n\"}]"
+                "[{\"insert\":\"\\n\"}]",
+                false
             ],
             [
                 "[{\"insert\":\"This is some Text\"}, $loadingEmbed, {\"insert\":\"loading embed should be gone\"}]",
                 "[{\"insert\":\"This is some Text\"},{\"insert\":\"loading embed should be gone\"}]",
+                false,
             ],
             [
                 "[{\"insert\":\"Just a normal post\"}, {\"insert\":\"nothing special here\"}]",
-                "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]"
+                "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]",
+                false
             ],
             [
                 // This shouldn't be altered at all.
                 $codeBlock,
                 $codeBlock,
+                false,
+            ],
+            [
+                $videoEmbed,
+                $videoOutput,
+                true
             ]
         ];
     }

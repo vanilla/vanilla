@@ -5,16 +5,19 @@
  * @license GPL-2.0-only
  */
 
-import { allLinkStates, colorOut, margins, negative, paddings, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, negative } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
+import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { CSSObject } from "@emotion/css";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const mixinMetaContainer = (selector: string, overwrites = {}) => {
     cssOut(selector, metaContainerStyles(overwrites));
@@ -52,8 +55,8 @@ export const forumMetaCSS = () => {
         .DataList .Meta
     `,
         {
-            color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.size),
+            color: ColorsUtils.colorOut(globalVars.meta.text.color),
+            fontSize: styleUnit(globalVars.meta.text.size),
         },
     );
 
@@ -76,25 +79,25 @@ export const forumMetaCSS = () => {
         .map((s) => {
             const selector = trim(s);
             const debug = false;
-            const linkStates: NestedCSSProperties = allLinkStates(
+            const linkStates: CSSObject = allLinkStates(
                 {
                     noState: {
-                        color: colorOut(globalVars.mainColors.fg),
+                        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
                     },
                     hover: {
-                        color: colorOut(globalVars.links.colors.hover),
+                        color: ColorsUtils.colorOut(globalVars.links.colors.hover),
                         textDecoration: "underline",
                     },
                     focus: {
-                        color: colorOut(globalVars.links.colors.focus),
+                        color: ColorsUtils.colorOut(globalVars.links.colors.focus),
                         textDecoration: "underline",
                     },
                     keyboardFocus: {
-                        color: colorOut(globalVars.links.colors.keyboardFocus),
+                        color: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
                         textDecoration: "underline",
                     },
                     active: {
-                        color: colorOut(globalVars.links.colors.active),
+                        color: ColorsUtils.colorOut(globalVars.links.colors.active),
                         textDecoration: "underline",
                     },
                 },
@@ -102,13 +105,7 @@ export const forumMetaCSS = () => {
             );
 
             logDebugConditionnal(debug, linkStates);
-
-            const nested = linkStates.$nest;
-            delete linkStates["$nest"];
-
             cssOut(selector, linkStates);
-
-            nested && nestedWorkaround(selector, nested as NestedCSSProperties);
         });
 
     cssOut(
@@ -119,10 +116,10 @@ export const forumMetaCSS = () => {
         .MainContent.Content .MItem.RoleTracker a:not(.Tag),
     `,
         {
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: 0,
             }),
-            ...margins({
+            ...Mixins.margin({
                 all: 0,
             }),
         },
@@ -134,7 +131,7 @@ export const forumMetaCSS = () => {
         .Tag
         `,
         {
-            color: colorOut(globalVars.meta.text.color),
+            color: ColorsUtils.colorOut(globalVars.meta.text.color),
         },
     );
 
@@ -155,7 +152,7 @@ export const forumMetaCSS = () => {
         .Content .DataTableWrap .IdeationTag
         `,
         {
-            marginLeft: unit(globalVars.meta.spacing.default),
+            marginLeft: styleUnit(globalVars.meta.spacing.default),
         },
     );
 
@@ -164,7 +161,7 @@ export const forumMetaCSS = () => {
         .Meta-Discussion > .Tag,
         .idea-counter-module`,
         {
-            marginRight: unit(globalVars.meta.spacing.default),
+            marginRight: styleUnit(globalVars.meta.spacing.default),
         },
     );
 
@@ -180,11 +177,11 @@ export const forumMetaCSS = () => {
     .DiscussionMeta .MItem,
     `,
         {
-            ...paddings({
+            ...Mixins.padding({
                 all: 0,
             }),
-            ...margins({
-                horizontal: unit(globalVars.meta.spacing.default),
+            ...Mixins.margin({
+                horizontal: styleUnit(globalVars.meta.spacing.default),
             }),
         },
     );
@@ -200,7 +197,7 @@ export const forumMetaCSS = () => {
     });
 
     cssOut(`.Container .AuthorInfo .MItem img`, {
-        paddingLeft: unit(12),
+        paddingLeft: styleUnit(12),
     });
 
     cssOut(
@@ -226,33 +223,32 @@ export const forumMetaCSS = () => {
 
     cssOut(`.MItem img`, {
         width: "auto",
-        height: unit(12),
-        ...paddings({
+        height: styleUnit(12),
+        ...Mixins.padding({
             left: 12,
         }),
     });
 
     cssOut(`.DataList.Discussions .ItemContent .Meta`, {
-        marginLeft: unit(negative(globalVars.meta.spacing.horizontalMargin)),
+        marginLeft: styleUnit(negative(globalVars.meta.spacing.horizontalMargin)),
     });
 
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const inlineTagSelector = `.InlineTags.Meta a`;
     cssOut(inlineTagSelector, {
-        color: linkColors.color,
-        ...(linkColors.$nest ? nestedWorkaround(inlineTagSelector, linkColors.$nest as NestedCSSProperties) : {}),
+        ...linkColors,
     });
 };
 
 function mixinMetaLinkContainer(selector: string) {
     selector = trimTrailingCommas(selector);
     const vars = globalVariables();
-    const metaFg = colorOut(vars.meta.colors.fg);
+    const metaFg = ColorsUtils.colorOut(vars.meta.colors.fg);
 
     cssOut(selector, {
         color: metaFg,
         textDecoration: "none",
-        $nest: {
+        ...{
             "& a": {
                 color: metaFg,
                 fontSize: "inherit",

@@ -964,4 +964,14 @@ class DiscussionModelTest extends SiteTestCase {
         $discussionsMemberRows = $discussionsMember->numRows();
         $this->assertEquals($discussionsMemberRows, $discussionsMemberRows + $countDiscussionsMember);
     }
+
+    /**
+     * Test a dirty-record is added when calling setField.
+     */
+    public function testDirtyRecordAdded() {
+        $discussion = $this->insertDiscussions(1);
+        $id = $discussion[0]['DiscussionID'];
+        $this->discussionModel->setField($id, 'Announce', 1);
+        $this->assertDirtyRecordInserted('discussion', $id);
+    }
 }

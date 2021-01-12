@@ -3,11 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { rgba, percent, linearGradient } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { keyframes } from "typestyle";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { keyframes } from "@library/styles/styleShim";
 
 export const loadingRectangleVariables = useThemeCache(() => {
     const makeVars = variableFactory("loadingRectatngle");
@@ -39,9 +41,9 @@ export const loadingRectangleClass = useThemeCache((height: string | number, wid
     return style({
         display: "block",
         borderRadius: 2,
-        background: colorOut(vars.colors.bg),
-        height: unit(height),
-        width: unit(width),
+        background: ColorsUtils.colorOut(vars.colors.bg),
+        height: styleUnit(height),
+        width: styleUnit(width),
         animationName: vars.loadingAnimation,
         animationDuration: "4s",
         animationIterationCount: "infinite",
@@ -52,7 +54,7 @@ export const loadingRectangleClass = useThemeCache((height: string | number, wid
 export const loadingSpacerClass = useThemeCache((height: string | number) => {
     return style({
         display: "block",
-        height: unit(height),
+        height: styleUnit(height),
         width: percent(100),
     });
 });
@@ -60,9 +62,9 @@ export const loadingSpacerClass = useThemeCache((height: string | number) => {
 export const loadingCircleClass = useThemeCache((height: string | number) => {
     const vars = loadingRectangleVariables();
     return style({
-        height: unit(50),
-        width: unit(50),
-        background: colorOut(vars.colors.bg),
+        height: styleUnit(50),
+        width: styleUnit(50),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         margin: 20,
         borderRadius: 50,
     });

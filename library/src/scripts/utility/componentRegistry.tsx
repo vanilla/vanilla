@@ -3,12 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { resetThemeCache } from "@library/styles/styleUtils";
+import { resetThemeCache } from "@library/styles/themeCache";
 import { IComponentMountOptions, mountReact } from "@vanilla/react-utils";
 import { logDebug, logWarning } from "@vanilla/utils";
 import React from "react";
-import ReactDOM from "react-dom";
-import { forceRenderStyles } from "typestyle";
 
 let useTheme = true;
 
@@ -145,5 +143,4 @@ export async function _mountComponents(parent: Element) {
     });
 
     await Promise.all(awaiting);
-    forceRenderStyles();
 }

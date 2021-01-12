@@ -127,7 +127,11 @@ class PocketsModel extends \Gdn_Model {
      * @param array $formPostValues
      */
     private function validateWidgetType(array &$formPostValues) {
-        $widgetFormat = $formPostValues['Format'] ?? self::FORMAT_CUSTOM;
+        if (!isset($formPostValues['Format'])) {
+            return;
+        }
+
+        $widgetFormat = $formPostValues['Format'];
         if ($widgetFormat === self::FORMAT_WIDGET) {
             $widgetID = $formPostValues['WidgetID'] ?? null;
             $widgetParameters = $formPostValues['WidgetParameters'] ?? null;

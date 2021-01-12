@@ -7,76 +7,45 @@
 
 namespace Vanilla\Scheduler\Meta;
 
-use DateTime;
-use Exception;
 use Garden\EventManager;
-use Gdn;
+use Psr\Log\LoggerInterface;
 use Throwable;
-use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class CronMetaDao
  */
 class SchedulerMetaDao {
 
-    protected const SCHEDULER_JOB_DETAILS_PRUNE_AGE = 24 * 60 * 60;
-    protected const SCHEDULER_CONTROL_META_NAME = "SCHEDULER_CONTROL";
-    protected const SCHEDULER_JOB_META_PREFIX = "SCHEDULER_JOB_";
+    protected const SCHEDULER_CONTROL_META_NAME = "Garden.Scheduler.ControlMeta";
 
-    /** @var Gdn */
-    protected $gdn;
+    /** @var ConfigurationInterface */
+    protected $config;
 
     /** @var EventManager */
     protected $eventManager;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * CronMetaDao constructor.
      *
-     * @param Gdn $gdn
+     * @param ConfigurationInterface $config
      * @param EventManager $eventManager
+     * @param LoggerInterface $logger
      */
-    public function __construct(Gdn $gdn, EventManager $eventManager) {
-        $this->gdn = $gdn;
+    public function __construct(ConfigurationInterface $config, EventManager $eventManager, LoggerInterface $logger) {
+        $this->config = $config;
         $this->eventManager = $eventManager;
-    }
-
-    /**
-     * Get JobMeta
-     *
-     * @param string $key
-     * @return SchedulerJobMeta
-     */
-    public function getJob($key): ?SchedulerJobMeta {
-        // Previously this method logged to the UserMeta table, but this wrecked performance on large sites.
-        // This logging can be added back in the future, but will be more carefully considered));
-        return null;
-    }
-
-    /**
-     * PutJob
-     *
-     * @param SchedulerJobMeta $schedulerJobMeta
-     * @return bool
-     */
-    public function putJob(SchedulerJobMeta $schedulerJobMeta): bool {
-        $values = [
-            'jobId' => $schedulerJobMeta->getJobId(),
-            'received' => $schedulerJobMeta->getReceived(),
-            'status' => $schedulerJobMeta->getStatus()->getStatus(),
-            'errorMessage' => $schedulerJobMeta->getErrorMessage(),
-        ];
-
-        // Previously this method logged to the UserMeta table, but this wrecked performance on large sites.
-        // This logging can be added back in the future, but will be more carefully considered.
-
-        return true;
+        $this->logger = $logger;
     }
 
     /**
      * @return SchedulerControlMeta|null
      */
     public function getControl(): ?SchedulerControlMeta {
-        $values = json_decode($this->gdn::get(self::SCHEDULER_CONTROL_META_NAME, null), true);
+        $values = $this->config->get(self::SCHEDULER_CONTROL_META_NAME, null);
         if ($values === null) {
             return null;
         } else {
@@ -101,62 +70,8 @@ class SchedulerMetaDao {
             'hostname' => $schedulerControlMeta->getHostname(),
         ];
 
-        // Previously this method logged to the UserMeta table, but this wrecked performance on large sites.
-        // This logging can be added back in the future, but will be more carefully considered.
+        $this->config->saveToConfig(self::SCHEDULER_CONTROL_META_NAME, $values);
 
         return true;
-    }
-
-    /**
-     * Get Details
-     *
-     * @return array
-     * @throws Exception In case of DateTime conversion error.
-     */
-    public function getDetails(): array {
-        // Previously this method logged to the UserMeta table, but this wrecked performance on large sites.
-        // This logging can be added back in the future, but will be more carefully considered));
-
-        return [];
-    }
-
-    /**
-     * Prune Details
-     *
-     * @param int|null $age
-     * @return SchedulerJobMeta[]
-     */
-    public function pruneDetails(int $age = null): array {
-        // Previously this method logged to the UserMeta table, but this wrecked performance on large sites.
-        // This logging can be added back in the future, but will be more carefully considered));
-
-        return [];
-    }
-
-
-    /**
-     * Hydrate a JobMeta from raw data
-     *
-     * @param string $key
-     * @param array $raw
-     * @return SchedulerJobMeta|null
-     */
-    protected function hydrateJobMeta(string $key, array $raw) {
-        if ($raw === null) {
-            return null;
-        } else {
-            $schedulerJobMeta = new SchedulerJobMeta();
-            $schedulerJobMeta->setKey($key);
-            $schedulerJobMeta->setJobId($raw['jobId']);
-            $schedulerJobMeta->setReceived($raw['received'] ?? 0);
-            $schedulerJobMeta->setStatus(
-                $raw['status'] ?
-                    JobExecutionStatus::looseStatus($raw['status']) :
-                    JobExecutionStatus::unknown()
-            );
-            $schedulerJobMeta->setErrorMessage($raw['errorMessage']);
-
-            return $schedulerJobMeta;
-        }
     }
 }

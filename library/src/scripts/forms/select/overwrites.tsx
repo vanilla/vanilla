@@ -63,6 +63,7 @@ export function Menu(props: MenuProps<any>) {
  */
 export function MenuList(props: MenuListComponentProps<any>) {
     const { ...rest } = props;
+
     return (
         <components.MenuList {...rest}>
             <ul className="suggestedTextInput-menuItems">{props.children}</ul>
@@ -134,7 +135,6 @@ type ISelectOptionOverwrite = OptionProps<any> & IComboBoxOption;
  */
 export function SelectOption(props: ISelectOptionOverwrite) {
     const { isSelected, isFocused, selectProps, value } = props;
-    const placeholder = {};
 
     return (
         <li className="suggestedTextInput-item">

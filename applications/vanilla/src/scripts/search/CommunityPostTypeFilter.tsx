@@ -7,7 +7,7 @@ import React from "react";
 import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { onReady, t } from "@library/utility/appUtils";
-import { useSearchForm } from "@library/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import flatten from "lodash/flatten";
 
 interface IProps {}

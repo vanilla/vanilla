@@ -7,7 +7,8 @@
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
-import { ListItem, ListType, ListValue } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
+import { ListType, ListValue } from "@rich-editor/quill/blots/lists/ListUtils";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { IFormats } from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -24,7 +25,7 @@ export const menuState = (formatter: Formatter, activeFormats: IFormats) => {
         BlockquoteLineBlot.blotName,
         CodeBlockBlot.blotName,
         SpoilerLineBlot.blotName,
-        ListItem.blotName,
+        ListLineBlot.blotName,
     ].forEach((item) => {
         if (item in activeFormats) {
             isParagraphEnabled = false;
@@ -33,7 +34,7 @@ export const menuState = (formatter: Formatter, activeFormats: IFormats) => {
 
     const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
 
-    const listValue: ListValue = activeFormats[ListItem.blotName];
+    const listValue: ListValue = activeFormats[ListLineBlot.blotName];
     const hasListFormat = (type: ListType) => {
         return listValue && typeof listValue === "object" && listValue.type === type;
     };

@@ -12,8 +12,10 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Theme\ThemeFeatures;
 
 /**
@@ -100,6 +102,15 @@ class Gdn {
      */
     public static function addonManager() {
         return self::factory(self::AliasAddonManager);
+    }
+
+    /**
+     * Get the addon manager.
+     *
+     * @return SchedulerInterface
+     */
+    public static function scheduler(): SchedulerInterface {
+        return self::getContainer()->get(SchedulerInterface::class);
     }
 
     /**
@@ -481,10 +492,25 @@ class Gdn {
         return self::$_Session;
     }
 
+    /**
+     * Set a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $value
+     * @deprecated Use UserMetaModel
+     */
     public static function set($key, $value = null) {
         return Gdn::userMetaModel()->setUserMeta(0, $key, $value);
     }
 
+    /**
+     * Get a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $default
+     * @return false|mixed|null
+     * @deprecated Use UserMetaModel.
+     */
     public static function get($key, $default = null) {
         $response = Gdn::userMetaModel()->getUserMeta(0, $key, $default);
         if (sizeof($response) == 1) {

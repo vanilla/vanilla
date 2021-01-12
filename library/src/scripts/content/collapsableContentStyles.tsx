@@ -4,10 +4,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, defaultTransition, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { absolutePosition, defaultTransition } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { linearGradient, percent, px, translateY } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 
 export const collapsableContentClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -16,7 +19,7 @@ export const collapsableContentClasses = useThemeCache(() => {
     const paddingAdjustment = style("paddingAdjustment", {});
 
     const root = style({
-        background: colorOut(globalVars.mainColors.bg),
+        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         position: "relative",
     });
 
@@ -27,12 +30,12 @@ export const collapsableContentClasses = useThemeCache(() => {
     });
 
     const collapser = style("collapser", {
-        $nest: {
+        ...{
             "&&": {
                 ...buttonResetMixin(),
                 borderRadius: 0,
                 width: percent(100),
-                height: unit(globalVars.icon.sizes.default),
+                height: styleUnit(globalVars.icon.sizes.default),
                 padding: 0,
                 margin: 0,
             },
@@ -41,13 +44,13 @@ export const collapsableContentClasses = useThemeCache(() => {
 
     const footer = style("footer", {
         position: "relative",
-        height: unit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
     });
 
     const collapserIcon = style("collapserIcon", {
         ...defaultTransition("transform"),
         margin: "auto",
-        height: unit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
         display: "block",
     });
 
@@ -57,8 +60,8 @@ export const collapsableContentClasses = useThemeCache(() => {
         height: 75,
         background: linearGradient(
             "to bottom",
-            colorOut(globalVars.mainColors.bg.fade(0))!,
-            colorOut(globalVars.mainColors.bg)!,
+            ColorsUtils.colorOut(globalVars.mainColors.bg.fade(0))!,
+            ColorsUtils.colorOut(globalVars.mainColors.bg)!,
         ),
         transform: `translateY(-100%)`,
     });

@@ -16,13 +16,6 @@ use Vanilla\Formatting\Html\HtmlDocument;
 trait HtmlProcessorTrait {
 
     /**
-     * Get the HTML that should be modified.
-     *
-     * @return HtmlDocument
-     */
-    abstract protected function getDocument(): HtmlDocument;
-
-    /**
      * Get Attribute from dom node
      *
      * @param string $attr The attribute you want
@@ -50,7 +43,7 @@ trait HtmlProcessorTrait {
      * @return string
      */
     public function getOuterHtml(\DOMElement $element): string {
-        return $this->getDocument()->getDom()->saveHTML($element);
+        return $this->getDom()->saveHTML($element);
     }
 
     /**
@@ -113,7 +106,7 @@ trait HtmlProcessorTrait {
      * @return \DOMNodeList
      */
     public function queryXPath(string $xpathQuery): \DOMNodeList {
-        $xpath = new \DOMXPath($this->getDocument()->getDom());
+        $xpath = new \DOMXPath($this->getDom());
         return $xpath->query($xpathQuery) ?: new \DOMNodeList();
     }
 

@@ -28,7 +28,9 @@
                             if (json.FormSaved == true) {
                                 gdn.inform(json);
                                 if (json.RedirectUrl) {
-                                    setTimeout("document.location='" + json.RedirectUrl + "';", 300);
+                                    setTimeout(function () {
+                                        document.location = json.RedirectUrl;
+                                    }, 300);
                                 } else if (json.DeliveryType == "ASSET") {
                                     $frm.parents($(handle).selector).replaceWith(json.Data);
                                     $(document).trigger('contentLoad');

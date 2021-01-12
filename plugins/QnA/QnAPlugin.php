@@ -11,8 +11,10 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QuestionSearchType;
+use Vanilla\QnA\Models\AnswerModel;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Search\SearchTypeCollectorInterface;
@@ -34,6 +36,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
     /** @var string Question follow up feature flag key */
     const FOLLOWUP_FLAG = 'QnAFollowUp';
+
+    /** @var string key used when normalizing a record*/
+    const QNA_KEY = 'qnA';
 
     /** @var int  */
     private const ANSWERED_LIMIT = 100;
@@ -62,8 +67,14 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /** @var DiscussionModel */
     private $discussionModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
     /** @var UserModel */
     private $userModel;
+
+    /** @var AnswerModel */
+    private $answerModel;
 
     /** @var array Lookup cache for commentsApiController_normalizeOutput */
     public $discussionsCache = [];
@@ -74,13 +85,22 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param AnswerModel $questionModel
      */
-    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(
+        CommentModel $commentModel,
+        DiscussionModel $discussionModel,
+        UserModel $userModel,
+        CategoryModel $categoryModel,
+        AnswerModel $questionModel
+    ) {
         parent::__construct();
 
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->categoryModel = $categoryModel;
+        $this->answerModel = $questionModel;
         $this->setLogger(Logger::getLogger());
         if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
@@ -558,54 +578,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             // Update the discussion.
             $this->recalculateDiscussionQnA($discussion);
 
-            // Determine QnA change
-            if ($comment['QnA'] != $qna) {
-                $change = 0;
-                switch ($qna) {
-                    case 'Rejected':
-                        $change = -1;
-                        if ($comment['QnA'] != 'Accepted') {
-                            $change = 0;
-                        }
-                        break;
+            $commentID = $comment['CommentID'] ?? false;
+            $updatedAnswer = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
 
-                    case 'Accepted':
-                        $change = 1;
-                        break;
-
-                    default:
-                        if ($comment['QnA'] == 'Rejected') {
-                            $change = 0;
-                        }
-                        if ($comment['QnA'] == 'Accepted') {
-                            $change = -1;
-                        }
-                        break;
-                }
-            }
-
-            // Apply change effects
-            if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
-                // Update the user
-                $userID = val('InsertUserID', $comment);
-                $this->recalculateUserQnA($userID);
-
-                // Update reactions
-                if ($this->Reactions) {
-                    include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
-                    $reactionModel = new ReactionModel();
-
-                    // Assume that the reaction is done by the question's owner
-                    $questionOwner = $discussion['InsertUserID'];
-                    // If there's change, reactions will take care of it
-                    $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
-                } else {
-                    $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                    if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                        CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
-                    }
-                }
-            }
+            $this->answerModel->applyCommentQnAChange($discussion, $updatedAnswer, $comment['QnA'], $qna);
 
             $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer to a question: <a href="{Url,html}">{Data.Name,text}</a>');
 
@@ -628,6 +604,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                 $ActivityModel->saveQueue();
 
                 $this->EventArguments['Activity'] =& $activity;
+
                 $this->fireEvent('AfterAccepted');
             }
         }
@@ -679,6 +656,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             if ($answeredComment) {
                 $set['QnA'] = 'Answered';
                 $set['DateAccepted'] = null;
+                $set['DateOfAnswer'] = $answeredComment['DateInserted'] ?? null;
             } else if ($countComments > 0) {
                 $set['QnA'] = 'Rejected';
                 $set['DateAccepted'] = null;
@@ -702,8 +680,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param string|int $userID User identifier
      */
     public function recalculateUserQnA($userID) {
-        $countAcceptedAnswers = Gdn::sql()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
-        Gdn::userModel()->setField($userID, 'CountAcceptedAnswers', $countAcceptedAnswers);
+        $this->answerModel->recalculateUserQnA($userID);
     }
 
     /**
@@ -760,73 +737,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param Gdn_Form|null $form
      */
     protected function updateCommentQnA($discussion, $comment, $newQnA, Gdn_Form $form = null) {
-        $currentQnA = val('QnA', $comment);
-
-        if ($currentQnA != $newQnA) {
-            $set = ['QnA' => $newQnA];
-
-            if ($newQnA == 'Accepted') {
-                $set['DateAccepted'] = DateTimeFormatter::getCurrentDateTime();
-                $set['AcceptedUserID'] = Gdn::session()->UserID;
-            } else {
-                $set['DateAccepted'] = null;
-                $set['AcceptedUserID'] = null;
-            }
-
-            $this->commentModel->setField(val('CommentID', $comment), $set);
-            if ($form) {
-                $form->setValidationResults($this->commentModel->validationResults());
-            }
-
-            // Determine QnA change
-            if ($currentQnA != $newQnA) {
-                $change = 0;
-                switch ($newQnA) {
-                    case 'Rejected':
-                        $change = -1;
-                        if ($currentQnA != 'Accepted') {
-                            $change = 0;
-                        }
-                        break;
-
-                    case 'Accepted':
-                        $change = 1;
-                        break;
-
-                    default:
-                        if ($currentQnA == 'Rejected') {
-                            $change = 0;
-                        }
-                        if ($currentQnA == 'Accepted') {
-                            $change = -1;
-                        }
-                        break;
-                }
-            }
-
-            // Apply change effects
-            if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
-                // Update the user
-                $userID = val('InsertUserID', $comment);
-                $this->recalculateUserQnA($userID);
-
-                // Update reactions
-                if ($this->Reactions) {
-                    include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
-                    $reactionModel = new ReactionModel();
-
-                    // Assume that the reaction is done by the question's owner
-                    $questionOwner = $discussion['InsertUserID'];
-                    // If there's change, reactions will take care of it
-                    $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
-                } else {
-                    $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                    if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                        CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
-                    }
-                }
-            }
-        }
+        $this->answerModel->updateCommentQnA($discussion, $comment, $newQnA, $form);
     }
 
     /**
@@ -1013,6 +924,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $sender->setData('ApplyRestrictions', true);
         $sender->setCategoryIDs(array_keys($categories));
 
+        // unanswered should not be filtered by category follow
+        if ($this->categoryModel->followingEnabled()) {
+            $sender->setData('EnableFollowingFilter', false);
+            $sender->setData('Followed', false);
+        }
+
         $sender->index(val(0, $args, 'p1'));
         $this->InUnanswered = true;
     }
@@ -1040,12 +957,42 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         // TODO: Dekludge this when category permissions are refactored (tburry).
         $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
+        $groupModel = new GroupModel();
 
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
+        // Get allowed categories and allowed groups so the count will match the number of discussions the user can actually view.
+            $categoryModel = new CategoryModel();
+            $allowedCategories = $categoryModel->getVisibleCategoryIDs();
+            if ($allowedCategories === true) {
+                $allowedCategories = array_column(CategoryModel::categories(), 'CategoryID');
+            }
+            $allowedGroupCategories = [];
+            $groupCategories = GroupModel::getGroupCategoryIDs();
+            foreach ($groupCategories as $groupCat) {
+                if (in_array($groupCat, $allowedCategories)) {
+                    $flippedArray = array_flip($allowedCategories);
+                    unset($allowedCategories[$flippedArray[$groupCat]]);
+                    $allowedGroupCategories[] = $groupCat;
+                }
+            }
+            $allowedGroups = [];
+            $groups = $groupModel->getAccessibleGroups(null, null, null, null);
+            if (!empty($groups)) {
+                foreach ($groups as $group) {
+                    if ($groupModel->hasGroupPermission(GroupPermissions::VIEW, $group['GroupID']) &&
+                        in_array($group['CategoryID'], $allowedGroupCategories)) {
+                        $allowedGroups[] = $group['GroupID'];
+                    }
+                }
+            }
             $questionCount = Gdn::sql()
                 ->beginWhereGroup()
                 ->where('QnA', null)
                 ->orWhereIn('QnA', ['Unanswered', 'Rejected'])
+                ->endWhereGroup()
+                ->beginWhereGroup()
+                ->whereIn('CategoryID', $allowedCategories)
+                ->orWhere('GroupID', $allowedGroups)
                 ->endWhereGroup()
                 ->getCount('Discussion', ['Type' => 'Question']);
 
@@ -1436,6 +1383,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $options['expand'] ?? [])) {
+            if (!empty($discussion[self::QNA_KEY])) {
+                $discussion['labelCodes'][] = $discussion[self::QNA_KEY];
+            }
             return $discussion;
         }
 
@@ -1525,6 +1475,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         array $options
     ) {
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $options['expand'] ?? [])) {
+            if (!empty($comment[self::QNA_KEY])) {
+                $comment['labelCodes'][] = $comment[self::QNA_KEY];
+            }
             return $comment;
         }
         $discussionID = $comment['discussionID'];
@@ -1539,12 +1492,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             return $comment;
         }
 
-        $comment['attributes']['answer'] = [
-            'status' => !empty($comment['qnA']) ? strtolower($comment['qnA']) : 'pending',
-            'dateAccepted' => $comment['dateAccepted'],
-            'acceptUserID' => $comment['acceptedUserID'],
-        ];
-
+        $comment = $this->answerModel->normalizeRow($comment);
         return $comment;
     }
 

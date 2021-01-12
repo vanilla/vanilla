@@ -20,10 +20,14 @@ class ContentFilter {
     /** @var string? */
     private $words;
 
+    /** @var null|array */
+    private static $patterns = null;
+
     /**
      * Replace black-listed words according to pattern
      *
      * @param string $text
+     *
      * @return ?string
      */
     public function replace($text = ''): ?string {
@@ -42,19 +46,21 @@ class ContentFilter {
      * @return array
      */
     public function getPatterns(): array {
-        static $patterns = null;
+        $patterns = $this->getStaticPatterns();
 
         if ($patterns === null) {
             $patterns = [];
             $words = $this->words;
             if ($words !== null) {
                 $explodedWords = explode(';', $words);
+
                 foreach ($explodedWords as $word) {
                     if (trim($word)) {
-                        $patterns[] = '`(?<![\pL\pN])'.preg_quote(trim($word), '`').'(?![\pL\pN])`isu';
+                        $patterns[] = '`(?<![\pL\pN\pM])'.preg_quote(trim($word), '`').'(?![\pL\pN\pM])`isu';
                     }
                 }
             }
+            $this->setStaticPatterns($patterns);
         }
         return $patterns;
     }
@@ -66,6 +72,25 @@ class ContentFilter {
      */
     public function getReplacement(): string {
         return $this->replacement;
+    }
+
+    /**
+     * A method to be able to set the pattern externally.
+     * Ex. When running a test, we need to refresh the pattern with every test.
+     *
+     * @param null|array $patterns $patterns Patterns to set.
+     */
+    public function setStaticPatterns(?array $patterns) {
+        self::$patterns = $patterns;
+    }
+
+    /**
+     * Set statis patterns.
+     *
+     * @return null|array
+     */
+    public function getStaticPatterns() {
+        return self::$patterns;
     }
 
     /**

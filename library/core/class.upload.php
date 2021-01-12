@@ -518,8 +518,8 @@ class Gdn_Upload extends Gdn_Pluggable {
             }
         } else {
             // If all validations were successful, return the tmp name/location of the file.
-            $this->_UploadedFile = $_FILES[$inputName];
-            return $this->_UploadedFile['tmp_name'];
+            $this->_UploadedFile = $_FILES[$inputName] ?? null;
+            return $this->_UploadedFile['tmp_name'] ?? null;
         }
     }
 }

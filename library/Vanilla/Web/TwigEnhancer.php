@@ -132,6 +132,7 @@ class TwigEnhancer {
     public function enhanceFileSystem(FilesystemLoader $loader) {
         $addons = $this->addonManager->getEnabled();
         $loader->addPath(PATH_ROOT . '/resources/views', 'resources');
+        $loader->addPath(PATH_ROOT . "/library", "library");
 
         foreach ($addons as $addon) {
             $viewDirectory = PATH_ROOT . $addon->getSubdir() . '/views';

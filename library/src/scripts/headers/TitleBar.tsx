@@ -14,8 +14,9 @@ import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
-import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
-import { titleBarClasses, titleBarLogoClasses, titleBarVariables } from "@library/headers/titleBarStyles";
+import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import { titleBarClasses, titleBarLogoClasses } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { SignInIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -40,9 +41,11 @@ import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeConte
 import { useMeasure } from "@vanilla/react-utils/src";
 import { SkipNavLink, SkipNavContent } from "@reach/skip-nav";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { LogoAlignment } from "@library/headers/LogoAlignment";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
+    wrapperComponent?: React.ComponentType<{ children: React.ReactNode }>;
     className?: string;
     title?: string; // Needed for mobile flyouts
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts, does NOT work with hamburger
@@ -55,11 +58,6 @@ interface IProps {
     forceVisibility?: boolean; // For storybook, as it will disable closing the search
     scope?: ISearchScopeNoCompact;
     forceMenuOpen?: INavigationVariableItem; // For storybook, will force nested menu open
-}
-
-export enum LogoAlignment {
-    LEFT = "left",
-    CENTER = "center",
 }
 
 /**
@@ -97,8 +95,6 @@ export default function TitleBar(_props: IProps) {
     // When previewing and updating the colors live, there can be flickering of some components.
     // As a result we want to hide them on first render for these cases.
 
-    const leftAlignedLogoRef = useRef<HTMLDivElement | null>(null);
-    const logoAlignedLogoMeasure = useMeasure(leftAlignedLogoRef);
     const isPreviewing = useSelector((state: ICoreStoreState) => state.theme.forcedVariables);
     const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(!!isPreviewing);
     useEffect(() => {
@@ -107,7 +103,7 @@ export default function TitleBar(_props: IProps) {
         }
     }, [isPreviewFirstRender]);
 
-    const headerContent = (
+    let headerContent = (
         <>
             <HashOffsetReporter className={classes.container}>
                 <div className={classes.bgContainer}>
@@ -122,7 +118,12 @@ export default function TitleBar(_props: IProps) {
                         >
                             {/* Cannot be a background image there will be flickering. */}
                             {vars.colors.bgImage && (
-                                <img src={vars.colors.bgImage} alt={"titleBarImage"} aria-hidden={true} />
+                                <img
+                                    src={vars.colors.bgImage}
+                                    className={classes.bgImage}
+                                    alt={"titleBarImage"}
+                                    aria-hidden={true}
+                                />
                             )}
                             {vars.overlay && <div className={classes.overlay} />}
                         </animated.div>
@@ -148,13 +149,6 @@ export default function TitleBar(_props: IProps) {
                                             [classes.logoCenterer]: isDesktopLogoCentered,
                                             [classes.logoLeftAligned]: !isDesktopLogoCentered,
                                         })}
-                                        ref={
-                                            !isCompact && isDesktopLogoCentered
-                                                ? collisionSourceRef
-                                                : !isCompact && !isDesktopLogoCentered
-                                                ? leftAlignedLogoRef
-                                                : undefined
-                                        }
                                     >
                                         <>
                                             <SkipNavLink className={classes.skipNav}>
@@ -178,7 +172,6 @@ export default function TitleBar(_props: IProps) {
                                 <TitleBarNav
                                     forceMenuOpen={props.forceMenuOpen}
                                     isCentered={vars.navAlignment.alignment === "center"}
-                                    logoDimensions={logoAlignedLogoMeasure}
                                     containerRef={
                                         vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
                                             ? collisionSourceRef
@@ -292,6 +285,9 @@ export default function TitleBar(_props: IProps) {
 
     const { resetScrollOffset, setScrollOffset, offsetClass } = useScrollOffset();
     const containerElement = props.container !== null ? props.container || document.getElementById("titleBar") : null;
+    if (props.wrapperComponent) {
+        headerContent = <props.wrapperComponent>{headerContent}</props.wrapperComponent>;
+    }
 
     const containerClasses = classNames(
         "titleBar",

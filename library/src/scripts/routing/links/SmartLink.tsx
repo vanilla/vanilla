@@ -32,7 +32,7 @@ export interface ISmartLinkProps extends NavLinkProps {
  * To = https://test.com/root/someUrl/deeper/nested
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
-export default function SmartLink(props: ISmartLinkProps) {
+export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: React.Ref<HTMLAnchorElement>) {
     const { replace, ...passthru } = props;
     const context = useLinkContext();
 
@@ -49,6 +49,7 @@ export default function SmartLink(props: ISmartLinkProps) {
             <NavLink
                 rel={props.target === "_blank" ? "noreferer noopener ugc" : undefined}
                 {...passthru}
+                innerRef={ref}
                 to={makeLocationDescriptorObject(props.to, href)}
                 activeClassName="isCurrent"
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
@@ -60,6 +61,7 @@ export default function SmartLink(props: ISmartLinkProps) {
         return (
             <a
                 {...passthru}
+                ref={ref}
                 href={sanitizeUrl(href)}
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
                 target={isForeign ? "_blank" : undefined}
@@ -67,4 +69,4 @@ export default function SmartLink(props: ISmartLinkProps) {
             />
         );
     }
-}
+});

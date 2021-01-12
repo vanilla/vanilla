@@ -130,6 +130,11 @@
     width: $font-size-base;
   }
 
+    .card-title {
+        margin-top: 0;
+        font-size: 16px;
+    }
+
   .media-title {
       font-weight: 600;
   }
@@ -175,6 +180,26 @@
   }
 }
 
+.card-label-list {
+    li {
+        padding-bottom: 4px;
+        padding-top: 4px;
+        display: flex;
+        align-items: center;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+    strong {
+        display: inline-block;
+        width: 120px;
+        min-width: 120px;
+        padding-right: 12px;
+        font-weight: 600;
+    }
+}
+
 .card-footer {
   @include has-top-border;
 
@@ -185,6 +210,9 @@
 
 .card-block {
   padding: $spacer;
+  &.card-block-minimal {
+    padding: 9px;
+  }
 }
 
 .drop {

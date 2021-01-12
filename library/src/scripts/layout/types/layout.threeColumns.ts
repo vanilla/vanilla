@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";

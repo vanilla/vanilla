@@ -86,7 +86,8 @@ class LegacySearchAdapter {
             'locale' => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
         ];
 
-        if ($search = $this->getValidField($advQuery, 'Search')) {
+        if ($search = $this->getValidField($advQuery, 'Search')
+            ?? $this->getValidField($advQuery, 'search')) {
             $query['query'] = $search;
         }
 
@@ -113,8 +114,8 @@ class LegacySearchAdapter {
             $this->extractTypesQueries($advQuery),
             $this->extractDateQueries($advQuery)
         );
-
-        $rawCat = $this->getValidField($advQuery, 'cat') ?? 'all';
+        $queryCategoryID = $this->getValidField($advQuery, 'categoryid') ?? null;
+        $rawCat = $this->getValidField($advQuery, 'cat') ?? $queryCategoryID ?? 'all';
         $query['includeArchivedCategories'] = (bool)($this->getValidField($advQuery, 'archived') ?? false);
         $query['followedCategories'] = (bool)($this->getValidField($advQuery, 'followedcats') ?? false);
         if (is_numeric($rawCat)) {

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import { DeltaOperation, DeltaStatic } from "quill/core";
 import CodeBlock from "quill/formats/code";
 import BaseHistoryModule from "quill/modules/history";
@@ -125,7 +125,7 @@ export default class HistoryModule extends BaseHistoryModule {
     private undoKeyboardListener = (event: KeyboardEvent) => {
         // Quill's Keyboard.match() FAILS to match a shortkey + z for some reason. Just check it ourself.
         if (event.keyCode === this.Z_KEYCODE && event[SHORTKEY]) {
-            if (document.activeElement && document.activeElement.classList.contains(FOCUS_CLASS)) {
+            if (document.activeElement && document.activeElement.classList.contains(EMBED_FOCUS_CLASS)) {
                 if (event.shiftKey) {
                     this.redo();
                 } else {

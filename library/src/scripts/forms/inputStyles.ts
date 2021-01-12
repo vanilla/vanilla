@@ -3,26 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    colorOut,
-    EMPTY_BORDER,
-    EMPTY_FONTS,
-    fonts,
-    getHorizontalPaddingForTextInput,
-    IBordersWithRadius,
-    placeholderStyles,
-    textInputSizingFromFixedHeight,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { placeholderStyles, textInputSizingFromFixedHeight } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
 import merge from "lodash/merge";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 
 export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -42,16 +36,16 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         height: formElementVars.sizing.height,
     });
 
-    const font = makeThemeVars("font", {
-        ...EMPTY_FONTS,
-        size: globalVars.fonts.size.large,
-        weight: globalVars.fonts.weights.normal,
-        color: colors.fg,
-    });
+    const font = makeThemeVars(
+        "font",
+        Variables.font({
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.normal,
+            color: colors.fg,
+        }),
+    );
 
-    const border = makeThemeVars("borders", {
-        ...globalVars.borderType.formElements.default,
-    });
+    const border = makeThemeVars("borders", { ...globalVars.borderType.formElements.default });
 
     return {
         colors,
@@ -65,49 +59,45 @@ export const inputMixinVars = (vars?: { sizing?: any; font?: any; colors?: any; 
     const inputVars = inputVariables();
     return {
         sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
-        font: merge(inputVars.font, vars?.font ?? {}),
+        font: Variables.font(merge(inputVars.font, vars?.font ?? {})),
         colors: merge(inputVars.colors, vars?.colors ?? {}),
-        border: {
-            ...EMPTY_BORDER,
-            ...inputVars.border,
-            ...(vars?.border ?? {}),
-        },
+        border: merge(inputVars.border, vars?.border ?? {}),
     };
 };
 
-export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }): CSSObject => {
     const variables = inputMixinVars(vars);
     const globalVars = globalVariables();
     const {
         sizing,
-        font = {
+        font = Variables.font({
             size: globalVars.fonts.size.large,
-        },
+        }),
         colors,
         border,
     } = variables;
 
     return {
-        ...textInputSizingFromFixedHeight(sizing.height, font.size, border.width * 2),
-        backgroundColor: colorOut(colors.bg),
-        color: colorOut(colors.fg),
-        ...borders(border),
-        ...fonts(font),
+        ...textInputSizingFromFixedHeight(sizing.height, font.size as number, border.width * 2),
+        backgroundColor: ColorsUtils.colorOut(colors.bg),
+        color: ColorsUtils.colorOut(colors.fg),
+        ...Mixins.border(border),
+        ...Mixins.font(font),
         outline: 0,
-        $nest: {
+        ...{
             ...placeholderStyles({
-                color: colorOut(colors.placeholder),
+                color: ColorsUtils.colorOut(colors.placeholder),
             }),
-            "& .SelectOne__input": {
+            ".SelectOne__input": {
                 width: percent(100),
             },
-            "& .SelectOne__placeholder": {
-                color: colorOut(formElementsVariables().placeholder.color),
+            ".SelectOne__placeholder": {
+                color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
             },
-            "& .tokens__placeholder": {
-                color: colorOut(formElementsVariables().placeholder.color),
+            ".tokens__placeholder": {
+                color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
             },
-            "& .SelectOne__input input": {
+            ".SelectOne__input input": {
                 display: "inline-block",
                 width: important(`100%`),
                 overflow: "hidden",
@@ -115,13 +105,13 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
                 minHeight: 0,
             },
             "&:active, &:hover, &:focus, &.focus-visible": {
-                ...borders({
+                ...Mixins.border({
                     ...border,
                     color: colors.state.fg,
                 }),
             },
         },
-    } as NestedCSSProperties;
+    };
 };
 
 export const inputClasses = useThemeCache(() => {
@@ -130,7 +120,7 @@ export const inputClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
 
-    const inputPaddingMixin: NestedCSSProperties = {
+    const inputPaddingMixin: CSSObject = {
         padding: inputMixin().padding,
         paddingTop: inputMixin().paddingTop,
         paddingBottom: inputMixin().paddingBottom,
@@ -147,9 +137,9 @@ export const inputClasses = useThemeCache(() => {
     const inputText = style("inputText", {
         ...inputMixin(),
         marginBottom: 0,
-        $nest: {
+        ...{
             "&&": {
-                marginTop: unit(globalVars.gutter.quarter),
+                marginTop: styleUnit(globalVars.gutter.quarter),
             },
         },
     });

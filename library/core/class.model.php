@@ -6,6 +6,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
@@ -16,6 +17,8 @@ use Vanilla\Formatting\DateTimeFormatter;
  * complicated procedures related to different tables.
  */
 class Gdn_Model extends Gdn_Pluggable {
+
+    use LegacyDirtyRecordTrait;
 
     /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
@@ -290,7 +293,7 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     *  Takes a set of form data ($Form->_PostValues), validates them, and
+     * Takes a set of form data ($Form->_PostValues), validates them, and
      * inserts or updates them to the datatabase.
      *
      * @param array $formPostValues An associative array of $Field => $Value pairs that represent data posted
@@ -1045,5 +1048,14 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     protected function onUpdate() {
         $this->fireEvent('onUpdate');
+    }
+
+    /**
+     * Return a model.
+     *
+     * @return Gdn_Model
+     */
+    public function getLegacyModel(): \Gdn_Model {
+        return $this;
     }
 }

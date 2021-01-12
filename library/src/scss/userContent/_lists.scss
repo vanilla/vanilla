@@ -16,25 +16,25 @@ $nestedList-margin: 0 0 0 1em;
 
 .userContent {
     ol {
-        li {
+        > li {
             list-style: decimal !important;
         }
-        ol li {
+        ol > li {
             list-style: lower-alpha !important;
         }
-        ol ol li {
+        ol ol > li {
             list-style: lower-roman !important;
         }
-        ol ol ol li {
+        ol ol ol > li {
             list-style: decimal !important;
         }
-        ol ol ol ol li {
+        ol ol ol ol > li {
             list-style: lower-alpha !important;
         }
-        ol ol ol ol ol li {
+        ol ol ol ol ol > li {
             list-style: lower-roman !important;
         }
-        ol ol ol ol ol ol li {
+        ol ol ol ol ol ol > li {
             list-style: decimal !important;
         }
         ol,
@@ -42,20 +42,9 @@ $nestedList-margin: 0 0 0 1em;
             margin: $nestedList-margin;
         }
     }
-}
-
-.userContent {
     ul {
-        li {
-            list-style: none !important;
-            position: relative;
-
-            &::before {
-                content: "•";
-                font-family: 'Arial', serif !important;
-                position: absolute;
-                left: -1em;
-            }
+        > li {
+            list-style: disc !important;
         }
         ol,
         ul {

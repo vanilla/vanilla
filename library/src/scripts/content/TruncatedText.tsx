@@ -7,7 +7,6 @@
 import { useMeasure } from "@vanilla/react-utils";
 import React, { useEffect, useRef } from "react";
 import shave from "shave";
-import { forceRenderStyles } from "typestyle";
 
 interface IProps {
     tag?: string;
@@ -35,7 +34,6 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
     }, [measure]);
 
     function truncate() {
-        forceRenderStyles();
         if (props.useMaxHeight) {
             truncateTextBasedOnMaxHeight();
         } else {

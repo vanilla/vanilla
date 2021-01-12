@@ -1,6 +1,13 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut, absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const newPostBackgroundVariables = useThemeCache(() => {
     const themeVars = variableFactory("newPostBackground");
@@ -29,8 +36,8 @@ export const newPostBackgroundClasses = useThemeCache(() => {
         height: "100vh",
         width: "100vw",
         position: "absolute",
-        top: unit(vars.container.top),
-        left: unit(vars.container.left),
+        top: styleUnit(vars.container.top),
+        left: styleUnit(vars.container.left),
         zIndex: 9999,
     });
 

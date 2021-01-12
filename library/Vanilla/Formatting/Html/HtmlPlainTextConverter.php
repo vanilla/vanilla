@@ -82,36 +82,45 @@ HTML;
             $xpath = new \DOMXPath($dom);
             $foundItems = $xpath->query(".//*[contains(@class, '$cssClass')]");
 
-            /** @var \DOMNode $spoiler */
+            /** @var \DOMNode $foundItem */
             foreach ($foundItems as $foundItem) {
-                // Add the text content.
-                /** @var \DOMElement $parent */
-                $parent = $foundItem->parentNode;
-                $textNode = $dom->createTextNode(self::t($replacementString));
-                $breakNode = $dom->createElement('br');
-                $parent->replaceChild($textNode, $foundItem);
-                $parent->insertBefore($breakNode, $textNode->nextSibling);
+                $this->replaceNodeWithString($dom, $foundItem, $replacementString);
             }
         }
 
         foreach ($tagNameStringMapping as $nodeName => $replacementString) {
             $foundItems = $dom->getElementsByTagName($nodeName);
 
-            /** @var \DOMNode $spoiler */
+            /** @var \DOMNode $foundItem */
             foreach ($foundItems as $foundItem) {
-                // Add the text content.
-                /** @var \DOMElement $parent */
-                $parent = $foundItem->parentNode;
-                $textNode = $dom->createTextNode(self::t($replacementString));
-                $breakNode = $dom->createElement('br');
-                $parent->replaceChild($textNode, $foundItem);
-                $parent->insertBefore($breakNode, $textNode->nextSibling);
+                $this->replaceNodeWithString($dom, $foundItem, $replacementString);
             }
         }
 
         $content = $dom->getElementById('contentID');
         $htmlBodyString = @$dom->saveXML($content, LIBXML_NOEMPTYTAG);
         return $htmlBodyString;
+    }
+
+    /**
+     * Replace a dom node with a string.
+     *
+     * @param \DOMDocument $dom
+     * @param \DOMNode $node
+     * @param string $replacement
+     */
+    private function replaceNodeWithString(\DOMDocument $dom, \DOMNode $node, string $replacement) {
+        /** @var \DOMElement $parent */
+        $parent = $node->parentNode;
+        $nextSiblimg = $node->nextSibling;
+        if (empty($replacement)) {
+            $parent->removeChild($node);
+        } else {
+            $textNode = $dom->createTextNode(self::t($replacement));
+            $parent->replaceChild($textNode, $node);
+        }
+        $breakNode = $dom->createElement('br');
+        $parent->insertBefore($breakNode, $nextSiblimg);
     }
 
     /**

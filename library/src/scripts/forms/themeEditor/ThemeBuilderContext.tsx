@@ -3,16 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext, useState, useCallback, useDebugValue, useRef } from "react";
+import React, { useMemo, useContext, useState, useCallback, useDebugValue, useRef, useEffect } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { buttonVariables, buttonGlobalVariables } from "@library/forms/Button.variables";
 import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
 import unset from "lodash/unset";
 import { bannerVariables } from "@library/banner/bannerStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
 import { all } from "q";

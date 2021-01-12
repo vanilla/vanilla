@@ -4,8 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { containerVariables } from "@library/layout/components/containerStyles";
 
@@ -17,7 +18,7 @@ export const widgetContainerClasses = useThemeCache(() => {
         position: "relative",
         maxWidth: percent(100),
         margin: "auto",
-        $nest: {
+        ...{
             "&.isNarrow": {
                 maxWidth: vars.sizing.narrowContentSize,
             },

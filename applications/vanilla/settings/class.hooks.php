@@ -912,6 +912,7 @@ class VanillaHooks extends Gdn_Plugin {
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
+        /** @var Gdn_DataSet $comments */
         $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'), null, 'desc', 'PermsDiscussionsView');
         $totalRecords = $offset + $commentModel->LastCommentCount + 1;
 

@@ -6,10 +6,10 @@
 
 import React from "react";
 import { IStoryTileAndTextProps, StoryTileAndText } from "@library/storybook/StoryTileAndText";
-import { ColorValues } from "@library/styles/styleHelpersColors";
+import { ColorHelper } from "csx";
 
 interface IProps extends IStoryTileAndTextProps {
-    backgroundColor?: ColorValues;
+    backgroundColor?: ColorHelper;
 }
 
 /**

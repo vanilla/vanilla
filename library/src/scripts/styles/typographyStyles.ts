@@ -4,14 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { color, em, percent } from "csx";
-import { margins, paddings, unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");
@@ -26,33 +27,34 @@ export const typographyClasses = useThemeCache(() => {
     const pageTitle = style(
         "pageTitle",
         {
-            fontSize: unit(globalVars.fonts.size.title),
+            fontSize: styleUnit(globalVars.fonts.size.title),
+            fontWeight: globalVars.fonts.sizeWeight.title ?? undefined,
             lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
-            $nest: {
+            ...{
                 ...lineHeightAdjustment(),
                 [`&.${largeTitle}`]: {
-                    fontSize: unit(globalVars.fonts.size.largeTitle),
+                    fontSize: styleUnit(globalVars.fonts.size.largeTitle),
                 },
             },
-        } as NestedCSSProperties,
+        },
         mediaQueries.oneColumnDown({
-            fontSize: unit(globalVars.fonts.mobile.size.title),
-            $nest: {
+            fontSize: styleUnit(globalVars.fonts.mobile.size.title),
+            ...{
                 [`&.${largeTitle}`]: {
-                    fontSize: unit(globalVars.fonts.mobile.size.title),
+                    fontSize: styleUnit(globalVars.fonts.mobile.size.title),
                 },
             },
         }),
     );
 
     const subTitle = style("subTitle", {
-        fontSize: unit(globalVars.fonts.size.subTitle),
+        fontSize: styleUnit(globalVars.fonts.size.subTitle),
     });
 
     const componentSubTitle = style("componentSubTitle", {
-        fontSize: unit(globalVars.fonts.size.large),
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     return {

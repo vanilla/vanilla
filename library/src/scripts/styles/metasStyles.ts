@@ -5,10 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { allLinkStates, colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { allLinkStates, defaultTransition, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { calc, important } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
+import { tagVariables } from "@library/styles/tagStyles";
 
 export const metasVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -57,66 +62,67 @@ export const metaContainerStyles = (overwrites?: any) => {
     return {
         display: "block",
         lineHeight: globalVars.lineHeights.meta,
-        color: colorOut(vars.colors.fg),
-        width: calc(`100% + ${unit(vars.spacing.default * 2)}`),
+        color: ColorsUtils.colorOut(vars.colors.fg),
+        width: calc(`100% + ${styleUnit(vars.spacing.default * 2)}`),
         overflow: "initial", // We can't hide overflow or stuff like user cards will not be shown.
         textAlign: "left",
-        fontSize: unit(globalVars.meta.text.size),
-        ...margins({
+        fontSize: styleUnit(globalVars.meta.text.size),
+        ...Mixins.margin({
             left: -vars.spacing.default,
             right: vars.spacing.default,
         }),
-        $nest: {
+        ...{
             a: {
                 ...allLinkStates({
                     allStates: {
                         textShadow: "none",
                     },
                     noState: {
-                        color: colorOut(vars.colors.fg),
+                        color: ColorsUtils.colorOut(vars.colors.fg),
                     },
                     hover: {
-                        color: colorOut(vars.colors.hover.fg),
+                        color: ColorsUtils.colorOut(vars.colors.hover.fg),
                     },
                     focus: {
-                        color: colorOut(vars.colors.focus.fg),
+                        color: ColorsUtils.colorOut(vars.colors.focus.fg),
                     },
                     active: {
-                        color: colorOut(vars.colors.active.fg),
+                        color: ColorsUtils.colorOut(vars.colors.active.fg),
                     },
                 }),
             },
             "&.isFlexed": flexed,
         },
         ...overwrites,
-    } as NestedCSSProperties;
+    };
 };
 
 export const metaItemStyle = useThemeCache(() => {
     const vars = metasVariables();
     return {
         display: "inline-block",
-        fontSize: unit(vars.fonts.size),
-        color: colorOut(vars.colors.fg),
-        ...margins({
+        fontSize: styleUnit(vars.fonts.size),
+        color: ColorsUtils.colorOut(vars.colors.fg),
+        ...Mixins.margin({
             top: 0,
             right: vars.spacing.default,
             bottom: 0,
             left: vars.spacing.default,
         }),
-        $nest: {
+        ...{
             "& &": {
                 margin: 0,
             },
-            "& .isDeleted, &.isDeleted": {
-                color: colorOut(vars.colors.deleted.fg),
+            ".isDeleted, &.isDeleted": {
+                color: ColorsUtils.colorOut(vars.colors.deleted.fg),
             },
         },
-    } as NestedCSSProperties;
+    };
 });
 
 export const metasClasses = useThemeCache(() => {
     const vars = metasVariables();
+    const tagVars = tagVariables();
     const globalVars = globalVariables();
     const style = styleFactory("metas");
 
@@ -127,7 +133,7 @@ export const metasClasses = useThemeCache(() => {
     const metaIcon = style("metaIcon", {
         ...metaItemStyle(),
         maxHeight: 14,
-        $nest: {
+        ...{
             "& svg": {
                 display: "inline-block",
                 marginBottom: -6,
@@ -135,11 +141,24 @@ export const metasClasses = useThemeCache(() => {
         },
     });
 
+    const metaLabel = style("metaLabel", {
+        display: "inline-block",
+        maxWidth: "100%",
+        whiteSpace: "normal",
+        textOverflow: "ellipsis",
+        ...userSelect(),
+        ...Mixins.padding(tagVars.padding),
+        ...Mixins.border(tagVars.border),
+        ...Mixins.font(tagVars.font),
+        ...defaultTransition("border"),
+        ...Mixins.margin(tagVars.margin),
+    });
+
     // Get styles of meta, without the margins
     const metaStyle = style("metaStyles", {
         display: "inline-block",
-        fontSize: unit(vars.fonts.size),
-        color: colorOut(vars.colors.fg),
+        fontSize: styleUnit(vars.fonts.size),
+        color: ColorsUtils.colorOut(vars.colors.fg),
     });
 
     const draftStatus = style("draftStatus", {
@@ -151,13 +170,26 @@ export const metasClasses = useThemeCache(() => {
         textDecoration: important("none"),
     });
 
+    const inlineBlock = style("inlineBlock", {
+        display: "inline-flex",
+        borderTop: "none !important",
+        ...{
+            "& *:hover, & *:focus, & .isFocused": {
+                color: `${globalVars.links.colors.default} !important`,
+                backgroundColor: "transparent !important",
+            },
+        },
+    });
+
     return {
         root,
         meta,
+        metaLabel,
         metaLink,
         metaIcon,
         metaStyle,
         draftStatus,
         noUnderline,
+        inlineBlock,
     };
 });

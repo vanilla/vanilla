@@ -4,23 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { style } from "typestyle";
-import getStore from "@library/redux/getStore";
-import { getMeta } from "@library/utility/appUtils";
-import memoize from "lodash/memoize";
+import { CSSObject } from "@emotion/css";
+import { style } from "@library/styles/styleShim";
 import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
-import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
+import { logDebug, logWarning, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
-import { useEffect, useState } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
 /**
- * A better helper to generate human readable classes generated from TypeStyle.
+ * A better helper to generate human readable classes generated from Emotion.
  *
  * This works like debugHelper but automatically. The generated function behaves just like `style()`
  * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
@@ -34,17 +30,16 @@ export const DEBUG_STYLES = Symbol.for("Debug");
  * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: NestedCSSProperties[]): string;
-    function styleCreator(debug: symbol, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
-    function styleCreator(...objects: NestedCSSProperties[]): string;
-    function styleCreator(...objects: Array<NestedCSSProperties | string | symbol>): string {
+    function styleCreator(subcomponentName: string, ...objects: CSSObject[]): string;
+    function styleCreator(debug: symbol, subcomponentName: string, ...objects: CSSObject[]): string;
+    function styleCreator(...objects: CSSObject[]): string;
+    function styleCreator(...objects: Array<CSSObject | string | symbol>): string {
         if (objects.length === 0) {
             return style();
         }
-
         let debugName = componentName;
         let shouldLogDebug = false;
-        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        let styleObjs: CSSObject[] = objects as any;
         if (objects[0] === DEBUG_STYLES) {
             styleObjs.shift();
             shouldLogDebug = true;
@@ -53,6 +48,7 @@ export function styleFactory(componentName: string) {
             const [subcomponentName, ...restObjects] = styleObjs;
             debugName += `-${subcomponentName}`;
             styleObjs = restObjects;
+            styleObjs.forEach((obj) => (obj["label"] = debugName));
         }
 
         if (shouldLogDebug) {
@@ -60,59 +56,10 @@ export function styleFactory(componentName: string) {
             logDebug(styleObjs);
         }
 
-        const hasNestedStyles = !!objects.find((obj) => typeof obj === "object" && "$nest" in obj);
-
-        // Applying $unique generally gives better consistency, but it can cause issues with nested styles.
-        // As a result we don't apply it if the class has any nested styles.
-        return style({ $debugName: debugName, $unique: !hasNestedStyles }, ...styleObjs);
+        return style(...styleObjs);
     }
 
     return styleCreator;
-}
-
-// A unique identifier that represents the current state of the theme.
-let _themeCacheID = hashString(Math.random().toString());
-
-// Event name for resetting the theme cacheID.
-export const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
-
-export function resetThemeCache() {
-    _themeCacheID = hashString(Math.random().toString());
-    document.dispatchEvent(new CustomEvent(THEME_CACHE_EVENT, { detail: _themeCacheID }));
-    return _themeCacheID;
-}
-
-export function useThemeCacheID() {
-    const [cacheID, setCacheID] = useState(_themeCacheID);
-    useEffect(() => {
-        const listener = (e: CustomEvent) => {
-            setCacheID(e.detail);
-        };
-        document.addEventListener(THEME_CACHE_EVENT, listener);
-
-        return () => {
-            document.removeEventListener(THEME_CACHE_EVENT, listener);
-        };
-    });
-
-    return { cacheID, resetThemeCache };
-}
-
-/**
- * Wrap a callback so that it will only run once with a particular set of global theme variables.
- *
- * @param callback The function to wrap.
- */
-export function useThemeCache<Cb>(callback: Cb): Cb {
-    const makeCacheKey = (...args) => {
-        const storeState = getStore().getState();
-        const themeKey = getMeta("ui.themeKey", "default");
-        const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status + _themeCacheID;
-        const result = cacheKey + JSON.stringify(args);
-        return result;
-    };
-    return memoize(callback as any, makeCacheKey);
 }
 
 /**
@@ -432,4 +379,21 @@ function getDebugVars(vars: any): any {
  */
 export function appendSource(className: string, source?: string) {
     return `${className}${source ? "--" + source : ""}`;
+}
+
+export function getPixelNumber(val: string | number | undefined, fallback: number = 0): number {
+    if (val == undefined) {
+        return fallback;
+    }
+    if (typeof val === "number") {
+        return val;
+    } else {
+        val = val.replace("px", "");
+        const parsed = Number.parseInt(val);
+        if (Number.isNaN(parsed)) {
+            return fallback;
+        } else {
+            return parsed;
+        }
+    }
 }

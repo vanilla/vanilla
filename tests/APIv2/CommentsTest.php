@@ -7,8 +7,11 @@
 
 namespace VanillaTests\APIv2;
 
+use CommentModel;
 use DiscussionModel;
 use Gdn_Configuration;
+use Vanilla\Models\DirtyRecordModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -19,6 +22,8 @@ class CommentsTest extends AbstractResourceTest {
     use AssertLoggingTrait;
     use TestPrimaryKeyRangeFilterTrait;
     use TestSortingTrait;
+    use TestFilterDirtyRecordsTrait;
+    use CommunityApiTestTrait;
 
     /**
      * {@inheritdoc}
@@ -106,5 +111,45 @@ class CommentsTest extends AbstractResourceTest {
         ])->getBody();
 
         $this->assertEquals($comments, $updatedComments);
+    }
+
+    /**
+     * Ensure that there are dirtyRecords for a specific resource.
+     */
+    protected function triggerDirtyRecords() {
+        $discussion = $this->createDiscussion();
+        $comment1 = $this->createComment();
+        $comment2 = $this->createComment();
+
+        /** @var CommentModel $commentModel */
+        $commentModel = \Gdn::getContainer()->get(CommentModel::class);
+
+        $commentModel->setField($comment1["commentID"], 'Score', 10);
+        $commentModel->setField($comment2["commentID"], 'Score', 5);
+    }
+
+    /**
+     * Get the resource type.
+     *
+     *
+     * @return array
+     */
+    protected function getResourceInformation(): array {
+        return [
+            "resourceType" => "comment",
+            "primaryKey" => "commentID"
+        ];
+    }
+
+    /**
+     * Get the api query.
+     *
+     * @return array
+     */
+    protected function getQuery():array {
+        return [
+            DirtyRecordModel::DIRTY_RECORD_OPT => true,
+            'insertUserID' => $this->api()->getUserID()
+        ];
     }
 }

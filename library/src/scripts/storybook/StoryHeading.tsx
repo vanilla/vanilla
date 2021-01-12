@@ -6,7 +6,7 @@
 
 import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import classNames from "classnames";
+import { cx } from "@library/styles/styleShim";
 
 export interface IStoryHeadingProps {
     depth?: number;
@@ -23,7 +23,7 @@ export function StoryHeading(props: IStoryHeadingProps) {
     const Tag = `h${depth}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     return (
         <Tag
-            className={classNames(classes.heading, {
+            className={cx(classes.heading, {
                 [classes.headingH1]: depth === 1,
                 [classes.headingH2]: depth === 2,
                 [classes.headingH3]: depth === 3,

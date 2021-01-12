@@ -12,6 +12,7 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchService;
@@ -328,6 +329,7 @@ class CommentsApiController extends AbstractApiController {
                     },
                 ],
             ],
+            'dirtyRecords:b?',
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
@@ -359,7 +361,13 @@ class CommentsApiController extends AbstractApiController {
         if (isset($query['discussionID'])) {
             $this->getEventManager()->fireFilter('commentsApiController_getFilters', $this, $query['discussionID'], $query);
         }
+
         $where = ApiUtils::queryToFilters($in, $query);
+
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
+        }
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 

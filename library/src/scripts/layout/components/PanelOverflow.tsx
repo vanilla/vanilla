@@ -6,7 +6,7 @@
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import classNames from "classnames";
 import React from "react";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { panelBackgroundVariables } from "@library/layout/PanelBackground.variables";
 import { useLayout, withLayout } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 

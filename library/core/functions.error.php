@@ -601,7 +601,7 @@ if (!function_exists('logException')) {
             return;
         }
 
-        if ($ex instanceof Gdn_UserException) {
+        if ($ex instanceof Gdn_UserException || $ex instanceof \Garden\Web\Exception\ClientException) {
             return;
         }
 

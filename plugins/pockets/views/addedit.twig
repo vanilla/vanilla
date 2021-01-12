@@ -33,22 +33,22 @@
         <ul>
             <li class="form-group">
                 <div class="label-wrap">
-                    {{ form.label('Page', 'Page') }}
-                    <div
-                        class="info">{{ t('Select the location of the pocket.', 'Select the location of the pocket.') }}</div>
-                </div>
-                <div class="input-wrap">
-                    {{ form.dropdown('Page', Pages) }}
-                </div>
-            </li>
-            <li class="form-group">
-                <div class="label-wrap">
                     {{ form.label('Location', 'Location') }}
                     <div
                         class="info">{{ t('Select the location of the pocket.', 'Select the location of the pocket.') }}</div>
                 </div>
                 <div class="input-wrap">
                     {{ form.dropdown('Location', LocationsArray) }}
+                </div>
+            </li>
+            <li class="form-group" id="pocketPageFormGroup">
+                <div class="label-wrap">
+                    {{ form.label('Page', 'Page') }}
+                    <div
+                        class="info">{{ t('Select the Page the pocket will render on.', 'Select the Page the pocket will render on.') }}</div>
+                </div>
+                <div class="input-wrap">
+                    {{ form.dropdown('Page', Pages) }}
                 </div>
             </li>
             {{ fireEchoEvent("settingsController_additionalPocketFilterInputs", {form: form, Attributes: Attributes}) }}

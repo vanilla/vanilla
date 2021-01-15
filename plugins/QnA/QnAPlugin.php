@@ -11,7 +11,6 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
-use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
@@ -958,42 +957,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         // TODO: Dekludge this when category permissions are refactored (tburry).
         $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
-        $groupModel = new GroupModel();
 
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
-        // Get allowed categories and allowed groups so the count will match the number of discussions the user can actually view.
-            $categoryModel = new CategoryModel();
-            $allowedCategories = $categoryModel->getVisibleCategoryIDs();
-            if ($allowedCategories === true) {
-                $allowedCategories = array_column(CategoryModel::categories(), 'CategoryID');
-            }
-            $allowedGroupCategories = [];
-            $groupCategories = GroupModel::getGroupCategoryIDs();
-            foreach ($groupCategories as $groupCat) {
-                if (in_array($groupCat, $allowedCategories)) {
-                    $flippedArray = array_flip($allowedCategories);
-                    unset($allowedCategories[$flippedArray[$groupCat]]);
-                    $allowedGroupCategories[] = $groupCat;
-                }
-            }
-            $allowedGroups = [];
-            $groups = $groupModel->getAccessibleGroups(null, null, null, null);
-            if (!empty($groups)) {
-                foreach ($groups as $group) {
-                    if ($groupModel->hasGroupPermission(GroupPermissions::VIEW, $group['GroupID']) &&
-                        in_array($group['CategoryID'], $allowedGroupCategories)) {
-                        $allowedGroups[] = $group['GroupID'];
-                    }
-                }
-            }
             $questionCount = Gdn::sql()
                 ->beginWhereGroup()
                 ->where('QnA', null)
                 ->orWhereIn('QnA', ['Unanswered', 'Rejected'])
-                ->endWhereGroup()
-                ->beginWhereGroup()
-                ->whereIn('CategoryID', $allowedCategories)
-                ->orWhere('GroupID', $allowedGroups)
                 ->endWhereGroup()
                 ->getCount('Discussion', ['Type' => 'Question']);
 

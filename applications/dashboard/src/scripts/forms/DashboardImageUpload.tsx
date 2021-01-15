@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";

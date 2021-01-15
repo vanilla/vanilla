@@ -15,6 +15,8 @@
  * @since 2.0
  */
 
+use Vanilla\CurrentTimeStamp;
+
 /**
  * Class Gdn_SQLDriver
  */
@@ -1088,10 +1090,10 @@ abstract class Gdn_SQLDriver {
         $userID = valr('User.UserID', Gdn::session(), Gdn::session()->UserID);
 
         if ($insertFields) {
-            $this->set('DateInserted', Gdn_Format::toDateTime())->set('InsertUserID', $userID);
+            $this->set('DateInserted', CurrentTimeStamp::getMySQL())->set('InsertUserID', $userID);
         }
         if ($updateFields) {
-            $this->set('DateUpdated', Gdn_Format::toDateTime())->set('UpdateUserID', $userID);
+            $this->set('DateUpdated', CurrentTimeStamp::getMySQL())->set('UpdateUserID', $userID);
         }
         return $this;
     }
@@ -1259,6 +1261,17 @@ abstract class Gdn_SQLDriver {
         $this->_Joins[] = $joinClause;
 
         return $this;
+    }
+
+    /**
+     * Escapes fields with \, %, _
+     *
+     * @param string $field
+     * @return string|string[]
+     */
+    public function escapeField(string $field) {
+        $field =  str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $field);
+        return $field;
     }
 
     /**
@@ -2055,7 +2068,9 @@ abstract class Gdn_SQLDriver {
      * @throws \Exception Throws an exception if an invalid type is passed for {@link $value}.
      */
     public function set($field, $value = '', $escapeString = true, $createNewNamedParameter = true) {
-        $field = Gdn_Format::objectAsArray($field);
+        if (is_object($field)) {
+            $field = (array) $field;
+        }
 
         if (!is_array($field)) {
             $field = [$field => $value];

@@ -5,9 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { componentThemeVariables, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const userDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -61,7 +62,7 @@ export const userDropDownClasses = useThemeCache(() => {
 
     const userCardPhoto = style("userCardPhoto", {
         border: `solid 1px ${globalVars.mixBgAndFg(0.3)}`,
-        marginTop: unit(vars.userCard.topMargin),
+        marginTop: styleUnit(vars.userCard.topMargin),
         marginLeft: "auto",
         marginRight: "auto",
     });
@@ -70,19 +71,19 @@ export const userDropDownClasses = useThemeCache(() => {
         display: "block",
         color: "inherit",
         fontWeight: vars.userName.fontWeight,
-        fontSize: unit(vars.userName.fontSize),
+        fontSize: styleUnit(vars.userName.fontSize),
         lineHeight: vars.userName.lineHeight,
         textAlign: "center",
-        marginTop: unit(vars.userName.topMargin),
+        marginTop: styleUnit(vars.userName.topMargin),
         marginRight: "auto",
-        marginBottom: unit(vars.userName.bottomMargin),
+        marginBottom: styleUnit(vars.userName.bottomMargin),
         marginLeft: "auto",
-        paddingRight: unit(vars.userName.paddingRight),
-        paddingLeft: unit(vars.userName.paddingLeft),
+        paddingRight: styleUnit(vars.userName.paddingRight),
+        paddingLeft: styleUnit(vars.userName.paddingLeft),
     });
 
     const contents = style("contents", {
-        width: unit(vars.contents.width),
+        width: styleUnit(vars.contents.width),
     });
 
     return {

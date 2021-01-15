@@ -4,11 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, translateX } from "csx";
-import { borders, colorOut, negativeUnit, textInputSizingFromFixedHeight, unit } from "@library/styles/styleHelpers";
+import { negativeUnit, textInputSizingFromFixedHeight } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const colorPickerVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -37,19 +41,19 @@ export const colorPickerClasses = useThemeCache(() => {
 
     const textInput = style("textInput", {
         position: "relative",
-        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size, 2, 0),
-        width: unit(inputWidth),
-        maxWidth: unit(inputWidth), // Needed for Firefox.
-        color: colorOut(builderVariables.defaultFont.color),
-        flexBasis: unit(inputWidth),
-        ...borders(builderVariables.border),
+        ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size as number, 2, 0),
+        width: styleUnit(inputWidth),
+        maxWidth: styleUnit(inputWidth), // Needed for Firefox.
+        color: ColorsUtils.colorOut(builderVariables.defaultFont.color),
+        flexBasis: styleUnit(inputWidth),
+        ...Mixins.border(builderVariables.border),
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         zIndex: 1,
         transition: `color .2s ease-out, background .2s ease-out`,
-        $nest: {
+        ...{
             [`&.${builderClasses.invalidField}`]: {
-                color: colorOut(builderVariables.error.color),
+                color: ColorsUtils.colorOut(builderVariables.error.color),
             },
         },
     });
@@ -57,14 +61,14 @@ export const colorPickerClasses = useThemeCache(() => {
     const swatch = style("swatch", {
         display: "block",
         position: "relative",
-        width: unit(vars.swatch.width),
-        flexBasis: unit(vars.swatch.width),
+        width: styleUnit(vars.swatch.width),
+        flexBasis: styleUnit(vars.swatch.width),
         height: percent(100),
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
-        borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
-        borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
-        $nest: {
+        borderTopRightRadius: styleUnit(builderVariables.wrap.borderRadius),
+        borderBottomRightRadius: styleUnit(builderVariables.wrap.borderRadius),
+        ...{
             "&:focus, &:active": {
                 zIndex: 2,
             },
@@ -75,9 +79,9 @@ export const colorPickerClasses = useThemeCache(() => {
         position: "absolute",
         outline: 0,
         transform: translateX(negativeUnit(10)),
-        $nest: {
+        ...{
             [`&:focus + .${textInput}`]: {
-                borderColor: colorOut(builderVariables.outline.color),
+                borderColor: ColorsUtils.colorOut(builderVariables.outline.color),
             },
         },
     });

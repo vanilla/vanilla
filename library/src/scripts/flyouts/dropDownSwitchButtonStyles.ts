@@ -5,9 +5,10 @@
  */
 
 import React from "react";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
 
 export const dropdownSwitchButtonClasses = useThemeCache(() => {
@@ -16,13 +17,13 @@ export const dropdownSwitchButtonClasses = useThemeCache(() => {
 
     const container = style("button", {
         display: "flex",
-        lineHeight: unit(1.25),
-        minHeight: unit(30),
-        padding: unit(0),
-        paddingBottom: unit(4),
-        paddingLeft: unit(14),
-        paddingRight: unit(14),
-        paddingTop: unit(4),
+        lineHeight: styleUnit(1.25),
+        minHeight: styleUnit(30),
+        padding: styleUnit(0),
+        paddingBottom: styleUnit(4),
+        paddingLeft: styleUnit(14),
+        paddingRight: styleUnit(14),
+        paddingTop: styleUnit(4),
         textAlign: "left",
         textDecoration: "none",
         userSelect: "none",

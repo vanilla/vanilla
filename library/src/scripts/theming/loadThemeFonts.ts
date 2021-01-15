@@ -7,7 +7,7 @@ import getStore from "@library/redux/getStore";
 import WebFont from "webfontloader";
 import { getMeta, assetUrl, siteUrl, isAllowedUrl } from "@library/utility/appUtils";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
-import { THEME_CACHE_EVENT } from "@library/styles/styleUtils";
+import { THEME_CACHE_EVENT } from "@library/styles/themeCache";
 import { IThemeFont } from "@library/theming/themeReducer";
 
 const defaultFontConfig: WebFont.Config = {

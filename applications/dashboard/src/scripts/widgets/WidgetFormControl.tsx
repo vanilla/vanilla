@@ -19,6 +19,7 @@ interface IProps {
     schema: IJsonSchema;
     value: any;
     onChange: (value: any) => void;
+    isRequired?: boolean;
 }
 
 export function WidgetFormControl(props: IProps) {
@@ -67,7 +68,7 @@ export function WidgetFormControl(props: IProps) {
             if (api) {
                 return (
                     <DashboardSelectLookup
-                        isClearable={false}
+                        isClearable={!props.isRequired}
                         value={value}
                         onChange={(option) => onChange(option?.value)}
                         api={api}

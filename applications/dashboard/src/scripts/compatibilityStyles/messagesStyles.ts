@@ -5,9 +5,10 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { absolutePosition, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { absolutePosition } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { metaContainerStyles } from "@library/styles/metasStyles";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { forumVariables } from "@library/forms/forumStyleVars";
@@ -19,7 +20,7 @@ export const messagesCSS = () => {
     const userPhotoVars = formVars.userPhoto;
 
     cssOut(`.DismissMessage`, {
-        color: colorOut(globalVars.elementaryColors.black),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.black),
     });
 
     cssOut(
@@ -29,7 +30,7 @@ export const messagesCSS = () => {
 
         `,
         {
-            paddingLeft: unit(userPhotoVars.sizing.medium + layoutVars.cell.paddings.horizontal),
+            paddingLeft: styleUnit(userPhotoVars.sizing.medium + layoutVars.cell.paddings.horizontal),
         },
     );
 

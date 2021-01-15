@@ -5,9 +5,11 @@
  */
 
 import { percent } from "csx";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, unit } from "@library/styles/styleHelpers";
+import { allLinkStates } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const panelListVariables = useThemeCache(() => {
     const globalVals = globalVariables();
@@ -46,14 +48,14 @@ export const panelListClasses = useThemeCache((mediaQueries) => {
     });
 
     const title = style("title", {
-        fontSize: unit(vars.title.fontSize),
-        marginBottom: unit(vars.offset.default),
+        fontSize: styleUnit(vars.title.fontSize),
+        marginBottom: styleUnit(vars.offset.default),
     });
 
     const item = style("item", {
-        $nest: {
+        ...{
             "& + &": {
-                marginTop: unit(vars.offset.default),
+                marginTop: styleUnit(vars.offset.default),
             },
         },
     });
@@ -62,7 +64,7 @@ export const panelListClasses = useThemeCache((mediaQueries) => {
         display: "block",
         position: "relative",
         width: percent(100),
-        fontSize: unit(vars.link.fontSize),
+        fontSize: styleUnit(vars.link.fontSize),
         color: "inherit",
         ...allLinkStates({
             allStates: {

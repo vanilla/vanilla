@@ -66,6 +66,27 @@ paths:
                 $ref: '#/components/schemas/Resource'
         '403':
           $ref: '#/components/responses/PermissionError'
+  /resources/dirty-records/{recordType}:
+    delete:
+      summary: Delete resources dirty records.
+      tags:
+        - Resources
+      parameters:
+        - name: recordType
+          description: The record type slug of the resource.
+          in: path
+          required: true
+          schema:
+            type: string
+            example: discussion
+        - name: dateInserted
+          description: Date to filter records by.
+          in: query
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
 components:
   schemas:
     ResourceFragment:

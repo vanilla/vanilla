@@ -160,7 +160,7 @@ class Addon {
                         $info['keyRaw'] = $info['name'];
                     }
                 } else {
-                    if ($addonFolder !== $info['key']) {
+                    if (isset($info['key']) && $addonFolder !== $info['key']) {
                         $info['keyRaw'] = $addonFolder;
                     }
                 }

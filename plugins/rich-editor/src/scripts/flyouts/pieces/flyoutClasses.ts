@@ -5,20 +5,16 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import {
-    borders,
-    colorOut,
-    isLightColor,
-    longWordEllipsis,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { longWordEllipsis, singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { important } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 
 export const richEditorFlyoutClasses = useThemeCache(() => {
     const vars = richEditorVariables();
@@ -26,25 +22,27 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const globalVars = globalVariables();
 
-    const root = style(!isLightColor(globalVars.mainColors.bg) ? {} : shadows.dropDown(), {
+    const root = style(!ColorsUtils.isLightColor(globalVars.mainColors.bg) ? {} : shadows.dropDown(), {
         position: "absolute",
-        left: unit(0),
-        width: unit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
+        left: styleUnit(0),
+        width: styleUnit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 8),
         zIndex: 6,
         overflow: "hidden",
-        backgroundColor: colorOut(vars.colors.bg),
-        ...borders(globalVars.borderType.dropDowns),
-        $nest: {
+        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+        ...Mixins.border(globalVars.borderType.dropDowns),
+        ...{
             "&& .ReactVirtualized__Grid": {
-                width: important(unit(vars.richEditorWidth) as string),
+                width: important(styleUnit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 6) as string),
+                display: "flex",
+                justifyContent: "center",
             },
         },
-    } as NestedCSSProperties);
+    });
 
     const header = style("header", {
         position: "relative",
         borderBottom: singleBorder(),
-        ...paddings(vars.emojiHeader.padding),
+        ...Mixins.padding(vars.emojiHeader.padding),
     });
 
     const title = style("title", {
@@ -52,12 +50,12 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
         alignItems: "center",
         ...longWordEllipsis(),
         margin: 0,
-        maxWidth: calc(`100% - ${unit(vars.menuButton.size)}`),
+        maxWidth: calc(`100% - ${styleUnit(vars.menuButton.size)}`),
         minHeight: vars.menuButton.size - vars.emojiBody.padding.horizontal,
         fontSize: percent(100),
         lineHeight: "inherit",
-        color: colorOut(globalVars.mainColors.fg),
-        $nest: {
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ...{
             "&:focus": {
                 outline: 0,
             },
@@ -65,8 +63,8 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     });
 
     const body = style("body", {
-        ...paddings(vars.emojiBody.padding),
-        width: unit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
+        ...Mixins.padding(vars.emojiBody.padding),
+        width: styleUnit(vars.richEditorWidth + vars.emojiBody.padding.horizontal * 8),
     });
 
     const footer = style("footer", {

@@ -39,11 +39,11 @@ export function PocketCategoryInput(props) {
                     <CommunityCategoryInput
                         placeholder={t("Select...")}
                         label={null}
-                        inputClassName={dashboardClasses().selectOne}
-                        onChange={(option: IComboBoxOption) => {
-                            setCategory(option);
+                        className={dashboardClasses().selectOne}
+                        onChange={(option) => {
+                            setCategory(option[0]);
                         }}
-                        value={category}
+                        value={category ? [category] : []}
                     />
                 </div>
                 <input name={props.fieldName} type={"hidden"} value={hasCategory ?? ""} />

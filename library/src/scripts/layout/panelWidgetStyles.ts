@@ -5,10 +5,11 @@
  */
 
 import { percent } from "csx";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { paddings } from "@library/styles/styleHelpers";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { Mixins } from "@library/styles/Mixins";
 
 export const panelWidgetClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
@@ -19,35 +20,35 @@ export const panelWidgetClasses = useThemeCache((mediaQueries) => {
         flexDirection: "column",
         position: "relative",
         width: percent(100),
-        ...paddings({
+        ...Mixins.padding({
             all: globalVars.widget.padding,
         }),
-        $nest: {
+        ...{
             "&.hasNoVerticalPadding": {
-                ...paddings({ vertical: 0 }),
+                ...Mixins.padding({ vertical: 0 }),
             },
             "&.hasNoHorizontalPadding": {
-                ...paddings({ horizontal: 0 }),
+                ...Mixins.padding({ horizontal: 0 }),
             },
             "&.isSelfPadded": {
-                ...paddings({ all: 0 }),
+                ...Mixins.padding({ all: 0 }),
             },
             ...mediaQueries({
                 [LayoutTypes.TWO_COLUMNS]: {
                     oneColumnDown: {
-                        ...paddings({
+                        ...Mixins.padding({
                             all: globalVars.widget.padding,
                         }),
                     },
                 },
                 [LayoutTypes.THREE_COLUMNS]: {
                     oneColumnDown: {
-                        ...paddings({
+                        ...Mixins.padding({
                             all: globalVars.widget.padding,
                         }),
                     },
                 },
-            }).$nest,
+            }),
         },
     });
 

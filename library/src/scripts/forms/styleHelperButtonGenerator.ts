@@ -4,19 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, ButtonPreset, buttonResetMixin, buttonSizing } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables } from "@library/forms/Button.variables";
+import { buttonResetMixin, buttonSizing } from "@library/forms/buttonMixins";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { borders, EMPTY_BORDER } from "@library/styles/styleHelpersBorders";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { EMPTY_FONTS, fonts } from "@library/styles/styleHelpersTypography";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import cloneDeep from "lodash/cloneDeep";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { nestedWorkaround } from "@dashboard/compatibilityStyles";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 
 export const generateButtonStyleProperties = (props: {
@@ -75,16 +76,15 @@ export const generateButtonStyleProperties = (props: {
     }
 
     if (!buttonTypeVars.borders.color) {
-        buttonTypeVars.borders = EMPTY_BORDER;
+        buttonTypeVars.borders = {};
     }
 
     const borderVars = {
-        ...EMPTY_BORDER,
         ...buttonGlobalVars.borders,
         ...buttonTypeVars.borders,
     };
 
-    const defaultBorder = borders(borderVars, {
+    const defaultBorder = Mixins.border(borderVars, {
         fallbackBorderVariables: buttonGlobalVars.border,
         debug,
     });
@@ -93,8 +93,8 @@ export const generateButtonStyleProperties = (props: {
         buttonTypeVars.hover && buttonTypeVars.hover.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders(
-                      { ...EMPTY_BORDER, ...buttonTypeVars.hover.borders },
+                  Mixins.border(
+                      { ...buttonTypeVars.hover.borders },
                       { fallbackBorderVariables: buttonGlobalVars.border },
                   ),
               )
@@ -104,8 +104,8 @@ export const generateButtonStyleProperties = (props: {
         buttonTypeVars.active && buttonTypeVars.active.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders(
-                      { ...EMPTY_BORDER, ...buttonTypeVars.active.borders },
+                  Mixins.border(
+                      { ...buttonTypeVars.active.borders },
                       { fallbackBorderVariables: buttonGlobalVars.border },
                   ),
               )
@@ -115,8 +115,8 @@ export const generateButtonStyleProperties = (props: {
         buttonTypeVars.focus && buttonTypeVars.focus.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders(
-                      { ...EMPTY_BORDER, ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
+                  Mixins.border(
+                      { ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
                       { fallbackBorderVariables: buttonGlobalVars.border },
                   ),
               )
@@ -126,14 +126,14 @@ export const generateButtonStyleProperties = (props: {
         buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
             ? merge(
                   cloneDeep(defaultBorder),
-                  borders(
-                      { ...EMPTY_BORDER, ...buttonTypeVars.focusAccessible.borders },
+                  Mixins.border(
+                      { ...buttonTypeVars.focusAccessible.borders },
                       { fallbackBorderVariables: buttonGlobalVars.border },
                   ),
               )
             : {};
 
-    const fontVars = { ...EMPTY_FONTS, ...buttonGlobalVars.font, ...buttonTypeVars.fonts };
+    const fontVars = Variables.font({ ...buttonGlobalVars.font, ...buttonTypeVars.fonts });
 
     const paddingHorizontal =
         buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined
@@ -147,20 +147,20 @@ export const generateButtonStyleProperties = (props: {
     const { minHeight, minWidth } = buttonDimensions;
     const { skipDynamicPadding = false } = buttonTypeVars;
 
-    const result: NestedCSSProperties = {
+    const result: CSSObject = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),
-        backgroundColor: colorOut(backgroundColor),
-        ...fonts({
+        backgroundColor: ColorsUtils.colorOut(backgroundColor),
+        ...Mixins.font({
             ...fontVars,
             size: fontSize,
             color: fontColor,
             weight: fontVars.weight ?? undefined,
         }),
-        ["-webkit-font-smoothing" as any]: "antialiased",
+        WebkitFontSmoothing: "antialiased",
         ...defaultBorder,
         ...buttonSizing({
             minHeight,
@@ -181,18 +181,18 @@ export const generateButtonStyleProperties = (props: {
         touchAction: "manipulation",
         cursor: "pointer",
         ...defaultTransition("background", "color", "border"),
-        $nest: {
+        ...{
             [`&:not([disabled]):not(.focus-visible)`]: {
                 outline: 0,
             },
             [`&:not([disabled]):hover${stateSuffix ?? ""}`]: {
                 zIndex,
-                color: colorOut(
+                color: ColorsUtils.colorOut(
                     buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.fg
                         ? buttonTypeVars.hover.colors.fg
                         : undefined,
                 ),
-                backgroundColor: colorOut(
+                backgroundColor: ColorsUtils.colorOut(
                     buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
                         ? buttonTypeVars.hover.colors.bg
                         : undefined,
@@ -201,12 +201,12 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):focus${stateSuffix ?? ""}`]: {
                 zIndex,
-                color: colorOut(
+                color: ColorsUtils.colorOut(
                     buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.fg
                         ? buttonTypeVars.focus!.colors.fg
                         : undefined,
                 ),
-                backgroundColor: colorOut(
+                backgroundColor: ColorsUtils.colorOut(
                     buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
                         ? buttonTypeVars.focus!.colors.bg
                         : undefined,
@@ -215,12 +215,12 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):active${stateSuffix ?? ""}`]: {
                 zIndex,
-                color: colorOut(
+                color: ColorsUtils.colorOut(
                     buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.fg
                         ? buttonTypeVars.active!.colors.fg
                         : undefined,
                 ),
-                backgroundColor: colorOut(
+                backgroundColor: ColorsUtils.colorOut(
                     buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
                         ? buttonTypeVars.active!.colors.bg
                         : undefined,
@@ -229,12 +229,12 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):focus-visible${stateSuffix ?? ""}`]: {
                 zIndex,
-                color: colorOut(
+                color: ColorsUtils.colorOut(
                     buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.fg
                         ? buttonTypeVars.focusAccessible!.colors.fg
                         : undefined,
                 ),
-                backgroundColor: colorOut(
+                backgroundColor: ColorsUtils.colorOut(
                     buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
                         ? buttonTypeVars.focusAccessible!.colors.bg
                         : undefined,
@@ -262,7 +262,6 @@ const generateButtonClass = (
         setZIndexOnState,
     });
     const buttonClass = style(buttonStyles);
-    nestedWorkaround(`.${buttonClass}`, buttonStyles.$nest);
     return buttonClass;
 };
 

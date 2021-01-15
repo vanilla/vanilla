@@ -8,8 +8,10 @@ import React from "react";
 import { paragraphMenuCheckRadioClasses } from "../paragraphMenuBarStyles";
 import classNames from "classnames";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-import { style } from "typestyle";
-import { colorOut, unit, visibility } from "@library/styles/styleHelpers";
+import { style } from "@library/styles/styleShim";
+import { visibility } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CheckIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n/src";
@@ -43,11 +45,11 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
         const isRadio = type === IMenuBarItemTypes.RADIO;
         const globalStyles = globalVariables();
         const iconStyle = style({
-            width: unit(globalStyles.icon.sizes.default),
-            height: unit(globalStyles.icon.sizes.default),
+            width: styleUnit(globalStyles.icon.sizes.default),
+            height: styleUnit(globalStyles.icon.sizes.default),
         });
         const checkStyle = style({
-            color: colorOut(globalStyles.mainColors.primary),
+            color: ColorsUtils.colorOut(globalStyles.mainColors.primary),
         });
         return (
             <button

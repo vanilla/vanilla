@@ -15,7 +15,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
 import { StringMap, DeltaStatic, DeltaOperation } from "quill/core";
-import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 /**

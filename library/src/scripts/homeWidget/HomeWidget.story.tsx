@@ -8,7 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { HomeWidgetItem, IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { STORY_ICON, STORY_IMAGE, STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT } from "@library/storybook/storyData";
 import { HomeWidgetContainer, IHomeWidgetContainerProps } from "@library/homeWidget/HomeWidgetContainer";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import { BorderType } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -29,6 +29,40 @@ const iconUrls = {
     thirdIcon: "https://us.v-cdn.net/5022541/uploads/048/66SQHHGSZT2R.png",
     forthIcon: "https://us.v-cdn.net/5022541/uploads/346/B6QMAFIQAXLI.png",
 };
+
+export function ContentTypeChatBubble() {
+    const itemOptions: IHomeWidgetItemOptions = {
+        contentType: HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
+    };
+    return (
+        <div>
+            <HomeWidget
+                title="4 columns"
+                itemOptions={itemOptions}
+                itemData={STANDARD_5_ITEMS}
+                containerOptions={{ maxColumnCount: 4 }}
+            />
+            <HomeWidget
+                title="3 columns"
+                itemOptions={itemOptions}
+                itemData={STANDARD_5_ITEMS}
+                containerOptions={{ maxColumnCount: 3 }}
+            />
+            <HomeWidget
+                title="2 columns"
+                itemOptions={itemOptions}
+                itemData={STANDARD_5_ITEMS}
+                containerOptions={{ maxColumnCount: 2 }}
+            />
+            <HomeWidget
+                title="1 column"
+                itemOptions={itemOptions}
+                itemData={STANDARD_5_ITEMS}
+                containerOptions={{ maxColumnCount: 1 }}
+            />
+        </div>
+    );
+}
 
 export function ContentTypeText() {
     const itemOptions: IHomeWidgetItemOptions = {
@@ -725,6 +759,7 @@ interface IDummyItemProps {
     noCounts?: boolean;
     noBorder?: boolean;
     iconBackground?: boolean;
+    callToAction?: string;
 }
 
 function dummyItemProps(props?: IDummyItemProps): IHomeWidgetItemProps {
@@ -737,6 +772,8 @@ function dummyItemProps(props?: IDummyItemProps): IHomeWidgetItemProps {
                 : HomeWidgetItemContentType.TITLE_DESCRIPTION,
             borderType: props?.noBorder ? BorderType.NONE : undefined,
         },
+        callToAction: "Learn more",
+        url: "https://vanillaforums.com/en/",
         imageUrl: props?.imageMissing ? undefined : STORY_IMAGE,
         iconUrl: props?.imageMissing ? undefined : props?.iconCustomUrl ? props.iconCustomUrl : STORY_ICON,
         to: "#",
@@ -777,7 +814,7 @@ function ItemIn4Variants(props: { children: React.ReactElement }) {
         display: "flex",
         flexDirection: "column",
         marginRight: 24,
-        $nest: {
+        ...{
             "&:last-child": {
                 marginRight: 0,
             },

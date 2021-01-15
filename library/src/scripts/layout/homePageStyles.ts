@@ -3,14 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { IBackground, EMPTY_BACKGROUND } from "@library/styles/styleHelpers";
+import { IBackground } from "@library/styles/cssUtilsTypes";
+import { Variables } from "@library/styles/Variables";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const homePageVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("homePage");
 
     // See IBackground for options
-    const backgroundImage: IBackground = makeThemeVars("backgroundImage", EMPTY_BACKGROUND);
+    const backgroundImage: IBackground = makeThemeVars("backgroundImage", Variables.background({}));
 
     return {
         backgroundImage,

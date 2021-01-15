@@ -28,11 +28,17 @@ can build a custom-tailored environment that meets your community's particular n
 
 ## Installation
 
+The current version of Vanilla requires PHP 7.2+ and MySQL 5.7+. The following PHP extensions are also required: cURL, DOM, Fileinfo, GD, intl, JSON, libxml, PDO
+
 -   [Local Installation](https://github.com/vanilla/vanilla-docker)
 -   [Our Cloud Hosting Solution](https://vanillaforums.com/en/plans/)
 -   [The Basics of Self Hosting ](https://docs.vanillaforums.com/developer/installation/self-hosting/)
 
 _Upgrading from an earlier version of Vanilla? See [our upgrade notes](https://docs.vanillaforums.com/developer/installation/self-hosting/#upgrading)._
+
+## Changes to Fulltext Indexing
+
+Full-text index support has been disabled by default as of Vanilla 4. To enable full-text index support, add a `FullTextIndexing` key under the `Database` section of your site config and set its value to `true`. **Failure to add this config value will result in full-text indexes being removed from Vanilla's database tables.**
 
 ## Contributing
 

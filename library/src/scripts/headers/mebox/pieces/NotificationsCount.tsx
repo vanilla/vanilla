@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IUsersStoreState } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { t } from "@library/utility/appUtils";
 import React from "react";

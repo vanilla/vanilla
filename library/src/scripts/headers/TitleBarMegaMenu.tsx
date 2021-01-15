@@ -9,10 +9,11 @@ import useClasses from "./TitleBarMegaMenu.styles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import Container from "@library/layout/components/Container";
 import { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { useLastValue, useMeasure } from "@vanilla/react-utils/src";
 import { TabHandler } from "@vanilla/dom-utils/src";
 import { containerVariables } from "@library/layout/components/containerStyles";
+import { Func } from "mocha";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -43,45 +44,38 @@ function TitleBarMegaMenuChildImpl(props: IChildProps, ref: React.Ref<IMegaMenuC
 }
 
 interface IProps {
-    active?: INavigationVariableItem;
-    logoDimensions?: DOMRect;
-    currentNavElement?: HTMLElement;
-    onOpen?(item: INavigationVariableItem): void;
-    onClose?(item: INavigationVariableItem): void;
-    forceMenuOpen?: INavigationVariableItem;
+    expanded?: INavigationVariableItem;
+    leftOffset?: number;
+    menuItem?: HTMLElement;
+    onClose?(): void;
 }
 
 function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
-    const { active, logoDimensions, onOpen, onClose, currentNavElement, forceMenuOpen } = props;
+    const { expanded, leftOffset = 0, onClose, menuItem } = props;
 
     const classes = useClasses();
 
     const { getCalcedHashOffset } = useScrollOffset();
     const [isFocusWithin, setIsFocusWithin] = useState(false);
     const [isMouseWithin, setIsMouseWithin] = useState(false);
-    const [expanded, setExpanded] = useState<INavigationVariableItem | undefined>();
     const [shouldFocusFirstItem, setShouldFocusFirstItem] = useState(false);
     const [isHidden, setIsHidden] = useState(true);
 
-    const hoveredHasChildren = active && active.children?.length;
-    const isActive = forceMenuOpen || isFocusWithin || isMouseWithin;
-    const isExpanded = expanded !== undefined;
+    const onCloseRef = useRef<(() => void) | undefined>(onClose);
 
-    const titleBarRef = useRef<HTMLElement>(null);
+    const isExpanded = expanded && expanded.children?.length;
+    const isActive = isFocusWithin || isMouseWithin;
 
-    const measureTitleBar = useMeasure(titleBarRef, false, true);
+    const containerRef = useRef<HTMLElement>(null);
 
-    const menuHeight = measureTitleBar.height;
+    const containerDimensions = useMeasure(containerRef, false, true);
+
+    const menuHeight = containerDimensions.height;
     const yBounds = getCalcedHashOffset() + menuHeight;
 
     useEffect(() => {
-        if (expanded) {
-            if (onOpen) onOpen(expanded);
-            return () => {
-                if (onClose) onClose(expanded);
-            };
-        }
-    }, [expanded]);
+        onCloseRef.current = onClose;
+    }, [onClose]);
 
     useEffect(() => {
         if (isExpanded) {
@@ -102,28 +96,27 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     const focusFirstItem = useCallback(() => {
         if (shouldFocusFirstItem) {
-            const firstItem = titleBarRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`);
+            const firstItem = containerRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`);
             if (firstItem) {
                 firstItem?.focus();
                 setShouldFocusFirstItem(false);
             }
         }
-    }, [shouldFocusFirstItem, expanded, classes.menuItemChild, classes.menuItemTitle]);
+    }, [shouldFocusFirstItem, classes.menuItemChild]);
 
     useLayoutEffect(() => {
         focusFirstItem();
     }, [focusFirstItem]);
 
     useEffect(() => {
-        if (forceMenuOpen) {
-            setExpanded(forceMenuOpen);
-        } else if (hoveredHasChildren) {
-            setExpanded(active);
-        } else if (!isActive || (active && !active.children?.length)) {
-            const timeout = setTimeout(() => setExpanded(undefined), HIDE_TIMEOUT_MS);
+        if (!isActive) {
+            const onCloseCallback = onCloseRef.current;
+            const timeout = setTimeout(() => {
+                if (onCloseCallback) onCloseCallback();
+            }, HIDE_TIMEOUT_MS);
             return () => clearTimeout(timeout);
         }
-    }, [active, isFocusWithin, hoveredHasChildren, isActive]);
+    }, [isActive]);
 
     useEffect(() => {
         function onMouseMove(event: MouseEvent) {
@@ -141,26 +134,23 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
         setIsMouseWithin(false);
     }, [expanded]);
 
-    const containerPadding = containerVariables().spacing.padding * 2;
-
-    const spacingLeft = logoDimensions ? logoDimensions.width + containerPadding : undefined;
-
     function handleKeyPress(event: React.KeyboardEvent) {
-        if (titleBarRef.current === null || document.activeElement === null) {
+        if (containerRef.current === null || document.activeElement === null) {
             return;
         }
 
-        const tabHandler = new TabHandler(titleBarRef.current);
-        const nextElement = tabHandler.getNext(document.activeElement, false, false);
-        const prevElement = tabHandler.getNext(document.activeElement, true, false);
-        const parent = document.activeElement.closest('div[class^="titleBarMegaMenu-menuItem"]');
+        const tabHandler = new TabHandler(containerRef.current);
+        const target = event.target as HTMLElement;
+        const nextElement = tabHandler.getNext(target, false, false);
+        const prevElement = tabHandler.getNext(target, true, false);
+        const parent = target.closest('div[class^="titleBarMegaMenu-menuItem"]');
         const nextParentSibling = parent?.nextSibling as HTMLElement;
         const previousParentSibling = parent?.previousSibling as HTMLElement;
 
         switch (event.key) {
             case "Escape": {
                 event.preventDefault();
-                currentNavElement?.focus();
+                menuItem?.focus();
                 setIsMouseWithin(false);
                 break;
             }
@@ -174,13 +164,12 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
             case "ArrowUp": {
                 event.preventDefault();
+
                 if (!prevElement) {
-                    currentNavElement?.focus();
+                    menuItem?.focus();
                 } else {
                     prevElement?.focus();
                 }
-
-                setIsMouseWithin(false);
 
                 break;
             }
@@ -223,41 +212,43 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
         >
             <Container
                 ref={(ref) => {
-                    (titleBarRef as any).current = ref;
+                    (containerRef as any).current = ref;
                     focusFirstItem();
                 }}
-                style={{ paddingLeft: spacingLeft, width: `calc(100% - ${spacingLeft})` }}
+                style={{ paddingLeft: leftOffset - containerDimensions.left }}
                 className={classes.container}
                 fullGutter
             >
-                {expanded?.children.map((item, key) => (
+                {expanded?.children?.map((item, key) => (
                     <div key={key} className={classes.menuItem}>
-                        <>
-                            {!item.children.length ? (
+                        {!item.children.length ? (
+                            <TitleBarMegaMenuChild
+                                className={classes.menuItemChild}
+                                url={item.url}
+                                text={item.name}
+                                key={key}
+                                onKeyDown={(e) => handleKeyPress(e)}
+                            />
+                        ) : (
+                            <span className={classes.menuItemTitle}>{item.name}</span>
+                        )}
+
+                        <ul>
+                            {item.children.map((child, key) => (
                                 <TitleBarMegaMenuChild
                                     className={classes.menuItemChild}
-                                    url={item.url}
-                                    text={item.name}
+                                    url={child.url}
+                                    text={child.name}
                                     key={key}
                                     onKeyDown={(e) => handleKeyPress(e)}
                                 />
-                            ) : (
-                                <span className={classes.menuItemTitle}>{item.name}</span>
-                            )}
-
-                            <ul>
-                                {item.children.map((child, key) => (
-                                    <TitleBarMegaMenuChild
-                                        className={classes.menuItemChild}
-                                        url={child.url}
-                                        text={child.name}
-                                        key={key}
-                                        onKeyDown={(e) => handleKeyPress(e)}
-                                    />
-                                ))}
-                            </ul>
-                        </>
+                            ))}
+                        </ul>
                     </div>
+                ))}
+                {/* These items ensure that empty space in the row is filled */}
+                {[...Array(6).keys()].map((key) => (
+                    <span key={key} className={classes.fillerItem} />
                 ))}
             </Container>
         </div>

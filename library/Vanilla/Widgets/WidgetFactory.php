@@ -9,11 +9,15 @@ namespace Vanilla\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Contracts\Addons\WidgetInterface;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class for instantiating widgets.
  */
 class WidgetFactory implements \JsonSerializable {
+
+    use TwigRenderTrait;
 
     /** @var string */
     private $widgetClass;
@@ -80,5 +84,38 @@ class WidgetFactory implements \JsonSerializable {
         } else {
             throw new \Exception('Not implemented yet');
         }
+    }
+
+    /**
+     * Render a widget summary.
+     *
+     * @param array $parameters
+     * @return string
+     */
+    public function renderWidgetSummary(array $parameters): string {
+        $schema = $this->getSchema();
+        $widgetParameters = [];
+        foreach ($schema->getSchemaArray()['properties'] as $fieldName => $property) {
+            $form = $property['x-control'] ?? null;
+            if (!$form) {
+                continue;
+            }
+
+            $label = $form['label'];
+            $actualValue = $parameters[$fieldName] ?? $form['default'] ?? '(Default)';
+            $staticChoices = $form['choices']['staticOptions'] ?? null;
+            if ($staticChoices !== null && isset($staticChoices[$actualValue])) {
+                $actualValue = $staticChoices[$actualValue] ?? '(Unknown)';
+            }
+            $widgetParameters[] = [
+                'name' => $label,
+                'value' => $actualValue,
+            ];
+        }
+
+        return $this->renderTwig("@library/Vanilla/Widgets/WidgetFactorySummary.twig", [
+            'widgetName' => $this->getName(),
+            'parameters' => $widgetParameters,
+        ]);
     }
 }

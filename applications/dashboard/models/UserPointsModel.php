@@ -177,7 +177,7 @@ class UserPointsModel extends Model {
             \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(self::CONF_CACHE_TTL, self::DEFAULT_CACHE_TTL),
         ]);
 
-        $this->userModel->joinUsers($leaderData, ['UserID'], ['Join' => ['Name', 'Email', 'Photo', 'Title']]);
+        $this->userModel->joinUsers($leaderData, ['UserID'], ['Join' => ['Name', 'Email', 'Photo', 'Label']]);
 
         return $leaderData;
     }

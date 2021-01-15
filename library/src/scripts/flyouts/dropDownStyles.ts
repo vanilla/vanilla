@@ -5,27 +5,25 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import {
-    borders,
-    colorOut,
-    fonts,
-    margins,
-    paddings,
     buttonStates,
-    unit,
     userSelect,
     IStateSelectors,
     absolutePosition,
     negativeUnit,
     pointerEvents,
-    srOnly,
 } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { CSSObject } from "@emotion/css";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 
 export const notUserContent = "u-notUserContent";
 
@@ -48,10 +46,10 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     const metas = makeThemeVars("metas", {
-        font: {
+        font: Variables.font({
             size: globalVars.meta.text.size,
             color: globalVars.meta.text.color,
-        },
+        }),
         padding: {
             vertical: 6,
             horizontal: 14,
@@ -122,19 +120,23 @@ export const dropDownClasses = useThemeCache(() => {
         "contents",
         {
             position: "absolute",
-            minWidth: unit(vars.sizing.widths.default),
-            backgroundColor: colorOut(vars.contents.bg),
-            color: colorOut(vars.contents.fg),
+            minWidth: styleUnit(vars.sizing.widths.default),
+            backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
+            color: ColorsUtils.colorOut(vars.contents.fg),
             overflow: "auto",
-            ...borders(vars.contents.border),
-            ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders(vars.contents.border), shadows.dropDown()),
-            $nest: {
+            ...Mixins.border(vars.contents.border),
+            ...shadowOrBorderBasedOnLightness(
+                vars.contents.bg,
+                Mixins.border(vars.contents.border),
+                shadows.dropDown(),
+            ),
+            ...{
                 "&&": {
                     zIndex: 3,
-                    ...borders(vars.contents.border),
+                    ...Mixins.border(vars.contents.border),
                 },
                 "&.isMedium": {
-                    width: unit(vars.sizing.widths.medium),
+                    width: styleUnit(vars.sizing.widths.medium),
                 },
                 "&.isParentWidth": {
                     minWidth: "initial",
@@ -148,14 +150,14 @@ export const dropDownClasses = useThemeCache(() => {
                     right: 0,
                     top: 0,
                 },
-                "& .frame": {
+                ".frame": {
                     boxShadow: "none",
                 },
                 "&.noMinWidth": {
                     minWidth: 0,
                 },
                 "&.hasVerticalPadding": {
-                    ...paddings({
+                    ...Mixins.padding({
                         vertical: 12,
                         horizontal: important(0),
                     }),
@@ -163,7 +165,7 @@ export const dropDownClasses = useThemeCache(() => {
             },
         },
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&.isOwnWidth": {
                     width: percent(100),
                 },
@@ -172,8 +174,8 @@ export const dropDownClasses = useThemeCache(() => {
     );
 
     const asModal = style("asModal", {
-        $nest: {
-            "&.hasVerticalPadding": paddings({
+        ...{
+            "&.hasVerticalPadding": Mixins.padding({
                 vertical: 12,
             }),
         },
@@ -181,39 +183,39 @@ export const dropDownClasses = useThemeCache(() => {
 
     const likeDropDownContent = style("likeDropDownContent", {
         ...shadows.dropDown(),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...borders(vars.contents.border),
-    } as NestedCSSProperties);
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        ...Mixins.border(vars.contents.border),
+    });
 
     const items = style(
         "items",
         {
             padding: 0,
-            fontSize: unit(globalVars.fonts.size.medium),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
         },
         mediaQueries.oneColumnDown({
-            ...paddings({
+            ...Mixins.padding({
                 vertical: 9,
             }),
         }),
     );
 
     const metaItems = style("metaItems", {
-        $nest: {
+        ...{
             "&&": {
                 display: "block",
             },
         },
-        ...paddings(vars.metas.padding),
+        ...Mixins.padding(vars.metas.padding),
     });
 
     const metaItem = style("metaItem", {
-        $nest: {
+        ...{
             "& + &": {
-                paddingTop: unit(vars.item.padding.top),
+                paddingTop: styleUnit(vars.item.padding.top),
             },
         },
-        ...fonts(vars.metas.font),
+        ...Mixins.font(vars.metas.font),
     });
 
     // wrapping element
@@ -234,25 +236,25 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const toggleButtonIcon = style("toggleButtonIcon", {
-        $nest: {
+        ...{
             ...buttonStates({
                 allStates: {
-                    color: colorOut(globalVars.mainColors.primary),
+                    color: ColorsUtils.colorOut(globalVars.mainColors.primary),
                 },
             }),
         },
     });
 
     const action = style("action", {
-        $nest: {
+        ...{
             "&&": actionMixin(),
         },
     });
 
     const actionActive = style("actionActive", {
-        $nest: {
+        ...{
             "&&": {
-                color: important(colorOut(globalVars.links.colors.active)!),
+                color: important(ColorsUtils.colorOut(globalVars.links.colors.active)!),
                 fontWeight: important(globalVars.fonts.weights.bold) as any,
             },
         },
@@ -265,14 +267,14 @@ export const dropDownClasses = useThemeCache(() => {
 
     const separator = style("separator", {
         listStyle: "none",
-        height: unit(globalVars.separator.size),
-        backgroundColor: colorOut(globalVars.separator.color),
-        ...margins(vars.spacer.margin),
+        height: styleUnit(globalVars.separator.size),
+        backgroundColor: ColorsUtils.colorOut(globalVars.separator.color),
+        ...Mixins.margin(vars.spacer.margin),
         border: "none",
-        $nest: {
+        ...{
             "&:first-child": {
                 height: 0,
-                ...margins({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
+                ...Mixins.margin({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
             },
         },
     });
@@ -283,16 +285,16 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const panel = style("panel", {
-        backgroundColor: colorOut(vars.contents.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
         ...absolutePosition.fullSizeOfParent(),
         zIndex: 2,
     });
 
     const panelFirst = style("panelFirst", {
-        $nest: {
+        ...{
             // We want the initial view to have no left space
             "& li": {
-                paddingLeft: important(unit(0)),
+                paddingLeft: important(styleUnit(0)),
             },
             "&&": {
                 position: "relative",
@@ -303,14 +305,14 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const panelLast = style("panelLast", {
-        $nest: {
+        ...{
             "&&": {},
         },
     });
 
     const panelContent = style("panelContent", {
         flex: 1,
-        $nest: {
+        ...{
             "&.isNested": {},
         },
     });
@@ -320,23 +322,23 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const sectionHeading = style("sectionHeading", {
-        $nest: {
+        ...{
             "&&": {
-                color: colorOut(globalVars.meta.text.color),
-                fontSize: unit(globalVars.fonts.size.small),
+                color: ColorsUtils.colorOut(globalVars.meta.text.color),
+                fontSize: styleUnit(globalVars.fonts.size.small),
                 textTransform: "uppercase",
                 textAlign: "center",
                 fontWeight: globalVars.fonts.weights.semiBold,
-                ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
+                ...Mixins.padding(vars.sectionTitle.padding),
             },
-            [`& + .${sectionContents} li:first-child`]: { paddingTop: unit(vars.spacer.margin.vertical) },
+            [`& + .${sectionContents} li:first-child`]: { paddingTop: styleUnit(vars.spacer.margin.vertical) },
         },
     });
 
     const headingContentContainer = style("headingContentContainer", {
         display: "flex",
         alignItems: "center",
-        height: unit(44),
+        height: styleUnit(44),
     });
 
     const headingTitleContainer = style("headingTitleContainer", {
@@ -344,9 +346,9 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const arrow = style("arrow", {
-        $nest: {
+        ...{
             "&&": {
-                padding: unit(globalVars.gutter.quarter),
+                padding: styleUnit(globalVars.gutter.quarter),
             },
         },
     });
@@ -358,25 +360,25 @@ export const dropDownClasses = useThemeCache(() => {
     const backButton = style(
         "backButton",
         {
-            $nest: {
+            ...{
                 "&&": {
                     zIndex: 2,
-                    minHeight: unit(vars.item.minHeight),
+                    minHeight: styleUnit(vars.item.minHeight),
                     transform: "translateX(12px)",
                 },
             },
         },
         mediaQueries.oneColumnDown({
-            $nest: {
+            ...{
                 "&&": {
-                    minHeight: unit(vars.item.mobile.minHeight),
+                    minHeight: styleUnit(vars.item.mobile.minHeight),
                 },
             },
         }),
     );
 
     const count = style("count", {
-        fontSize: unit(globalVars.fonts.size.small),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         paddingLeft: "1em",
         marginLeft: "auto",
     });
@@ -384,45 +386,45 @@ export const dropDownClasses = useThemeCache(() => {
     const verticalPadding = style(
         "verticalPadding",
         {
-            ...paddings({
+            ...Mixins.padding({
                 vertical: vars.contents.padding.vertical,
                 horizontal: 0,
             }),
         },
         mediaQueries.oneColumnDown({
-            ...paddings({
+            ...Mixins.padding({
                 vertical: 0,
             }),
         }),
     );
 
     const noVerticalPadding = style("noVerticalPadding", {
-        ...paddings({ vertical: 0 }),
+        ...Mixins.padding({ vertical: 0 }),
     });
 
     const title = style("title", {
-        ...fonts({
+        ...Mixins.font({
             weight: globalVars.fonts.weights.semiBold,
             size: globalVars.fonts.size.medium,
             lineHeight: globalVars.lineHeights.condensed,
         }),
-        ...paddings({
+        ...Mixins.padding({
             all: 0,
         }),
-        ...margins({
+        ...Mixins.margin({
             all: 0,
         }),
         textAlign: "left",
         flexGrow: 1,
-        color: colorOut(vars.title.color),
+        color: ColorsUtils.colorOut(vars.title.color),
     });
 
     const paddedFrame = style("paddedFrame", {
-        ...paddings(vars.contents.padding),
+        ...Mixins.padding(vars.contents.padding),
     });
 
     const check = style("check", {
-        color: colorOut(globalVars.mainColors.primary),
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
 
         /// Check to fix icon alignment.
         transform: `translateX(4px)`,
@@ -435,7 +437,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const contentOffsetLeft = style("contentOffsetLeft", {
-        transform: `translateX(${unit(flyoutOffset)})`,
+        transform: `translateX(${styleUnit(flyoutOffset)})`,
     });
 
     const contentOffsetRight = style("contentOffsetRight", {
@@ -446,12 +448,12 @@ export const dropDownClasses = useThemeCache(() => {
     // without it being visible to the user until the calculation is complete
     const positioning = style("positioning", {
         ...pointerEvents(),
-        ...srOnly(),
+        ...Mixins.absolute.srOnly(),
     });
 
     const closeButton = style("closeButtonOffsetRight", {
         display: "inline-block",
-        marginRight: unit(12),
+        marginRight: styleUnit(12),
     });
 
     const itemButton = style("itemButton", {
@@ -502,7 +504,7 @@ export const dropDownClasses = useThemeCache(() => {
 
 // Contents (button or link)
 // Replaces: .dropDownItem-button, .dropDownItem-link
-export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProperties => {
+export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -515,17 +517,17 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
         alignItems: "center",
         width: percent(100),
         textAlign: "left",
-        minHeight: unit(vars.item.minHeight),
+        minHeight: styleUnit(vars.item.minHeight),
         lineHeight: globalVars.lineHeights.condensed,
-        ...paddings({
+        ...Mixins.padding({
             vertical: 4,
             horizontal: vars.item.padding.horizontal,
         }),
-        ...borders({
+        ...Mixins.border({
             color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
-        color: colorOut(vars.item.colors.fg),
+        color: ColorsUtils.colorOut(vars.item.colors.fg),
         ...userSelect("none"),
         ...buttonStates(
             {
@@ -534,29 +536,37 @@ export const actionMixin = (classBasedStates?: IStateSelectors): NestedCSSProper
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: important(colorOut(globalVars.states.hover.highlight) as string),
-                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.hover.contrast) : undefined,
+                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.hover.highlight) as string),
+                    color: globalVars.states.hover.contrast
+                        ? ColorsUtils.colorOut(globalVars.states.hover.contrast)
+                        : undefined,
                 },
                 focus: {
-                    backgroundColor: important(colorOut(globalVars.states.focus.highlight) as string),
-                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.focus.contrast) : undefined,
+                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.focus.highlight) as string),
+                    color: globalVars.states.hover.contrast
+                        ? ColorsUtils.colorOut(globalVars.states.focus.contrast)
+                        : undefined,
                 },
                 active: {
-                    backgroundColor: important(colorOut(globalVars.states.active.highlight) as string),
-                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.active.contrast) : undefined,
+                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.active.highlight) as string),
+                    color: globalVars.states.hover.contrast
+                        ? ColorsUtils.colorOut(globalVars.states.active.contrast)
+                        : undefined,
                 },
                 keyboardFocus: {
-                    borderColor: colorOut(globalVars.states.focus.highlight),
-                    color: globalVars.states.hover.contrast ? colorOut(globalVars.states.focus.contrast) : undefined,
+                    borderColor: ColorsUtils.colorOut(globalVars.states.focus.highlight),
+                    color: globalVars.states.hover.contrast
+                        ? ColorsUtils.colorOut(globalVars.states.focus.contrast)
+                        : undefined,
                 },
             },
             undefined,
             classBasedStates,
         ),
         ...mediaQueries.oneColumnDown({
-            fontSize: unit(vars.item.mobile.fontSize),
+            fontSize: styleUnit(vars.item.mobile.fontSize),
             fontWeight: globalVars.fonts.weights.semiBold,
-            minHeight: unit(vars.item.mobile.minHeight),
+            minHeight: styleUnit(vars.item.mobile.minHeight),
         }),
     };
 };

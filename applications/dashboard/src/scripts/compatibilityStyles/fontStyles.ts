@@ -6,13 +6,15 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { paddings, unit, EMPTY_SPACING } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
 import { siteNavVariables } from "@library/navigation/siteNavStyles";
 import { panelListVariables } from "@library/layout/panelListStyles";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const forumFontsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");
@@ -42,10 +44,9 @@ export const forumFontsVariables = useThemeCache(() => {
     });
 
     const panelTitle = makeThemeVars("panelTitle", {
-        margins: {
-            ...EMPTY_SPACING,
+        margins: Variables.spacing({
             bottom: navVars.spacer.default,
-        },
+        }),
     });
 
     return { fonts, panelLink, panelTitle };
@@ -57,13 +58,13 @@ export const fontCSS = () => {
     const inputVars = inputVariables();
 
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
-    const metaFg = colorOut(globalVars.meta.colors.fg);
+    const fg = ColorsUtils.colorOut(mainColors.fg);
+    const bg = ColorsUtils.colorOut(mainColors.bg);
+    const primary = ColorsUtils.colorOut(mainColors.primary);
+    const metaFg = ColorsUtils.colorOut(globalVars.meta.colors.fg);
 
     cssOut(`.Meta .MItem`, {
-        ...fonts(globalVars.meta.text),
+        ...Mixins.font(globalVars.meta.text),
     });
 
     cssOut(
@@ -78,11 +79,11 @@ export const fontCSS = () => {
 
     // Panel Headings
     cssOut(`.Panel h4, .Panel h3, .Panel h2`, {
-        ...paddings({
+        ...Mixins.padding({
             vertical: 0,
         }),
-        marginBottom: unit(panelListVariables().offset.default),
-        ...fonts({
+        marginBottom: styleUnit(panelListVariables().offset.default),
+        ...Mixins.font({
             size: vars.fonts.sizes.title,
             weight: globalVars.fonts.weights.bold,
         }),
@@ -96,7 +97,7 @@ export const fontCSS = () => {
         .BoxCategories.BoxCategories .PanelCategories li.Heading
     `,
         {
-            ...fonts({
+            ...Mixins.font({
                 size: vars.fonts.sizes.title,
                 weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
@@ -111,7 +112,7 @@ export const fontCSS = () => {
         .BoxCategories.BoxCategories .PanelCategories li.Depth2 a,
     `,
         {
-            ...fonts({
+            ...Mixins.font({
                 size: vars.fonts.sizes.base,
                 weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
@@ -134,7 +135,7 @@ export const fontCSS = () => {
         .BoxCategories.BoxCategories .PanelCategories li.Depth5 a
     `,
         {
-            ...fonts({
+            ...Mixins.font({
                 size: vars.fonts.sizes.base,
                 weight: globalVars.fonts.weights.normal,
                 lineHeight: globalVars.lineHeights.condensed,
@@ -143,7 +144,7 @@ export const fontCSS = () => {
     );
 
     for (let i = 1; i <= 12; i++) {
-        const offset = unit((i - 1) * vars.panelLink.spacer.default);
+        const offset = styleUnit((i - 1) * vars.panelLink.spacer.default);
         // Links
         cssOut(
             `
@@ -153,9 +154,9 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading[aria-level='${i}'],
         `,
             {
-                fontSize: unit(i === 1 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
+                fontSize: styleUnit(i === 1 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
                 paddingLeft: offset,
-                color: colorOut(globalVars.mainColors.fg),
+                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
             },
         );
 
@@ -165,7 +166,7 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading.Heading[aria-level='${i}'],
         `,
             {
-                fontSize: i === 1 ? unit(globalVars.fonts.size.large) : unit(globalVars.fonts.size.small),
+                fontSize: i === 1 ? styleUnit(globalVars.fonts.size.large) : styleUnit(globalVars.fonts.size.small),
                 paddingLeft: offset,
             },
         );
@@ -175,7 +176,7 @@ export const fontCSS = () => {
 export const forumTitleMixin = () => {
     const vars = forumFontsVariables();
     return {
-        ...fonts({
+        ...Mixins.font({
             size: vars.fonts.sizes.title,
         }),
         textDecoration: "none",

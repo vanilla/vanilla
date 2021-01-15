@@ -5,14 +5,17 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, fonts, importantUnit, margins, unit } from "@library/styles/styleHelpers";
-
+import { importantUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { calc, important, percent, translateY } from "csx";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { forumVariables } from "@library/forms/forumStyleVars";
+import { Mixins } from "@library/styles/Mixins";
 
 export const forumCategoriesVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumCategories");
@@ -33,7 +36,7 @@ export const categoriesCSS = () => {
     // Category list
 
     cssOut(`.DataList .Item .Title`, {
-        marginBottom: unit(4),
+        marginBottom: styleUnit(4),
     });
 
     cssOut(`.ItemContent.Category`, {
@@ -41,15 +44,15 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.categoryList-heading`, {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`.CategoryGroup`, {
-        marginTop: unit(globalVars.gutter.size * 2.5),
+        marginTop: styleUnit(globalVars.gutter.size * 2.5),
     });
 
     cssOut(`.Groups .DataTable.CategoryTable thead .CategoryName, .DataTable.CategoryTable thead .CategoryName`, {
-        paddingLeft: unit(layoutVars.cell.paddings.horizontal),
+        paddingLeft: styleUnit(layoutVars.cell.paddings.horizontal),
     });
 
     cssOut(
@@ -64,7 +67,7 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.CategoryNameHeading.isEmptyDescription`, {
-        minHeight: unit(vars.image.width),
+        minHeight: styleUnit(vars.image.width),
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -87,8 +90,8 @@ export const categoriesCSS = () => {
     cssOut(
         `.Groups .DataTable.CategoryTable tbody td.CategoryName .PhotoWrap, .DataTable.CategoryTable tbody td.CategoryName .PhotoWrap`,
         {
-            width: unit(vars.image.width),
-            height: unit(vars.image.width),
+            width: styleUnit(vars.image.width),
+            height: styleUnit(vars.image.width),
         },
     );
 
@@ -97,7 +100,7 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.CategoryBox .H`, {
-        ...fonts({
+        ...Mixins.font({
             size: globalVars.fonts.size.largeTitle,
             lineHeight: globalVars.lineHeights.condensed,
         }),
@@ -113,24 +116,24 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.CategoryBox-Head .H`, {
-        width: calc(`100% - ${unit(35)}`),
+        width: calc(`100% - ${styleUnit(35)}`),
     });
 
     cssOut(`.CategoryBox-Head .OptionsMenu`, {
         float: "none",
         transform: translateY(`-50%`),
-        ...margins({
+        ...Mixins.margin({
             horizontal: 0,
-            top: unit((globalVars.fonts.size.largeTitle * globalVars.lineHeights.condensed) / 2),
+            top: styleUnit((globalVars.fonts.size.largeTitle * globalVars.lineHeights.condensed) / 2),
             left: "auto",
         }),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading`, {
         paddingLeft: 0,
-        paddingTop: unit(18),
+        paddingTop: styleUnit(18),
         fontWeight: globalVars.fonts.weights.bold,
-        fontSize: unit(globalVars.fonts.size.large),
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading .Count`, {
@@ -138,12 +141,12 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1`, {
-        paddingTop: unit(18),
+        paddingTop: styleUnit(18),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1 a.ItemLink`, {
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: unit(globalVars.fonts.size.large),
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories li.Depth2 a.ItemLink`, {

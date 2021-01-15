@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
+use Vanilla\HostedJob\Driver\HostedDriverSlip;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 
@@ -34,16 +35,18 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
     }
 
     /**
-     * Get the status.
+     * GetStatus
      *
+     * @param bool $forceUpdate
      * @return JobExecutionStatus
      */
-    public function getStatus(): JobExecutionStatus {
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus {
         return JobExecutionStatus::failed();
     }
 
     /**
      * Get extended status.
+     *
      * @return array
      */
     public function getExtendedStatus(): array {
@@ -75,5 +78,32 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      */
     public function getErrorMessage(): ?string {
         return null;
+    }
+
+    /**
+     * GetTrackingId
+     *
+     * @return string|null
+     */
+    public function getTrackingId(): ?string {
+        return "unknown";
+    }
+
+    /**
+     * SetTrackingId
+     *
+     * @param string $trackingId
+     */
+    public function setTrackingId(string $trackingId): void {
+        // void
+    }
+
+    /**
+     * GetType
+     *
+     * @return string
+     */
+    public function getType(): string {
+        return "unknown";
     }
 }

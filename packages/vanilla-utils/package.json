@@ -7,6 +7,9 @@
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"
     },
+    "peerDependencies": {
+        "lodash": "*"
+    },
     "publishConfig": {
         "access": "public"
     }

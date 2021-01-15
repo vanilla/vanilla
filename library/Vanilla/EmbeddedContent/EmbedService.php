@@ -274,7 +274,9 @@ class EmbedService implements EmbedCreatorInterface {
         $factory = $this->getFactoryForUrl($url);
         $embed = $factory->createEmbedForUrl($url);
         $embed = $this->filterEmbed($embed);
-        $this->cache->cacheEmbed($embed);
+        if ($embed->isCacheable()) {
+            $this->cache->cacheEmbed($embed);
+        }
         return $embed;
     }
 

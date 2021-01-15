@@ -8,13 +8,14 @@ import * as React from "react";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/styles/metasStyles";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 
 interface IProps extends IFileAttachment {
@@ -45,7 +46,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         return (
             <EmbedContainer
                 size={EmbedContainerSize.SMALL}
-                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
+                className={classNames("attachment", "isLoading", this.props.className, EMBED_FOCUS_CLASS)}
                 aria-label={t("Uploading...")}
             >
                 <div

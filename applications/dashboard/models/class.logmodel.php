@@ -985,7 +985,7 @@ class LogModel extends Gdn_Pluggable {
 
                     // Unban a user.
                     if ($log['RecordType'] == 'User' && $log['Operation'] == 'Ban') {
-                        Gdn::userModel()->setField($iD, 'Banned', 0);
+                        Gdn::userModel()->save(["UserID" => $iD, "Banned" => 0]);
                     }
 
                     // Keep track of discussions and categories so that their counts can be recalculated.

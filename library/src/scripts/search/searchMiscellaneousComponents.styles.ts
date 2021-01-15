@@ -4,8 +4,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { fonts, unit, margins } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 
 export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("searchComponents");
@@ -26,12 +28,12 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        marginBottom: unit(vars.spacing.margin),
+        marginBottom: styleUnit(vars.spacing.margin),
     });
 
     const sort = style("sort", {
         display: "flex",
-        ...margins({
+        ...Mixins.margin({
             all: 0,
             right: globalVars.gutter.size,
         }),
@@ -40,8 +42,8 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
 
     const sortLabel = style("sortLabel", {
         alignSelf: "center",
-        marginRight: unit(6),
-        ...fonts({
+        marginRight: styleUnit(6),
+        ...Mixins.font({
             color: globalVars.meta.text.color,
             weight: globalVars.fonts.weights.normal,
         }),

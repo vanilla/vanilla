@@ -84,16 +84,37 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
      * @return Schema
      */
     public function getAttributesSchema(): Schema {
+        $notificationSchema = Schema::parse([
+            'name:s?',
+            'body:s?',
+            'format?' => new FormatSchema(),
+            'url:s?',
+        ]);
+
         $r = Schema::parse([
             'notification?' => [
-                'name:s?',
-                'body:s?',
-                'format?' => new FormatSchema(),
-                'url:s?',
+                'type' => 'object',
+                'properties' => [
+                    'approved?' => $notificationSchema,
+                    'denied?' => $notificationSchema,
+                    'communityManager?' => $notificationSchema,
+                ]
             ],
-            'link?' => [
+            'link:o?' => [
                 'name:s?',
                 'description:s?',
+            ],
+            'allowReapply' => [
+                'type' => 'boolean',
+                'default' => 'false'
+            ],
+            'notifyDenied' => [
+                'type' => 'boolean',
+                'default' => 'false'
+            ],
+            'notifyCommunityManager' => [
+                'type' => 'boolean',
+                'default' => 'false'
             ],
         ]);
         return $r;

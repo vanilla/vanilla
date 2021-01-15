@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { SearchService } from "@library/search/SearchService";
 import { t, onReady } from "@vanilla/library/src/scripts/utility/appUtils";
 import { TypePlacesIcon, TypeCategoriesIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { ISearchForm, ISearchResult } from "@vanilla/library/src/scripts/search/searchTypes";
@@ -13,7 +13,7 @@ import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFi
 import Result from "@vanilla/library/src/scripts/result/Result";
 import flatten from "lodash/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
-import { PLACES_CATEGORY_TYPE } from "@vanilla/library/src/scripts/search/searchConstants";
+import { PLACES_CATEGORY_TYPE, PLACES_DOMAIN_NAME } from "@vanilla/library/src/scripts/search/searchConstants";
 import { ResultMeta } from "@vanilla/library/src/scripts/result/ResultMeta";
 
 export function PlacesResultMeta(props: { searchResult: Partial<ISearchResult> }) {
@@ -26,11 +26,18 @@ export function PlacesResultMeta(props: { searchResult: Partial<ISearchResult> }
 
 export function registerPlaceSearchDomain() {
     onReady(() => {
-        SearchFormContextProvider.addPluggableDomain({
-            key: "places",
+        SearchService.addPluggableDomain({
+            key: PLACES_DOMAIN_NAME,
             name: t("Places"),
             sort: 3,
             icon: <TypePlacesIcon />,
+            getName: () => {
+                const subTypes = SearchService.getSubTypes().filter((subType) => subType.domain === PLACES_DOMAIN_NAME);
+                if (subTypes.length === 1) {
+                    return subTypes[0].label;
+                }
+                return t("Places");
+            },
             getAllowedFields: () => {
                 return ["description"];
             },
@@ -72,7 +79,8 @@ export function registerPlaceSearchDomain() {
             MetaComponent: PlacesResultMeta,
         });
 
-        SearchFormContextProvider.addSubType({
+        SearchService.addSubType({
+            domain: PLACES_DOMAIN_NAME,
             label: t("Categories"),
             icon: <TypeCategoriesIcon />,
             recordType: "category",

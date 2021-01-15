@@ -3,14 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { t } from "@library/utility/appUtils";
 import { simplifyFraction } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
 
 interface IProps extends IBaseEmbedProps {
@@ -47,7 +47,7 @@ export function VideoEmbed(props: IProps) {
             break;
         default:
             ratioClass = style({
-                $debugName: "isCustomRatio",
+                label: "isCustomRatio",
                 paddingTop: percent(((height || 3) / (width || 4)) * 100),
             });
     }

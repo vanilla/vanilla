@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { inputMixin } from "@library/forms/inputStyles";
-import { colorOut, importantColorOut } from "@library/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const themeInputTextClasses = useThemeCache(() => {
@@ -16,8 +17,8 @@ export const themeInputTextClasses = useThemeCache(() => {
     const style = styleFactory("themeInputText");
     const classesInput = inputBlockClasses();
     const root = style({
-        $nest: {
-            [`& .${classesInput.inputWrap}`]: {
+        ...{
+            [`.${classesInput.inputWrap}`]: {
                 margin: 0,
             },
             [`&& .${classesInput.errors}`]: {
@@ -25,14 +26,16 @@ export const themeInputTextClasses = useThemeCache(() => {
                 paddingRight: 0,
             },
             [`&&.hasError .${classesInput.inputText}`]: {
-                borderColor: importantColorOut(globalVariables().messageColors.error.fg),
-                color: colorOut(globalVariables().messageColors.error.fg),
-                backgroundColor: colorOut(globalVariables().messageColors.error.bg),
+                borderColor: ColorsUtils.colorOut(globalVariables().messageColors.error.fg, {
+                    makeImportant: true,
+                }),
+                color: ColorsUtils.colorOut(globalVariables().messageColors.error.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVariables().messageColors.error.bg),
             },
         },
     });
     const input = style("input", {
-        $nest: {
+        ...{
             [`&&.${classesInput.inputText}`]: inputMixin({
                 sizing: {
                     height: vars.input.height,

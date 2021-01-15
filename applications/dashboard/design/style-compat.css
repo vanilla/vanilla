@@ -793,11 +793,10 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 3px;
 }
 
-.form-group {
+.FormWrapper .form-group {
   margin-top: 6px;
   margin-bottom: 6px;
 }
-
 .FormWrapper .file-upload {
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1023,6 +1022,20 @@ body {
 }
 .userContent > *:not(.emoji):first-child:not(br):not(.embedExternal) {
   margin-top: -0.25em !important;
+}
+.userContent .embedResponsive {
+  margin-bottom: 0 !important;
+}
+.userContent .float-left, .userContent .float-right {
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.userContent .float-left .embedExternal-content, .userContent .float-right .embedExternal-content {
+  margin-bottom: 14px;
+}
+.userContent .embedExternal {
+  margin-bottom: 14px;
 }
 .userContent,
 .userContent h1,
@@ -1407,6 +1420,7 @@ body.isMobile .Popup.hasRichEditor .Border {
       -ms-flex-align: center;
           align-items: center;
   box-sizing: border-box;
+  clear: both;
 }
 
 .embedExternal-content {
@@ -1644,7 +1658,28 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedImage {
   width: 100%;
   max-width: 100%;
-  display: inline-block;
+  display: block;
+}
+@media (min-width: 550px) {
+  .embedImage:after {
+    content: "";
+    display: block;
+    height: 1px;
+  }
+  .embedImage.display-small .embedExternal-content {
+    max-width: calc(33.333% - 1px);
+  }
+  .embedImage.display-medium .embedExternal-content {
+    max-width: calc(66.666% - 1px);
+  }
+  .embedImage.float-left .embedExternal-content {
+    float: left;
+    margin-right: 20px;
+  }
+  .embedImage.float-right .embedExternal-content {
+    float: right;
+    margin-left: 20px;
+  }
 }
 
 .Message img .embedImage-img,
@@ -1676,14 +1711,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
-}
-
-.richEditor .embedImage-img:hover {
-  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
-}
-
-.richEditor .embed-isSelected .embedImage-img {
-  box-shadow: 0 0 0 2px #0291db;
 }
 
 /*!
@@ -2172,41 +2199,33 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 1em 0 1em 2em;
 }
 
-.userContent ol li {
+.userContent ol > li {
   list-style: decimal !important;
 }
-.userContent ol ol li {
+.userContent ol ol > li {
   list-style: lower-alpha !important;
 }
-.userContent ol ol ol li {
+.userContent ol ol ol > li {
   list-style: lower-roman !important;
 }
-.userContent ol ol ol ol li {
+.userContent ol ol ol ol > li {
   list-style: decimal !important;
 }
-.userContent ol ol ol ol ol li {
+.userContent ol ol ol ol ol > li {
   list-style: lower-alpha !important;
 }
-.userContent ol ol ol ol ol ol li {
+.userContent ol ol ol ol ol ol > li {
   list-style: lower-roman !important;
 }
-.userContent ol ol ol ol ol ol ol li {
+.userContent ol ol ol ol ol ol ol > li {
   list-style: decimal !important;
 }
 .userContent ol ol,
 .userContent ol ul {
   margin: 0 0 0 1em;
 }
-
-.userContent ul li {
-  list-style: none !important;
-  position: relative;
-}
-.userContent ul li::before {
-  content: "•";
-  font-family: "Arial", serif !important;
-  position: absolute;
-  left: -1em;
+.userContent ul > li {
+  list-style: disc !important;
 }
 .userContent ul ol,
 .userContent ul ul {

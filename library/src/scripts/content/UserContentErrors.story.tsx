@@ -7,7 +7,7 @@
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { EmbedRenderError } from "@library/embeddedContent/EmbedRenderError";
+import { EmbedRenderError } from "@library/embeddedContent/components/EmbedRenderError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";

@@ -8,12 +8,30 @@
 namespace VanillaTests\CivilTongueEx\Library;
 
 use CivilTongueEx\Library\ContentFilter;
+use Garden\Container\Container;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Class ContentFilterTest
  */
 class ContentFilterTest extends TestCase {
+
+    use SiteTestTrait;
+    use SetupTraitsTrait;
+
+    /** @var ContentFilter */
+    private static $contentFilter;
+
+    /**
+     * Get the names of addons to install.
+     *
+     * @return string[] Returns an array of addon names.
+     */
+    protected static function getAddons(): array {
+        return ['civiltongueex'];
+    }
 
     /**
      * Bootstrap ContentFilter
@@ -21,6 +39,17 @@ class ContentFilterTest extends TestCase {
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         require PATH_ROOT.'/plugins/CivilTongueEx/Library/ContentFilter.php';
+        self::setUpBeforeClassTestTraits();
+    }
+
+    /**
+     * Configure the container before addons are started.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        self::$contentFilter = new ContentFilter();
+        $container->setInstance(ContentFilter::class, self::$contentFilter);
     }
 
     /**
@@ -28,9 +57,7 @@ class ContentFilterTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-
-        $this->contentFilter = new ContentFilter();
-        $this->contentFilter->setReplacement('****');
+        $this->setUpTestTraits();
     }
 
     /**
@@ -42,9 +69,28 @@ class ContentFilterTest extends TestCase {
      * @dataProvider providePatternList
      */
     public function testReplace(string $patternList, string $text, string $expected) {
-        $this->contentFilter->setWords($patternList);
-        $result = $this->contentFilter->replace($text);
+        self::$contentFilter->setReplacement('****');
+        self::$contentFilter->setWords($patternList);
+        $result = self::$contentFilter->replace($text);
         $this->AssertSame($expected, $result);
+        self::$contentFilter->setStaticPatterns(null);
+    }
+
+    /**
+     * Test Civil Tongue via APIs for integration testing.
+     */
+    public function testActivityItems(): void {
+        self::$contentFilter->setReplacement('dog');
+        self::$contentFilter->setWords('cat');
+        $response = $this->bessy()->post('/activity/post/public', [
+            'Format' => 'Markdown',
+            'Comment' => 'cat food'
+        ]);
+        $activityID = $response->Data['Activities'][0]['ActivityID'] ?? null;
+        $this->assertNotNull($activityID);
+
+        $activity = $this->bessy()->getJsonData('/activity/item/' . $activityID);
+        $this->assertSame('dog food', $activity['Activities'][0]['Story']);
     }
 
     /**
@@ -61,6 +107,12 @@ class ContentFilterTest extends TestCase {
             'SwearStartsWithDollarSign' => ['poop;$hit;a$$', '$hit the text', '**** the text'],
             'SwearHasDollarSign' => ['poop;$hit;a$$', '$hithead the text', '$hithead the text'],
             'SwearHasCamelCase' => ['poop;$hit;a$$', 'PoOp the text', '**** the text'],
+            'Thai 1' => ['อี', 'อี', '****'],
+            'Thai 2' => ['อี เหี้ย', 'อี เหี้ย', '****'],
+            'Thai 3' => ['อี เหี้ย', 'อี เหี้ย', '****'],
+            'Thai 3 multiple ' => ['หน้าตัวเมีย;อี', 'หน้าตัวเมีย อี', '**** ****'],
+            'Thai 3 multiple eng' => ['หน้าตัวเมีย;อี;block', 'หน้าตัวเมีย อี block', '**** **** ****'],
+            'Thai 3 multiple eng 2' => ['หน้าตัวเมีย;อี;block', 'หน้าตัวเมีย อี block not blocked', '**** **** **** not blocked']
         ];
         return $provider;
     }

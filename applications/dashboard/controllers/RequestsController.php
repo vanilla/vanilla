@@ -9,6 +9,7 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Models\RoleRequestModel;
 use Vanilla\Dashboard\Models\RoleRequestsApiController;
+use Vanilla\Exception\FeatureNotEnabledException;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -81,6 +82,9 @@ class RequestsController extends \Gdn_Controller {
      * Handle the `/requests/role-applications` endpoint.
      *
      * @param int|string $role The role ID or name.
+     * @throws Gdn_UserException Throw user errors.
+     * @throws NotFoundException No roleID or invalid roleID.
+     * @throws FeatureNotEnabledException Restrict feature to instances with the flag in the config.
      */
     public function roleApplications($role): void {
         \Vanilla\FeatureFlagHelper::ensureFeature(ManageController::FEATURE_ROLE_APPLICATIONS);
@@ -107,7 +111,8 @@ class RequestsController extends \Gdn_Controller {
                     'type' => RoleRequestModel::TYPE_APPLICATION,
                 ])->getData()[0] ?? null;
             $this->setData('roleRequest', $application);
-            if (!empty($application)) {
+            $canReApply =  (!empty($meta['attributes']['allowReapply']) && $application['status'] === RoleRequestModel::STATUS_DENIED);
+            if (!empty($application) && !$canReApply) {
                 $state = 'alreadyApplied';
             } else {
                 $state = 'apply';

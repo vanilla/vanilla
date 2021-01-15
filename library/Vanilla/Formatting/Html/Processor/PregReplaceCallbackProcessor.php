@@ -21,21 +21,24 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
     /** @var Callable $callback */
     private $callback;
 
+    /** @var bool $escapeHtml */
+    private $escapeHtml;
+
     /** @var array $attributes */
     private $attributes;
 
     /**
      * PregReplaceCallbackProcessor constructor.
      *
-     * @param HtmlDocument $document
      * @param array $pattern
      * @param callable $callback
-     * @param array $attributes
+     * @param bool $escapeHtml
+     * @param ?array $attributes
      */
-    public function __construct(HtmlDocument $document, array $pattern, callable $callback, ?array $attributes = []) {
-        parent::__construct($document);
+    public function __construct(array $pattern, callable $callback, bool $escapeHtml = true, ?array $attributes = []) {
         $this->setPattern($pattern);
         $this->setCallback($callback);
+        $this->setEscapeHtml($escapeHtml);
         $this->setAttributes($attributes);
     }
 
@@ -44,19 +47,21 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
      *
      * @return HtmlDocument
      */
-    public function processDocument(): HtmlDocument {
-        $this->applyPregReplaceProcessor();
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        $this->applyPregReplaceProcessor($document);
+        return $document;
     }
 
     /**
      * Apply DomUtils::pregReplaceCallback()
+     *
+     * @param HtmlDocument $document
      */
-    public function applyPregReplaceProcessor() {
+    public function applyPregReplaceProcessor(HtmlDocument $document) {
         if (empty($this->attributes)) {
-            DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback);
+            DomUtils::pregReplaceCallback($document->getDom(), $this->pattern, $this->callback);
         } else {
-            DomUtils::pregReplaceCallback($this->document->getDom(), $this->pattern, $this->callback, $this->attributes);
+            DomUtils::pregReplaceCallback($document->getDom(), $this->pattern, $this->callback, $this->escapeHtml, $this->attributes);
         }
     }
 
@@ -68,6 +73,17 @@ class PregReplaceCallbackProcessor extends HtmlProcessor {
      */
     private function setPattern($pattern) {
         $this->pattern = $pattern;
+        return $this;
+    }
+
+    /**
+     * Set escapeHtml
+     *
+     * @param bool $escapeHtml
+     * @return $this
+     */
+    private function setEscapeHtml(bool $escapeHtml) {
+        $this->escapeHtml = $escapeHtml;
         return $this;
     }
 

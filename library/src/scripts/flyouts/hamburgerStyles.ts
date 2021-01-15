@@ -5,9 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { negative, paddings, unit } from "@library/styles/styleHelpers";
+import { negative } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent } from "csx";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
@@ -30,50 +32,50 @@ export const hamburgerClasses = useThemeCache(() => {
     const root = style({});
     const formElVars = formElementsVariables();
     const content = style({
-        $nest: {
-            "& .Navigation-row": {
+        ...{
+            ".Navigation-row": {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
             },
-            "& .NewDiscussion": {
+            ".NewDiscussion": {
                 width: percent(100),
             },
-            "& .BoxButtons": {
+            ".BoxButtons": {
                 width: percent(100),
             },
-            "& .ButtonGroup.Multi": {
+            ".ButtonGroup.Multi": {
                 maxWidth: percent(100),
             },
-            "& .Dropdown.MenuItems": {
-                $nest: {
+            ".Dropdown.MenuItems": {
+                ...{
                     "&&": {
                         top: percent(100),
                     },
                 },
             },
 
-            "& .ButtonGroup.NewDiscussion.Multi": {
+            ".ButtonGroup.NewDiscussion.Multi": {
                 display: "flex",
                 flexWrap: "wrap",
-                $nest: {
-                    "& .Button.Primary": {
+                ...{
+                    ".Button.Primary": {
                         position: "relative",
                     },
-                    "& .Button.Handle": {
+                    ".Button.Handle": {
                         position: "relative",
-                        width: unit(formElVars.sizing.height),
-                        height: unit(formElVars.sizing.height),
-                        marginLeft: unit(negative(formElVars.sizing.height)),
+                        width: styleUnit(formElVars.sizing.height),
+                        height: styleUnit(formElVars.sizing.height),
+                        marginLeft: styleUnit(negative(formElVars.sizing.height)),
                         borderTopLeftRadius: important(0),
                         borderBottomLeftRadius: important(0),
                     },
-                    "& .Dropdown.MenuItems": {
+                    ".Dropdown.MenuItems": {
                         position: "relative",
                         maxWidth: percent(100),
-                        marginTop: unit(negative(formElVars.border.width)),
+                        marginTop: styleUnit(negative(formElVars.border.width)),
                     },
-                    "& .mobileFlyoutOverlay": {
+                    ".mobileFlyoutOverlay": {
                         position: "relative",
                         height: "auto",
                         background: "none",
@@ -85,16 +87,16 @@ export const hamburgerClasses = useThemeCache(() => {
 
     const closeButton = style("closeButton", {
         position: "absolute",
-        top: unit(globalVars.gutter.half),
-        right: unit(globalVars.gutter.half),
+        top: styleUnit(globalVars.gutter.half),
+        right: styleUnit(globalVars.gutter.half),
         zIndex: 10,
     });
 
     const spacer = (count: number) => {
         const formElVars = formElementsVariables();
         return style("spacer", {
-            height: unit(1),
-            width: count ? unit(count * formElVars.sizing.height) : unit(formElVars.sizing.height * 2),
+            height: styleUnit(1),
+            width: count ? styleUnit(count * formElVars.sizing.height) : styleUnit(formElVars.sizing.height * 2),
         });
     };
 

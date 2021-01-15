@@ -16,9 +16,8 @@ class SchedulerControlMeta {
      * @var int
      * Minimum amount of time between to consecutive cron run
      */
-
-    /** @var int */
     protected $lockTime;
+
     /** @var string */
     protected $hostname;
 

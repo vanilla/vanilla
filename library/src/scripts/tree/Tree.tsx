@@ -92,30 +92,28 @@ export default function Tree<D = {}>(props: Props<D>) {
                 return flatItem.path;
             };
 
-            const renderDraggableItem = (flatItem: IFlattenedItem<D>) => (
-                provided: DraggableProvided,
-                snapshot: DraggableStateSnapshot,
-            ) => {
-                const currentPath: Path = calculateEffectivePath(flatItem, snapshot);
-                if (snapshot.isDropAnimating) {
-                    expandTimer.stop();
-                }
-                return (
-                    <TreeItem
-                        item={flatItem.item}
-                        path={currentPath}
-                        offsetPerLevel={offsetPerLevel}
-                        onExpand={onExpand}
-                        onCollapse={onCollapse}
-                        renderItem={props.renderItem}
-                        provided={provided}
-                        snapshot={snapshot}
-                        itemRef={(itemId, element) => {
-                            itemRef.current[itemId] = element;
-                        }}
-                    />
-                );
-            };
+            const renderDraggableItem = (flatItem: IFlattenedItem<D>) =>
+                function DraggableItem(provided: DraggableProvided, snapshot: DraggableStateSnapshot) {
+                    const currentPath: Path = calculateEffectivePath(flatItem, snapshot);
+                    if (snapshot.isDropAnimating) {
+                        expandTimer.stop();
+                    }
+                    return (
+                        <TreeItem
+                            item={flatItem.item}
+                            path={currentPath}
+                            offsetPerLevel={offsetPerLevel}
+                            onExpand={onExpand}
+                            onCollapse={onCollapse}
+                            renderItem={props.renderItem}
+                            provided={provided}
+                            snapshot={snapshot}
+                            itemRef={(itemId, element) => {
+                                itemRef.current[itemId] = element;
+                            }}
+                        />
+                    );
+                };
 
             return (
                 <Draggable

@@ -25,7 +25,7 @@ import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { StorySmallContent } from "@library/storybook/StorySmallContent";
 import { FormToggle } from "@library/forms/FormToggle";
 import { flexHelper } from "@library/styles/styleHelpers";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 
 const story = storiesOf("Forms/User Facing", module);

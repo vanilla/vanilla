@@ -7,8 +7,8 @@ import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users"
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { UserLabel } from "@library/content/UserLabel";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
 import { DiscussionIcon, RightChevronIcon } from "@library/icons/common";

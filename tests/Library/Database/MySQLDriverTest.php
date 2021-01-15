@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\MinMax;
 use Vanilla\Schema\RangeExpression;
@@ -111,6 +112,31 @@ class MySQLDriverTest extends TestCase {
     public function testMapAliases($input, $expected, $escape = true) {
         $aliases = $this->sql->mapAliases($input, $escape);
         $this->assertSame($aliases, $expected);
+    }
+
+    /**
+     * Test escapeField.
+     *
+     * @param string $input Input field
+     * @param string|array $expected Expected result
+     * @dataProvider provideEscapeData
+     */
+    public function testEscapeField(string $input, $expected): void {
+        $result = $this->sql->escapeField($input);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provide data to escape.
+     *
+     * @return array
+     */
+    public function provideEscapeData(): array {
+        return [
+            ["abc_c", "abc\_c"],
+            ["abc%c", "abc\%c"],
+            ["ab\c", "ab\\\\c"],
+        ];
     }
 
     /**
@@ -397,5 +423,37 @@ where `foo` not in ('a', 'b')
 SQL;
 
         $this->assertSame($expected, $sql);
+    }
+
+    /**
+     * Test the history method
+     */
+    public function testHistory() {
+        $ts = strtotime('January 1, 2020');
+        $dateString = date('Y-m-d H:i:s', $ts);
+        CurrentTimeStamp::mockTime($ts);
+        $userId = (int) \Gdn::session()->UserID;
+
+        $bothParams = $this->sql->history(true, true)->namedParameters();
+        $insertParams = $this->sql->history(false, true)->namedParameters();
+        $updateParams = $this->sql->history(true, false)->namedParameters();
+
+        $this->assertArrayHasKey(':DateInserted', $bothParams);
+        $this->assertArrayHasKey(':DateUpdated', $bothParams);
+        $this->assertArrayHasKey(':InsertUserID', $bothParams);
+        $this->assertArrayHasKey(':UpdateUserID', $bothParams);
+        $this->assertArrayHasKey(':DateInserted', $insertParams);
+        $this->assertArrayHasKey(':InsertUserID', $insertParams);
+        $this->assertArrayHasKey(':DateUpdated', $updateParams);
+        $this->assertArrayHasKey(':UpdateUserID', $updateParams);
+        $this->assertSame($dateString, $bothParams[':DateInserted']);
+        $this->assertSame($dateString, $bothParams[':DateUpdated']);
+        $this->assertSame($userId, $bothParams[':InsertUserID']);
+        $this->assertSame($userId, $bothParams[':UpdateUserID']);
+        $this->assertSame($dateString, $insertParams[':DateInserted']);
+        $this->assertSame($userId, $insertParams[':InsertUserID']);
+        $this->assertSame($dateString, $updateParams[':DateUpdated']);
+        $this->assertSame($userId, $updateParams[':UpdateUserID']);
+        CurrentTimeStamp::clearMockTime();
     }
 }

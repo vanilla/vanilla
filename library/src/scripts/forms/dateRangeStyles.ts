@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("dateRange");
 
     const input = style("input", {
-        width: unit(136),
+        width: styleUnit(136),
         maxWidth: percent(100),
     });
 
@@ -28,9 +29,9 @@ export const dateRangeClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "space-between",
         width: percent(100),
-        $nest: {
+        ...{
             "& + &": {
-                marginTop: unit(12),
+                marginTop: styleUnit(12),
             },
         },
     });
@@ -41,7 +42,7 @@ export const dateRangeClasses = useThemeCache(() => {
         wordBreak: "break-word",
         textOverflow: "ellipsis",
         maxWidth: percent(100),
-        paddingLeft: unit(8),
+        paddingLeft: styleUnit(8),
     });
 
     return {

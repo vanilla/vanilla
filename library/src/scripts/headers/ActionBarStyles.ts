@@ -4,13 +4,15 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { unit, colorOut } from "@library/styles/styleHelpers";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { margins } from "@library/styles/styleHelpers";
 import { em, percent, px } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const actionBarClasses = useThemeCache(() => {
     const style = styleFactory("actionBar");
@@ -26,12 +28,12 @@ export const actionBarClasses = useThemeCache(() => {
             justifyContent: "flex-end",
             alignItems: "center",
             width: percent(100),
-            height: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
             listStyle: "none",
             margin: 0,
         },
         mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
@@ -39,22 +41,21 @@ export const actionBarClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        $nest: {
+        ...{
             "&.isPullLeft": {
-                ...margins({
+                ...Mixins.margin({
                     left: 0,
                     right: "auto",
                 }),
                 justifyContent: "flex-start",
             },
             "&.isPullRight": {
-                ...margins({
+                ...Mixins.margin({
                     left: "auto",
                     right: 0,
                 }),
                 justifyContent: "flex-end",
-
-                $nest: {
+                ...{
                     "& button": {
                         fontSize: globalVars.fonts.size.medium,
                     },
@@ -64,8 +65,8 @@ export const actionBarClasses = useThemeCache(() => {
     });
 
     const itemMarginLeft = style("itemMarginLeft", {
-        marginLeft: unit(globalVars.gutter.half),
-        $nest: {
+        marginLeft: styleUnit(globalVars.gutter.half),
+        ...{
             "& button": {
                 fontSize: globalVars.fonts.size.medium,
             },
@@ -74,13 +75,13 @@ export const actionBarClasses = useThemeCache(() => {
 
     const centreColumn = style("centreColumn", {
         flexGrow: 1,
-        ...margins({
-            horizontal: unit(globalVars.spacer.size),
+        ...Mixins.margin({
+            horizontal: styleUnit(globalVars.spacer.size),
         }),
     });
 
     const callToAction = style("callToAction", {
-        color: colorOut(globalVars.mainColors.primary),
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         fontWeight: globalVars.fonts.weights.semiBold,
         whiteSpace: "nowrap",
     });
@@ -91,11 +92,10 @@ export const actionBarClasses = useThemeCache(() => {
     });
 
     const backLink = style("backLink", {
-        $nest: {
+        ...{
             "&&": {
                 marginRight: "auto",
-
-                $nest: {
+                ...{
                     "& a": {
                         textDecoration: "none",
                     },
@@ -122,7 +122,7 @@ export const actionBarClasses = useThemeCache(() => {
     });
 
     const anotherCallToAction = style("anotherCallToAction", {
-        paddingRight: unit(10),
+        paddingRight: styleUnit(10),
     });
 
     return {

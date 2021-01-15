@@ -10,7 +10,7 @@ import { t } from "@vanilla/i18n";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
 import { logWarning } from "@vanilla/utils";
 import { Spring, animated, config as springConfig } from "react-spring/renderprops";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { ThemeBuilderUpload } from "@library/forms/themeEditor/ThemeBuilderUpload";
 
 interface IProps {

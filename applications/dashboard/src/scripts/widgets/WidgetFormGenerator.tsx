@@ -18,6 +18,7 @@ interface IPartialProps {
 
     // The value of the subset of the form.
     instance: any;
+    isRequired?: boolean;
 
     // The root value of the form.
     rootInstance: any;
@@ -27,6 +28,7 @@ interface IPartialProps {
 function WidgetPartialSchemaForm(props: IPartialProps) {
     const { schema, path, instance, rootInstance, onChange } = props;
     if (schema.type === "object") {
+        const requiredProperties = schema.required ?? [];
         return (
             <>
                 {Object.entries(schema.properties).map(([key, value]) => (
@@ -39,6 +41,7 @@ function WidgetPartialSchemaForm(props: IPartialProps) {
                         onChange={(value) => {
                             onChange({ ...instance, [key]: value });
                         }}
+                        isRequired={requiredProperties.includes(key)}
                     />
                 ))}
             </>
@@ -63,6 +66,7 @@ function WidgetPartialSchemaForm(props: IPartialProps) {
                             value={instance}
                             schema={schema}
                             onChange={onChange}
+                            isRequired={props.isRequired}
                         />
                     </DashboardFormGroup>
                 );

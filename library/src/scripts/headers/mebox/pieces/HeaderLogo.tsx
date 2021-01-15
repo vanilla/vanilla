@@ -8,7 +8,8 @@ import React from "react";
 import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
 import { formatUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
-import { titleBarLogoClasses, titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarLogoClasses } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import classNames from "classnames";
 import { navigationVariables } from "@library/headers/navigationVariables";
 

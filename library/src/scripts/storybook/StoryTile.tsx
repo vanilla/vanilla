@@ -5,11 +5,10 @@
  */
 
 import React from "react";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { ColorValues, margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import classNames from "classnames";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { ColorHelper } from "csx";
 
 export interface IStoryTileProps {
     mouseOverText?: string;
@@ -17,7 +16,7 @@ export interface IStoryTileProps {
     type?: string;
     scaleContents?: number;
     tag?: string;
-    backgroundColor?: ColorValues;
+    backgroundColor?: ColorHelper;
 }
 
 /**

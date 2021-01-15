@@ -521,7 +521,9 @@ class ConversationsApiController extends AbstractApiController {
             $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
         }
 
-        $dbRecord['body'] = isset($dbRecord['LastBody'])
+        $lastBody = $dbRecord['LastBody'] ?? '';
+
+        $dbRecord['body'] = $lastBody
             ? Gdn::formatService()->renderPlainText($dbRecord['LastBody'], $dbRecord['LastFormat'])
             : t('No messages.');
 

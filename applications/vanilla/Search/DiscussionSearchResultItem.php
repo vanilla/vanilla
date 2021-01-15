@@ -27,7 +27,8 @@ class DiscussionSearchResultItem extends SearchResultItem {
     protected function extraSchema(): ?Schema {
         return Schema::parse([
             'discussionID:i?',
-            'tagIDs:a?'
+            'tagIDs:a?',
+            'labelCodes:a?',
         ]);
     }
 

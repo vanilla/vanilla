@@ -8,7 +8,7 @@ import { Optionalize } from "@library/@types/utils";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 
 export enum TitleBarDevices {
     COMPACT = "compact",

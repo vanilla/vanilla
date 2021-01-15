@@ -3,11 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { viewHeight } from "csx";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, defaultTransition, absolutePosition, borders } from "@library/styles/styleHelpers";
+import { defaultTransition, absolutePosition } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 
 export const textEditorVariables = useThemeCache(() => {
     const makeTextEditorVars = variableFactory("textEditor");
@@ -32,31 +35,34 @@ export const textEditorClasses = useThemeCache(() => {
     const style = styleFactory("textEditor");
     const globalVars = globalVariables();
 
-    const root = (theme: string, minimal?: boolean) => {
+    const root = (theme: string, minimal?: boolean, noPadding?: boolean) => {
         return style({
             transition: "backgroundColor 0.25s ease",
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
             height: minimal ? "300px" : viewHeight(90),
-            backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),
+            backgroundColor:
+                theme === "vs-dark"
+                    ? ColorsUtils.colorOut("#1E1E1E")
+                    : ColorsUtils.colorOut(globalVars.elementaryColors.white),
             position: "relative",
-            paddingTop: unit(vars.editorPadding.padding.top),
-            paddingLeft: minimal ? 0 : unit(vars.editorPadding.padding.left),
-            $nest: {
-                "& .decorationsOverviewRuler": {
+            paddingTop: styleUnit(vars.editorPadding.padding.top),
+            paddingLeft: minimal || noPadding ? 0 : styleUnit(vars.editorPadding.padding.left),
+            ...{
+                ".decorationsOverviewRuler": {
                     display: "none",
                 },
-                "& .monaco-editor .overflow-guard": {
+                ".monaco-editor .overflow-guard": {
                     borderRadius: 6,
                 },
-                "& .monaco-editor": {
+                ".monaco-editor": {
                     borderRadius: 6,
                 },
             },
             ...(minimal
                 ? {
-                      ...borders(),
+                      ...Mixins.border(),
                   }
                 : {}),
         });
@@ -76,7 +82,10 @@ export const textEditorClasses = useThemeCache(() => {
     const colorChangeOverlay = (theme) =>
         style("colorChangeOverlay", {
             ...absolutePosition.fullSizeOfParent(),
-            backgroundColor: theme === "vs-dark" ? colorOut("#1E1E1E") : colorOut(globalVars.elementaryColors.white),
+            backgroundColor:
+                theme === "vs-dark"
+                    ? ColorsUtils.colorOut("#1E1E1E")
+                    : ColorsUtils.colorOut(globalVars.elementaryColors.white),
         });
 
     return {

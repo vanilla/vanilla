@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import { inputBlockClasses } from "@vanilla/library/src/scripts/forms/InputBlockStyles";
 import { dateRangeClasses } from "@vanilla/library/src/scripts/forms/dateRangeStyles";
 import { FilterFrame } from "@vanilla/library/src/scripts/search/panels/FilterFrame";

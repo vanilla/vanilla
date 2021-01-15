@@ -1990,7 +1990,7 @@ class ActivityModel extends Gdn_Model {
         $result = [];
         $options = [
             "DisableFloodControl" => true,
-            "QueueEmail" => true,
+            "QueueEmail" => $batchEmails,
         ];
 
         if (Gdn_Cache::activeEnabled()) {

@@ -188,18 +188,12 @@ components:
           description: Customize the notification sent when a role is approved.
           type: object
           properties:
-            name:
-              description: Override the notification subject.
-              type: string
-            body:
-              description: Override the notification body.
-              type: string
-            format:
-              $ref: '#/components/schemas/Format'
-            url:
-              description: Overide the notification URL.
-              type: string
-              format: uri
+            approved:
+              $ref: '#/components/schemas/RoleRequestMetaNotification'
+            denied:
+              $ref: '#/components/schemas/RoleRequestMetaNotification'
+            communityManager:
+              $ref: '#/components/schemas/RoleRequestMetaNotification'
         link:
           description: Customize the request link display.
           type: object
@@ -210,3 +204,19 @@ components:
             description:
               description: Give a link description.
               type: string
+    RoleRequestMetaNotification:
+      type: object
+      properties:
+        name:
+          description: Override the notification subject.
+          type: string
+          minLength: 1
+        body:
+          description: Override the notification body.
+          type: string
+        format:
+          $ref: '#/components/schemas/Format'
+        url:
+          description: Overide the notification URL.
+          type: string
+          format: uri

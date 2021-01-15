@@ -625,7 +625,12 @@ if (!function_exists('validateMinTextLength')) {
      */
     function validateMinTextLength($value, $field, $post) {
         if (isset($post['Format'])) {
+            $original = $value;
             $value = Gdn::formatService()->renderPlainText($value, $post['Format']);
+            // We need to simulate non-empty string if initial value was not empty
+            if (!empty($original) && empty($value)) {
+                $value = '.';
+            }
         }
 
         $value = html_entity_decode(trim(strip_tags($value)));

@@ -1,9 +1,10 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { forumVariables } from "@library/forms/forumStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { absolutePosition } from "@library/styles/styleHelpersPositioning";
-import { unit, importantUnit } from "@library/styles/styleHelpers";
+import { importantUnit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const userCardDiscussionPlacement = () => {
     const discussionItemPadding = globalVariables().itemList.padding;
@@ -59,7 +60,7 @@ export const userCardDiscussionPlacement = () => {
         .DataList.Discussions .ItemIdea.ItemIdea .Discussion.ItemContent
         `,
         {
-            paddingLeft: unit(userPhotoVars.sizing.medium + formVars.spacer.size / 2),
+            paddingLeft: styleUnit(userPhotoVars.sizing.medium + formVars.spacer.size / 2),
         },
     );
 
@@ -67,7 +68,7 @@ export const userCardDiscussionPlacement = () => {
     cssOut(
         `.DataList.Discussions .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto.ItemIdea .Discussion.ItemContent`,
         {
-            paddingLeft: unit(userPhotoVars.sizing.medium + formVars.spacer.size + formVars.countBox.width),
+            paddingLeft: styleUnit(userPhotoVars.sizing.medium + formVars.spacer.size + formVars.countBox.width),
         },
     );
 };

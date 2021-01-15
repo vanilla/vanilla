@@ -130,16 +130,22 @@ class DiscussionsController extends VanillaController {
         $categoryModel = new CategoryModel();
         $followingEnabled = $categoryModel->followingEnabled();
         if ($followingEnabled) {
-            $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-            $followed = paramPreference(
-                'followed',
-                'FollowedDiscussions',
-                'Vanilla.SaveFollowingPreference',
-                null,
-                $saveFollowing
-            );
-            if (strpos($this->SelfUrl, "discussions") !== false) {
-                $this->enableFollowingFilter = true;
+
+            // some other controller has already set this value, so just take what's there
+            if (array_key_exists('EnableFollowingFilter', $this->Data)) {
+                $this->enableFollowingFilter = $this->data('EnableFollowingFilter');
+            } else {
+                $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+                $followed = paramPreference(
+                    'followed',
+                    'FollowedDiscussions',
+                    'Vanilla.SaveFollowingPreference',
+                    null,
+                    $saveFollowing
+                );
+                if (strpos($this->SelfUrl, "discussions") !== false) {
+                    $this->enableFollowingFilter = true;
+                }
             }
         } else {
             $followed = false;

@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { IIconSizes } from "@library/styles/cssUtilsTypes";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const vars = globalVariables(forcedVars);
-    const varsLayouts = layoutVariables(forcedVars);
     const makeThemeVars = variableFactory("formElements", forcedVars);
 
     const mixBgAndFg = vars.mixBgAndFg;
@@ -55,9 +56,9 @@ export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables
     });
 
     const errorSpacing = makeThemeVars("errorSpacing", {
-        horizontalPadding: varsLayouts.gutter.size,
-        verticalPadding: varsLayouts.gutter.size,
-        verticalMargin: varsLayouts.gutter.halfSize,
+        horizontalPadding: vars.constants.fullGutter,
+        verticalPadding: vars.constants.fullGutter,
+        verticalMargin: vars.constants.fullGutter / 2,
     });
 
     const placeholder = makeThemeVars("placeholder", {
@@ -106,8 +107,8 @@ export const accessibleErrorClasses = useThemeCache(() => {
         alignItems: "center",
     });
     const paragraph = style("paragraph", {
-        color: colorOut(globalVars.messageColors.error.fg),
-        fontSize: unit(globalVars.fonts.size.small),
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        fontSize: styleUnit(globalVars.fonts.size.small),
     });
 
     return {
@@ -122,9 +123,9 @@ export const formErrorClasses = useThemeCache(() => {
     const vars = formElementsVariables();
 
     const root = style({
-        backgroundColor: colorOut(varsGlobal.messageColors.error.fg),
-        color: colorOut(varsGlobal.messageColors.error.fg),
-        marginBottom: unit(16),
+        backgroundColor: ColorsUtils.colorOut(varsGlobal.messageColors.error.fg),
+        color: ColorsUtils.colorOut(varsGlobal.messageColors.error.fg),
+        marginBottom: styleUnit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,
         paddingTop: vars.errorSpacing.verticalPadding,
@@ -140,7 +141,7 @@ export const formErrorClasses = useThemeCache(() => {
     });
 
     const actionButton = style("button", {
-        marginLeft: unit(12),
+        marginLeft: styleUnit(12),
     });
 
     const activeButton = style("activeButton", {

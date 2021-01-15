@@ -14,14 +14,14 @@ import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import { style } from "typestyle";
+import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
 import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
-import { SearchFormContextProvider } from "@library/search/SearchFormContext";
+import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 
 interface IProps {
@@ -54,7 +54,7 @@ export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
     const rootStyle = style({
-        $debugName: "appContext",
+        label: "appContext",
         width: percent(100),
     });
 

@@ -8,16 +8,67 @@
 namespace Vanilla\Formatting;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Formatting\Html\Processor\HtmlProcessor;
 
 /**
  * Base format with simple simple implementations.
  */
 abstract class BaseFormat implements FormatInterface {
+
     /** @var int */
     const EXCERPT_MAX_LENGTH = 325;
 
     /** @var bool */
     protected $allowExtendedContent = false;
+
+    /** @var HtmlProcessor[] */
+    protected $staticProcessors = [];
+
+    /** @var HtmlProcessor[] */
+    protected $dynamicProcessors = [];
+
+    /**
+     * Apply an HTML processor to the stack of processors.
+     *
+     * @param HtmlProcessor $processor
+     *
+     * @return $this For chaining.
+     */
+    public function addHtmlProcessor(HtmlProcessor $processor): BaseFormat {
+        if ($processor->getProcessorType() === HtmlProcessor::TYPE_DYNAMIC) {
+            $this->dynamicProcessors[] = $processor;
+        } else {
+            $this->staticProcessors[] = $processor;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply the registered HTML processors.
+     *
+     * @param string $html The HTML to apply processors to.
+     * @param string|null $processorType The type of HTML processors to apply. See HtmlProcessor::TYPE constants.
+     * @return string The processed HTML.
+     */
+    public function applyHtmlProcessors(string $html, ?string $processorType = null): string {
+        $document = new HtmlDocument($html);
+
+        if ($processorType === HtmlProcessor::TYPE_STATIC || $processorType === null) {
+            foreach ($this->staticProcessors as $processor) {
+                $document = $processor->processDocument($document);
+            }
+        }
+
+        if ($processorType === HtmlProcessor::TYPE_DYNAMIC || $processorType === null) {
+            foreach ($this->dynamicProcessors as $processor) {
+                $document = $processor->processDocument($document);
+            }
+        }
+
+        return $document->getInnerHtml();
+    }
 
     /**
      * Implement rendering of excerpts based on the plain-text version of format.

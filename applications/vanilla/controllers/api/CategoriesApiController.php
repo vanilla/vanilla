@@ -9,6 +9,7 @@ use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
 use Vanilla\Utility\InstanceValidatorSchema;
@@ -277,7 +278,7 @@ class CategoriesApiController extends AbstractApiController {
                 'default' => 2,
             ],
             'archived:b|n' => [
-                'default' => false
+                'default' => null
             ],
             'page:i?' => [
                 'default' => 1,
@@ -291,8 +292,10 @@ class CategoriesApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition([]),
             'featured:b?',
+            'dirtyRecords:b?'
         ], 'in')
-            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'parentCategoryID', 'parentCategoryCode', 'followed']))
+            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'archived', 'followed', 'featured']))
+            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'parentCategoryID', 'parentCategoryCode']))
             ->setDescription('List categories.')
         ;
 
@@ -318,8 +321,12 @@ class CategoriesApiController extends AbstractApiController {
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $where = [];
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
+        }
+
         if (!empty($query['categoryID'])) {
-            // CategoryID can't be queried with other filters.
             /** @var \Vanilla\Schema\RangeExpression $range */
             $range = $query['categoryID'];
 
@@ -330,29 +337,14 @@ class CategoriesApiController extends AbstractApiController {
                 $range = $range->withFilteredValue('=', $categoryIDs);
             }
 
-            $where = [
-                'categoryID' => $range,
-            ];
+            $where['categoryID'] = $range;
+
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'CategoryID');
-        } elseif ($parent['DisplayAs'] === 'Flat') {
-            // Flat categories can't be queried with other filters.
-            $categories = $this->categoryModel->getTreeAsFlat(
-                $parent['CategoryID'],
-                $offset,
-                $limit
-            );
-
-            $totalCountCallBack = function () use ($parent) {
-                return $parent['CountCategories'];
-            };
-        } else {
-            if ($query['followed'] ?? false) {
-                $where['Followed'] = true;
-            }
-            if ($query['featured'] ?? false) {
-                $where['Featured'] = true;
-            }
-
+        } elseif ($query['followed'] ?? false) {
+            $where['Followed'] = true;
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+        } elseif ($query['featured'] ?? false) {
+            $where['Featured'] = true;
             // Filter by parent.
             if ($parent['CategoryID'] !== -1) {
                 $filterCategories = $this->categoryModel->getTree(
@@ -362,10 +354,6 @@ class CategoriesApiController extends AbstractApiController {
                     ]
                 );
 
-                // Filter tree by the category "archived" fields.
-                if ($query['archived'] !== null) {
-                    $filterCategories = $this->archiveFilter($filterCategories, $query['archived'] ? 0 : 1);
-                }
                 $filterCategoryIDs = array_column($filterCategories, 'CategoryID');
                 $filterCategoryIDs = array_filter($filterCategoryIDs, function (int $id) {
                     return $id !== -1;
@@ -374,8 +362,37 @@ class CategoriesApiController extends AbstractApiController {
                 $where['categoryID'] = $filterCategoryIDs;
             }
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
-        }
+        } elseif ($parent['DisplayAs'] === 'Flat') {
+            $options = [];
+            if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+                $options[DirtyRecordModel::DIRTY_RECORD_OPT] = $where[DirtyRecordModel::DIRTY_RECORD_OPT];
+            }
+            $categories = $this->categoryModel->getTreeAsFlat(
+                $parent['CategoryID'],
+                $offset,
+                $limit,
+                $options
+            );
 
+            $totalCountCallBack = function () use ($parent) {
+                return $parent['CountCategories'];
+            };
+        } else {
+            $options = [];
+            $options['maxdepth'] = $query['maxDepth'] ?? 2;
+            if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+                $options[DirtyRecordModel::DIRTY_RECORD_OPT] = $where[DirtyRecordModel::DIRTY_RECORD_OPT];
+            }
+            $categories = $this->categoryModel->getTree(
+                $parent['CategoryID'],
+                $options
+            );
+
+            // Filter tree by the category "archived" fields.
+            if ($query['archived'] !== null) {
+                $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
+            }
+        }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
 
         foreach ($categories as &$category) {
@@ -649,9 +666,17 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      */
     private function getCategoriesWhere(array $where, $limit, $offset, $order = ''): array {
-        $categories = $this->categoryModel
-            ->getWhere($where, $order, '', $limit, $offset)
-            ->resultArray();
+        $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($dirtyRecords) {
+            $this->categoryModel->applyDirtyWheres();
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+            $categories = $this->categoryModel->getWhere($where, $order, '', $limit, $offset)
+                ->resultArray();
+        } else {
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, '', $limit, $offset)
+                ->resultArray();
+        }
 
         // Index by ID for category calculation functions.
         $categories = array_column($categories, null, 'CategoryID');

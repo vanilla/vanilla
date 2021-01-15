@@ -3,44 +3,31 @@
  * @license GPL-2.0-only
  */
 
-import { mountReact } from "@vanilla/react-utils";
+import { BrightcoveEmbed } from "@library/embeddedContent/BrightcoveEmbed";
 import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
+import { EmbedErrorBoundary } from "@library/embeddedContent/components/EmbedErrorBoundary";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
+import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
+import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
-import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
-import { onContent, t } from "@library/utility/appUtils";
-import { logWarning, logError } from "@vanilla/utils";
-import React, { useContext } from "react";
-import Quill from "quill/core";
-import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
-import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { visibility } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
-import { BrightcoveEmbed } from "@library/embeddedContent/BrightcoveEmbed";
+import { onContent, t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { mountReact } from "@vanilla/react-utils";
+import { logError, logWarning } from "@vanilla/utils";
+import React from "react";
+import { EmbedContext, IEmbedContext } from "./IEmbedContext";
 
-export const FOCUS_CLASS = "embed-focusableElement";
-export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
-
-interface IEmbedContext {
-    inEditor?: boolean;
-    descriptionID?: string;
-    onRenderComplete?: () => void;
-    syncBackEmbedValue?: (values: object) => void;
-    quill?: Quill | null;
-    isSelected?: boolean;
-    selectSelf?: () => void;
-    deleteSelf?: () => void;
-}
+const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
 
 export interface IBaseEmbedData {
     embedType: string;
@@ -64,11 +51,6 @@ export function registerEmbed(embedType: string, EmbedComponent: EmbedComponentT
 
 export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
-}
-
-export const EmbedContext = React.createContext<IEmbedContext>({});
-export function useEmbedContext() {
-    return useContext(EmbedContext);
 }
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {

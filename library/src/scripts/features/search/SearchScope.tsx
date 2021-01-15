@@ -7,7 +7,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { SearchIcon } from "@library/icons/titleBar";
-import { IBorderRadiusValue } from "@library/styles/styleHelpersBorders";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 
 export function SearchScope(props: {

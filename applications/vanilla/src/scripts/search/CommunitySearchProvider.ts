@@ -36,12 +36,16 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
                 crumbs: result.breadcrumbs ?? [],
                 name: result.name,
                 dateUpdated: result.dateUpdated ?? result.dateInserted,
+                labels: result.labelCodes,
                 url: result.url,
+                type: result.type,
             };
             return {
                 label: result.name,
                 value: result.name,
                 data,
+                type: result.type,
+                url: result.url,
             };
         });
     };

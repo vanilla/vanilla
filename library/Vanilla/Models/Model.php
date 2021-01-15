@@ -17,6 +17,7 @@ use Vanilla\Utility\ArrayUtils;
  * Basic model class.
  */
 class Model implements InjectableInterface {
+
     public const OPT_LIMIT = "limit";
     public const OPT_OFFSET = "offset";
     public const OPT_SELECT = "select";
@@ -24,6 +25,8 @@ class Model implements InjectableInterface {
     public const OPT_MODE = 'mode';
     public const OPT_REPLACE = 'replace';
     public const OPT_IGNORE = 'ignore';
+    public const OPT_META = 'meta';
+    public const OPT_JOINS = 'joins';
 
     /** @var \Gdn_Database */
     private $database;
@@ -166,6 +169,12 @@ class Model implements InjectableInterface {
 
             $sqlDriver->select($selects);
         }
+
+        $joins = $options[self::OPT_JOINS] ?? false;
+        if ($joins) {
+            $this->applyJoins($joins, $sqlDriver);
+        }
+
         $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
@@ -390,5 +399,21 @@ class Model implements InjectableInterface {
             $this->databaseSchema = $this->database->simpleSchema($this->getTable());
         }
         return $this->databaseSchema;
+    }
+
+    /**
+     * Apply joins to sql query.
+     *
+     * @param array $joins
+     * @param \Gdn_SQLDriver $sqlDriver
+     */
+    protected function applyJoins(array $joins, \Gdn_SQLDriver $sqlDriver): void {
+        foreach ($joins as $join) {
+            $tableName = $join['tableName'] ?? '';
+            $on = $join['on'] ?? '';
+            $joinType = $join['joinType'] ?? '';
+
+            $sqlDriver->join($tableName, $on, $joinType);
+        }
     }
 }

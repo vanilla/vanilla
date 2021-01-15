@@ -19,17 +19,20 @@ class StripEmbedsProcessor extends HtmlProcessor {
     /**
      * Process the HTML document.
      *
+     * @param HtmlDocument $document
      * @return HtmlDocument
      */
-    public function processDocument(): HtmlDocument {
-        $this->applyStripEmbeds();
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        $this->applyStripEmbeds($document);
+        return $document;
     }
 
     /**
      * Apply DomUtils::stripEmbeds()
+     *
+     * @param HtmlDocument $document
      */
-    public function applyStripEmbeds() {
-        DomUtils::stripEmbeds($this->document->getDom());
+    public function applyStripEmbeds(HtmlDocument $document) {
+        DomUtils::stripEmbeds($document->getDom());
     }
 }

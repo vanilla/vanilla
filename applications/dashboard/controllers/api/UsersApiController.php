@@ -14,6 +14,7 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -428,7 +429,6 @@ class UsersApiController extends AbstractApiController {
             "name",
             "photoUrl",
             "email:s|n" => ['default' => null],
-            "ssoID:s|n" => ['default' => null],
             "dateLastActive",
             "isAdmin:b",
             "countUnreadNotifications" => [
@@ -461,12 +461,11 @@ class UsersApiController extends AbstractApiController {
         $user["permissions"] = $this->globalPermissions();
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
         $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
-
-        $ssoIDs = $this->expandMiddleware->joinSSOIDs([$user['userID']]);
-        $user["ssoID"] = $ssoIDs[$user['userID']] ?? null;
-
         $result = $out->validate($user);
-        return new Data($result, [\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW => ['email']]);
+
+        $response = $this->expandMiddleware->updateResponseByKey($result, 'userID', true);
+        $response->setMeta(\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW, ['email']);
+        return $response;
     }
 
     /**
@@ -541,6 +540,7 @@ class UsersApiController extends AbstractApiController {
                 'default' => 1,
                 'minimum' => 1,
             ],
+            'dirtyRecords:b?',
             'limit:i?' => [
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
@@ -565,6 +565,11 @@ class UsersApiController extends AbstractApiController {
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $query[DirtyRecordModel::DIRTY_RECORD_OPT];
+        }
+
         $rows = $this->userModel->search($where, $query['sort'] ?? '', '', $limit, $offset)->resultArray();
 
         // Join in the roles more efficiently for the index.
@@ -584,12 +589,18 @@ class UsersApiController extends AbstractApiController {
 
         $result = $out->validate($rows);
 
+
+
         // Determine if we are gonna use the "numbered" or "more" pageInfo.
         if (empty($where)) {
             if (!Gdn::userModel()->pastUserMegaThreshold()) {
                 $totalCount = $this->userModel->getCount();
             }
         } elseif (!Gdn::userModel()->pastUserThreshold()) {
+            if ($joinDirtyRecords) {
+                $this->userModel->applyDirtyWheres('u');
+                unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+            }
             $totalCount = $this->userModel->searchCount($where);
         }
 

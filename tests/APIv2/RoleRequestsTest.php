@@ -17,6 +17,7 @@ use Vanilla\Dashboard\Models\RoleRequestMetaModel;
 use Vanilla\Dashboard\Models\RoleRequestModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\Bootstrap;
+use Vanilla\Dashboard\Controllers\RequestsController;
 
 /**
  * Tests for the `/api/v2/role-requests` endpoints.
@@ -69,11 +70,28 @@ class RoleRequestsTest extends AbstractAPIv2Test {
             'attributesSchema' => Schema::parse(['body:s', 'format:s'])->jsonSerialize(),
             'attributes' => [
                 'notification' => [
-                    'name' => 'Test name',
-                    'body' => 'Test body',
-                    'format' => 'html',
-                    'url' => '/categories/test',
-                ]
+                    'approved' => [
+                        'name' => 'Test name approved',
+                        'body' => 'Test body approved',
+                        'format' => 'markdown',
+                        'url' => '/categories/test/approved',
+                    ],
+                    'denied' => [
+                        'name' => 'Test name denied',
+                        'body' => 'Test body denied',
+                        'format' => 'markdown',
+                        'url' => '/categories/test/denied',
+                    ],
+                    'communityManager' => [
+                        'name' => 'Test name admin',
+                        'body' => 'Test body admin',
+                        'format' => 'markdown',
+                        'url' => '/categories/test/admin',
+                    ]
+                ],
+                'allowReapply' => true,
+                'notifyDenied' => false,
+                'notifyCommunityManager' => false,
             ]
         ]);
         $this->meta = $this->metaModel->selectSingle([
@@ -126,10 +144,18 @@ class RoleRequestsTest extends AbstractAPIv2Test {
             'attributesSchema' => Schema::parse(['body:s', 'format:s'])->jsonSerialize(),
             'attributes' => [
                 'notification' => [
-                    'name' => __FUNCTION__.' name',
-                    'body' => __FUNCTION__.' body',
-                    'format' => 'html',
-                    'url' => '/foo',
+                    'approved' => [
+                        'name' => __FUNCTION__.' name',
+                        'body' => __FUNCTION__.' body',
+                        'format' => 'markdown',
+                        'url' => '/foo',
+                    ],
+                    'denied' => [
+                        'name' => __FUNCTION__.' denied name',
+                        'body' => __FUNCTION__.' denied body',
+                        'format' => 'markdown',
+                        'url' => '/denied',
+                    ]
                 ]
             ]
         ];
@@ -310,10 +336,10 @@ class RoleRequestsTest extends AbstractAPIv2Test {
         );
 
         $notification = $this->assertNotification($this->application['userID'], ['t.Name' => 'roleRequest']);
-        $this->assertSame('Test name', $notification['Headline']);
-        $this->assertSame('Test body', $notification['Story']);
-        $this->assertSame('html', $notification['Format']);
-        $this->assertSame(url('/categories/test', true), $notification['Url']);
+        $this->assertSame('Test name approved', $notification['Headline']);
+        $this->assertSame('Test body approved', $notification['Story']);
+        $this->assertSame('markdown', $notification['Format']);
+        $this->assertSame(url('/categories/test/approved', true), $notification['Url']);
 
         $this->assertApplicationMeta(true, RoleRequestModel::STATUS_APPROVED);
     }
@@ -321,7 +347,7 @@ class RoleRequestsTest extends AbstractAPIv2Test {
     /**
      * Smoke test role application denial.
      */
-    public function testDenyApplication(): void {
+    public function testDenyApplication(): array {
         $this->setAdminApiUser();
         $response = $this->api()->patch(
             "/role-requests/applications/{$this->application['roleRequestID']}",
@@ -334,17 +360,55 @@ class RoleRequestsTest extends AbstractAPIv2Test {
             $newRoles
         );
         $this->assertApplicationMeta(false, RoleRequestModel::STATUS_DENIED);
+        return $response->getBody();
+    }
+
+    /**
+     * Smoke test denying a role and sending a notification.
+     */
+    public function testDenyApplicationNotify(): void {
+        $this->meta['attributes']['notifyDenied'] = true;
+        $this->api()->put("/role-requests/metas", $this->meta);
+        $this->setAdminApiUser();
+        $response = $this->api()->patch(
+            "/role-requests/applications/{$this->application['roleRequestID']}",
+            ['status' => RoleRequestModel::STATUS_DENIED]
+        );
+        $notification = $this->assertNotification($this->application['userID'], ['t.Name' => 'roleRequest']);
+        $this->assertSame('Test name denied', $notification['Headline']);
+        $this->assertSame('Test body denied', $notification['Story']);
+        $this->assertSame('markdown', $notification['Format']);
+        $this->assertSame(url('/categories/test/denied', true), $notification['Url']);
     }
 
     /**
      * A user should not be able to apply for a role twice.
      */
-    public function testReApply(): void {
+    public function testReApplyNotAllowed(): void {
+        $this->api()->setUserID($this->adminID);
+        $this->meta['attributes']['allowReapply'] = false;
+        $this->api()->put("/role-requests/metas", $this->meta);
+
         $this->api()->setUserID($this->memberID);
 
         $this->expectExceptionCode(409);
         $this->expectExceptionMessage('You have already applied.');
         $application = $this->api()->post('/role-requests/applications', $this->application)->getBody();
+    }
+
+    /**
+     * A user should be able to re-apply for a role if "allowReapply" configured.
+     *
+     * @param array $application A denied role application.
+     * @depends testDenyApplication
+     */
+    public function testAllowedReApply(array $application): void {
+        $this->api()->setUserID($application['userID']);
+        $updateAttributes = ['body' => 'new body', 'format' => 'markdown'];
+        $application['attributes'] = $updateAttributes;
+        $this->api()->post('/role-requests/applications', $application)->getBody();
+        $newApplication = $this->api()->get('/role-requests/applications', ['roleRequestID' => $application['roleRequestID']])->getBody();
+        $this->assertArraySubsetRecursive($newApplication[0]['attributes'], $updateAttributes);
     }
 
     /**

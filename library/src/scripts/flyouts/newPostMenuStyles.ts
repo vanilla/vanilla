@@ -1,9 +1,18 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut, borders, margins, absolutePosition } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { absolutePosition } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { calc, color } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const newPostMenuVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -92,48 +101,48 @@ export const newPostMenuClasses = useThemeCache(() => {
 
     const root = style("root", {
         position: "fixed",
-        bottom: unit(vars.position.bottom),
-        right: unit(vars.position.right),
+        bottom: styleUnit(vars.position.bottom),
+        right: styleUnit(vars.position.right),
         textAlign: "right",
     });
 
     const item = style("item", {
-        marginTop: unit(vars.item.position.top),
-        marginRight: unit(vars.item.position.right),
+        marginTop: styleUnit(vars.item.position.top),
+        marginRight: styleUnit(vars.item.position.right),
     });
 
     const itemFocus = style("itemFocus", {
         ...absolutePosition.fullSizeOfParent(),
-        margin: unit(1),
+        margin: styleUnit(1),
         maxWidth: calc(`100% - 2px`),
         maxHeight: calc(`100% - 2px`),
-        borderRadius: unit(vars.action.borderRadius),
+        borderRadius: styleUnit(vars.action.borderRadius),
     });
 
     const action = style("action", {
         position: "relative",
-        borderRadius: unit(vars.action.borderRadius),
+        borderRadius: styleUnit(vars.action.borderRadius),
         ...shadowHelper().floatingButton(),
-        minHeight: unit(vars.action.size.height),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        paddingLeft: unit(vars.action.padding.horizontal),
-        paddingRight: unit(vars.action.padding.horizontal),
+        minHeight: styleUnit(vars.action.size.height),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        paddingLeft: styleUnit(vars.action.padding.horizontal),
+        paddingRight: styleUnit(vars.action.padding.horizontal),
         display: "inline-flex",
         alignItems: "center",
-        ...clickableItemStates({ default: globalVars.mainColors.fg }),
-        $nest: {
+        ...Mixins.clickable.itemState({ default: globalVars.mainColors.fg }),
+        ...{
             "&.focus-visible": {
                 outline: 0,
             },
             [`&.focus-visible .${itemFocus}`]: {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+                boxShadow: `0 0 0 1px ${ColorsUtils.colorOut(globalVars.mainColors.primary)} inset`,
             },
         },
     });
 
     const toggleFocus = style("toggleFocus", {
         ...absolutePosition.fullSizeOfParent(),
-        margin: unit(1),
+        margin: styleUnit(1),
         maxWidth: calc(`100% - 2px`),
         maxHeight: calc(`100% - 2px`),
         borderRadius: "50%",
@@ -143,22 +152,22 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         justifyItems: "center",
-        height: unit(vars.toggle.size),
-        width: unit(vars.toggle.size),
-        backgroundColor: colorOut(globalVars.mainColors.primary),
+        height: styleUnit(vars.toggle.size),
+        width: styleUnit(vars.toggle.size),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
         borderRadius: "50%",
-        $nest: {
+        ...{
             [`&.focus-visible`]: {
                 outline: 0,
             },
             [`&.focus-visible .${toggleFocus}`]: {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primaryContrast)} inset`,
+                boxShadow: `0 0 0 1px ${ColorsUtils.colorOut(globalVars.mainColors.primaryContrast)} inset`,
             },
         },
     });
 
     const label = style("label", {
-        marginLeft: unit(vars.label.margin.left),
+        marginLeft: styleUnit(vars.label.margin.left),
         display: "inline-block",
     });
 
@@ -166,9 +175,9 @@ export const newPostMenuClasses = useThemeCache(() => {
         display: "inline-flex",
         borderRadius: "50%",
         ...shadowHelper().floatingButton(),
-        height: unit(vars.toggle.size),
-        width: unit(vars.toggle.size),
-        ...margins(vars.toggle.margin),
+        height: styleUnit(vars.toggle.size),
+        width: styleUnit(vars.toggle.size),
+        ...Mixins.margin(vars.toggle.margin),
     });
 
     return {

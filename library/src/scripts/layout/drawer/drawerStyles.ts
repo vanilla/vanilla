@@ -5,9 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { componentThemeVariables } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
 
 export const drawerVariables = useThemeCache(() => {
@@ -53,15 +55,15 @@ export const drawerClasses = useThemeCache(() => {
 
     const toggle = style({
         fontWeight: vars.fonts.weight,
-        padding: `${unit(vars.spacing.button.padding)} 0`,
+        padding: `${styleUnit(vars.spacing.button.padding)} 0`,
         width: percent(100),
         textAlign: "left",
         ...debug.name("toggle"),
     });
     const icon = style({
         display: "inline-flex",
-        minWidth: unit(vars.sizing.icon),
-        fontSize: unit(vars.fonts.size),
+        minWidth: styleUnit(vars.sizing.icon),
+        fontSize: styleUnit(vars.fonts.size),
         ...debug.name("icon"),
     });
 

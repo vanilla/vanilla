@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
-import { useThemeCacheID } from "@library/styles/styleUtils";
+import { useThemeCacheID } from "@library/styles/themeCache";
 
 interface IProps {
     children: React.ReactNode;

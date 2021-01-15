@@ -16,6 +16,7 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 
                 $this->Category = $Category;
                 $this->DiscussionData = $this->CategoryDiscussionData[$Category->CategoryID] ?? null;
+                $this->AnnounceData = $this->CategoryAnnounceData[$Category->CategoryID] ?? null;
                 $options = getOptions($Category);
 
             ?>
@@ -56,7 +57,10 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
                         echo "</div>";
                     }
                 ?>
-                <?php if (!empty($this->DiscussionData) && $this->DiscussionData->numRows() > 0) : ?>
+                <?php if (
+                    (!empty($this->DiscussionData) && $this->DiscussionData->numRows() > 0) ||
+                    (!empty($this->AnnounceData) && $this->AnnounceData->numRows() > 0)
+                ) : ?>
                     <ul class="DataList Discussions">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>
                     </ul>

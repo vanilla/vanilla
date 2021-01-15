@@ -8,11 +8,13 @@ import React from "react";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import Tile from "@library/features/tiles/Tile";
-import { tilesClasses, tilesVariables } from "@library/features/tiles/tilesStyles";
+import { tilesClasses } from "@library/features/tiles/Tiles.classes";
+import { tilesVariables } from "@library/features/tiles/Tiles.variables";
 import Container from "@library/layout/components/Container";
 import Heading from "@library/layout/Heading";
 import { visibility } from "@library/styles/styleHelpers";
 import { useLayout } from "@library/layout/LayoutContext";
+import { TileAlignment } from "./TileAlignment";
 
 interface ITile {
     icon: string;
@@ -31,11 +33,6 @@ interface IProps {
     fallbackIcon?: React.ReactNode;
     alignment?: TileAlignment;
     columns?: number;
-}
-
-export enum TileAlignment {
-    LEFT = "left",
-    CENTER = "center",
 }
 
 /**

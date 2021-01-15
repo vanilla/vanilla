@@ -1,3 +1,11 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+import set from "lodash/set";
+
 export function spaceshipCompare(a, b): number {
     if (a > b) {
         return 1;
@@ -8,14 +16,24 @@ export function spaceshipCompare(a, b): number {
     }
 }
 
-export function flattenObject(obj: Record<any, any>, prefix = "") {
-    return Object.keys(obj).reduce((acc, k) => {
-        const pre = prefix.length ? prefix + "." : "";
-        if (typeof obj[k] === "object") {
-            Object.assign(acc, flattenObject(obj[k], pre + k));
+export function flattenObject(obj: Record<any, any>, delimiter = "") {
+    return Object.keys(obj).reduce((acc, key) => {
+        const prefix = delimiter.length ? delimiter + "." : "";
+        if (typeof obj[key] === "object") {
+            Object.assign(acc, flattenObject(obj[key], prefix + key));
         } else {
-            acc[pre + k] = obj[k];
+            acc[prefix + key] = obj[key];
         }
         return acc;
     }, {});
+}
+
+export function unflattenObject(original: Record<any, any>) {
+    const result = {};
+
+    for (const [key, value] of Object.entries(original)) {
+        set(result, key, value);
+    }
+
+    return result;
 }

@@ -4,12 +4,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, colorOut, importantUnit, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { allLinkStates, importantUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { important, percent } from "csx";
-import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
-import { cssOut } from "@dashboard/compatibilityStyles";
+import { embedContainerVariables } from "@library/embeddedContent/components/embedStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { Mixins } from "@library/styles/Mixins";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,7 +42,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const style = styleFactory("quoteEmbed");
 
     const root = style({
-        $nest: {
+        ...{
             "&&": {
                 overflow: "visible",
             },
@@ -50,7 +54,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         textAlign: "left",
         margin: 0,
         padding: 0,
-        $nest: {
+        ...{
             "&::before, &::after": {
                 content: "initial",
             },
@@ -63,14 +67,14 @@ export const quoteEmbedClasses = useThemeCache(() => {
 
     const title = style("title", {
         ...lineHeightAdjustment(),
-        ...margins({
+        ...Mixins.margin({
             horizontal: importantUnit(0),
             top: importantUnit(0),
             bottom: importantUnit(globalVars.meta.spacing.default),
         }),
         display: "block",
         width: percent(100),
-        color: important(colorOut(globalVars.mainColors.fg) as string),
+        color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
         fontSize: globalVars.fonts.size.medium,
         fontWeight: globalVars.fonts.weights.bold,
         lineHeight: globalVars.lineHeights.condensed,
@@ -82,15 +86,15 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const titleLink = style("titleLink", {
         display: "block",
         position: "relative",
-        $nest: {
+        ...{
             [`&.${isPadded}`]: {
-                paddingTop: unit(vars.title.padding),
+                paddingTop: styleUnit(vars.title.padding),
             },
         },
     });
 
     const header = style("header", {
-        ...paddings({
+        ...Mixins.padding({
             all: embedVars.spacing.padding,
             bottom: 0,
         }),
@@ -99,14 +103,14 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const paddingAdjustment = style("paddingAdjustment", {});
 
     const content = style("content", {
-        ...paddings({
+        ...Mixins.padding({
             all: embedVars.spacing.padding,
         }),
         width: percent(100),
         boxSizing: "border-box",
-        $nest: {
+        ...{
             [`&.${paddingAdjustment}`]: {
-                ...paddings({
+                ...Mixins.padding({
                     all: embedVars.spacing.padding,
                     top: vars.userContent.padding,
                 }),
@@ -116,7 +120,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
 
     const footer = style("footer", {
         position: "relative",
-        ...paddings({
+        ...Mixins.padding({
             horizontal: embedVars.spacing.padding,
         }),
     });
@@ -128,7 +132,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         width: percent(100),
         alignItems: "center",
         justifyContent: "space-between",
-        minHeight: unit(vars.footer.height),
+        minHeight: styleUnit(vars.footer.height),
     });
 
     const footerSeparator = style("footerSeparator", {
@@ -140,8 +144,8 @@ export const quoteEmbedClasses = useThemeCache(() => {
 
         // Styling
         width: percent(100),
-        height: unit(1),
-        backgroundColor: colorOut(globalVars.mixBgAndFg(0.2)),
+        height: styleUnit(1),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.2)),
     });
 
     const postLink = style("postLink", {
@@ -153,16 +157,16 @@ export const quoteEmbedClasses = useThemeCache(() => {
                 textDecoration: "none",
             },
             noState: {
-                color: colorOut(globalVars.links.colors.default),
+                color: ColorsUtils.colorOut(globalVars.links.colors.default),
             },
             hover: {
-                color: colorOut(globalVars.links.colors.hover),
+                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             },
             focus: {
-                color: colorOut(globalVars.links.colors.focus),
+                color: ColorsUtils.colorOut(globalVars.links.colors.focus),
             },
             active: {
-                color: colorOut(globalVars.links.colors.active),
+                color: ColorsUtils.colorOut(globalVars.links.colors.active),
             },
         }),
     });
@@ -171,23 +175,23 @@ export const quoteEmbedClasses = useThemeCache(() => {
     });
 
     const discussionLink = style("discussionLink", {
-        height: unit(globalVars.icon.sizes.default),
-        width: unit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
+        width: styleUnit(globalVars.icon.sizes.default),
         ...allLinkStates({
             allStates: {
                 textDecoration: "none",
             },
             noState: {
-                color: colorOut(globalVars.links.colors.default),
+                color: ColorsUtils.colorOut(globalVars.links.colors.default),
             },
             hover: {
-                color: colorOut(globalVars.links.colors.hover),
+                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             },
             focus: {
-                color: colorOut(globalVars.links.colors.focus),
+                color: ColorsUtils.colorOut(globalVars.links.colors.focus),
             },
             active: {
-                color: colorOut(globalVars.links.colors.active),
+                color: ColorsUtils.colorOut(globalVars.links.colors.active),
             },
         }),
     });
@@ -199,10 +203,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
     const blockquote = style("blockquote", {
         margin: 0,
         padding: 0,
-        $nest: {
+        ...{
             ".userContent": {
                 ...lineHeightAdjustment(),
-                fontSize: unit(globalVars.fonts.size.medium),
+                fontSize: styleUnit(globalVars.fonts.size.medium),
             },
         },
     });

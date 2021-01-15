@@ -469,7 +469,7 @@ EOT;
     public function testDefaultDropdown(): void {
         $actual = $this->form->dropDown('foo', ['>' => 'b', '"' => 'd']);
         $expected = <<<EOT
-<select id="Form_foo" name="foo" class="form-control">
+<select id="Form_foo" data-value="" name="foo" class="form-control">
 <option value="&gt;">b</option>
 <option value="&quot;">d</option>
 </select>
@@ -519,7 +519,7 @@ EOT;
     public function testDefaultDate(): void {
         $actual = $this->form->date('fo>"', ['YearRange' => '2019-2020']);
         $expected = <<<EOT
-<select id="Form_fo_Month" name="fo&gt;&quot;_Month" class="Month">
+<select id="Form_fo_Month" data-value="" name="fo&gt;&quot;_Month" class="Month">
     <option value="0">Month</option>
     <option value="1">Jan</option>
     <option value="2">Feb</option>
@@ -534,7 +534,7 @@ EOT;
     <option value="11">Nov</option>
     <option value="12">Dec</option>
 </select>
-<select id="Form_fo_Day" name="fo&gt;&quot;_Day" class="Day">
+<select id="Form_fo_Day" data-value="" name="fo&gt;&quot;_Day" class="Day">
     <option value="0">Day</option>
     <option value="1">1</option>
     <option value="2">2</option>
@@ -568,7 +568,7 @@ EOT;
     <option value="30">30</option>
     <option value="31">31</option>
 </select>
-<select id="Form_fo_Year" name="fo&gt;&quot;_Year" class="Year">
+<select id="Form_fo_Year" data-value="" name="fo&gt;&quot;_Year" class="Year">
     <option value="0">Year</option>
     <option value="2019">2019</option>
     <option value="2020">2020</option>
@@ -683,7 +683,7 @@ EOT;
                 false,
             ],
         ];
-        
+
         return $r;
     }
 }

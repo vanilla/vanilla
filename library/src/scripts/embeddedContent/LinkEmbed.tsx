@@ -8,10 +8,10 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import { metasClasses } from "@library/styles/metasStyles";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import TruncatedText from "@library/content/TruncatedText";
-import { EmbedTitle } from "@library/embeddedContent/EmbedTitle";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     photoUrl?: string;

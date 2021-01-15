@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 import { getMeta, t, assetUrl, formatUrl } from "@library/utility/appUtils";
-import { variableFactory, useThemeCache } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
 import { IThemeVariables } from "@library/theming/themeReducer";

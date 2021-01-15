@@ -6,9 +6,12 @@
 
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { px } from "csx";
-import { colorOut, paddings, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 
 export const nextPreviousVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -49,8 +52,8 @@ export const nextPreviousClasses = useThemeCache(() => {
         display: "block",
         fontSize: px(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
-        color: colorOut(vars.colors.label),
-        marginBottom: unit(2),
+        color: ColorsUtils.colorOut(vars.colors.label),
+        marginBottom: styleUnit(2),
     });
 
     const title = style("title", {
@@ -59,14 +62,14 @@ export const nextPreviousClasses = useThemeCache(() => {
         fontSize: px(globalVars.fonts.size.medium),
         lineHeight: globalVars.lineHeights.condensed,
         fontWeight: globalVars.fonts.weights.semiBold,
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     const chevron = style("chevron", {
         position: "absolute",
         top: px((vars.fonts.title * globalVars.lineHeights.condensed) / 2),
         transform: `translateY(-50%)`,
-        color: colorOut(vars.colors.chevron),
+        color: ColorsUtils.colorOut(vars.colors.chevron),
     });
 
     const chevronLeft = style("chevronLeft", {
@@ -80,9 +83,9 @@ export const nextPreviousClasses = useThemeCache(() => {
     });
 
     const activeStyles = {
-        $nest: {
-            "& .adjacentLinks-icon, & .adjacentLinks-title": {
-                color: colorOut(vars.colors.hover.fg),
+        ...{
+            ".adjacentLinks-icon, .adjacentLinks-title": {
+                color: ColorsUtils.colorOut(vars.colors.hover.fg),
             },
         },
     };
@@ -90,11 +93,11 @@ export const nextPreviousClasses = useThemeCache(() => {
     // Common to both left and right
     const adjacent = style("adjacent", {
         display: "block",
-        ...paddings({
+        ...Mixins.padding({
             vertical: 8,
         }),
-        color: colorOut(vars.colors.title),
-        $nest: {
+        color: ColorsUtils.colorOut(vars.colors.title),
+        ...{
             "&.focus-visible": activeStyles,
             "&:hover": activeStyles,
             "&:focus": activeStyles,

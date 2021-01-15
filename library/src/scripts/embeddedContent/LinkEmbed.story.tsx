@@ -8,7 +8,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
-import { EmbedContext } from "@library/embeddedContent/embedService";
+import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
 
 const story = storiesOf("Embeds", module);
 

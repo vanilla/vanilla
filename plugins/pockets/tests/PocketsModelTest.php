@@ -134,13 +134,31 @@ class PocketsModelTest extends SiteTestCase {
         ]);
         ModelUtils::validationResultToValidationException($pocketModel);
         $pocket = $pocketModel->getID($pocketID);
+
+        $goodSubset = [
+            'Body' => 'hello world',
+            'Format' => PocketsModel::FORMAT_CUSTOM,
+            'WidgetID' => null,
+            'WidgetParameters' => null,
+        ];
+
         $this->assertArraySubsetRecursive(
-            [
-                'Body' => 'hello world',
-                'Format' => PocketsModel::FORMAT_CUSTOM,
-                'WidgetID' => null,
-                'WidgetParameters' => null,
-            ],
+            $goodSubset,
+            $pocket
+        );
+
+        // Make sure enabled/disable don't break the pocket.
+        $pocketModel->save([
+            'PocketID' => $pocketID,
+            'Disabled' => \Pocket::DISABLED,
+        ]);
+        $pocketModel->save([
+            'PocketID' => $pocketID,
+            'Disabled' => \Pocket::ENABLED,
+        ]);
+
+        $this->assertArraySubsetRecursive(
+            $goodSubset,
             $pocket
         );
     }

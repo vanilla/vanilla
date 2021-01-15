@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
-import { IInjectableUserState } from "@library/features/users/userModel";
+import { IInjectableUserState } from "@library/features/users/userTypes";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
 
 export interface IMeBoxProps extends IInjectableUserState {

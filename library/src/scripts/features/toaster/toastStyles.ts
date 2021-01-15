@@ -4,11 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { borders, colorOut, unit, flexHelper, paddings } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables } from "@library/forms/Button.variables";
 
 export const toastClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -22,19 +26,17 @@ export const toastClasses = useThemeCache(() => {
             bottom: 18,
             left: 18,
             display: "inline-block",
-            ...paddings({
+            ...Mixins.padding({
                 horizontal: globalVars.gutter.size,
                 top: globalVars.gutter.size,
                 bottom: globalVars.gutter.half,
             }),
-            margin: unit(globalVars.gutter.quarter),
-            ...borders(),
+            margin: styleUnit(globalVars.gutter.quarter),
+            ...Mixins.border(),
             ...shadowHelper().dropDown(),
-            background: colorOut(globalVars.mainColors.bg),
-            $nest: {
-                p: {
-                    margin: 0,
-                },
+            background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+            p: {
+                margin: 0,
             },
         });
     };
@@ -45,7 +47,7 @@ export const toastClasses = useThemeCache(() => {
     });
 
     const button = style("button", {
-        margin: unit("3px"),
+        margin: styleUnit("3px"),
         fontSize: globalVars.fonts.size.medium,
     });
 

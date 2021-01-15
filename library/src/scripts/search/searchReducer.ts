@@ -14,6 +14,7 @@ import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext"
 export interface ISearchState {
     form: ISearchForm;
     results: ILoadable<ISearchResults>;
+    domainSearchResults: Record<string, ILoadable<ISearchResults>>;
 }
 
 export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
@@ -30,6 +31,7 @@ export const INITIAL_SEARCH_STATE: ISearchState = {
     results: {
         status: LoadStatus.PENDING,
     },
+    domainSearchResults: {},
 };
 
 const reinitilizeParams = ["sort", "domain", "scope", "page"];
@@ -82,6 +84,28 @@ export const searchReducer = produce(
         .case(SearchActions.performSearchACs.failed, (nextState, payload) => {
             nextState.results.status = LoadStatus.ERROR;
             nextState.results.error = payload.error;
+
+            return nextState;
+        })
+        .case(SearchActions.performDomainSearchACs.started, (nextState, payload) => {
+            const { domain } = payload;
+            nextState.domainSearchResults[domain] = {
+                status: LoadStatus.LOADING,
+            };
+
+            return nextState;
+        })
+        .case(SearchActions.performDomainSearchACs.done, (nextState, payload) => {
+            const { domain } = payload.params;
+            nextState.domainSearchResults[domain].status = LoadStatus.SUCCESS;
+            nextState.domainSearchResults[domain].data = payload.result;
+
+            return nextState;
+        })
+        .case(SearchActions.performDomainSearchACs.failed, (nextState, payload) => {
+            const { domain } = payload.params;
+            nextState.domainSearchResults[domain].status = LoadStatus.ERROR;
+            nextState.domainSearchResults[domain].error = payload.error;
 
             return nextState;
         })

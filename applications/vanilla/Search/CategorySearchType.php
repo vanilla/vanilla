@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
+use Vanilla\Search\BoostableSearchQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
@@ -167,13 +168,16 @@ class CategorySearchType extends AbstractSearchType {
             $query->addIndex($this->getIndex());
 
             $locale = $query->getQueryParameter('locale');
+            $enableBoost = false;
 
             if ($queryParam = $query->getQueryParameter('query', false)) {
-                $query->whereText($queryParam, ['name', 'description'], $query::MATCH_FULLTEXT, $locale);
+                $query->whereText($queryParam, ['name', 'description'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $enableBoost = true;
             }
 
             if ($name = $query->getQueryParameter('name', false)) {
-                $query->setFilter('name', [$name], false, 'wildcard');
+                $query->whereText($name, ['name'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $enableBoost = true;
             }
 
             if ($description = $query->getQueryParameter('description', false)) {
@@ -183,6 +187,14 @@ class CategorySearchType extends AbstractSearchType {
             $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
+            }
+
+            if ($enableBoost) {
+                if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter('categoryBoost')) {
+                    $query->startBoostQuery();
+                    $query->boostType($this, $this->getBoostValue());
+                    $query->endBoostQuery();
+                }
             }
         }
     }
@@ -206,6 +218,29 @@ class CategorySearchType extends AbstractSearchType {
             ],
         ]);
     }
+
+    /**
+     * Get article boost types.
+     *
+     * @return Schema|null
+     */
+    public function getBoostSchema(): ?Schema {
+        return Schema::parse([
+            'categoryBoost:b' => [
+                'default' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * Get search type boost value.
+     *
+     * @return float|null
+     */
+    protected function getBoostValue(): ?float {
+        return 10;
+    }
+
 
     /**
      * Generates prepares sql query string

@@ -1841,7 +1841,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!$node) {
             return;
         }
-
+        $node = htmlspecialchars($node, ENT_XML1);
         echo "$indent<$node>";
 
         if (is_scalar($data)) {
@@ -2285,7 +2285,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($name !== 'Status') {
                 safeHeader("$name: $value", true);
             } else {
-                $code = array_shift($shift = explode(' ', $value));
+                $shift = explode(' ', $value);
+                $code = array_shift($shift);
                 safeHeader("$name: $value", true, $code);
             }
         }
@@ -2575,6 +2576,15 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->data('Title');
+    }
+
+    /**
+     * Get the destination URL where the page will be redirected after an ajax request.
+     *
+     * @return string|null
+     */
+    public function getRedirectTo(): ?string {
+        return $this->redirectTo;
     }
 
     /**

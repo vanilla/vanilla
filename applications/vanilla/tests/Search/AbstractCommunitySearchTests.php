@@ -22,16 +22,7 @@ use VanillaTests\Search\AbstractSearchTest;
 abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
 
     /** @var array */
-    protected static $category;
-
-    /** @var array */
-    protected static $discussion;
-
-    /** @var array */
-    protected static $discussionAugust;
-
-    /** @var array */
-    protected static $comment;
+    protected static $data;
 
     /**
      * @inheritdoc
@@ -57,7 +48,6 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
-//        $session->start(self::$siteInfo['adminUserID'], false, false);
 
         /** @var \CategoriesApiController $categoriesAPIController */
         $categoriesAPIController = static::container()->get('CategoriesApiController');
@@ -67,194 +57,256 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
         $commentAPIController = static::container()->get('CommentsApiController');
 
         $tmp = uniqid('category_');
-        self::$category = $categoriesAPIController->post([
+        self::$data['category1'] = $categoriesAPIController->post([
             'name' => $tmp,
             'urlcode' => $tmp,
         ]);
 
         $tmp = uniqid('discussion_');
-        self::$discussion = $discussionsAPIController->post([
+        self::$data['discussion1'] = $discussionsAPIController->post([
             'name' => $tmp,
             'body' => $tmp,
             'format' => 'markdown',
-            'categoryID' => self::$category['categoryID'],
+            'categoryID' => self::$data['category1']['categoryID'],
         ]);
-        self::$discussion['rawBody'] = $tmp;
+        self::$data['discussion1']['rawBody'] = $tmp;
 
-        self::$discussionAugust = $discussionsAPIController->post([
+        self::$data['discussion2'] = $discussionsAPIController->post([
             'name' => 'August test 2019',
             'body' => 'August test 2019',
             'format' => 'markdown',
-            'categoryID' => self::$category['categoryID'],
+            'categoryID' => self::$data['category1']['categoryID'],
         ]);
 
         $tmp = $tmp . ' ' . uniqid('comment_');
-        self::$comment = $commentAPIController->post([
+        self::$data['comment1'] = $commentAPIController->post([
             'body' => $tmp,
             'format' => 'markdown',
-            'discussionID' => self::$discussion['discussionID'],
+            'discussionID' => self::$data['discussion1']['discussionID'],
         ]);
-        self::$comment['rawBody'] = $tmp;
+        self::$data['comment1']['rawBody'] = $tmp;
 
-//        $session->end();
+        $tmp = uniqid('category_');
+        self::$data['category2'] = $categoriesAPIController->post([
+            'name' => $tmp,
+            'urlcode' => $tmp,
+        ]);
+
+        $tmp = uniqid('discussion_');
+        self::$data['discussion3'] = $discussionsAPIController->post([
+            'name' => $tmp,
+            'body' => $tmp,
+            'format' => 'markdown',
+            'categoryID' => self::$data['category2']['categoryID'],
+        ]);
+        self::$data['discussion3']['rawBody'] = $tmp;
+
+        self::$data['discussion4'] = $discussionsAPIController->post([
+            'name' => 'December test 2020',
+            'body' => 'Decemberj  test 2020',
+            'format' => 'markdown',
+            'categoryID' => self::$data['category2']['categoryID'],
+        ]);
+
+        $tmp = $tmp . ' ' . uniqid('comment_');
+        self::$data['comment2'] = $commentAPIController->post([
+            'body' => $tmp,
+            'format' => 'markdown',
+            'discussionID' => self::$data['discussion3']['discussionID'],
+        ]);
+        self::$data['comment2']['rawBody'] = $tmp;
+
+        self::$data['non_existing']['discussionID'] = 999999;
+        self::$data['non_existing']['categoryID'] = 999999;
+
         $this->ensureIndexed();
         $this->assertTrue(true);
     }
 
     /**
-     * Test search scoped to discussions.
+     * Tests for searching with a query param.
      *
+     * @param array $searchParams
+     * @param array $expectedResults
      * @depends testSetup
+     * @dataProvider queryDataProvider
      */
-    public function testRecordTypesDiscussion() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'recordTypes' => 'discussion',
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        $this->assertEquals(1, count($results));
-        $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
+    public function testCases(array $searchParams, array $expectedResults) {
+        $searchParams = $this->calculateParams($searchParams);
+        $expectedResults = $this->calculateResults($expectedResults);
+        $this->assertSearchResults($searchParams, $expectedResults, false, count($expectedResults['name']));
     }
 
     /**
-     * Test search scoped to comments.
+     * Calculate param values from their pseudo keys if need
      *
-     * @depends testSetup
+     * @param array $params
+     * @return array
      */
-    public function testRecordTypesComment() {
-        $params = [
-            'query' => self::$comment['rawBody'],
-            'recordTypes' => 'comment',
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        $this->assertEquals(1, count($results));
-        $this->assertRowsEqual(['recordType' => 'comment'], $results[0]);
+    private function calculateParams(array $params) {
+        if (array_key_exists('query', $params) && is_array($params['query'])) {
+            $query = '';
+            foreach ($params['query'] as $key => $field) {
+                $query .= self::$data[$key][$field];
+            }
+            $params['query'] = $query;
+        }
+        if (!empty($params['discussionID'] ?? '')) {
+            $params['discussionID'] = self::$data[$params['discussionID']]['discussionID'];
+        }
+        if (!empty($params['categoryID'] ?? '')) {
+            $params['categoryID'] = self::$data[$params['categoryID']]['categoryID'];
+        }
+        if (!empty($params['categoryIDs'] ?? '')) {
+            $categoryIDs = [];
+            foreach ($params['categoryIDs'] as $categoryKey) {
+                $categoryIDs[] = self::$data[$categoryKey]['categoryID'];
+            }
+            $params['categoryIDs'] = $categoryIDs;
+        }
+        return $params;
     }
 
     /**
-     * Test search scoped to a discussion.
+     * Calculate result set values from their pseudo keys if need
      *
-     * @depends testSetup
+     * @param array $results
+     * @return array
      */
-    public function testExistingDiscussionID() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'discussionID' => self::$discussion['discussionID'],
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        // Should return 2 both: discussion and comment for it
-        $this->assertEquals(2, count($results));
+    private function calculateResults(array $results) {
+        if (array_key_exists('name', $results) && is_array($results['name'])) {
+            $res = [];
+            foreach ($results['name'] as $key => $field) {
+                $res[] = self::$data[$key][$field];
+            }
+            $results['name'] = $res;
+        }
+        return $results;
     }
 
     /**
-     * Test search scoped to a non existing discussion.
-     *
      * @depends testSetup
+     * @return array
      */
-    public function testNonExistingDiscussionID() {
-        $params = [
-            'query' => self::$comment['rawBody'],
-            'discussionID' => 999999,
+    public function queryDataProvider() {
+        $types = ['discussion', 'comment', 'category'];
+        return [
+            'recordTypes => discussion' => [
+                [
+                    'query' => ['discussion1' => 'name'],
+                    'recordTypes' => 'discussion',
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                    ]
+                ]
+            ],
+            'recordTypes => comment' => [
+                [
+                    'query' => ['comment1' => 'rawBody'],
+                    'recordTypes' => 'comment',
+                ],
+                [
+                    'name' => [
+                        'comment1' => 'name',
+                    ]
+                ]
+            ],
+            'discussionID => discussion1' => [
+                [
+                    'recordTypes' => ['comment', 'discussion'],
+                    'discussionID' => 'discussion1'
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                        'comment1' => 'name',
+                    ]
+                ]
+            ],
+            'discussionID => non_existing' => [
+                [
+                    'recordTypes' => ['comment', 'discussion'],
+                    'discussionID' => 'non_existing'
+                ],
+                [
+                    'name' => []
+                ]
+            ],
+            'categoryID => category1' => [
+                [
+                    'recordTypes' => ['comment', 'discussion'],
+                    'categoryID' => 'category1'
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                        'discussion2' => 'name',
+                        'comment1' => 'name',
+                    ]
+                ]
+            ],
+            'categoryID => non_existing' => [
+                [
+                    'recordTypes' => ['comment', 'discussion'],
+                    'categoryID' => 'non_existing'
+                ],
+                [
+                    'name' => []
+                ]
+            ],
+            'categoryIDs => category1, category2' => [
+                [
+                    'recordTypes' => ['comment', 'discussion'],
+                    'categoryIDs' => ['category1', 'category2']
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                        'discussion2' => 'name',
+                        'comment1' => 'name',
+                        'discussion3' => 'name',
+                        'discussion4' => 'name',
+                        'comment2' => 'name',
+                    ]
+                ]
+            ],
+            'insertUserNames => circleci, daffewfega' => [
+                [
+                    'query' => ['discussion1' => 'name'],
+                    'insertUserNames' => 'circleci, daffewfega'
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                        'comment1' => 'name',
+                    ]
+                ]
+            ],
+            'insertUserIDs => 1,2' => [
+                [
+                    'query' => ['discussion1' => 'name'],
+                    'insertUserIDs' => '1,2'
+                ],
+                [
+                    'name' => [
+                        'discussion1' => 'name',
+                        'comment1' => 'name',
+                    ]
+                ]
+            ],
         ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        $this->assertTrue(count($results) === 0);
     }
 
     /**
-     * Test search scoped to a category.
+     * Test validation conflict categoryID vs categoryIDs
      *
      * @depends testSetup
      */
-    public function testExistingCategoryID() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'categoryID' => self::$category['categoryID'],
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        // Correct value is 2.
-        // Partially fixed https://github.com/vanilla/internal/issues/1963
-        $this->assertEquals(2, count($results));
-    }
-
-    /**
-     * Test search scoped to a non existing category.
-     *
-     * @depends testSetup
-     */
-    public function testNonExistingCategoryID() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'categoryID' => 777,
-        ];
-        $api = $this->api();
-        $response = $api->get('/search?' . http_build_query($params));
-
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-        $this->assertEquals(0, count($results));
-    }
-
-
-    /**
-     * Test search by user names.
-     *
-     * @depends testSetup
-     */
-    public function testInsertUserNames() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'insertUserNames' => 'circleci, daffewfega',
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        // Correct value is 2.
-        // Partially fixed https://github.com/vanilla/internal/issues/1963
-        $this->assertEquals(2, count($results));
-    }
-
-    /**
-     * Test search by user IDs
-     *
-     * @depends testSetup
-     */
-    public function testInsertUserIDs() {
-        $params = [
-            'query' => self::$discussion['name'],
-            'insertUserIDs' => '1,2',
-        ];
-        $response = $this->api()->get('/search?' . http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $results = $response->getBody();
-
-        // Correct value is 2.
-        // Partially fixed https://github.com/vanilla/internal/issues/1963
-        $this->assertEquals(2, count($results));
+    public function testValidationConflict() {
+        $this->expectExceptionMessage('Only one of categoryID, categoryIDs are allowed.');
+        $this->api()->get('/search', ['categoryID' => 1, 'categoryIDs' => [1,2]]);
     }
 
     /**
@@ -269,14 +321,14 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => 'Title Query',
             'Body' => 'Body',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
         ]);
 
         $discussionWrongTitle = $discussionModel->save([
             'Name' => 'Wrong',
             'Body' => 'Title Query in body',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
         ]);
 
         $this->ensureIndexed();
@@ -301,7 +353,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => 'date test filter ananas 7 1',
             'Body' => '7 1',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-01 12:00:00"
         ]);
 
@@ -309,7 +361,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => 'date test filter ananas 7 2',
             'Body' => '7 2',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-02 12:00:00"
         ]);
 
@@ -317,7 +369,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => 'date test filter ananas 7 3',
             'Body' => '7 3',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-03 12:00:00"
         ]);
 
@@ -649,7 +701,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => '3 sort test 7 1 relevance',
             'Body' => '7 1',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-01 12:00:00",
             'Points' => 1,
         ]);
@@ -658,7 +710,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => '1 sort test 7 2 relevance important',
             'Body' => '7 2 sort test',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-02 12:00:00",
             'Points' => 3,
         ]);
@@ -667,7 +719,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
             'Name' => '2 sort test 7 3 relevance',
             'Body' => '7 3',
             'Format' => 'markdown',
-            'CategoryID' => self::$category['categoryID'],
+            'CategoryID' => self::$data['category1']['categoryID'],
             'DateInserted' => "2019-07-03 12:00:00",
             'Points' => 2,
         ]);

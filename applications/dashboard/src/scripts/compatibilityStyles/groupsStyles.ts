@@ -5,21 +5,17 @@
  * @license GPL-2.0-only
  */
 
-import {
-    absolutePosition,
-    colorOut,
-    margins,
-    negativeUnit,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important, percent, translateX } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumLayoutVariables } from "./forumLayoutStyles";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const groupVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("groups");
@@ -45,11 +41,11 @@ export const groupsCSS = () => {
     const mediaQueries = layoutVars.mediaQueries();
 
     cssOut(`.Group-Banner`, {
-        height: unit(vars.banner.height),
+        height: styleUnit(vars.banner.height),
     });
 
     cssOut(`.groupToolbar`, {
-        marginTop: unit(32),
+        marginTop: styleUnit(32),
     });
 
     cssOut(
@@ -61,12 +57,12 @@ export const groupsCSS = () => {
         `,
         {
             color: "inherit",
-            marginRight: unit(6),
+            marginRight: styleUnit(6),
         },
     );
 
     cssOut(`.Group-Header.NoBanner .Group-Header-Info`, {
-        paddingLeft: unit(0),
+        paddingLeft: styleUnit(0),
     });
 
     cssOut(`.Group-Header`, {
@@ -94,10 +90,10 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
-        width: unit(vars.logo.height),
-        height: unit(vars.logo.height),
-        flexBasis: unit(vars.logo.height),
-        top: unit(vars.banner.height - vars.logo.height / 2),
+        width: styleUnit(vars.logo.height),
+        height: styleUnit(vars.logo.height),
+        flexBasis: styleUnit(vars.logo.height),
+        top: styleUnit(vars.banner.height - vars.logo.height / 2),
         background: "transparent",
         zIndex: 1,
     });
@@ -114,21 +110,21 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.GroupOptions`, {
-        top: calc(`100% + ${unit(globalVars.gutter.size)}`),
+        top: calc(`100% + ${styleUnit(globalVars.gutter.size)}`),
         marginLeft: "auto",
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
-        color: colorOut(globalVars.meta.colors.fg),
+        color: ColorsUtils.colorOut(globalVars.meta.colors.fg),
     });
 
     cssOut(`.Groups .Name.Group-Name .Options .Button`, {
         minWidth: 0,
-        marginLeft: unit(globalVars.gutter.size),
+        marginLeft: styleUnit(globalVars.gutter.size),
     });
 
     cssOut(`.DataTableContainer.Group-Box`, {
-        marginTop: unit(globalVars.gutter.size * 3),
+        marginTop: styleUnit(globalVars.gutter.size * 3),
     });
 
     cssOut(
@@ -156,11 +152,11 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.groupsMemberFilter`, {
-        marginTop: unit(100),
+        marginTop: styleUnit(100),
     });
 
     cssOut(`.Event-Title`, {
-        marginTop: unit(75),
+        marginTop: styleUnit(75),
     });
 
     cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
@@ -201,12 +197,12 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
-        paddingLeft: unit(58),
+        paddingLeft: styleUnit(58),
     });
 
     cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
-        paddingLeft: unit(0),
-        paddingRight: unit(70),
+        paddingLeft: styleUnit(0),
+        paddingRight: styleUnit(70),
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons`, {
@@ -216,7 +212,7 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
-        marginRight: unit(4),
+        marginRight: styleUnit(4),
     });
 
     cssOut(`.DataList .Item.Event.event .DateTile`, {
@@ -225,8 +221,8 @@ export const groupsCSS = () => {
 
     cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
         order: 1,
-        $nest: {
-            [`& .ToggleFlyout.OptionsMenu`]: {
+        ...{
+            [`.ToggleFlyout.OptionsMenu`]: {
                 display: "flex",
                 alignItems: "center",
             },
@@ -243,7 +239,7 @@ export const groupsCSS = () => {
     );
 
     cssOut(`.Group-Box`, {
-        marginBottom: unit(36),
+        marginBottom: styleUnit(36),
     });
 
     cssOut(`.Group-Header-Actions`, {
@@ -251,8 +247,8 @@ export const groupsCSS = () => {
         alignItems: "center",
         justifyContent: "space-between",
         width: percent(100),
-        ...margins({
-            vertical: unit(globalVars.gutter.size),
+        ...Mixins.margin({
+            vertical: styleUnit(globalVars.gutter.size),
         }),
     });
     cssOut(
@@ -276,7 +272,7 @@ export const groupsCSS = () => {
             textAlign: "left",
         }),
         mediaQueries.mobileDown({
-            marginBottom: unit(6),
+            marginBottom: styleUnit(6),
         }),
     );
 
@@ -294,8 +290,8 @@ export const groupsCSS = () => {
     `,
         mediaQueries.mobileDown({
             display: "block",
-            $nest: {
-                [`& .Button`]: {
+            ...{
+                [`.Button`]: {
                     marginRight: "auto",
                 },
             },

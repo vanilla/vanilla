@@ -38,7 +38,6 @@ export function ThemeColorPicker(_props: IProps) {
     );
 
     const classes = colorPickerClasses();
-    const colorInput = useRef<HTMLInputElement>(null);
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
 
@@ -49,12 +48,15 @@ export function ThemeColorPicker(_props: IProps) {
     const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue ?? null);
     const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? null);
 
-    useEffect(() => {
-        setTextFieldValue(rawValue ?? null);
-    }, [rawValue, setTextFieldValue]);
-
     // If we have no color selected we are displaying the default and are definitely valid.
     const isValidColor = textInputValue ? stringIsValidColor(textInputValue) : true;
+
+    useEffect(() => {
+        setTextFieldValue(rawValue ?? null);
+        if (stringIsValidColor(rawValue)) {
+            setLastValidColor(rawValue ?? null);
+        }
+    }, [rawValue, setTextFieldValue]);
 
     // Do initial load validation of the color.
     useEffect(() => {

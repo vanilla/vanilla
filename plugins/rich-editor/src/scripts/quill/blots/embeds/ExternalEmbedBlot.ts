@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@vanilla/library/src/scripts/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import { getData, setData } from "@vanilla/dom-utils";
-import { mountEmbed } from "@library/embeddedContent/embedService";
+import { mountEmbed } from "@vanilla/library/src/scripts/embeddedContent/embedService";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import ErrorBlot, { ErrorBlotType, IErrorData } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
@@ -153,7 +154,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
 
         // Remove the focus class. It should be handled by the mounted embed at this point.
         loaderElement && loaderElement.remove();
-        jsEmbed.classList.remove(FOCUS_CLASS);
+        jsEmbed.classList.remove(EMBED_FOCUS_CLASS);
         // Trigger an update.
         forceSelectionUpdate();
     }

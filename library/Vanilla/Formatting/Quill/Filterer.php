@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use exussum12\CoverageChecker\ArgParser;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Exception\FormattingException;
@@ -65,6 +66,13 @@ class Filterer {
                 continue;
             }
             $embed = &$op['insert']['embed-external'];
+            $type = array_key_exists('loaderData', $embed) ? $embed['loaderData']['type'] : $embed['data']['embedType'];
+
+            // If 'Garden.Format.DisableUrlEmbeds' convert external embeds to links
+            if (($type !== QuoteEmbed::TYPE) && c('Garden.Format.DisableUrlEmbeds', false)) {
+                $operations[$key] = $this->convertExternalEmbedToLink($embed);
+                continue;
+            }
 
             // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
             // We want to strip these embeds that haven't finished properly loading.
@@ -83,5 +91,24 @@ class Filterer {
         }
 
         return array_values($operations);
+    }
+
+    /**
+     * Convert external embeds to links
+     *
+     * @param array $embed
+     * @return array|null
+     */
+    private function convertExternalEmbedToLink(array $embed = []): ?array {
+        if (empty($embed)) {
+            return null;
+        }
+
+        return [
+            'attributes' => [
+                'link' => $embed['loaderData']['link']
+            ],
+            'insert' => $embed['loaderData']['link']
+        ];
     }
 }

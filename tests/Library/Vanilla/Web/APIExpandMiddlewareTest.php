@@ -59,10 +59,21 @@ class APIExpandMiddlewareTest extends TestCase {
 
         $this->middleware = new APIExpandMiddleware(
             "/",
-            \Vanilla\Permissions::RANK_COMMUNITY_MANAGER,
+            Permissions::RANK_COMMUNITY_MANAGER,
             $userModel,
             $session
         );
+
+        $this->middleware->addExpandField("ssoID", [
+            "firstInsertUser.ssoID" => "firstInsertUserID",
+            "insertUser.ssoID" => "insertUserID",
+            "lastInsertUser.ssoID" => "lastInsertUserID",
+            "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
+            "lastUser.ssoID" => "lastUserID",
+            "updateUser.ssoID" => "updateUserID",
+            "user.ssoID" => "userID",
+            "ssoID" => "userID",
+        ], [$userModel, "getDefaultSSOIDs"]);
     }
 
     /**
@@ -133,6 +144,47 @@ class APIExpandMiddlewareTest extends TestCase {
                 'ssoID' => 'sso-2',
             ],
         ], $actual->getData());
+    }
+
+    /**
+     * You should be able to specify multiple fields from separate field expanders.
+     */
+    public function testMultipleExpanders(): void {
+        // Should already have one expander, added in setup. Add another.
+        $this->middleware->addExpandField("extended", [
+            "updateUser.foo" => "updateUserID",
+        ], function (array $ids) {
+            $r = [];
+            foreach ($ids as $id) {
+                $r[$id] = "bar-{$id}";
+            }
+            return $r;
+        });
+
+        $otherExpand = "baz";
+        $expand = ["insertUser.ssoID", "updateUser.foo", $otherExpand];
+        $request = new Request("/?expand=" . implode(",", $expand));
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, function () {
+            return [
+                "insertUserID" => 1,
+                "body" => "foo",
+                "updateUserID" => 2,
+            ];
+        });
+        $this->assertSame([
+            "insertUserID" => 1,
+            "body" => "foo",
+            "updateUserID" => 2,
+            "insertUser" => [
+                "ssoID" => "sso-1",
+            ],
+            "updateUser" => [
+                "foo" => "bar-2",
+            ],
+        ], $actual->getData());
+        $this->assertSame($otherExpand, $request->getQuery()["expand"]);
     }
 
     /**

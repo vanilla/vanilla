@@ -6,7 +6,7 @@
 import React from "react";
 import CheckboxGroup from "@vanilla/library/src/scripts/forms/CheckboxGroup";
 import Checkbox from "@library/forms/Checkbox";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import flatten from "lodash/flatten";
 import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
 import { inputBlockClasses } from "@vanilla/library/src/scripts/forms/InputBlockStyles";

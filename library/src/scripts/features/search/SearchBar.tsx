@@ -6,7 +6,8 @@
 
 import Translate from "@library/content/Translate";
 import { IComboBoxOption, ISearchBarProps } from "@library/features/search/ISearchBarProps";
-import { ISearchBarOverwrites, searchBarClasses, searchBarVariables } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarVariables } from "@library/features/search/SearchBar.variables";
 import { SearchScope } from "@library/features/search/SearchScope";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -27,6 +28,7 @@ import { AsyncCreatable, components } from "react-select";
 import { MenuProps } from "react-select/lib/components/Menu";
 import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
+import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
 
 // Re-exported after being moved.
 export { IComboBoxOption };
@@ -161,7 +163,7 @@ export default React.forwardRef(function SearchBar(
         };
     }, [optionComponent, resultsRef]);
 
-    const [options, setOptions] = useState([]);
+    const [options, setOptions] = useState<any[]>([]);
 
     const menuIsOpen = (props.resultsRef?.current && props.forceMenuOpen) || isMenuVisible;
 
@@ -184,8 +186,24 @@ export default React.forwardRef(function SearchBar(
             cached={true}
             loadOptions={() => {
                 return props.loadOptions?.(props.value).then((results) => {
-                    setOptions(results);
-                    return results;
+                    // We want items belonging to group, category, and kb types to be on top
+                    // of the list (inline elements), but we cannot simply copy over, since
+                    // react-select use label to identify the items, and so there will be
+                    // double hover, double listing etc. behavior.
+                    const placesListingResults = results
+                        .filter((result) =>
+                            [PLACES_GROUP_TYPE, PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE].includes(result.type),
+                        )
+                        .map((result) => ({ ...result, label: `places___${result.label}___` }));
+
+                    if (placesListingResults[0]) {
+                        placesListingResults[0].data.isFirst = true;
+                    }
+
+                    const result = [...placesListingResults, ...results];
+
+                    setOptions(result);
+                    return result;
                 });
             }}
             defaultOptions={props.forcedOptions}
@@ -455,7 +473,7 @@ function SearchBarControl(props: IControlProps) {
                     </div>
                 </div>
             </div>
-            <ConditionalWrap condition={!searchButtonIsVisible} className={visibility().srOnly}>
+            <ConditionalWrap condition={!searchButtonIsVisible} className={visibility().visuallyHidden}>
                 <Button
                     submit={true}
                     id={searchButtonID}

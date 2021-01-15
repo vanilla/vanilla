@@ -5,8 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
@@ -60,33 +62,33 @@ export const frameClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
 
     const headerWrap = style("headerWrap", {
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
     const bodyWrap = style("bodyWrap", {
         position: "relative",
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         width: percent(100),
     });
     const footerWrap = style("footerWrap", {
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
 
     const root = style(
         {
-            backgroundColor: colorOut(vars.colors.bg),
+            backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
             maxHeight: viewHeight(80),
             height: percent(100),
-            borderRadius: unit(vars.border.radius),
+            borderRadius: styleUnit(vars.border.radius),
             width: percent(100),
             position: "relative",
             display: "flex",
             flexDirection: "column",
             minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
-            $nest: {
+            ...{
                 [`.${bodyWrap}`]: {
                     flexGrow: 1,
                     overflowY: "auto",

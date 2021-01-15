@@ -3,29 +3,22 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import {
-    fonts,
-    unit,
-    colorOut,
-    paddings,
-    singleBorder,
-    EMPTY_BORDER,
-    EMPTY_SPACING,
-    EMPTY_FONTS,
-    borders,
-} from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
 import { userPhotoVariables, userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { BorderBottomProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { TLength } from "@library/styles/styleShim";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { TextTransformProperty } from "csstype";
 import { IAllLayoutMediaQueries } from "@library/layout/types/interface.panelLayout";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { makeTestConfig } from "build/scripts/configs/makeTestConfig";
 
@@ -45,21 +38,18 @@ export const memberListVariables = useThemeCache((forcedVars?: IThemeVariables) 
     });
 
     const label = makeVars("label", {
-        border: {
-            ...EMPTY_BORDER,
+        border: Variables.border({
             color: globalVars.mainColors.primary,
             radius: 3,
-        },
-        padding: {
-            ...EMPTY_SPACING,
+        }),
+        padding: Variables.spacing({
             horizontal: 7,
-        },
-        font: {
-            ...EMPTY_FONTS,
+        }),
+        font: Variables.font({
             color: globalVars.mainColors.primary,
             size: 10,
-            transform: "uppercase" as TextTransformProperty,
-        },
+            transform: "uppercase",
+        }),
     });
 
     const head = makeVars("head", {
@@ -87,7 +77,7 @@ export const memberListClasses = useThemeCache(() => {
     const vars = memberListVariables();
 
     const root = style("root", {
-        ...paddings(vars.spacing.padding),
+        ...Mixins.padding(vars.spacing.padding),
         borderBottom: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
@@ -115,10 +105,10 @@ export const memberListClasses = useThemeCache(() => {
         display: "flex",
         justifyContent: "flex-start",
         alignItems: "center",
-        paddingLeft: unit(12),
-        maxWidth: calc(`100% - ${unit(userPhotoVariables().sizing.medium)}`),
-        minHeight: unit(userPhotoVariables().sizing.medium),
-        $nest: {
+        paddingLeft: styleUnit(12),
+        maxWidth: calc(`100% - ${styleUnit(userPhotoVariables().sizing.medium)}`),
+        minHeight: styleUnit(userPhotoVariables().sizing.medium),
+        ...{
             [`&.${mainContentCompact}`]: {
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -133,29 +123,29 @@ export const memberListClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const profileLink = style("profileLink", {
-        ...fonts({
+        ...Mixins.font({
             size: globalVars.fonts.size.large,
         }),
-        marginRight: unit(globalVars.gutter.size),
-        $nest: linkColors.$nest,
+        marginRight: styleUnit(globalVars.gutter.size),
+        ...linkColors,
     });
 
     const cell = style("container", {
-        ...paddings(vars.spacing.padding),
+        ...Mixins.padding(vars.spacing.padding),
     });
 
     const isLeft = style("isLeft", {
-        $nest: {
-            "&&": { paddingLeft: unit(globalVars.gutter.size) },
+        "&&": {
+            paddingLeft: styleUnit(globalVars.gutter.size),
         },
     });
 
     const isRight = style("isRight", {
         verticalAlign: "top",
-        $nest: {
-            "&&": { paddingRight: unit(globalVars.gutter.size) },
+        "&&": {
+            paddingRight: styleUnit(globalVars.gutter.size),
         },
     });
 
@@ -165,7 +155,7 @@ export const memberListClasses = useThemeCache(() => {
     });
 
     const date = style("date", {
-        ...fonts({
+        ...Mixins.font({
             size: globalVars.fonts.size.large,
             color: globalVars.meta.text.color,
             lineHeight: globalVars.lineHeights.condensed,
@@ -181,11 +171,11 @@ export const memberListClasses = useThemeCache(() => {
 
     const label = style("label", {
         display: "inline-flex",
-        ...fonts(vars.label.font),
-        ...paddings(vars.label.padding),
-        ...borders(vars.label.border),
+        ...Mixins.padding(vars.label.padding),
+        ...Mixins.font(vars.label.font),
+        ...Mixins.border(vars.label.border),
         alignItems: "center",
-        minHeight: unit(globalVars.fonts.size.large),
+        minHeight: styleUnit(globalVars.fonts.size.large),
         flexShrink: 1,
         lineHeight: 1,
     });
@@ -197,17 +187,17 @@ export const memberListClasses = useThemeCache(() => {
     const mainColumn = style("mainColumn", {});
 
     const postsColumn = style("postsColumn", {
-        minWidth: unit(vars.columns.posts.minWidth),
+        minWidth: styleUnit(vars.columns.posts.minWidth),
         verticalAlign: "top",
     });
 
     const lastActiveColumn = style("lastActiveColumn", {
-        minWidth: unit(vars.columns.lastActive.minWidth),
+        minWidth: styleUnit(vars.columns.lastActive.minWidth),
     });
 
     const head = style("head", {
-        ...paddings(vars.head.padding),
-        ...fonts({
+        ...Mixins.padding(vars.head.padding),
+        ...Mixins.font({
             size: globalVars.fonts.size.medium,
             weight: globalVars.fonts.weights.semiBold,
             transform: "uppercase",
@@ -227,7 +217,7 @@ export const memberListClasses = useThemeCache(() => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: unit(userPhotoVariables().sizing.medium),
+        minHeight: styleUnit(userPhotoVariables().sizing.medium),
     });
 
     return {

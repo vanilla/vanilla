@@ -14,7 +14,8 @@
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
             "@groups/*": ["./applications/groups/src/scripts/*"],
             "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
-            "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"]
+            "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"],
+            "typestyle": ["./library/src/scripts/styles/styleShim.ts"]
         },
         "typeRoots": ["@types", "./node_modules/@types"]
     },

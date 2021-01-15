@@ -85,6 +85,26 @@ class TestHtmlDocument extends HtmlDocument {
         }
     }
 
+
+    /**
+     * Assert that IF a CSS selector exists,. it does not contain a string.
+     *  Good for making sure the correct error message is displaying
+     *
+     * @param string $cssSelector The CSS selector query.
+     * @param string $expected The expected text value.
+     * @return void Does not return an error if it is not present.
+     */
+    public function assertCssSelectorNotTextContains(string $cssSelector, string $expected) {
+        $items = $this->queryCssSelector($cssSelector);
+        foreach ($items as $item) {
+            if (isset($item)) {
+                TestCase::assertStringNotContainsString($expected, $item->textContent);
+                return $item;
+            }
+        }
+        TestCase::assertStringNotContainsString($expected, '');
+    }
+
     /**
      * Assert that some string is within the HTML somewhere.
      *
@@ -119,6 +139,24 @@ class TestHtmlDocument extends HtmlDocument {
         $node = $this->assertCssSelectorExists("input[name=\"$name\"]", "Could not find form input: $name");
         if ($value !== null) {
             $attr = $node->getAttribute('value');
+            TestCase::assertSame($value, $attr);
+        }
+
+        return $node;
+    }
+
+
+    /**
+     * Assert that there is a form textarea with a given name and value.
+     *
+     * @param string $name The form input name.
+     * @param string|null $value The desired value. Pass `null` to not assert and just return the node.
+     * @return \DOMNode Returns the matched node.
+     */
+    public function assertFormTextArea(string $name, ?string $value = null): \DOMNode {
+        $node = $this->assertCssSelectorExists("textarea[name=\"$name\"]", "Could not find form input: $name");
+        if ($value !== null) {
+            $attr = $node->nodeValue;
             TestCase::assertSame($value, $attr);
         }
 

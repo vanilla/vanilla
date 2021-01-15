@@ -8,14 +8,17 @@
  * @since 2.0
  */
 
+use Garden\Container\Callback;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Dashboard\Modules\CommunityLeadersModule;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Contracts;
+use Vanilla\Utility\ContainerUtils;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Web\APIExpandMiddleware;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -99,10 +102,32 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         $privateIPs = \Gdn::config('Garden.Privacy.IPs');
 
         if (in_array($privateIPs, ['full', 'partial'])) {
-            \Vanilla\Utility\ContainerUtils::addCall($dic, \Gdn_Request::class, 'anonymizeIP', [$privateIPs === 'full']);
+            ContainerUtils::addCall($dic, \Gdn_Request::class, 'anonymizeIP', [$privateIPs === 'full']);
             // This is a kludge, but given this is a privacy setting, let's ensure newed up IPs are used properly.
             $_SERVER['HTTP_CLIENT_IP'] = $_SERVER['HTTP_X_FORWARDED_FOR'] = $_SERVER['REMOTE_ADDR'] = \Gdn::request()->getIP();
         }
+
+        ContainerUtils::addCall(
+            $dic,
+            APIExpandMiddleware::class,
+            "addExpandField",
+            [
+                "ssoID",
+                [
+                    "firstInsertUser.ssoID" => "firstInsertUserID",
+                    "insertUser.ssoID" => "insertUserID",
+                    "lastInsertUser.ssoID" => "lastInsertUserID",
+                    "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
+                    "lastUser.ssoID" => "lastUserID",
+                    "updateUser.ssoID" => "updateUserID",
+                    "user.ssoID" => "userID",
+                    "ssoID" => "userID",
+                ],
+                new Callback(function (Container $dic) {
+                    return [$dic->get(UserModel::class), "getDefaultSSOIDs"];
+                })
+            ]
+        );
     }
 
     /**

@@ -163,8 +163,11 @@ class ModelUtils {
 
         // Gather all of the IDs.
         $ids = [];
-        foreach ($idFields as $idField => $aliasField) {
-            $ids += array_column($dataset, $idField, $idField);
+        foreach ($dataset as $row) {
+            foreach ($idFields as $idField => $aliasField) {
+                $currentID = ArrayUtils::getByPath($idField, $row);
+                $ids[$currentID] = $currentID;
+            }
         }
 
         // Fetch them.
@@ -173,7 +176,7 @@ class ModelUtils {
         // Join them back into the data.
         foreach ($dataset as &$row) {
             foreach ($idFields as $idField => $aliasField) {
-                $row[$aliasField] = $fragments[$row[$idField]] ?? $default;
+                ArrayUtils::setByPath($aliasField, $row, $fragments[ArrayUtils::getByPath($idField, $row)] ?? $default);
             }
         }
     }
@@ -189,7 +192,7 @@ class ModelUtils {
      * ]
      * ```
      *
-     * The `idField` is the name of the array key in a dataset used to gather the IDs and the the `aliasField` is what is meant
+     * The `idField` is the name of the array key in a dataset used to gather the IDs and the `aliasField` is what is meant
      * to add to the result array. The input array can handle shorter forms, such as.
      *
      * ```

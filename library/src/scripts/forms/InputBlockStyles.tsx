@@ -5,15 +5,19 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { OverflowProperty, ResizeProperty } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const inputBlockClasses = useThemeCache(() => {
     const style = styleFactory("inputBlock");
@@ -36,17 +40,17 @@ export const inputBlockClasses = useThemeCache(() => {
     const root = style({
         display: "block",
         width: percent(100),
-        $nest: {
+        ...{
             [`& + &`]: {
-                marginTop: unit(formElementVars.spacing.margin),
+                marginTop: styleUnit(formElementVars.spacing.margin),
             },
             [`&.isLast`]: {
-                marginBottom: unit(formElementVars.spacing.margin),
+                marginBottom: styleUnit(formElementVars.spacing.margin),
             },
             [`&.hasError .${inputText}`]: {
-                borderColor: colorOut(globalVars.messageColors.error.fg),
-                backgroundColor: colorOut(globalVars.messageColors.error.fg),
-                color: colorOut(globalVars.messageColors.error.fg),
+                borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+                color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
             },
             "&.isHorizontal": {
                 display: "flex",
@@ -63,7 +67,7 @@ export const inputBlockClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             [`&.${tokensClasses().withIndicator} .tokens__value-container`]: {
-                paddingRight: unit(inputVariables().sizing.height),
+                paddingRight: styleUnit(inputVariables().sizing.height),
             },
             [`&.${tokensClasses().withIndicator} .tokens__indicators`]: {
                 position: "absolute",
@@ -76,23 +80,23 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const errors = style("errors", {
         display: "block",
-        fontSize: unit(globalVars.fonts.size.small),
+        fontSize: styleUnit(globalVars.fonts.size.small),
     });
 
     const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
 
     const error = style("error", {
         display: "block",
-        color: colorOut(globalVars.messageColors.error.fg),
-        $nest: {
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        ...{
             "& + &": {
-                marginTop: unit(6),
+                marginTop: styleUnit(6),
             },
         },
     });
     const labelNote = style("labelNote", {
         display: "block",
-        fontSize: unit(globalVars.fonts.size.small),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         fontWeight: globalVars.fonts.weights.normal,
         opacity: 0.6,
     });
@@ -100,8 +104,8 @@ export const inputBlockClasses = useThemeCache(() => {
     const labelText = style("labelText", {
         display: "block",
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: unit(globalVars.fonts.size.medium),
-        marginBottom: unit(formElementVars.spacing.margin),
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        marginBottom: styleUnit(formElementVars.spacing.margin),
     });
 
     const sectionTitle = style("sectionTitle", {
@@ -110,42 +114,42 @@ export const inputBlockClasses = useThemeCache(() => {
     });
 
     const fieldsetGroup = style("fieldsetGroup", {
-        marginTop: unit(formElementVars.spacing.margin),
-        $nest: {
+        marginTop: styleUnit(formElementVars.spacing.margin),
+        ...{
             "&.noMargin": {
-                marginTop: unit(0),
+                marginTop: styleUnit(0),
             },
         },
     });
 
     const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
         return style("multiLine", {
-            ...paddings({ vertical: 9 }),
+            ...Mixins.padding({ vertical: 9 }),
             resize: (resize ? resize : "vertical") as ResizeProperty,
             overflow: (overflow ? overflow : "auto") as OverflowProperty,
         });
     };
 
     const related = style("related", {
-        marginTop: unit(globalVars.gutter.size),
+        marginTop: styleUnit(globalVars.gutter.size),
     });
 
     const grid = style("grid", {
         display: "flex",
         flexWrap: "wrap",
-        $nest: {
-            [`& .${checkRadioClasses().root}`]: {
+        ...{
+            [`.${checkRadioClasses().root}`]: {
                 width: percent(50),
                 alignItems: "flex-start",
             },
             [`&.${fieldsetGroup}`]: {
-                marginTop: unit(9),
+                marginTop: styleUnit(9),
             },
         },
-    } as NestedCSSProperties);
+    });
 
     const tight = style("tight", {
-        $nest: {
+        ...{
             [`&&&`]: {
                 marginTop: negativeUnit(9),
             },

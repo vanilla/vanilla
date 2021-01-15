@@ -8,6 +8,7 @@
 namespace VanillaTests\Dashboard\Models;
 
 use Garden\Events\BulkUpdateEvent;
+use Garden\Events\ResourceEvent;
 use PHPUnit\Framework\Constraint\IsInstanceOf;
 use PHPUnit\Framework\Constraint\IsType;
 use Psr\SimpleCache\CacheInterface;
@@ -17,6 +18,7 @@ use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Formatting\DateTimeFormatter;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\EventSpyTestTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -26,6 +28,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 class UserVisitUpdaterTest extends AbstractAPIv2Test {
     use EventSpyTestTrait;
     use UsersAndRolesApiTestTrait;
+    use CommunityApiTestTrait;
     use SetupTraitsTrait;
 
     /**
@@ -134,6 +137,33 @@ class UserVisitUpdaterTest extends AbstractAPIv2Test {
                 'dateLastActive' => $updateTime->format(DATE_RFC3339)
             ]
         ));
+    }
+
+    /**
+     * Test that restricted property updates don't fire events.
+     */
+    public function testRestrictedPropertiesEvents() {
+        $user = $this->createUser();
+        $userID = $user["userID"];
+
+        $this->clearDispatchedEvents();
+
+        // 1. Giving a user points shouldn't fire and event.
+        $this->givePoints($user["userID"], 10);
+
+        $this->assertEventNotDispatched(["type" => "user", "action" => ResourceEvent::ACTION_UPDATE]);
+        $this->assertDirtyRecordInserted("user", $userID);
+
+        // 2. Updating a users discussion count shouldn't an fire event.
+        $currentApiUser = $this->api()->getUserID();
+        $this->api()->setUserID($userID);
+
+        $this->createDiscussion();
+
+        $this->assertEventNotDispatched(["type" => "user", "action" => ResourceEvent::ACTION_UPDATE]);
+        $this->assertDirtyRecordInserted("user", $userID);
+
+        $this->api()->setUserID($currentApiUser);
     }
 
     /**

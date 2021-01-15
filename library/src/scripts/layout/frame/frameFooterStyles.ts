@@ -5,10 +5,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { singleBorder } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { important } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const frameFooterClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -17,14 +21,14 @@ export const frameFooterClasses = useThemeCache(() => {
 
     const root = style({
         display: "flex",
-        minHeight: unit(vars.footer.minHeight),
+        minHeight: styleUnit(vars.footer.minHeight),
         alignItems: "center",
         position: "relative",
         zIndex: 1,
         borderTop: singleBorder(),
         flexWrap: "wrap",
         justifyContent: "space-between",
-        ...paddings({
+        ...Mixins.padding({
             top: 0,
             bottom: 0,
             left: vars.footer.spacing,
@@ -33,7 +37,7 @@ export const frameFooterClasses = useThemeCache(() => {
     });
 
     const justifiedRight = style("justifiedRight", {
-        $nest: {
+        ...{
             "&&": {
                 justifyContent: "flex-end",
             },
@@ -41,16 +45,16 @@ export const frameFooterClasses = useThemeCache(() => {
     });
 
     const markRead = style("markRead", {
-        $nest: {
+        ...{
             "&.buttonAsText": {
                 fontWeight: globalVars.fonts.weights.semiBold,
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
         },
     });
 
     const actionButton = style("actionButton", {
-        marginLeft: unit(24),
+        marginLeft: styleUnit(24),
     });
 
     const selfPadded = style({
@@ -59,7 +63,7 @@ export const frameFooterClasses = useThemeCache(() => {
     });
 
     const forDashboard = style({
-        minHeight: unit(65),
+        minHeight: styleUnit(65),
     });
 
     return {

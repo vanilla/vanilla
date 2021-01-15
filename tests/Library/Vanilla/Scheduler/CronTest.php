@@ -10,12 +10,14 @@ namespace VanillaTests\Library\Vanilla\Scheduler;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\EventManager;
+use Gdn_Cache;
 use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Scheduler\TrackingSlip;
+use VanillaTests\Fixtures\OfflineNullCache;
 use VanillaTests\Fixtures\Scheduler\EchoJob;
 use VanillaTests\Fixtures\Scheduler\ThrowableEchoJob;
 
@@ -141,7 +143,10 @@ class CronTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      */
     public function testAddCronEchoJobWithCronExecutionTypeOfflineCache() {
-        $container = $this->getConfiguredContainer(false);
+        $container = $this->getConfiguredContainer();
+
+        $offlineCache = $container->get(OfflineNullCache::class);
+        $container->setInstance(Gdn_Cache::class, $offlineCache);
 
         /** @var $eventManager EventManager */
         $eventManager = $container->get(EventManager::class);

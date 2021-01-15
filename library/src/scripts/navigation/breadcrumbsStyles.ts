@@ -6,19 +6,13 @@
 
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { px, em } from "csx";
-import {
-    colorOut,
-    margins,
-    singleLineEllipsis,
-    unit,
-    userSelect,
-    EMPTY_FONTS,
-    fonts,
-    ensureColorHelper,
-} from "@library/styles/styleHelpers";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { em } from "csx";
+import { singleLineEllipsis, userSelect, ensureColorHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const breadcrumbsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -28,15 +22,13 @@ export const breadcrumbsVariables = useThemeCache(() => {
         minHeight: 16,
     });
 
-    const linkColors = clickableItemStates();
     const link = makeVariables("link", {
-        textTransform: "uppercase",
-        font: {
-            ...EMPTY_FONTS,
-            color: ensureColorHelper(linkColors.color as string),
+        font: Variables.font({
+            color: ensureColorHelper(globalVars.links.colors.default),
             size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
-        },
+            transform: "uppercase",
+        }),
     });
 
     return { sizing, link };
@@ -46,13 +38,12 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = breadcrumbsVariables();
     const style = styleFactory("breadcrumbs");
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        ...fonts(vars.link.font),
-        textTransform: vars.link.textTransform as any,
-        $nest: linkColors.$nest,
+        ...Mixins.font(vars.link.font),
+        ...linkColors,
     });
 
     const root = style({
@@ -60,7 +51,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        $nest: {
+        ...{
             [`& a.${link}`]: {
                 textDecoration: "underline",
             },
@@ -70,7 +61,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const crumb = style("crumb", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        fontSize: unit(globalVars.fonts.size.small),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
         overflow: "hidden",
     });
@@ -81,12 +72,12 @@ export const breadcrumbsClasses = useThemeCache(() => {
         flexDirection: "row",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        minHeight: unit(vars.sizing.minHeight),
+        minHeight: styleUnit(vars.sizing.minHeight),
     });
 
     const separator = style("separator", {
         ...userSelect(),
-        ...margins({
+        ...Mixins.margin({
             vertical: 0,
             horizontal: em(0.2),
         }),
@@ -106,7 +97,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const breadcrumb = style("breadcrumb", {
         display: "inline-flex",
         lineHeight: 1,
-        minHeight: unit(vars.sizing.minHeight),
+        minHeight: styleUnit(vars.sizing.minHeight),
     });
 
     const current = style("current", {

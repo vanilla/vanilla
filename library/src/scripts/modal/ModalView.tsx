@@ -10,7 +10,6 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
-import { forceRenderStyles } from "typestyle";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
 
@@ -117,6 +116,7 @@ export function ModalView(props: IProps) {
                     fromDirection: FromDirection.TOP,
                 };
             case ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT:
+            case ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT_LARGE:
                 return {
                     fade: false,
                     fromDirection: FromDirection.RIGHT,
@@ -129,9 +129,6 @@ export function ModalView(props: IProps) {
         }
     })();
 
-    // We HAVE to render force the styles to render before componentDidMount
-    // And our various focusing tricks or the page will jump.
-    forceRenderStyles();
     return (
         <div onKeyPress={props.onKeyPress}>
             <EntranceAnimation
@@ -163,6 +160,7 @@ export function ModalView(props: IProps) {
                                     size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT ||
                                     size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
                                 isSidePanelRight: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT,
+                                isSidePanelRightLarge: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT_LARGE,
                                 isSidePanelLeft: size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
                                 isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
                                 isXL: size === ModalSizes.XL,

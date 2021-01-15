@@ -1,0 +1,13 @@
+<div class="card">
+    <div class="card-block card-block-minimal">
+        <h4 class="card-title">{{ widgetName }}</h4>
+        <ul class="card-label-list">
+            {% for parameter in parameters %}
+                <li>
+                    <strong>{{ parameter.name }}</strong>
+                    <span>{{ parameter.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

@@ -149,6 +149,10 @@ form {
             max-width: 100%;
         }
     }
+
+    .dashboard-main & {
+        margin-bottom: 0;
+    }
 }
 
 // Radio and Checkbox Groups
@@ -185,7 +189,8 @@ label,
 .input-wrap {
 
     input,
-    .SelectOne__single-value {
+    .SelectOne__single-value,
+    .SelectOne__placeholder {
         font-size: 14px;
     }
 

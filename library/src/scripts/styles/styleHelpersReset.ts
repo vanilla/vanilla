@@ -4,14 +4,15 @@
  * @license GPL-2.0-only
  */
 
+import { CSSObject } from "@emotion/css";
 import { AppearanceProperty } from "csstype";
 import { important } from "csx";
 
-export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false) => {
+export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false): CSSObject => {
     const val = (isImportant ? important(value) : value) as any;
     return {
-        "-webkit-appearance": val,
-        "-moz-appearance": val,
+        WebkitAppearance: val,
+        MozAppearance: val,
         appearance: val,
     };
 };

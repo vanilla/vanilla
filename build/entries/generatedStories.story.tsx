@@ -8,12 +8,14 @@ import React, { useEffect } from "react";
 import { storiesOf } from "@storybook/react";
 import { useStoryConfig, NO_WRAPPER_CONFIG } from "@vanilla/library/src/scripts/storybook/StoryContext";
 import classNames from "classnames";
-import { compatibilityStyles, cssOut } from "@dashboard/compatibilityStyles";
+import { compatibilityStyles } from "@dashboard/compatibilityStyles";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import "../../addons/themes/theme-foundation/src/scss/custom.scss";
 import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { initAllUserContent } from "@vanilla/library/src/scripts/content";
 
 ///
 /// These imports are just so that the files get loaded into storybook.
@@ -79,6 +81,7 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         applyCompatibilityIcons();
         applyCompatibilityUserCards();
         loadedCSS();
+        initAllUserContent();
 
         // Add HTML links.
         const dynamicCssFiles = data.cssFiles;

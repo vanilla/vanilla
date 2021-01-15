@@ -5,10 +5,13 @@
  * @license GPL-2.0-only
  */
 
-import { importantUnit, margins, unit } from "@library/styles/styleHelpers";
+import { importantUnit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { calc, important } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { Mixins } from "@library/styles/Mixins";
 
 export const photoGridVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("groups");
@@ -29,15 +32,15 @@ export const photoGridCSS = () => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        ...margins({
+        ...Mixins.margin({
             vertical: importantUnit(-vars.spacer.default),
             left: importantUnit(-vars.spacer.default),
         }),
-        width: important(calc(`100% + ${unit(vars.spacer.default * 2)}`)),
+        width: important(calc(`100% + ${styleUnit(vars.spacer.default * 2)}`)),
     });
 
     cssOut(`.PhotoGrid .PhotoWrap`, {
-        ...margins({
+        ...Mixins.margin({
             all: importantUnit(vars.spacer.default),
         }),
     });

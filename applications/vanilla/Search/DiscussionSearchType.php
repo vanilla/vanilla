@@ -8,6 +8,8 @@
 namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Cloud\ElasticSearch\Driver\ElasticSearchQuery;
 use Vanilla\DateFilterSchema;
@@ -108,6 +110,10 @@ class DiscussionSearchType extends AbstractSearchType {
             ]);
             $results = $results->getData();
 
+            if (!$results) {
+                return [];
+            }
+
             $resultItems = array_map(function ($result) {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'discussionID',
@@ -201,6 +207,12 @@ class DiscussionSearchType extends AbstractSearchType {
             'categoryID:i?' => [
                 'x-search-scope' => true,
             ],
+            'categoryIDs:a?' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'x-search-scope' => true,
+            ],
             'followedCategories:b?' => [
                 'x-search-filter' => true,
             ],
@@ -246,6 +258,12 @@ class DiscussionSearchType extends AbstractSearchType {
         $categoryID = $query->getQueryParameter('categoryID', null);
         if ($categoryID !== null && !$this->categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View')) {
             throw new PermissionException('Vanilla.Discussions.View');
+        }
+        $categoryIDs = $query->getQueryParameter('categoryIDs', null);
+        if ($categoryID !== null && $categoryIDs !== null) {
+            $validation = new Validation();
+            $validation->addError('categoryID', 'Only one of categoryID, categoryIDs are allowed.');
+            throw new ValidationException($validation);
         }
     }
 
@@ -364,7 +382,8 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('categoryID'),
             $query->getQueryParameter('followedCategories'),
             $query->getQueryParameter('includeChildCategories'),
-            $query->getQueryParameter('includeArchivedCategories')
+            $query->getQueryParameter('includeArchivedCategories'),
+            $query->getQueryParameter('categoryIDs')
         );
         return $categoryIDs;
     }

@@ -10,8 +10,11 @@
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Vanilla\Events\DirtyRecordTrait;
+use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
@@ -34,6 +37,8 @@ use Vanilla\Dashboard\Models\BannerImageModel;
  * Manages discussion categories' data.
  */
 class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface {
+
+    use LegacyDirtyRecordTrait;
 
     private const ADJUST_COUNT_DECREMENT = "decrement";
 
@@ -324,7 +329,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         ?int $categoryID = null,
         ?bool $followedCategories = null,
         ?bool $includeChildCategories = null,
-        ?bool $includeArchivedCategories = null
+        ?bool $includeArchivedCategories = null,
+        ?array $categoryIDs = null
     ): array {
         $categoryFilter = [
             'forceArrayReturn' => true,
@@ -349,6 +355,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 $selectedCategoryIDs = [$categoryID];
             }
             $resultIDs = array_intersect($selectedCategoryIDs, $resultIDs);
+        } elseif (!empty($categoryIDs)) {
+            $resultIDs = array_intersect($categoryIDs, $resultIDs);
         }
 
         // Make sure 0 (allowing other record types) makes it in.
@@ -605,9 +613,12 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 continue;
             }
 
+            $lazyPermSet = self::$toLazySet[$categoryID]['PermsDiscussionsView'] ?? false;
             if (!$category['PermsDiscussionsView']) {
-                $unfiltered = false;
-                continue;
+                if (!$lazyPermSet) {
+                    $unfiltered = false;
+                    continue;
+                }
             }
 
             $result[] = $category;
@@ -1265,9 +1276,15 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @param string|null $filter Restrict results to only those with names matching this value, if provided.
      * @param string $orderFields
      * @param string $orderDirection
+     * @param array $options
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc') {
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc', array $options = []) {
+        $joinDirtyRecords = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres();
+        }
+
         $query = $this->SQL
             ->from('Category')
             ->where('DisplayAs <>', 'Heading')
@@ -2076,7 +2093,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $schemaRecord['type'] = 'category';
             /** @var SiteSectionModel $siteSectionModel */
             $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
-            $siteSection = $siteSectionModel->getSiteSectionForAttribute('allCategories', $dbRecord['CategoryID'], 'comment');
+            $siteSection = $siteSectionModel
+                ->getSiteSectionForAttribute('allCategories', $dbRecord['CategoryID']);
             $schemaRecord['locale'] = $siteSection->getContentLocale();
         }
 
@@ -3446,7 +3464,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             if ($Insert && isset($formPostValues['ParentCategoryID']) && $formPostValues['ParentCategoryID'] > -1) {
                 $parentID = $formPostValues['ParentCategoryID'];
                 // Counts are updated.
-                $this->dispatchInsertUpdateEvent($parentID, ResourceEvent::ACTION_UPDATE);
+                $this->addDirtyRecord('category', $parentID);
             }
 
             // Let the world know we succeeded in our mission.
@@ -3544,8 +3562,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
         // Set the cache.
         self::setCache($rowID, $property);
-        $this->dispatchInsertUpdateEvent($rowID, ResourceEvent::ACTION_UPDATE);
-
+        $this->addDirtyRecord('category', $rowID);
         return $property;
     }
 
@@ -4207,7 +4224,12 @@ SQL;
         Assert::integerish($primaryCategoryID, "CategoryID must be an integer.");
 
         $this->adjustPostCounts($discussion, self::ADJUST_COUNT_INCREMENT);
-        $this->refreshAggregateRecentPost($primaryCategoryID, true);
+        $discussionSink = isset($discussion['sink']) && $discussion['sink'] === 1;
+        $isAdmin = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        // Don't update recent post with a sunk discussion.
+        if (!$discussionSink || $isAdmin) {
+            $this->refreshAggregateRecentPost($primaryCategoryID, true);
+        }
     }
 
     /**
@@ -4273,7 +4295,7 @@ SQL;
             );
 
         foreach ($categoryIDs as $categoryID) {
-            $this->dispatchInsertUpdateEvent($categoryID, ResourceEvent::ACTION_UPDATE);
+            $this->addDirtyRecord('category', $categoryID);
         }
         self::clearCache(true);
     }

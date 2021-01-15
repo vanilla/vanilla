@@ -6,8 +6,10 @@
 
 import { useHashScrolling } from "@library/content/hashScrolling";
 import { userContentClasses } from "@library/content/userContentStyles";
-import className from "classnames";
+// import classNames from "classnames";
 import React, { useMemo } from "react";
+
+import { cx } from "@library/styles/styleShim";
 
 interface IProps {
     className?: string;
@@ -29,7 +31,7 @@ export default function UserContent(props: IProps) {
 
     return (
         <div
-            className={className("userContent", props.className, classes.root)}
+            className={cx("userContent", classes.root, props.className)}
             dangerouslySetInnerHTML={{ __html: content }}
         />
     );

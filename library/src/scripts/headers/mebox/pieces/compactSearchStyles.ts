@@ -5,24 +5,19 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    colorOut,
-    unit,
-    modifyColorBasedOnLightness,
-    borders,
-    EMPTY_BORDER,
-    borderRadii,
-    paddings,
-    margins,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { color, important, percent, rgba } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { bannerVariables, SearchBarPresets } from "@library/banner/bannerStyles";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { bannerVariables } from "@library/banner/bannerStyles";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { inputClasses } from "@library/forms/inputStyles";
 
@@ -39,7 +34,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
     const isTransparentButton = searchButtonOptions.preset === ButtonPreset.TRANSPARENT;
     const isSolidButton = searchButtonOptions.preset === ButtonPreset.SOLID || isUnifiedBorder; // force solid button when using unified border
 
-    let baseColor = modifyColorBasedOnLightness({ color: titleBarVars.colors.bg, weight: 0.2 });
+    let baseColor = ColorsUtils.modifyColorBasedOnLightness({ color: titleBarVars.colors.bg, weight: 0.2 });
     if (titleBarVars.colors.bgImage !== null) {
         // If we have a BG image, make sure we have some opacity so it shines through.
         baseColor = baseColor.fade(0.3);
@@ -71,11 +66,6 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
     const bgColorActive = isTransparentButton ? backgrounds.overlayColor.fade(0.15) : colors.secondary;
     const fgColor = isTransparentButton ? colors.contrast : colors.fg;
     const activeBorderColor = isTransparentButton ? colors.contrast : colors.bg;
-
-    const borders = makeThemeVars("borders", {
-        ...EMPTY_BORDER,
-        // borderRadius: globalVars.border.radius,
-    });
 
     const searchBar = makeThemeVars("searchBar", {
         sizing: {
@@ -170,7 +160,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         },
     });
 
-    return { colors, borders, searchBar, searchButton, backgrounds };
+    return { colors, searchBar, searchButton, backgrounds };
 });
 
 export const compactSearchClasses = useThemeCache(() => {
@@ -183,26 +173,26 @@ export const compactSearchClasses = useThemeCache(() => {
     inputClasses().applyInputCSSRules();
 
     const root = style({
-        $nest: {
+        ...{
             ".searchBar": {
                 flexGrow: 1,
             },
-            "& .searchBar__input": {
-                color: colorOut(vars.searchBar.font.color),
+            ".searchBar__input": {
+                color: ColorsUtils.colorOut(vars.searchBar.font.color),
                 width: percent(100),
             },
-            "& .searchBar__input input": {
-                color: colorOut(vars.searchBar.font.color),
+            ".searchBar__input input": {
+                color: ColorsUtils.colorOut(vars.searchBar.font.color),
                 borderRadius: important(0),
             },
             ".searchBar-valueContainer": {
-                height: unit(formElementsVars.sizing.height),
+                height: styleUnit(formElementsVars.sizing.height),
             },
             ".searchBar__placeholder": {
-                color: colorOut(vars.colors.placeholder),
+                color: ColorsUtils.colorOut(vars.colors.placeholder),
             },
             ".searchBar-icon": {
-                color: colorOut(vars.colors.placeholder),
+                color: ColorsUtils.colorOut(vars.colors.placeholder),
             },
             "&.isOpen": {
                 maxWidth: percent(100),
@@ -210,9 +200,9 @@ export const compactSearchClasses = useThemeCache(() => {
             "&.isCentered": {
                 margin: "auto",
             },
-            "& .suggestedTextInput-inputTextutText": {
-                borderTopRightRadius: unit(globalVars.border.radius),
-                borderBottomRightRadius: unit(globalVars.border.radius),
+            ".suggestedTextInput-inputTextutText": {
+                borderTopRightRadius: styleUnit(globalVars.border.radius),
+                borderBottomRightRadius: styleUnit(globalVars.border.radius),
             },
         },
     });
@@ -221,11 +211,10 @@ export const compactSearchClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         flexWrap: "nowrap",
-        minHeight: unit(formElementsVars.sizing.height),
+        minHeight: styleUnit(formElementsVars.sizing.height),
         justifyContent: "center",
         width: percent(100),
         position: "relative",
-        // ...borders(vars.borders),
     });
 
     const close = style("close", {
@@ -234,11 +223,11 @@ export const compactSearchClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.semiBold,
         margin: 0,
         outline: 0,
-        ...borders({
+        ...Mixins.border({
             radius: 0,
             color: globalVars.elementaryColors.transparent,
         }),
-        ...paddings({
+        ...Mixins.padding({
             horizontal: 10,
         }),
     });
@@ -249,10 +238,10 @@ export const compactSearchClasses = useThemeCache(() => {
         flex: 1,
         position: "relative",
         width: percent(100),
-        height: unit(formElementsVars.sizing.height),
+        height: styleUnit(formElementsVars.sizing.height),
         display: "flex",
         flexWrap: "nowrap",
-        ...margins({
+        ...Mixins.margin({
             horizontal: 1,
         }),
     });

@@ -5,28 +5,18 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { cssRaw, cssRule, forceRenderStyles, media } from "typestyle";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
-import { fonts } from "@library/styles/styleHelpersTypography";
-import {
-    absolutePosition,
-    borders,
-    importantUnit,
-    margins,
-    negative,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
+import { importantUnit, negative, singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { calc, ColorHelper, important } from "csx";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
-import * as types from "typestyle/lib/types";
 import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
 import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
@@ -57,6 +47,8 @@ import { forumVariables } from "@library/forums/forumStyleVars";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { cssOut } from "./cssOut";
+export { cssOut };
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -66,9 +58,9 @@ compatibilityStyles = useThemeCache(() => {
     const formVars = forumVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
-    const primary = colorOut(mainColors.primary);
+    const fg = ColorsUtils.colorOut(mainColors.fg);
+    const bg = ColorsUtils.colorOut(mainColors.bg);
+    const primary = ColorsUtils.colorOut(mainColors.primary);
     const userPhotoVars = userPhotoVariables();
 
     fullBackgroundCompat();
@@ -89,14 +81,14 @@ compatibilityStyles = useThemeCache(() => {
         `,
         {
             background: "none",
-            borderColor: colorOut(vars.border.color),
-            ...paddings(layoutVars.cell.paddings),
+            borderColor: ColorsUtils.colorOut(vars.border.color),
+            ...Mixins.padding(layoutVars.cell.paddings),
         },
     );
 
     // @mixin font-style-base()
     cssOut("html, body, .DismissMessage", {
-        ...fonts({
+        ...Mixins.font({
             family: vars.fonts.families.body,
             color: mainColors.fg,
         }),
@@ -147,13 +139,13 @@ compatibilityStyles = useThemeCache(() => {
         .Item .Aside
         `,
         {
-            ...margins({
+            ...Mixins.margin({
                 all: 0,
                 left: "auto",
             }),
-            ...paddings({
+            ...Mixins.padding({
                 all: 0,
-                left: unit(12),
+                left: styleUnit(12),
             }),
         },
     );
@@ -172,7 +164,7 @@ compatibilityStyles = useThemeCache(() => {
         `,
         {
             color: fg,
-            fontSize: unit(vars.fonts.size.large),
+            fontSize: styleUnit(vars.fonts.size.large),
         },
     );
 
@@ -183,11 +175,7 @@ compatibilityStyles = useThemeCache(() => {
             .DataTable .Item:not(.Read) .Title
     `,
         {
-            $nest: {
-                "&&": {
-                    fontWeight: vars.fonts.weights.bold,
-                },
-            },
+            fontWeight: vars.fonts.weights.bold,
         },
     );
 
@@ -198,11 +186,7 @@ compatibilityStyles = useThemeCache(() => {
             .DataTable .Item.Read .Title
     `,
         {
-            $nest: {
-                "&&": {
-                    fontWeight: vars.fonts.weights.normal,
-                },
-            },
+            fontWeight: vars.fonts.weights.normal,
         },
     );
 
@@ -215,7 +199,7 @@ compatibilityStyles = useThemeCache(() => {
             borderRight: 0,
             backgroundColor: bg,
             color: fg,
-            ...borders(inputVariables().border),
+            ...Mixins.border(inputVariables().border),
             borderTopRightRadius: 0,
             borderBottomRightRadius: 0,
         },
@@ -223,7 +207,7 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`div.Popup .Body`, {
         // borderRadius: unit(vars.border.radius),
-        ...borders(vars.borderType.modals),
+        ...Mixins.border(vars.borderType.modals),
         backgroundColor: bg,
         color: fg,
     });
@@ -231,10 +215,11 @@ compatibilityStyles = useThemeCache(() => {
     // Items
     const resultVars = searchResultsVariables();
 
-    const horizontalPadding = resultVars.spacing.padding.left + resultVars.spacing.padding.right;
+    const horizontalPadding =
+        (resultVars.spacing.padding.left as number) + (resultVars.spacing.padding.right as number);
     cssOut(`.DataList, .Item-Header`, {
-        marginLeft: unit(-resultVars.spacing.padding.left),
-        width: calc(`100% + ${unit(horizontalPadding)}`),
+        marginLeft: styleUnit(-resultVars.spacing.padding.left! as number),
+        width: calc(`100% + ${styleUnit(horizontalPadding)}`),
     });
 
     cssOut(
@@ -245,9 +230,9 @@ compatibilityStyles = useThemeCache(() => {
         {
             borderTop: singleBorder(),
             borderBottom: singleBorder(),
-            ...paddings(resultVars.spacing.padding),
-            ...margins(formVars.lists.spacing.margin),
-            backgroundColor: colorOut(formVars.lists.colors.bg),
+            ...Mixins.padding(resultVars.spacing.padding),
+            ...Mixins.margin(formVars.lists.spacing.margin),
+            backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.bg),
         },
     );
 
@@ -256,7 +241,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
-        marginTop: unit(vars.gutter.size * 2.5),
+        marginTop: styleUnit(vars.gutter.size * 2.5),
         border: "none",
     });
 
@@ -266,7 +251,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Herobanner-bgImage`, {
-        "-webkit-filter": "none",
+        WebkitFilter: "none",
         filter: "none",
     });
 
@@ -281,7 +266,7 @@ compatibilityStyles = useThemeCache(() => {
         a.TextColor:hover,
         a:hover .TextColor`,
         {
-            color: colorOut(vars.links.colors.hover),
+            color: ColorsUtils.colorOut(vars.links.colors.hover),
         },
     );
 
@@ -290,41 +275,41 @@ compatibilityStyles = useThemeCache(() => {
         a.TextColor, a .TextColor`,
 
         {
-            color: colorOut(vars.mainColors.fg),
+            color: ColorsUtils.colorOut(vars.mainColors.fg),
         },
     );
 
     cssOut(".ButtonGroup .Dropdown", {
-        marginTop: unit(negative(vars.border.width)),
+        marginTop: styleUnit(negative(vars.border.width)),
     });
 
     cssOut(`.QuickSearchButton`, {
         color: fg,
-        ...borders(vars.borderType.formElements.buttons),
+        ...Mixins.border(vars.borderType.formElements.buttons),
     });
 
     cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
-        ...paddings({
+        ...Mixins.padding({
             vertical: vars.gutter.size,
             horizontal: importantUnit(vars.gutter.half),
         }),
     });
 
     cssOut(".MenuItems, .Flyout.Flyout", {
-        ...borders(vars.borderType.dropDowns),
+        ...Mixins.border(vars.borderType.dropDowns),
         overflow: "hidden",
     });
 
     cssOut(`.Frame-content`, {
-        marginTop: unit(layoutVars.main.topSpacing - vars.gutter.size),
+        marginTop: styleUnit(layoutVars.main.topSpacing - vars.gutter.size),
     });
 
     cssOut(`.Content .PageControls`, {
-        marginBottom: unit(24),
+        marginBottom: styleUnit(24),
     });
 
     cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
-        borderTopColor: colorOut(vars.border.color),
+        borderTopColor: ColorsUtils.colorOut(vars.border.color),
     });
 
     cssOut(`.Author a:not(.PhotoWrap), .Author .${userCardClasses().link}`, {
@@ -332,7 +317,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList.Discussions .Item .Title`, {
-        width: calc(`100% - ${unit(vars.icon.sizes.default * 2 + vars.gutter.quarter)}`),
+        width: calc(`100% - ${styleUnit(vars.icon.sizes.default * 2 + vars.gutter.quarter)}`),
     });
 
     cssOut(`.DataList.Discussions .Item .Title a`, {
@@ -341,8 +326,8 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.DataList.Discussions .Item .Options`, {
         position: "absolute",
-        right: unit(layoutVars.cell.paddings.horizontal),
-        top: unit(layoutVars.cell.paddings.vertical),
+        right: styleUnit(layoutVars.cell.paddings.horizontal),
+        top: styleUnit(layoutVars.cell.paddings.vertical),
     });
 
     cssOut(`.Container .DataList .Meta .Tag-Announcement`, {
@@ -350,7 +335,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".Panel > * + *", {
-        marginTop: unit(24),
+        marginTop: styleUnit(24),
     });
 
     cssOut(`.Panel > .PhotoWrapLarge`, {
@@ -366,7 +351,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`#ConversationForm label`, {
-        color: colorOut(vars.mainColors.fg),
+        color: ColorsUtils.colorOut(vars.mainColors.fg),
     });
 
     cssOut(`.Group-Box.Group-MembersPreview .PageControls .H`, {
@@ -380,24 +365,24 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.HasNew`, {
-        backgroundColor: colorOut(vars.mainColors.primaryContrast),
-        color: colorOut(vars.mainColors.primary),
-        ...borders({
+        backgroundColor: ColorsUtils.colorOut(vars.mainColors.primaryContrast),
+        color: ColorsUtils.colorOut(vars.mainColors.primary),
+        ...Mixins.border({
             radius: 2,
             color: vars.mainColors.primary,
         }),
-        ...paddings({
+        ...Mixins.padding({
             vertical: 3,
             horizontal: 6,
         }),
     });
 
     cssOut(`.Item.Read`, {
-        backgroundColor: colorOut(formVars.lists.colors.read.bg),
+        backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.read.bg),
         opacity: 1,
-        $nest: {
+        ...{
             "&:hover, &:focus, &:active, &.focus-visible": {
-                backgroundColor: colorOut(formVars.lists.colors.read.bg),
+                backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.read.bg),
                 opacity: 1,
             },
         },
@@ -414,28 +399,26 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.Breadcrumbs`, {
-        ...paddings({
+        ...Mixins.padding({
             vertical: vars.gutter.half,
         }),
     });
 
-    cssOut(".selectBox-item .selectBox-selectedIcon", { color: colorOut(dropDownVariables().item.colors.fg) });
+    cssOut(".selectBox-item .selectBox-selectedIcon", {
+        color: ColorsUtils.colorOut(dropDownVariables().item.colors.fg),
+    });
 
     cssOut(`.HomepageTitle, .pageNotFoundTitle`, {
-        ...fonts({
+        ...Mixins.font({
             size: vars.fonts.size.largeTitle,
             weight: vars.fonts.weights.bold,
         }),
     });
 
     cssOut(`.DataList .PhotoWrap, .MessageList .PhotoWrap`, {
-        top: unit(2),
-        $nest: {
-            "&&": {
-                width: unit(userPhotoVars.sizing.medium),
-                height: unit(userPhotoVars.sizing.medium),
-            },
-        },
+        top: styleUnit(2),
+        width: styleUnit(userPhotoVars.sizing.medium),
+        height: styleUnit(userPhotoVars.sizing.medium),
     });
 
     cssOut(`.LocaleOptions`, {
@@ -471,73 +454,18 @@ compatibilityStyles = useThemeCache(() => {
 export const mixinCloseButton = (selector: string) => {
     const vars = globalVariables();
     cssOut(selector, {
-        color: colorOut(vars.mainColors.fg),
+        color: ColorsUtils.colorOut(vars.mainColors.fg),
         background: "none",
-        $nest: {
+        ...{
             "&:hover": {
-                color: colorOut(vars.mainColors.primary),
+                color: ColorsUtils.colorOut(vars.mainColors.primary),
             },
             "&:focus": {
-                color: colorOut(vars.mainColors.primary),
+                color: ColorsUtils.colorOut(vars.mainColors.primary),
             },
             "&.focus-visible": {
-                color: colorOut(vars.mainColors.primary),
+                color: ColorsUtils.colorOut(vars.mainColors.primary),
             },
         },
-    });
-};
-
-export const trimTrailingCommas = (selector) => {
-    return selector.trim().replace(new RegExp("[,]+$"), "");
-};
-
-export const cssOut = (selector: string, ...objects: types.NestedCSSProperties[]) => {
-    cssRule(trimTrailingCommas(selector), ...objects, { $unique: true });
-};
-
-export const camelCaseToDash = (str: string) => {
-    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-};
-
-export const nestedWorkaround = (selector: string, nestedObject, debug?: boolean) => {
-    // $nest doesn't work in this scenario. Working around it by doing it manually.
-    // Hopefully a future update will allow us to just pass the nested styles in the cssOut above.
-    const selectors: string[] = trimTrailingCommas(selector).split(",");
-
-    selectors.forEach((s, i) => {
-        const cleanSelector = s.trim();
-        if (nestedObject) {
-            let rawStyles = `\n`;
-            Object.keys(nestedObject).forEach((key) => {
-                const finalSelector = `${cleanSelector}${key.replace(/^&+/, "")}`;
-                let newStyleDeclaration = "";
-                if (cleanSelector !== "") {
-                    const targetStyles = nestedObject[key];
-                    const styleProps = targetStyles ? Object.keys(targetStyles) : [];
-
-                    let emptyStyles = true;
-
-                    if (styleProps.length > 0) {
-                        newStyleDeclaration += `${finalSelector} { `;
-                        styleProps.forEach((property) => {
-                            const style = targetStyles[property];
-                            if (style !== undefined && style !== "") {
-                                newStyleDeclaration += `\n    ${camelCaseToDash(property)}: ${
-                                    style instanceof ColorHelper ? colorOut(style) : style
-                                };`;
-                                emptyStyles = false;
-                            }
-                        });
-                        newStyleDeclaration += `\n}\n\n`;
-                    }
-
-                    if (!emptyStyles) {
-                        rawStyles += newStyleDeclaration;
-                    }
-                }
-            });
-            logDebugConditionnal(debug, rawStyles);
-            cssRaw(rawStyles);
-        }
     });
 };

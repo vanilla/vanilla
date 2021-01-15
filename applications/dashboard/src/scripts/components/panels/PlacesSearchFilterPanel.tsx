@@ -5,7 +5,7 @@
 
 import React from "react";
 import { FilterFrame } from "@vanilla/library/src/scripts/search/panels/FilterFrame";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { t } from "@vanilla/library/src/scripts/utility/appUtils";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";

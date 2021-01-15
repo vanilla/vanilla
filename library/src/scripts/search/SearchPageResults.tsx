@@ -11,19 +11,19 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 import { SearchPagination } from "@library/search/SearchPagination";
 import { ISearchResult } from "@library/search/searchTypes";
-import { SearchFormContextProvider, useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { SearchService } from "@library/search/SearchService";
+import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import { hashString } from "@vanilla/utils";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
-import { SearchPageRoute, makeSearchUrl } from "@library/search/SearchPageRoute";
-import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
+import { makeSearchUrl } from "@library/search/SearchPageRoute";
+import { formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
-import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 import { metasClasses } from "@library/styles/metasStyles";
 
@@ -105,7 +105,7 @@ function mapUserInfo(userInfo?: IUser): IUserCardInfo | undefined {
  */
 function mapResult(searchResult: ISearchResult): IResult | undefined {
     const crumbs = searchResult.breadcrumbs || [];
-    const icon = SearchFormContextProvider.getSubType(searchResult.type)?.icon;
+    const icon = SearchService.getSubType(searchResult.type)?.icon;
 
     return {
         name: searchResult.name,
@@ -169,6 +169,7 @@ function MetaFactory(props: { searchResult: ISearchResult }) {
                 type={searchResult.recordType}
                 updateUser={searchResult.insertUser!}
                 dateUpdated={searchResult.dateInserted}
+                labels={searchResult.labelCodes}
                 crumbs={crumbs}
                 isForeign={searchResult.isForeign}
                 extra={extraResults}

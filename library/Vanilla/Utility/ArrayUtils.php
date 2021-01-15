@@ -45,21 +45,6 @@ final class ArrayUtils {
     }
 
     /**
-     * Break a path up into its individual associative keys.
-     *
-     * @param string $path
-     * @return array
-     */
-    private static function explodePath(string $path): array {
-        $explodePattern = "#(?<!\\\\)\\".self::PATH_SEPARATOR."#";
-        $result = preg_split($explodePattern, $path);
-        array_walk($result, function (&$value) {
-            $value = self::unescapeKey($value);
-        });
-        return $result;
-    }
-
-    /**
      * Split a string by a string and do some trimming to clean up faulty user input.
      *
      * @param string $delimiter The boundary string.
@@ -84,7 +69,7 @@ final class ArrayUtils {
     public static function getByPath(string $path, $array, $default = null) {
         self::assertArray($array, __METHOD__."() expects argument 2 to be an array or array-like object.");
 
-        $keys = self::explodePath($path);
+        $keys = explode(self::PATH_SEPARATOR, $path);
 
         $search = function ($array, array $keys) use ($default, &$search) {
             self::assertArray($array, "Unexpected argument type. Expected an array or array-like object.");
@@ -189,15 +174,15 @@ final class ArrayUtils {
     /**
      * Set a value in an associative array by its full key path, creating new segments as necessary.
      *
-     * @param mixed $value
      * @param string $path
      * @param array|ArrayAccess $array
+     * @param mixed $value
      * @return mixed
      */
-    public static function setByPath($value, string $path, $array) {
+    public static function setByPath(string $path, &$array, $value): array {
         self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
 
-        $keys = self::explodePath($path);
+        $keys = explode(self::PATH_SEPARATOR, $path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
             if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey])) {
@@ -222,22 +207,6 @@ final class ArrayUtils {
         $array = $search($array, $keys);
 
         return $array;
-    }
-
-    /**
-     * Unescape reserved characters in an escaped associative array key.
-     *
-     * @param string $key
-     * @return string
-     */
-    private static function unescapeKey(string $key): string {
-        $result = str_replace(
-            "\\".self::PATH_SEPARATOR,
-            self::PATH_SEPARATOR,
-            $key
-        );
-
-        return $result;
     }
 
     /**

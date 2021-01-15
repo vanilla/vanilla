@@ -11,7 +11,7 @@ import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
-interface IProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
+export interface IButtonProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
     className?: string;
     disabled?: boolean;
@@ -26,7 +26,7 @@ interface IProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonEl
     ariaHidden?: boolean;
     tabIndex?: number;
     lang?: string;
-    buttonRef?: React.RefObject<HTMLButtonElement>;
+    buttonRef?: React.Ref<HTMLButtonElement>;
     role?: string;
     onKeyDownCapture?: (event: any) => void;
     controls?: string;
@@ -72,6 +72,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return "btn btn-secondary";
             case ButtonTypes.DASHBOARD_LINK:
                 return "btn btn-link";
+            case ButtonTypes.NOT_STANDARD:
+                return classes.notStandard;
             default:
                 return "";
         }
@@ -83,8 +85,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
 /**
  * A stylable, configurable button component.
  */
-export default class Button extends React.Component<IProps, IState> {
-    public static defaultProps: Partial<IProps> = {
+export default class Button extends React.Component<IButtonProps, IState> {
+    public static defaultProps: Partial<IButtonProps> = {
         id: undefined,
         disabled: false,
         prefix: "button",

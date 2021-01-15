@@ -20,7 +20,7 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryFullPage } from "@library/storybook/StoryFullPage";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { loadTranslations } from "@vanilla/i18n";
 import { color, linearGradient } from "csx";
@@ -281,7 +281,9 @@ export const WithGradientAndImageOnSticky = storyWithConfig(
                 overlay: {
                     background: linearGradient(
                         `-180deg`,
-                        `${colorOut(color("#fdfcfa").fade(0.5))},${colorOut(color("#2e2c2b").fade(0.5))}`,
+                        `${ColorsUtils.colorOut(color("#fdfcfa").fade(0.5))},${ColorsUtils.colorOut(
+                            color("#2e2c2b").fade(0.5),
+                        )}`,
                     ),
                 },
             },

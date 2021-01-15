@@ -1124,3 +1124,20 @@ export function FeatureIcon(props: { className?: string; "aria-hidden"?: areaHid
         </svg>
     );
 }
+
+export function ArrowIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            width="12"
+            height="12"
+            className={classNames(classes, props.className)}
+            style={{ height: 12, width: 12 }}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 12 12"
+        >
+            <path fill="currentColor" id="arrow" d="M6,0,4.909,1.091l4.13,4.13H0V6.779H9.039l-4.13,4.13L6,12l6-6Z" />
+        </svg>
+    );
+}

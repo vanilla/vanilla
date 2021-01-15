@@ -20,18 +20,21 @@ const data: ILoadable<any, IAPIErrorFragment> = {
     },
 };
 
-const story = (status: LoadStatus) => () => (
-    <StoryContent>
-        <StoryHeading depth={1}>Loading Status ({status})</StoryHeading>
-        <StoryParagraph>
-            The <code>LoadingStatus</code> component takes an <code>ILoadable</code> and will render a loader, error, or
-            the component children if the data loaded successfully.
-        </StoryParagraph>
-        <div>
-            <PageLoadStatus loadable={{ ...data, status }}>Data yay!</PageLoadStatus>
-        </div>
-    </StoryContent>
-);
+const story = (status: LoadStatus) =>
+    function Story() {
+        return (
+            <StoryContent>
+                <StoryHeading depth={1}>Loading Status ({status})</StoryHeading>
+                <StoryParagraph>
+                    The <code>LoadingStatus</code> component takes an <code>ILoadable</code> and will render a loader,
+                    error, or the component children if the data loaded successfully.
+                </StoryParagraph>
+                <div>
+                    <PageLoadStatus loadable={{ ...data, status }}>Data yay!</PageLoadStatus>
+                </div>
+            </StoryContent>
+        );
+    };
 
 formsStory.add(LoadStatus.PENDING, story(LoadStatus.PENDING));
 formsStory.add(LoadStatus.LOADING, story(LoadStatus.LOADING));

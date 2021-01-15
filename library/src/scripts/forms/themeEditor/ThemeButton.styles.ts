@@ -4,11 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
-import { borders, colorOut, flexHelper, fonts, unit } from "@library/styles/styleHelpers";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const themeButtonClasses = useThemeCache(() => {
     const style = styleFactory("themeButton");
@@ -17,12 +22,12 @@ export const themeButtonClasses = useThemeCache(() => {
 
     const root = style({
         width: percent(100),
-        background: colorOut(globalVars.mainColors.bg),
-        $nest: {
+        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        ...{
             "& button": {
                 width: percent(100),
-                height: unit(builderVariables.input.height),
-                ...borders(
+                height: styleUnit(builderVariables.input.height),
+                ...Mixins.border(
                     {
                         ...(builderVariables.border as IGlobalBorderStyles),
                         radius: builderVariables.wrap.borderRadius,
@@ -31,7 +36,7 @@ export const themeButtonClasses = useThemeCache(() => {
                 ),
             },
             "&& button:focus": {
-                borderColor: colorOut(globalVars.mainColors.primary),
+                borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
         },
     });

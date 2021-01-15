@@ -5,34 +5,30 @@
  */
 
 import React from "react";
-import {
-    absolutePosition,
-    borders,
-    colorOut,
-    defaultTransition,
-    disabledInput,
-    srOnly,
-    unit,
-    userSelect,
-    margins,
-    paddings,
-    fonts,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, em, important, percent, px } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = variableFactory("checkRadio");
 
-    const border = themeVars("border", {
-        ...formElementVars.border,
-        radius: 2,
-    });
+    const border = themeVars(
+        "border",
+        Variables.border({
+            ...formElementVars.border,
+            radius: 2,
+        }),
+    );
 
     const main = themeVars("check", {
         fg: globalVars.mainColors.bg,
@@ -109,23 +105,23 @@ export const checkRadioClasses = useThemeCache(() => {
     //.radioButton-label,
     // .checkbox-label
     const label = style("label", {
-        lineHeight: unit(vars.sizing.width),
-        paddingLeft: unit(8),
+        lineHeight: styleUnit(vars.sizing.width),
+        paddingLeft: styleUnit(8),
         cursor: "pointer",
         ...userSelect(),
-        width: calc(`100% - ${unit(vars.sizing.width)}`),
+        width: calc(`100% - ${styleUnit(vars.sizing.width)}`),
     });
 
     const labelBold = style("labelBold", {
-        ...fonts({
+        ...Mixins.font({
             weight: globalVars.fonts.weights.semiBold,
         }),
     });
 
     const labelNote = style("labelNote", {
         display: "inline-block",
-        fontSize: unit(vars.labelNote.fontSize),
-        marginLeft: unit(24),
+        fontSize: styleUnit(vars.labelNote.fontSize),
+        marginLeft: styleUnit(24),
         opacity: vars.labelNote.opacity,
         verticalAlign: "middle",
     });
@@ -138,28 +134,28 @@ export const checkRadioClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: unit(vars.sizing.width),
-        height: unit(vars.sizing.width),
-        flexBasis: unit(vars.sizing.width),
+        width: styleUnit(vars.sizing.width),
+        height: styleUnit(vars.sizing.width),
+        flexBasis: styleUnit(vars.sizing.width),
         verticalAlign: "middle",
         cursor: "pointer",
-        backgroundColor: colorOut(vars.main.bg),
-        ...borders(vars.border),
-    } as NestedCSSProperties);
+        backgroundColor: ColorsUtils.colorOut(vars.main.bg),
+        ...Mixins.border(vars.border),
+    });
 
     const radioIcon = style("radioIcon", {
         ...absolutePosition.middleLeftOfParent(),
         display: "none",
-        width: unit(vars.radioButton.icon.width),
-        height: unit(vars.radioButton.icon.height),
+        width: styleUnit(vars.radioButton.icon.width),
+        height: styleUnit(vars.radioButton.icon.height),
         margin: "auto",
     });
 
     const checkIcon = style("checkBoxIcon", {
         ...absolutePosition.middleOfParent(),
         display: "none",
-        width: unit(vars.checkBox.check.width),
-        height: unit(vars.checkBox.check.height),
+        width: styleUnit(vars.checkBox.check.width),
+        height: styleUnit(vars.checkBox.check.height),
         color: "inherit",
         margin: "auto",
     });
@@ -174,28 +170,28 @@ export const checkRadioClasses = useThemeCache(() => {
         height: vars.checkBox.disk.height,
     });
 
-    const uncheckedStateStyles: NestedCSSProperties = {
-        borderColor: colorOut(vars.main.hover.border.color),
-        backgroundColor: colorOut(vars.main.hover.bg),
+    const uncheckedStateStyles: CSSObject = {
+        borderColor: ColorsUtils.colorOut(vars.main.hover.border.color),
+        backgroundColor: ColorsUtils.colorOut(vars.main.hover.bg),
     };
 
-    const checkedStateStyles: NestedCSSProperties = {
-        backgroundColor: colorOut(vars.main.checkedHover.bg),
-        color: colorOut(vars.main.checkedHover.fg),
+    const checkedStateStyles: CSSObject = {
+        backgroundColor: ColorsUtils.colorOut(vars.main.checkedHover.bg),
+        color: ColorsUtils.colorOut(vars.main.checkedHover.fg),
     };
 
     // .radioButton-input,
     // .checkbox-input
     const input = style("input", {
-        ...srOnly(),
-        $nest: {
+        ...Mixins.absolute.srOnly(),
+        ...{
             [`&:hover:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
             [`&.focus-visible:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
             [`&:checked + .${iconContainer}`]: {
-                borderColor: colorOut(vars.main.checked.border),
-                color: colorOut(vars.main.checked.fg),
-                backgroundColor: colorOut(vars.main.checked.bg),
-                $nest: {
+                borderColor: ColorsUtils.colorOut(vars.main.checked.border),
+                color: ColorsUtils.colorOut(vars.main.checked.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.main.checked.bg),
+                ...{
                     "& svg": {
                         display: "block",
                     },
@@ -215,48 +211,48 @@ export const checkRadioClasses = useThemeCache(() => {
         flexWrap: "wrap",
         alignItems: "center",
         outline: 0,
-        ...paddings(vars.spacing),
-        $nest: {
+        ...Mixins.padding(vars.spacing),
+        ...{
             [`&&`]: {
                 margin: 0,
             },
-            [`&.isHorizontal.isHorizontal.isHorizontal`]: margins({
+            [`&.isHorizontal.isHorizontal.isHorizontal`]: Mixins.margin({
                 all: 0,
                 right: px(globalVars.spacer.size / 2),
             }),
             [`&.${isDashboard} + .info`]: {
-                ...margins({
-                    top: unit(2),
-                    bottom: unit(6),
+                ...Mixins.margin({
+                    top: styleUnit(2),
+                    bottom: styleUnit(6),
                 }),
             },
         },
-    } as NestedCSSProperties);
+    });
 
     const grid = style("grid", {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "strech",
-        $nest: {
+        ...{
             [`.${root}`]: {
                 flexBasis: "50%",
                 display: "block !important",
-                ...margins({
+                ...Mixins.margin({
                     top: 0,
                 }),
             },
             [`.${root}:nth-child(n + 3)`]: {
-                ...margins({
-                    top: unit(globalVars.gutter.half),
+                ...Mixins.margin({
+                    top: styleUnit(globalVars.gutter.half),
                 }),
             },
             [`.${root}:nth-child(odd)`]: {
-                ...paddings({
-                    right: unit(globalVars.gutter.half),
+                ...Mixins.padding({
+                    right: styleUnit(globalVars.gutter.half),
                 }),
             },
         },
-    } as NestedCSSProperties);
+    });
 
     return {
         root,

@@ -44,6 +44,7 @@ module.exports = api => {
             resolve("@babel/preset-typescript"),
         ],
         plugins: [
+            "@emotion",
             resolve("@babel/plugin-proposal-class-properties"),
             resolve("@babel/plugin-proposal-object-rest-spread"),
             resolve("@babel/plugin-syntax-dynamic-import"),

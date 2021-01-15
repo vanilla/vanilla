@@ -1488,13 +1488,6 @@ class Gdn_Form extends Gdn_Pluggable {
             $return = '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
-        // Opening select tag
-        $return .= '<select';
-        $return .= $this->_idAttribute($fieldName, $attributes);
-        $return .= $this->_nameAttribute($fieldName, $attributes);
-        $return .= $this->_attributesToString($attributes);
-        $return .= ">\n";
-
         // Get value from attributes and ensure it's an array
         $value = arrayValueI('Value', $attributes);
         if ($value === false) {
@@ -1506,6 +1499,14 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Prevent default $Value from matching key of zero
         $hasValue = ($value !== [false] && $value !== ['']) ? true : false;
+        $attributes['data-value'] = $value[0] ?? "";
+
+        // Opening select tag
+        $return .= '<select';
+        $return .= $this->_idAttribute($fieldName, $attributes);
+        $return .= $this->_nameAttribute($fieldName, $attributes);
+        $return .= $this->_attributesToString($attributes);
+        $return .= ">\n";
 
         // Start with null option?
         $includeNull = arrayValueI('IncludeNull', $attributes, false);
@@ -3291,7 +3292,7 @@ PASSWORDMETER;
             $row = [
                 'LabelCode' => isset($prop['x-label']) ? '@'.$prop['x-label'] : self::labelCode($key),
                 'Control' => $control,
-                'Description' => $prop['description'],
+                'Description' => $prop['description'] ?? '',
                 'Options' => $opts,
             ];
 

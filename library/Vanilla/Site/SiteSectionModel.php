@@ -7,12 +7,13 @@
 
 namespace Vanilla\Site;
 
-use Gdn;
-use Gdn_Cache;
 use Gdn_Router;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Site\SiteSectionCounterInterface;
+use Vanilla\Contracts\Site\SiteSectionCountStasherInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Class SiteSectionModel
@@ -22,6 +23,9 @@ class SiteSectionModel {
 
     /** @var SiteSectionProviderInterface[] $providers */
     private $providers = [];
+
+    /** @var SiteSectionCounterInterface[] */
+    private $siteSectionCounters = [];
 
     /** @var SiteSectionInterface[] $siteSections */
     private $siteSections;
@@ -35,7 +39,7 @@ class SiteSectionModel {
     /** @var array $defaultRoutes */
     private $defaultRoutes = [];
 
-    /** @var array $apps */
+    /** @var Application[] $apps */
     private $apps = [];
 
     /** @var SiteSectionInterface[] $siteSectionsForAttribute */
@@ -57,11 +61,32 @@ class SiteSectionModel {
      * @param SiteSectionProviderInterface $provider
      */
     public function addProvider(SiteSectionProviderInterface $provider) {
+        foreach ($this->providers as $existingProvider) {
+            if (get_class($provider) === get_class($existingProvider) && !($provider instanceof MockSiteSectionProvider)) {
+                return;
+            }
+        }
         $this->providers[] = $provider;
         if (!empty($current = $provider->getCurrentSiteSection())) {
             $this->currentSiteSection = $current;
         }
     }
+
+    /**
+     * Register site section
+     *
+     * @param SiteSectionCounterInterface $counter
+     */
+    public function addCounter(SiteSectionCounterInterface $counter) {
+        foreach ($this->siteSectionCounters as $existingCounter) {
+            if (get_class($counter) === get_class($existingCounter)) {
+                return;
+            }
+        }
+
+        $this->siteSectionCounters[] = $counter;
+    }
+
 
     /**
      * Register optional default route
@@ -210,34 +235,92 @@ class SiteSectionModel {
      *
      * @param string $attributeName
      * @param string|int $attributeValue
-     * @param string $recordType
+     *
      * @return SiteSectionInterface
      */
-    public function getSiteSectionForAttribute(string $attributeName, $attributeValue, $recordType = 'siteSection'): SiteSectionInterface {
-        $key = $recordType . '_' .$attributeName . '_' .$attributeValue;
-        $siteSectionForAttribute = $this->siteSectionsForAttributes[$key] ?? null;
+    public function getSiteSectionForAttribute(string $attributeName, $attributeValue): SiteSectionInterface {
+        $key = 'siteSection' . '_' .$attributeName . '_' .$attributeValue;
+        $result = $this->siteSectionsForAttributes[$key] ?? null;
 
-        if (!$siteSectionForAttribute) {
+        if (!$result) {
             foreach ($this->getAll() as $siteSection) {
+                // Lookup and find the attribute.
+
                 $attributes = $siteSection->getAttributes();
                 $attribute = $attributes[$attributeName] ?? [];
                 if (is_array($attribute)) {
                     if (in_array($attributeValue, $attribute)) {
-                        $this->siteSectionsForAttributes[$key] = $siteSection;
-                        return $siteSection;
+                        $result = $siteSection;
+                        break;
                     }
-                }
-
-                if ($attribute === $attributeValue) {
-                    $this->siteSectionsForAttributes[$key] = $siteSection;
-                    return $siteSection;
+                } elseif ($attribute === $attributeValue) {
+                    $result = $siteSection;
+                    break;
                 }
             }
 
-            $this->siteSectionsForAttributes[$key] = $this->defaultSiteSection;
-            return $this->defaultSiteSection;
+            $this->siteSectionsForAttributes[$key] = $result;
         }
 
-        return $siteSectionForAttribute;
+        // If we still don't have a siteSection.
+        if (!$result) {
+            $this->siteSectionsForAttributes[$key] = $this->getDefaultSiteSection();
+        }
+
+        return $this->siteSectionsForAttributes[$key];
+    }
+
+    /**
+     * @return SiteSectionInterface
+     */
+    public function getDefaultSiteSection(): SiteSectionInterface {
+        return $this->defaultSiteSection;
+    }
+
+    /**
+     * Recalculate counts for a site section.
+     *
+     * @param SiteSectionInterface $siteSection
+     *
+     * @return array The counts.
+     */
+    public function recalculateCounts(SiteSectionInterface $siteSection): array {
+        $stashers = $this->getCountStashers();
+        if (empty($stashers)) {
+            // Don't calculate counts if nothing is saving them.
+            return [];
+        }
+
+        $counts = [];
+        foreach ($this->siteSectionCounters as $siteSectionCounter) {
+            $counts = array_merge($counts, $siteSectionCounter->calculateCountsForSiteSection($this, $siteSection));
+        }
+
+        foreach ($stashers as $stasher) {
+            $stasher->stashCountsForSiteSection($siteSection, $counts);
+        }
+        return $counts;
+    }
+
+    /**
+     * @return SiteSectionCountStasherInterface[]
+     */
+    private function getCountStashers(): array {
+        $stashers = [];
+        foreach ($this->providers as $siteSectionProvider) {
+            if ($siteSectionProvider instanceof SiteSectionCountStasherInterface) {
+                $stashers[] = $siteSectionProvider;
+            }
+        }
+
+        return $stashers;
+    }
+
+    /**
+     * Clear the local cache of site sections.
+     */
+    public function clearLocalCache() {
+        $this->siteSections = [];
+        $this->siteSectionsForAttributes = [];
     }
 }

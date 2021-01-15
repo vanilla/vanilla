@@ -126,15 +126,6 @@ class ArrayUtilsTest extends TestCase {
                 ["foo" => ["xyz" => "Hello world."]],
                 null,
             ],
-            "escaped path" => [
-                "foo.b\.ar.baz",
-                [
-                    "foo" => [
-                        "b.ar" => ["baz" => "Hello world."],
-                    ],
-                ],
-                "Hello world."
-            ],
             "array object" => [
                 "w.x.y",
                 new \ArrayObject([
@@ -186,8 +177,8 @@ class ArrayUtilsTest extends TestCase {
      * @param array|ArrayAccess $expected
      * @dataProvider provideSetByPathTests
      */
-    public function testSetByPath($value, string $path, $array, $expected): void {
-        $actual = ArrayUtils::setByPath($value, $path, $array);
+    public function testSetByPath(string $path, $array, $value, $expected): void {
+        $actual = ArrayUtils::setByPath($path, $array, $value);
         $this->assertSame($expected, $actual);
     }
 
@@ -199,21 +190,21 @@ class ArrayUtilsTest extends TestCase {
     public function provideSetByPathTests(): array {
         $result = [
             "simple" => [
-                "Hello world.",
                 "foo.bar.baz",
                 ["foo" => ["bar" => []]],
+                "Hello world.",
                 ["foo" => ["bar" => ["baz" => "Hello world."]]],
             ],
             "deep" => [
-                "Hello world.",
                 "foo.bar.baz",
                 ["foo" => []],
+                "Hello world.",
                 ["foo" => ["bar" => ["baz" => "Hello world."]]],
             ],
             "append" => [
-                "Hello world.",
                 "foo.bar.baz",
                 ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three"]]],
+                "Hello world.",
                 ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three", "baz" => "Hello world."]]],
             ],
         ];
@@ -228,7 +219,7 @@ class ArrayUtilsTest extends TestCase {
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Unexpected type in path.");
-        ArrayUtils::setByPath("Bingo.", "foo.bar.baz", $array);
+        ArrayUtils::setByPath("foo.bar.baz", $array, "Bingo.");
     }
 
     /**

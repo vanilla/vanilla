@@ -58,6 +58,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
                             'dateInserted' => '2018-04-20T21:06:41+00:00',
                         ]
                     ],
+                    'isCacheable' => true
                 ]
             ],
             [
@@ -65,7 +66,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
                 [
                     'Title' => 'I am a standard title.',
                     'Description' => 'I am a description. Instead of being part of the document head, I am inside the page contents. This is not ideal and is only a fallback for pages without proper meta descriptors.',
-                    'Images' => []
+                    'Images' => [],
+                    'isCacheable' => true
                 ]
             ],
             [
@@ -73,7 +75,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
                 [
                     'Title' => 'Online Community Software and Customer Forum Software by Vanilla Forums',
                     'Description' => 'Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.',
-                    'Images' => ['https://vanillaforums.com/images/metaIcons/vanillaForums.png']
+                    'Images' => ['https://vanillaforums.com/images/metaIcons/vanillaForums.png'],
+                    'isCacheable' => true
                 ]
             ],
             [
@@ -81,7 +84,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
                 [
                     'Title' => 'I am a standard title.',
                     'Description' => 'I am a standard description.',
-                    'Images' => []
+                    'Images' => [],
+                    'isCacheable' => true
                 ]
             ]
         ];

@@ -4,16 +4,11 @@
  */
 
 import { percent, color, rgba, px } from "csx";
-import {
-    unit,
-    paddings,
-    defaultTransition,
-    flexHelper,
-    colorOut,
-    offsetLightness,
-    absolutePosition,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { defaultTransition, flexHelper, absolutePosition } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 
@@ -46,7 +41,7 @@ export const themeCardVariables = useThemeCache(() => {
 
     const actionDropdown = makeThemeVars("actionDropdown", {
         state: {
-            bg: offsetLightness(colors.overlayBg, 0.04),
+            bg: ColorsUtils.offsetLightness(colors.overlayBg, 0.04),
         },
     });
 
@@ -64,34 +59,34 @@ export const themeCardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const menuBar = style("menuBar", {
-        background: colorOut(globalVars.mainColors.bg),
-        height: unit(vars.menuBar.height),
+        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        height: styleUnit(vars.menuBar.height),
         display: "flex",
-        paddingTop: unit(vars.menuBar.padding.top + 2),
-        paddingLeft: unit(vars.menuBar.padding.horizontal - 3),
+        paddingTop: styleUnit(vars.menuBar.padding.top + 2),
+        paddingLeft: styleUnit(vars.menuBar.padding.horizontal - 3),
         position: "relative",
         zIndex: 1,
     });
 
     const menuBarDots = style("menuBarDots", {
-        height: unit(vars.menuBar.dotSize),
-        width: unit(vars.menuBar.dotSize),
+        height: styleUnit(vars.menuBar.dotSize),
+        width: styleUnit(vars.menuBar.dotSize),
         backgroundColor: "#bbb",
         borderRadius: percent(50),
-        marginRight: unit(3),
+        marginRight: styleUnit(3),
     });
 
     const actionButtons = style("actionButtons", {
         textAlign: "center",
         margin: "44px 0",
-        paddingTop: unit(vars.menuBar.height),
+        paddingTop: styleUnit(vars.menuBar.height),
         ...flexHelper().middle(),
         flexDirection: "column",
     });
 
     const actionButton = style("actionButton", {
-        marginBottom: unit(globalVars.gutter.half),
-        $nest: {
+        marginBottom: styleUnit(globalVars.gutter.half),
+        ...{
             "&&": {
                 minWidth: px(180),
             },
@@ -110,7 +105,7 @@ export const themeCardClasses = useThemeCache(() => {
 
     const overlayBg = style("overlayBg", {
         ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: colorOut(vars.colors.overlayBg),
+        backgroundColor: ColorsUtils.colorOut(vars.colors.overlayBg),
     });
 
     const wrapper = style("wrapper", {
@@ -120,8 +115,8 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const constraintContainer = style("constrainContainer", {
-        maxWidth: unit(vars.container.maxWidth),
-        minWidth: unit(vars.container.minWidth),
+        maxWidth: styleUnit(vars.container.maxWidth),
+        minWidth: styleUnit(vars.container.minWidth),
         maxHeight: (vars.container.maxWidth * vars.container.ratioHeight) / vars.container.ratioWidth,
         ...shadowHelper().embed(),
     });
@@ -134,9 +129,8 @@ export const themeCardClasses = useThemeCache(() => {
 
     const container = style("container", {
         ...absolutePosition.fullSizeOfParent(),
-        borderRadius: unit(2),
-
-        $nest: {
+        borderRadius: styleUnit(2),
+        ...{
             [`&:hover .${overlay}`]: {
                 opacity: 1,
             },
@@ -156,11 +150,11 @@ export const themeCardClasses = useThemeCache(() => {
 
     const svg = style("svg", {
         ...absolutePosition.fullSizeOfParent(),
-        top: unit(vars.menuBar.height),
+        top: styleUnit(vars.menuBar.height),
     });
 
     const isFocused = style("isFocused", {
-        $nest: {
+        ...{
             [`.${overlay}`]: {
                 opacity: 1,
             },
@@ -170,7 +164,7 @@ export const themeCardClasses = useThemeCache(() => {
     const previewImage = style("previewImage", {
         objectPosition: "center top",
         position: "absolute",
-        top: unit(vars.menuBar.height),
+        top: styleUnit(vars.menuBar.height),
         left: 0,
         right: 0,
         bottom: 0,
@@ -179,24 +173,24 @@ export const themeCardClasses = useThemeCache(() => {
 
     const actionDropdown = style("actionDropdown", {
         position: "absolute",
-        top: unit(vars.menuBar.height),
-        right: unit(vars.menuBar.height),
-        color: colorOut(globalVars.elementaryColors.white),
-        $nest: {
-            "& .icon-dropDownMenu": {
-                color: colorOut(globalVars.elementaryColors.white),
+        top: styleUnit(vars.menuBar.height),
+        right: styleUnit(vars.menuBar.height),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+        ...{
+            ".icon-dropDownMenu": {
+                color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
             },
             "&.focus-visible": {
                 borderRadius: "2px",
-                backgroundColor: colorOut(vars.actionDropdown.state.bg),
+                backgroundColor: ColorsUtils.colorOut(vars.actionDropdown.state.bg),
             },
             "&:focus": {
                 borderRadius: "2px",
-                backgroundColor: colorOut(vars.actionDropdown.state.bg),
+                backgroundColor: ColorsUtils.colorOut(vars.actionDropdown.state.bg),
             },
             "&:hover": {
                 borderRadius: "2px",
-                backgroundColor: colorOut(vars.actionDropdown.state.bg),
+                backgroundColor: ColorsUtils.colorOut(vars.actionDropdown.state.bg),
             },
         },
     });
@@ -213,27 +207,27 @@ export const themeCardClasses = useThemeCache(() => {
 
     const actionLink = style("actionLink", {
         textDecoration: "none",
-        paddingBottom: unit(4),
-        paddingLeft: unit(14),
-        paddingRight: unit(14),
-        paddingTop: unit(4),
+        paddingBottom: styleUnit(4),
+        paddingLeft: styleUnit(14),
+        paddingRight: styleUnit(14),
+        paddingTop: styleUnit(4),
         textAlign: "left",
         color: vars.colors.btnTextColor.toString(),
-        $nest: {
+        ...{
             "&:hover": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
             },
             "&:focus": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
             },
             "&:active": {
-                backgroundColor: colorOut(globalVars.states.active.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.active.highlight),
             },
         },
     });
 
     const action = style("dropDown-item", {
-        $nest: {
+        ...{
             "&&:hover, &&:focus, &&active": {
                 textDecoration: "none",
             },

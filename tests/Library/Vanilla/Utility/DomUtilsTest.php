@@ -11,6 +11,7 @@ namespace VanillaTests\Library\Vanilla\Utility;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\DomUtils;
+use Vanilla\Utility\HtmlUtils;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 
@@ -247,6 +248,66 @@ class DomUtilsTest extends TestCase {
 <p>this is &gt;&gt;&gt;.</p>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+
+    /**
+     * Test preg replace with unescaped HTML.
+     *
+     * @param int $expectedCount
+     * @param string|string[] $patternText
+     * @param string $input
+     * @param string $expected
+     * @param bool $escapeHtml
+     * @dataProvider providePregReplaceCallbackTestsUnescapedHTML
+     */
+    public function testPregReplaceCallbackUnescapedHtml(int $expectedCount, string $patternText, string $input, string $expected, bool $escapeHtml): void {
+        $domDocument = new HtmlDocument($input);
+        $dom = $domDocument->getDom();
+        $pattern = ['/'.$patternText.'/'];
+        $count = DomUtils::pregReplaceCallback($dom, $pattern, function (array $matches): string {
+            return HtmlUtils::formatTags("<0>{$matches[0]}</0>", 'strong');
+        }, $escapeHtml);
+        $actual = $domDocument->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+        $this->assertSame($expectedCount, $count);
+    }
+
+
+    /**
+     * Provide tests for `testPregReplaceCallbackUnescapedHtml()`.
+     *
+     * @return array
+     */
+    public function providePregReplaceCallbackTestsUnescapedHTML(): array {
+        $r = [
+            'simpletextnoescape' => [
+                1,
+                'random', 'test random text','test <strong>random</strong> text', false
+            ],
+            'htmltagsnoescape' => [
+                1,
+                'random', '<div><p><b>test</b> random text</p></div>','<div><p><b>test</b> <strong>random</strong> text</p></div>', false
+            ],
+            'simpletextecsape' => [
+                1,
+                'random', 'test random text','test &lt;strong&gt;random&lt;/strong&gt; text', true
+            ],
+            'htmltagsescape' => [
+                1,
+                'random', '<div><p><b>test</b> random text</p></div>','<div><p><b>test</b> &lt;strong&gt;random&lt;/strong&gt; text</p></div>', true
+            ],
+            'simpletextnoescape-multipematches' => [
+                2,
+                'random', 'test random text random','test <strong>random</strong> text <strong>random</strong>', false
+            ],
+            'htmltagsnoescape-multiplematches' => [
+                2,
+                'random', '<div><p><b>test</b> random text random</p></div>','<div><p><b>test</b> <strong>random</strong> text<strong>random</strong></p></div>', false
+            ],
+
+        ];
+        return $r;
     }
 
     /**

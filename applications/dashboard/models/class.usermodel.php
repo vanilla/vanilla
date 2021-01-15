@@ -20,20 +20,23 @@ use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
+use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 
 /**
  * Handles user data.
  */
 class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface, CrawlableInterface, FragmentFetcherInterface {
+
+    use LegacyDirtyRecordTrait;
 
     /** @var int */
     const GUEST_USER_ID = 0;
@@ -317,7 +320,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $user = $this->getID($userID);
         $banned = val('Banned', $user, 0);
 
-        $this->setField($userID, 'Banned', BanModel::setBanned($banned, true, BanModel::BAN_MANUAL));
+        $this->save(["UserID" => $userID, "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_MANUAL)]);
 
         $logID = false;
         if (val('DeleteContent', $options)) {
@@ -664,7 +667,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Unban the user.
         $newBanned = BanModel::setBanned($banned, false, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
-        $this->setField($userID, 'Banned', $newBanned);
+        $this->save(["UserID" => $userID, "Banned" => $newBanned]);
 
         // Restore the user's content.
         if (val('RestoreContent', $options)) {
@@ -1218,7 +1221,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 if (is_numeric($iD)) {
                     $user = $users[$iD] ?? false;
                     foreach ($join as $column) {
-                        $value = $user[$column];
+                        $value = $user[$column] ?? null;
                         if ($column == 'Photo') {
                             if ($value && !isUrl($value)) {
                                 $value = Gdn_Upload::url(changeBasename($value, 'n%s'));
@@ -1954,7 +1957,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * If $userID is a scalar, the return value will be a single dimensional array of $UserMetaKey => $Value
      * pairs.
      *
-     * @param int $userID UserID or array of UserIDs.
+     * @param int|int[] $userID UserID or array of UserIDs.
      * @param string $key Relative user meta key.
      * @param string $prefix
      * @param string $default
@@ -2584,6 +2587,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $this->EventArguments[self::OPT_SAVE_ROLES] = &$saveRoles;
             $this->EventArguments['RoleIDs'] = &$roleIDs;
             $this->EventArguments['Fields'] = &$fields;
+            $this->EventArguments['isApi'] = $settings["isApi"] ?? false;
             $this->fireEvent('BeforeSave');
             $user = array_merge($user, $fields);
 
@@ -3191,6 +3195,11 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     ) {
         $optimize = false;
 
+        $dirtyRecords = $filter[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($filter[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($filter[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
+
         if (is_array($filter)) {
             $where = $filter;
             $keywords = val('Keywords', $filter, '');
@@ -3240,6 +3249,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 ->orWhere('u.Name', $numericQuery)
                 ->endWhereGroup();
         } elseif ($keywords) {
+            $keywords = $this->SQL->escapeField($keywords);
             if ($optimize && !$isIPAddress) {
                 // An optimized search should only be done against name OR email.
                 if (strpos($keywords, '@') !== false) {
@@ -3263,6 +3273,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         if ($optimize && $this->SQL->whereCount() == 0 && empty($roleID)) {
             $this->SQL->reset();
             return new Gdn_DataSet([]);
+        }
+
+        if ($dirtyRecords) {
+            $this->applyDirtyWheres('u');
         }
 
         $data = $this->SQL
@@ -3398,7 +3412,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Preserve existing % by escaping.
         $name = trim($name);
-        $name = str_replace(['%', '_'], ['\%', '\_'], $name);
+        $name = $this->SQL->escapeField($name);
         if ($wildcardSearch) {
             $name = rtrim($name, '*');
         }
@@ -4762,7 +4776,6 @@ SQL;
      * @deprecated Call `setCalculatedFields()` with an array instead.
      */
     public function setCalculatedFieldsObject(&$user) {
-        deprecated(__METHOD__);
         if ($v = val('Attributes', $user)) {
             if (is_string($v)) {
                 setValue('Attributes', $user, dbdecode($v));
@@ -4939,7 +4952,11 @@ SQL;
         $email->setEmailTemplate($emailTemplate);
 
         // Apply rate limiting
-        self::rateLimit($user);
+        // Check if user is admin to avoid applying ratelimit when approving
+        // user registrations
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            self::rateLimit($user);
+        }
 
         try {
             $email->send();
@@ -5410,31 +5427,7 @@ SQL;
         $this->EventArguments['Fields'] = $property;
         $this->fireEvent('AfterSetField');
 
-        // Certain fields are too commonly updated to trigger these updates for every change.
-        // DateLastActive for example is specifically batched.
-        $propertyNames = array_keys($property);
-        $shouldResourceEvent = false;
-        foreach ($propertyNames as $propertyName) {
-            $fieldIsValid = !str_contains($propertyName, 'Count')
-                && !in_array($propertyName, [
-                    'Points', // Maybe in the future?
-                    'Score', // Maybe in the future?,
-                    'Permissions', // Don't care in elastic.
-                    'DateLastActive', // Has specific bulk handling.
-                ]);
-            if ($fieldIsValid) {
-                $shouldResourceEvent = true;
-            }
-        }
-        if ($shouldResourceEvent) {
-            $user = $this->getID($rowID);
-            $userEvent = $this->eventFromRow(
-                (array)$user,
-                UserEvent::ACTION_UPDATE,
-                $this->currentFragment()
-            );
-            $this->getEventManager()->dispatch($userEvent);
-        }
+        $this->addDirtyRecord('user', $rowID);
         return $value;
     }
 

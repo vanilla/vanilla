@@ -7,6 +7,7 @@
 namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
@@ -18,7 +19,7 @@ use Vanilla\Community\Events\CommentEvent;
  * Test {@link CommentModel}.
  */
 class CommentModelTest extends SiteTestCase {
-    use TestCommentModelTrait, CommunityApiTestTrait;
+    use TestCommentModelTrait, CommunityApiTestTrait, EventSpyTestTrait;
 
     /** @var CommentEvent */
     private $lastEvent;
@@ -243,4 +244,14 @@ class CommentModelTest extends SiteTestCase {
         $this->assertEquals(10, $countRows);
     }
 
+    /**
+     * Test a dirty-record is added when calling setField.
+     */
+    public function testDirtyRecordAdded() {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        $id = $comment['commentID'];
+        $this->commentModel->setField($id, 'Score', 5);
+        $this->assertDirtyRecordInserted('comment', $id);
+    }
 }

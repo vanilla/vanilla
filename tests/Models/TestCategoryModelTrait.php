@@ -114,4 +114,16 @@ trait TestCategoryModelTrait {
         $rows = $this->insertCategories(1, $overrides);
         return $rows[0];
     }
+
+    /**
+     * Follow a category
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @param bool|null $followed
+     * @return bool
+     */
+    protected function followCategory(int $userID, int $categoryID, ?bool $followed = null) {
+        return $this->categoryModel->follow($userID, $categoryID, $followed);
+    }
 }

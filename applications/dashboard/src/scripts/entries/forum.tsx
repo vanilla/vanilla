@@ -56,7 +56,7 @@ Router.addRoutes(
 
 applySharedPortalContext((props) => {
     return (
-        <AppContext variablesOnly errorComponent={ErrorPage}>
+        <AppContext variablesOnly noWrap errorComponent={ErrorPage}>
             <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>{props.children}</LayoutProvider>
         </AppContext>
     );

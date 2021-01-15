@@ -3,29 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import {
-    colorOut,
-    ColorValues,
-    offsetLightness,
-    IBackground,
-    IBorderRadiusOutput,
-    modifyColorBasedOnLightness,
-    radiusValue,
-    EMPTY_BACKGROUND,
-    getRatioBasedOnDarkness,
-    fontFallbacks,
-    monoFallbacks,
-    IFont,
-    EMPTY_SPACING,
-} from "@library/styles/styleHelpers";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderStyleProperty, BorderWidthProperty } from "csstype";
-import { color, ColorHelper, rgba } from "csx";
-import { TLength } from "typestyle/lib/types";
-import { logDebug, logError, logWarning } from "@vanilla/utils";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { IBackground } from "@library/styles/cssUtilsTypes";
+import { fontFallbacks, monoFallbacks } from "@library/styles/fontFallbacks";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { Variables } from "@library/styles/Variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { isLightColor } from "@library/styles/styleHelpersColors";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
+import { color, ColorHelper, rgba } from "csx";
 
 export enum GlobalPreset {
     DARK = "dark",
@@ -90,15 +77,17 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         weight: number,
         color: ColorHelper = mainColors ? mainColors.bg : initialMainColors.bg,
     ) => {
-        return getRatioBasedOnDarkness(weight, color);
+        return ColorsUtils.getRatioBasedOnDarkness(weight, color);
     };
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        primaryContrast: isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
-        statePrimary: offsetLightness(colorPrimary, 0.04), // Default state color change
-        secondary: offsetLightness(colorPrimary, 0.05),
+        primaryContrast: ColorsUtils.isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        statePrimary: ColorsUtils.offsetLightness(colorPrimary, 0.04), // Default state color change
+        secondary: ColorsUtils.offsetLightness(colorPrimary, 0.05),
         stateSecondary: undefined, // Calculated below, but you can overwrite it here.
-        secondaryContrast: isLightColor(colorSecondary) ? elementaryColors.almostBlack : elementaryColors.white,
+        secondaryContrast: ColorsUtils.isLightColor(colorSecondary)
+            ? elementaryColors.almostBlack
+            : elementaryColors.white,
     });
 
     const mainColors = {
@@ -154,7 +143,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         if (state !== "default" && state !== "visited") {
             if (!links[state]) {
                 links.colors[state] =
-                    generatedMainColors.stateSecondary ?? offsetLightness(links.colors.default, 0.008);
+                    generatedMainColors.stateSecondary ?? ColorsUtils.offsetLightness(links.colors.default, 0.008);
             }
         }
     });
@@ -164,15 +153,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     }
 
     const body: IBody = makeThemeVars("body", {
-        backgroundImage: {
-            ...EMPTY_BACKGROUND,
+        backgroundImage: Variables.background({
             color: mainColors.bg,
-        },
+        }),
     });
 
     const border = makeThemeVars("border", {
-        color: mixBgAndFg(0.15),
-        colorHover: mixBgAndFg(0.2),
+        color: mixBgAndFg(0.3),
+        colorHover: mixBgAndFg(0.5),
         width: 1,
         style: "solid",
         radius: 6, // Global default
@@ -290,6 +278,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             title: 22,
             subTitle: 18,
         },
+        sizeWeight: {
+            large: undefined as undefined | number,
+            medium: undefined as undefined | number,
+            small: undefined as undefined | number,
+            largeTitle: undefined as undefined | number,
+            title: undefined as undefined | number,
+            subTitle: undefined as undefined | number,
+        },
         mobile: {
             size: {
                 title: 26,
@@ -381,11 +377,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const meta = makeThemeVars("meta", {
-        text: {
+        text: Variables.font({
             size: fonts.size.small,
             color: options.preset === GlobalPreset.LIGHT ? color("#767676") : elementaryColors.white,
             lineHeight: lineHeights.base,
-        } as IFont,
+        }),
         spacing: {
             horizontalMargin: 4,
             verticalMargin: 12,
@@ -405,30 +401,30 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             opacity: 0.75,
         },
         hover: {
-            highlight: mixPrimaryAndBg(constants.states.hover.bgEmphasis),
+            highlight: links.colors.default.fade(constants.states.hover.bgEmphasis),
             contrast: undefined,
-            opacity: 1,
+            opacity: 1.0,
         },
         selected: {
-            highlight: mixPrimaryAndBg(constants.states.selected.bgEmphasis),
+            highlight: links.colors.default.fade(constants.states.selected.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
         active: {
-            highlight: mixPrimaryAndBg(constants.states.active.bgEmphasis),
+            highlight: links.colors.default.fade(constants.states.active.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
         focus: {
-            highlight: mixPrimaryAndBg(constants.states.focus.bgEmphasis),
+            highlight: links.colors.default.fade(constants.states.focus.bgEmphasis),
             contrast: undefined,
             opacity: 1,
         },
     });
 
-    const overlayBg = modifyColorBasedOnLightness({ color: mainColors.fg, weight: 0.5 });
+    const overlayBg = ColorsUtils.modifyColorBasedOnLightness({ color: mainColors.fg, weight: 0.5 });
     const overlay = makeThemeVars("overlay", {
-        dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
+        dropShadow: `2px -2px 5px ${ColorsUtils.colorOut(overlayBg.fade(0.3))}`,
         bg: overlayBg,
         border: {
             color: border.color,
@@ -523,13 +519,12 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 
     const itemList = makeThemeVars("itemList", {
-        padding: {
-            ...EMPTY_SPACING,
+        padding: Variables.spacing({
             top: 15,
             right: widget.padding,
             bottom: 16,
             left: widget.padding,
-        },
+        }),
     });
 
     return {
@@ -570,16 +565,3 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         itemList,
     };
 });
-
-export interface IGlobalBorderStyles extends IBorderRadiusOutput {
-    color?: ColorValues;
-    width?: BorderWidthProperty<TLength> | number;
-    style?: BorderStyleProperty;
-    radius?: radiusValue;
-}
-
-export enum IIconSizes {
-    SMALL = "small",
-    DEFAULT = "default",
-    LARGE = "large",
-}

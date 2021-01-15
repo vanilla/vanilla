@@ -24,7 +24,7 @@ import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import LinkBlot from "quill/formats/link";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
@@ -34,7 +34,7 @@ export default class KeyboardBindings {
         SpoilerLineBlot.blotName,
         BlockquoteLineBlot.blotName,
         CodeBlockBlot.blotName,
-        ListItem.blotName,
+        ListLineBlot.blotName,
     ];
     public bindings: {
         [key: string]: BindingObject;
@@ -386,7 +386,7 @@ export default class KeyboardBindings {
         this.bindings["List Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: [ListItem.blotName],
+            format: [ListLineBlot.blotName],
             handler: (range: RangeStatic) => {
                 const formatter = new Formatter(this.quill, range);
                 const listItems = formatter.getListItems();
@@ -394,14 +394,18 @@ export default class KeyboardBindings {
                 let handled = false;
                 listItems.forEach((item) => {
                     if (item.domNode.textContent === "") {
-                        item.outdent();
+                        if (item.getValue().depth > 0) {
+                            item.outdent();
+                        } else {
+                            item.replaceWith("block", "");
+                        }
                         handled = true;
                     }
                 });
 
                 if (handled) {
-                    this.quill.update(Quill.sources.USER);
-                    this.quill.setSelection(range, Quill.sources.API);
+                    this.quill.update(Quill.sources.SILENT);
+                    this.quill.setSelection(range, Quill.sources.USER);
                     return false;
                 } else {
                     return true;
@@ -484,8 +488,19 @@ export default class KeyboardBindings {
         const handleListBackspace = (range: RangeStatic) => {
             const formatter = new Formatter(this.quill, range);
             const listItem = formatter.getListItems()[0];
-            listItem.replaceWith("block", "");
-            this.quill.setSelection(range, Quill.sources.SILENT);
+            if (listItem instanceof ListLineBlot && !listItem.domNode.textContent) {
+                // We have an empty list item and we are at the start of it.
+                if (listItem.hasNestedList()) {
+                    listItem.outdent(true);
+                    this.quill.update(Quill.sources.USER);
+                }
+                this.quill.deleteText(listItem.offset(this.quill.scroll), listItem.length());
+                const newPosition = range.index - 1;
+                if (newPosition > 0) {
+                    this.quill.setSelection({ index: newPosition, length: 0 }, Quill.sources.USER);
+                }
+                return false;
+            }
             return true;
         };
 
@@ -493,7 +508,7 @@ export default class KeyboardBindings {
             key: KeyboardModule.keys.BACKSPACE,
             offset: 0,
             collapsed: true,
-            format: [ListItem.blotName],
+            format: [ListLineBlot.blotName],
             handler: handleListBackspace,
         };
         this.bindings["Block Backspace With Selection"] = {

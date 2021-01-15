@@ -28,6 +28,7 @@ import {
     SEARCH_SCOPE_EVERYWHERE,
 } from "@library/features/search/SearchScopeContext";
 import { AsyncCreatable } from "react-select";
+import { cx } from "@library/styles/styleShim";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -177,7 +178,7 @@ export function CompactSearch(props: ICompactSearchProps) {
 
                     <Button
                         onClick={props.onCloseSearch}
-                        className={classNames(props.cancelButtonClassName, classes.close, classesSearchBar.closeButton)}
+                        className={cx(props.cancelButtonClassName, classes.close, classesSearchBar.closeButton)}
                         title={t("Cancel")}
                         aria-expanded={true}
                         aria-haspopup="true"

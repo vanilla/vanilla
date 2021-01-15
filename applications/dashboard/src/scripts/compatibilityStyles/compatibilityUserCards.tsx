@@ -7,13 +7,13 @@ import React from "react";
 import isNumeric from "validator/lib/isNumeric";
 import { logError, notEmpty } from "@vanilla/utils";
 import { IMountable, mountReact, mountReactMultiple } from "@vanilla/react-utils/src";
-import { cssOut, nestedWorkaround } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 import { hasPermission } from "@vanilla/library/src/scripts/features/users/Permission";
 import { deconstructAttributesFromElement } from "@vanilla/react-utils";
 import { absolutePosition } from "@library/styles/styleHelpersPositioning";
 import { important } from "csx";
-import { buttonVariables } from "@library/forms/buttonStyles";
+import { buttonVariables } from "@vanilla/library/src/scripts/forms/Button.variables";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
@@ -130,14 +130,10 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
     `;
 
     cssOut(buttonsFromUserCardSelectors, {
-        $nest: {
-            [`&&&&&&`]: {
-                ...buttonStyles,
-            },
+        [`&&&&&&`]: {
+            ...buttonStyles,
         },
     });
-
-    nestedWorkaround(buttonsFromUserCardSelectors, buttonStyles.$nest);
 
     const spanInMetaSelectors = `
         .Groups .DataTable.CategoryTable tbody td.LatestPost .Meta .${numberFormattedClasses().root},

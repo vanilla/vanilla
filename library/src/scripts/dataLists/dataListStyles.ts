@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
-import { paddings } from "@library/styles/styleHelpersSpacing";
-import { TextAlignLastProperty, TextAlignProperty } from "csstype";
-import { percent } from "csx";
+import { TextAlignProperty } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("dataList", forcedVars);
@@ -29,12 +29,11 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             vertical: spacing.padding.vertical,
             right: globalVars.spacer.size,
         },
-        font: {
-            ...EMPTY_FONTS,
+        font: Variables.font({
             size: globalVars.fonts.size.small,
             weight: globalVars.fonts.weights.bold,
             lineHeight: globalVars.lineHeights.condensed,
-        } as IFont,
+        }),
     });
 
     const value = makeThemeVars("value", {
@@ -63,7 +62,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         "table",
         {},
         mediaQueries.xs({
-            $nest: {
+            ...{
                 "&&": {
                     display: "block",
                 },
@@ -76,13 +75,13 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         verticalAlign: "top",
         whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.bold,
-        ...paddings(vars.key.padding),
+        ...Mixins.padding(vars.key.padding),
     });
 
     const value = style("value", {
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
-        ...paddings(vars.value.padding),
+        ...Mixins.padding(vars.value.padding),
     });
 
     const row = style("row", {});

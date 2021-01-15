@@ -3,10 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { important, px } from "csx";
+import { ColorHelper, important, px } from "csx";
 import isNumeric from "validator/lib/isNumeric";
-import { logError } from "@vanilla/utils";
-import { ColorValues } from "@library/styles/styleHelpersColors";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
 export * from "@library/styles/styleHelpersTypography";
@@ -22,6 +20,8 @@ export * from "@library/styles/styleHelpersReset";
 export * from "@library/styles/styleHelpersSpinner";
 export * from "@library/styles/styleHelpersTypography";
 export * from "@library/styles/styleHelpersVisibility";
+import { styleUnit } from "@library/styles/styleUnit";
+export const unit = styleUnit;
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -31,9 +31,9 @@ export const debugHelper = (componentName: string) => {
     return {
         name: (subElementName?: string) => {
             if (subElementName) {
-                return { $debugName: `${componentName}-${subElementName}` };
+                return { label: `${componentName}-${subElementName}` };
             } else {
-                return { $debugName: componentName };
+                return { label: componentName };
             }
         },
     };
@@ -65,52 +65,18 @@ export const processValue = (variable) => {
     };
 };
 
-export const unit = (
-    val: string | number | undefined,
-    options?: { unitFunction?: (value) => string; isImportant?: boolean; debug?: boolean },
-) => {
-    const { unitFunction = px, isImportant = false, debug = false } = options || {};
-
-    if (typeof val === "object") {
-        logError(`You cannot pass objects (${JSON.stringify(val)}) to the "unit" function`);
-        return undefined;
-    }
-
-    if (val === undefined) {
-        return undefined;
-    }
-
-    const valIsNumeric = isNumeric(val.toString().trim());
-
-    let output;
-
-    if (typeof val === "string" && !valIsNumeric) {
-        output = val;
-    } else if (val !== undefined && val !== null && valIsNumeric) {
-        output = unitFunction(val as number);
-    } else {
-        output = val;
-    }
-
-    if (isImportant) {
-        return important(output);
-    } else {
-        return output;
-    }
-};
-
 export const importantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = unit(val);
+    const withUnit = styleUnit(val);
     return withUnit ? important(withUnit.toString()) : withUnit;
 };
 
 export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = unit(val);
+    const withUnit = styleUnit(val);
     return withUnit ? important(negative(withUnit).toString()) : withUnit;
 };
 
 export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
-    return negative(unit(val));
+    return negative(styleUnit(val));
 };
 
 export const negative = (val) => {
@@ -129,16 +95,16 @@ export const negative = (val) => {
 };
 
 export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {
-    return val !== undefined ? unit(val) : undefined;
+    return val !== undefined ? styleUnit(val) : undefined;
 };
 
 export interface IStateColors {
-    allStates?: ColorValues; // Applies to all
-    noState?: ColorValues; // Applies to stateless link
-    hover?: ColorValues;
-    focus?: ColorValues;
-    clickFocus?: ColorValues; // Focused, not through keyboard
-    keyboardFocus?: ColorValues; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
-    active?: ColorValues;
+    allStates?: ColorHelper; // Applies to all
+    noState?: ColorHelper; // Applies to stateless link
+    hover?: ColorHelper;
+    focus?: ColorHelper;
+    clickFocus?: ColorHelper; // Focused, not through keyboard
+    keyboardFocus?: ColorHelper; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: ColorHelper;
     source?: string; // for debugging
 }

@@ -18,17 +18,21 @@ class ImageHtmlProcessor extends HtmlProcessor {
     const EMBED_IMAGE_XPATH = './/img[not(contains(@class, "emoji"))]';
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function processDocument(): HtmlDocument {
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        return $document;
     }
 
     /**
+     * Parse all images URLs from the document.
+     *
+     * @param HtmlDocument $document The document to parse.
+     *
      * @return string[]
      */
-    public function getImageURLs(): array {
-        $domImages = $this->queryXPath(self::EMBED_IMAGE_XPATH);
+    public function getImageURLs(HtmlDocument $document): array {
+        $domImages = $document->queryXPath(self::EMBED_IMAGE_XPATH);
 
         /** @var string[] $headings */
         $imageUrls = [];
@@ -47,8 +51,8 @@ class ImageHtmlProcessor extends HtmlProcessor {
     /**
      * @return string[]
      */
-    public function getImages(): array {
-        $domImages = $this->queryXPath(self::EMBED_IMAGE_XPATH);
+    public function getImages(HtmlDocument $document): array {
+        $domImages = $document->queryXPath(self::EMBED_IMAGE_XPATH);
 
         /** @var array[] $headings */
         $images = [];

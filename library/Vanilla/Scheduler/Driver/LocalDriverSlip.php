@@ -27,13 +27,16 @@ class LocalDriverSlip implements DriverSlipInterface {
     /** @var string */
     protected $errorMessage = null;
 
+    /** @var string|null */
+    protected $trackingId = null;
+
     /**
      * LocalDriverSlip constructor.
      *
      * @param LocalJobInterface $job
      */
     public function __construct(LocalJobInterface $job) {
-        $this->id = uniqid('localDriverId_', true);
+        $this->id = uniqid('localDriverId::', true);
         $this->status = JobExecutionStatus::received();
         $this->job = $job;
     }
@@ -48,11 +51,12 @@ class LocalDriverSlip implements DriverSlipInterface {
     }
 
     /**
-     * Get status
+     * GetStatus
      *
+     * @param bool $forceUpdate
      * @return JobExecutionStatus
      */
-    public function getStatus(): JobExecutionStatus {
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus {
         return $this->status;
     }
 
@@ -113,5 +117,32 @@ class LocalDriverSlip implements DriverSlipInterface {
      */
     public function getErrorMessage(): ?string {
         return $this->errorMessage;
+    }
+
+    /**
+     * GetType
+     *
+     * @return string
+     */
+    public function getType(): string {
+        return preg_replace('/\\\\/', '_', get_class($this->job));
+    }
+
+    /**
+     * GetTrackingId
+     *
+     * @return string|null
+     */
+    public function getTrackingId(): ?string {
+        return $this->trackingId;
+    }
+
+    /**
+     * SetTrackingId
+     *
+     * @param string $trackingId
+     */
+    public function setTrackingId(string $trackingId): void {
+        $this->trackingId = $trackingId;
     }
 }

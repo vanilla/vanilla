@@ -5,13 +5,12 @@
  */
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import moment from "moment";
-import { IUserFragment } from "@library/@types/api/users";
 
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;

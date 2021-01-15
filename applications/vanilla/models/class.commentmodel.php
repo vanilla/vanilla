@@ -13,9 +13,11 @@ use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
+use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
 use Vanilla\Community\Events\CommentEvent;
@@ -36,6 +38,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     use UpdateMediaTrait;
 
     use FormatFieldTrait;
+
+    use LegacyDirtyRecordTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -521,7 +525,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         if ($limit === null) {
             $limit = $this->getDefaultLimit();
         }
-
+        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         $perms = DiscussionModel::categoryPermissions();
 
         if (is_array($perms) && empty($perms)) {
@@ -537,6 +544,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         }
 
         $query = $this->SQL;
+
         if ($sort === 'dateUpdated') {
             $this->orderBy('sortDateUpdated');
             $query->select('c.dateUpdated, c.dateInserted', 'COALESCE', 'sortDateUpdated');
@@ -559,6 +567,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         if ($offset) {
             $query->offset($offset);
         }
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('c');
+        }
+
         $result = $query->get();
         $data =& $result->result();
         $this->LastCommentCount = $result->numRows();
@@ -932,6 +944,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'url:s?' => 'The full URL to the comment.',
+            'labelCodes:a?' => ['items' => ['type' => 'string']],
             'type:s?' => 'Record type for search drivers.',
             'format:s?' => 'The format of the comment'
         ]);
@@ -1192,9 +1205,12 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->addUpdateFields($formPostValues);
         }
 
+        $isValidUser = true;
         // Prep and fire event
         $this->EventArguments['FormPostValues'] = &$formPostValues;
         $this->EventArguments['CommentID'] = $commentID;
+        $this->EventArguments['IsValid'] = &$isValidUser;
+        $this->EventArguments['UserModel'] = $this->userModel;
         $this->fireEvent('BeforeSaveComment');
 
         // Validate the form posted values
@@ -1285,7 +1301,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
 
             // Update discussion's comment count.
-            if (isset($formPostValues['DiscussionID'])) {
+            if (isset($formPostValues['DiscussionID']) && $isValidUser) {
                 $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
             }
         }
@@ -1349,7 +1365,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $result['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
             $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
             $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
-            $siteSection = $this->siteSectionModel->getSiteSectionForAttribute('allCategories', $row['CategoryID'], 'comment');
+            $siteSection = $this->siteSectionModel
+                ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
             $result['locale'] = $siteSection->getContentLocale();
         }
         return $result;
@@ -1397,7 +1414,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         // Make a quick check so that only the user making the comment can make the notification.
         // This check may be used in the future so should not be depended on later in the method.
-        if (Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
+        $validController = Gdn::controller() instanceof Gdn_Controller;
+        if ($validController && Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
             return;
         }
 
@@ -1414,7 +1432,12 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 
-        if ($Insert) {
+        $updateCounts = true;
+        // We shouldn't update the category counts if the discussion counts haven't been updated.
+        if ($Fields['InsertUserID'] !== $Discussion->LastCommentUserID) {
+            $updateCounts = false;
+        }
+        if ($Insert && $updateCounts) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
                 CategoryModel::instance()->incrementLastComment($Fields);
@@ -1629,6 +1652,18 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             // Save to the attributes column of the user table for this user.
             $this->userModel->setField($userID, 'CountComments', $countComments);
         }
+    }
+
+    /**
+     * Override of parent::setField
+     *
+     * @param int $rowID
+     * @param array|string $property
+     * @param bool $value
+     */
+    public function setField($rowID, $property, $value = false) {
+        parent::setField($rowID, $property, $value);
+        $this->addDirtyRecord('comment', $rowID);
     }
 
     /**

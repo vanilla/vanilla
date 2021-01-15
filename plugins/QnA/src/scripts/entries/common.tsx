@@ -5,19 +5,19 @@
 
 import React from "react";
 import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
-import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { SearchService } from "@library/search/SearchService";
 import { TypeQuestionIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 
 onReady(() => {
-    SearchFormContextProvider.addSubType({
+    SearchService.addSubType({
         label: t("Question"),
         icon: <TypeQuestionIcon />,
         recordType: "discussion",
         type: "question",
     });
 
-    SearchFormContextProvider.addSubType({
+    SearchService.addSubType({
         label: t("Answer"),
         icon: <TypeQuestionIcon />,
         recordType: "comment",

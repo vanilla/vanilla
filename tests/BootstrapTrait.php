@@ -14,6 +14,7 @@ use Psr\SimpleCache\CacheInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Cache\StaticCache;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\FeatureFlagHelper;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
 use VanillaTests\Fixtures\TestCache;
@@ -273,6 +274,16 @@ trait BootstrapTrait {
         static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter($cache));
         static::container()->get(ConfigurationInterface::class)->set('Cache.Enabled', true);
         return $cache;
+    }
+
+    /**
+     * Enable a feature flag.
+     *
+     * @param string $feature The config-friendly name of the feature.
+     */
+    public static function enableFeature(string $feature) {
+        static::container()->get(ConfigurationInterface::class)->set("Feature.{$feature}.Enabled", true);
+        FeatureFlagHelper::clearCache();
     }
 
     /**

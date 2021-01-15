@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import { UserWarningIcon } from "@library/icons/titleBar";
@@ -22,7 +22,7 @@ export default class StandardEmbedError extends React.Component<IProps> {
 
         return (
             <div
-                className={classNames("embedLoader-error", FOCUS_CLASS)}
+                className={classNames("embedLoader-error", EMBED_FOCUS_CLASS)}
                 aria-describedby={descriptionId}
                 aria-label={t("Error")}
                 role="alert"

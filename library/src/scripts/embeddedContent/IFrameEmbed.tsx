@@ -5,8 +5,8 @@
 
 import React from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -36,7 +36,16 @@ export function IFrameEmbed(props: IProps): JSX.Element {
         <EmbedContainer className="embedIFrame">
             <EmbedContent type={props.embedType}>
                 <div className="embedExternal-ratio" style={ratioStyle}>
-                    <iframe src={props.url} className="embedIFrame-iframe" frameBorder={0} />
+                    <iframe
+                        // We're excluding the following capabiltiies.
+                        // allow-popups - Don't allow popups (window.open(), showModalDialog(), target=”_blank”, etc.).
+                        // allow-pointer-lock - Don't allow the frame to lock the pointer.
+                        // allow-top-navigation - Don't allow the document to break out of the frame by navigating the top-level window.
+                        sandbox="allow-same-origin allow-scripts allow-forms"
+                        src={props.url}
+                        className="embedIFrame-iframe"
+                        frameBorder={0}
+                    />
                 </div>
             </EmbedContent>
         </EmbedContainer>

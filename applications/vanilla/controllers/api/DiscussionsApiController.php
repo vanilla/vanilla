@@ -15,6 +15,7 @@ use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchOptions;
@@ -493,6 +494,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'default' => 'first',
                 'enum' => ['first', 'mixed'],
             ],
+            'dirtyRecords:b?',
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
@@ -546,6 +548,11 @@ class DiscussionsApiController extends AbstractApiController {
         if ($query['followed']) {
             $where['Followed'] = true;
             $query['pinOrder'] = 'mixed';
+        }
+
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
         }
 
         $pinned = $query['pinned'] ?? null;

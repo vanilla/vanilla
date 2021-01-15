@@ -94,4 +94,21 @@ interface SchedulerInterface {
      * @param JobExecutionType $executionType
      */
     public function setExecutionType(JobExecutionType $executionType): void;
+
+    /**
+     * Whether or not to finalize the request and flush output buffers.
+     *
+     * In a web request, you probably want to flush buffers,
+     * however in other environments, it's best not to flush buffers you didn't start.
+     *
+     * @return bool
+     */
+    public function getFinalizeRequest(): bool;
+
+    /**
+     * Set the finalize request flag.
+     *
+     * @param bool $finalizeRequest
+     */
+    public function setFinalizeRequest(bool $finalizeRequest): void;
 }

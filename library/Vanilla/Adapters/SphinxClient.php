@@ -82,6 +82,8 @@ class SphinxClient {
     const UPDATE_STRING = 2;
     const UPDATE_JSON = 3;
 
+    const RESERVED_CHARACTERS = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<'];
+
     private $host = "localhost";
     private $port = 9312;
     private $path = false;
@@ -420,7 +422,7 @@ class SphinxClient {
      * @return string
      */
     public static function escapeString(string $str): string {
-        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<'];
+        $from = self::RESERVED_CHARACTERS;
         $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\=', '\<'];
 
         return str_replace($from, $to, $str);

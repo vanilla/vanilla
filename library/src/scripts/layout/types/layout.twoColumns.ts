@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { media } from "typestyle";
-import { px } from "csx";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { CSSObject } from "@emotion/css";
+import { media } from "@library/styles/styleShim";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
@@ -65,57 +65,57 @@ export const twoColumnLayoutVariables = useThemeCache(
         const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
         const mediaQueries = (): ITwoColumnLayoutMediaQueries => {
-            const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const noBleed = (styles: CSSObject, useMinWidth: boolean = true) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.noBleed),
-                        minWidth: useMinWidth ? px(breakPoints.oneColumn + 1) : undefined,
+                        maxWidth: breakPoints.noBleed,
+                        minWidth: useMinWidth ? breakPoints.oneColumn + 1 : undefined,
                     },
                     styles,
                 );
             };
 
-            const noBleedDown = (styles: NestedCSSProperties) => {
+            const noBleedDown = (styles: CSSObject) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.noBleed),
+                        maxWidth: breakPoints.noBleed,
                     },
                     styles,
                 );
             };
 
-            const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const oneColumn = (styles: CSSObject, useMinWidth: boolean = true) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.oneColumn),
-                        minWidth: useMinWidth ? px(breakPoints.xs + 1) : undefined,
+                        maxWidth: breakPoints.oneColumn,
+                        minWidth: useMinWidth ? breakPoints.xs + 1 : undefined,
                     },
                     styles,
                 );
             };
 
-            const oneColumnDown = (styles: NestedCSSProperties) => {
+            const oneColumnDown = (styles: CSSObject) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.oneColumn),
+                        maxWidth: breakPoints.oneColumn,
                     },
                     styles,
                 );
             };
 
-            const aboveOneColumn = (styles: NestedCSSProperties) => {
+            const aboveOneColumn = (styles: CSSObject) => {
                 return media(
                     {
-                        minWidth: px(breakPoints.oneColumn + 1),
+                        minWidth: breakPoints.oneColumn + 1,
                     },
                     styles,
                 );
             };
 
-            const xs = (styles: NestedCSSProperties) => {
+            const xs = (styles: CSSObject) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.xs),
+                        maxWidth: breakPoints.xs,
                     },
                     styles,
                 );

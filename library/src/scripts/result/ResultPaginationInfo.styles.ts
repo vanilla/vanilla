@@ -3,16 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { fonts } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
 
 export const resultPaginationInfoClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("resultPaginationInfo");
 
     const root = style({
-        ...fonts(globalVars.meta.text),
+        ...Mixins.font(globalVars.meta.text),
         marginTop: globalVars.gutter.half,
     });
 

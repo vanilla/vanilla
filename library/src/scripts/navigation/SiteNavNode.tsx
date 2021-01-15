@@ -16,7 +16,7 @@ import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
 import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { RecordID } from "@vanilla/utils";
 
 interface IProps extends INavigationTreeItem {

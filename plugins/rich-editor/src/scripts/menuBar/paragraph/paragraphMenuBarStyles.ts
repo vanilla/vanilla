@@ -4,12 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
+import { styleFactory } from "@library//styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
-import { appearance, colorOut, unit } from "@library/styles/styleHelpers";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { appearance } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonMixins";
 
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -17,7 +20,7 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const style = styleFactory("paragraphMenuCheckRadio");
 
     const group = style("group", {
-        marginBottom: unit(9),
+        marginBottom: styleUnit(9),
     });
 
     const checkRadio = style("checkRadio", {
@@ -27,21 +30,21 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         width: percent(100),
-        minHeight: unit(30),
+        minHeight: styleUnit(30),
         userSelect: "none",
         padding: 0,
         outline: 0,
-        $nest: {
+        ...{
             "&:hover": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
                 zIndex: 1,
             },
             "&:active": {
-                backgroundColor: colorOut(globalVars.states.active.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.active.highlight),
                 zIndex: 1,
             },
             "&:focus": {
-                backgroundColor: colorOut(globalVars.states.hover.highlight),
+                backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
                 zIndex: 1,
             },
         },
@@ -51,17 +54,17 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const checked = style("checked", {});
     const separator = style("separator", {});
     const icon = style("icon", {
-        width: unit(vars.menuButton.size),
-        flexBasis: unit(vars.menuButton.size),
+        width: styleUnit(vars.menuButton.size),
+        flexBasis: styleUnit(vars.menuButton.size),
     });
     const checkRadioLabel = style("checkRadioLabel", {
         flexGrow: 1,
-        maxWidth: calc(`100% - ${unit(vars.menuButton.size * 2)}`),
+        maxWidth: calc(`100% - ${styleUnit(vars.menuButton.size * 2)}`),
         textAlign: "left",
     });
     const checkRadioSelected = style("checkRadioSelected", {
-        width: unit(vars.menuButton.size),
-        flexBasis: unit(vars.menuButton.size),
+        width: styleUnit(vars.menuButton.size),
+        flexBasis: styleUnit(vars.menuButton.size),
     });
 
     return {

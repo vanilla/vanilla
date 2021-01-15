@@ -8,8 +8,7 @@ import { actionCreatorFactory } from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
 import { ITheme, IThemeAssets, IThemeRevision } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
-import { resetThemeCache } from "@library/styles/styleUtils";
-import { reinit, forceRenderStyles } from "typestyle";
+import { resetThemeCache } from "@library/styles/themeCache";
 import { setMeta } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
 
@@ -72,7 +71,6 @@ export default class ThemeActions extends ReduxActions {
 
         // Clear the cache of variables.
         resetThemeCache();
-        forceRenderStyles();
     };
 
     public static readonly getAllThemes_ACS = createAction.async<{}, IGetAllThemeResponse, IApiError>("GET_ALL_THEMES");

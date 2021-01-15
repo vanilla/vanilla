@@ -19,6 +19,19 @@ class ModerationController extends VanillaController {
     // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
     private const MAX_TIME_BATCH = 10;
 
+    /** @var \Garden\EventManager */
+    private $eventManager;
+
+    /**
+     * ModerationController constructor.
+     *
+     * @param \Garden\EventManager $eventManager
+     */
+    public function __construct(\Garden\EventManager $eventManager) {
+        $this->eventManager = $eventManager;
+        parent::__construct();
+    }
+
     /**
      * Looks at the user's attributes and form postback to see if any comments
      * have been checked for administration, and if so, puts an inform message on
@@ -434,10 +447,14 @@ class ModerationController extends VanillaController {
         $CountCheckedDiscussions = count($DiscussionIDs);
         $this->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
 
+        // fire event
+        $this->EventArguments['select'] = ['DiscussionID', 'Name', 'Type', 'DateLastComment', 'CategoryID', 'CountComments'];
+        $this->fireEvent('beforeDiscussionMoveSelect', $this->EventArguments);
+
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL
-            ->select('DiscussionID, Name, Type, DateLastComment, CategoryID, CountComments')
+            ->select($this->EventArguments['select'])
             ->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
 
         $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
@@ -447,7 +464,7 @@ class ModerationController extends VanillaController {
                 $this->setData('DiscussionType', $Discussion['Type']);
                 $this->setData('CategoryID', $Category['CategoryID']);
             }
-            if ($Category && $Category['PermsDiscussionsEdit']) {
+            if ($Category && CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Edit')) {
                 $AllowedDiscussions[] = $DiscussionID;
             }
         }
@@ -467,13 +484,14 @@ class ModerationController extends VanillaController {
                 $RedirectLink = $this->Form->getFormValue('RedirectLink');
 
                 // User must have add permission on the target category
-                if (!$Category['PermsDiscussionsAdd']) {
+                if (!CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
                     throw forbiddenException('@' . t('You do not have permission to add discussions to this category.'));
                 }
 
                 // Iterate and move.
                 foreach ($AllowedDiscussions as $DiscussionID) {
                     $Discussion = val($DiscussionID, $DiscussionData);
+                    $this->EventArguments['discussion'] = &$Discussion;
 
                     // Create the shadow redirect.
                     if ($RedirectLink) {
@@ -492,6 +510,11 @@ class ModerationController extends VanillaController {
                             'Format' => 'Html',
                             'Closed' => true
                         ];
+
+                        $this->EventArguments['redirectDiscussion'] = &$RedirectDiscussion;
+
+                        // fire event
+                        $this->fireEvent('beforeRedirectDiscussionSave', $this->EventArguments);
 
                         // Pass a forced input formatter around this exception.
                         if (c('Garden.ForceInputFormatter')) {
@@ -512,10 +535,15 @@ class ModerationController extends VanillaController {
                         }
                     }
 
-                    $DiscussionModel->save([
+                    $this->EventArguments['save'] = [
                         "CategoryID" => $CategoryID,
                         "DiscussionID" => $DiscussionID,
-                    ]);
+                    ];
+
+                    // fire event
+                    $this->fireEvent('beforeDiscussionMoveSave', $this->EventArguments);
+
+                    $DiscussionModel->save($this->EventArguments['save']);
                     unset($checkedDiscussions[$DiscussionID]);
 
                     Gdn::userModel()->saveAttribute(

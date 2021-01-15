@@ -16,36 +16,30 @@ abstract class HtmlProcessor {
 
     use HtmlProcessorTrait;
 
-    /** @var HtmlDocument */
-    protected $document;
+    /**
+     * Dynamic processors should be re-applied on every render.
+     */
+    const TYPE_DYNAMIC = "dynamic";
 
     /**
-     * Constructor.
+     * Results from dynamic processors can be cached indefinitely.
+     */
+    const TYPE_STATIC = "static";
+
+    /**
+     * Get the processor type.
      *
-     * @param HtmlDocument $document
+     * @return string One of TYPE_DYNAMIC or TYPE_STATIC.
      */
-    public function __construct(HtmlDocument $document) {
-        $this->document = $document;
-    }
-
-    /**
-     * @return HtmlDocument
-     */
-    protected function getDocument(): HtmlDocument {
-        return $this->document;
-    }
-
-    /**
-     * @param HtmlDocument $document
-     */
-    public function setDocument(HtmlDocument $document) {
-        $this->document = $document;
+    public function getProcessorType(): string {
+        return self::TYPE_STATIC;
     }
 
     /**
      * Process the HTML document in some way.
      *
-     * @return HtmlDocument
+     * @param HtmlDocument $document The document to process.
+     * @return HtmlDocument The modified document.
      */
-    abstract public function processDocument(): HtmlDocument;
+    abstract public function processDocument(HtmlDocument $document): HtmlDocument;
 }

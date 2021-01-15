@@ -8,6 +8,8 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use Vanilla\Models\DirtyRecordModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
  * Test the /api/v2/categories endpoints.
@@ -16,6 +18,8 @@ class CategoriesTest extends AbstractResourceTest {
 
     use TestExpandTrait;
     use TestPrimaryKeyRangeFilterTrait;
+    use TestFilterDirtyRecordsTrait;
+    use CommunityApiTestTrait;
 
     /** This category should never exist. */
     const BAD_CATEGORY_ID = 999;
@@ -60,6 +64,58 @@ class CategoriesTest extends AbstractResourceTest {
      */
     protected function getExpandableUserFields() {
         return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function triggerDirtyRecords() {
+        $this->resetTable('dirtyRecord');
+        $category = $this->createCategory();
+        $this->createDiscussion(['categoryID' => $category['categoryID']]);
+
+        return $category;
+    }
+
+    /**
+     * Get the resource type.
+     *
+     * @return array
+     */
+    protected function getResourceInformation(): array {
+        return [
+            "resourceType" => "category",
+            "primaryKey" => "categoryID"
+        ];
+    }
+
+    /**
+     * Assert all dirty records for a specific resource are returned.
+     *
+     * INDEX /Categories by default returns a category tree (max 2 levels)
+     * we must check if the child-categories are dirty-records as well.
+     *
+     * @param array $records
+     */
+    protected function assertAllDirtyRecordsReturned($records) {
+        /** @var DirtyRecordModel $dirtyRecordModel */
+        $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
+        $recordType = $this->getResourceInformation();
+        $dirtyRecords = $dirtyRecordModel->select(["recordType" => $recordType]);
+
+        // getCategoryTree will return a tree with dirtyRecords
+        foreach ($records as $record) {
+            if (count($record['children']) > 0) {
+                $records = array_merge($records, $record['children']);
+            }
+        }
+
+        $dirtyRecordIDs = array_column($dirtyRecords, 'recordID');
+        $categoryIDs = array_column($records, 'categoryID');
+
+        foreach ($dirtyRecordIDs as $dirtyRecordID) {
+            $this->assertContains($dirtyRecordID, $categoryIDs);
+        }
     }
 
     /**
@@ -374,7 +430,7 @@ class CategoriesTest extends AbstractResourceTest {
      * Make sure `GET /categories` doesn't allow invalid querystring parameters.
      */
     public function testOnlyOneOfIndexQuery(): void {
-        $this->expectExceptionMessage('Only one of categoryID, parentCategoryID, parentCategoryCode, followed are allowed.');
+        $this->expectExceptionMessage('Only one of categoryID, archived, followed, featured are allowed.');
         $r = $this->api()->get($this->baseUrl, ['categoryID' => 123, 'followed' => true]);
     }
 }

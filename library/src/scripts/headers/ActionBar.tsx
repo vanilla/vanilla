@@ -15,7 +15,7 @@ import BackLink from "@library/routing/links/BackLink";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode, useRef } from "react";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
 import { actionBarClasses } from "@library/headers/ActionBarStyles";
@@ -61,8 +61,8 @@ export function ActionBar(props: IProps) {
 
     const minButtonSizeStyles: React.CSSProperties =
         restoreSize.width && backSize.width
-            ? { minWidth: unit(largerWidth) }
-            : { minWidth: unit(globalVars.icon.sizes.default) };
+            ? { minWidth: styleUnit(largerWidth) }
+            : { minWidth: styleUnit(globalVars.icon.sizes.default) };
 
     const content = (
         <ul className={classNames(classes.items)}>

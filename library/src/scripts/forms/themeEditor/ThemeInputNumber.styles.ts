@@ -4,20 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, translateX, translateY } from "csx";
 import {
     absolutePosition,
-    borders,
-    colorOut,
-    fonts,
     negativeUnit,
     textInputSizingFromFixedHeight,
-    unit,
     userSelect,
 } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 import { themeBuilderClasses, themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { IGlobalBorderStyles } from "@library/styles/globalStyleVars";
+import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const themeInputNumberVariables = useThemeCache(() => {
     // Intentionally not overwritable with theming system.
@@ -35,10 +36,10 @@ export const themeInputNumberVariables = useThemeCache(() => {
         },
         spinner: {
             width: 18,
-            fonts: {
+            fonts: Variables.font({
                 ...builderVars.defaultFont,
                 size: 12,
-            },
+            }),
         },
     };
 });
@@ -55,9 +56,9 @@ export const themeInputNumberClasses = useThemeCache(() => {
         flexDirection: "column",
         justifyContent: "stretch",
         alignItems: "stretch",
-        height: unit(vars.sizing.height),
-        width: unit(vars.spinner.width + builderVariables.border.width),
-        flexBasis: unit(vars.spinner.width + builderVariables.border.width),
+        height: styleUnit(vars.sizing.height),
+        width: styleUnit(vars.spinner.width + builderVariables.border.width),
+        flexBasis: styleUnit(vars.spinner.width + builderVariables.border.width),
         transform: translateX(negativeUnit(builderVariables.border.width)),
     });
 
@@ -66,8 +67,8 @@ export const themeInputNumberClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         justifyContent: "stretch",
         alignItems: "stretch",
-        maxWidth: unit(vars.input.width),
-        width: unit(vars.input.width),
+        maxWidth: styleUnit(vars.input.width),
+        width: styleUnit(vars.input.width),
         position: "relative",
     });
 
@@ -75,22 +76,22 @@ export const themeInputNumberClasses = useThemeCache(() => {
         position: "relative",
         ...textInputSizingFromFixedHeight(
             vars.sizing.height,
-            vars.label.fonts.size,
+            vars.label.fonts.size as number,
             builderVariables.border.width * 2, // 2
         ),
-        height: unit(vars.sizing.height),
-        width: unit(vars.input.width - vars.spinner.width),
-        maxWidth: unit(vars.input.width - vars.spinner.width),
-        color: colorOut(builderVariables.defaultFont.color),
-        flexBasis: unit(builderVariables.input.width),
-        ...borders({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
+        height: styleUnit(vars.sizing.height),
+        width: styleUnit(vars.input.width - vars.spinner.width),
+        maxWidth: styleUnit(vars.input.width - vars.spinner.width),
+        color: ColorsUtils.colorOut(builderVariables.defaultFont.color),
+        flexBasis: styleUnit(builderVariables.input.width),
+        ...Mixins.border({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
         borderRight: 0,
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
-        borderTopLeftRadius: unit(builderVariables.wrap.borderRadius),
-        borderBottomLeftRadius: unit(builderVariables.wrap.borderRadius),
+        borderTopLeftRadius: styleUnit(builderVariables.wrap.borderRadius),
+        borderBottomLeftRadius: styleUnit(builderVariables.wrap.borderRadius),
         transition: `color .2s ease-out, background .2s ease-out`,
-        $nest: {
+        ...{
             ":not(.focus-visible)": {
                 outline: 0,
             },
@@ -98,28 +99,28 @@ export const themeInputNumberClasses = useThemeCache(() => {
                 zIndex: 1,
             },
             [`&.${builderClasses.invalidField}`]: {
-                color: colorOut(builderVariables.error.color),
-                background: colorOut(builderVariables.error.backgroundColor),
+                color: ColorsUtils.colorOut(builderVariables.error.color),
+                background: ColorsUtils.colorOut(builderVariables.error.backgroundColor),
             },
         },
     });
 
     const stepUp = style("stepUp", {
         ...absolutePosition.topRight(),
-        ...borders({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
+        ...Mixins.border({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
         ...userSelect(),
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        borderTopRightRadius: unit(builderVariables.wrap.borderRadius),
+        borderTopRightRadius: styleUnit(builderVariables.wrap.borderRadius),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 0,
-        height: unit(Math.ceil(vars.sizing.height / 2)),
+        height: styleUnit(Math.ceil(vars.sizing.height / 2)),
         width: percent(100),
-        ...fonts(vars.spinner.fonts),
-        $nest: {
+        ...Mixins.font(vars.spinner.fonts),
+        ...{
             "&:hover, &:focus, &:active, &.focus-visible": {
                 zIndex: 1,
             },
@@ -127,20 +128,20 @@ export const themeInputNumberClasses = useThemeCache(() => {
     });
     const stepDown = style("stepDown", {
         ...absolutePosition.bottomRight(),
-        ...borders({}, { fallbackBorderVariables: builderVariables.border }),
+        ...Mixins.border({}, { fallbackBorderVariables: builderVariables.border }),
         ...userSelect(),
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
         borderTopRightRadius: 0,
-        borderBottomRightRadius: unit(builderVariables.wrap.borderRadius),
+        borderBottomRightRadius: styleUnit(builderVariables.wrap.borderRadius),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 0,
-        ...fonts(vars.spinner.fonts),
-        height: unit(Math.ceil(vars.sizing.height / 2)),
+        ...Mixins.font(vars.spinner.fonts),
+        height: styleUnit(Math.ceil(vars.sizing.height / 2)),
         width: percent(100),
-        $nest: {
+        ...{
             "&:hover": {
                 zIndex: 1,
             },
@@ -153,15 +154,15 @@ export const themeInputNumberClasses = useThemeCache(() => {
     const spinnerSpacer = style("spinnerSpacer", {
         display: "block",
         position: "relative",
-        height: unit(vars.sizing.height),
-        minHeight: unit(vars.sizing.height),
-        width: unit(vars.spinner.width + builderVariables.border.width),
-        flexBasis: unit(vars.spinner.width + builderVariables.border.width),
+        height: styleUnit(vars.sizing.height),
+        minHeight: styleUnit(vars.sizing.height),
+        width: styleUnit(vars.spinner.width + builderVariables.border.width),
+        flexBasis: styleUnit(vars.spinner.width + builderVariables.border.width),
     });
 
     const inputWrap = style("inputWrap", {
-        width: unit(vars.input.width),
-        flexBasis: unit(vars.input.width),
+        width: styleUnit(vars.input.width),
+        flexBasis: styleUnit(vars.input.width),
     });
 
     return {

@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
-import { cssRule } from "typestyle";
+import { cssRule } from "@library/styles/styleShim";
 import { important } from "csx";
 import { iconClasses } from "@library/icons/iconStyles";
 

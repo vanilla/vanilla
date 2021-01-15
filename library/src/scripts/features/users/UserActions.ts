@@ -8,7 +8,7 @@ import { IApiError, LoadStatus } from "@library/@types/api/core";
 import { IMe, IMeCounts, IUser, IInvitees } from "@library/@types/api/users";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IPermissions } from "@library/features/users/userModel";
+import { IPermissions } from "@library/features/users/userTypes";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 const createAction = actionCreatorFactory("@@users");

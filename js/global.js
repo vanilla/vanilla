@@ -983,7 +983,7 @@ jQuery(document).ready(function($) {
             try {
                 var message = response.InformMessages[i].Message;
                 var emptyMessage = message === '';
-
+                
                 message = '<span class="InformMessageBody">' + message + '</span>';
 
                 // Is there a sprite?
@@ -994,7 +994,9 @@ jQuery(document).ready(function($) {
                 if (css.indexOf('Dismissable') > 0)
                     message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
-                message = '<div class="InformMessage">' + message + '</div>';
+                var messageID = gdn.generateString(10);
+                message = '<div class="InformMessage" id="'+messageID+'">' + message + '</div>';
+
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
                 message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
                 if (gdn.getMeta('SelfUrl')) {
@@ -1006,7 +1008,7 @@ jQuery(document).ready(function($) {
                 }
                 var skip = false;
                 for (var j = 0; j < wrappers.length; j++) {
-                    if ($(wrappers[j]).text() == $(message).text()) {
+                    if ($(wrappers[j]).children().attr('id') === $(message).attr('id')) {
                         skip = true;
                     }
                 }

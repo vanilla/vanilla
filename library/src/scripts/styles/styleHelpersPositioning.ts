@@ -14,38 +14,40 @@ import {
     PositionProperty,
     RightProperty,
 } from "csstype";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { TLength } from "@library/styles/styleShim";
+import { CSSObject } from "@emotion/css";
 import { percent, px } from "csx";
-import { unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top: unit(top),
-            right: unit(right),
+            top: styleUnit(top),
+            right: styleUnit(right),
         };
     },
     topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top: unit(top),
-            left: unit(left),
+            top: styleUnit(top),
+            left: styleUnit(left),
         };
     },
     bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom: unit(bottom),
-            right: unit(right),
+            bottom: styleUnit(bottom),
+            right: styleUnit(right),
         };
     },
     bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom: unit(bottom),
-            left: unit(left),
+            bottom: styleUnit(bottom),
+            left: styleUnit(left),
         };
     },
     middleOfParent: (shrink: boolean = false) => {
@@ -109,7 +111,7 @@ export const absolutePosition = {
     },
 };
 
-export function sticky(): NestedCSSProperties {
+export function sticky(): CSSObject {
     return {
         position: ["-webkit-sticky", "sticky"],
     };
@@ -137,7 +139,7 @@ export function flexHelper() {
     return { middle, middleLeft };
 }
 
-export function fullSizeOfParent(): NestedCSSProperties {
+export function fullSizeOfParent(): CSSObject {
     return {
         position: "absolute",
         display: "block",

@@ -4,7 +4,8 @@
  */
 
 import React from "react";
-import { SearchFormContextProvider, getGlobalSearchSorts } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { getGlobalSearchSorts } from "@library/search/SearchFormContextProvider";
+import { SearchService } from "@library/search/SearchService";
 import { TypeDiscussionsIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { ISearchForm } from "@vanilla/library/src/scripts/search/searchTypes";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
@@ -16,12 +17,11 @@ import { SearchFilterPanelCommunity } from "@vanilla/addon-vanilla/search/Search
 import Result from "@vanilla/library/src/scripts/result/Result";
 import { SearchFilterPanelComments } from "@vanilla/addon-vanilla/search/SearchFilterPanelComments";
 import CollapseCommentsSearchMeta from "@vanilla/addon-vanilla/search/CollapseCommentsSearchMeta";
-import { ResultMeta } from "@vanilla/library/src/scripts/result/ResultMeta";
 import { notEmpty } from "@vanilla/utils";
 
 export function registerCommunitySearchDomain() {
     onReady(() => {
-        SearchFormContextProvider.addPluggableDomain({
+        SearchService.addPluggableDomain({
             key: "discussions",
             name: t("Discussions"),
             sort: 1,
@@ -30,6 +30,7 @@ export function registerCommunitySearchDomain() {
                 return [
                     "tagsOptions",
                     "categoryOption",
+                    "categoryOptions",
                     "followedCategories",
                     "includeChildCategories",
                     "includeArchivedCategories",
@@ -50,7 +51,13 @@ export function registerCommunitySearchDomain() {
                 if (query.tagsOptions) {
                     query.tags = query.tagsOptions.map((tag: any) => tag?.tagCode ?? tag?.tagName).filter(notEmpty);
                 }
-                if (query.categoryOption) {
+
+                if (query.categoryOptions) {
+                    query.categoryIDs = query.categoryOptions.map((option) => option.value as number);
+                    // These are not allowed parameters
+                    delete query.categoryOptions;
+                    delete query.categoryOption;
+                } else if (query.categoryOption) {
                     query.categoryID = query.categoryOption.value as number;
                 }
 
@@ -79,14 +86,14 @@ export function registerCommunitySearchDomain() {
             showSpecificRecordCrumbs: () => false,
         });
 
-        SearchFormContextProvider.addSubType({
+        SearchService.addSubType({
             label: t("Discussions"),
             icon: <TypeDiscussionsIcon />,
             recordType: "discussion",
             type: "discussion",
         });
 
-        SearchFormContextProvider.addSubType({
+        SearchService.addSubType({
             label: t("Comment"),
             icon: <TypeDiscussionsIcon />,
             recordType: "comment",

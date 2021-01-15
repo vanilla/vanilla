@@ -4,10 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { borders, EMPTY_BORDER, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { objectFitWithFallback } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject } from "@emotion/css";
 import { important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -20,12 +24,14 @@ export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) =
     const makeThemeVars = variableFactory("userPhoto", forcedVars);
     const globalVars = globalVariables();
 
-    const border = makeThemeVars("border", {
-        ...EMPTY_BORDER,
-        radius: "50%",
-        width: 1,
-        color: globalVars.mixBgAndFg(0.5).fade(0.3),
-    });
+    const border = makeThemeVars(
+        "border",
+        Variables.border({
+            radius: "50%",
+            width: 1,
+            color: globalVars.mixBgAndFg(0.5).fade(0.3),
+        }),
+    );
 
     const sizing = makeThemeVars("sizing", {
         small: 28,
@@ -41,45 +47,44 @@ export const userPhotoMixins = (vars = userPhotoVariables()) => {
     // wrapper of image
     const root = {
         position: "relative",
-        borderRadius: vars.border.radius,
         overflow: "hidden",
-        ...borders(vars.border),
-    } as NestedCSSProperties;
+        ...Mixins.border(vars.border),
+    };
 
     const photo = {
         ...objectFitWithFallback(),
         padding: important(0),
         margin: important(0),
-        $nest: {
+        ...{
             "&&": {
                 width: percent(100),
                 height: "auto",
             },
         },
-    } as NestedCSSProperties;
+    };
 
     const small = {
-        width: unit(vars.sizing.small),
-        height: unit(vars.sizing.small),
-        flexBasis: unit(vars.sizing.small),
-    } as NestedCSSProperties;
+        width: styleUnit(vars.sizing.small),
+        height: styleUnit(vars.sizing.small),
+        flexBasis: styleUnit(vars.sizing.small),
+    };
 
     const medium = {
-        width: unit(vars.sizing.medium),
-        height: unit(vars.sizing.medium),
-        flexBasis: unit(vars.sizing.medium),
-    } as NestedCSSProperties;
+        width: styleUnit(vars.sizing.medium),
+        height: styleUnit(vars.sizing.medium),
+        flexBasis: styleUnit(vars.sizing.medium),
+    };
 
     const large = {
-        width: unit(vars.sizing.large),
-        height: unit(vars.sizing.large),
-        flexBasis: unit(vars.sizing.large),
-    } as NestedCSSProperties;
+        width: styleUnit(vars.sizing.large),
+        height: styleUnit(vars.sizing.large),
+        flexBasis: styleUnit(vars.sizing.large),
+    };
 
     const xlarge = {
-        width: unit(vars.sizing.xlarge),
-        height: unit(vars.sizing.xlarge),
-        flexBasis: unit(vars.sizing.xlarge),
+        width: styleUnit(vars.sizing.xlarge),
+        height: styleUnit(vars.sizing.xlarge),
+        flexBasis: styleUnit(vars.sizing.xlarge),
     };
 
     return {
@@ -98,7 +103,7 @@ export const userPhotoClasses = useThemeCache(() => {
     // I'm doing this so we can import the styles in the compatibility styles.
     const mixinStyles = userPhotoMixins(vars);
 
-    const root = style(mixinStyles.root);
+    const root = style(mixinStyles.root as CSSObject);
     const photo = style("photo", mixinStyles.photo);
     const small = style("small", mixinStyles.small);
     const medium = style("medium", mixinStyles.medium);
@@ -107,7 +112,7 @@ export const userPhotoClasses = useThemeCache(() => {
 
     const noPhoto = style("noPhoto", {
         display: "block",
-        $nest: {
+        ...{
             "&&": {
                 width: percent(100),
             },

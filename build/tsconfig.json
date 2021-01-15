@@ -7,7 +7,7 @@
         "strict": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "lib": ["es2017"],
+        "lib": ["es2017", "dom"],
         "baseUrl": ".",
         "isolatedModules": false,
         "paths": {

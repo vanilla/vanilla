@@ -9,7 +9,7 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchContext";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import Checkbox from "@library/forms/Checkbox";
@@ -61,14 +61,16 @@ export function SearchFilterPanelCommunity() {
             />
             <CommunityCategoryInput
                 label={t("Category")}
-                onChange={(option) => {
-                    updateForm({ categoryOption: option });
+                multiple
+                onChange={(options) => {
+                    updateForm({ categoryOptions: options });
                 }}
-                value={form.categoryOption}
+                value={form.categoryOptions ?? []}
             />
 
             <CheckboxGroup tight={true}>
                 <Checkbox
+                    disabled={(form.categoryOptions?.length || 0) > 1}
                     label={t("Search Subcategories")}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ includeChildCategories: event.target.checked || false });
@@ -77,7 +79,7 @@ export function SearchFilterPanelCommunity() {
                     className={classesInputBlock.root}
                 />
                 <Checkbox
-                    label={t("Search only followed Categories")}
+                    label={t("Search Followed Categories Only")}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ followedCategories: event.target.checked || false });
                     }}
@@ -85,7 +87,7 @@ export function SearchFilterPanelCommunity() {
                     className={classesInputBlock.root}
                 />
                 <Checkbox
-                    label={t("Search archived")}
+                    label={t("Search Archived Categories")}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ includeArchivedCategories: event.target.checked || false });
                     }}

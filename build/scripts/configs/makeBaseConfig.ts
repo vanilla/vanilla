@@ -4,16 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import * as path from "path";
-import webpack from "webpack";
-import { DIST_DIRECTORY, PRETTIER_FILE, VANILLA_ROOT } from "../env";
-import PrettierPlugin from "prettier-webpack-plugin";
-import { BuildMode, getOptions } from "../buildOptions";
 import chalk from "chalk";
-import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import EntryModel from "../utility/EntryModel";
+import * as path from "path";
+import PrettierPlugin from "prettier-webpack-plugin";
+import webpack from "webpack";
 import WebpackBar from "webpackbar";
+import { BuildMode, getOptions } from "../buildOptions";
+import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
+import EntryModel from "../utility/EntryModel";
+import { printVerbose } from "../utility/utils";
+const CircularDependencyPlugin = require("circular-dependency-plugin");
 
 /**
  * Create the core webpack config.
@@ -34,11 +35,14 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    const babelPlugins: string[] = [];
+    const babelPlugins: any[] = [];
     const hotLoaders: any[] = [];
     const hotAliases: any = {};
     if (options.mode === BuildMode.DEVELOPMENT) {
-        babelPlugins.push(require.resolve("react-refresh/babel"));
+        // This plugin has very flaky detection of env variables.
+        // It can't seem to detect that we are no in production mode.
+        // So we need to disable the ENV check.
+        babelPlugins.push([require.resolve("react-refresh/babel"), { skipEnvCheck: true }]);
     }
 
     // Leaving this out until we get the docs actually generating. Huge slowdown.
@@ -104,6 +108,17 @@ ${chalk.green(aliases)}`;
                                   loader: "style-loader",
                                   options: {
                                       injectType: "singletonStyleTag",
+                                      insert: function insertAtTop(element: HTMLElement) {
+                                          const staticStylesheets = document.head.querySelectorAll(
+                                              'link[rel="stylesheet"][static="1"]',
+                                          );
+                                          const lastStaticStylesheet = staticStylesheets[staticStylesheets.length - 1];
+                                          if (lastStaticStylesheet) {
+                                              document.head.insertBefore(element, lastStaticStylesheet.nextSibling);
+                                          } else {
+                                              document.head.appendChild(element);
+                                          }
+                                      },
                                   },
                               },
                         {
@@ -148,6 +163,7 @@ ${chalk.green(aliases)}`;
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
                 "react-select": require.resolve("react-select/dist/react-select.esm.js"),
+                typestyle: path.resolve(VANILLA_ROOT, "library/src/scripts/styles/styleShim.ts"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.
@@ -183,6 +199,22 @@ ${chalk.green(aliases)}`;
             name: section,
         }),
     );
+
+    if (options.circular) {
+        config.plugins.push(
+            new CircularDependencyPlugin({
+                // exclude detection of files based on a RegExp
+                exclude: /a\.js|node_modules|rich-editor/,
+                // add errors to webpack instead of warnings
+                failOnError: true,
+                // allow import cycles that include an asyncronous import,
+                // e.g. via import(/* webpackMode: "weak" */ './file.js')
+                allowAsyncCycles: false,
+                // set the current working directory for displaying module paths
+                cwd: process.cwd(),
+            }),
+        );
+    }
 
     return config;
 }

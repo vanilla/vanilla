@@ -2,7 +2,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { forceRenderStyles } from "typestyle";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { useEffect } from "react";
 import { initAllUserContent } from "@library/content/index";
@@ -36,7 +35,6 @@ export function useHashScrolling(content: string, disabled?: boolean) {
 export function scrollToElement(element?: HTMLElement, offset?: number, beforeScrollHandler?: () => void) {
     const currentOffset = offset == null ? previousHashOffset : offset;
     if (element) {
-        forceRenderStyles();
         beforeScrollHandler && beforeScrollHandler();
         setTimeout(() => {
             const top = window.pageYOffset + element.getBoundingClientRect().top - currentOffset;

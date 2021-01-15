@@ -127,6 +127,17 @@ class PipelineModel extends Model implements InjectableInterface {
         $operation->setOptions($options);
         $operation->setSet($set);
         $operation->setWhere($where);
+
+        $metaInformation = $options[self::OPT_META] ?? null;
+
+        if ($metaInformation) {
+            if (is_array($metaInformation)) {
+                foreach ($metaInformation as $key => $meta) {
+                    $operation->setMeta($key, $meta);
+                }
+            }
+        }
+
         $result = $this->performOperation($operation, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }

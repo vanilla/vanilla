@@ -1,6 +1,7 @@
 {%- autoescape false -%}
 var supportsAllFeatures =
     window.Promise &&
+    window.Promise.prototype.finally &&
     window.fetch &&
     window.Symbol &&
     window.CustomEvent &&

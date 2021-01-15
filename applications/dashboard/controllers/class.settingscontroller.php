@@ -13,6 +13,7 @@ use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Handles /settings endpoint.
@@ -43,12 +44,16 @@ class SettingsController extends DashboardController {
      */
     private $addonModel;
 
+    /** @var WidgetService */
+    private $widgetService;
+
     /**
      * SettingsController constructor.
      */
     public function __construct() {
         parent::__construct();
         $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
     }
 
     /**
@@ -1164,6 +1169,13 @@ class SettingsController extends DashboardController {
             }
             $this->jsonTarget("#enable-tagging-toggle", $newToggle);
         }
+
+        if (Gdn::config('Tagging.Discussions.Enabled', false)) {
+            $this->widgetService->registerWidget(TagModule::class);
+        } else {
+            $this->widgetService->unregisterWidget(TagModule::class);
+        }
+
         $this->render('blank', 'utility');
     }
 

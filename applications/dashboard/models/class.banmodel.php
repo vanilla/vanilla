@@ -403,7 +403,7 @@ class BanModel extends Gdn_Model {
         }
 
         $newBanned = static::setBanned($banned, $bannedValue, self::BAN_AUTOMATIC);
-        Gdn::userModel()->setField($user['UserID'], 'Banned', $newBanned);
+        Gdn::userModel()->save(["UserID" => $user['UserID'], 'Banned' => $newBanned]);
         $banningUserID = Gdn::session()->UserID;
         // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
         if ($user['UserID'] == $banningUserID) {

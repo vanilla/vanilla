@@ -4,23 +4,17 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    borders,
-    colorOut,
-    flexHelper,
-    paddings,
-    singleBorder,
-    unit,
-    userSelect,
-    fonts,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { absolutePosition, flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { border, calc, percent, px, translateX } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { Mixins } from "@library/styles/Mixins";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -80,7 +74,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        $nest: {
+        ...{
             ".siteNav": {
                 paddingLeft: px(globalVars.gutter.half),
             },
@@ -154,12 +148,12 @@ export const mobileDropDownClasses = useThemeCache(() => {
         padding: px(0),
         margin: "auto",
         color: vars.chevron.color.toString(),
-        $nest: {
+        ...{
             "&:hover": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
-            "&:active": { color: colorOut(globalVars.mainColors.primary) },
-            "&:focus": { color: colorOut(globalVars.mainColors.primary) },
+            "&:active": { color: ColorsUtils.colorOut(globalVars.mainColors.primary) },
+            "&:focus": { color: ColorsUtils.colorOut(globalVars.mainColors.primary) },
         },
     });
 
@@ -169,13 +163,13 @@ export const mobileDropDownClasses = useThemeCache(() => {
     });
 
     const headerSizing = {
-        height: unit(vars.header.minHeight.height),
+        height: styleUnit(vars.header.minHeight.height),
         width: percent(100),
     };
 
     const header = style("header", {
         ...shadowHelper().embed(),
-        background: colorOut(frameVars.colors.bg),
+        background: ColorsUtils.colorOut(frameVars.colors.bg),
         position: "fixed",
         top: 0,
         left: 0,
@@ -188,7 +182,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "center",
         margin: "auto",
-        height: unit(vars.header.minHeight.height),
+        height: styleUnit(vars.header.minHeight.height),
     });
 
     const headerSpacer = style("headerSpacer", {
@@ -199,9 +193,9 @@ export const mobileDropDownClasses = useThemeCache(() => {
         Math.floor(globalVars.icon.sizes.xSmall) + 2 * (globalVars.gutter.half + globalVars.gutter.quarter);
     const closeButton = style("closeButton", {
         ...absolutePosition.middleLeftOfParent(),
-        height: unit(closeWidth),
-        width: unit(closeWidth),
-        minWidth: unit(closeWidth),
+        height: styleUnit(closeWidth),
+        width: styleUnit(closeWidth),
+        minWidth: styleUnit(closeWidth),
         padding: 0,
         transform: translateX("-50%"),
     });
@@ -211,13 +205,13 @@ export const mobileDropDownClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         textTransform: "uppercase",
-        minHeight: unit(titleBarVars.sizing.height - 4),
-        fontSize: unit(globalVars.fonts.size.small),
+        minHeight: styleUnit(titleBarVars.sizing.height - 4),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         textOverflow: "ellipsis",
-        ...paddings({
-            vertical: unit(4),
+        ...Mixins.padding({
+            vertical: styleUnit(4),
         }),
-        ...fonts({
+        ...Mixins.font({
             size: globalVars.fonts.size.small,
             transform: "uppercase",
             color: globalVars.mixBgAndFg(0.6),

@@ -7,7 +7,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 
 export const textLinkCSS = () => {
     const globalVars = globalVariables();

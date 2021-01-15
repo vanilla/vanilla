@@ -51,4 +51,60 @@ class PocketsRenderTest extends AbstractAPIv2Test {
         $html->assertCssSelectorText("#htmlpocket", "hello custom");
         $html->assertCssSelectorText(".mockWidget", "My Widget 1");
     }
+
+    /**
+     * Test rendering of a pocket for a user with a non-default guest-type role.
+     */
+    public function testRenderPocketForGuestTypeUser() {
+        $guestRoleID = $this->roleModel->save(
+            [
+                "CanSession" => false,
+                "Deletable" => true,
+                "Description" => "test guest user",
+                "Name" => "GuestType",
+                "Type" => "guest",
+            ]
+        );
+        $memberRoleID = $this->roleModel->save(
+            [
+                "CanSession" => true,
+                "Deletable" => true,
+                "Description" => "test member user",
+                "Name" => "MemberType",
+                "Type" => "member",
+            ]
+        );
+        $memberTypeUserID = $this->userModel->save(
+            [
+                "Name" => "GuestUser",
+                "Email" => "guestuser" . "@example.com",
+                "Password" => "vanilla",
+                "RoleID" => $memberRoleID,
+            ]
+        );
+
+        $this->pocketsModel->touchPocket('GuestType Pocket', [
+            'Body' => '<div id="guesttypepocket">hello guest-type person</div>',
+            'Disabled' => \Pocket::ENABLED,
+            'RoleIDs' => [$guestRoleID],
+        ]);
+
+        // A guest user should see the pocket.
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start();
+
+        $html = $this->bessy()->getHtml('/discussions', [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
+        $html->assertCssSelectorText("#guesttypepocket", "hello guest-type person");
+
+        $session->end();
+
+        // A logged-in user should not.
+
+        $this->container()->get(\PocketsPlugin::class)->setUserRoleIDs(null);
+        $session->start($memberTypeUserID);
+
+        $html = $this->bessy()->getHtml('/discussions', [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
+        $session->end();
+        $html->assertCssSelectorNotTextContains("#guesttypepocket", "hello guest-type person");
+    }
 }

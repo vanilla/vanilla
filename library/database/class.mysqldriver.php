@@ -167,6 +167,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 }
             }
 
+            // Remove "unsigned" suffix on MySQL > 5.7
+            $type = str_replace(' unsigned', '', $type);
+
             $object = new stdClass();
             $object->Name = $field->Field;
             $object->PrimaryKey = ($field->Key == 'PRI' ? true : false);

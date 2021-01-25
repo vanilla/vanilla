@@ -30,7 +30,7 @@ class ModerationControllerTest extends SiteTestCase {
      * {@inheritDoc}
      */
     public static function getAddons(): array {
-        return ['vanilla', 'groups'];
+        return ['vanilla'];
     }
 
     /**

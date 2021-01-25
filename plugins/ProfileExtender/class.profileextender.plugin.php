@@ -10,6 +10,7 @@
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Attributes;
 use Vanilla\Web\APIExpandMiddleware;
 
 /**
@@ -893,7 +894,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $fields = array_column($this->getProfileFields(), null, 'Name');
         $utc = new DateTimeZone('UTC');
         foreach ($values as $id => &$row) {
-            $row = array_intersect_key($row, $fields);
+            $row = new Attributes(array_intersect_key($row, $fields));
             foreach ($row as $key => &$value) {
                 switch ($fields[$key]['FormType'] ?? 'TextBox') {
                     case 'CheckBox':

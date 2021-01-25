@@ -136,7 +136,7 @@ export class VariableParser {
         const parsed = BabelParser.parse(fileContents, {
             sourceType: "module",
             sourceFilename: filePath,
-            plugins: ["typescript"],
+            plugins: ["typescript", "classProperties"],
         });
         const comments = parsed.comments ?? [];
 

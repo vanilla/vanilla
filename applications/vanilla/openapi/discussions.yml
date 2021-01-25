@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+  discussion:
+    x-addon: "vanilla"
+    name: "Discussion"
+    type: "discussion"
 paths:
   /discussions:
     get:

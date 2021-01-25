@@ -21,6 +21,7 @@ import { calc, percent } from "csx";
 import { CSSObject } from "@emotion/css";
 
 export interface IHomeWidgetContainerOptions {
+    noGutter?: boolean;
     outerBackground?: IBackground;
     innerBackground?: IBackground;
     borderType?: BorderType | "navLinks";
@@ -55,6 +56,7 @@ export const homeWidgetContainerVariables = useThemeCache(
         let options = makeVars(
             "options",
             {
+                noGutter: false,
                 outerBackground: Variables.background({}),
                 innerBackground: Variables.background({}),
                 borderType: BorderType.NONE as BorderType | "navLinks",
@@ -63,6 +65,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     to: undefined as string | undefined,
                     position: "bottom" as "top" | "bottom",
                     displayType: ButtonTypes.TEXT_PRIMARY,
+                    name: "View All",
                 },
                 maxColumnCount: [
                     HomeWidgetItemContentType.TITLE_BACKGROUND,

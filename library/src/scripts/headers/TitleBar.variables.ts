@@ -77,7 +77,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * @title Foreground/Text Color
          * @description Foreground color for the titlebar.
          * It's recommended that this color have sufficient color with the background color.
-         * @type string|number
+         * @type string
          * @format hex-color
          */
         fg: globalVars.mainColors.primaryContrast,
@@ -86,7 +86,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * @title Background Color
          * @description Background color for the titlebar.
          * It's recommended that this color have sufficient color with the foreground color.
-         * @type string|number
+         * @type string
          * @format hex-color
          */
         bg: globalVars.mainColors.primary,
@@ -258,7 +258,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const clearBorder = {
         type: BorderType.NONE,
-        color: color("transparent"),
+        color: "transparent",
         width: styleUnit(0),
         radius: styleUnit(0),
     };

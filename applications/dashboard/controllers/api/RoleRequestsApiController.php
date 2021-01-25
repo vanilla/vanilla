@@ -159,7 +159,7 @@ class RoleRequestsApiController extends Controller {
      * Apply to a role.
      *
      * @param array $body
-     * @return Data
+     * @return Data Data object for a web response;
      */
     public function post_applications(array $body): Data {
         $this->permission('Garden.SignIn.Allow');
@@ -179,7 +179,6 @@ class RoleRequestsApiController extends Controller {
 
         $id = $this->requestModel->insert($body);
         $result = $this->getInternal($id);
-
         return $result;
     }
 
@@ -342,6 +341,29 @@ class RoleRequestsApiController extends Controller {
     /**
      * Get a single row without a permission check.
      *
+     * @param array $where The where clause to find the record.
+     * @param array $query
+     * @return Data
+     * @throws NoResultsException Failed to retrieve results.
+     * @throws \Garden\Schema\ValidationException Data failed to validate.
+     */
+    protected function getInternalWhere(array $where, array $query = []): Data {
+        $in = Schema::parse([
+            'expand?' => ApiUtils::getExpandDefinition(['user', 'role']),
+        ]);
+        $query = $in->validate($query);
+
+        $row = $this->requestModel->selectSingle($where);
+        $row = $this->filterRequestRow($row);
+        $rows = [&$row];
+        $this->expand($rows, $query['expand'] ?? []);
+
+        return new Data($row);
+    }
+
+    /**
+     * Get a single row without a permission check.
+     *
      * @param int $roleRequestID
      * @param array $query
      * @return Data
@@ -349,17 +371,10 @@ class RoleRequestsApiController extends Controller {
      * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
     protected function getInternal(int $roleRequestID, array $query = []): Data {
-        $in = Schema::parse([
-            'expand?' => ApiUtils::getExpandDefinition(['user', 'role']),
-        ]);
-        $query = $in->validate($query);
+        $where = $this->requestModel->primaryWhere($roleRequestID);
 
-        $row = $this->requestModel->selectSingle($this->requestModel->primaryWhere($roleRequestID));
-        $row = $this->filterRequestRow($row);
-        $rows = [&$row];
-        $this->expand($rows, $query['expand'] ?? []);
-
-        return new Data($row);
+        $result = $this->getInternalWhere($where, $query);
+        return $result;
     }
 
     /**

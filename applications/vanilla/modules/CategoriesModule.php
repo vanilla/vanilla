@@ -12,6 +12,7 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Modules\FoundationCategoriesShim;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Widgets\AbstractHomeWidgetModule;
 
@@ -47,6 +48,7 @@ class CategoriesModule extends AbstractHomeWidgetModule {
         $this->categoriesApi = $categoriesApi;
         $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
         $this->moduleName = self::CATEGORIES_MODULE;
+        $this->title = t('Featured Categories');
     }
 
     /**
@@ -67,39 +69,7 @@ class CategoriesModule extends AbstractHomeWidgetModule {
             'parentCategoryID' => $contextualCategoryID,
         ], $this->apiParams);
         $data = $this->categoriesApi->index($apiParams)->getData();
-        return array_map([$this, 'mapCategoryToItem'], $data);
-    }
-
-    /**
-     * Return the module's title
-     *
-     * @return string|null
-     */
-    protected function getTitle(): ?string {
-        return $this->title ?: t('Featured Categories');
-    }
-
-
-    /**
-     * Utility for for mapping category data into a widget item.
-     *
-     * @param array $category
-     * @return array
-     */
-    public function mapCategoryToItem(array $category): array {
-        return [
-            'to' => $category['url'],
-            'iconUrl' => $category['iconUrl'],
-            'imageUrl' => $category['bannerUrl'],
-            'name' => $category['name'],
-            'description' => $category['description'],
-            'counts' => [
-                [
-                    'labelCode' => 'Discussions',
-                    'count' => $category['countAllDiscussions'],
-                ]
-            ]
-        ];
+        return array_map([FoundationCategoriesShim::class, 'mapApiCategoryToItem'], $data);
     }
 
     /**

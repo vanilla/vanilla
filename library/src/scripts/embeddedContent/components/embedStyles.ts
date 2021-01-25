@@ -156,20 +156,6 @@ export const embedContentClasses = useThemeCache(() => {
 
     const root = style("root", {
         position: "relative",
-        ...{
-            "&:after": {
-                content: '""',
-                display: "block",
-                cursor: "pointer",
-                pointerEvents: important("all"),
-                zIndex: 2,
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-            },
-        },
     });
 
     return { small, root };

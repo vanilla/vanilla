@@ -78,7 +78,7 @@ export const fontCSS = () => {
     );
 
     // Panel Headings
-    cssOut(`.Panel h4, .Panel h3, .Panel h2`, {
+    cssOut(`.Panel h4:not(.no-css), .Panel h3:not(.no-css), .Panel h2:not(.no-css)`, {
         ...Mixins.padding({
             vertical: 0,
         }),

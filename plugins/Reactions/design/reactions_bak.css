@@ -1,0 +1,152 @@
+.Reactions {
+   position: relative;
+   text-align: right;
+   background: rgba(0,0,0,0.06);
+   margin: 12px -8px -8px;
+   margin: 12px 0 0;
+   font-size: 11px;
+   /* border: 2px solid rgba(0,0,0,0.07); */
+}
+.Reactions a {
+   position: relative;
+   display: inline-block;
+   padding: 2px 4px 2px 27px;
+   line-height: 2;
+}
+.Reactions strong {
+   padding: 2px 6px;
+   font-weight: normal;
+   display: inline-block;
+   text-align: center;
+   background: rgba(0,0,0,0.04);
+   color: rgba(0,0,0,0.4);
+}
+.Comment:hover .Reactions strong {
+   background: rgba(0,0,0,0.8);
+   color: #fff;
+}
+.React a {
+   margin-left: 4px;
+}
+.Flag a {
+   margin-right: 4px;
+}
+.Reactions a label { cursor: pointer; }
+.Reactions a .Count {
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+}
+.Reactions .Flag {
+   position: absolute;
+   left: 0;
+}
+.Reactions .Options {
+   display: none;
+   float: none;
+}
+.Reactions .React .Options {
+   display: block;
+}
+.Reactions .React .Handle {
+   display: none;
+}
+.ReactSprite {
+   position: absolute;
+   top: 4px;
+   left: 4px;
+   background: url('reaction-sprites.png') 0 0 no-repeat transparent;
+   height: 18px;
+   width: 18px;
+   display: inline-block;
+}
+
+/* Color */
+.ReactSpam { background-position: 0px -36px; }
+.ReactFlag { background-position: -18px -36px; }
+.ReactTroll { background-position: -36px -36px; }
+.ReactDisagree { background-position: -54px -36px; }
+.ReactOffTopic { background-position: -72px -36px; }
+.ReactAgree { background-position: -90px -36px; }
+.ReactAwesome { background-position: -108px -36px; }
+
+/* Black */
+.ReactSpam { background-position: 0px -18px; }
+.ReactFlag { background-position: -18px -18px; }
+.ReactTroll { background-position: -36px -18px; }
+.ReactDisagree { background-position: -54px -18px; }
+.ReactOffTopic { background-position: -72px -18px; }
+.ReactAgree { background-position: -90px -18px; }
+.ReactAwesome { background-position: -108px -18px; }
+
+/* Grey */
+.ReactSpam { background-position: 0px 0px; }
+.ReactFlag { background-position: -18px 0px; }
+.ReactTroll { background-position: -36px 0px; }
+.ReactDisagree { background-position: -54px 0px; }
+.ReactOffTopic { background-position: -72px 0px; }
+.ReactAgree { background-position: -90px 0px; }
+.ReactAwesome { background-position: -108px 0px; }
+
+/* Hover Mechanics */
+.Reactions {
+   background: rgba(0,0,0,0.01);
+}
+.Reactions a {
+   color: rgba(0,0,0,0.4);
+}
+.Reactions a:hover {
+   color: rgba(0,0,0,0.8);
+}
+.Comment:hover .Reactions {
+   background: rgba(0,0,0,0.03);
+}
+
+/* Black on Reactions Bar Hover 
+.Reactions:hover .ReactSpam { background-position: 0px -18px; }
+.Reactions:hover .ReactFlag { background-position: -18px -18px; }
+.Reactions:hover .ReactTroll { background-position: -36px -18px; }
+.Reactions:hover .ReactDisagree { background-position: -54px -18px; }
+.Reactions:hover .ReactOffTopic { background-position: -72px -18px; }
+.Reactions:hover .ReactAgree { background-position: -90px -18px; }
+.Reactions:hover .ReactAwesome { background-position: -108px -18px; }
+*/
+
+.Reactions a:hover {
+   background: rgba(0,0,0,0.06);
+}
+/* Color on Hover or when has count */
+.ReactSpam.HasCount,
+.Reactions:hover a:hover .ReactSpam { background-position: 0px -36px; }
+.ReactFlag.HasCount,
+.Reactions:hover a:hover .ReactFlag { background-position: -18px -36px; }
+.ReactTroll.HasCount,
+.Reactions:hover a:hover .ReactTroll { background-position: -36px -36px; }
+.ReactDisagree.HasCount,
+.Reactions:hover a:hover .ReactDisagree { background-position: -54px -36px; }
+.ReactOffTopic.HasCount,
+.Reactions:hover a:hover .ReactOffTopic { background-position: -72px -36px; }
+.ReactAgree.HasCount,
+.Reactions:hover a:hover .ReactAgree { background-position: -90px -36px; }
+.ReactAwesome.HasCount,
+.Reactions:hover a:hover .ReactAwesome { background-position: -108px -36px; }
+
+
+/* Roundy Edges */
+.Reactions {
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+}
+.React .Handle a,
+.React strong {
+   border-radius: 0 4px 4px 0;
+   -moz-border-radius: 0 4px 4px 0;
+   -webkit-border-radius: 0 4px 4px 0;
+}
+.Flag .Handle a,
+.Flag strong {
+   border-radius: 4px 0 0 4px;
+   -moz-border-radius: 4px 0 0 4px;
+   -webkit-border-radius: 4px 0 0 4px;
+}

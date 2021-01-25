@@ -10,11 +10,13 @@ use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
+use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
 use Vanilla\Models\FragmentService;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\SearchTypeCollectorInterface;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Widgets\WidgetService;
 
 Gdn::getContainer()
@@ -45,6 +47,8 @@ Gdn::getContainer()
 
     ->rule(WidgetService::class)
     ->addCall('registerWidget', [\Vanilla\Community\CategoriesModule::class])
+    ->rule(QuickLinksVariableProvider::class)
+    ->addCall('addQuickLinkProvider', [new Reference(ForumQuickLinksProvider::class)])
 ;
 
 

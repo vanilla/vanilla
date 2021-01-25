@@ -56,6 +56,9 @@ export function ThemeColorPicker(_props: IProps) {
         if (stringIsValidColor(rawValue)) {
             setLastValidColor(rawValue ?? null);
         }
+        if (rawValue == null) {
+            setLastValidColor(null);
+        }
     }, [rawValue, setTextFieldValue]);
 
     // Do initial load validation of the color.

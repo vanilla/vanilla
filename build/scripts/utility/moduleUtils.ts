@@ -37,8 +37,8 @@ export function copyMonacoEditorModule() {
 
     print("Copying monaco editor to /dist");
     if (fse.existsSync(MONACO_PATH)) {
-        fse.copySync(MONACO_PATH, path.resolve(DIST_DIRECTORY, "monaco-editor"), {
-            filter: file => {
+        fse.copySync(MONACO_PATH, path.resolve(DIST_DIRECTORY, "monaco-editor-21-2"), {
+            filter: (file) => {
                 if (file.match(/\/monaco-editor\/node_modules/) || file.match(/\/monaco-editor\/(dev|esm|min-maps)/)) {
                     return false;
                 } else {
@@ -62,14 +62,14 @@ export function spawnChildProcess(command: string, args: string[], options: any)
     return new Promise((resolve, reject) => {
         const task = spawn(command, args, options);
 
-        task.on("close", code => {
+        task.on("close", (code) => {
             if (code !== 0) {
                 reject(new Error(`command "${command} exited with a non-zero status code."`));
             }
             return resolve(true);
         });
 
-        task.on("error", err => {
+        task.on("error", (err) => {
             return reject(err);
         });
     });

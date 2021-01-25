@@ -98,18 +98,19 @@ export class FocusWatcher {
             if (activeElement !== null) {
                 const isWatchedInBody = document.body.contains(this.watchedNode);
                 const isFocusedInBody = document.body.contains(activeElement);
-                const isModal = document.getElementById("modals")?.contains(activeElement);
-                const hasFocus =
+                const isModal = Boolean(document.getElementById("modals")?.contains(activeElement));
+                const hasFocus = Boolean(
                     this.watchedNode &&
-                    activeElement &&
-                    (activeElement === this.watchedNode || this.watchedNode.contains(activeElement));
+                        activeElement &&
+                        (activeElement === this.watchedNode || this.watchedNode.contains(activeElement)),
+                );
 
                 // We will only invalidate based on something actually getting focus.
                 // Make sure we are still mounted before calling this.
                 // It could happen that our flyout is unmounted in between the setTimeout call.
                 // We might have focused on a modal which can't be in the watched tree.
-                if (isWatchedInBody && isFocusedInBody && !isModal) {
-                    callback(!!hasFocus);
+                if (isWatchedInBody && isFocusedInBody) {
+                    callback(hasFocus || isModal);
                 }
             }
         }, 0);

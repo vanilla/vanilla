@@ -17,7 +17,7 @@ import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { t } from "@vanilla/i18n";
 
-interface IProps {
+export interface IPanelNavItemsProps {
     navItems: INavigationTreeItem[];
     activeRecord: IActiveRecord;
     pushParentItem: (item: INavigationTreeItem) => void;
@@ -30,7 +30,7 @@ interface IProps {
     onClose?: () => void;
 }
 
-export function PanelNavItems(props: IProps) {
+export function PanelNavItems(props: IPanelNavItemsProps) {
     const { isActive } = props;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const prevFocusedRef = useRef<HTMLElement | null>(null);

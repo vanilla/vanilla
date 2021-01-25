@@ -203,7 +203,7 @@ export default function TitleBar(_props: IProps) {
                                                     logoClasses.mobileLogo,
                                                 )}
                                             >
-                                                <animated.span className={"mobileLogoAnimated"} {...logoProps}>
+                                                <animated.span className={classes.logoAnimationWrap} {...logoProps}>
                                                     <HeaderLogo
                                                         className={classes.logoContainer}
                                                         logoClassName="titleBar-logo"

@@ -6,6 +6,7 @@
 import React, { useState } from "react";
 import InviteUserCard from "@library/features/users/ui/InviteUserCard";
 import { useInviteUsers } from "@library/features/users/userHooks";
+import { useUserActions } from "@library/features/users/UserActions";
 
 export interface IInviteUserCardModule {
     userID: number;
@@ -16,13 +17,15 @@ export interface IInviteUserCardModule {
 export function InViteUserCardModule(props: IInviteUserCardModule) {
     const { userID, groupID, visible } = props;
 
-    const { emailsString, updateStoreEmails, invitees, updateStoreInvitees, sentInvitations } = useInviteUsers({
-        userID,
-        groupID,
-    });
-
     const [isVisible, setIsVisible] = useState(visible);
     const closeModal = () => setIsVisible(false);
+
+    const { clearInviteUsers } = useUserActions();
+    const { emailsString, updateStoreEmails, invitees, updateStoreInvitees, sentInvitations, errors } = useInviteUsers({
+        userID,
+        groupID,
+        onSuccess: closeModal,
+    });
 
     return (
         <>
@@ -32,8 +35,12 @@ export function InViteUserCardModule(props: IInviteUserCardModule) {
                 defaultUsers={invitees}
                 updateStoreInvitees={updateStoreInvitees}
                 visible={isVisible}
-                closeModal={closeModal}
+                closeModal={() => {
+                    closeModal();
+                    clearInviteUsers({ userID });
+                }}
                 sentInvitations={sentInvitations}
+                errors={errors}
             />
         </>
     );

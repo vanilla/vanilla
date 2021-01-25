@@ -16,6 +16,11 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { forumVariables } from "@library/forms/forumStyleVars";
 import { Mixins } from "@library/styles/Mixins";
+import { FontSizeProperty } from "csstype";
+import { TLength } from "typestyle";
+import { CSSObject } from "@emotion/css";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { userContentVariables } from "@library/content/userContentStyles";
 
 export const forumCategoriesVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumCategories");

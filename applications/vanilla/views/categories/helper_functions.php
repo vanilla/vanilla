@@ -1,5 +1,7 @@
 <?php
 if (!defined('APPLICATION')) exit();
+
+use Vanilla\Forum\Modules\FoundationCategoriesShim;
 use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
@@ -391,13 +393,18 @@ if (!function_exists('writeCategoryList')):
         ?>
         <div class="DataListWrap">
             <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
-            <ul class="DataList CategoryList">
-                <?php
-                foreach ($categories as $category) {
-                    writeListItem($category, $depth);
+
+            <?php
+                if (FoundationCategoriesShim::isEnabled()) {
+                    FoundationCategoriesShim::printLegacyShim($categories);
+                } else {
+                    echo '<ul class="DataList CategoryList">';
+                    foreach ($categories as $category) {
+                        writeListItem($category, $depth);
+                    }
+                    echo '</ul>';
                 }
-                ?>
-            </ul>
+            ?>
         </div>
         <?php
     }

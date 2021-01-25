@@ -19,7 +19,7 @@ writeAdminCheck();
 
 echo '</div>';
 
-echo '<h1>'.($this->data('Discussion.namePrefix') ? $this->data('Discussion.namePrefix').' '.$this->data('Discussion.Name') : $this->data('Discussion.Name')).'</h1>';
+echo '<h1>'.($this->data('Discussion.displayName') ? $this->data('Discussion.displayName') : $this->data('Discussion.Name')).'</h1>';
 
 echo "</div>\n\n";
 

@@ -75,7 +75,22 @@ export function registerCommunitySearchDomain() {
                     types: flatten(CommunityPostTypeFilter.postTypes.map((type) => type.values)),
                 };
             },
-            getSortValues: getGlobalSearchSorts,
+            getSortValues: () => {
+                const sorts = getGlobalSearchSorts();
+                if (SearchService.supportsExtensions()) {
+                    sorts.push(
+                        {
+                            content: "Top",
+                            value: "-score",
+                        },
+                        {
+                            content: "Hot",
+                            value: "-hot",
+                        },
+                    );
+                }
+                return sorts;
+            },
             isIsolatedType: () => false,
             ResultComponent: Result,
             hasSpecificRecord: (form: ISearchForm<ICommunitySearchTypes>) =>

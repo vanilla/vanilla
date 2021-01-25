@@ -53,16 +53,16 @@ export function ResultMeta(props: IProps) {
         counts.map((item, i) => {
             let { count, labelCode } = item;
             // labelCode returned from backend is always in plural, e.g. groups, sub-categories
-            if (count < 2) {
+            if (count < 2 && count !== 0) {
                 const p = /ies|s$/;
                 const m = labelCode.match(p);
                 labelCode = labelCode.replace(p, m && m[0] === "ies" ? "y" : "");
             }
-            return count ? (
+            return (
                 <span className={classesMetas.meta} key={i}>
                     <Translate source={`<0/> ${labelCode}`} c0={<NumberFormatted value={count} />} />
                 </span>
-            ) : null;
+            );
         });
 
     return (

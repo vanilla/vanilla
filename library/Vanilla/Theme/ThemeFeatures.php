@@ -28,30 +28,33 @@ class ThemeFeatures implements \JsonSerializable {
     const FEATURE_DEFAULTS = [
         // Used for keystone and newer to allow flyouts to convert to Modals o mobile.
         'NewFlyouts' => false,
-        
+
         // Use twig master templates. You do not have access to the full master view.
         'SharedMasterView' => false,
-        
+
         // Used foundation and some other themes, adds extra header information on top of the profile page.
         'ProfileHeader' => false,
-        
+
         // Applies the Variabler driven CSS across the forum. (Eg. foundation based).
         'DataDrivenTheme' => false,
-        
+
         // Turn on user cards.
         'UserCards' => false,
-        
+
         // Disable legacy based variables.json.
         'DisableKludgedVars' => false,
-        
+
         // Use the new event list page, and new event view page.
         'NewEventsPage' => false,
-        
+
         // Enable the new search UI (member directory, places, new interface).
         SearchRootController::ENABLE_FLAG => false,
-        
+
         // Make backwards-incompatbile view changes for better accessibility.
         'EnhancedAccessibility' => false,
+
+        // Use the new themeable quicklinks.
+        'NewQuickLinks' => true,
     ];
 
     /**
@@ -103,10 +106,15 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['UserCards'] = true;
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
             $themeValues['EnhancedAccessibility'] = true;
+            $themeValues['QuickLinks'] = true;
         }
 
         if (FeatureFlagHelper::featureEnabled('NewEventsPage')) {
             $themeValues['NewEventsPage'] = true;
+        }
+
+        if (FeatureFlagHelper::featureEnabled('NewQuickLinks')) {
+            $themeValues['NewQuickLinks'] = true;
         }
 
         if (FeatureFlagHelper::featureEnabled(SearchRootController::ENABLE_FLAG)) {
@@ -155,6 +163,13 @@ class ThemeFeatures implements \JsonSerializable {
      */
     public function useProfileHeader(): bool {
         return (bool) $this->allFeatures()['ProfileHeader'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function useNewQuickLinks(): bool {
+        return (bool) $this->allFeatures()['NewQuickLinks'];
     }
 
     /**

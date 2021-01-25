@@ -19,6 +19,9 @@ class DiscussionsModule extends Gdn_Module {
     /** @var string  */
     public $Prefix = 'Discussion';
 
+    /** @var bool */
+    public $showTitle = true;
+
     /** @var bool Whether to show the discussion author avatar. */
     private $showPhotos = false;
 

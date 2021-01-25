@@ -120,6 +120,11 @@ export const usersReducer = produce(
             state.usersInvitationsByID[userID].invitees = [];
             return state;
         })
+        .case(UserActions.clearInviteUsersAC, (state, payload) => {
+            const { userID } = payload;
+            delete state.usersInvitationsByID[userID];
+            return state;
+        })
         .case(UserActions.inviteUsersACs.failed, (state, payload) => {
             const { userID } = payload.params;
             state.usersInvitationsByID[userID].results = {

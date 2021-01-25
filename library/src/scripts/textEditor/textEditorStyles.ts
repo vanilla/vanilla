@@ -41,7 +41,7 @@ export const textEditorClasses = useThemeCache(() => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
-            height: minimal ? "300px" : viewHeight(90),
+            height: minimal ? "300px" : viewHeight(100),
             backgroundColor:
                 theme === "vs-dark"
                     ? ColorsUtils.colorOut("#1E1E1E")

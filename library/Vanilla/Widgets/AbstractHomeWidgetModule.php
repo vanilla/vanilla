@@ -56,6 +56,9 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /** @var string|null */
     public $contentAlignment = null;
 
+    /** @var bool */
+    public $noGutter = false;
+
     /**
      * @var string|null Defines content width.
      */
@@ -113,14 +116,15 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      * @return array
      */
     protected function getContainerOptions(): array {
-        $this->containerOptions = [
+        $this->containerOptions = array_merge([
             'maxColumnCount' => $this->maxColumnCount,
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'headerAlignment' => $this->headerAlignment,
             'contentAlignment' => $this->contentAlignment,
             'maxWidth' => $this->maxWidth,
-        ];
+            'noGutter' => $this->noGutter,
+        ], $this->containerOptions);
 
         return $this->containerOptions;
     }
@@ -187,6 +191,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 'innerBackground:?' => $bgSchema,
                 'borderType:s?',
                 'maxWidth:s?',
+                'noGutter:b?',
                 'viewAll?' => Schema::parse([
                     'position:s?',
                     'to:s?',

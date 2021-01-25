@@ -5,7 +5,11 @@ if (!isset($this->Prefix))
     $this->Prefix = 'Discussion';
 ?>
 <div class="Box BoxDiscussions">
-    <?php echo panelHeading(t('Recent Discussions')); ?>
+<?php
+if ($this->showTitle) {
+    echo panelHeading(t($this->title ?? 'Recent Discussions'));
+}
+?>
     <ul class="PanelInfo PanelDiscussions DataList">
         <?php
         foreach ($this->data('Discussions')->result() as $Discussion) {

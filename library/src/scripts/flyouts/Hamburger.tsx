@@ -19,6 +19,8 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
+import { IPanelNavItemsProps } from "@library/flyouts/panelNav/PanelNavItems";
+import MobileOnlyNavigation from "@library/headers/MobileOnlyNavigation";
 
 interface IProps {
     className?: string;
@@ -77,6 +79,7 @@ export default function Hamburger(props: IProps) {
                 )}
                 <div className={classes.container}>
                     <SiteNavigation onClose={() => setIsOpen(false)} />
+                    <MobileOnlyNavigation />
                     {props.extraNavTop}
                     {props.extraNavBottom}
                     {extraNavGroups.map((GroupComponent, i) => (
@@ -92,51 +95,51 @@ interface ISiteNavigationProps {
     onClose: () => void;
 }
 
+export function varItemToNavTreeItem(
+    variableItem: INavigationVariableItem,
+    parentID: string = "root",
+): INavigationTreeItem | null {
+    const { permission, name, url, id, children, isHidden } = variableItem;
+
+    if (permission && !hasPermission(permission)) {
+        return null;
+    }
+
+    if (isHidden) {
+        return null;
+    }
+
+    return {
+        name,
+        url,
+        recordID: id,
+        recordType: "customLink",
+        parentID: parentID,
+        children: children?.map((child) => varItemToNavTreeItem(child, id)).filter(notEmpty) ?? [],
+        sort: 0,
+    };
+}
+
+export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavItemsProps["activeRecord"] {
+    let currentItemID: string | null = null;
+
+    for (const item of navTreeItems) {
+        if (window.location.href.includes(item.url.replace("~", ""))) {
+            currentItemID = `${item.recordID}`;
+        }
+    }
+    return {
+        recordID: currentItemID ?? "notspecified",
+        recordType: "customLink",
+    };
+}
+
 function SiteNavigation(props: ISiteNavigationProps) {
     const { navigationItems } = navigationVariables();
 
     const [treeItems, activeRecord] = useMemo(() => {
-        const treeItems: INavigationTreeItem[] = [];
-        let currentItemID: string | null = null;
-
-        function varItemToNavTreeItem(
-            variableItem: INavigationVariableItem,
-            parentID: string = "root",
-        ): INavigationTreeItem | null {
-            const { permission, name, url, id, children, isHidden } = variableItem;
-            if (permission && !hasPermission(permission)) {
-                return null;
-            }
-
-            if (isHidden) {
-                return null;
-            }
-
-            if (window.location.href.includes(url.replace("~", ""))) {
-                currentItemID = id;
-            }
-
-            return {
-                name,
-                url,
-                recordID: id,
-                recordType: "customLink",
-                parentID: parentID,
-                children: children.map((child) => varItemToNavTreeItem(child, id)).filter(notEmpty),
-                sort: 0,
-            };
-        }
-
-        for (const varItem of navigationItems) {
-            const item = varItemToNavTreeItem(varItem);
-            if (item) {
-                treeItems.push(item);
-            }
-        }
-        const activeRecord = {
-            recordID: currentItemID ?? "notspecified",
-            recordType: "customLink",
-        };
+        const treeItems = navigationItems.map((item) => varItemToNavTreeItem(item)).filter(notEmpty);
+        const activeRecord = getActiveRecord(treeItems);
         return [treeItems, activeRecord];
     }, [navigationItems]);
 

@@ -56,9 +56,8 @@ class SearchApiController extends AbstractApiController {
      */
     public function index(array $query): Data {
         $in = $this->searchService->buildQuerySchema();
-        $driver = $this->searchService->getActiveDriver();
-
         $query = $in->validate($query);
+        $driver = $this->searchService->getActiveDriver($query['driver'] ?? null);
         // Paging
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 

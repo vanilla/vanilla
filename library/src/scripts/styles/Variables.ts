@@ -2,6 +2,8 @@
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
+
+import { IBoxOptions } from "@library/layout/Box.styles";
 import {
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
@@ -14,6 +16,7 @@ import {
     ISpacing,
     IStateColors,
 } from "@library/styles/cssUtilsTypes";
+import { BorderType } from "@library/styles/styleHelpers";
 
 export class Variables {
     constructor() {
@@ -29,4 +32,12 @@ export class Variables {
     static background = (vars: IBackground): IBackground => ({ ...EMPTY_BACKGROUND, ...vars });
 
     static clickable = (vars: IStateColors): IStateColors => ({ ...EMPTY_STATE_COLORS, ...vars });
+
+    static box = (vars: Partial<IBoxOptions>): IBoxOptions => {
+        return {
+            borderType: BorderType.NONE,
+            background: Variables.background(vars.background ?? {}),
+            ...vars,
+        };
+    };
 }

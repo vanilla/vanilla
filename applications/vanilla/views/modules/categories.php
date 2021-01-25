@@ -23,14 +23,14 @@ if ($this->Data !== FALSE && $displayModule) {
 
             $MaxDepth = c('Vanilla.Categories.MaxDisplayDepth');
 
-            foreach ($this->Data->result() as $Category) {
+            $dbRecords = $this->Data->result();
+            foreach ($dbRecords as $Category) {
                 if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
                     continue;
 
                 $attributes = false;
 
                 if ($Category->DisplayAs === 'Heading') {
-
                     $CssClass = 'Heading '.$Category->CssClass;
                     $attributes = ['aria-level' => $Category->Depth + 2];
                 } else {

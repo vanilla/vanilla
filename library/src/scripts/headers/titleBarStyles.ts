@@ -775,7 +775,11 @@ export const titleBarLogoClasses = useThemeCache(() => {
     const style = styleFactory("titleBarLogo");
     const mediaQueries = vars.mediaQueries();
 
-    const logoFrame = style("logoFrame", { display: "inline-flex", alignSelf: "center" });
+    const logoFrame = style("logoFrame", {
+        display: "inline-flex",
+        alignSelf: "center",
+        justifyContent: "center",
+    });
 
     const mobileLogoStyles = {
         display: "flex",

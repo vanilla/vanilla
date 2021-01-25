@@ -14,6 +14,7 @@ import { useLastValue, useMeasure } from "@vanilla/react-utils/src";
 import { TabHandler } from "@vanilla/dom-utils/src";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { Func } from "mocha";
+import SmartLink from "@library/routing/links/SmartLink";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -36,9 +37,9 @@ function TitleBarMegaMenuChildImpl(props: IChildProps, ref: React.Ref<IMegaMenuC
 
     return (
         <li className={className}>
-            <a tabIndex={0} onKeyDown={onKeyDown} href={url}>
+            <SmartLink tabIndex={0} onKeyDown={onKeyDown} to={url}>
                 {text}
-            </a>
+            </SmartLink>
         </li>
     );
 }
@@ -221,7 +222,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
             >
                 {expanded?.children?.map((item, key) => (
                     <div key={key} className={classes.menuItem}>
-                        {!item.children.length ? (
+                        {!item.children?.length ? (
                             <TitleBarMegaMenuChild
                                 className={classes.menuItemChild}
                                 url={item.url}
@@ -233,17 +234,19 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                             <span className={classes.menuItemTitle}>{item.name}</span>
                         )}
 
-                        <ul>
-                            {item.children.map((child, key) => (
-                                <TitleBarMegaMenuChild
-                                    className={classes.menuItemChild}
-                                    url={child.url}
-                                    text={child.name}
-                                    key={key}
-                                    onKeyDown={(e) => handleKeyPress(e)}
-                                />
-                            ))}
-                        </ul>
+                        {item.children && (
+                            <ul>
+                                {item.children.map((child, key) => (
+                                    <TitleBarMegaMenuChild
+                                        className={classes.menuItemChild}
+                                        url={child.url}
+                                        text={child.name}
+                                        key={key}
+                                        onKeyDown={(e) => handleKeyPress(e)}
+                                    />
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 ))}
                 {/* These items ensure that empty space in the row is filled */}

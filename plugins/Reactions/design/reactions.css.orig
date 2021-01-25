@@ -1,0 +1,339 @@
+.Reactions {
+   position: relative;
+   margin: 5px 0 0;
+   font-size: 11px;
+   line-height: 18px;
+}
+
+.Reactions .Handle {
+   display: inline-block;
+   opacity: .3;
+}
+
+.React {
+   position: absolute;
+   right: 0;
+   top: 0;
+}
+
+.ReactHeading {
+   display: inline-block;
+   padding: 0px 6px;
+   background: rgba(0,0,0,0.04);
+   color: rgba(0,0,0,0.4);
+}
+
+.Flag .ReactHeading {
+   border-radius: 4px 0 0 4px;
+}
+
+.React .ReactHeading {
+   border-radius: 0 4px 4px 0;
+}
+
+.Item:hover .ReactHeading {
+   background: rgba(0,0,0,0.8);
+   color: #fff;
+}
+
+.ReactButton {
+   display: inline-block;
+   padding: 0px 2px;
+   border-radius: 12px;
+   
+   margin: 0 2px;
+   padding: 0 3px 0 0;
+}
+
+/* Hover Mechanics */
+.Reactions a {
+   color: #000;
+
+/*   -webkit-transition: all .3s ease-in-out;
+	-moz-transition: all .3s ease-in-out;
+	-o-transition: all .3s ease-in-out;
+	-ms-transition: all .3s ease-in-out;
+	transition: all .3s ease-in-out;*/
+}
+/*
+This was causing text-decoration: underline to float above the text of the label in cartalk.
+.ReactLabel {
+   vertical-align: top;
+}
+*/
+.Reactions .Count {
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   vertical-align: top;
+   background: #494949;
+   background: rgba(0, 0, 0, 0.7);
+}
+
+.ReactSprite {
+   background: url('reaction-sprites-grey.png') 1px no-repeat transparent;
+   height: 18px;
+   width: 18px;
+   display: inline-block;
+   vertical-align: top;
+   
+   border-radius: 18px;
+}
+
+.MenuItems .ReactSprite {
+   background-image: url('reaction-sprites-light-grey.png');
+}
+
+.ReactButton {
+   opacity: 0;
+   line-height: 18px;
+}
+
+.Item:hover .Reactions .Handle {
+   opacity: .75;
+}
+
+.Reactions .ReactHandle {
+   display: none;
+}
+
+/*.Item {
+   -webkit-transition: all .3s ease-in-out;
+   -moz-transition: all .3s ease-in-out;
+   -o-transition: all .3s ease-in-out;
+   -ms-transition: all .3s ease-in-out;
+   transition: all .3s ease-in-out;
+}*/
+/*
+TOO DESTRUCTIVE FOR A PLUGIN!
+.Item:hover {
+   background: #F0FAFF;
+}
+*/
+
+.Item:hover .Reactions a {
+   opacity: .8;
+   width: inherit;
+}
+
+.MenuItems li:hover .ReactButton .ReactSprite,
+.ReactButton:hover .ReactSprite,
+.HasCount .ReactSprite {
+   background-image: url('reaction-sprites-color.png');
+}
+.Reactions a.HasCount {
+   display: inline-block;
+   opacity: 1 !Important;
+}
+
+.InProgress .ReactSprite {
+   background-image: none !Important;
+   background: transparent !Important;
+}
+.InProgress .Count {
+   visibility: hidden;
+}
+
+.ReactEverything,
+.ReactReact {        background-position: -7px; }
+.ReactFlag {         background-position: -39px; }
+.ReactSpam {         background-position: -71px; }
+.ReactAbuse {        background-position: -103px; }
+.ReactTroll {        background-position: -135px; }
+.ReactDisagree {     background-position: -167px; }
+.ReactOffTopic {     background-position: -199px; }
+.ReactAgree {        background-position: -231px; }
+.ReactLike {         background-position: -263px; }
+.ReactDislike {      background-position: -295px; }
+.ReactAwesome {      background-position: -327px; }
+.ReactLOL {          background-position: -359px; }
+.ReactWTF {          background-position: -391px; }
+.ReactUp {           background-position: -423px; }
+.ReactDown {         background-position: -455px; }
+.ReactPromote {      background-position: -487px; }
+.ReactInsightful {   background-position: -519px; }
+
+.FilterButton.Selected {
+   font-weight: bold;
+}
+
+.DataCounts {
+   margin: 5px 0;
+   text-align: center;
+}
+
+.DataCounts a {
+   color: #000;
+}
+
+.DataCounts a:hover {
+   color: #ff0084;
+}
+
+.CountTotal {
+   display: block;
+   line-height: 100%;
+   font-size: 28px;
+}
+
+.CountTotal img {
+   height: 40px;
+}
+
+.CountItemWrap {
+   width: 10%;
+   display: inline-block;
+}
+
+.CountItem {
+/*   float: left;*/
+   display: block;
+   text-align: center;
+   border: solid 2px transparent;
+   padding: 4px;
+   margin: 0 4px;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   white-space: nowrap;
+   overflow: visible;
+}
+
+.Compact .Item .Author img {
+   height: 24px;
+   width: 24px;
+   margin: 0 5px 4px 0;
+}
+
+.Compact .Title {
+   font-sixe: 13px;
+}
+
+.Compact .Reactions {
+   margin-top: 5px;
+}
+
+.Compact p {
+   margin: 5px 0;
+}
+
+.CountItem.Selected {
+    background: rgba(55, 173, 227, 0.1);
+    border: solid 2px rgba(55, 173, 227, .2);
+    padding: 4px
+}
+
+.Buried {
+    padding: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.Buried, .Buried a {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.Buried .MItem {
+    display: none;
+}
+
+.Buried .Author .ProfilePhoto {
+    height: 21px;
+    width: 21px;
+    margin: 0 3px 0 0;
+    opacity: .4;
+}
+
+.Buried .Reactions {
+    display: none;
+}
+
+.Buried * {
+   display: inline;
+   margin: 0;
+   white-space: nowrap;
+   padding-top: 0;
+   padding-bottom: 0;
+}
+
+.Buried br {
+   display: none;
+}
+
+.Buried .Options {
+   display: none;
+}
+
+.Buried .CommentInfo {
+    display: none;
+}
+
+.Buried:hover:before {
+    content: "Post is buried, click here to show the rest.";
+    display: block;
+    position: absolute;
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    text-shadow: 0 1px 1px #000;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 40px; /* approx, could cause problems */
+}
+
+.Promoted {
+    box-shadow: inset 0 80px 600px #fffcdc;
+    border-top: solid 1px #fff;
+}
+
+.Promoted .Message {
+    font-size: 110%;
+}
+
+.Promoted .Author .ProfilePhotoMedium {
+    box-shadow: 0px -1px 8px #fff;
+}
+
+/* Menu stuff */
+
+.Flyout.Flags {
+    left: -8px;
+    top: 25px;
+    z-index: 1000;
+}
+
+.Flyout.Flags:before {
+   border-bottom: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 9px;
+   position: absolute;
+   top: -7px;
+}
+
+/* Begin "Best Of" */
+.ReactionFilters {
+   margin: 8px 0;
+}
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList .Item:first-child {
+   border-top: 1px solid #BEC8CC;
+}
+
+/* End "Best Of" */

@@ -19,6 +19,7 @@ use Vanilla\Forum\Search\KnowledgeBaseSearchIndexTemplate;
 use Vanilla\Forum\Search\UserSearchIndexTemplate;
 use Vanilla\Http\InternalClient;
 use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\MysqlSearchDriver;
 use Vanilla\Search\SearchService;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\CategoryAndDiscussionApiTestTrait;
@@ -76,6 +77,9 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
         $container
             ->rule(SearchService::class)
             ->addCall('registerActiveDriver', [
+                'driver' => new Reference(MysqlSearchDriver::class)
+            ])
+            ->addCall('registerActiveDriver', [
                 'driver' => new Reference(static::getSearchDriverClass())
             ])
         ;
@@ -122,9 +126,6 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
 
         $results = $response->getBody();
 
-        if (is_int($count)) {
-            $this->assertEquals($count, count($results));
-        }
         foreach ($expectedFields as $expectedField => $expectedValues) {
             if ($expectedValues === null) {
                 foreach ($results as $result) {
@@ -139,6 +140,10 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
 
                 $this->assertEquals($expectedValues, $actualValues);
             }
+        }
+
+        if (is_int($count)) {
+            $this->assertEquals($count, count($results));
         }
     }
 

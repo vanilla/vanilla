@@ -183,6 +183,10 @@ class RequestsControllerTest extends SiteTestCase {
      */
     public function testDeniedUserCanReapply() {
         $roleRequest = $this->testUserCanApply();
+        if ($roleRequest['roleRequestID'] !== 1) {
+            $this->requestsModel->delete(['roleRequestID' => 1]);
+        }
+
         $this->metaModel->update(['attributes' => ['allowReapply' => true]], ['roleID' => $this->meta['roleID']]);
         $this->requestsModel->update(['status' => 'denied'], ['roleRequestID' => $roleRequest['roleRequestID']]);
         $this->getSession()->start($this->moderatorID);

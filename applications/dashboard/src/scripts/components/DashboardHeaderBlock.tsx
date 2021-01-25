@@ -14,6 +14,7 @@ interface IProps {
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;
+    /** @deprecated use useFallbackBackUrl("/action"); instead */
     onBackClick?: () => void;
 }
 

@@ -18,6 +18,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Utility\ModelUtils;
+use Gdn_Session as SessionInterface;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -78,6 +80,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /** @var array Lookup cache for commentsApiController_normalizeOutput */
     public $discussionsCache = [];
 
+    /** @var SessionInterface */
+    private $session;
+
     /**
      * QnAPlugin constructor.
      *
@@ -86,13 +91,15 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param UserModel $userModel
      * @param CategoryModel $categoryModel
      * @param AnswerModel $questionModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         CommentModel $commentModel,
         DiscussionModel $discussionModel,
         UserModel $userModel,
         CategoryModel $categoryModel,
-        AnswerModel $questionModel
+        AnswerModel $questionModel,
+        SessionInterface $session
     ) {
         parent::__construct();
 
@@ -101,6 +108,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $this->userModel = $userModel;
         $this->categoryModel = $categoryModel;
         $this->answerModel = $questionModel;
+        $this->session = $session;
         $this->setLogger(Logger::getLogger());
         if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
@@ -133,7 +141,14 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $dic->rule(SearchTypeCollectorInterface::class)
             ->addCall('registerSearchType', [new Reference(QuestionSearchType::class)])
             ->addCall('registerSearchType', [new Reference(AnswerSearchType::class)]);
+
+        $dic->rule(QuickLinksVariableProvider::class)
+            ->addCall('addQuickLinkProvider', [$this]);
+
+        $dic->rule(WidgetService::class)
+            ->addCall('registerWidget', [QnAModule::class]);
     }
+
 
     /**
      * Database updates.
@@ -636,9 +651,15 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     public function recalculateDiscussionQnA($discussion, bool $return = false) {
         $set = [];
 
+        $discussionArr = (array) $discussion;
+        $discussionID = $discussionArr['discussionID'] ?? $discussionArr['DiscussionID'];
         // Look for at least one accepted answer/comment.
         $acceptedComment = Gdn::sql()->getWhere(
-            'Comment', ['DiscussionID' => val('DiscussionID', $discussion), 'QnA' => 'Accepted'], '', 'asc', 1
+            'Comment',
+            ['DiscussionID' => $discussionID, 'QnA' => 'Accepted'],
+            '',
+            'asc',
+            1
         )->firstRow(DATASET_TYPE_ARRAY);
 
         if ($acceptedComment) {
@@ -648,7 +669,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         } else {
             // Look for at least one untreated answer/comment.
             $answeredComment = Gdn::sql()->getWhere(
-                'Comment', ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is null' => ''], '', 'asc', 1
+                'Comment',
+                ['DiscussionID' => val('DiscussionID', $discussion),
+                    'QnA is null' => ''],
+                '',
+                'asc',
+                1
             )->firstRow(DATASET_TYPE_ARRAY);
 
             $countComments = val('CountComments', $discussion, 0);
@@ -657,7 +683,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                 $set['QnA'] = 'Answered';
                 $set['DateAccepted'] = null;
                 $set['DateOfAnswer'] = $answeredComment['DateInserted'] ?? null;
-            } else if ($countComments > 0) {
+            } elseif ($countComments > 0) {
                 $set['QnA'] = 'Rejected';
                 $set['DateAccepted'] = null;
                 $set['DateOfAnswer'] = null;
@@ -671,7 +697,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         if ($return) {
             return $set;
         }
-        $this->discussionModel->setField(val('DiscussionID', $discussion), $set);
+        $this->discussionModel->setField($discussionID, $set);
     }
 
     /**

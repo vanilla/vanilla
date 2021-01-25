@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Vanilla\Adapters\SphinxClient;
 use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Vanilla\ApiUtils;
+use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\DateFilterSchema;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Sphinx\Search\SphinxSearchQuery;
@@ -148,6 +149,9 @@ class GlobalSearchType extends AbstractSearchType {
             'dateInserted?' => new DateFilterSchema([
                 'x-search-filter' => true,
             ]),
+            'driver?' => [
+                "enum" => $this->searchService->getDriverNames()
+            ],
             "sort:s?" => [
                 "enum" => [
                     "relevance",

@@ -6,6 +6,8 @@
 
 namespace Vanilla\ProfileExtender\Tests\APIv2;
 
+use Vanilla\Attributes;
+
 /**
  * Tests for the profile extender addon.
  */
@@ -71,6 +73,15 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $this->profileExtender->updateUserFields($this->memberID, $fields);
         $data = $this->api()->get("/users/{$this->memberID}", ['expand' => \ProfileExtenderPlugin::FIELD_EXTENDED])->getBody();
         $this->assertArraySubsetRecursive($fields, $data['extended']);
+    }
+
+    /**
+     * Verify our expander still creates an empty Attributes object for users with no extended profile fields.
+     */
+    public function testEmptyExpansion(): void {
+        $result = $this->profileExtender->getUserProfileValuesChecked([$this->memberID]);
+        $this->assertInstanceOf(Attributes::class, $result[$this->memberID]);
+        $this->assertSame(0, $result[$this->memberID]->count());
     }
 
     /**

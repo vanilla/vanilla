@@ -11,10 +11,13 @@ import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/Community
 import { accessibleRoleButton } from "@vanilla/addon-vanilla/legacy/legacyAccessibility";
 import { addComponent } from "@library/utility/componentRegistry";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
+import { QuickLinks } from "@library/navigation/QuickLinks";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
+
 addComponent("HomeWidget", HomeWidget, { overwrite: true });
+addComponent("QuickLinks", QuickLinks, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

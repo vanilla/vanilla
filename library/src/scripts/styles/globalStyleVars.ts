@@ -159,8 +159,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const border = makeThemeVars("border", {
-        color: mixBgAndFg(0.3),
-        colorHover: mixBgAndFg(0.5),
+        color: mixBgAndFg(0.2),
+        colorHover: mixBgAndFg(0.4),
         width: 1,
         style: "solid",
         radius: 6, // Global default

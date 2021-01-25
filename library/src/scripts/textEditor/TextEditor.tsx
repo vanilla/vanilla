@@ -8,12 +8,12 @@ import {
 } from "@monaco-editor/react";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
-import { assetUrl, siteUrl } from "@library/utility/appUtils";
+import { assetUrl, getMeta, siteUrl } from "@library/utility/appUtils";
 import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
 
 monaco.config({
     paths: {
-        vs: assetUrl("/dist/monaco-editor/min/vs"),
+        vs: assetUrl("/dist/monaco-editor-21-2/min/vs"),
     },
 });
 export interface ITextEditorProps {
@@ -140,6 +140,7 @@ function useJsonSchema(schemaUri: string | null) {
         if (!schemaUri) {
             return;
         }
+        const busterUrl = schemaUri + `?h=${getMeta("context.cacheBuster")}`;
         monaco.init().then((monaco) => {
             monaco.languages.json.jsonDefaults.setModeConfiguration({
                 colors: true,
@@ -153,14 +154,15 @@ function useJsonSchema(schemaUri: string | null) {
                 selectionRanges: true,
                 tokens: true,
             });
-            fetch(schemaUri)
+            fetch(busterUrl)
                 .then((res) => res.json())
                 .then((json) => {
                     monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
                         validate: true,
+                        enableSchemaRequest: true,
                         schemas: [
                             {
-                                uri: schemaUri,
+                                uri: busterUrl,
                                 fileMatch: ["*"],
                                 schema: json,
                             },

@@ -12180,6 +12180,19 @@ body.isMobile .Popup.hasRichEditor .Border {
 .richEditor .embedLinkLoader-link:hover:after {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
 }
+.richEditor .embedImage .embedExternal-content:after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+  cursor: "pointer";
+  z-index: 2;
+  transition: 0.2s ease box-shadow;
+  pointer-events: all;
+}
 .richEditor .embed-isSelected .embedExternal-content:after,
 .richEditor .embed-isSelected .embedLinkLoader-link:after {
   box-shadow: 0 0 0 2px #0291db inset;

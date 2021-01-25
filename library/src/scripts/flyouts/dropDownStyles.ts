@@ -290,19 +290,20 @@ export const dropDownClasses = useThemeCache(() => {
         zIndex: 2,
     });
 
-    const panelFirst = style("panelFirst", {
-        ...{
-            // We want the initial view to have no left space
-            "& li": {
-                paddingLeft: important(styleUnit(0)),
-            },
-            "&&": {
-                position: "relative",
-                height: "initial",
-                zIndex: 0,
-            },
+    const panelFirstStyle: CSSObject = {
+        // We want the initial view to have no left space
+        "& li": {
+            paddingLeft: important(styleUnit(0)),
         },
-    });
+        "&&": {
+            position: "relative",
+            height: "initial",
+            zIndex: 0,
+        },
+    };
+    const panelFirst = style("panelFirst", panelFirstStyle);
+
+    const panelMobileOnly = style("panelMobileOnly", panelFirstStyle);
 
     const panelLast = style("panelLast", {
         ...{
@@ -485,6 +486,7 @@ export const dropDownClasses = useThemeCache(() => {
         noVerticalPadding,
         paddedFrame,
         panelFirst,
+        panelMobileOnly,
         panelLast,
         panelNavItems,
         panel,

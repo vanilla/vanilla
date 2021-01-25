@@ -4,7 +4,7 @@
  */
 
 import { useSelector } from "react-redux";
-import { IGetUserByIDQuery, useUserActions, IInviteUsersByGroupIDQuery } from "@library/features/users/UserActions";
+import { IGetUserByIDQuery, IInviteUsersByGroupIDQuery, useUserActions } from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
 import { useEffect } from "react";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
@@ -48,8 +48,9 @@ function getInviteeIDs(invitees: IComboBoxOption[]): number[] {
     return invitees.map((invitee) => invitee.value as number);
 }
 
-export function useInviteUsers({ userID, groupID }) {
-    const { inviteUsersByGroupID, updateInvitees, updateEmailsString } = useUserActions();
+export function useInviteUsers(params: { userID: number; groupID: number; onSuccess: () => void }) {
+    const { userID, groupID, onSuccess } = params;
+    const { inviteUsersByGroupID, updateInvitees, updateEmailsString, clearInviteUsers } = useUserActions();
 
     const emailsString = useSelector((state: IUsersStoreState) => {
         return state.users.usersInvitationsByID[userID]?.emailsString ?? "";
@@ -77,8 +78,23 @@ export function useInviteUsers({ userID, groupID }) {
             userIDs,
             emails,
         };
-        inviteUsersByGroupID(query);
+        return inviteUsersByGroupID(query);
     };
 
-    return { emailsString, updateStoreEmails, invitees, updateStoreInvitees, sentInvitations };
+    const errors = useSelector((state: IUsersStoreState) => {
+        return state.users.usersInvitationsByID[userID]?.results?.error?.response?.data?.errors;
+    });
+
+    const status = useSelector((state: IUsersStoreState) => {
+        return state.users.usersInvitationsByID[userID]?.results?.status ?? LoadStatus.PENDING;
+    });
+
+    useEffect(() => {
+        if (status === LoadStatus.SUCCESS) {
+            onSuccess();
+            clearInviteUsers({ userID });
+        }
+    });
+
+    return { emailsString, updateStoreEmails, invitees, updateStoreInvitees, sentInvitations, errors };
 }

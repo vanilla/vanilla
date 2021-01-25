@@ -193,12 +193,14 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
         }
 
         $allowReApply = !empty($meta['attributes']['allowReapply']);
+        $wasInserted = false;
         if ($op->getType() === Operation::TYPE_INSERT && $allowReApply && isset($current)) {
             $op->setType(Operation::TYPE_UPDATE);
             $op->setWhere([
                 'roleID' => $op->getSetItem('roleID'),
                 'type' => $op->getSetItem('type'),
                 'userID' => $op->getSetItem('userID')]);
+            $wasInserted = true;
         }
 
         // You are only allowed to update one request at a time.
@@ -221,6 +223,10 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
 
         try {
             $result = parent::handleInnerOperation($op);
+
+            if (true === $result && $wasInserted && isset($current)) {
+                $result = (int)$current['roleRequestID'];
+            }
         } catch (\Exception $ex) {
             if ($op->getType() === Operation::TYPE_INSERT && preg_match('`^Duplicate entry`', $ex->getMessage())) {
                 throw new ClientException(t('You have already applied.'), 409);

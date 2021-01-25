@@ -9,14 +9,12 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\CurrentTimeStamp;
 
-require_once(__DIR__.'/QnaTestHelperTrait.php');
-
 /**
  * Test managing answers with the /api/v2/comments endpoint.
  */
 class CommentsAnswerTest extends AbstractAPIv2Test {
 
-    use QnaTestHelperTrait;
+    use QnaApiTestTrait;
 
     private static $category;
 
@@ -45,31 +43,14 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Create a question.
-     *
-     * @return array The question.
-     */
-    protected function createQuestion() {
-        $record = [
-            'categoryID' => self::$category['categoryID'],
-            'name' => 'Test Question For Answer %s',
-            'body' => 'Hello world! %s',
-            'format' => 'markdown',
-        ];
-        $response = $this->api()->post('discussions/question', self::sprintfCounter($record));
-        $this->assertEquals(201, $response->getStatusCode());
-
-        return $response->getBody();
-    }
-
-    /**
      * Create a set of QnA discussions covering the range of answered statuses ('unanswered', 'answered', 'accepted', 'rejected').
      *
      * @return array The set of questions
      */
     public function createQuestionSet() {
+        $category = $this->createCategory();
         $questionSet = [
-            $this->createQuestion(),
+            $this->createQuestion(['categoryID' => $category['categoryID']]),
             $this->testResetAnswer(),
             $this->testAcceptAnswer(),
             $this->testRejectAnswer(),
@@ -98,8 +79,9 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @return mixed
      */
     public function testPostAnswer($discussionID = null) {
+        $category = $this->createCategory();
         if ($discussionID === null) {
-            $question = $this->createQuestion();
+            $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
             $discussionID = $question['discussionID'];
         }
 
@@ -149,7 +131,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @depends testPostAnswer
      */
     public function testAcceptAnswer() {
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
@@ -172,7 +155,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @depends testPostAnswer
      */
     public function testRejectAnswer() {
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
@@ -195,7 +179,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @depends testPostAnswer
      */
     public function testResetAnswer() {
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
@@ -221,7 +206,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @depends testPostAnswer
      */
     public function testAcceptRejectAnswer() {
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
@@ -245,7 +231,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @depends testPostAnswer
      */
     public function testResetRejectedQuestionStatus() {
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $answer = $this->testPostAnswer($question['discussionID']);
 
         $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
@@ -277,8 +264,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         // Mock the current time.
         CurrentTimeStamp::mockTime('Dec 1 2010');
-
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $this->assertIsQuestion($question, ['dateAccepted' => null]);
 
         $answer = $this->testPostAnswer($question['discussionID']);
@@ -302,7 +289,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      */
     public function testUnAnsweredQuestionDates() {
 
-        $question = $this->createQuestion();
+        $category = $this->createCategory();
+        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
         $this->assertIsQuestion($question, ['dateAccepted' => null]);
 
         $answerNumberOne = $this->testPostAnswer($question['discussionID']);

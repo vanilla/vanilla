@@ -8,12 +8,18 @@ import { CSSObject } from "@emotion/css";
 import { style } from "@library/styles/styleShim";
 import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
-import { logDebug, logWarning, logError } from "@vanilla/utils";
+import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
+// Re-export for compatibility.
+export { useThemeCache } from "@library/styles/themeCache";
+
 export const DEBUG_STYLES = Symbol.for("Debug");
+
+// Use this type to allow people to to pass conditional styles in.
+type CSSObjectOrFalsy = CSSObject | null | false | undefined;
 
 /**
  * A better helper to generate human readable classes generated from Emotion.
@@ -30,10 +36,11 @@ export const DEBUG_STYLES = Symbol.for("Debug");
  * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: CSSObject[]): string;
-    function styleCreator(debug: symbol, subcomponentName: string, ...objects: CSSObject[]): string;
-    function styleCreator(...objects: CSSObject[]): string;
-    function styleCreator(...objects: Array<CSSObject | string | symbol>): string {
+    function styleCreator(subcomponentName: string, ...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(debug: symbol, subcomponentName: string, ...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(...objects: Array<CSSObjectOrFalsy | string | symbol>): string {
+        objects = objects.filter((val) => !!val);
         if (objects.length === 0) {
             return style();
         }
@@ -48,8 +55,9 @@ export function styleFactory(componentName: string) {
             const [subcomponentName, ...restObjects] = styleObjs;
             debugName += `-${subcomponentName}`;
             styleObjs = restObjects;
-            styleObjs.forEach((obj) => (obj["label"] = debugName));
         }
+
+        styleObjs.forEach((obj) => (obj["label"] = debugName));
 
         if (shouldLogDebug) {
             logWarning(`Debugging component ${debugName}`);

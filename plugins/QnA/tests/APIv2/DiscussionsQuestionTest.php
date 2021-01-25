@@ -9,14 +9,12 @@ namespace VanillaTests\APIv2;
 
 use Gdn;
 
-require_once(__DIR__.'/QnaTestHelperTrait.php');
-
 /**
  * Test managing questions with the /api/v2/discussions endpoint.
  */
 class DiscussionsQuestionTest extends AbstractAPIv2Test {
 
-    use QnaTestHelperTrait;
+    use QnaApiTestTrait;
 
     /** @var int Category containing questions. */
     private static $category;

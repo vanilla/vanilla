@@ -211,6 +211,22 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     }
 
     /**
+     * @param SearchService $searchService
+     */
+    public function setSearchService(SearchService $searchService) {
+        foreach ($this->getSearchTypes() as $searchType) {
+            $searchType->setSearchService($searchService);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function supportExtensions(): bool {
+        return false;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getSearchTypeByDType(int $dType): ?AbstractSearchType {

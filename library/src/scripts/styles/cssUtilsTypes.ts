@@ -200,3 +200,31 @@ export enum IIconSizes {
     DEFAULT = "default",
     LARGE = "large",
 }
+
+export enum ListSeparation {
+    /**
+     * Item 1
+     * Item 2
+     * Item 3
+     */
+    NONE = "none",
+
+    /**
+     * -------
+     * |Item 1|
+     * --------
+     *
+     * --------
+     * |Item 2|
+     * --------
+     */
+    BORDER = "border",
+    /**
+     * Item 1
+     * -------
+     * Item 2
+     * -------
+     * Item 3
+     */
+    SEPARATOR = "separator",
+}

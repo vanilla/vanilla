@@ -15,7 +15,7 @@ export interface INavigationVariableItem {
     id: string;
     name: string;
     url: string;
-    children: INavigationVariableItem[];
+    children?: INavigationVariableItem[];
     permission?: string;
     isCustom?: boolean;
     isHidden?: boolean;
@@ -34,11 +34,13 @@ export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) 
 
     const navigationItems: INavigationVariableItem[] = makeVars("navigationItems", getDefaultNavItems());
 
+    const mobileOnlyNavigationItems: INavigationVariableItem[] = makeVars("mobileOnlyNavigationItems", []);
+
     const logo = makeVars("logo", {
         url: "/",
     });
 
-    return { navigationItems, logo };
+    return { navigationItems, mobileOnlyNavigationItems, logo };
 });
 
 function getDefaultNavItems() {

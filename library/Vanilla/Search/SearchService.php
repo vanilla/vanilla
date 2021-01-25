@@ -38,16 +38,24 @@ class SearchService {
     /**
      * Get the active search driver.
      *
+     * @param ?string $driverName Driver name.
      * @return AbstractSearchDriver
      */
-    public function getActiveDriver(): AbstractSearchDriver {
+    public function getActiveDriver(?string $driverName = null): AbstractSearchDriver {
         if (empty($this->drivers)) {
             throw new ServerException('No search service is registered');
         }
-        $driver = end($this->drivers)['driver'];
+        $forceDriver = \Gdn::config('Vanilla.Search.Driver', null);
+
+        if ($driverName || $forceDriver) {
+            $driver = $this->getDriverByName($driverName ?? $forceDriver);
+        } else {
+            $driver = end($this->drivers)['driver'];
+        }
         if (!$driver) {
             throw new ServerException('Could not find active driver');
         }
+        $driver->setSearchService($this);
         return $driver;
     }
 
@@ -73,5 +81,36 @@ class SearchService {
         return $this
             ->getActiveDriver()
             ->buildQuerySchema();
+    }
+
+    /**
+     * Get a single driver by name.
+     *
+     * @param string $name
+     * @return AbstractSearchDriver
+     */
+    public function getDriverByName(string $name): AbstractSearchDriver {
+        /** @var  AbstractSearchDriver $driver */
+        foreach ($this->drivers as $currentDriver) {
+            if (strtolower($currentDriver['driver']->getName()) === strtolower($name)) {
+                $driver = $currentDriver['driver'];
+                break;
+            }
+        }
+        return $driver;
+    }
+
+    /**
+     * Get available driver names.
+     *
+     * @return array
+     */
+    public function getDriverNames(): array {
+        $driverNames = [];
+        /** @var  AbstractSearchDriver $driver */
+        foreach ($this->drivers as $driver) {
+            $driverNames[] = strtolower($driver['driver']->getName());
+        }
+        return $driverNames;
     }
 }

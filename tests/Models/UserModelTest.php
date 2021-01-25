@@ -21,6 +21,8 @@ use ActivityModel;
  */
 class UserModelTest extends SiteTestCase {
 
+    public static $addons = ['vanilla', 'dashboard', 'conversations'];
+
     /** @var UserEvent */
     private $lastEvent;
 

@@ -775,7 +775,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $permissions = $permissionModel->getJunctionPermissions(['JunctionID' => $categoryID], 'Category', '', ['AddDefaults' => !$this->Category->CustomPermissions]);
         $permissions = $permissionModel->unpivotPermissions($permissions, true);
 
-        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+        if (in_array($this->deliveryType(), [DELIVERY_TYPE_ALL, DELIVERY_TYPE_VIEW])) {
             $this->setData('PermissionData', $permissions, true);
         }
 

@@ -48,13 +48,41 @@ trait UsersAndRolesApiTestTrait {
         $user = $this->createUser([
             'roleID' => [$this->lastRoleID],
         ]);
-        $this->api()->setUserID($this->lastUserID);
-        $result = call_user_func($callback);
+        $result = $this->runWithUser($callback, $user);
 
         // Cleanup.
-        $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
         $this->api()->deleteWithBody("/users/{$user['userID']}");
         $this->api()->delete("/roles/{$role['roleID']}");
+        return $result;
+    }
+
+    /**
+     * Delete all users except System and Admin(circleci).
+     */
+    protected function clearUsers() {
+        $userModel = \Gdn::userModel();
+        $users = $userModel->get()->resultArray();
+        foreach ($users as $user) {
+            if (!in_array($user['Name'], ['circleci', 'System'])) {
+                $userModel->deleteID($user['UserID']);
+            }
+        }
+    }
+
+    /**
+     * Run something with a particular API user.
+     *
+     * @param callable $callback The callback to run.
+     * @param int|array $userOrUserID A user array or userID.
+     *
+     * @return mixed The result of the callback.
+     */
+    protected function runWithUser(callable $callback, $userOrUserID) {
+        $userID = is_array($userOrUserID) ? $userOrUserID['userID'] : $userOrUserID;
+        $apiUserBefore = $this->api()->getUserID();
+        $this->api()->setUserID($userID);
+        $result = call_user_func($callback);
+        $this->api()->setUserID($apiUserBefore);
         return $result;
     }
 

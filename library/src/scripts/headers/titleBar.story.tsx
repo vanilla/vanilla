@@ -549,3 +549,32 @@ export const TitleBarWithMegaMenu = storyWithConfig(
     { useWrappers: false, themeVars: { navigation: { navigationItems } } },
     () => <StoryTitleBar forceMenuOpen={navigationItems[0]} title="With Mega Menu" />,
 );
+
+export const WithMobileOnlyNavigationItems = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            navigation: {
+                navigationItems: [
+                    {
+                        url: "/discussions",
+                        name: "Discussions",
+                    },
+                    {
+                        url: "/categories",
+                        name: "Categories",
+                    },
+                ],
+
+                mobileOnlyNavigationItems: [
+                    {
+                        id: "mobileOnlyItem",
+                        url: "/somePath",
+                        name: "Mobile-only Link",
+                    },
+                ],
+            },
+        },
+    },
+    () => <StoryTitleBar title="With Mobile-only Navigation Items" />,
+);

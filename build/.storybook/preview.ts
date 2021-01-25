@@ -7,6 +7,8 @@ import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import { makeStorybookDecorator } from "@library/makeStorybookDecorator";
 import { styleUnit } from "@library/styles/styleUnit";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
+import { HomeWidget } from "@library/homeWidget/HomeWidget";
 
 const panelLayoutBreakPoints = layoutVariables().panelLayoutBreakPoints;
 
@@ -70,3 +72,4 @@ export const parameters = {
 };
 
 export const decorators = [makeStorybookDecorator()];
+

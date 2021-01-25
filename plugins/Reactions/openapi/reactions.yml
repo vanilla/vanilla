@@ -1,0 +1,152 @@
+openapi: 3.0.2
+info:
+x-resourceEvents:
+  reaction:
+    x-addon: "reactions"
+    name: "Reaction"
+    type: "reaction"
+paths:
+  /reactions:
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReactionType'
+                type: array
+          description: Success
+      tags:
+      - Reactions
+      summary: Get a list of reaction types.
+  '/reactions/edit/{urlCode}':
+    get:
+      parameters:
+      - in: path
+        name: urlCode
+        required: true
+        schema:
+          type: string
+      - description: |
+          The reaction type ID.
+        in: query
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReactionType'
+          description: Success
+      tags:
+      - Reactions
+      summary: Get a reaction type for editing.
+  '/reactions/{urlCode}':
+    get:
+      parameters:
+      - in: path
+        name: urlCode
+        required: true
+        schema:
+          type: string
+      - description: |
+          The reaction type ID.
+        in: query
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReactionType'
+          description: Success
+      tags:
+      - Reactions
+      summary: Get a single reaction type.
+    patch:
+      parameters:
+      - in: path
+        name: urlCode
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReactionType'
+          description: Success
+      tags:
+      - Reactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionType'
+        required: true
+      summary: Update a reaction type.
+components:
+  schemas:
+    ReactionType:
+      properties:
+        active:
+          description: Is this type available for use?
+          type: boolean
+        attributes:
+          description: Metadata.
+          nullable: true
+          type: object
+        class:
+          description: The classification of the type. Directly maps to permissions.
+          minLength: 1
+          nullable: true
+          type: string
+        custom:
+          description: Is this a non-standard type?
+          type: boolean
+        description:
+          description: A user-friendly description.
+          minLength: 1
+          type: string
+        hidden:
+          description: Should this type be hidden from the UI?
+          type: boolean
+        name:
+          description: A user-friendly name.
+          minLength: 1
+          type: string
+        points:
+          description: Reputation points to be applied along with this reaction.
+          type: integer
+        sort:
+          description: Display order when listing types.
+          nullable: true
+          type: integer
+        tagID:
+          description: The numeric ID of the tag associated with the type.
+          type: integer
+        urlCode:
+          description: A URL-safe identifier.
+          minLength: 1
+          type: string
+      required:
+      - urlCode
+      - name
+      - description
+      - points
+      - class
+      - tagID
+      - attributes
+      - sort
+      - active
+      - custom
+      - hidden
+      type: object

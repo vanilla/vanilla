@@ -188,8 +188,9 @@ class PostController extends VanillaController {
 
         touchValue('Type', $this->Data, 'Discussion');
 
+        $id = $category['CategoryID'] ?? null;
         // Remove Announce parameter if it was injected into the form.
-        if (!CategoryModel::checkPermission($category['CategoryID'], 'Vanilla.Discussions.Announce')) {
+        if (!CategoryModel::checkPermission($id, 'Vanilla.Discussions.Announce')) {
             $this->Form->removeFormValue('Announce');
         }
 

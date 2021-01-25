@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+  comment:
+    x-addon: "vanilla"
+    name: "Comment"
+    type: "comment"
 paths:
   /comments:
     get:

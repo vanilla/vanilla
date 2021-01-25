@@ -385,7 +385,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (val('_arg3', $get) == 'page') {
                 $result['_arg4'] = 'Page';
             }
-        } elseif (val('_arg1', $get) == 'bd-p') { // Board = Category
+        } elseif (in_array(val('_arg1', $get), ['bd-p', 'ct-p' , 'bg-p'])) { // Board = Category
             $result = [
                 '_arg2' => [
                     'CategoryCode',
@@ -540,7 +540,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             ];
             self::vbFriendlyUrlID($get, 't');
         }
-        
+
         return $data;
 
     }

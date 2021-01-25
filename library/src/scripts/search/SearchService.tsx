@@ -9,6 +9,13 @@ import React from "react";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 
 export class SearchService {
+    private static _supportsExtensions = false;
+    static setSupportsExtensions(supports: boolean) {
+        this._supportsExtensions = supports;
+    }
+    static supportsExtensions(): boolean {
+        return this._supportsExtensions;
+    }
     static extraFilters = [] as IExtraFilter[];
     static addSearchFilter = (domain: string, filterNode: React.ReactNode) => {
         SearchService.extraFilters.push({

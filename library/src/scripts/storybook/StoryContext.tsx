@@ -24,6 +24,9 @@ import { tilesVariables } from "@library/features/tiles/Tiles.variables";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { inputClasses } from "@library/forms/inputStyles";
 import { userContentVariables } from "@library/content/userContentStyles";
+import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
+import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
+import { HomeWidget } from "@library/homeWidget/HomeWidget";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -39,6 +42,7 @@ interface IContext {
         tile?: DeepPartial<ReturnType<typeof tileVariables>>;
         banner?: DeepPartial<ReturnType<typeof bannerVariables>>;
         userContent?: DeepPartial<ReturnType<typeof userContentVariables>>;
+        quickLinks?: DeepPartial<ReturnType<typeof quickLinksVariables>>;
         [key: string]: any;
     };
     useWrappers?: boolean;
@@ -80,6 +84,11 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
         storeState: {},
     });
     const [themeKey, setThemeKey] = useState("");
+
+    useLayoutEffect(() => {
+        addComponent("HomeWidget", HomeWidget, { overwrite: true, bypassPortalManager: true });
+        _mountComponents(document.body);
+    });
 
     const updateContext = useCallback(
         (value: Partial<IContext>) => {

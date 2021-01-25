@@ -2059,12 +2059,15 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     /**
      * Normalize a database record to match the Schema definition.
      *
-     * @param array $dbRecord Database record.
+     * @param array|object $dbRecord Database record.
      * @param array|string|bool $expand Expand options.
      *
      * @return array Return a Schema record.
      */
-    public function normalizeRow(array $dbRecord, $expand = []) {
+    public function normalizeRow($dbRecord, $expand = []) {
+        if (is_object($dbRecord)) {
+            $dbRecord = (array) $dbRecord;
+        }
         if ($dbRecord['CategoryID'] === -1) {
             $dbRecord['Url'] = url('/categories');
             $dbRecord['DisplayAs'] = 'Discussions';

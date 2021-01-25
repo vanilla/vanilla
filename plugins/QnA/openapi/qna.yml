@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+  answer:
+    x-addon: "qna"
+    name: "Answer"
+    type: "answer"
 components:
   parameters:
     # This is a partial schema to add Q&A options to the main schema.
@@ -8,4 +13,3 @@ components:
         items:
           enum:
             - acceptedAnswers
-

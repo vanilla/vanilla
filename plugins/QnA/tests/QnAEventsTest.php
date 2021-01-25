@@ -8,6 +8,7 @@
 namespace QnA\Tests;
 
 use Vanilla\QnA\Models\AnswerModel;
+use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
@@ -21,7 +22,7 @@ use VanillaTests\VanillaTestCase;
  * Test QnA events are working.
  */
 class QnAEventsTest extends VanillaTestCase {
-    use CommunityApiTestTrait, SiteTestTrait, SetupTraitsTrait, EventSpyTestTrait;
+    use SiteTestTrait, SetupTraitsTrait, EventSpyTestTrait, QnaApiTestTrait;
 
     /** @var AnswerModel */
     private $answerModel;
@@ -63,10 +64,13 @@ class QnAEventsTest extends VanillaTestCase {
      * Tests event upon an answer to a question is chosen.
      */
     public function testQnaChosenAnswerEvent() {
+        $category = $this->createCategory();
         $question = $this->createQuestion([
+            'categoryID' => $category['categoryID'],
             'name' => 'Question 1',
             'body' => 'Question 1'
         ]);
+
 
         $answer1 = $this->createAnswer([
             'discussionID' => $question['discussionID'],
@@ -99,46 +103,5 @@ class QnAEventsTest extends VanillaTestCase {
                 ]
             )
         );
-    }
-
-    /**
-     * Create a Question.
-     *
-     * @param array $body
-     * @return array
-     */
-    public function createQuestion(array $body = []): array {
-        $categoryID = $body['categoryID'] ?? $this->lastInsertedCategoryID;
-        if (!$categoryID) {
-            $category = $this->createCategory();
-            $categoryID = $category['categoryID'];
-        }
-
-        return $this->api()->post('discussions/question', [
-            'categoryID' => $categoryID ?? $this->lastInsertedCategoryID,
-            'name' => $body['name'] ?? 'Question',
-            'body' => $body['body'] ?? 'Question being asked!',
-            'format' => 'markdown',
-        ])->getBody();
-    }
-
-    /**
-     * Create a Question.
-     *
-     * @param array $body
-     * @return array
-     */
-    public function createAnswer(array $body): array {
-        if (!$body['discussionID']) {
-            $question = $this->createQuestion();
-            $body['discussionID'] = $question['discussionID'];
-        }
-
-        $record = [
-            'discussionID' => $body['discussionID'],
-            'body' => 'Answering',
-            'format' => 'markdown',
-        ];
-        return $this->api()->post('comments', $record)->getBody();
     }
 }

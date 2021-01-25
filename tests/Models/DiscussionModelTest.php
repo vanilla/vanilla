@@ -17,14 +17,16 @@ use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
 
 /**
  * Some basic tests for the `DiscussionModel`.
  */
 class DiscussionModelTest extends SiteTestCase {
-    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait, TestCategoryModelTrait;
+    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait, TestCategoryModelTrait, CommunityApiTestTrait, UsersAndRolesApiTestTrait;
 
     /** @var DiscussionEvent */
     private $lastEvent;
@@ -217,40 +219,42 @@ class DiscussionModelTest extends SiteTestCase {
      * Test canClose() where Admin is false and user has CloseOwn permission but user did not start the discussion.
      */
     public function testCanCloseCloseOwnTrueNotOwn() {
-        $this->session->UserID = 123;
-        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
-        $this->session->getPermissions()->setAdmin(false);
-        $discussion = [
-            'DiscussionID' => 0,
-            'CategoryID' => 1,
-            'Name' => 'test',
-            'Body' => 'discuss',
-            'InsertUserID' => 321
-        ];
-        $actual = DiscussionModel::canClose($discussion);
-        $expected = false;
-        $this->assertSame($expected, $actual);
+        $this->runWithUser(function () {
+            $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
+            $this->session->getPermissions()->setAdmin(false);
+            $discussion = [
+                'DiscussionID' => 0,
+                'CategoryID' => 1,
+                'Name' => 'test',
+                'Body' => 'discuss',
+                'InsertUserID' => 321
+            ];
+            $actual = DiscussionModel::canClose($discussion);
+            $expected = false;
+            $this->assertSame($expected, $actual);
+        }, 123);
     }
 
     /**
      * Test canClose() with discussion already closed and user didn't start the discussion.
      */
     public function testCanCloseCloseIsClosed() {
-        $this->session->UserID = 123;
-        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
-        $this->session->getPermissions()->setAdmin(false);
-        $discussion = [
-            'DiscussionID' => 0,
-            'CategoryID' => 1,
-            'Name' => 'test',
-            'Body' => 'discuss',
-            'InsertUserID' => 321,
-            'Closed' => true,
-            'Attributes' => ['ClosedByUserID' => 321]
-        ];
-        $actual = DiscussionModel::canClose($discussion);
-        $expected = false;
-        $this->assertSame($expected, $actual);
+        $this->runWithUser(function () {
+            $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
+            $this->session->getPermissions()->setAdmin(false);
+            $discussion = [
+                'DiscussionID' => 0,
+                'CategoryID' => 1,
+                'Name' => 'test',
+                'Body' => 'discuss',
+                'InsertUserID' => 321,
+                'Closed' => true,
+                'Attributes' => ['ClosedByUserID' => 321]
+            ];
+            $actual = DiscussionModel::canClose($discussion);
+            $expected = false;
+            $this->assertSame($expected, $actual);
+        }, 123);
     }
 
     /**
@@ -973,5 +977,24 @@ class DiscussionModelTest extends SiteTestCase {
         $id = $discussion[0]['DiscussionID'];
         $this->discussionModel->setField($id, 'Announce', 1);
         $this->assertDirtyRecordInserted('discussion', $id);
+    }
+
+    /**
+     * Test particpation count.
+     */
+    public function testParticipatedCount() {
+        $this->resetTable('Comment');
+        $user2 = $this->createUser();
+        $this->createCategory();
+        $disc1 = $this->createDiscussion();
+        $disc2 = $this->createDiscussion();
+        $this->runWithUser(function () use ($disc1, $disc2) {
+            $this->createComment(['discussionID' => $disc1['discussionID']]);
+            $this->createComment(['discussionID' => $disc2['discussionID']]);
+            $this->assertEquals(2, $this->discussionModel->getCountParticipated());
+        }, $user2);
+
+        $this->assertEquals(0, $this->discussionModel->getCountParticipated());
+        $this->assertEquals(2, $this->discussionModel->getCountParticipated($user2['userID']));
     }
 }

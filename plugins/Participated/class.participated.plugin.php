@@ -6,7 +6,13 @@
  */
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Theme\VariableProviders\QuickLink;
+use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 
+/**
+ * Class ParticipatedPlugin
+ */
 class ParticipatedPlugin extends Gdn_Plugin {
 
     /** @var int|null  */
@@ -18,26 +24,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
      * @param Container $dic
      */
     public function container_init(Container $dic) {
-        $dic->rule(\Vanilla\Menu\CounterModel::class)
+        $dic
+            ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Participated\ParticipatedCounterProvider::class)])
         ;
-    }
-
-    /**
-     * Get the current user's total participated discussions.
-     *
-     * @return int|bool|null
-     */
-    protected function getCountParticipated() {
-        if ($this->countParticipated === null) {
-            $discussionModel = new DiscussionModel();
-            try {
-                $this->countParticipated = $discussionModel->getCountParticipated(null);
-            } catch (Exception $e) {
-                $this->countParticipated = false;
-            }
-        }
-        return $this->countParticipated;
     }
 
     /**
@@ -83,33 +73,6 @@ class ParticipatedPlugin extends Gdn_Plugin {
         CategoryModel::joinCategories($data);
 
         return $data;
-    }
-
-    /**
-     * Gets number of discussions user has commented on.
-     *
-     * @param DiscussionModel $sender
-     * @throws Exception if user is not logged in.
-     * @return int|false
-     */
-    public function discussionModel_getCountParticipated_create($sender) {
-        $userID = val(0, $sender->EventArguments);
-
-        if ($userID === null) {
-            if (!Gdn::session()->isValid()) {
-                throw new Exception(t('Could not get participated discussions for non logged-in user.'));
-            }
-            $userID = Gdn::session()->UserID;
-        }
-
-        $count = Gdn::sql()->select('c.DiscussionID','distinct','NumDiscussions')
-            ->from('Comment c')
-            ->where('c.InsertUserID', $userID)
-            ->groupBy('c.DiscussionID')
-            ->get();
-
-        $result = ($count instanceof Gdn_Dataset) ? $count->numRows() : false;
-        return $result;
     }
 
     /**
@@ -200,7 +163,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
         $page = val(0, $args);
 
         // Set criteria & get discussions data
-        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        [$offset, $limit] = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
         $discussionModel = new DiscussionModel();
 
         $sender->DiscussionData = $discussionModel->getParticipated(Gdn::session()->UserID, $offset, $limit);

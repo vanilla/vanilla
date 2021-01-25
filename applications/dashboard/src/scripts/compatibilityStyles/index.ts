@@ -50,6 +50,9 @@ import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { cssOut } from "./cssOut";
 export { cssOut };
 
+// Re-export for compatibility.
+export { trimTrailingCommas } from "./trimTrailingCommas";
+
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
 export let compatibilityStyles: () => void;
@@ -346,7 +349,7 @@ compatibilityStyles = useThemeCache(() => {
         minHeight: 0,
     });
 
-    cssOut(".Panel.Panel li + li", {
+    cssOut(".Panel .Box li + li", {
         paddingTop: forumFontsVariables().panelLink.spacer.default,
     });
 

@@ -10,11 +10,15 @@ use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Search\SearchService;
 
 /**
  * Interface for a search item.
  */
 abstract class AbstractSearchType {
+
+    /** @var SearchService */
+    protected $searchService;
 
     /**
      * @var string Class used to construct search result items.
@@ -53,6 +57,15 @@ abstract class AbstractSearchType {
      */
     public function getIndex(): string {
         return $this->getSearchGroup();
+    }
+
+    /**
+     * Set the search service.
+     *
+     * @param \Vanilla\Search\SearchService $searchService
+     */
+    public function setSearchService(SearchService $searchService) {
+        $this->searchService = $searchService;
     }
 
     /**
@@ -99,6 +112,14 @@ abstract class AbstractSearchType {
      */
     abstract public function getQuerySchema(): Schema;
 
+    /**
+     * Get the schema extension include additional schema rules not supported by some search drivers.
+     *
+     * @return Schema
+     */
+    public function getQuerySchemaExtension(): ?Schema {
+        return null;
+    }
     /**
      * Validate a query.
      *

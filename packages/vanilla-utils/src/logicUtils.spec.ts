@@ -25,6 +25,7 @@ describe("spaceshipCompare()", () => {
 describe("flattenObject()", () => {
     const nested = {
         key1: "val1",
+        isNull: null,
         nested: {
             nestedKey: "val2",
             array1: ["one", "two", "three"],
@@ -33,11 +34,12 @@ describe("flattenObject()", () => {
 
     const flattened = {
         key1: "val1",
+        isNull: null,
         "nested.nestedKey": "val2",
-        "nested.array1.0": "one",
-        "nested.array1.1": "two",
-        "nested.array1.2": "three",
+        "nested.array1": ["one", "two", "three"],
     };
+
+    const things = ["one", "two"];
 
     it("flattens objects", () => {
         expect(flattenObject(nested)).deep.equal(flattened);

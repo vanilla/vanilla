@@ -15,10 +15,6 @@ use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
-use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
-use Vanilla\Knowledge\Models\NavigationCacheProcessor;
-use Vanilla\Metadata\Parser\JsonLDParser;
-use Vanilla\Metadata\Parser\OpenGraphParser;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
@@ -26,7 +22,6 @@ use Vanilla\Models\ModelFactory;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\PageScraper;
 use Vanilla\Permissions;
 use Vanilla\PlainTextLengthValidator;
 use Vanilla\Search\AbstractSearchDriver;
@@ -39,11 +34,9 @@ use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
-use \Vanilla\Formatting\Formats;
 use Firebase\JWT\JWT;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Web\Page;
 use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
@@ -181,7 +174,8 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     // File base theme api provider
     ->rule(\Vanilla\Theme\ThemeService::class)
         ->setShared(true)
-        ->addCall("addThemeProvider", [new Reference(\Vanilla\Theme\FsThemeProvider::class)])
+        ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
+        ->addCall("addVariableProvider", [new Reference(QuickLinksVariableProvider::class)])
 
     ->rule(\Vanilla\Theme\ThemeSectionModel::class)
     ->setShared(true)

@@ -3,6 +3,11 @@ if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
 
+if (\Gdn::themeFeatures()->useNewQuickLinks()) {
+    echo \Gdn_Theme::module(\Vanilla\Theme\VariableProviders\QuickLinksModule::class);
+    return;
+}
+
 $Controller = Gdn::controller();
 $Session = Gdn::session();
 $Title = property_exists($Controller, 'Category') ? val('Name', $Controller->Category, '') : '';

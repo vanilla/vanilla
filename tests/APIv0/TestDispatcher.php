@@ -156,8 +156,12 @@ class TestDispatcher {
         if ($this->lastController === null) {
             throw new \Exception("The controller was not properly rendered.");
         }
-        if ($options[self::OPT_THROW_FORM_ERRORS] && isset($this->lastController->Form) && $this->lastController->Form instanceof \Gdn_Form) {
-            ModelUtils::validationResultToValidationException($this->lastController->Form, \Gdn::locale(), true);
+        if ($options[self::OPT_THROW_FORM_ERRORS]) {
+            $form = $this->lastController->Form ?? ($this->lastController->form ?? null);
+
+            if ($form) {
+                ModelUtils::validationResultToValidationException($form, \Gdn::locale(), true);
+            }
         }
 
         return $this->lastController;

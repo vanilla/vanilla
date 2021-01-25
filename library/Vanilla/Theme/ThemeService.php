@@ -13,6 +13,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\Asset\ThemeAsset;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
+use VanillaTests\Fixtures\QuickLinks\MockQuickLinksVariableProvider;
 
 /**
  * Handle custom themes.
@@ -37,6 +39,9 @@ class ThemeService {
 
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
+
+    /** @var VariableDefaultsProviderInterface[] */
+    private $variableDefaultsProviders = [];
 
     /** @var ConfigurationInterface $config */
     private $config;
@@ -104,6 +109,9 @@ class ThemeService {
      */
     public function addVariableProvider(VariablesProviderInterface $provider) {
         $this->variableProviders[] = $provider;
+        if ($provider instanceof VariableDefaultsProviderInterface) {
+            $this->variableDefaultsProviders[] = $provider;
+        }
     }
 
     /**
@@ -572,6 +580,11 @@ class ThemeService {
             $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 
-        $theme->overlayVariables($additionalVariables);
+        $defaults = [];
+        foreach ($this->variableDefaultsProviders as $defaultsProvider) {
+            $defaults = array_replace_recursive($defaults, $defaultsProvider->getVariableDefaults());
+        }
+
+        $theme->overlayVariables($additionalVariables, !empty($defaults) ? $defaults : null);
     }
 }

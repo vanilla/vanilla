@@ -48,7 +48,7 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
      */
     function truncateBasedOnLines() {
         const lineHeight = calculateLineHeight();
-        if (lineHeight !== null) {
+        if (lineHeight !== null && !Number.isNaN(lineHeight)) {
             const maxHeight = props.lines! * lineHeight;
             shave(ref.current!, maxHeight);
         }

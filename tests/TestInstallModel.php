@@ -242,6 +242,10 @@ class TestInstallModel extends InstallModel {
         if (class_exists(\SubcommunityModel::class)) {
             \SubcommunityModel::clearStaticCache();
         }
+
+        if (class_exists(\ReactionModel::class)) {
+            \ReactionModel::resetForTests();
+        }
     }
 
     /**

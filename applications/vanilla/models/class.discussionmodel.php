@@ -943,6 +943,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
         $this->EventArguments['SQL'] = $sql;
         $this->fireEvent('BeforeGetSubQuery');
+        $this->modifyTypeDiscussionQueryClause($safeWheres);
         $sql->where($safeWheres);
 
         $subQuery = $sql->getSelect(true);
@@ -951,7 +952,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $sql->select('d2.*')
             ->from('Discussion d2')
             ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
-
         $this->fireEvent('AfterGetSubQuery');
 
         // Add the UserDiscussion query.
@@ -1458,6 +1458,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
 
         $this->discussionSummaryQuery([], false);
+
+        $this->modifyTypeDiscussionQueryClause($wheres);
 
         if (!empty($wheres)) {
             $this->SQL->where($wheres);
@@ -2159,6 +2161,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * If a query asks for only discussion-type records, modifies the query to get 'discussion' and null values.
+     *
+     * @param array $wheres
+     */
+    public function modifyTypeDiscussionQueryClause(&$wheres) {
+        if (isset($wheres['d.Type']) && strtolower($wheres['d.Type']) === 'discussion') {
+            $this->SQL->beginWhereGroup()
+                ->where('d.Type', 'discussion')
+                ->orWhere('d.Type is null')
+                ->endWhereGroup();
+            unset($wheres['d.Type']);
+        }
+    }
+
+    /**
      * Marks the specified announcement as dismissed by the specified user.
      *
      * @param int $discussionID Unique ID of discussion being affected.
@@ -2826,9 +2843,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param bool $inc Whether to increment of recalculate from scratch.
      */
     public function updateUserDiscussionCount($userID, $inc = false) {
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         if ($inc) {
-            $user = $this->userModel->getID($userID);
-
             $countDiscussions = val('CountDiscussions', $user);
             // Increment if 100 or greater; Recalculate on 120, 140 etc.
             if ($countDiscussions >= 100 && $countDiscussions % 20 !== 0) {
@@ -2838,6 +2854,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     ->put();
 
                 $this->userModel->updateUserCache($userID, 'CountDiscussions', $countDiscussions + 1);
+                $this->addDirtyRecord('user', $userID);
                 return;
             }
         }
@@ -3026,6 +3043,50 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         return (bool)$bookmarked;
     }
+
+    /**
+     * Get the count of discussions a user has participated in.
+     *
+     * @param int|null $userID
+     *
+     * @return int
+     */
+    public function getCountParticipated(?int $userID = null): int {
+        $session = $this->getSessionInterface();
+        if ($userID === null) {
+            if (!$session->isValid()) {
+                throw new Exception(t('Could not get participated discussions for non logged-in user.'));
+            }
+            $userID = $session->UserID;
+        }
+
+        $cache = \Gdn::cache();
+        $key = "discussion/participatedCount/" . $userID;
+        $count = $cache->get($key);
+        if ($count === \Gdn_Cache::CACHEOP_FAILURE) {
+            $sql = clone $this->SQL;
+            $sql->reset();
+            $sqlResult = $sql
+                ->select('c.DiscussionID', 'COUNT(DISTINCT(%s))', 'NumDiscussions')
+                ->from('Comment c')
+                ->where('c.InsertUserID', $userID)
+                ->groupBy('c.InsertUserID')
+                ->get();
+
+            if (!($sqlResult instanceof Gdn_DataSet)) {
+                $count = 0;
+            } else {
+                $count = $sqlResult->firstRow(DATASET_TYPE_ARRAY)['NumDiscussions'] ?? 0;
+            }
+
+            $cache->store($key, $count, [
+                \Gdn_Cache::FEATURE_EXPIRY => 60 * 10, // 10 minutes.
+            ]);
+        }
+
+        return $count;
+    }
+
 
     /**
      * Bookmarks (or unbookmarks) a discussion for specified user.
@@ -3836,6 +3897,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $row['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
             $row['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
             $row['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
+            $row['score'] = $row['Score'] ?? 0;
+            $row['hot'] = $row['Score'] + $row['CountComments'];
             $type = $row['Type'] ?? '';
             $row['Type'] = ($type === self::REDIRECT_TYPE) ? self::DISCUSSION_TYPE : $type;
             $siteSection = $this->siteSectionModel
@@ -3941,6 +4004,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             'countComments:i' => 'The number of comments on the discussion.',
             'countViews:i' => 'The number of views on the discussion.',
             'score:i|n' => 'Total points associated with this post.',
+            'hot:i|n?' => 'Score points plus comments count.',
             'url:s?' => 'The full URL to the discussion.',
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
             'format:s?' => 'Format of the discussion',

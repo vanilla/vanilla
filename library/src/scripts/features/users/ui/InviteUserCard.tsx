@@ -18,6 +18,7 @@ import InputTextBlock, { InputTextBlockBaseClass } from "@library/forms/InputTex
 import Checkbox from "@library/forms/Checkbox";
 import { userCardClasses } from "@library/features/users/ui/inviteUserCardStyles";
 import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 interface IProps {
     defaultUsers: IComboBoxOption[];
@@ -27,6 +28,7 @@ interface IProps {
     sentInvitations: () => void;
     visible: boolean;
     closeModal: () => void;
+    errors?: Record<string, IError[]>;
 }
 
 export default function InviteUserCard(props: IProps) {
@@ -38,6 +40,7 @@ export default function InviteUserCard(props: IProps) {
         sentInvitations,
         visible,
         closeModal,
+        errors,
     } = props;
 
     const hasEmailInvitePermission = hasPermission("emailInvitations.add");
@@ -95,6 +98,7 @@ export default function InviteUserCard(props: IProps) {
                                         rows: 5,
                                         maxRows: 5,
                                     }}
+                                    errors={props.errors?.emails}
                                 />
                             )}
                             {inputEmails.trim() && (
@@ -123,9 +127,8 @@ export default function InviteUserCard(props: IProps) {
                                 className={classes.button}
                                 baseClass={ButtonTypes.PRIMARY}
                                 onClick={() => {
-                                    sentInvitations();
                                     setBoxChecked(false);
-                                    closeModal();
+                                    sentInvitations();
                                 }}
                             >
                                 {t("Invite")}

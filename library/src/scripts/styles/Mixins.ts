@@ -301,6 +301,7 @@ export class Mixins {
     static clickable = {
         itemState: (overwriteColors?: ILinkColorOverwritesWithOptions, options?: IClickableItemOptions): CSSObject => {
             const vars = globalVariables();
+            const cssProperty = "color";
             const { disableTextDecoration } = options || { disableTextDecoration: false };
             // We want to default to the standard styles and only overwrite what we want/need
             const linkColors = vars.links.colors;
@@ -329,54 +330,52 @@ export class Mixins {
 
             const styles = {
                 default: {
-                    color: mergedColors.default,
+                    [cssProperty]: mergedColors.default?.toString(),
                     textDecoration,
                 },
                 hover: {
-                    color: mergedColors.hover,
+                    [cssProperty]: mergedColors.hover?.toString(),
                     cursor: "pointer",
                     textDecoration,
                 },
                 focus: {
-                    color: mergedColors.focus,
+                    [cssProperty]: mergedColors.focus?.toString(),
                     textDecoration,
                 },
                 clickFocus: {
-                    color: mergedColors.focus,
+                    [cssProperty]: mergedColors.focus?.toString(),
                     textDecoration,
                 },
                 keyboardFocus: {
-                    color: mergedColors.keyboardFocus,
+                    [cssProperty]: mergedColors.keyboardFocus?.toString(),
                     textDecoration,
                 },
                 active: {
-                    color: mergedColors.active,
+                    [cssProperty]: mergedColors.active?.toString(),
                     cursor: "pointer",
                     textDecoration,
                 },
                 visited: mergedColors.visited
                     ? {
-                          color: mergedColors.visited,
+                          [cssProperty]: mergedColors.visited?.toString(),
                           textDecoration,
                       }
                     : undefined,
             };
 
             const final = {
-                color: styles.default.color?.toString(),
-                $nest: {
-                    "&&:hover": styles.hover,
-                    "&&:focus, &.isFocused": {
-                        ...(styles.focus ?? {}),
-                        ...(styles.clickFocus ?? {}),
-                    },
-                    "&&.focus-visible": {
-                        ...(styles.focus ?? {}),
-                        ...(styles.keyboardFocus ?? {}),
-                    },
-                    "&&:active": styles.active,
-                    "&:visited": styles.visited ?? undefined,
+                [cssProperty]: styles.default.color?.toString(),
+                "&&:hover": styles.hover,
+                "&&:focus, &.isFocused": {
+                    ...(styles.focus ?? {}),
+                    ...(styles.clickFocus ?? {}),
                 },
+                "&&.focus-visible": {
+                    ...(styles.focus ?? {}),
+                    ...(styles.keyboardFocus ?? {}),
+                },
+                "&&:active": styles.active,
+                "&:visited": styles.visited ?? undefined,
             };
 
             // @NOTE: color from fallbackBorderVariables needs to be changed to string type

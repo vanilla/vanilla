@@ -164,9 +164,10 @@ class AnswerModel implements EventFromRowInterface {
         }
 
         $discussionInsertUserID = $discussion['InsertUserID'] ?? $discussion['insertUserID'] ?? null;
+        $updatedAnswerUserID = $updatedAnswer['InsertUserID'] ?? $updatedAnswer['insertUserID'] ?? null;
 
         // Apply change effects
-        if ($change && $discussionInsertUserID != $updatedAnswer['InsertUserID']) {
+        if ($change && $discussionInsertUserID != null && $discussionInsertUserID != $updatedAnswerUserID) {
             // Update the user
             $userID = val('InsertUserID', $updatedAnswer);
             $this->recalculateUserQnA($userID);

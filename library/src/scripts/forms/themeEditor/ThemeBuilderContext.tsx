@@ -19,6 +19,7 @@ import { all } from "q";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 
 ///
 /// Types
@@ -205,6 +206,7 @@ function variableGenerator(variables: IThemeVariables) {
         navigation: navigationVariables(variables),
         homeWidgetItem: homeWidgetItemVariables({}, variables),
         homeWidgetContainer: homeWidgetContainerVariables({}, variables),
+        quickLinks: quickLinksVariables(variables),
     };
 
     // Mix in the addons generator variables.

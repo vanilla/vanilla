@@ -18,7 +18,7 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
     use CommunityApiTestTrait;
 
     /** @var string[] */
-    public static $addons = ["IndexPhotos"];
+    public static $addons = ["DiscussionExcerpt", "IndexPhotos"];
 
     /** @var array */
     private static $commentedDiscussionID;
@@ -54,7 +54,8 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
         ])['categoryID'];
         $headingDepth2a = $this->createCategory([
             'name' => 'Heading Depth 2',
-            'countComments' => 143
+            'countComments' => 143,
+            'displayAs' => 'heading',
         ])['categoryID'];
         $this->createDiscussion(['name' => 'Hello Discussion 2']);
         self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
@@ -62,7 +63,8 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
         $headingDepth2b = $this->createCategory([
             'name' => 'Heading Depth 2',
             'parentCategoryID' => $headingDepth1,
-            'countComments' => 143
+            'countComments' => 143,
+            'displayAs' => 'heading',
         ])['categoryID'];
 
 
@@ -156,6 +158,10 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'Mixed' => [
                 ['Vanilla.Categories.Layout' => 'mixed'],
                 'Category List (Mixed)',
+            ],
+            'Foundation' => [
+                ['Vanilla.Categories.Layout' => 'foundation'],
+                'Category List (Foundation & Grid)',
             ],
         ];
     }

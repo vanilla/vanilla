@@ -197,14 +197,28 @@ class UserSearchType extends AbstractSearchType {
                     "enum" => [
                         "dateLastActive",
                         "-dateLastActive",
-                        "name",
-                        "-name"
                     ],
                 ],
             ],
             $this->schemaFields
         );
         return Schema::parse($schemaFields);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getQuerySchemaExtension(): Schema {
+        return Schema::parse([
+            "sort:s?" => [
+                "enum" => [
+                    "countPosts",
+                    "-countPosts",
+                    "name",
+                    "-name"
+                ],
+            ],
+        ]);
     }
 
     /**

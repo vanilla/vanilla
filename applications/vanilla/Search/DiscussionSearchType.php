@@ -21,10 +21,8 @@ use Vanilla\Search\CollapsableSerachQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
-use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Models\CrawlableRecordSchema;
 
 /**
  * Search record type for a discussion.
@@ -232,6 +230,22 @@ class DiscussionSearchType extends AbstractSearchType {
                 'items' => [
                     'type' => 'string',
                     'enum' => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getQuerySchemaExtension(): Schema {
+        return Schema::parse([
+            "sort:s?" => [
+                "enum" => [
+                    "score",
+                    "-score",
+                    "hot",
+                    "-hot"
                 ],
             ],
         ]);

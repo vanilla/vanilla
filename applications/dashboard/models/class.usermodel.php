@@ -2858,6 +2858,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $row['CountComments'] = 0;
         }
 
+        $row['CountPosts'] = $row['CountComments'] + $row['CountDiscussions'];
         $result = ArrayUtils::camelCase($row);
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
@@ -2935,6 +2936,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "title?",
                 "countDiscussions?",
                 "countComments?",
+                "countPosts?",
                 "label?",
             ]);
             $result->add($this->schema());

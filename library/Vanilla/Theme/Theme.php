@@ -275,21 +275,29 @@ class Theme implements \JsonSerializable {
      * Overlay a set of variables on the theme.
      *
      * @param array $variables The variables to overlay.
+     * @param array|null $defaults Default variable to apply under the theme variables.
      */
-    public function overlayVariables(array $variables) {
-        if (empty($variables)) {
+    public function overlayVariables(array $variables, ?array $defaults = null) {
+        if (empty($variables) && empty($defaults)) {
             return;
         }
 
         // Get the base variables asset.
         $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variablesAsset instanceof JsonThemeAsset) {
+            $result = $variablesAsset->getValue();
+            if ($defaults !== null) {
+                $result = ArrayUtils::mergeRecursive($defaults, $result, function ($arr1, $arr2) {
+                    return $arr2;
+                });
+            }
+
             // We want to fully replace arrays instead of merging them.
             // This mirrors our frontend variable handling.
-            $merged = ArrayUtils::mergeRecursive($variablesAsset->getValue(), $variables, function ($arr1, $arr2) {
+            $result = ArrayUtils::mergeRecursive($result, $variables, function ($arr1, $arr2) {
                 return $arr2;
             });
-            $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
+            $newAsset = new JsonThemeAsset(json_encode($result, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
             $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
         }
     }

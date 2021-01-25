@@ -55,7 +55,7 @@ export function registerMemberSearchDomain() {
                 };
             },
             getSortValues: () => {
-                return [
+                const sorts = [
                     {
                         content: "Recently Active",
                         value: "-dateLastActive",
@@ -73,6 +73,13 @@ export function registerMemberSearchDomain() {
                         value: "-dateInserted",
                     },
                 ];
+                if (SearchService.supportsExtensions()) {
+                    sorts.push({
+                        content: "Posts",
+                        value: "-countPosts",
+                    });
+                }
+                return sorts;
             },
             isIsolatedType: () => true,
             ResultComponent: Member,

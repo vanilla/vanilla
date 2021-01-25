@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+  user:
+    x-addon: "dashboard"
+    name: "User"
+    type: "user"
 paths:
   /users:
     get:

@@ -8,7 +8,6 @@
 namespace Vanilla\Models;
 
 use Garden\Web\RequestInterface;
-use Gdn;
 use Gdn_Session;
 use UserModel;
 use Vanilla\Addon;
@@ -16,6 +15,7 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
@@ -149,6 +149,7 @@ class SiteMeta implements \JsonSerializable {
      * @param FormatService $formatService
      * @param UserModel $userModel
      * @param AddonManager $addonManager
+     * @param SearchService $searchService
      */
     public function __construct(
         RequestInterface $request,
@@ -160,7 +161,8 @@ class SiteMeta implements \JsonSerializable {
         Gdn_Session $session,
         FormatService $formatService,
         UserModel $userModel,
-        AddonManager $addonManager
+        AddonManager $addonManager,
+        SearchService $searchService
     ) {
         $this->host = $request->getHost();
 

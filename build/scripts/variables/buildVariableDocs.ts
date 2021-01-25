@@ -8,6 +8,7 @@ import { JsonSchemaConverter, VariableParser } from "@vanilla/variable-parser";
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
+import { boxExpander } from "./boxExpander";
 import { DIST_DIRECTORY, VANILLA_ROOT } from "../env";
 import { print, printError, printSection } from "../utility/utils";
 import { backgroundExpander } from "./backgroundExpander";
@@ -21,7 +22,8 @@ const parser = VariableParser.create()
     .addTypeExpander(spacingExpander)
     .addTypeExpander(borderExpander)
     .addTypeExpander(clickableExpander)
-    .addTypeExpander(backgroundExpander);
+    .addTypeExpander(backgroundExpander)
+    .addTypeExpander(boxExpander);
 
 const pattern = "**/*{Styles,styles,variables,Variables}.{ts,tsx}";
 

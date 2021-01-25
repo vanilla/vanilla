@@ -363,6 +363,21 @@ class DiscussionsTest extends AbstractResourceTest {
     }
 
     /**
+     * Make sure specifying discussion type returns records from the db where the type is null.
+     */
+    public function testGettingTypeDiscussion(): void {
+        $addedDiscussions = $this->insertDiscussions(4);
+        foreach ($addedDiscussions as $discussion) {
+            $this->assertTrue(is_null($discussion['Type']));
+        }
+        $retrievedDiscussions = $this->api()->get($this->baseUrl, ['type' => 'discussion'])->getBody();
+        $retrievedDiscussionsIDs = array_column($retrievedDiscussions, 'discussionID');
+        foreach ($addedDiscussions as $discussion) {
+            $this->assertTrue(in_array($discussion['DiscussionID'], $retrievedDiscussionsIDs));
+        }
+    }
+
+    /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords() {

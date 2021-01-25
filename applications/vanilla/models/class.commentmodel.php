@@ -1365,6 +1365,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $result['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
             $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
             $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
+            $result['score'] = $row['Score'] ?? 0;
             $siteSection = $this->siteSectionModel
                 ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
             $result['locale'] = $siteSection->getContentLocale();
@@ -1533,11 +1534,11 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      *
      * Events: BeforeUpdateCommentCount.
      *
+     * @param array|int $discussion
+     * @param array $options
+     *
      * @since 2.0.0
      * @access public
-     *
-     * @param int $discussionID Unique ID of the discussion we are updating.
-     * @param array $options
      *
      * @since 2.3 Added the $options parameter.
      */
@@ -1547,7 +1548,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->options($options);
             $discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $discussion])->firstRow(DATASET_TYPE_ARRAY);
         }
-        $discussionID = $discussion['DiscussionID'];
+        $discussionID = $discussion['DiscussionID'] ?? null;
 
         $this->fireEvent('BeforeUpdateCommentCountQuery');
 
@@ -1639,6 +1640,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 ->set('CountComments', 'CountComments + 1', false)
                 ->where('UserID', $userID)
                 ->put();
+            $this->addDirtyRecord('user', $userID);
         } else {
             // Retrieve a comment count
             $countComments = $this->SQL

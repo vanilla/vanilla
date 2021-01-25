@@ -99,6 +99,9 @@ export default class UserActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
+    public static clearInviteUsersAC = createAction<{ userID: number }>("CLEAR_INVITE_USER");
+    public clearInviteUsers = this.bindDispatch(UserActions.clearInviteUsersAC);
+
     public static inviteUsersACs = createAction.async<IInviteUsersByGroupIDQuery, IInvitees[], IApiError>(
         "INVITE_USERS",
     );

@@ -406,9 +406,11 @@ class RoleRequestsTest extends AbstractAPIv2Test {
         $this->api()->setUserID($application['userID']);
         $updateAttributes = ['body' => 'new body', 'format' => 'markdown'];
         $application['attributes'] = $updateAttributes;
-        $this->api()->post('/role-requests/applications', $application)->getBody();
-        $newApplication = $this->api()->get('/role-requests/applications', ['roleRequestID' => $application['roleRequestID']])->getBody();
-        $this->assertArraySubsetRecursive($newApplication[0]['attributes'], $updateAttributes);
+        $id = $application['roleRequestID'];
+        unset($application['roleRequestID']);
+        $newApplication = $this->api()->post('/role-requests/applications', $application)->getBody();
+        $this->assertSame($id, $newApplication['roleRequestID']);
+        $this->assertArraySubsetRecursive($newApplication['attributes'], $updateAttributes);
     }
 
     /**

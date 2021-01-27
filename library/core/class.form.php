@@ -3381,7 +3381,8 @@ PASSWORDMETER;
             'fields',
             'inlineerrors',
             'wrap',
-            'categorydata'
+            'categorydata',
+            'additionalpermissions'
         ];
         $return = '';
 

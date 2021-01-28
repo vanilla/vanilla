@@ -9,7 +9,7 @@
                 <?php
                 $Username = htmlspecialchars(val('Name', $User));
                 $Photo = val('Photo', $User);
-                $userID = $user->UserID ?? $user['UserID'];
+                $userID = $User->UserID ?? $User['UserID'];
 
 
                 if (val('Deleted', $User)) {

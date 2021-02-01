@@ -31,6 +31,7 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
@@ -2226,7 +2227,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * An event firing wrapper for Gdn_Model::setField().
      *
      * @param int $rowID
-     * @param string $property
+     * @param string|array $property
      * @param mixed $value
      */
     public function setField($rowID, $property, $value = false) {
@@ -2302,6 +2303,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         // Validate category permissions.
         $categoryID = val('CategoryID', $formPostValues);
         if ($categoryID !== false) {
+            // Trim any leading '0's to prevent inserting discussion into restricted category (https://github.com/vanilla/vanilla-patches/issues/716)
+            $categoryID = ltrim($categoryID, '0');
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
             if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
@@ -3912,6 +3915,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             if ($row['pinned'] ?? false) {
                 $row['labelCodes'][] = self::ANNOUNCEMENT_LABEL;
             }
+
+            $searchService = Gdn::getContainer()->get(SearchService::class);
+            /** @var SearchTypeQueryExtenderInterface $extender */
+            foreach ($searchService->getExtenders() as $extender) {
+                $extender->extendRecord($row, 'discussion');
+            }
         }
 
         $scheme = new CamelCaseScheme();
@@ -4012,6 +4021,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             'labelCodes:a?' => ['items' => ['type' => 'string']],
             'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
             'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
+            'groupID:i?' => [
+                'x-null-value' => -1,
+            ],
         ]);
         return $result;
     }

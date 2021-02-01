@@ -1,14 +1,18 @@
 <?php
 if (!defined('APPLICATION')) exit();
+
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
+BoxThemeShim::startHeading();
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
+BoxThemeShim::endHeading();
 if ($this->data('EnableFollowingFilter')) {
     echo '<div class="PageControls Top">'.categoryFilters().'</div>';
 }
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
 $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 ?>
-<div class="Categories">
+<div class="Categories pageBox">
     <?php if ($this->CategoryData->numRows() > 0): ?>
         <?php foreach ($this->CategoryData->result() as $Category) :
             if ($Category->CategoryID <= 0)
@@ -21,14 +25,17 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 
             ?>
 
+        <?php if (!BoxThemeShim::isActive()) { ?>
             <div class="CategoryBox Category-<?php echo $Category->UrlCode; ?>">
+        <?php } ?>
+
                 <?php
                     if (!$dataDriven) {
                         if ($this->Category->DisplayAs === "Discussions") {
                             echo $options;
                         }
                     } else {
-                        echo "<div class='CategoryBox-Head'>";
+                        echo "<div class='CategoryBox-Head pageHeadingBox'>";
                     }
                 ?>
                 <?php if ($this->Category->DisplayAs === "Heading") : ?>
@@ -61,7 +68,7 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
                     (!empty($this->DiscussionData) && $this->DiscussionData->numRows() > 0) ||
                     (!empty($this->AnnounceData) && $this->AnnounceData->numRows() > 0)
                 ) : ?>
-                    <ul class="DataList Discussions">
+                    <ul class="DataList Discussions pageBox">
                         <?php include($this->fetchViewLocation('discussions', 'discussions')); ?>
                     </ul>
 
@@ -79,9 +86,13 @@ $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
                         echo '<div class="Empty">'.t('No discussions were found.').'</div>';
                     } ?>
                 <?php endif; ?>
+            <?php if (!BoxThemeShim::isActive()) { ?>
             </div>
+            <?php } ?>
         <?php endforeach; ?>
     <?php else: ?>
+        <?php BoxThemeShim::startBox(); ?>
         <div class="Empty"><?php echo t('No categories were found.'); ?></div>
+        <?php BoxThemeShim::endBox(); ?>
     <?php endif; ?>
 </div>

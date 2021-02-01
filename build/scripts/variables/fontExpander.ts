@@ -80,6 +80,14 @@ export const fontExpander: ITypeExpander = {
                 key: variable.key + ".letterSpacing",
                 type: ["string", "number"],
             },
+            {
+                ...variable,
+                title: variable.title + " - " + "Text Decoration",
+                description: "Apply some decoration to the text.",
+                key: variable.key + ".textDecoration",
+                type: "string",
+                enum: ["none", "underline", "overline", "line-through"]
+            },
         ];
     },
 };

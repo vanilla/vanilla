@@ -3,7 +3,6 @@
  * @license gpl-2.0-only
  */
 
-import { IBoxOptions } from "@library/layout/Box.styles";
 import {
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
@@ -12,11 +11,14 @@ import {
     EMPTY_STATE_COLORS,
     IBackground,
     IBorderStyles,
+    IBoxOptions,
     IFont,
+    IContentBoxes,
     ISpacing,
     IStateColors,
 } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpers";
+import { DeepPartial } from "redux";
 
 export class Variables {
     constructor() {
@@ -37,7 +39,17 @@ export class Variables {
         return {
             borderType: BorderType.NONE,
             background: Variables.background(vars.background ?? {}),
+            spacing: Variables.spacing(vars.spacing ?? {}),
+            border: Variables.border(vars.border ?? {}),
             ...vars,
+        };
+    };
+
+    static contentBoxes = (vars?: DeepPartial<IContentBoxes>): IContentBoxes => {
+        return {
+            depth1: Variables.box(vars?.depth1 ?? {}),
+            depth2: Variables.box(vars?.depth2 ?? {}),
+            depth3: Variables.box(vars?.depth3 ?? {}),
         };
     };
 }

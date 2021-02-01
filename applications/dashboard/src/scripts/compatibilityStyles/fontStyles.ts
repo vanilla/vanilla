@@ -67,6 +67,14 @@ export const fontCSS = () => {
         ...Mixins.font(globalVars.meta.text),
     });
 
+    cssOut(".Meta .MItem:first-of-type", {
+        marginLeft: 0,
+    });
+
+    cssOut(".Meta .MItem.RSS + .MItem", {
+        marginLeft: 0,
+    });
+
     cssOut(
         `
         .Content .Title,

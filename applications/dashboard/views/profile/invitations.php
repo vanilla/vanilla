@@ -1,5 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit(); ?>
+    <?php BoxThemeShim::startHeading() ?>;
     <h1 class="H"><?php echo t('Invitations'); ?></h1>
+    <?php BoxThemeShim::endHeading(); ?>;
 <?php
 //render form
 if ($this->InvitationsLeft !== 0 && $this->isOwnProfile) {
@@ -27,6 +31,7 @@ if ($this->InvitationData->numRows() > 0) {
     echo '<div class="PageControls Top">';
     PagerModule::write($PagerOptions);
     echo '</div>';
+    BoxThemeShim::startBox();
     ?>
     <table class="Invitations DataTable">
         <thead>
@@ -89,4 +94,5 @@ if ($this->InvitationData->numRows() > 0) {
         </tbody>
     </table>
 <?php
+    BoxThemeShim::endBox();
 }

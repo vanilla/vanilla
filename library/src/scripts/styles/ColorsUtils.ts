@@ -15,7 +15,7 @@ export class ColorsUtils {
      * Calculation is based off of this formula. http://alienryderflex.com/hsp.html
      * @param color - The color we're checking
      */
-    static isLightColor = (referenceColor: ColorHelper | string) => {
+    static isLightColor = (referenceColor: ColorHelper | string): boolean => {
         const color = ColorsUtils.ensureColorHelper(referenceColor);
         const r = color.red();
         const b = color.blue();
@@ -25,7 +25,7 @@ export class ColorsUtils {
         return result >= 150;
     };
 
-    static ensureColorHelper = (colorValue: string | ColorHelper) => {
+    static ensureColorHelper = (colorValue: string | ColorHelper): ColorHelper => {
         return typeof colorValue === "string" ? color(colorValue) : colorValue;
     };
 
@@ -91,7 +91,7 @@ export class ColorsUtils {
         inverse?: boolean;
         flipWeightForDark?: boolean;
         debug?: boolean;
-    }) => {
+    }): ColorHelper => {
         const { color: referenceColor, inverse = false, flipWeightForDark = false, debug = false } = props;
         const colorObj = ColorsUtils.ensureColorHelper(referenceColor);
         let weight = props.weight;
@@ -139,7 +139,7 @@ export class ColorsUtils {
         weight: number,
         flipIfMax: boolean = true,
         debug: boolean = false,
-    ) => {
+    ): ColorHelper => {
         const colorValue = ColorsUtils.ensureColorHelper(referenceColorValue);
         const colorLightness = colorValue.lightness();
         let weightOffset = 1;
@@ -173,7 +173,11 @@ export class ColorsUtils {
      * @param percentage - The amount you want to mix the two colors
      * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
      */
-    static modifyColorSaturationBasedOnLightness = (c: ColorHelper | string, weight: number, flip: boolean = false) => {
+    static modifyColorSaturationBasedOnLightness = (
+        c: ColorHelper | string,
+        weight: number,
+        flip: boolean = false,
+    ): ColorHelper => {
         const colorObj = ColorsUtils.ensureColorHelper(c);
         if (weight > 1 || weight < 0) {
             throw new Error("mixAmount must be a value between 0 and 1 inclusively.");

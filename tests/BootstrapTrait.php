@@ -217,8 +217,9 @@ trait BootstrapTrait {
 
         // Create a backup of the config.
         $bak = [];
+        $removeFlag = uniqid();
         foreach ($config as $key => $value) {
-            $bak[$key] = $c->get($key, null);
+            $bak[$key] = $c->get($key, $removeFlag);
         }
 
         try {
@@ -230,7 +231,11 @@ trait BootstrapTrait {
             return $r;
         } finally {
             foreach ($bak as $key => $value) {
-                $c->set($key, $value, true, false);
+                if ($value === $removeFlag) {
+                    $c->remove($key, false);
+                } else {
+                    $c->set($key, $value, true, false);
+                }
             }
         }
     }

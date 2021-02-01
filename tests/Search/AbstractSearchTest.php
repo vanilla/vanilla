@@ -35,6 +35,9 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
     use ModelTestTrait;
     use CategoryAndDiscussionApiTestTrait;
 
+    /** @var int */
+    const ADMIN_USER_ID = 2;
+
     /** @var HttpResponse */
     protected $lastSearchResponse;
 
@@ -97,6 +100,7 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
         $container->addCall('registerSearchIndexTemplate', [new Reference(CommentSearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(DiscussionSearchIndexTemplate::class)]);
         $container->addCall('registerSearchIndexTemplate', [new Reference(UserSearchIndexTemplate::class)]);
+
 
         static::configureSearchContainer($container);
     }

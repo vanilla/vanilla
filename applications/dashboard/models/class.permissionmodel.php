@@ -1311,6 +1311,7 @@ class PermissionModel extends Gdn_Model {
      */
     public static function resetAllRoles($type = null) {
         // Retrieve an array containing all available roles.
+        RoleModel::$Roles = null;
         $roleModel = new RoleModel();
         if ($type) {
             $result = $roleModel->getByType($type)->resultArray();

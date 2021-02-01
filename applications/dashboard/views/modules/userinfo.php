@@ -1,12 +1,18 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 if (Gdn::config('Garden.Profile.ShowAbout')) {
     require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Profile', 'Dashboard');
-
+    if (!BoxThemeShim::isActive()) {
+        echo '<div class="About P">';
+    }
+        BoxThemeShim::startHeading();
+        echo '<h2 class="H">' . t('About') . '</h2>';
+        BoxThemeShim::endHeading();
+        BoxThemeShim::startBox('userInfoBox About');
+        $this->fireEvent('BeforeAboutList');
     ?>
-    <div class="About P">
-        <h2 class="H"><?php echo t('About'); ?></h2>
-        <?php  $this->fireEvent('BeforeAboutList');  ?>
         <dl class="About">
             <?php
             if ($this->User->Banned) {
@@ -76,6 +82,11 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             ?>
         </dl>
         <?php  $this->fireEvent('AfterAboutList');  ?>
-    </div>
+        <?php
+            BoxThemeShim::endBox();
+            if (!BoxThemeShim::isActive()) {
+                echo '</div>'; // We don't render the wrapping "div.About.P" if we are using the shim.
+            }
+        ?>
 <?php
 }

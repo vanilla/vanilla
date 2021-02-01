@@ -71,7 +71,7 @@ class Pocket {
     public $ShowInDashboard = false;
 
     /** @var array */
-    public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
+    public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'discussion' => 'comments'];
 
     /** @var array */
     public $Attributes = [];

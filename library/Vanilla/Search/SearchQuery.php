@@ -339,4 +339,13 @@ abstract class SearchQuery {
     public function driver(): string {
         return '';
     }
+
+    /**
+     * Does query and driver support extenders
+     *
+     * @return bool
+     */
+    public function supportsExtenders(): bool {
+        return false;
+    }
 }

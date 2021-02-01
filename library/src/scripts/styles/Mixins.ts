@@ -7,10 +7,12 @@ import {
     IBorderRadiusOptions,
     IBorderRadiusOutput,
     IBorderStyles,
+    IBoxOptions,
     IClickableItemOptions,
     IFont,
     ILinkColorOverwritesWithOptions,
     IMixedBorderStyles,
+    IContentBoxes,
     ISimpleBorderStyle,
     ISpacing,
     TLength,
@@ -37,10 +39,120 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
 import { monoFallbacks, fontFallbacks } from "@library/styles/fontFallbacks";
 import { Variables } from "@library/styles/Variables";
+import { BorderType, singleBorder } from "@library/styles/styleHelpersBorders";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { notEmpty } from "@vanilla/utils";
 
 export class Mixins {
     constructor() {
         throw new Error("Not to be instantiated");
+    }
+
+    public static box = (boxOptions: IBoxOptions): CSSObject => {
+        let { background, borderType, spacing, border } = boxOptions;
+        const globalVars = globalVariables();
+
+        border = {
+            ...globalVariables().borderType.contentBox,
+            ...border,
+        };
+
+        const boxHasSetPaddings = Object.values(spacing).filter(notEmpty).length > 0;
+
+        const hasBackground = (background.color || background.image) && !background.unsetBackground;
+
+        // We have a clearly defined box of sometype.
+        // Anything that makes the box stand out from the background on all side
+        // Means we should apply some default behaviours, like paddings, and borderRadius.
+        const hasFullOutline = [BorderType.BORDER, BorderType.SHADOW].includes(borderType) || hasBackground;
+
+        if (!boxHasSetPaddings && hasFullOutline) {
+            spacing = { horizontal: 16, vertical: borderType === BorderType.SEPARATOR ? 0 : 16 };
+        }
+
+        return {
+            // Resets
+            padding: 0,
+            border: "none",
+            boxShadow: "none",
+            borderRadius: hasFullOutline ? ((border.radius ?? globalVars.border.radius) as any) : 0,
+            background: "none",
+            clear: "both",
+
+            // Debugging
+            "--border-type": borderType,
+
+            "&:before": {
+                display: "none",
+            },
+            "&:after": {
+                display: "none",
+            },
+
+            // Apply styles
+            ...Mixins.background(background),
+            ...Mixins.borderType(borderType, { border }),
+            ...Mixins.padding(spacing),
+            ...(hasFullOutline || borderType === BorderType.SEPARATOR
+                ? {
+                      "& .pageBox:first-of-type:before": {
+                          // Hide separator
+                          display: "none",
+                      },
+                      "& .pageBox:last-of-type:after": {
+                          // Hide separator
+                          display: "none",
+                      },
+                  }
+                : {}),
+            ...(hasFullOutline
+                ? {
+                      "& + .pageBox": {
+                          marginTop: 16,
+                      },
+                  }
+                : {}),
+        };
+    };
+
+    public static borderType(borderType: BorderType, options?: { border?: IBorderStyles }): CSSObject {
+        switch (borderType) {
+            case BorderType.BORDER:
+                return {
+                    ...Mixins.border(options?.border),
+                };
+            case BorderType.SHADOW:
+                return {
+                    ...shadowHelper().embed(),
+                };
+            case BorderType.SEPARATOR:
+                return {
+                    "&:before": {
+                        content: `""`,
+                        display: "block",
+                        height: 16,
+                        width: "calc(100% + 16px)",
+                        marginLeft: -8,
+                        borderTop: singleBorder(),
+                    },
+                    "&:after": {
+                        content: `""`,
+                        display: "block",
+                        height: 16,
+                        width: "calc(100% + 16px)",
+                        marginLeft: -8,
+                        borderBottom: singleBorder(),
+                    },
+                    // & + & doesn't work.
+                    // https://github.com/emotion-js/emotion/issues/1922
+                    "& + .pageBox:before": {
+                        borderTop: "none",
+                    },
+                };
+            case BorderType.NONE:
+            default:
+                return {};
+        }
     }
 
     private static spacing(property: "margin" | "padding", spacings?: ISpacing): CSSObject {
@@ -110,6 +222,7 @@ export class Mixins {
             fontFamily: vars.family ? Mixins.fontFamilyWithDefaults(vars.family) : vars.family,
             textTransform: vars.transform,
             letterSpacing: vars.letterSpacing,
+            textDecoration: vars.textDecoration,
         };
     }
 
@@ -287,6 +400,11 @@ export class Mixins {
 
     static background(vars: IBackground): CSSObject {
         const image = getBackgroundImage(vars.image);
+        if (vars.unsetBackground) {
+            return {
+                background: "none",
+            };
+        }
         return {
             backgroundColor: vars.color ? ColorsUtils.colorOut(vars.color) : undefined,
             backgroundAttachment: vars.attachment,
@@ -365,19 +483,18 @@ export class Mixins {
 
             const final = {
                 [cssProperty]: styles.default.color?.toString(),
-                "&&:hover": styles.hover,
-                "&&:focus, &.isFocused": {
+                "&:visited": styles.visited ?? undefined,
+                "&:hover": styles.hover,
+                "&:focus, &.isFocused": {
                     ...(styles.focus ?? {}),
                     ...(styles.clickFocus ?? {}),
                 },
-                "&&.focus-visible": {
+                "&.focus-visible": {
                     ...(styles.focus ?? {}),
                     ...(styles.keyboardFocus ?? {}),
                 },
-                "&&:active": styles.active,
-                "&:visited": styles.visited ?? undefined,
+                "&:active": styles.active,
             };
-
             // @NOTE: color from fallbackBorderVariables needs to be changed to string type
             // @ts-ignore
             return final;
@@ -506,6 +623,14 @@ export class Mixins {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                flexWrap: wrap ? "wrap" : "nowrap",
+            };
+        },
+        spaceBetween: (wrap = false): CSSObject => {
+            return {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
                 flexWrap: wrap ? "wrap" : "nowrap",
             };
         },

@@ -25,6 +25,16 @@ class DiscussionsModule extends Gdn_Module {
     /** @var bool Whether to show the discussion author avatar. */
     private $showPhotos = false;
 
+    /** @var string */
+    private $title = 'Recent Discussions';
+
+    /**
+     * Render the full discussion item instead of the minimal module version.
+     *
+     * @var bool
+     */
+    private $fullView = false;
+
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
@@ -53,6 +63,34 @@ class DiscussionsModule extends Gdn_Module {
      */
     public function getShowPhotos() {
         return $this->showPhotos;
+    }
+
+    /**
+     * @param bool $fullView
+     */
+    public function setFullView(bool $fullView): void {
+        $this->fullView = $fullView;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void {
+        $this->title = $title;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullView(): bool {
+        return $this->fullView;
     }
 
     /**

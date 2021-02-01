@@ -222,7 +222,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const style = styleFactory("searchResult");
     const metaVars = metasVariables();
 
-    const linkColors = Mixins.clickable.itemState();
+    const linkColors = Mixins.clickable.itemState({ skipDefault: true });
 
     const title = style("title", {
         display: "block",

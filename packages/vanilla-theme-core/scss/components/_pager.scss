@@ -93,7 +93,9 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 }
 
 .CommentHeading {
-    float: left;
+    @if $staticVariables {
+        float: left;
+    }
     min-height: $pager_height;
     display: flex;
     align-items: center;
@@ -352,8 +354,10 @@ a.MoreWrap,
         float: none;
         height: #{$pager_height + 2px};
 
-        @include maxWidth {
-            margin: 0;
+        @if $staticVariables {
+            @include maxWidth {
+                margin: 0;
+            }
         }
     }
 }

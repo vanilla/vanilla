@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit(); ?>
     <div class="ActivityFormWrap">
     <h1 class="H"><?php echo $this->data('Title'); ?></h1>
 <?php
@@ -8,7 +8,9 @@ $this->fireEvent('BeforeStatusForm');
 $Session = Gdn::session();
 if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
+    BoxThemeShim::startHeading();
     echo '<h2 class="sr-only">'.t('Post Comment').'</h2>';
+    BoxThemeShim::endHeading();
     echo $this->Form->open(['action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity']);
     echo $this->Form->errors();
     echo $this->Form->bodyBox('Comment', ['Wrap' => true]);
@@ -20,9 +22,12 @@ if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo $this->Form->close();
     echo '</div>';
 }
+
 echo '</div>';
+BoxThemeShim::startHeading();
 echo '<h2 class="sr-only">'.t('Activity List').'</h2>';
-echo '<ul class="DataList Activities">';
+BoxThemeShim::endHeading();
+echo '<ul class="DataList Activities pageBox">';
 
 $Activities = $this->data('Activities', []);
 if (count($Activities) > 0) {

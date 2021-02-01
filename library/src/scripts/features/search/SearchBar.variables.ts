@@ -37,7 +37,7 @@ export const searchBarVariables = useThemeCache((forcedVars?: IThemeVariables) =
 
     const border = makeThemeVars("border", {
         color: globalVars.border.color,
-        width: globalVars.border.width,
+        width: globalVars.borderType.formElements.default.width,
         radius: globalVars.borderType.formElements.default.radius,
         inset: false,
     });

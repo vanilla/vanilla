@@ -4,7 +4,7 @@ function writeConnection($row) {
     $c = Gdn::controller();
     $connected = val('Connected', $row);
     ?>
-    <li id="<?php echo "Provider_{$row['ProviderKey']}"; ?>" class="Item">
+    <li id="<?php echo "Provider_{$row['ProviderKey']}"; ?>" class="Item pageBox">
         <div class="Connection-Header">
          <span class="IconWrap">
             <?php

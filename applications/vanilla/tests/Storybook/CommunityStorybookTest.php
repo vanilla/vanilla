@@ -8,6 +8,7 @@
 namespace VanillaTests\Storybook;
 
 use Vanilla\CurrentTimeStamp;
+use Vanilla\FeatureFlagHelper;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -28,8 +29,12 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
      */
     public function testSetup() {
         CurrentTimeStamp::mockTime('Dec 1 2019');
-        \Gdn::config()->saveToConfig('Vanilla.Categories.Use', true);
-        \Gdn::config()->saveToConfig('Vanilla.Categories.DoHeadings', true);
+        \Gdn::config()->saveToConfig([
+            'Vanilla.Categories.Use' => true,
+            'Vanilla.Categories.DoHeadings' => true,
+            'Feature.NewQuickLinks.Enabled' => true,
+        ]);
+
 
         $customCat = $this->createCategory([
             'name' => 'My Custom Category',

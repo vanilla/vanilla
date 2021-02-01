@@ -42,7 +42,9 @@
 
 .Section-ConversationList {
 
-    @include noPanel;
+    @if $staticVariables {
+        @include noPanel;
+    }
 }
 
 .Section-Conversation {

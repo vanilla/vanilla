@@ -1,12 +1,15 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit(); ?>
 <div class="FormTitleWrapper">
-<?php
-   echo $this->Form->open();
-?>
 <h1 class="H"><?php echo t('Signatures'); ?></h1>
+<?php BoxThemeShim::startBox(); ?>
+<?php
+echo $this->Form->open();
+?>
 <h2 class="H"><?php echo t('My Signature'); ?></h2>
    <?php echo $this->Form->errors(); ?>
-   <ul>
+   <ul class="pageBox">
       <?php
       if (isset($this->Data['Plugin-Signatures-ForceEditing']) && $this->Data['Plugin-Signatures-ForceEditing'] != false) {
          ?>
@@ -46,8 +49,7 @@
    ?>
 </ul>
 <h2 class="H"><?php echo t('Forum Signature Settings'); ?></h2>
-<ul>
-   <li>
+<ul class="pageBox">
       <?php
       echo $this->Form->checkBox('Plugin.Signatures.HideAll','Hide signatures always');
       if (!c('Signatures.Hide.Mobile', true)) {
@@ -58,4 +60,5 @@
    </li>
 </ul>
 <?php echo $this->Form->close('Save', '', ['class' => 'Button Primary']); ?>
+<?php BoxThemeShim::endBox() ?>
 </div>

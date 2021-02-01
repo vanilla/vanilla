@@ -16,6 +16,7 @@ import { borderExpander } from "./borderExpander";
 import { clickableExpander } from "./clickableExpander";
 import { fontExpander } from "./fontExpander";
 import { spacingExpander } from "./spacingExpander";
+import { contentBoxesExpander } from "./contentBoxesExpander";
 
 const parser = VariableParser.create()
     .addTypeExpander(fontExpander)
@@ -23,7 +24,8 @@ const parser = VariableParser.create()
     .addTypeExpander(borderExpander)
     .addTypeExpander(clickableExpander)
     .addTypeExpander(backgroundExpander)
-    .addTypeExpander(boxExpander);
+    .addTypeExpander(boxExpander)
+    .addTypeExpander(contentBoxesExpander);
 
 const pattern = "**/*{Styles,styles,variables,Variables}.{ts,tsx}";
 

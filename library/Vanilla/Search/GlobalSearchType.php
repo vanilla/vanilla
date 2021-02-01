@@ -98,7 +98,7 @@ class GlobalSearchType extends AbstractSearchType {
 
         $locale = $query->getQueryParameter('locale');
         if ($locale) {
-            $query->setFilter('locale', [$locale, CrawlableRecordSchema::ALL_LOCALES]);
+            $query->setFilter('locale', [$locale, strtolower($locale), CrawlableRecordSchema::ALL_LOCALES]);
         }
 
         // Sorts

@@ -22,35 +22,35 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 
 export const absolutePosition = {
-    topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
+    topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             top: styleUnit(top),
             right: styleUnit(right),
         };
     },
-    topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)) => {
+    topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             top: styleUnit(top),
             left: styleUnit(left),
         };
     },
-    bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)) => {
+    bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             bottom: styleUnit(bottom),
             right: styleUnit(right),
         };
     },
-    bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)) => {
+    bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             bottom: styleUnit(bottom),
             left: styleUnit(left),
         };
     },
-    middleOfParent: (shrink: boolean = false) => {
+    middleOfParent: (shrink: boolean = false): CSSObject => {
         if (shrink) {
             return {
                 position: "absolute" as PositionProperty,
@@ -75,7 +75,7 @@ export const absolutePosition = {
             };
         }
     },
-    middleLeftOfParent: (left: LeftProperty<TLength> = px(0)) => {
+    middleLeftOfParent: (left: LeftProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             display: "block",
@@ -87,7 +87,7 @@ export const absolutePosition = {
             margin: "auto 0",
         };
     },
-    middleRightOfParent: (right: RightProperty<TLength> = px(0)) => {
+    middleRightOfParent: (right: RightProperty<TLength> = px(0)): CSSObject => {
         return {
             position: "absolute" as PositionProperty,
             display: "block",
@@ -99,7 +99,7 @@ export const absolutePosition = {
             margin: "auto 0",
         };
     },
-    fullSizeOfParent: () => {
+    fullSizeOfParent: (): CSSObject => {
         return {
             display: "block",
             position: "absolute" as PositionProperty,
@@ -118,7 +118,7 @@ export function sticky(): CSSObject {
 }
 
 export function flexHelper() {
-    const middle = (wrap = false) => {
+    const middle = (wrap = false): CSSObject => {
         return {
             display: "flex" as DisplayProperty,
             alignItems: "center" as AlignItemsProperty,
@@ -127,7 +127,7 @@ export function flexHelper() {
         };
     };
 
-    const middleLeft = (wrap = false) => {
+    const middleLeft = (wrap = false): CSSObject => {
         return {
             display: "flex" as DisplayProperty,
             alignItems: "center" as AlignItemsProperty,

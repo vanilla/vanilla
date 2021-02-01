@@ -81,6 +81,7 @@ abstract class AbstractSearchIndexTemplate {
 
             $type = $properties['type'] ?? '';
             $analyzer = $properties['x-analyzer'] ?? null;
+            $nullValue = $properties['x-null-value'] ?? null;
 
             // ignore nullables fields for now.
             if (is_array($type)) {
@@ -91,6 +92,9 @@ abstract class AbstractSearchIndexTemplate {
                 $template[$fieldName] = self::SIMPLE_FIELD_TYPE_MAPPING[$type];
                 if ($type === "string" && $analyzer) {
                     $template[$fieldName]['analyzer'] = $analyzer;
+                }
+                if (!is_null($nullValue)) {
+                    $template[$fieldName]['null_value'] = $nullValue;
                 }
             }
 

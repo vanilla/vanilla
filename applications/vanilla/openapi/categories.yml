@@ -22,7 +22,7 @@ paths:
       - description: Only list categories followed by the current user.
         in: query
         name: followed
-        required: true
+        required: false
         schema:
           default: false
           type: boolean
@@ -38,11 +38,10 @@ paths:
           False for no archived categories. Not compatible with followed
           filter.
         in: query
-        required: true
+        required: false
         schema:
           default: false
           type: boolean
-        allowEmptyValue: true
       - description: Only list featured categories.
         in: query
         name: featured

@@ -58,7 +58,7 @@ export const navLinksVariables = useThemeCache(() => {
 
     const link = makeThemeVars("link", {
         fg: globalVars.mainColors.fg,
-        fontWeight: globalVars.fonts.weights.semiBold,
+        fontWeight: globalVars.fonts.weights.normal,
         lineHeight: globalVars.lineHeights.condensed,
         width: 203,
         maxWidth: percent(100),

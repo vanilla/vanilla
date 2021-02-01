@@ -1,6 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit(); ?>
     <h2 class="H"><?php echo $this->data('Title'); ?></h2>
 <?php
+BoxThemeShim::startBox();
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
@@ -18,3 +21,4 @@ echo $this->Form->errors();
         </li>
     </ul>
 <?php echo $this->Form->close('Save', '', ['class' => 'Button Primary']);
+BoxThemeShim::endBox();

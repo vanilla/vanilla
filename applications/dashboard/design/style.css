@@ -1739,47 +1739,37 @@ td.CheckBoxColumn {
 }
 
 .CategoryList .Depth2 {
-  padding-left: 25px !important;
+  padding-left: 25px;
 }
-
 .CategoryList .Depth3 {
-  padding-left: 50px !important;
+  padding-left: 50px;
 }
-
 .CategoryList .Depth4 {
-  padding-left: 75px !important;
+  padding-left: 75px;
 }
-
 .CategoryList .Depth5 {
-  padding-left: 100px !important;
+  padding-left: 100px;
 }
-
 .CategoryList .Depth6 {
-  padding-left: 125px !important;
+  padding-left: 125px;
 }
-
 .CategoryList .Depth7 {
-  padding-left: 150px !important;
+  padding-left: 150px;
 }
-
 .CategoryList .Depth8 {
-  padding-left: 175px !important;
+  padding-left: 175px;
 }
-
 .CategoryList .Depth9 {
-  padding-left: 200px !important;
+  padding-left: 200px;
 }
-
 .CategoryList .Depth10 {
-  padding-left: 225px !important;
+  padding-left: 225px;
 }
-
 .CategoryList .Depth11 {
-  padding-left: 250px !important;
+  padding-left: 250px;
 }
-
 .CategoryList .Depth12 {
-  padding-left: 275px !important;
+  padding-left: 275px;
 }
 
 .Box.RecentUsers {
@@ -2701,6 +2691,10 @@ div.Popup form ul li label {
   font-size: 14px;
   font-weight: bold;
   margin: 10px 0 0;
+}
+body.Profile.EditMode ul li:first-child label,
+div.Popup form ul li:first-child label {
+  margin-top: 0;
 }
 
 body.Entry form ul li.Gender label.RadioLabel,

@@ -53,6 +53,10 @@ body.Section-Profile {
         padding: $utility-baseUnitHalf;
         display: inline-flex;
         border-radius: $tag_borderRadius;
+
+        > * {
+            padding: 0 3px;
+        }
     }
 
     .H .Gloss {
@@ -235,21 +239,26 @@ body.Section-Profile {
         border: none;
     }
 
-    .About.P .About,
-    .FormTitleWrapper,
-    .change-picture,
-    &.quotes .Frame-content form {
-        padding: $utility-baseUnitDouble;
-        margin-bottom: $utility-baseUnitTriple;
+    @if $staticVariables {
+        .About.P .About,
+        .FormTitleWrapper,
+        .change-picture,
+        &.quotes .Frame-content form {
+            padding: $utility-baseUnitDouble;
+            margin-bottom: $utility-baseUnitTriple;
 
-        @include maxWidth {
-            padding: 0;
+            @include maxWidth {
+                padding: 0;
+            }
         }
     }
 
     .Content .BadgeGrid .PhotoGrid,
     .DataCounts {
         @include tilesContainer(5);
+        @if $staticVariables {
+            margin-top: -$utility-baseUnitTriple;
+        }
 
         @include maxWidth {
             @include tilesContainer(4);
@@ -385,18 +394,20 @@ body.Section-Profile {
 body.Section-EditProfile {
 
     // titles have different classes depending on the page
-    &.signature,
-    &.preferences {
+    @if $staticVariables {
+        &.signature,
+        &.preferences {
 
-        h2 {
-            font-size: $global-large_fontSize;
-            font-weight: $global-heading_fontWeight;
-            margin-top: $component-item_spacing;
-            margin-bottom: $utility-baseUnitHalf;
-            border-bottom: $component_border;
+            h2 {
+                font-size: $global-large_fontSize;
+                font-weight: $global-heading_fontWeight;
+                margin-top: $component-item_spacing;
+                margin-bottom: $utility-baseUnitHalf;
+                border-bottom: $component_border;
 
-            @include maxWidth {
-                font-size: $global-subTitle_fontSize;
+                @include maxWidth {
+                    font-size: $global-subTitle_fontSize;
+                }
             }
         }
     }
@@ -414,7 +425,9 @@ body.Section-EditProfile {
     }
 
     .FormTitleWrapper form {
-        background: none !important;
+        @if $staticVariables {
+            background: none !important;
+        }
 
         li {
             @include clearfix;

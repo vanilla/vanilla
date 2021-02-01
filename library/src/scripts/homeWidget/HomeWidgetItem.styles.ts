@@ -17,7 +17,6 @@ import { CSSObject } from "@emotion/css";
 import { percent, ColorHelper, calc, color, rgba } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { IButtonStates } from "@library/styles/styleHelpersButtons";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 const defaultIcon = require("!file-loader!./widgetDefaultIcon.svg").default;
@@ -244,11 +243,15 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const description = makeVars("description", {
-            padding: {
+            spacing: Variables.spacing({
                 ...name.spacing,
                 top: 0,
                 bottom: 0,
-            },
+            }),
+            font: Variables.font({
+                color: options.fg,
+                lineHeight: globalVars.lineHeights.base,
+            }),
         });
 
         const image = makeVars("image", {
@@ -268,11 +271,8 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     const globalVars = globalVariables();
     const style = styleFactory("homeWidgetItem");
 
-    const borderStyling: CSSObject = (() => {
+    const borderStyling = ((): CSSObject => {
         switch (vars.options.borderType) {
-            case BorderType.SHADOW_AS_BORDER:
-            case BorderType.NONE:
-                return {};
             case BorderType.BORDER:
                 return {
                     ...Mixins.border(),
@@ -294,6 +294,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
                         },
                     },
                 };
+            case BorderType.SHADOW_AS_BORDER:
+            case BorderType.NONE:
+            default:
+                return {};
         }
     })();
 
@@ -492,10 +496,9 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     });
 
     const description = style("description", {
-        lineHeight: globalVars.lineHeights.base,
         display: vars.options.display.description ? undefined : "none",
-        paddingLeft: vars.name.spacing?.horizontal,
-        paddingRight: vars.name.spacing?.horizontal,
+        ...Mixins.padding(vars.description.spacing),
+        ...Mixins.font(vars.description.font),
     });
 
     return {

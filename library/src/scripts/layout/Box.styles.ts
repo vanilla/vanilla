@@ -5,7 +5,7 @@
  */
 
 import { CSSObject } from "@emotion/css";
-import { IBackground } from "@library/styles/cssUtilsTypes";
+import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -13,11 +13,6 @@ import { BorderType } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
-
-export interface IBoxOptions {
-    borderType: BorderType;
-    background: IBackground;
-}
 
 /**
  * @varGroup box
@@ -33,12 +28,10 @@ export const boxVariables = useThemeCache((boxOptions?: Partial<IBoxOptions>, fo
      */
     const options: IBoxOptions = makeThemeVars(
         "options",
-        {
+        Variables.box({
             borderType: BorderType.NONE,
-            background: Variables.background({
-                color: globalVars.body.backgroundImage.color,
-            }),
-        },
+            background: Variables.background({}),
+        }),
         boxOptions,
     );
 

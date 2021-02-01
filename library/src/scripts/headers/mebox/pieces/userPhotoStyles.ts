@@ -45,7 +45,7 @@ export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) =
 
 export const userPhotoMixins = (vars = userPhotoVariables()) => {
     // wrapper of image
-    const root = {
+    const root: CSSObject = {
         position: "relative",
         overflow: "hidden",
         ...Mixins.border(vars.border),

@@ -1,11 +1,15 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit(); ?>
 <div class="FormTitleWrapper">
+    <?php BoxThemeShim::startHeading(); ?>
     <h1 class="H"><?php echo t('Change My Password'); ?></h1>
+    <?php BoxThemeShim::endHeading(); ?>
     <?php
     echo $this->Form->open();
     echo $this->Form->errors();
     ?>
-    <ul role="presentation">
+    <ul role="presentation" class="pageBox">
         <li role="presentation">
             <?php
             // No password may have been set if they have only signed in with a connect plugin

@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 
 $Alt = false;
@@ -7,7 +9,7 @@ $Messages = $this->data('Messages', []);
 foreach ($Messages as $Message) {
     $CurrentOffset++;
     $Alt = !$Alt;
-    $Class = 'Item';
+    $Class = 'Item pageBox';
     $Class .= $Alt ? ' Alt' : '';
     if ($this->Conversation->DateLastViewed < $Message->DateInserted)
         $Class .= ' New';
@@ -28,13 +30,15 @@ foreach ($Messages as $Message) {
     ?>
     <li id="Message_<?php echo $Message->MessageID; ?>"<?php echo $Class == '' ? '' : ' class="'.$Class.'"'; ?>>
         <div id="Item_<?php echo $CurrentOffset ?>" class="ConversationMessage">
+            <?php BoxThemeShim::activeHtml(userPhoto($Author)); ?>
+            <?php BoxThemeShim::activeHtml("<div class='ConversationMessage-content'>"); ?>
             <div class="Meta">
-         <span class="Author">
-            <?php
-            echo userPhoto($Author, 'Photo');
-            echo userAnchor($Author, 'Name');
-            ?>
-         </span>
+                 <span class="Author">
+                    <?php
+                    BoxThemeShim::inactiveHtml(userPhoto($Author));
+                    echo userAnchor($Author, 'Name');
+                    ?>
+                 </span>
                 <span class="MItem DateCreated"><?php echo Gdn_Format::date($Message->DateInserted, 'html'); ?></span>
                 <?php
                 $this->fireEvent('AfterConversationMessageDate');
@@ -48,6 +52,7 @@ foreach ($Messages as $Message) {
                 $this->fireEvent('AfterConversationMessageBody');
                 ?>
             </div>
+            <?php BoxThemeShim::activeHtml("</div>"); ?>
         </div>
     </li>
 <?php }

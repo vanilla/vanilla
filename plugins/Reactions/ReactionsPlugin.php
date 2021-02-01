@@ -18,6 +18,7 @@ use Garden\Container\Container;
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\VariableProviders\QuickLink;
 use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 use Gdn_Session as SessionInterface;
@@ -800,10 +801,21 @@ class ReactionsPlugin extends Gdn_Plugin {
     public function base_afterUserInfo_handler($Sender, $Args) {
         // Fetch the view helper functions.
         include_once Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
-        echo '<div class="ReactionsWrap">';
-        echo '<h2 class="H">'.t('Reactions').'</h2>';
-        writeProfileCounts();
-        echo '</div>';
+
+        $heading = '<h2 class="H">'.t('Reactions').'</h2>';
+        if (BoxThemeShim::isActive()) {
+            BoxThemeShim::startHeading();
+            echo $heading;
+            BoxThemeShim::endHeading();
+            BoxThemeShim::startBox('ReactionsWrap');
+            writeProfileCounts();
+            BoxThemeShim::endBox();
+        } else {
+            echo '<div class="ReactionsWrap">';
+            echo $heading;
+            writeProfileCounts();
+            echo '</div>';
+        }
     }
 
     /**

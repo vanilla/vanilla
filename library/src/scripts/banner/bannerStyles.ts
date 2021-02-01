@@ -247,7 +247,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          * @description Choose the width of the banner border.
          * @type number|string
          */
-        width: globalVars.border.width,
+        width: searchBarVars.border.width,
 
         /**
          * @var banner.border.width
@@ -260,7 +260,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     // Unified border loops around whole search component including search button
     const unifiedBorder = makeThemeVars("unifiedBorder", {
-        width: globalVars.border.width * 2,
+        width: searchBarVars.border.width * 2,
         color: globalVars.mainColors.primary,
     });
 
@@ -502,7 +502,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             color: !isBordered ? colors.bg : colors.primary,
             leftColor: isTransparentButton ? colors.primaryContrast : colors.borderColor,
             radius: border.radius,
-            width: globalVars.border.width,
+            width: searchBarVars.border.radius,
         },
     });
 
@@ -572,7 +572,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     let buttonBorderStyles = {
         color: isTransparentButton || isSolidBordered ? globalVars.border.color : searchBarVars.input.bg,
-        width: searchBar.border.width,
+        width: searchBarVars.border.width,
         borderRadius: {
             ...EMPTY_BORDER_RADIUS,
             left: 0,

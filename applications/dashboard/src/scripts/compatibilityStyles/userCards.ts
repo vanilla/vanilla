@@ -28,47 +28,4 @@ export const userCardDiscussionPlacement = () => {
     cssOut(`.DataTable.DiscussionsTable .ItemIdea .DiscussionName .Wrap`, {
         paddingLeft: importantUnit(globalVariables().gutter.half),
     });
-
-    // With photo or only an idea
-    cssOut(
-        `
-        .DataList.Discussions .ItemDiscussion-withPhoto .userCardWrapper-photo,
-        .DataList.Discussions .ItemIdea:not(.ItemDiscussion-withPhoto) .idea-counter-module,
-        body.Discussion .ItemDiscussion .DiscussionHeader .userCardWrapper-photo,
-        body.Discussion .MessageList .CommentHeader .userCardWrapper-photo,
-        `,
-        {
-            ...absolutePosition.topLeft(paddingTop, paddingLeft),
-        },
-    );
-
-    // With Photo AND idea
-    // The photo will already be placed, we need to take care of the idea
-    cssOut(
-        `
-
-        .DataList.Discussions .ItemIdea.ItemDiscussion-withPhoto .idea-counter-module
-        `,
-        {
-            ...absolutePosition.topLeft(paddingTop, paddingLeft + userPhotoVars.sizing.medium + paddingLeft),
-        },
-    );
-
-    cssOut(
-        `
-        .DataList.Discussions .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto .Discussion.ItemContent,
-        .DataList.Discussions .ItemIdea.ItemIdea .Discussion.ItemContent
-        `,
-        {
-            paddingLeft: styleUnit(userPhotoVars.sizing.medium + formVars.spacer.size / 2),
-        },
-    );
-
-    // With photo AND with idea
-    cssOut(
-        `.DataList.Discussions .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto.ItemIdea .Discussion.ItemContent`,
-        {
-            paddingLeft: styleUnit(userPhotoVars.sizing.medium + formVars.spacer.size + formVars.countBox.width),
-        },
-    );
 };

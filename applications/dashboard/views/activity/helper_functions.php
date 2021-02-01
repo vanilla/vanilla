@@ -51,7 +51,7 @@ function writeActivity($activity, $sender, $session) {
     $sender->EventArguments['CssClass'] = &$cssClass;
     $sender->fireEvent('BeforeActivity');
     ?>
-<li id="Activity_<?php echo $activity->ActivityID; ?>" class="<?php echo $cssClass; ?>">
+<li id="Activity_<?php echo $activity->ActivityID; ?>" class="<?php echo $cssClass; ?> pageBox">
    <?php
     if (ActivityModel::canDelete($activity)) {
         echo '<div class="Options">'.anchor('&times;', 'dashboard/activity/delete/'.$activity->ActivityID.'/'.$session->transientKey().'?Target='.urlencode($sender->SelfUrl), 'Delete').'</div>';
@@ -107,7 +107,7 @@ function writeActivity($activity, $sender, $session) {
             writeActivityComment($comment, $activity);
         }
     } else {
-        echo '<ul class="DataList ActivityComments Hidden">';
+        echo '<ul class="DataList ActivityComments Hidden pageBox">';
     }
 
     if ($session->checkPermission('Garden.Profiles.Edit')):

@@ -9,10 +9,17 @@
 \* -------------------------------------------------------------- */
 
 .DataList,
-.MessageList {
-    margin: 0 0 $utility-baseUnitTriple;
+.MessageList,
+.PageTitle {
+    .Options {
+        display: flex;
+    }
+}
 
+.DataList,
+.MessageList {
     @if ($staticVariables) {
+        margin: 0 0 $utility-baseUnitTriple;
         .Item {
             @include listItem;
         }
@@ -26,12 +33,14 @@
     }
 
     .Item.CategoryHeading {
-        padding: 0 !important;
-        background: transparent;
-        box-shadow: none;
-        margin-bottom: $component-vertical_padding;
-        font-size: $global-title_fontSize;
-        border-width: 0;
+        @if $staticVariables {
+            padding: 0 !important;
+            background: transparent;
+            box-shadow: none;
+            margin-bottom: $component-vertical_padding;
+            font-size: $global-title_fontSize;
+            border-width: 0;
+        }
 
         @if ($component_lateralBorder == true and $component-item_spacing != 0) {
             border-left: $component_border;
@@ -144,12 +153,10 @@
         display: none;
     }
 
-    .ItemContent.Discussion .Excerpt {
-        margin-top: $utility-baseUnit;
-    }
-
-    .Options {
-        display: flex;
+    @if $staticVariables {
+        .ItemContent.Discussion .Excerpt {
+            margin-top: $utility-baseUnit;
+        }
     }
 
     .Bookmark::before,
@@ -424,15 +431,17 @@
     }
 }
 
-.DataList.CategoryList {
-    @if $component-item_spacing == 0 {
-        .Item:not(.CategoryHeading) {
-            box-shadow: $component_boxShadow;
+@if $staticVariables {
+    .DataList.CategoryList {
+        @if $component-item_spacing == 0 {
+            .Item:not(.CategoryHeading) {
+                box-shadow: $component_boxShadow;
+            }
         }
-    }
 
-    .Item[class*="Depth"] {
-        padding-left: $component-horizontal_padding !important;
+        .Item[class*="Depth"] {
+            padding-left: $component-horizontal_padding !important;
+        }
     }
 }
 
@@ -449,26 +458,28 @@
         }
     }
 
-    .ItemDiscussion-withPhoto {
-        .Discussion.ItemContent {
-            padding-left: $theme-photo_size + $utility-baseUnitDouble;
-        }
+    @if $staticVariables {
+        .ItemDiscussion-withPhoto {
+            .Discussion.ItemContent {
+                padding-left: $theme-photo_size + $utility-baseUnitDouble;
+            }
 
-        .userCardWrapper-photo {
-            left: $utility-baseUnitDouble;
-            position: absolute;
-            top: $utility-baseUnitTriple;
-        }
-
-        &.ItemIdea {
-            .idea-counter-module {
+            .userCardWrapper-photo {
+                left: $utility-baseUnitDouble;
                 position: absolute;
-                left: $theme-photo_size + $utility-baseUnitTriple;
                 top: $utility-baseUnitTriple;
             }
 
-            .Discussion.ItemContent {
-                padding-left: $theme-photo_size + $utility-baseUnitTriple + $theme-photo_size;
+            &.ItemIdea {
+                .idea-counter-module {
+                    position: absolute;
+                    left: $theme-photo_size + $utility-baseUnitTriple;
+                    top: $utility-baseUnitTriple;
+                }
+
+                .Discussion.ItemContent {
+                    padding-left: $theme-photo_size + $utility-baseUnitTriple + $theme-photo_size;
+                }
             }
         }
     }
@@ -517,7 +528,9 @@
             background: $component-header_bg;
             margin: 0;
             width: 100%;
-            min-height: $theme-photo_size + ($utility-baseUnitDouble * 2);
+            @if $staticVariables {
+                min-height: $theme-photo_size + ($utility-baseUnitDouble * 2);
+            }
             padding: {
                 top: $component-vertical_padding;
                 bottom: calc(#{$component-vertical_padding} / 2);
@@ -560,7 +573,9 @@
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
                 display: inline-block;
-                padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
+                @if $staticVariables {
+                    padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
+                }
 
                 > * {
                     display: inline;
@@ -602,10 +617,11 @@
                 }
             }
 
-            .AuthorWrap {
-                max-width: calc(100% - 45px);
+            @if $staticVariables {
+                .AuthorWrap {
+                    max-width: calc(100% - 45px);
+                }
             }
-
             .MItem.Category {
                 display: none;
             }
@@ -647,26 +663,26 @@
             border-bottom-left-radius: $component_borderRadius;
             border-bottom-right-radius: $component_borderRadius;
             padding: {
-                top: calc(#{$component-vertical_padding} / 2);
-                bottom: $component-vertical_padding;
-                left: $component-horizontal_padding;
-                right: $component-horizontal_padding;
+                top: calc(#{$component-vertical_padding / 2});
             };
         }
 
-        .Item-Body > * {
-            margin: 0 0 $utility-baseUnitDouble;
+        .Item-Body > *:empty {
+            display: none;
+        }
 
-            &:last-child {
-                margin: 0;
-            }
+        .Item-Body > * {
+            margin: 0;
+            margin-top: $utility-baseUnitDouble;
         }
     }
 
-    .ItemComment {
-        .Options {
-            margin-top: $component-vertical_padding;
-            margin-right: $component-horizontal_padding;
+    @if $staticVariables {
+        .ItemComment {
+            .Options {
+                margin-top: $gutter-base;
+                margin-right: $gutter-base;
+            }
         }
     }
 }

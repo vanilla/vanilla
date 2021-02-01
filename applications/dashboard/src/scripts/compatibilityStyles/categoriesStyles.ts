@@ -72,7 +72,6 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.CategoryNameHeading.isEmptyDescription`, {
-        minHeight: styleUnit(vars.image.width),
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

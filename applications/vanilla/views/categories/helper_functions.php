@@ -2,6 +2,7 @@
 if (!defined('APPLICATION')) exit();
 
 use Vanilla\Forum\Modules\FoundationCategoriesShim;
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('CategoryHeading')):
@@ -162,7 +163,7 @@ if (!function_exists('writeListItem')):
         }
 
         if (val('DisplayAs', $category) === 'Heading') : ?>
-            <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
+            <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading pageHeadingBox <?php echo $cssClass; ?>">
                 <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
                     <?php echo Gdn_Format::text(val('Name', $category));
@@ -173,7 +174,7 @@ if (!function_exists('writeListItem')):
                 </div>
             </li>
         <?php else: ?>
-            <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?>">
+            <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?> pageBox">
                 <?php
                 Gdn::controller()->EventArguments['ChildCategories'] = &$children;
                 Gdn::controller()->EventArguments['Category'] = &$category;
@@ -386,7 +387,9 @@ if (!function_exists('writeCategoryList')):
      */
     function writeCategoryList($categories, $depth = 1) {
         if (empty($categories)) {
+            BoxThemeShim::startBox();
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            BoxThemeShim::endBox();
             return;
         }
 
@@ -398,7 +401,7 @@ if (!function_exists('writeCategoryList')):
                 if (FoundationCategoriesShim::isEnabled()) {
                     FoundationCategoriesShim::printLegacyShim($categories);
                 } else {
-                    echo '<ul class="DataList CategoryList">';
+                    echo '<ul class="DataList CategoryList pageBox">';
                     foreach ($categories as $category) {
                         writeListItem($category, $depth);
                     }
@@ -413,7 +416,9 @@ endif;
 if (!function_exists('writeCategoryTable')):
     function writeCategoryTable($categories, $depth = 1, $inTable = false) {
         if (empty($categories)) {
+            BoxThemeShim::startBox();
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            BoxThemeShim::endBox();
             return;
         }
 
@@ -430,15 +435,17 @@ if (!function_exists('writeCategoryTable')):
                 }
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
+                    <?php BoxThemeShim::startHeading(); ?>
                     <h2 class="H categoryList-heading"><?php echo $name; ?></h2>
+                    <?php BoxThemeShim::endHeading(); ?>
                     <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
                 </div>
                 <?php
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
-                        <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
-                        <table class="DataTable CategoryTable">
+                    <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
+                    <table class="DataTable CategoryTable">
                             <thead>
                             <?php writeTableHead(); ?>
                             </thead>

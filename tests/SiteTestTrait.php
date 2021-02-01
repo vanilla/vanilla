@@ -87,6 +87,8 @@ trait SiteTestTrait {
      * @return string[] Returns an array of addon names.
      */
     protected static function getAddons(): array {
+        // These applications must currently all be enabled at startup or things can get flaky.
+        static::$addons = array_unique(array_merge(static::$addons, ['dashboard', 'conversations', 'vanilla']));
         return static::$addons;
     }
 

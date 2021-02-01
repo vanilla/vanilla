@@ -6,7 +6,7 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React from "react";
+import React, { CSSProperties } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { t } from "@library/utility/appUtils";
@@ -68,14 +68,14 @@ story.add("Elements", () => {
                 <Checkbox label="Option D" />
             </CheckboxGroup>
             <StoryHeading>Toggles</StoryHeading>
-            <div style={flexHelper().middle()}>
+            <div style={flexHelper().middle() as CSSProperties}>
                 <StoryToggle accessibleLabel="Enabled" enabled={true} />
                 <StoryToggle accessibleLabel="Disabled" enabled={false} />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={false} />
             </div>
             <StoryHeading>Toggles (Slim)</StoryHeading>
-            <div style={flexHelper().middle()}>
+            <div style={flexHelper().middle() as CSSProperties}>
                 <StoryToggle accessibleLabel="Enabled" enabled={true} slim />
                 <StoryToggle accessibleLabel="Disabled" enabled={false} slim />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} slim />
@@ -143,7 +143,7 @@ const doNothing = () => {
 function StoryToggle(props: Omit<React.ComponentProps<typeof FormToggle>, "onChange">) {
     return (
         <InputBlock label={props.accessibleLabel}>
-            <FormToggle {...props} onChange={doNothing} />
+            <FormToggle {...props} enabled={false} onChange={doNothing} />
         </InputBlock>
     );
 }

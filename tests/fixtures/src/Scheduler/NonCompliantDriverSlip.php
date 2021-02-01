@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
-use Vanilla\HostedJob\Driver\HostedDriverSlip;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 

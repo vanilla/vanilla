@@ -136,8 +136,10 @@
         display: none;
     }
 
-    .ItemContent.Discussion .Excerpt {
-        margin-top: $utility-baseUnit;
+    @if $staticVariables {
+        .ItemContent.Discussion .Excerpt {
+            margin-top: $utility-baseUnit;
+        }
     }
 
     .Options {

@@ -94,6 +94,7 @@ _notes
 ~*
 composer-local.json
 /.htaccess
+tsconfig.tsbuildinfo
 .project
 .settings
 .buildpath

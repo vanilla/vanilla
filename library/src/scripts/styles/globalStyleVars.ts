@@ -7,6 +7,7 @@ import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { IBackground } from "@library/styles/cssUtilsTypes";
 import { fontFallbacks, monoFallbacks } from "@library/styles/fontFallbacks";
+import { BorderType } from "@library/styles/styleHelpersBorders";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
@@ -176,6 +177,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         modals: border,
         dropDowns: border,
+        contentBox: border,
     });
 
     const gutterSize = 16;
@@ -518,6 +520,62 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         logError("The function 'findColorMatch' is not meant for production");
     };
 
+    /**
+     * @varGroup global.contentBoxes
+     * @description Global content box preset that will apply to every page.
+     * Some pages may have their own that will need to modified separately.
+     * @expand contentBoxes
+     */
+    const contentBoxes = makeThemeVars(
+        "contentBoxes",
+        Variables.contentBoxes({
+            depth1: {
+                borderType: BorderType.NONE,
+            },
+            depth2: {
+                borderType: BorderType.SEPARATOR,
+            },
+            depth3: {
+                borderType: BorderType.SEPARATOR,
+            },
+        }),
+    );
+
+    /**
+     * @varGroup global.headingBox
+     * @description Heading boxes sit above every box.
+     * They can have titles, subtitles, descriptions, and sometimes action items in them.
+     */
+    const headingBox = makeThemeVars("headingBox", {
+        /**
+         * @varGroup global.headingBox.spacing
+         * @expand spacing
+         */
+        spacing: Variables.spacing({
+            top: 24,
+            bottom: 8,
+            horizontal: 0,
+        }),
+        /**
+         * @varGroup global.headingBox.mobileSpacing
+         * @expand spacing
+         */
+        mobileSpacing: Variables.spacing({
+            top: 28,
+            bottom: 16,
+            horizontal: 0,
+        }),
+        /**
+         * @varGroup global.headingBox.descriptionSpacing
+         * @expand spacing
+         */
+        descriptionSpacing: Variables.spacing({
+            top: 8,
+            bottom: 0,
+            horizontal: 0,
+        }),
+    });
+
     const itemList = makeThemeVars("itemList", {
         padding: Variables.spacing({
             top: 15,
@@ -562,6 +620,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         buttonPreset,
         foundationalWidths,
         widget,
+        headingBox,
         itemList,
+        contentBoxes,
     };
 });

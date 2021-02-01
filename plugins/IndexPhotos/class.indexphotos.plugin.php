@@ -7,6 +7,8 @@
  * @package IndexPhotos
  */
 
+use Vanilla\Theme\BoxThemeShim;
+
 /**
  * Class IndexPhotosPlugin
  *
@@ -22,7 +24,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
      */
     public function assetModel_styleCss_handler($sender) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
+        if (self::c('Vanilla.Discussions.Layout') != 'table' && !BoxThemeShim::isActive()) {
             $sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
         }
     }

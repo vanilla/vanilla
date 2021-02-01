@@ -263,9 +263,10 @@ class CategoriesApiController extends AbstractApiController {
      * List categories.
      *
      * @param array $query The query string.
+     * @param bool $filter Apply permission based filter
      * @return Data
      */
-    public function index(array $query) {
+    public function index(array $query, bool $filter = true) {
         $this->permission();
 
         $in = $this->schema([
@@ -339,7 +340,7 @@ class CategoriesApiController extends AbstractApiController {
 
             $where['categoryID'] = $range;
 
-            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'CategoryID');
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'CategoryID', $filter);
         } elseif ($query['followed'] ?? false) {
             $where['Followed'] = true;
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
@@ -663,9 +664,10 @@ class CategoriesApiController extends AbstractApiController {
      * @param int|null $limit
      * @param int|null $offset
      * @param string $order
+     * @param bool $filter Apply permission based filter
      * @return array
      */
-    private function getCategoriesWhere(array $where, $limit, $offset, $order = ''): array {
+    private function getCategoriesWhere(array $where, $limit, $offset, $order = '', bool $filter = true): array {
         $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if ($dirtyRecords) {
             $this->categoryModel->applyDirtyWheres();
@@ -687,8 +689,10 @@ class CategoriesApiController extends AbstractApiController {
         // Reset indexes for proper output detection as an indexed array.
         $categories = array_values($categories);
 
-        // Filter permissions
-        $categories = CategoryModel::filterExistingCategoryPermissions($categories);
+        if ($filter) {
+            // Filter permissions
+            $categories = CategoryModel::filterExistingCategoryPermissions($categories);
+        }
 
         $totalCountCallBack = function () use ($where) {
             return $this->categoryModel->getCount($where);

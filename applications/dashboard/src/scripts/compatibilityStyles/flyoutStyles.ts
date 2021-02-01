@@ -11,11 +11,13 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { actionMixin } from "@library/flyouts/dropDownStyles";
+import { actionMixin, dropDownVariables } from "@library/flyouts/dropDownStyles";
 import { Mixins } from "@library/styles/Mixins";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
+    const dropdownVars = dropDownVariables();
     const mainColors = globalVars.mainColors;
     const fg = ColorsUtils.colorOut(mainColors.fg);
     const bg = ColorsUtils.colorOut(mainColors.bg);
@@ -83,6 +85,16 @@ export const flyoutCSS = () => {
             borderBottomColor: ColorsUtils.colorOut(globalVars.separator.color),
         },
     );
+
+    cssOut(".MenuItems, .Flyout.Flyout", {
+        ...Mixins.border(globalVars.borderType.dropDowns),
+        ...shadowOrBorderBasedOnLightness(
+            dropdownVars.contents.bg,
+            Mixins.border(dropdownVars.contents.border),
+            shadowHelper().dropDown(),
+        ),
+        overflow: "hidden",
+    });
 };
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {

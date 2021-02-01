@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $isDataDrivenTheme = Gdn::themeFeatures()->useDataDrivenTheme();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
@@ -53,7 +53,7 @@ echo '</div>';
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>
     <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
-    <ul class="DataList Discussions">
+    <ul class="DataList Discussions pageBox">
         <?php include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
     </ul>
     <?php $this->fireEvent('AfterDiscussionsList'); ?>
@@ -66,7 +66,9 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
 } else {
     ?>
+    <?php BoxThemeShim::startBox(); ?>
     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+    <?php BoxThemeShim::endBox(); ?>
     <?php $this->fireEvent('AfterDiscussionsList'); ?>
 <?php
 }

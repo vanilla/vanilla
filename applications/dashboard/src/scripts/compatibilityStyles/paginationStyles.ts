@@ -5,13 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { userSelect } from "@library/styles/styleHelpers";
+import { extendItemContainer, userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { important } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
@@ -80,8 +81,14 @@ export const paginationCSS = () => {
     cssOut(`.Content .PageControls`, {
         display: "flex",
         alignItems: "center",
+        flexWrap: "wrap",
         justifyContent: "space-between",
         marginBottom: styleUnit(16),
+    });
+
+    cssOut(".Pager ~ .PageControls-filters", {
+        marginTop: 16,
+        width: "100%",
     });
 
     cssOut(`.MorePager`, {
@@ -93,10 +100,18 @@ export const paginationCSS = () => {
         },
     });
 
-    cssOut(`.PageControls-filters`, {
-        flex: 1,
+    cssOut(`.PageControls-filters.PageControls-filters`, {
+        flex: "auto",
+        width: "100%",
         display: "inline-flex",
         alignItems: "baseline",
+
+        ...extendItemContainer(8),
+        "& > *": {
+            ...Mixins.margin({
+                horizontal: 8,
+            }),
+        },
     });
 
     cssOut(`.PageControls.PageControls .selectBox`, {

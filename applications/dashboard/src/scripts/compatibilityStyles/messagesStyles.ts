@@ -42,6 +42,10 @@ export const messagesCSS = () => {
         ...metaContainerStyles(),
     });
 
+    cssOut(`.Condensed.DataList .ItemContent.Conversation .Excerpt a`, {
+        textDecoration: "none",
+    });
+
     cssOut(`.DataList.Conversations .Author.Photo`, {
         ...absolutePosition.topLeft(layoutVars.cell.paddings.vertical, layoutVars.cell.paddings.horizontal),
     });

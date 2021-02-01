@@ -26,20 +26,4 @@ export function blockColumnCSS() {
         justifyContent: "space-between",
         minHeight: styleUnit(userPhotoSizing.medium),
     });
-
-    const paddingTop: number = parseInt(`${layoutVars.cell.paddings.vertical}`) ?? 0;
-    const paddingLeft: number = parseInt(`${layoutVars.cell.paddings.horizontal}`) ?? 0;
-
-    // With photo or only an idea
-    cssOut(
-        `
-        .BlockColumn .Block.Wrap .userCardWrapper-photo.userCardWrapper-photo,
-        .BlockColumn .Block.Wrap .idea-counter-module.idea-counter-module
-        `,
-        {
-            width: styleUnit(userPhotoSizing.medium),
-            height: styleUnit(userPhotoSizing.medium),
-            ...absolutePosition.topLeft(paddingTop, calc(`${styleUnit(paddingLeft)} / 2`)),
-        },
-    );
 }

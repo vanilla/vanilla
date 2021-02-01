@@ -41,7 +41,7 @@
 
 <h1 class="H"><?php echo $this->data('Title'); ?></h1>
 
-<div class="Hero">
+<div class="Hero pageHeadingBox">
     <h3><?php echo t("What's This?"); ?></h3>
 
     <p>
@@ -51,7 +51,7 @@
     </p>
 </div>
 
-<ul class="DataList DataList-Connections">
+<ul class="DataList DataList-Connections pageBox">
     <?php
     foreach ($this->data('Connections') as $Key => $Row) {
         writeConnection($Row);

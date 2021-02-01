@@ -25,13 +25,6 @@ class QuickLinksTest extends SiteTestCase {
     }
 
     /**
-     * Setup.
-     */
-    public function setUp(): void {
-        parent::setUp();
-    }
-
-    /**
      * Test quickLink methods.
      */
     public function testQuickLink() {

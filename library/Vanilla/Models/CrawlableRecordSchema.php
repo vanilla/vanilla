@@ -120,13 +120,13 @@ final class CrawlableRecordSchema {
                 'default' => $siteProvider->getOwnSite()->getSiteID(),
             ],
             'recordCollapseID:s?',
+            "privacy:s?" => ["default" => "public"],
         ])->addFilter('', function ($data) use ($defaultType, $siteProvider, $isPrivateCommunity) {
             if (!isset($data['recordCollapseID'])) {
                 $recordID = $data["{$defaultType}ID"] ?? randomString(10);
                 $siteID = $data['siteID'] ?? $siteProvider->getOwnSite()->getSiteID();
                 $data['recordCollapseID'] = "site{$siteID}_{$defaultType}{$recordID}";
             }
-
             if ($isPrivateCommunity) {
                 $data['scope'] = self::SCOPE_RESTRICTED;
             }

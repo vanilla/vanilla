@@ -21,6 +21,7 @@ import {
 
 export enum BorderType {
     BORDER = "border",
+    SEPARATOR = "separator",
     NONE = "none",
     SHADOW = "shadow",
     SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element

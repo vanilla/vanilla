@@ -1673,7 +1673,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                 }
                 $data[$key] = $value;
             }
-            unset($this->Data);
+            // Wipe the data.
+            $this->Data = [];
         }
 
         // Massage the data for better rendering.

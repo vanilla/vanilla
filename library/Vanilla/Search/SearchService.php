@@ -19,6 +19,9 @@ class SearchService {
     /** @var array [driver => SearchDriverInterface, priority => int] */
     private $drivers;
 
+    /** @var array extenders */
+    protected $extenders = [];
+
     /**
      * Register an active driver.
      *
@@ -81,6 +84,24 @@ class SearchService {
         return $this
             ->getActiveDriver()
             ->buildQuerySchema();
+    }
+
+    /**
+     * Register search service extender
+     *
+     * @param SearchTypeQueryExtenderInterface $extender
+     */
+    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender) {
+        $this->extenders[] = $extender;
+    }
+
+    /**
+     * Get all search service extenders
+     *
+     * @return array
+     */
+    public function getExtenders(): array {
+        return $this->extenders;
     }
 
     /**

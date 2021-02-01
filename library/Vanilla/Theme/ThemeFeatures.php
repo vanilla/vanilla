@@ -54,7 +54,7 @@ class ThemeFeatures implements \JsonSerializable {
         'EnhancedAccessibility' => false,
 
         // Use the new themeable quicklinks.
-        'NewQuickLinks' => true,
+        'NewQuickLinks' => false,
     ];
 
     /**

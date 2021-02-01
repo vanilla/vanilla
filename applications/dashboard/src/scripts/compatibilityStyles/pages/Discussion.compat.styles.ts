@@ -5,20 +5,26 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { MixinsFoundation } from "@library/styles/MixinsFoundation";
+import { discussionVariables } from "@dashboard/compatibilityStyles/pages/Discussion.variables";
+import { forumVariables } from "@library/forms/forumStyleVars";
+import { cssOut } from "@dashboard/compatibilityStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { absolutePosition } from "@library/styles/styleHelpersPositioning";
 import { quote, translate } from "csx";
-import { forumVariables } from "@library/forms/forumStyleVars";
+import { negativeUnit } from "@library/styles/styleHelpers";
 import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
 import { Mixins } from "@library/styles/Mixins";
 
-export const discussionCSS = () => {
+export const discussionCompatCSS = () => {
+    const vars = discussionVariables();
     const globalVars = globalVariables();
     const formVars = forumVariables();
     const userPhotoVars = formVars.userPhoto;
+
+    MixinsFoundation.contentBoxes(vars.contentBoxes, "Discussion");
 
     cssOut(
         `
@@ -72,35 +78,10 @@ export const discussionCSS = () => {
     );
 
     cssOut(
-        `
-        .DiscussionHeader .AuthorWrap,
-        .MessageList .ItemComment .AuthorWrap,
-        .MessageList .ItemDiscussion .AuthorWrap,
-        `,
-        {
-            position: "relative",
-        },
-    );
-
-    cssOut(
         ".Meta.Meta-Discussion",
 
         {
             display: globalVars.meta.display,
-        },
-    );
-
-    cssOut(
-        `
-        .MessageList .ItemDiscussion .Item-Header.DiscussionHeader .PhotoWrap,
-        .MessageList .ItemComment .Item-Header .PhotoWrap,
-        .MessageList .ItemDiscussion .Item-Header .PhotoWrap,
-        .MessageList .Item-Header .userCardWrapper-photo,
-        `,
-        {
-            position: "absolute",
-            top: 2,
-            left: 2,
         },
     );
 
@@ -170,25 +151,26 @@ export const discussionCSS = () => {
 
     userCardDiscussionPlacement();
 
-    cssOut(
-        `
-        .Container .MessageList .ItemComment .Item-Header,
-        .Container .MessageList .ItemDiscussion .Item-Header
-    `,
-        Mixins.padding({
-            all: globalVars.gutter.half,
-            top: globalVars.gutter.size,
-        }),
-    );
+    cssOut(".Discussion", {
+        width: "100%",
+    });
 
-    cssOut(
-        `
-        body.Discussion .ItemDiscussion .DiscussionHeader .userCardWrapper-photo,
-        body.Discussion .MessageList .CommentHeader .userCardWrapper-photo,
-        `,
-        {
-            top: 0,
-            left: 0,
+    cssOut(`.MessageList .Item-Header.Item-Header`, {
+        ...Mixins.padding({
+            all: 0,
+        }),
+        display: "flex",
+
+        "& .Item-HeaderContent": {
+            flex: 1,
         },
-    );
+
+        "& .PhotoWrap": {
+            marginRight: 12,
+        },
+
+        "& .AuthorWrap, & .DiscussionMeta": {
+            paddingLeft: 0,
+        },
+    });
 };

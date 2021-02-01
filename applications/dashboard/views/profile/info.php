@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 if (!is_array($this->Roles))
     $this->Roles = [];
@@ -7,7 +7,9 @@ $this->fireEvent('BeforeInfo');
 if (Gdn::config('Garden.Profile.ShowAbout')) {
     ?>
     <div class="Info About">
+        <?php BoxThemeShim::startHeading(); ?>
         <h3><?php echo t('Basic Information'); ?></h3>
+        <?php BoxThemeShim::endHeading(); ?>
         <dl>
             <?php
             if ($this->User->Banned) {

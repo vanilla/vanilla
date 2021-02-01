@@ -17,7 +17,7 @@ export const frameVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("frame");
 
     const colors = makeThemeVars("colors", {
-        bg: globalVars.mainColors.bg,
+        bg: globalVars.body.backgroundImage.color,
         fg: globalVars.mainColors.fg,
     });
 

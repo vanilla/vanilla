@@ -16,6 +16,7 @@ import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/comp
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { initAllUserContent } from "@vanilla/library/src/scripts/content";
+import { setMeta } from "@vanilla/library/src/scripts/utility/appUtils";
 
 ///
 /// These imports are just so that the files get loaded into storybook.
@@ -82,6 +83,7 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         applyCompatibilityUserCards();
         loadedCSS();
         initAllUserContent();
+        setMeta("themeFeatures.NewQuickLinks", true);
 
         // Add HTML links.
         const dynamicCssFiles = data.cssFiles;

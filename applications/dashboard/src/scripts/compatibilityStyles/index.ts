@@ -29,10 +29,8 @@ import { categoriesCSS } from "@dashboard/compatibilityStyles/categoriesStyles";
 import { bestOfCSS } from "@dashboard/compatibilityStyles/bestOfStyles";
 import { ideaCSS } from "@dashboard/compatibilityStyles/ideaStyles";
 import { tableCSS } from "@dashboard/compatibilityStyles/tableStyles";
-import { discussionCSS } from "./discussionStyles";
 import { searchPageCSS } from "./searchPageStyles";
 import { groupsCSS } from "@dashboard/compatibilityStyles/groupsStyles";
-import { profilePageCSS } from "@dashboard/compatibilityStyles/profilePageSyles";
 import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
@@ -42,12 +40,18 @@ import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
-import { logDebugConditionnal } from "@vanilla/utils";
 import { forumVariables } from "@library/forums/forumStyleVars";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { leaderboardCSS } from "@dashboard/compatibilityStyles/Leaderboard.styles";
 import { cssOut } from "./cssOut";
+import { pageBoxCompatStyles } from "@dashboard/compatibilityStyles/PageBox.compat.styles";
+import { profileCompatCSS } from "@dashboard/compatibilityStyles/pages/Profile.compat.styles";
+import { discussionCompatCSS } from "@dashboard/compatibilityStyles/pages/Discussion.compat.styles";
+import { discussionListCompatCSS } from "@dashboard/compatibilityStyles/pages/DiscussionList.compat.styles";
+import { categoryListCompatCSS } from "@dashboard/compatibilityStyles/pages/CategoryList.compat.styles";
+import { conversationListCompatCSS } from "@dashboard/compatibilityStyles/pages/ConversationList.compat.styles";
+import { conversationCompatCSS } from "@dashboard/compatibilityStyles/pages/Conversation.compat.styles";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -76,18 +80,6 @@ compatibilityStyles = useThemeCache(() => {
     cssOut(".Frame", {
         background: "none",
     });
-
-    cssOut(
-        `
-        .Content .DataList .Item:not(.ItemDiscussion):not(.ItemComment),
-        .Content .MessageList .Item.Item:not(.ItemDiscussion):not(.ItemComment)
-        `,
-        {
-            background: "none",
-            borderColor: ColorsUtils.colorOut(vars.border.color),
-            ...Mixins.padding(layoutVars.cell.paddings),
-        },
-    );
 
     // @mixin font-style-base()
     cssOut("html, body, .DismissMessage", {
@@ -218,13 +210,6 @@ compatibilityStyles = useThemeCache(() => {
     // Items
     const resultVars = searchResultsVariables();
 
-    const horizontalPadding =
-        (resultVars.spacing.padding.left as number) + (resultVars.spacing.padding.right as number);
-    cssOut(`.DataList, .Item-Header`, {
-        marginLeft: styleUnit(-resultVars.spacing.padding.left! as number),
-        width: calc(`100% + ${styleUnit(horizontalPadding)}`),
-    });
-
     cssOut(
         `
         .DataList .Item,
@@ -291,19 +276,7 @@ compatibilityStyles = useThemeCache(() => {
         ...Mixins.border(vars.borderType.formElements.buttons),
     });
 
-    cssOut(`.DataList.CategoryList .Item[class*=Depth]`, {
-        ...Mixins.padding({
-            vertical: vars.gutter.size,
-            horizontal: importantUnit(vars.gutter.half),
-        }),
-    });
-
-    cssOut(".MenuItems, .Flyout.Flyout", {
-        ...Mixins.border(vars.borderType.dropDowns),
-        overflow: "hidden",
-    });
-
-    cssOut(`.Frame-content`, {
+    cssOut(`.Frame-contentWrap`, {
         marginTop: styleUnit(layoutVars.main.topSpacing - vars.gutter.size),
     });
 
@@ -324,7 +297,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList.Discussions .Item .Title a`, {
-        textDecoration: important("none"),
+        textDecoration: "none",
     });
 
     cssOut(`.DataList.Discussions .Item .Options`, {
@@ -419,7 +392,6 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(`.DataList .PhotoWrap, .MessageList .PhotoWrap`, {
-        top: styleUnit(2),
         width: styleUnit(userPhotoVars.sizing.medium),
         height: styleUnit(userPhotoVars.sizing.medium),
     });
@@ -428,6 +400,7 @@ compatibilityStyles = useThemeCache(() => {
         textAlign: "center",
     });
 
+    pageBoxCompatStyles();
     blockColumnCSS();
     buttonCSS();
     flyoutCSS();
@@ -444,14 +417,19 @@ compatibilityStyles = useThemeCache(() => {
     bestOfCSS();
     ideaCSS();
     tableCSS();
-    discussionCSS();
     searchPageCSS();
     groupsCSS();
-    profilePageCSS();
+    profileCompatCSS();
+    discussionCompatCSS();
+    discussionListCompatCSS();
+    categoryListCompatCSS();
+    conversationListCompatCSS();
+    conversationCompatCSS();
     photoGridCSS();
     messagesCSS();
     signaturesCSS();
     signInMethodsCSS();
+    leaderboardCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

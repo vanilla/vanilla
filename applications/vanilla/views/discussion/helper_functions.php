@@ -7,6 +7,8 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
 
 
@@ -108,7 +110,7 @@ if (!function_exists('writeComment')) :
 
         // First comment template event
         $sender->fireEvent('BeforeCommentDisplay'); ?>
-        <li class="<?php echo $cssClass; ?>" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
+        <li class="<?php echo $cssClass; ?> pageBox" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
             <div class="Comment">
 
                 <?php
@@ -117,37 +119,41 @@ if (!function_exists('writeComment')) :
                     echo '<span id="latest"></span>';
                 }
                 ?>
-                <div class="Options">
-                    <?php writeCommentOptions($comment); ?>
-                </div>
+                <?php if (!BoxThemeShim::isActive()) { ?>
+                    <div class="Options">
+                        <?php writeCommentOptions($comment); ?>
+                    </div>
+                <?php } ?>
                 <?php $sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
+                    <?php BoxThemeShim::activeHtml(userPhoto($author)); ?>
+                    <?php BoxThemeShim::activeHtml('<div class="Item-HeaderContent">'); ?>
                     <div class="AuthorWrap">
-            <span class="Author">
-               <?php
-               if ($userPhotoFirst) {
-                   echo userPhoto($author);
-                   echo userAnchor($author, 'Username');
-               } else {
-                   echo userAnchor($author, 'Username');
-                   echo userPhoto($author);
-               }
-               echo formatMeAction($comment);
-               $sender->fireEvent('AuthorPhoto');
-               ?>
-            </span>
-            <span class="AuthorInfo">
-               <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-               $sender->fireEvent('AuthorInfo');
-               ?>
-            </span>
+                        <span class="Author">
+                           <?php
+                           if ($userPhotoFirst) {
+                               BoxThemeShim::inactiveHtml(userPhoto($author));
+                               echo userAnchor($author, 'Username');
+                           } else {
+                               echo userAnchor($author, 'Username');
+                               BoxThemeShim::inactiveHtml(userPhoto($author));
+                           }
+                           echo formatMeAction($comment);
+                           $sender->fireEvent('AuthorPhoto');
+                           ?>
+                        </span>
+                        <span class="AuthorInfo">
+                           <?php
+                           echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                           echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                           $sender->fireEvent('AuthorInfo');
+                           ?>
+                        </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
-            <span class="MItem DateCreated">
-               <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
-            </span>
+                        <span class="MItem DateCreated">
+                           <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
+                        </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
                         ?>
@@ -167,6 +173,12 @@ if (!function_exists('writeComment')) :
                         $sender->fireEvent('AfterCommentMeta'); // DEPRECATED
                         ?>
                     </div>
+                    <?php BoxThemeShim::activeHtml("</div>"); ?>
+                    <?php if (BoxThemeShim::isActive()) { ?>
+                        <div class="Options">
+                            <?php writeCommentOptions($comment); ?>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="Item-BodyWrap">
                     <div class="Item-Body">
@@ -589,14 +601,14 @@ if (!function_exists('writeCommentForm')) :
         // Closed notification
         if ($discussion->Closed == '1') {
             ?>
-            <div class="Foot Closed">
+            <div class="Foot Closed pageBox">
                 <div class="Note Closed"><?php echo t('This discussion has been closed.'); ?></div>
             </div>
         <?php
         } elseif (!$userCanComment) {
             if (!Gdn::session()->isValid()) {
                 ?>
-                <div class="Foot Closed">
+                <div class="Foot Closed pageBox">
                     <div class="Note Closed SignInOrRegister"><?php
                         $popup = (c('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
                         $returnUrl = Gdn::request()->pathAndQuery();

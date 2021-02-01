@@ -4,6 +4,11 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 
+export enum TagType {
+    LIST = "list",
+    CLOUD = "cloud",
+}
+
 export const tagVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("forumFonts");
     const globalVars = globalVariables();
@@ -19,6 +24,44 @@ export const tagVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("color", {
         fg: globalVars.meta.text.color,
+    });
+
+    const tagItem = makeThemeVars("tagItem", {
+        /**
+         * @var forumFonts.tagItem.type
+         * @description Set the display type of tag items
+         * @type string
+         * @enum cloud | list
+         */
+        type: TagType.CLOUD,
+        /**
+         * @varGroup forumFonts.tagItem.font
+         * @description Font variables for the default state of the tag label
+         */
+        font: Variables.font({}),
+        /**
+         * @varGroup forumFonts.tagItem.fontState
+         * @description Font variables title when a tag item is being interacted with. (hover, active, focus).
+         */
+        fontState: Variables.font({}),
+        /**
+         * @varGroup forumFonts.tagItem.background
+         * @description Background variables for the default state of the tag background
+         */
+        background: Variables.background({}),
+        /**
+         * @varGroup forumFonts.tagItem.backgroundState
+         * @description Background variables title when a tag item is being interacted with. (hover, active, focus)
+         */
+        backgroundState: Variables.background({}),
+        /**
+         * @varGroup forumFonts.tagItem.margin
+         * @description Margins between tag items
+         * @expand spacing
+         */
+        margin: Variables.spacing({
+            all: 0,
+        }),
     });
 
     const font = makeThemeVars(
@@ -68,7 +111,7 @@ export const tagVariables = useThemeCache(() => {
         padding,
         border,
         margin,
-
+        tagItem,
         nested,
     };
 

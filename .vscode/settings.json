@@ -104,6 +104,5 @@
     "phpcs.autoConfigSearch": false,
     "phpcs.enable": false,
     "jestrunner.jestCommand": "yarn test:unit",
-    "typescript.tsdk": "node_modules/typescript/lib",
     "prettier.prettierPath": "./node_modules/prettier"
 }

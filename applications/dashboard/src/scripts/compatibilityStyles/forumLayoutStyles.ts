@@ -15,6 +15,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { media } from "@library/styles/styleShim";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Mixins } from "@library/styles/Mixins";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -137,12 +138,12 @@ export const forumLayoutVariables = useThemeCache(() => {
         size: foundationalWidths.fullGutter / 2, // 24
         halfSize: foundationalWidths.fullGutter / 4, // 12
         quarterSize: foundationalWidths.fullGutter / 8, // 6
-        mainGutterOffset: 60 - globalVars.gutter.size,
+        mainGutterOffset: foundationalWidths.fullGutter,
     });
 
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + gutter.full,
+        paddedWidth: foundationalWidths.panelWidth + gutter.size,
     });
 
     const main = makeThemeVars("main", {
@@ -177,7 +178,7 @@ export const forumLayoutCSS = () => {
         `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
         mediaQueries.tablet({
             ...Mixins.padding({
-                horizontal: globalVars.gutter.half,
+                horizontal: 12,
             }),
         }),
     );
@@ -187,33 +188,6 @@ export const forumLayoutCSS = () => {
     cssOut(`.Frame-content .HomepageTitle`, {
         ...lineHeightAdjustment(),
     });
-
-    cssOut(
-        `.Frame-row`,
-        {
-            display: "flex",
-            flexWrap: "nowrap",
-            justifyContent: "space-between",
-            ...Mixins.padding({
-                horizontal: globalVars.gutter.half,
-            }),
-            ...{
-                "& > *": {
-                    ...Mixins.padding({
-                        horizontal: globalVars.gutter.half,
-                    }),
-                },
-            },
-        },
-        mediaQueries.oneColumnDown({
-            flexWrap: important("wrap"),
-        }),
-        mediaQueries.tablet({
-            ...Mixins.padding({
-                horizontal: 0,
-            }),
-        }),
-    );
 
     cssOut(
         `.Panel`,
@@ -246,15 +220,25 @@ export const forumLayoutCSS = () => {
     cssOut(`.Frame-row`, {
         display: "flex",
         flexWrap: "nowrap",
+        justifyContent: "space-between",
         ...Mixins.padding({
             all: globalVars.gutter.half,
         }),
-        ...{
-            "& > *": {
-                ...Mixins.padding({
-                    horizontal: globalVars.gutter.half,
-                }),
-            },
+        "& > *": {
+            ...Mixins.padding({
+                horizontal: globalVars.gutter.half,
+            }),
         },
+        ...mediaQueries.oneColumnDown({
+            flexWrap: important("wrap"),
+            ...Mixins.padding({
+                horizontal: 0,
+            }),
+        }),
+        ...mediaQueries.tablet({
+            ...Mixins.padding({
+                horizontal: 0,
+            }),
+        }),
     });
 };

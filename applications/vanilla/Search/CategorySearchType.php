@@ -78,7 +78,6 @@ class CategorySearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array {
-
         $filteredRecordIDs = [];
         foreach ($recordIDs as $categoryID) {
             if (!in_array($categoryID, $this->excludedCategoryIDs)) {
@@ -89,10 +88,13 @@ class CategorySearchType extends AbstractSearchType {
             return [];
         }
 
-        $results = $this->categoriesApi->index([
-            'categoryID' => implode(',', $filteredRecordIDs),
-            'expand' => [ModelUtils::EXPAND_CRAWL],
-        ]);
+        $results = $this->categoriesApi->index(
+            [
+                'categoryID' => implode(',', $filteredRecordIDs),
+                'expand' => [ModelUtils::EXPAND_CRAWL],
+            ],
+            false
+        );
         $results = $results->getData();
 
         $resultItems = array_map(function ($result) {

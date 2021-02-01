@@ -2,6 +2,7 @@
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
+import { BorderType } from "@library/styles/styleHelpersBorders";
 import {
     FontFamilyProperty,
     FontSizeProperty,
@@ -61,6 +62,7 @@ export interface IFont {
     family?: FontFamilyProperty[];
     transform?: TextTransformProperty;
     letterSpacing?: LetterSpacingProperty<TLength>;
+    textDecoration?: "none" | "underline";
 }
 
 export interface IBackground {
@@ -145,6 +147,7 @@ export const EMPTY_FONTS: IFont = {
     family: undefined,
     transform: undefined,
     letterSpacing: undefined,
+    textDecoration: undefined,
 };
 
 /**
@@ -227,4 +230,17 @@ export enum ListSeparation {
      * Item 3
      */
     SEPARATOR = "separator",
+}
+
+export interface IBoxOptions {
+    borderType: BorderType;
+    background: IBackground;
+    spacing: ISpacing;
+    border: ISimpleBorderStyle;
+}
+
+export interface IContentBoxes {
+    depth1: IBoxOptions;
+    depth2: IBoxOptions;
+    depth3: IBoxOptions;
 }

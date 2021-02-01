@@ -472,6 +472,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 'comments' => 'Comments',
                 'dashboard' => 'Dashboard',
                 'discussions' => 'Discussions',
+                'categories' => 'Categories',
                 'inbox' => 'Inbox',
                 'profile' => 'Profile',
             ]

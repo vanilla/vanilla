@@ -12,21 +12,12 @@ export const mixinClickInput = (selector: string, overwriteColors?: {}, overwrit
     selector = trimTrailingCommas(selector);
     const selectors = selector.split(",");
     const linkColors = Mixins.clickable.itemState(overwriteColors, overwriteSpecial);
-    if (!selectors) {
+    selectors.map((s) => {
         if (linkColors.color !== undefined) {
             cssOut(selector, {
                 color: linkColors.color,
             });
         }
-        cssOut(trimTrailingCommas(selector), linkColors);
-    } else {
-        selectors.map((s) => {
-            if (linkColors.color !== undefined) {
-                cssOut(selector, {
-                    color: linkColors.color,
-                });
-            }
-            cssOut(trimTrailingCommas(s), linkColors);
-        });
-    }
+        cssOut(trimTrailingCommas(s), linkColors);
+    });
 };

@@ -1,12 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
 ?>
 <div class="FormTitleWrapper">
+    <?php BoxThemeShim::startHeading(); ?>
     <h1 class="H"><?php echo $this->data('Title'); ?></h1>
+    <?php BoxThemeShim::endHeading(); ?>
     <?php
     /** @var ProfileController $this */
-    echo $this->Form->open();
+    echo $this->Form->open(['class' => 'pageBox']);
     echo $this->Form->errors();
     ?>
     <ul role="presentation">

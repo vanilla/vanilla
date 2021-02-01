@@ -64,7 +64,7 @@ function QuickLink(props: IQuickLinkProps) {
         <li className={classNames(classes.listItem)}>
             <SmartLink className={classNames(classes.listItemTitle)} to={path}>
                 {t(title)}
-                {count && <span className={classNames(classes.count)}>{count}</span>}
+                {count != null && <span className={classNames(classes.count)}>{count}</span>}
             </SmartLink>
         </li>
     );

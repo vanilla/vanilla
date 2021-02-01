@@ -24,7 +24,6 @@ import Result from "@library/result/Result";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
-import PlacesSearchListing from "@library/search/PlacesSearchListing";
 import { SearchContext } from "./SearchContext";
 import { SearchService, ISearchDomain } from "./SearchService";
 
@@ -70,7 +69,7 @@ export function SearchFormContextProvider(props: IProps) {
         name: t("All"),
         sort: 0,
         icon: <TypeAllIcon />,
-        heading: <PlacesSearchListing />,
+        heading: SearchService.getHeadingComponent(),
         // To be called when performing a search in the current domain
         extraSearchAction: () => {
             searchInDomain(PLACES_DOMAIN_NAME);

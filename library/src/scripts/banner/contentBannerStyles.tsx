@@ -22,7 +22,7 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
     const dimensions = makeVars("dimensions", {
         minHeight: 120,
         mobile: {
-            minHeight: 80,
+            minHeight: 120,
         },
     });
 

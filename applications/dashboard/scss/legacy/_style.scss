@@ -1738,49 +1738,53 @@ overflow: hidden;
   padding-left: 48px;
 }
 
-.CategoryList .Depth2 {
-  padding-left: 25px !important;
+// Don't clash with our newer styles.
+.CategoryList {
+    .Depth2 {
+        padding-left: 25px;
+    }
+
+    .Depth3 {
+        padding-left: 50px;
+    }
+
+    .Depth4 {
+        padding-left: 75px;
+    }
+
+    .Depth5 {
+        padding-left: 100px;
+    }
+
+    .Depth6 {
+        padding-left: 125px;
+    }
+
+    .Depth7 {
+        padding-left: 150px;
+    }
+
+    .Depth8 {
+        padding-left: 175px;
+    }
+
+    .Depth9 {
+        padding-left: 200px;
+    }
+
+    .Depth10 {
+        padding-left: 225px;
+    }
+
+    .Depth11 {
+        padding-left: 250px;
+    }
+
+    .Depth12 {
+        padding-left: 275px;
+    }
 }
 
-.CategoryList .Depth3 {
-  padding-left: 50px !important;
-}
-
-.CategoryList .Depth4 {
-  padding-left: 75px !important;
-}
-
-.CategoryList .Depth5 {
-  padding-left: 100px !important;
-}
-
-.CategoryList .Depth6 {
-  padding-left: 125px !important;
-}
-
-.CategoryList .Depth7 {
-  padding-left: 150px !important;
-}
-
-.CategoryList .Depth8 {
-  padding-left: 175px !important;
-}
-
-.CategoryList .Depth9 {
-  padding-left: 200px !important;
-}
-
-.CategoryList .Depth10 {
-  padding-left: 225px !important;
-}
-
-.CategoryList .Depth11 {
-  padding-left: 250px !important;
-}
-
-.CategoryList .Depth12 {
-  padding-left: 275px !important;
-}
 
 .Box.RecentUsers {
   float: left;
@@ -2704,12 +2708,18 @@ div.Popup .userContent p {
   padding: 0;
 }
 
-body.Profile.EditMode ul li label,
-div.Popup form ul li label {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 10px 0 0;
+body.Profile.EditMode,
+div.Popup form {
+    & ul li label {
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        margin: 10px 0 0;
+    }
+
+    & ul li:first-child label {
+        margin-top: 0;
+    }
 }
 
 body.Entry form ul li.Gender label.RadioLabel,

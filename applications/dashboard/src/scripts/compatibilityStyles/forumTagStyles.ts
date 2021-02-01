@@ -9,12 +9,14 @@ import { defaultTransition, userSelect, negative } from "@library/styles/styleHe
 import { Mixins } from "@library/styles/Mixins";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { tagVariables } from "@library/styles/tagStyles";
+import { tagVariables, TagType } from "@library/styles/tagStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { important, percent } from "csx";
 
 export const forumTagCSS = () => {
     const vars = tagVariables();
+    const tagItemWidth = vars.tagItem.type === TagType.LIST ? "100%" : "auto";
+    const tagItemListStyle = vars.tagItem.type === TagType.LIST ? Mixins.flex.spaceBetween() : {};
 
     cssOut(
         `
@@ -29,10 +31,20 @@ export const forumTagCSS = () => {
         },
     );
 
-    cssOut(".Panel.Panel li.TagCloud-Item", {
-        margin: 0,
+    cssOut(".Panel.Panel li.TagCloud-Item.TagCloud-Item", {
         padding: 0,
+        width: tagItemWidth,
         maxWidth: percent(100),
+        ...Mixins.margin(vars.tagItem.margin),
+        "& a": {
+            ...tagItemListStyle,
+            ...Mixins.font(vars.tagItem.font),
+            ...Mixins.background(vars.tagItem.background),
+        },
+        "&  a:hover, a:active, a:focus": {
+            ...Mixins.font(vars.tagItem.fontState),
+            ...Mixins.background(vars.tagItem.backgroundState),
+        },
     });
 
     cssOut(`.AuthorInfo .MItem.RoleTracker a`, {

@@ -11,6 +11,7 @@ use Vanilla\Addons\Pockets\PocketsModel;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
+use VanillaTests\Fixtures\MockWidgets\MockWidget2;
 
 /**
  * Tests for pocket rendering.
@@ -106,5 +107,49 @@ class PocketsRenderTest extends AbstractAPIv2Test {
         $html = $this->bessy()->getHtml('/discussions', [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
         $session->end();
         $html->assertCssSelectorNotTextContains("#guesttypepocket", "hello guest-type person");
+    }
+
+
+    /**
+     * Test rendering pockets on specific page.
+     *
+     * @param string $onPage
+     * @param string $notOnPage
+     * @dataProvider providePageTests
+     */
+    public function testRenderOnPagePockets(string $onPage, string $notOnPage) {
+        $this->pocketsModel->touchPocket('HTML Pocket', [
+            'Body' => '<div id="htmlpocket">hello custom on discussions page</div>',
+            'Disabled' => \Pocket::ENABLED,
+            'Page' => $onPage,
+        ]);
+        $this->pocketsModel->touchPocket('Widget Pocket', [
+            'WidgetParameters' => ['name' => 'My Widget 2 on discussions page'],
+            'Format' => PocketsModel::FORMAT_WIDGET,
+            'WidgetID' => MockWidget2::getWidgetID(),
+            'Disabled' => \Pocket::ENABLED,
+            'Page' => $onPage,
+        ]);
+
+        $htmlPage = $this->bessy()->getHtml('/' . $onPage, [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
+        $htmlPage->assertCssSelectorText("#htmlpocket", "hello custom on discussions page");
+        $htmlPage->assertCssSelectorText(".mockWidget", "My Widget 2 on discussions page");
+        $htmlOtherPage = $this->bessy()->getHtml('/' . $notOnPage, [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
+        $htmlOtherPage->assertCssSelectorNotExists("#htmlpocket");
+        $htmlOtherPage->assertCssSelectorNotExists(".mockWidget");
+    }
+
+    /**
+     * Provide data tests for rendering on page only.
+     *
+     * @return array
+     */
+    public function providePageTests(): array {
+        $r = [
+            ['discussions', 'categories'],
+            ['categories', 'discussions'],
+        ];
+
+        return $r;
     }
 }

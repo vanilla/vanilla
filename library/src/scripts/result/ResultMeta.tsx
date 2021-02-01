@@ -70,7 +70,7 @@ export function ResultMeta(props: IProps) {
             {labels &&
                 labels.map((label) => (
                     <span className={classesMetas.metaLabel} key={label}>
-                        {label}
+                        {t(label)}
                     </span>
                 ))}
 

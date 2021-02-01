@@ -555,7 +555,7 @@ class MediaItemModule extends Gdn_Module {
     public function prepare(){
         if ($this->dropdown !== null) {
             if (!$this->dropdown->prepare()) {
-                unset($this->dropdown);
+                $this->dropdown = null;
             }
         }
 

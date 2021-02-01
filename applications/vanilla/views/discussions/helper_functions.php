@@ -160,7 +160,7 @@ if (!function_exists('WriteDiscussion')) :
 
         $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
         ?>
-        <li id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
+        <li id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?> pageBox">
             <?php
             if (!property_exists($sender, 'CanEditDiscussions')) {
                 $sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');

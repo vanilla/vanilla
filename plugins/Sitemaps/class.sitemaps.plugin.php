@@ -123,7 +123,8 @@ class SitemapsPlugin extends Gdn_Plugin {
         $limit = (int)min($m[3], 5000);
 
         $category = CategoryModel::categories($urlCode);
-        if (!$category || $offset > $category['countDiscussions']) {
+        $countDiscussions = $category['CountDiscussions'] ?? $category['countDiscussions'] ?? null;
+        if (!$category || $offset > $countDiscussions) {
             throw notFoundException();
         }
         if (!$category['PermsDiscussionsView']) {

@@ -167,7 +167,8 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
         if (Array.isArray(customVariable) && isArray(defaultVariable)) {
             // We currently can't pre-process arrays.
             return customVariable;
-        } else if (
+        }
+        if (
             defaultVariable instanceof ColorHelper ||
             (defaultVariable === undefined && typeof customVariable === "string" && customVariable.startsWith("#"))
         ) {

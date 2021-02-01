@@ -183,7 +183,9 @@ select::-ms-expand {
 
 .Buttons .Close,
 .Button.Danger {
-    @include Button;
+    @if $staticVariables {
+        @include Button;
+    }
 }
 
 .ActivityFormWrap {

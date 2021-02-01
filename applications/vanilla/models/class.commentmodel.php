@@ -11,6 +11,7 @@
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
 use Vanilla\Events\LegacyDirtyRecordTrait;
@@ -27,6 +28,8 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 use Webmozart\Assert\Assert;
+use Vanilla\Search\SearchService;
+use Vanilla\Search\SearchTypeQueryExtenderInterface;
 
 /**
  * Manages discussion comments data.
@@ -946,7 +949,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             'url:s?' => 'The full URL to the comment.',
             'labelCodes:a?' => ['items' => ['type' => 'string']],
             'type:s?' => 'Record type for search drivers.',
-            'format:s?' => 'The format of the comment'
+            'format:s?' => 'The format of the comment',
+            'groupID:i?' => [
+                'x-null-value' => -1,
+            ],
         ]);
         return $result;
     }
@@ -1254,6 +1260,14 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     return $invalidReturnType;
                 }
 
+                // Make sure the discussion actually exists (https://github.com/vanilla/vanilla-patches/issues/716).
+                if (isset($formPostValues['DiscussionID'])) {
+                    $discussion = $this->discussionModel->getID($formPostValues['DiscussionID']);
+                    if (!$discussion) {
+                        throw new NotFoundException('Discussion');
+                    }
+                }
+
                 if ($insert === false) {
                     // Log the save.
                     LogModel::logChange('Edit', 'Comment', array_merge($fields, ['CommentID' => $commentID]));
@@ -1366,9 +1380,16 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
             $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
             $result['score'] = $row['Score'] ?? 0;
+            $discussion = $this->discussionModel->getID($row['DiscussionID']);
+            $result['groupID'] = $discussion->GroupID ?? null;
             $siteSection = $this->siteSectionModel
                 ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
             $result['locale'] = $siteSection->getContentLocale();
+            $searchService = Gdn::getContainer()->get(SearchService::class);
+            /** @var SearchTypeQueryExtenderInterface $extender */
+            foreach ($searchService->getExtenders() as $extender) {
+                $extender->extendRecord($result, 'comment');
+            }
         }
         return $result;
     }

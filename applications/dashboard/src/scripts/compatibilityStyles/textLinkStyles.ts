@@ -45,7 +45,7 @@ export const textLinkCSS = () => {
     mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
     });
-    mixinClickInput(".DataList .Item .Title a");
+    mixinClickInput(".DataList .Item .Title a", { default: globalVars.mainColors.fg, textDecoration: "underline" });
     mixinClickInput("body.Section-Entry label.RadioLabel a, body.Section-Entry label.CheckBoxLabel a");
 
     // Links that have FG color by default but regular state colors.

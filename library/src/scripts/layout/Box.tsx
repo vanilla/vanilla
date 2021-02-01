@@ -5,7 +5,8 @@
 
 import React from "react";
 import { cx } from "@emotion/css";
-import { boxClasses, IBoxOptions } from "@library/layout/Box.styles";
+import { boxClasses } from "@library/layout/Box.styles";
+import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: React.ReactNode;

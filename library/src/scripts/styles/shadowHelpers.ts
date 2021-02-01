@@ -23,6 +23,7 @@ interface IShadowSizing {
 }
 
 export const shadowVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const makeVariables = variableFactory("shadow");
 
     const widget: IShadowSizing = makeVariables("widget", {
@@ -46,7 +47,7 @@ export const shadowVariables = useThemeCache(() => {
         verticalOffset: 5,
         blur: 10,
         spread: 0,
-        opacity: 0.3,
+        opacity: globalVars.borderType.dropDowns.width > 1 ? 0 : 0.3,
     });
 
     const modal: IShadowSizing = makeVariables("modal", {

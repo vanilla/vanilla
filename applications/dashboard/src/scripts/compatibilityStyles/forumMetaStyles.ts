@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { allLinkStates, negative } from "@library/styles/styleHelpers";
+import { allLinkStates, extendItemContainer, negative } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -169,6 +169,10 @@ export const forumMetaCSS = () => {
         background: "none",
     });
 
+    cssOut(".AuthorWrap", {
+        ...extendItemContainer(globalVars.meta.spacing.default),
+    });
+
     cssOut(
         `
     .AuthorWrap a.Username,
@@ -209,15 +213,6 @@ export const forumMetaCSS = () => {
         `,
         {
             textDecoration: "none",
-        },
-    );
-
-    cssOut(
-        `
-    .Content  .idea-counter-module
-    `,
-        {
-            padding: 0,
         },
     );
 

@@ -22,6 +22,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 export const buttonCSS = () => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
+    const buttonVars = buttonGlobalVariables();
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
@@ -53,8 +54,8 @@ export const buttonCSS = () => {
     mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
 
     const buttonBorderRadius = parseInt(globalVars.borderType.formElements.buttons.toString(), 10);
-    const borderOffset = globalVars.border.width * 2;
-    const handleSize = formElementVars.sizing.height - borderOffset;
+    const borderOffset = buttonVars.border.width * 2;
+    const handleSize = buttonVars.sizing.minHeight - borderOffset;
 
     if (buttonBorderRadius && buttonBorderRadius > 0) {
         cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
@@ -106,7 +107,6 @@ export const buttonCSS = () => {
     });
 
     cssOut(`.Frame .ButtonGroup.Multi.Open .Button.Handle`, {
-        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.secondary),
         width: styleUnit(formElementVars.sizing.height),
     });
 

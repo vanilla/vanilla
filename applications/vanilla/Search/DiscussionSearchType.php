@@ -21,8 +21,11 @@ use Vanilla\Search\CollapsableSerachQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
+use Vanilla\Search\SearchResultItem;
+use Vanilla\Search\SearchTypeQueryExtenderInterface;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Models\CrawlableRecordSchema;
 
 /**
  * Search record type for a discussion.
@@ -43,6 +46,9 @@ class DiscussionSearchType extends AbstractSearchType {
 
     /** @var BreadcrumbModel */
     protected $breadcrumbModel;
+
+    /** @var array extenders */
+    protected $extenders = [];
 
     /**
      * DI.
@@ -67,12 +73,20 @@ class DiscussionSearchType extends AbstractSearchType {
         $this->breadcrumbModel = $breadcrumbModel;
     }
 
-
     /**
      * @inheritdoc
      */
     public function getKey(): string {
         return 'discussion';
+    }
+
+    /**
+     * Register search query extender
+     *
+     * @param SearchTypeQueryExtenderInterface $extender
+     */
+    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender) {
+        $this->extenders[] = $extender;
     }
 
     /**
@@ -100,6 +114,11 @@ class DiscussionSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array {
+        if ($query->supportsExtenders()) {
+            foreach ($this->extenders as $extender) {
+                $extender->extendPermissions();
+            }
+        }
         try {
             $results = $this->discussionsApi->index([
                 'discussionID' => implode(",", $recordIDs),
@@ -156,6 +175,13 @@ class DiscussionSearchType extends AbstractSearchType {
             $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
+            }
+
+            if ($query->supportsExtenders()) {
+                /** @var SearchTypeQueryExtenderInterface $extender */
+                foreach ($this->extenders as $extender) {
+                    $extender->extendQuery($query);
+                }
             }
 
             if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter('discussionRecency')) {
@@ -247,7 +273,7 @@ class DiscussionSearchType extends AbstractSearchType {
                     "hot",
                     "-hot"
                 ],
-            ],
+            ]
         ]);
     }
 
@@ -399,6 +425,12 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('includeArchivedCategories'),
             $query->getQueryParameter('categoryIDs')
         );
+        if ($query->supportsExtenders()) {
+            /** @var SearchTypeQueryExtenderInterface $extender */
+            foreach ($this->extenders as $extender) {
+                $categoryIDs = $extender->extendCategories($categoryIDs);
+            }
+        }
         return $categoryIDs;
     }
 

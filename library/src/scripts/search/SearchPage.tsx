@@ -56,7 +56,6 @@ function SearchPage(props: IProps) {
         form,
         updateForm,
         search,
-        searchInDomain,
         results,
         getDomains,
         getCurrentDomain,

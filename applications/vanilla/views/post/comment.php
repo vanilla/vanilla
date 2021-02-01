@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 
 $Session = Gdn::session();
 $NewOrDraft = !isset($this->Comment) || property_exists($this->Comment, 'DraftID') ? true : false;
@@ -6,11 +8,13 @@ $Editing = isset($this->Comment);
 $formCssClass = 'MessageForm CommentForm FormTitleWrapper';
 $this->EventArguments['FormCssClass'] = &$formCssClass;
 $this->fireEvent('BeforeCommentForm');
+BoxThemeShim::inactiveHtml("<div class='$formCssClass'>");
+BoxThemeShim::startHeading();
 ?>
-<div class="<?php echo $formCssClass; ?>">
     <h2 class="H"><?php echo t($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
+    <?php BoxThemeShim::endHeading(); ?>
 
-    <div class="CommentFormWrap">
+    <div class="CommentFormWrap pageBox">
         <?php if (Gdn::session()->isValid()) : ?>
             <div class="Form-HeaderWrap">
                 <div class="Form-Header">
@@ -85,4 +89,6 @@ $this->fireEvent('BeforeCommentForm');
             </div>
         </div>
     </div>
-</div>
+<?php
+BoxThemeShim::inactiveHtml("</div>");
+?>

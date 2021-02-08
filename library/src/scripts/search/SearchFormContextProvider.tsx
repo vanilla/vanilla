@@ -26,6 +26,7 @@ import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { SearchContext } from "./SearchContext";
 import { SearchService, ISearchDomain } from "./SearchService";
+import PlacesSearchListing from "@library/search/PlacesSearchListing";
 
 interface IProps {
     children?: React.ReactNode;
@@ -64,15 +65,21 @@ export function SearchFormContextProvider(props: IProps) {
         });
     };
 
+    const hasPlacesDomain = SearchService.pluggableDomains.map((domain) => domain.key).includes(PLACES_DOMAIN_NAME);
+
     const ALL_CONTENT_DOMAIN: ISearchDomain = {
         key: ALL_CONTENT_DOMAIN_NAME,
         name: t("All"),
         sort: 0,
         icon: <TypeAllIcon />,
-        heading: SearchService.getHeadingComponent(),
-        // To be called when performing a search in the current domain
+        heading: hasPlacesDomain ? <PlacesSearchListing /> : null,
+        // To be called when performing a search in the current domain. We need to be aware of PLACES_DOMAIN_NAME
+        // here because the component <PlacesSearchListing /> is specific to Places Search and yet we want it in
+        // all domains and we want to make the query to the places domain
         extraSearchAction: () => {
-            searchInDomain(PLACES_DOMAIN_NAME);
+            if (hasPlacesDomain) {
+                searchInDomain(PLACES_DOMAIN_NAME);
+            }
         },
         PanelComponent: FilterPanelAll,
         getAllowedFields: () => {

@@ -4,7 +4,7 @@
  */
 
 import { IUserFragment } from "@library/@types/api/users";
-import { ICrumb } from "@vanilla/library/src/scripts/navigation/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 
 export interface IDiscussion {
     discussionID: number;

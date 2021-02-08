@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
+use Vanilla\HostedJob\Driver\HostedDriverSlip;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 
@@ -30,7 +31,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * @return string
      */
     public function getId(): string {
-        return "null";
+        return HostedDriverSlip::LEGACY_NULL_STRING_VALUE;
     }
 
     /**

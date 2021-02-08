@@ -241,6 +241,11 @@ class ConversationMessageModel extends ConversationsModel {
         $messageID = false;
         if ($formIsValid && $floodCheckPassed) {
             $fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
+
+            // Prevent request from setting the messageID (https://github.com/vanilla/vanilla-patches/issues/720)
+            if (isset($fields['MessageID'])) {
+                unset($fields['MessageID']);
+            }
             touchValue('Format', $fields, c('Garden.InputFormatter', 'Html'));
 
             $this->EventArguments['Fields'] = $fields;

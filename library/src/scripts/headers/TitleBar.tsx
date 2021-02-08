@@ -74,6 +74,8 @@ export default function TitleBar(_props: IProps) {
         ..._props,
     };
 
+    const containerOptions = titleBarVariables().titleBarContainer;
+
     const { bgProps, bg2Props, logoProps } = useScrollTransition();
     const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
 
@@ -129,7 +131,11 @@ export default function TitleBar(_props: IProps) {
                         </animated.div>
                     )}
                 </div>
-                <Container fullGutter>
+                <Container
+                    fullGutter
+                    gutterSpacing={containerOptions.gutterSpacing}
+                    maxWidth={containerOptions.maxWidth}
+                >
                     <div className={classes.titleBarContainer}>
                         <div className={classNames(classes.bar, { isHome: showSubNav })}>
                             {isCompact &&

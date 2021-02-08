@@ -11,9 +11,9 @@ import { connect } from "react-redux";
 import { OptionProps } from "react-select/lib/components/Option";
 import { NoOptionsMessage } from "@library/forms/select/overwrites";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
-import Tokens, { ITokenProps } from "@vanilla/library/src/scripts/forms/select/Tokens";
-import SelectOne from "@vanilla/library/src/scripts/forms/select/SelectOne";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
+import SelectOne from "@library/forms/select/SelectOne";
 
 interface IProps {
     multiple?: boolean;

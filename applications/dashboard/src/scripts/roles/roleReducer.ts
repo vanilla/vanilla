@@ -6,7 +6,7 @@
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IRole } from "@dashboard/roles/roleTypes";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { RoleActions } from "@dashboard/roles/RoleActions";
 
 export interface IRoleState {

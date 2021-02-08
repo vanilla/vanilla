@@ -17,6 +17,8 @@ namespace Vanilla\Utility;
  * name and the total time will be tracked alongside the min, max, and count of timers.
  */
 final class Timers implements \JsonSerializable {
+    const TIMERS = ['cacheRead', 'cacheWrite', 'dbRead', 'dbWrite'];
+
     private const DEFAULT_TIMER = [
         'time' => 0.0,
         'human' => '0',
@@ -26,6 +28,8 @@ final class Timers implements \JsonSerializable {
     ];
 
     private $timers = [];
+
+    private $customTimers = [];
 
     /**
      * Start a timer.
@@ -218,5 +222,19 @@ final class Timers implements \JsonSerializable {
         }, $keys);
 
         return implode(', ', $args);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTimers(): array {
+        return array_merge(self::TIMERS, $this->customTimers);
+    }
+
+    /**
+     * @param string $timer
+     */
+    public function addCustomTimer(string $timer): void {
+        $this->customTimers[] = $timer;
     }
 }

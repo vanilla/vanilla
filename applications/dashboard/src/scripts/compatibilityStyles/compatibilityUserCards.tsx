@@ -11,12 +11,12 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 import { deconstructAttributesFromElement } from "@vanilla/react-utils";
 import { important } from "csx";
-import { buttonVariables } from "@vanilla/library/src/scripts/forms/Button.variables";
+import { buttonVariables } from "@library/forms/Button.variables";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { numberFormattedClasses } from "@library/content/NumberFormatted.styles";
 import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
-import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
+import { getMeta } from "@library/utility/appUtils";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 
 export function applyCompatibilityUserCards(scope: HTMLElement | Document | undefined = document) {

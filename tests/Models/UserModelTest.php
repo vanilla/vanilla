@@ -213,28 +213,52 @@ class UserModelTest extends SiteTestCase {
 
     /**
      * Test UserModel::search().
+     *
+     * @param string $username
+     * @param string $keywords
+     * @param int $expectedCount
+     * @dataProvider searchDataProvider
      */
-    public function testSearch(): void {
-        $userA = [
-            "Name" => "user_a",
-            "Email" => "testuser1@example.com",
+    public function testSearch(string $username, string $keywords, int $expectedCount): void {
+        if ($username) {
+            $this->createUser($username);
+        }
+        $result = $this->userModel->search(['Keywords' => $keywords]);
+        $this->assertEquals($expectedCount, $result->numRows());
+    }
+
+    /**
+     * Test cases data provider
+     */
+    public function searchDataProvider(): array {
+        return [
+            'regular search' => ['searcha', 'searcha', 1],
+            'regular search 2' => ['abcsearcha', 'searcha', 1],
+            'search user with space' => ['search a', 'search a', 1],
+            'user with underscore' => ['search_a', 'search_a', 1],
+            'wildcard search both' => ['', '%searcha%', 2],
+            'wildcard search left' => ['', '%searcha', 2],
+            'wildcard search right' => ['', 'searcha%', 1],
+            'wildcard both username with space' => ['', '%search a%', 1],
+            'wildcard left username with space'=> ['', '%search a', 1],
+            'wildcard right username with space' => ['', 'search a%', 1],
+            'wildcard right multiple users' => ['', 'search%', 3],
+            ];
+    }
+
+    /**
+     * Create  User.
+     *
+     * @param string $userName
+     */
+    private function createUser(string $userName): void {
+        $rand = rand(10, 1000);
+        $user = [
+            "Name" => $userName,
+            "Email" => $rand."test@example.com",
             "Password" => "vanilla"
         ];
-
-        $userB = [
-            "Name" => "user a",
-            "Email" => "testuser2@example.com",
-            "Password" => "vanilla"
-        ];
-
-        $userIDA = $this->userModel->save($userA);
-        $this->userModel->save($userB);
-
-
-        $result = $this->userModel->search($userA['Name']);
-        $row = $result->firstRow(DATASET_TYPE_ARRAY);
-        $this->assertEquals($userIDA, $row['UserID']);
-        $this->assertEquals(1, $result->numRows());
+        $this->userModel->save($user);
     }
 
     /**

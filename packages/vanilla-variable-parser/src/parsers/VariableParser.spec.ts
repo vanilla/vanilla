@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import path from "path";
 import { VariableParser } from "./VariableParser";
 
@@ -45,53 +51,5 @@ describe("VariableParser", () => {
         const output = parser.parseString(input, "file.js");
         expect(output.errors).toHaveLength(0);
         expect(output.variables).toMatchSnapshot("font expansions");
-    });
-
-    it("applies varGroup prefixes and common descriptions", () => {
-        const input = `
-        /**
-         * @varGroup thing
-         * @commonTitle PREFIX
-         * @commonDescription DESCRIPTION
-         */
-
-         /**
-          * @var thing.var1
-          * @title Variable 1
-          * @description My Description
-          */
-
-         /**
-          * @var thing.var2
-          * @title Variable 2
-          * @description My Description 2
-          */
-        `;
-        const parser = VariableParser.create();
-        const output = parser.parseString(input, "file.js");
-
-        expect(output.errors).toHaveLength(0);
-        expect(output.variables).toMatchSnapshot("varGroupPrefixes expansions");
-    });
-
-    it("handles nested parentGroups", () => {
-        const input = `
-        /**
-         * @varGroup thing
-         * @commonTitle PREFIX
-         * @commonDescription DESCRIPTION
-         */
-
-         /**
-          * @var thing.nested.var1
-          * @title Variable 1
-          * @description My Description
-          */
-        `;
-        const parser = VariableParser.create();
-        const output = parser.parseString(input, "file.js");
-
-        expect(output.errors).toHaveLength(0);
-        expect(output.variables[0].title).toEqual("PREFIX - Variable 1");
     });
 });

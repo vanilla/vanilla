@@ -9,8 +9,8 @@ import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 import { wait, waitFor } from "@testing-library/react";
-import { registerEmbed } from "@vanilla/library/src/scripts/embeddedContent/embedService";
-import { IFrameEmbed, supportsFrames } from "@vanilla/library/src/scripts/embeddedContent/IFrameEmbed";
+import { registerEmbed } from "@library/embeddedContent/embedService";
+import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { expect } from "chai";
 import Quill, { DeltaOperation } from "quill/core";
 

@@ -49,7 +49,7 @@ class SchemaForm {
      * Text box form element schema.
      *
      * @param FormOptions $options
-     * @param string $type "text" or "textarea".
+     * @param string $type "text", "number" or "textarea".
      *
      * @return array
      */

@@ -12,7 +12,7 @@ import { calc, percent } from "csx";
 import { appearance } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonMixins";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();

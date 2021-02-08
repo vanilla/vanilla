@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { useThemeCache } from "@library/styles/themeCache";
-import { cssRaw } from "@vanilla/library/src/scripts/styles/styleShim";
+import { cssRaw } from "@library/styles/styleShim";
 import { Mixins } from "@library/styles/Mixins";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent } from "csx/lib/units";

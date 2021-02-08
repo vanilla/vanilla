@@ -93,6 +93,14 @@ paths:
               $ref: '#/components/schemas/ReactionType'
         required: true
       summary: Update a reaction type.
+  /discussions:
+    get:
+      parameters:
+        - name: reactionType
+          description: Get all discussions you have given a specific reaction to.
+          in: query
+          schema:
+            type: string
 components:
   schemas:
     ReactionType:

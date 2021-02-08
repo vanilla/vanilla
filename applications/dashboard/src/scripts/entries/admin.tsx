@@ -13,11 +13,11 @@ import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUpload
 import { applySharedPortalContext, mountReact } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import "@library/theming/reset";
-import { SCROLL_OFFSET_DEFAULTS, ScrollOffsetContext } from "@vanilla/library/src/scripts/layout/ScrollOffsetContext";
-import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { SCROLL_OFFSET_DEFAULTS, ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
+import { registerReducer } from "@library/redux/reducerRegistry";
 import { roleReducer } from "@dashboard/roles/roleReducer";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
-import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
+import { bodyCSS } from "@library/layout/bodyStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { Route } from "react-router-dom";
@@ -25,7 +25,7 @@ import RoleApplicationsPage from "@dashboard/roleRequests/pages/RoleApplications
 import { RoleRequestReducer } from "@dashboard/roleRequests/state/roleRequestReducer";
 import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
-import { TextEditorContextProvider } from "@vanilla/library/src/scripts/textEditor/TextEditor";
+import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
 import { WidgetFormGenerator } from "@dashboard/widgets/WidgetFormGenerator";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });

@@ -15,6 +15,7 @@ use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Cache\StaticCache;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\StringUtils;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
 use VanillaTests\Fixtures\TestCache;
@@ -448,5 +449,30 @@ trait BootstrapTrait {
         if (!empty($model->Validation->results())) {
             TestCase::fail($model->Validation->resultsText());
         }
+    }
+
+    /**
+     * Strip the webroot off a full path.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function stripWebRoot(string $path): string {
+        $webroot = \Gdn::request()->getRoot();
+        TestCase::assertStringStartsWith($webroot, $path);
+        return StringUtils::substringLeftTrim($path, $webroot);
+    }
+
+    /**
+     * Assert that a full path has an expected subpath.
+     *
+     * @param string $expectedSubpath
+     * @param string $actualFullPath
+     * @return string
+     */
+    public static function assertSubpath(string $expectedSubpath, string $actualFullPath): string {
+        $path = static::stripWebRoot($actualFullPath);
+        static::assertSame($expectedSubpath, $path);
+        return $path;
     }
 }

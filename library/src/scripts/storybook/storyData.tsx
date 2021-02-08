@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");

@@ -9,6 +9,7 @@
     "private": true,
     "dependencies": {
         "@babel/parser": "^7.12.10",
+        "@vanilla/utils": "*",
         "fs-extra": "^9.0.1",
         "globby": "^11.0.1",
         "json-schema": "^0.2.5"

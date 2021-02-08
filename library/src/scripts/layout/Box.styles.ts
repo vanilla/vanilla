@@ -41,11 +41,6 @@ export const boxVariables = useThemeCache((boxOptions?: Partial<IBoxOptions>, fo
      */
     const border = makeThemeVars("border", Variables.border({}));
 
-    /**
-     * @varGroup box.needsPadding
-     * @description If there is a visible border, padding should be implemented for better initial spacing.
-     * @expand border
-     */
     const needsPadding = [BorderType.SHADOW, BorderType.BORDER].includes(options.borderType);
 
     /**

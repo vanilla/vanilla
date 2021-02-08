@@ -9,6 +9,10 @@
  * @since 2.0.10
  */
 
+use Garden\JSON\Transformer;
+use Vanilla\Attributes;
+use Vanilla\Utility\CamelCaseScheme;
+
 /**
  * Used to access and manipulate the UserAuthenticationProvider table.
  */
@@ -26,13 +30,13 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     const ALL_CACHE_KEY = 'AuthenticationProviders-All';
     const DEFAULT_CACHE_KEY = 'AuthenticationProviders-Default';
     const CACHE_TTL = 60 * 30; // 30 minutes.
+    const OPT_RETURN_KEY = 'returnKey';
 
     /**
      *
      */
     public function __construct() {
         parent::__construct('UserAuthenticationProvider');
-        $this->PrimaryKey = self::COLUMN_KEY;
     }
 
     /**
@@ -43,6 +47,48 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         $cache = Gdn::cache();
         $cache->remove(self::ALL_CACHE_KEY);
         $cache->remove(self::DEFAULT_CACHE_KEY);
+    }
+
+    /**
+     * Delete a row by the ID or the authentication key.
+     *
+     * @param mixed $id
+     * @param false $datasetType
+     * @param array $options
+     * @return array|false|Gdn_DataSet|object
+     */
+    public function getID($id, $datasetType = false, $options = []) {
+        $result = false;
+        if (is_numeric($id)) {
+            $result = parent::getID($id, $datasetType, $options);
+        }
+        if ($result === false) {
+            parent::options($options);
+            $result = parent::getWhere([self::COLUMN_KEY => $id])->firstRow($datasetType);
+        }
+
+        if (is_array($result) || is_object($result)) {
+            $this->calculate($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Delete a row by the ID or the authentication key.
+     *
+     * @param mixed $id
+     * @param array $options
+     * @return bool|int
+     */
+    public function deleteID($id, $options = []) {
+        $result = 0;
+        if (is_numeric($id)) {
+            $result = parent::deleteID($id, $options);
+        }
+        if ($result === 0) {
+            $result = parent::delete([self::COLUMN_KEY => $id], $options);
+        }
+        return $result;
     }
 
 
@@ -56,11 +102,19 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             return;
         }
 
-        $attributes = dbdecode($row['Attributes']);
-        if (is_array($attributes)) {
-            $row = array_merge($attributes, $row);
+        if (is_array($row)) {
+            $attributes = dbdecode($row['Attributes']);
+            if (is_array($attributes)) {
+                $row = array_merge($attributes, $row);
+            }
+            unset($row['Attributes']);
+        } elseif (is_object($row)) {
+            $attributes = dbdecode($row->Attributes ?? null);
+            if (is_array($attributes)) {
+                $row = (object) array_merge($attributes, (array) $row);
+            }
+            unset($row->Attributes);
         }
-        unset($row['Attributes']);
     }
 
     /**
@@ -102,7 +156,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
             $data = $this->SQL->get()->resultArray();
         } else {
-            $data = $this->getAll();
+            $data = $this->getAllVisible();
         }
 
         $data = Gdn_DataSet::index($data, ['AuthenticationKey']);
@@ -113,9 +167,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     }
 
     /**
+     * Get all authenticators that are visible (i.e. should have a sign-in button).
+     *
      * @return array
      */
-    public function getAll(): array {
+    public function getAllVisible(): array {
         $cache = Gdn::cache();
 
         $data = $cache->get(self::ALL_CACHE_KEY);
@@ -123,6 +179,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             $data = $this->SQL
                 ->select('uap.*')
                 ->from('UserAuthenticationProvider uap')
+                ->where('Visible', true)
                 ->get()
                 ->resultArray()
             ;
@@ -132,6 +189,16 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         }
 
         return $data;
+    }
+
+    /**
+     * Alias for getting all authenticators.
+     *
+     * @return array
+     * @deprecated
+     */
+    public function getAll(): array {
+        return $this->getAllVisible();
     }
 
     /**
@@ -242,15 +309,53 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     }
 
     /**
+     * Given a database row, massage the data into a more externally-useful format.
+     *
+     * @param array $row
+     * @param array $additionalTransformations
+     * @return array $row
+     */
+    public function normalizeRow(array $row, array $additionalTransformations = []): array {
+        $spec = array_merge_recursive([
+            "active" => "Active",
+            "authenticatorID" => "UserAuthenticationProviderID",
+            "clientID" => "AuthenticationKey",
+            "default" => "IsDefault",
+            "name" => "Name",
+            "type" => "AuthenticationSchemeAlias",
+            "urls" => [
+                "authenticateUrl" => "AuthenticateUrl",
+                "passwordUrl" => "PasswordUrl",
+                "profileUrl" => "ProfileUrl",
+                "registerUrl" => "RegisterUrl",
+                "signInUrl" => "SignInUrl",
+                "signOutUrl" => "SignOutUrl",
+            ],
+            "visible" => "Visible",
+        ], $additionalTransformations);
+        $transformer = new Transformer($spec);
+
+        $result = $transformer->transform($row);
+        $result["urls"] = new Attributes($result["urls"] ?? []);
+        return $result;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function save($formPostValues, $settings = false) {
+        $settings = (array)$settings + [
+            self::OPT_RETURN_KEY => true,
+        ];
+
         // Grab the current record.
         $row = false;
-        if ($id = val('ID', $settings)) {
-            $row = $this->getWhere([$this->PrimaryKey => $id])->firstRow(DATASET_TYPE_ARRAY);
-        } elseif (isset($formPostValues[$this->PrimaryKey])) {
-            $row = $this->getWhere([$this->PrimaryKey => $formPostValues[$this->PrimaryKey]])->firstRow(DATASET_TYPE_ARRAY);
+        if ($id = $formPostValues[$this->PrimaryKey] ?? null) {
+            $row = $this->getID($id, DATASET_TYPE_ARRAY);
+        } elseif ($id = val('ID', $settings)) {
+            $row = $this->getWhere([self::COLUMN_KEY => $id])->firstRow(DATASET_TYPE_ARRAY);
+        } elseif (isset($formPostValues[self::COLUMN_KEY])) {
+            $row = $this->getWhere([self::COLUMN_KEY => $formPostValues[self::COLUMN_KEY]])->firstRow(DATASET_TYPE_ARRAY);
         } elseif ($pK = val('PK', $settings)) {
             $row = $this->getWhere([$pK => $formPostValues[$pK]])->firstRow(DATASET_TYPE_ARRAY);
         }
@@ -293,11 +398,16 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
                 }
 
                 if (!empty($fields)) {
-                    $primaryKeyVal = $row[$this->PrimaryKey];
-                    $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
+                    $this->update($fields, [$this->PrimaryKey => $row[$this->PrimaryKey]]);
+                    $primaryKeyVal = $settings[self::OPT_RETURN_KEY] ?
+                        ($fields[self::COLUMN_KEY] ?? $row[self::COLUMN_KEY]) :
+                        $row[$this->PrimaryKey];
                 }
             } else {
                 $primaryKeyVal = $this->insert($fields);
+                if ($settings[self::OPT_RETURN_KEY]) {
+                    $primaryKeyVal = $fields[self::COLUMN_KEY];
+                }
             }
         } else {
             $primaryKeyVal = false;

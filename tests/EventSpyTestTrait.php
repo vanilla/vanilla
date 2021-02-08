@@ -152,6 +152,9 @@ trait EventSpyTestTrait {
         if ($strictCount) {
             $expectedCount = count($events);
             $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
+            $dispatchedEvents = array_values(array_filter($dispatchedEvents, function ($event) {
+                return $event instanceof ResourceEvent;
+            }));
             $actualCount = count($dispatchedEvents);
             TestCase::assertEquals(
                 $expectedCount,
@@ -186,6 +189,9 @@ trait EventSpyTestTrait {
      */
     public function assertNoEventsDispatched(string $eventClass = null) {
         $events = $this->getEventManager()->getDispatchedEvents();
+        $events = array_values(array_filter($events, function ($event) {
+            return $event instanceof ResourceEvent;
+        }));
         if ($eventClass !== null) {
             $events = array_filter($events, function ($event) use ($eventClass) {
                 return is_a($event, $eventClass);
@@ -207,6 +213,10 @@ trait EventSpyTestTrait {
         $eventDispatched = false;
         if ($eventProperties) {
             foreach ($events as $event) {
+                if (!($eventDispatched instanceof ResourceEvent)) {
+                    continue;
+                }
+
                 $type = $eventProperties["type"] ?? '';
                 $action = $eventProperties["action"] ?? '';
                 if ($event->getType() === $type &&
@@ -251,7 +261,7 @@ trait EventSpyTestTrait {
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
         /** @var ResourceEvent $dispatchedEvent */
         foreach ($dispatchedEvents as $dispatchedEvent) {
-            if (!($event instanceof ResourceEvent)) {
+            if (!($event instanceof ResourceEvent) || !($dispatchedEvent instanceof ResourceEvent)) {
                 continue;
             }
 

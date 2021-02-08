@@ -1264,17 +1264,6 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Escapes fields with \, %, _
-     *
-     * @param string $field
-     * @return string|string[]
-     */
-    public function escapeField(string $field) {
-        $field =  str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $field);
-        return $field;
-    }
-
-    /**
      * A convenience method for Gdn_DatabaseDriver::Join that makes the join type 'left.'
      *
      * @param string $tableName

@@ -113,10 +113,14 @@ export async function _mountComponents(parent: Element) {
         if (typeof props === "string") {
             props = JSON.parse(props);
         }
+        const registeredComponent = getComponent(name);
+
+        if (!registeredComponent) {
+            return;
+        }
         const children = node.innerHTML;
         node.innerHTML = "";
 
-        const registeredComponent = getComponent(name);
         node.removeAttribute("data-react");
         node.removeAttribute("data-props");
 

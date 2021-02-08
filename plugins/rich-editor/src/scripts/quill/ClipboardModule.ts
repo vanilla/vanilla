@@ -11,7 +11,7 @@ import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import { supportsFrames } from "@vanilla/library/src/scripts/embeddedContent/IFrameEmbed";
+import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { forceInt } from "@vanilla/utils";
 
 export const EDITOR_SCROLL_CONTAINER_CLASS = "js-richEditorScrollContainer";

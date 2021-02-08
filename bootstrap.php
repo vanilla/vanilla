@@ -99,9 +99,6 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
-    ->rule(\Vanilla\ImageResizer::class)
-    ->addCall('setAlwaysRewriteGif', [false])
-
     ->rule(Contracts\Site\AbstractSiteProvider::class)
     ->setShared(true)
     ->setClass(OwnSiteProvider::class)

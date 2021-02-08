@@ -22,7 +22,7 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 // This new page must have our base reset in place.
 import "@library/theming/reset";
 import { t, formatUrl } from "@library/utility/appUtils";
-import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import Banner from "@library/banner/Banner";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";

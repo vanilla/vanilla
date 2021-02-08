@@ -446,7 +446,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * @param bool $checkThreshold Whether or not to check the alter table threshold before altering the table.
      * @return bool Whether or not the query succeeded.
      */
-    protected function executeQuery($sql, $checkThreshold = false) {
+    public function executeQuery($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
                 $this->Database->CapturedSql = [];

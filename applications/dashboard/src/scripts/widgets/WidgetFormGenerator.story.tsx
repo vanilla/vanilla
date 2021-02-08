@@ -4,7 +4,7 @@
  */
 
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
-import { mockAPI } from "@vanilla/library/src/scripts/__tests__/utility";
+import { mockAPI } from "@library/__tests__/utility";
 import React, { useState } from "react";
 import { WidgetFormGenerator } from "./WidgetFormGenerator";
 import keyBy from "lodash/keyBy";

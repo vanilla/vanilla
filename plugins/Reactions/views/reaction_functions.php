@@ -217,7 +217,7 @@ if (!function_exists('ScoreCssClass')) {
      */
     function scoreCssClass($row, $all = false) {
         $score = getValue('Score', $row);
-        $restored = !is_null(val('Attributes', $row)['DateRestored']);
+        $restored = !is_null(valr('Attributes.DateRestored', $row));
         if (!$score) {
             $score = 0;
         }

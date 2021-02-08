@@ -34,19 +34,19 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
             $this->profileExtender = $profileExtender;
         });
 
-        $r = $this->bessy()->post('/settings/profile-field-add-edit', [
+        $this->bessy()->post('/settings/profile-field-add-edit', [
             'Name' => 'text',
             'Label' => 'Text',
             'FormType' => 'TextBox'
         ]);
 
-        $r = $this->bessy()->post('/settings/profile-field-add-edit', [
+        $this->bessy()->post('/settings/profile-field-add-edit', [
             'Name' => 'check',
             'Label' => 'Check',
             'FormType' => 'CheckBox'
         ]);
 
-        $r = $this->bessy()->post('/settings/profile-field-add-edit', [
+        $this->bessy()->post('/settings/profile-field-add-edit', [
             'Name' => 'birthday',
             'Label' => 'Birthday',
             'FormType' => 'DateOfBirth'
@@ -93,5 +93,17 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $this->profileExtender->updateUserFields($this->api()->getUserID(), $fields);
         $data = $this->api()->get("/users/me")->getBody();
         $this->assertArraySubsetRecursive($fields, $data['extended']);
+    }
+
+    /**
+     * Verify Profile Extender values appear when editing user profiles, complete with values.
+     */
+    public function testFieldsOnEditProfile(): void {
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $this->profileExtender->updateUserFields($session->UserID, ['text' => __FUNCTION__]);
+
+        $result = $this->bessy()->getHtml("profile/edit");
+        $result->assertFormInput("text", __FUNCTION__);
     }
 }

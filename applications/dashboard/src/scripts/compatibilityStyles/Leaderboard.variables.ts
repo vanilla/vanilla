@@ -17,6 +17,7 @@ enum TitleAlignment { // FIXME: The same interface probably exists elsewhere
 
 /**
  * @varGroup leaderboard
+ * @description Variables affecting the leaderdboard module, made available through the Badges plugin.
  * @commonTitle Leaderboard
  */
 export const leaderboardVariables = useThemeCache((forcedVars?: IThemeVariables) => {

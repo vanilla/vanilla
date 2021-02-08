@@ -1,3 +1,10 @@
 [
-    "http://test.com",
-    "http://test2.com"]
+    {
+        "alt": "image Alt",
+        "url": "http://test.com"
+    },
+    {
+        "alt": "image",
+        "url": "http://test2.com"
+    }
+]

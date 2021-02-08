@@ -8,7 +8,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { conversationVariables } from "@dashboard/compatibilityStyles/pages/Conversation.variables";
-import { cssRaw } from "@vanilla/library/src/scripts/styles/styleShim";
+import { cssRaw } from "@library/styles/styleShim";
 
 export const conversationCompatCSS = () => {
     const globalVars = globalVariables();

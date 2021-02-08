@@ -3,9 +3,9 @@
  * @license GPL-2.0-only
  */
 
-import ReduxActions, { bindThunkAction, useReduxActions } from "@vanilla/library/src/scripts/redux/ReduxActions";
+import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
-import { IApiError } from "@vanilla/library/src/scripts/@types/api/core";
+import { IApiError } from "@library/@types/api/core";
 import { ITag } from "@library/features/tags/TagsReducer";
 import debounce from "lodash/debounce";
 

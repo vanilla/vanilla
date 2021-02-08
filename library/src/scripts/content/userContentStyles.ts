@@ -32,6 +32,8 @@ export enum TableStyle {
 /**
  * @varGroup userContent
  * @commonTitle User Content
+ * @description Variables affecting content created by users of the site.
+ * If you input it through a text editor, it's likely user content.
  */
 export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("userContent", forcedVars);

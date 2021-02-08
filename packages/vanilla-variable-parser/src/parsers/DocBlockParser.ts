@@ -1,6 +1,7 @@
 /**
- * @copyright 2020 Adam (charrondev) Charron
- * @license Proprietary
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
 
 import { Validator, ValidatorFn } from "./Validator";
@@ -230,7 +231,7 @@ export class DocBlockParser<T extends DocBlockResult = DocBlockResult> {
 
         // Clear the last attribute if necessary.
         if (currentLineAttribute) {
-            clearCurrentAttribute(currentLineAttribute);
+            clearCurrentAttribute(0);
         }
 
         if (this.leadingAttribute && !matchedLeadingAttribute) {

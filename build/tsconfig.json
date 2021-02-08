@@ -4,12 +4,12 @@
         "esModuleInterop": true,
         "target": "es6",
         "moduleResolution": "node",
-        "strict": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "lib": ["es2017", "dom"],
+        "lib": ["es2019", "dom"],
         "baseUrl": ".",
         "isolatedModules": false,
+        "strictNullChecks": true,
         "paths": {
             "happypack": ["scripts/@types/happypack"],
             "prettier-webpack-plugin": ["scripts/@types/prettier-webpack-plugin"],
@@ -17,5 +17,5 @@
             "react-docgen-typescript-webpack-plugin": ["scripts/@types/react-docgen-typescript-webpack-plugin"]
         }
     },
-    "include": ["scripts/**/*.ts"],
+    "include": ["scripts/**/*.ts"]
 }

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
+import { INavigationTreeItem } from "@library/@types/api/core";
 
 export const STORY_SITE_NAV_ACTIVE_RECORD = {
     recordID: 79,

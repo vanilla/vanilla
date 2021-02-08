@@ -133,9 +133,9 @@ class TestHtmlDocument extends HtmlDocument {
      *
      * @param string $name The form input name.
      * @param string|null $value The desired value. Pass `null` to not assert and just return the node.
-     * @return \DOMNode Returns the matched node.
+     * @return \DOMElement Returns the matched node.
      */
-    public function assertFormInput(string $name, ?string $value = null): \DOMNode {
+    public function assertFormInput(string $name, ?string $value = null): \DOMElement {
         $node = $this->assertCssSelectorExists("input[name=\"$name\"]", "Could not find form input: $name");
         if ($value !== null) {
             $attr = $node->getAttribute('value');

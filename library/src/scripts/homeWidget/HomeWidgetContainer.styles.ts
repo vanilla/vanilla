@@ -19,7 +19,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
 import { CSSObject } from "@emotion/css";
-
 export interface IHomeWidgetContainerOptions {
     noGutter?: boolean;
     outerBackground?: IBackground;
@@ -46,6 +45,11 @@ interface IViewAll {
     displayType?: ButtonTypes;
 }
 
+/**
+ * @varGroup homeWidgetContainer
+ * @title HomeWidget Container
+ * @description The home widget container controls the grid of home widget items. It doesn't affect the individual items, instead focusing on the content around the items and their arrangement/placement together.
+ */
 export const homeWidgetContainerVariables = useThemeCache(
     (optionOverrides?: IHomeWidgetContainerOptions, forcedVars?: IThemeVariables) => {
         const makeVars = variableFactory("homeWidgetContainer", forcedVars);
@@ -53,6 +57,11 @@ export const homeWidgetContainerVariables = useThemeCache(
         const layoutVars = layoutVariables(forcedVars);
         const itemVars = homeWidgetItemVariables({}, forcedVars);
 
+        /**
+         * @varGroup homeWidgetContainer.options
+         * @commonTitle HomeWidget - Options
+         * @description Control different variants for the HomeWidget. These options can affect multiple parts of the HomeWidget at once.
+         */
         let options = makeVars(
             "options",
             {
@@ -112,6 +121,11 @@ export const homeWidgetContainerVariables = useThemeCache(
         );
 
         const title = makeVars("title", {
+            /**
+             * @var homeWidgetContainer.title.font
+             * @type string
+             * @expand font
+             */
             font: Variables.font({}),
         });
 
@@ -122,15 +136,42 @@ export const homeWidgetContainerVariables = useThemeCache(
         const needsSpacing =
             options.outerBackground.color || options.outerBackground.image || options.borderType === "navLinks";
         const spacing = makeVars("spacing", {
+            /**
+             * @varGroup homeWidgetContainer.spacing.padding
+             * @title HomeWidget Spacing
+             * @expand spacing
+             */
             padding: Variables.spacing({
                 top: needsSpacing ? globalVars.gutter.size * 2 : globalVars.gutter.size,
                 bottom: needsSpacing ? globalVars.gutter.size * bottomMultiplier : 0,
             }),
         });
 
+        /**
+         * @varGroup homeWidgetContainer.itemSpacing
+         * @commonTitle HomeWidget Grid Spacing
+         * @expand spacing
+         */
         const itemSpacing = makeVars("itemSpacing", {
+            /**
+             * @var homeWidgetContainer.itemSpacing.horizontal
+             * @description Sets the amount of padding on content in the HomeWidget Container. The higher padding, the more narrow the widget becomes.
+             * @type string | number
+             */
             horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
+
+            /**
+             * @var homeWidgetContainer.itemSpacing.vertical
+             * @description Sets the amount of space underneath the View All button row.
+             * @type string | number
+             */
             vertical: globalVars.gutter.size / 2,
+
+            /**
+             * @var homeWidgetContainer.itemSpacing.mobile
+             * @description Sets the amount of horizontal padding the container has on mobile devices.
+             * @type string | number
+             */
             mobile: {
                 horizontal: options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
             },
@@ -139,33 +180,66 @@ export const homeWidgetContainerVariables = useThemeCache(
         const horizontalSpacing = (itemSpacing.horizontal as number) / 2; // Cut in half to account for grid item spacing.
         const horizontalSpacingMobile = (itemSpacing.mobile.horizontal as number) / 2; // Cut in half to account for grid item spacing.
 
+        /**
+         * @varGroup homeWidgetContainer.grid
+         * @commonTitle HomeWidget Grid
+         */
         const grid = makeVars("grid", {
             padding: Variables.spacing({
                 horizontal: horizontalSpacing,
                 vertical: itemSpacing.vertical,
             }),
+
             paddingMobile: {
                 horizontal: horizontalSpacingMobile,
             },
         });
 
         const gridItem = makeVars("gridItem", {
+            /**
+             * @varGroup homeWidgetContainer.gridItem.padding
+             * @commonTitle Padding
+             * @expand spacing
+             */
             padding: Variables.spacing({
                 horizontal: horizontalSpacing,
                 vertical: itemSpacing.vertical,
             }),
+
+            /**
+             * @varGroup homeWidgetContainer.gridItem.paddingMobile
+             * @commonTitle Mobile Padding
+             * @expand spacing
+             */
             paddingMobile: Variables.spacing({
                 horizontal: horizontalSpacingMobile,
             }),
         });
 
         const description = makeVars("description", {
+            /**
+             * @varGroup homeWidgetContainer.description.font
+             * @commonTitle Font
+             * @expand font
+             */
             font: Variables.font({}),
+
+            /**
+             * @varGroup homeWidgetContainer.description.padding
+             * @commonTitle Padding
+             * @expand spacing
+             */
             padding: Variables.spacing({
                 horizontal: calc(`${styleUnit((gridItem.padding.horizontal as number) * 2)}`),
                 vertical: calc(`${styleUnit(gridItem.padding.vertical)}`),
                 top: options.subtitle.content && options.subtitle.type === "standard" ? 0 : undefined,
             }),
+
+            /**
+             * @varGroup homeWidgetContainer.description.paddingMobile
+             * @commonTitle Mobile Padding
+             * @expand spacing
+             */
             paddingMobile: Variables.spacing({
                 horizontal: gridItem.padding.horizontal,
             }),

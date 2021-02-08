@@ -14,4 +14,3 @@ export const PLACES_DOMAIN_NAME = "places";
 export const PLACES_KNOWLEDGE_BASE_TYPE = "knowledgeBase";
 export const PLACES_GROUP_TYPE = "group";
 export const PLACES_CATEGORY_TYPE = "category";
-export const PLACES_SEARCH_LISTING_COMPONENT_NAME = "PlacesSearchListing";

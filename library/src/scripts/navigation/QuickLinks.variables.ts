@@ -16,8 +16,8 @@ import { IThemeVariables } from "@library/theming/themeReducer";
  * @description Quick links are a component of customizable links, normally appearing in a side panel.
  */
 export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const makeThemeVars = variableFactory("quickLinks");
-    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("quickLinks", forcedVars);
+    const globalVars = globalVariables(forcedVars);
 
     /**
      * @varGroup quickLinks.box

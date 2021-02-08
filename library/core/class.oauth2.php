@@ -7,10 +7,12 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerExceptionInterface;
+use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
 
 /**
@@ -28,6 +30,7 @@ use Vanilla\Permissions;
  *
  */
 class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
+    const COLUMN_ASSOCIATION_KEY = 'AssociationKey';
 
     /** @var string token provided by authenticator  */
     protected $accessToken;
@@ -63,9 +66,14 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     protected $settingsView;
 
     /**
+     * @var string
+     */
+    protected $clientIDField = self::COLUMN_ASSOCIATION_KEY;
+
+    /**
      * @var SsoUtils
      */
-    private $ssoUtils;
+    protected $ssoUtils;
 
     /**
      * @var \SessionModel
@@ -173,7 +181,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      */
     public function isConfigured() {
         $provider = $this->provider();
-        return (val('AssociationSecret', $provider) && val('AssociationKey', $provider));
+        return (val('AssociationSecret', $provider) && val(self::COLUMN_ASSOCIATION_KEY, $provider));
     }
 
     /**
@@ -352,7 +360,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      */
     public function provider() {
         if (!$this->provider) {
-            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme($this->providerKey);
         }
 
         return $this->provider;
@@ -436,18 +444,28 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         if (!$form->authenticatedPostBack()) {
             $provider = $this->provider();
-            $form->setData($provider);
-        } else {
 
-            $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+            // kludge to migrate the client ID to the real key field.
+            if ($this->clientIDField !== self::COLUMN_ASSOCIATION_KEY) {
+                $provider[self::COLUMN_ASSOCIATION_KEY] = $provider[$this->clientIDField];
+            }
+            $form->setData($provider);
+            $form->addHidden($model->PrimaryKey, $provider[$model->PrimaryKey] ?? '');
+        } else {
             $form->setFormValue('AuthenticationSchemeAlias', $this->getAuthenticationSchemeAlias());
 
-            $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
+            // If this error is triggered then we did something wrong.
+            $sender->Form->validateRule($model->PrimaryKey, 'ValidateRequired', 'There was an error getting the provider ID.');
+
+            $sender->Form->validateRule(self::COLUMN_ASSOCIATION_KEY, 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
             $sender->Form->validateRule('ProfileUrl', 'isUrl', 'You must provide a complete URL in the Profile Url field.');
 
+            if ($this->clientIDField !== self::COLUMN_ASSOCIATION_KEY) {
+                $sender->Form->setFormValue($this->clientIDField, $form->getFormValue(self::COLUMN_ASSOCIATION_KEY));
+            }
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
@@ -463,7 +481,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         // Set up the form.
         $formFields = [
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
+            self::COLUMN_ASSOCIATION_KEY =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
@@ -518,7 +536,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @return string Returns the sign-in URL.
      */
     final protected function realRegisterUri($state = []) {
-        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['RegisterUrl'], $state);
+        $r = $this->generateAuthorizeUriWithStateToken((string)$this->provider()['RegisterUrl'], $state);
         return $r;
     }
 
@@ -548,13 +566,14 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         $defaultParams = [
             'response_type' => $response_type,
-            'client_id' => val('AssociationKey', $provider),
+            'client_id' => $provider[$this->clientIDField] ?? 'not-found',
             'redirect_uri' => url($redirect_uri, true),
             'scope' => val('AcceptedScope', $provider)
         ];
         // allow child class to overwrite or add to the authorize URI.
         $get = array_merge($defaultParams, $this->authorizeUriParams);
 
+        $state['cid'] = $provider[\Gdn_AuthenticationProviderModel::COLUMN_KEY];
         $state['token'] = $this->ssoUtils->getStateToken();
         $get['state'] = $this->encodeState($state);
 
@@ -575,7 +594,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @throws Gdn_UserException Throws an exception if the server returns an error.
      */
     protected function api($uri, $method = 'GET', $params = [], $options = []) {
-        $proxy = new ProxyRequest();
+        /** @var \ProxyRequest $proxy */
+        $proxy = \Gdn::getContainer()->get(ProxyRequest::class);
 
         // Create default values of options to be passed to ProxyRequest.
         $defaultOptions['ConnectTimeout'] = 20;
@@ -671,9 +691,11 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         // Save the access token and the profile to the session table, set expiry to 3 minutes.
         $expiryTime = new \DateTimeImmutable('now + 5 minutes');
+        $provider = $this->provider();
         $stashID = $this->sessionModel->insert(
             [
                 'Attributes' => [
+                    Gdn_AuthenticationProviderModel::COLUMN_KEY => $provider[Gdn_AuthenticationProviderModel::COLUMN_KEY],
                     'AccessToken' => $response['access_token'] ,
                     'RefreshToken' => $response['refresh_token'],
                     'Profile' => $profile,
@@ -693,8 +715,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     /**
      * Inject into the process of the base connection.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_connectData_handler($sender, $args) {
         if (val(0, $args) != $this->getProviderKey()) {
@@ -731,10 +753,9 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         trace($accessToken, 'Access Token');
         trace($refreshToken, 'Refresh Token');
 
-
         // Create a form and populate it with values from the profile.
-        $originaFormValues = $form->formValues();
-        $formValues = array_replace($originaFormValues, $profile);
+        $originalFormValues = $form->formValues();
+        $formValues = array_replace($originalFormValues, $profile);
         $form->formValues($formValues);
         trace($formValues, 'Form Values');
 
@@ -767,7 +788,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @param bool $refresh if we are using the stored RefreshToken to request a new AccessToken
      * @return mixed Result of the API call to the provider, usually JSON.
      */
-    public function requestAccessToken($code, $refresh=false) {
+    public function requestAccessToken($code, $refresh = false) {
         $provider = $this->provider();
         $uri = val('TokenUrl', $provider);
 
@@ -780,7 +801,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         } else {
             $defaultParams = [
                 'code' => $code,
-                'client_id' => val('AssociationKey', $provider),
+                'client_id' => $provider[$this->clientIDField] ?? 'not-found',
                 'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
                 'client_secret' => val('AssociationSecret', $provider),
                 'grant_type' => 'authorization_code',
@@ -818,7 +839,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);
 
-        $profile['Provider'] = $this->providerKey;
+        $profile['Provider'] = $provider[\Gdn_AuthenticationProviderModel::COLUMN_KEY];
 
         return $profile;
     }
@@ -873,8 +894,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     /**
      * Redirect to provider's signin page if this is the default behaviour.
      *
-     * @param EntryController $sender.
-     * @param EntryController $args.
+     * @param EntryController $sender
+     * @param array $args
      *
      * @return mixed|bool Return null if not configured.
      */
@@ -893,9 +914,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * Redirect to provider's signin page if this is the default behaviour.
      *
      * @param EntryController $sender Entry Controller object.
-     * @param EntryController $args Array of Event Arguments from the Entry Controller.
-     *
-     * @return mixed|bool Return null if not configured.
+     * @param array $args Array of Event Arguments from the Entry Controller.
      */
     public function entryController_overrideRegister_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -908,25 +927,10 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     }
 
     /**
-     * Inject a sign-in icon into the ME menu.
-     *
-     * @param Gdn_Controller $sender Controller object that executes the page the button will be on..
-     * @param Gdn_Controller $args Array of arguments from the host controller.
-     */
-    public function base_beforeSignInButton_handler($sender, $args) {
-        if (!$this->isConfigured() || $this->isDefault()) {
-            return;
-        }
-
-        echo ' '.$this->signInButton('icon').' ';
-    }
-
-
-    /**
      * Inject sign-in button into the sign in page.
      *
-     * @param EntryController $sender.
-     * @param EntryController $args.
+     * @param EntryController $sender
+     * @param array $args
      *
      * @return mixed|bool Return null if not configured
      */
@@ -945,7 +949,6 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         }
     }
 
-
     /**
      * Create signup button specific to this plugin.
      *
@@ -963,10 +966,30 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     }
 
     /**
+     * Create a sign in button for a specific provider row.
+     *
+     * @param array $provider The provider row from the `GDN_UserAuthenticationProvider` table.
+     * @param string|null $target The redirect target or **null** to read the request.
+     * @param string $type The type of button.
+     * @return string
+     */
+    public function signInButtonFromProvider(array $provider, ?string $target = null, string $type = 'button') {
+        if ($target === null) {
+            $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
+        }
+        $url = $this->authorizeUri(['target' => $target]);
+        $providerName = $provider['Name'] ?? 'OAuth';
+        $linkLabel = sprintf(t('Sign In with %s'), $providerName);
+        $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
+
+        return $result;
+    }
+
+    /**
      * Insert css file for generic styling of signin button/icon.
      *
-     * @param AssetModel $sender.
-     * @param AssetModel $args.
+     * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
+     * @param array $args
      */
     public function assetModel_styleCss_handler($sender, $args) {
         $sender->addCssFile('oauth2.css', 'plugins/oauth2');
@@ -1060,10 +1083,10 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     }
 
     /**
-     * When DB_Logger is turned on, log SSO data.
+     * Log a debug message to the general event log.
      *
-     * @param $message
-     * @param $data
+     * @param string $message
+     * @param array $data
      */
     public function log($message, $data) {
         if (c('Vanilla.SSO.Debug')) {
@@ -1111,6 +1134,44 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     }
 
     /**
+     * Get a schema describing an OAuth2 authentication provider fragment.
+     *
+     * @return Schema
+     */
+    protected function providerFragmentSchema(): Schema {
+        $schema = new UserAuthenticationProviderFragmentSchema();
+        $schema->merge(Schema::parse([
+            "secret:s",
+            "urls:o" => [
+                "authorizeUrl:s",
+                "profileUrl:s",
+                "registerUrl:s?" => ["default" => null],
+                "signOutUrl:s?" => ["default" => null],
+                "tokenUrl:s",
+            ],
+            "authenticationRequest:o?" => [
+                "scope:s?" => ["default" => null],
+                "prompt?" => [
+                    "default" => null,
+                    "enum" => ["consent", "consent and login", "login", "none"],
+                    "type" => "string",
+                ],
+            ],
+            "useBearerToken:b?" => ["default" => null],
+            "allowAccessTokens:b?" => ["default" => null],
+            "userMappings:o?" => [
+                "uniqueID:s?" => ["default" => "user_id"],
+                "email:s?" => ["default" => "email"],
+                "name:s?" => ["default" => "displayname"],
+                "photoUrl:s?" => ["default" => "picture"],
+                "fullName:s?" => ["default" => "name"],
+                "roles:s?" => ["default" => "roles"],
+            ],
+        ]));
+        return $schema;
+    }
+
+    /**
      * Exchange an OAuth access token for a Vanilla access token.
      *
      * @param TokensApiController $sender
@@ -1143,11 +1204,12 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * Connect the user payload with a user.
      *
      * @param array $payload The user profile.
+     * @param string $providerKey The client ID of the connection.
      * @return int
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
      * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
-    final private function sso(array $payload): int {
+    final private function sso(array $payload, string $providerKey): int {
         unset($payload['UserID']); // safety precaution due to Gdn_UserModel::connect() behaviour
 
         /* @var \UserModel $userModel */
@@ -1155,7 +1217,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
         $userID = $userModel->connect(
             $payload['UniqueID'] ?? '',
-            $this->getProviderKey(),
+            $providerKey,
             $payload,
             ['SyncExisting' => false]
         );
@@ -1201,17 +1263,27 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         $cachedType = Gdn::cache()->get($key);
 
         if ($cachedType === Gdn_Cache::CACHEOP_FAILURE) {
-            $providers = Gdn_AuthenticationProviderModel::getWhereStatic();
-
-            foreach ($providers as $provider) {
-                if ($clientID === $provider['AssociationKey'] ?? '') {
-                    $cachedType = $provider['AuthenticationSchemeAlias'];
-                    Gdn::cache()->store($key, $cachedType, [Gdn_Cache::FEATURE_EXPIRY => 300]);
-                    return $cachedType;
+            if ($this->clientIDField === Gdn_AuthenticationProviderModel::COLUMN_KEY) {
+                $provider = Gdn_AuthenticationProviderModel::getProviderByKey($clientID);
+                if ($provider === false) {
+                    throw new NotFoundException("An OAuth client with ID \"$clientID\" could not be found.");
                 }
-            }
+                $cachedType = $provider['AuthenticationSchemeAlias'];
+                Gdn::cache()->store($key, $cachedType, [Gdn_Cache::FEATURE_EXPIRY => 300]);
+                return $cachedType;
+            } else {
+                $providers = Gdn_AuthenticationProviderModel::getWhereStatic();
 
-            throw new NotFoundException("An OAuth client with ID \"$clientID\" could not be found.");
+                foreach ($providers as $provider) {
+                    if ($clientID === $provider[self::COLUMN_ASSOCIATION_KEY] ?? '') {
+                        $cachedType = $provider['AuthenticationSchemeAlias'];
+                        Gdn::cache()->store($key, $cachedType, [Gdn_Cache::FEATURE_EXPIRY => 300]);
+                        return $cachedType;
+                    }
+                }
+
+                throw new NotFoundException("An OAuth client with ID \"$clientID\" could not be found.");
+            }
         }
         return $cachedType;
     }
@@ -1224,8 +1296,10 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @return array Returns an array with the access token and expiry date.
      * @throws \Garden\Container\ContainerException Throws an exception if the addon instance was improperly registered.
      */
-    final protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
-        if ($clientID !== $this->provider()['AssociationKey'] ?? null) {
+    protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
+        $provider = $this->provider();
+
+        if ($clientID !== $provider[$this->clientIDField] ?? null) {
             throw new ClientException('Invalid client ID.', 422);
         }
 
@@ -1248,7 +1322,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
             throw new \Garden\Web\Exception\ForbiddenException($ex->getMessage());
         }
 
-        $userID = $this->sso($profile);
+        $userID = $this->sso($profile, $provider[$this->clientIDField]);
 
         /* @var AccessTokenModel $tokenModel */
         $tokenModel = $this->container->get(AccessTokenModel::class);

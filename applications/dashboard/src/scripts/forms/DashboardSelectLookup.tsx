@@ -6,7 +6,7 @@
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { ISelectLookupProps, SelectLookup } from "@vanilla/library/src/scripts/forms/select/SelectLookup";
+import { ISelectLookupProps, SelectLookup } from "@library/forms/select/SelectLookup";
 import classNames from "classnames";
 import React from "react";
 

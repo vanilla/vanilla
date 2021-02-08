@@ -1,9 +1,15 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { JSONSchema4 } from "json-schema";
-import { JsonSchemaConverter } from "./JsonSchemaConverter";
+import { JsonSchemaFlatAdapter } from "./JsonSchemaFlatAdapter";
 import { IVariable } from "./VariableParser";
 import * as JsonSchema from "json-schema";
 
-describe("JsonSchemaConverter", () => {
+describe("JsonSchemaFlatAdapter", () => {
     it("can convert variables to a JSON schema", () => {
         const variables: IVariable[] = [
             {
@@ -30,18 +36,21 @@ describe("JsonSchemaConverter", () => {
                     description: "Description!!!",
                     markdownDescription: "Description!!!",
                     "x-sinceVersion": "2020.024",
+                    "x-key": "myVar.thing",
                     type: ["string", "null"],
                 },
                 "myVar.thing2": {
                     title: "MyVar - Thing 2",
                     description: "Description2!!!",
                     markdownDescription: "Description2!!!",
+                    "x-key": "myVar.thing2",
                     type: "number",
                 },
             },
         };
 
-        const actual = JsonSchemaConverter.convertVariables(variables);
+        const adapter = new JsonSchemaFlatAdapter(variables, []);
+        const actual = adapter.asJsonSchema();
         expect(actual).toEqual(expected);
 
         // Test validation with it.

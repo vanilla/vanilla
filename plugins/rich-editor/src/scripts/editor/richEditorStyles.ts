@@ -22,7 +22,7 @@ import { calc, important, percent, quote, translateY } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { CSSObject } from "@emotion/css";
-import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonMixins";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean) => {

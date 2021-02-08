@@ -12,17 +12,11 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { CSSObject } from "@emotion/css";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");
     const globalVars = globalVariables();
-    const vars = containerVariables();
     const mediaQueries = layoutVariables().mediaQueries();
-
-    const largeTitle = style("largeTitle", {
-        width: percent(100),
-    });
 
     const pageTitle = style(
         "pageTitle",
@@ -32,20 +26,21 @@ export const typographyClasses = useThemeCache(() => {
             lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
-            ...{
-                ...lineHeightAdjustment(),
-                [`&.${largeTitle}`]: {
-                    fontSize: styleUnit(globalVars.fonts.size.largeTitle),
-                },
-            },
+            ...lineHeightAdjustment(),
         },
         mediaQueries.oneColumnDown({
             fontSize: styleUnit(globalVars.fonts.mobile.size.title),
-            ...{
-                [`&.${largeTitle}`]: {
-                    fontSize: styleUnit(globalVars.fonts.mobile.size.title),
-                },
-            },
+        }),
+    );
+
+    const largeTitle = style(
+        "largeTitle",
+        {
+            width: percent(100),
+            fontSize: styleUnit(globalVars.fonts.size.largeTitle),
+        },
+        mediaQueries.oneColumnDown({
+            fontSize: styleUnit(globalVars.fonts.mobile.size.title),
         }),
     );
 

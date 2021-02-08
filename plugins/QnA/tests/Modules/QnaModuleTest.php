@@ -40,6 +40,11 @@ class QnaModuleTest extends StorybookGenerationTestCase {
         $this->runWithUser(function () use ($question, $answer) {
             $this->acceptAnswer($question, $answer);
         }, $user);
+
+        // Make an answer.
+        $question2 = $this->createQuestion();
+        $this->createAnswer();
+        $this->recalculateDiscussionQnA($question2);
         $this->generateStoryHtml('/categories', 'QnA Module');
     }
 
@@ -52,13 +57,37 @@ class QnaModuleTest extends StorybookGenerationTestCase {
         /** @var \QnAModule $module */
         $module = self::container()->get(\QnAModule::class);
         $module->setAcceptedAnswer(false);
-        $module->setTitle('Not Accepted');
+        $module->setTitle('Unanswered');
         $sender->addModule($module);
 
         /** @var \QnAModule $module */
         $module = self::container()->get(\QnAModule::class);
         $module->setAcceptedAnswer(true);
         $module->setTitle('Accepted');
+        $sender->addModule($module);
+
+        /** @var \QnAModule $module */
+        $module = self::container()->get(\QnAModule::class);
+        $module->setQuestionFilter(\QnaModel::UNANSWERED);
+        $module->setTitle('Filter by Unanswered');
+        $sender->addModule($module);
+
+        /** @var \QnAModule $module */
+        $module = self::container()->get(\QnAModule::class);
+        $module->setQuestionFilter(\QnaModel::ANSWERED);
+        $module->setTitle('Filter by Answered');
+        $sender->addModule($module);
+
+        /** @var \QnAModule $module */
+        $module = self::container()->get(\QnAModule::class);
+        $module->setQuestionFilter(\QnaModel::ACCEPTED);
+        $module->setTitle('Filter by Accepted Answer');
+        $sender->addModule($module);
+
+        /** @var \QnAModule $module */
+        $module = self::container()->get(\QnAModule::class);
+        $module->setQuestionFilter(\QnAModule::ALL_QUESTIONS);
+        $module->setTitle('All questions');
         $sender->addModule($module);
     }
 }

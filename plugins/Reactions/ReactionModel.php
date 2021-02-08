@@ -336,15 +336,54 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function getRecordsWhere($where, $orderFields = '', $orderDirection = '', $limit = 30, $offset = 0) {
         // Grab the user tags.
-        $userTags = $this->SQL
-            ->limit($limit, $offset)
-            ->getWhere('UserTag', $where, $orderFields, $orderDirection)
-            ->resultArray();
+        $userTags = $this->buildUserTagQuery($where, $orderFields, $orderDirection, $limit, $offset)->get()->resultArray();
 
         $this->LastCount = count($userTags);
         self::joinRecords($userTags);
 
         return $userTags;
+    }
+
+    /**
+     * Get all of the records a user has reacted to.
+     *
+     * @param int $userID
+     * @param array $reactionCodes An array of the url codes of the desired reactions.
+     * @param array $wheres
+     * @param int|null $limit
+     * @return array An array of discussionIDs
+     */
+    public function getReactedDiscussionIDsByUser(
+        int $userID,
+        array $reactionCodes = [],
+        array $wheres = [],
+        ?int $limit = null
+    ): array {
+        $reactionTagIDs = [];
+        if (!empty($reactionCodes)) {
+            foreach ($reactionCodes as $code) {
+                $tagID = self::reactionTypes($code)['TagID'];
+                if (!is_null($tagID)) {
+                    $reactionTagIDs[] = $tagID;
+                }
+            }
+        }
+
+        $allWheres = ['UserID' => $userID, 'RecordType' => 'Discussion'];
+
+        if (empty($reactionTagIDs)) {
+            throw new \Garden\Web\Exception\NotFoundException(t('reactionType(s) not found.'));
+        } else {
+            $allWheres += ['TagID' => $reactionTagIDs];
+        }
+
+        $allWheres = array_merge($allWheres, $wheres);
+
+        $query = $this->buildUserTagQuery($allWheres, '', '', $limit);
+        $query->select('RecordID');
+        $recordIDs = $query->get()->resultArray();
+
+        return array_column($recordIDs, 'RecordID');
     }
 
     /**
@@ -1332,7 +1371,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
         }
 
         // Calculate the user totals.
-        $this->SQL->delete('UserTag', ['UserID' => self::USERID_OTHER]);
+        $this->SQL->delete('UserTag', ['UserID' => self::USERID_OTHER, 'RecordType' => 'User']);
 
         $sql = "insert ignore GDN_UserTag (
          RecordType,
@@ -1728,5 +1767,31 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             }
         }
         return $row;
+    }
+
+    /**
+     * Query the UserTag table.
+     *
+     * @param array $where
+     * @param string|null $orderFields
+     * @param string|null $orderDirection
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return object
+     * @throws Exception Throws exception.
+     */
+    private function buildUserTagQuery(
+        array $where,
+        ?string $orderFields = '',
+        ?string $orderDirection = '',
+        ?int $limit = null,
+        ?int $offset = 0
+    ) {
+        $userTagQuery = $this->SQL
+            ->limit($limit, $offset)
+            ->from('UserTag')
+            ->where($where)
+            ->orderBy($orderFields, $orderDirection);
+        return $userTagQuery;
     }
 }

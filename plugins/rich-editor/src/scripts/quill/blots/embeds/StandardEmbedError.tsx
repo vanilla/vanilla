@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
+import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import { UserWarningIcon } from "@library/icons/titleBar";

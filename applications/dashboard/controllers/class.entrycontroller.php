@@ -371,7 +371,9 @@ class EntryController extends Gdn_Controller {
 
             $url = str_ireplace('{target}', rawurlencode(url($target, true)), $url);
 
-            if ($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) {
+            if (($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) ||
+                (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED)
+            ) {
                 redirectTo(url($url, true), 302, false);
             } else {
                 $this->setData('Url', $url);

@@ -192,10 +192,6 @@ export const groupsCSS = () => {
         float: "none",
     });
 
-    cssOut(`.Groups .DataList .ItemContent`, {
-        order: 11,
-    });
-
     cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
         paddingLeft: styleUnit(58),
     });

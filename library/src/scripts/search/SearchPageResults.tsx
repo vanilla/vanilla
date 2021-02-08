@@ -18,7 +18,7 @@ import { hashString } from "@vanilla/utils";
 import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
-import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUser } from "@library/@types/api/users";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { formatUrl, t } from "@library/utility/appUtils";

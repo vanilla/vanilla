@@ -25,4 +25,22 @@ trait PrivateAccessTrait {
         $fn = $callable->bindTo($on, $on);
         return $fn(...$args);
     }
+
+    /**
+     * Call a protected or private method on an object.
+     *
+     * @param object $on The object to call the method on.
+     * @param string $method The name of the method to call.
+     * @param array $args Arguments to pass to the method.
+     * @return mixed Returns the result of the method.
+     * @psalm-suppress InvalidScope
+     */
+    public static function callMethodOn(object $on, string $method, ...$args) {
+        $fn = function (...$args) use ($method) {
+            // phpcs:disable Squiz.Scope.StaticThisUsage
+            return $this->$method(...$args);
+            // phpcs:enable Squiz.Scope.StaticThisUsage
+        };
+        return self::callOn($on, $fn, ...$args);
+    }
 }

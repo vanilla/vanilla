@@ -181,7 +181,7 @@ export class VariableParser {
                 } else if (commonTitle && !title) {
                     title = commonTitle;
                 } else if (!title && !commonTitle) {
-                    commonTitle = title = varNameToTitle(varGroup);
+                    commonTitle = title = VariableParser.varNameToTitle(varGroup);
                 }
                 const newGroup: IVariableGroup = {
                     ...rest,
@@ -207,21 +207,17 @@ export class VariableParser {
                     }
 
                     let { var: varKey, title, description, ...rest } = value;
-                    title = title ?? varNameToTitle(varKey);
+                    title = title ?? VariableParser.varNameToTitle(varKey);
 
                     // We may have a title prefix we need to apply.
-                    let parentGroupKey = trimVariableKey(varKey);
+                    let parentGroupKey = VariableParser.trimVariableKey(varKey);
                     let parentGroup: IVariableGroup | undefined = undefined;
                     while (parentGroupKey && parentGroup === undefined) {
                         parentGroup = resultGroups.find((group) => group.key === parentGroupKey);
                         if (!parentGroup) {
                             // Pop off another dot.
-                            parentGroupKey = trimVariableKey(parentGroupKey);
+                            parentGroupKey = VariableParser.trimVariableKey(parentGroupKey);
                         }
-                    }
-
-                    if (parentGroup?.commonTitle) {
-                        title = `${parentGroup.commonTitle.trim()} - ${title.trim()}`;
                     }
 
                     // If we have a common description, be sure to apply it.
@@ -292,41 +288,35 @@ export class VariableParser {
         }
         return this.typeExpanders.find((expander) => expander.type === forType) ?? null;
     }
-}
 
-/**
- * Trim off the end of a variable key.
- * @example thing.nested.paddings -> thing.nested
- * @param key The key to start.
- * @return Either the trimmed key or null if there wasn't anything to trim.
- */
-function trimVariableKey(varKey: string): string | null {
-    const lastIndex = varKey.lastIndexOf(".");
-    if (lastIndex > 0) {
-        return varKey.slice(0, lastIndex);
-    } else {
-        return null;
+    /**
+     * Trim off the end of a variable key.
+     * @example thing.nested.paddings -> thing.nested
+     * @param key The key to start.
+     * @return Either the trimmed key or null if there wasn't anything to trim.
+     */
+    public static trimVariableKey(varKey: string): string | null {
+        const lastIndex = varKey.lastIndexOf(".");
+        if (lastIndex > 0) {
+            return varKey.slice(0, lastIndex);
+        } else {
+            return null;
+        }
     }
-}
 
-/**
- * If there was no title try to give a decent fallback.
- * Eg. "this.nest.paddings" -> "Paddings"
- *
- * @param varName The variable name to convert.
- */
-function varNameToTitle(varName: string): string {
-    const split = varName.split(".");
-    return titleCase(split[split.length - 1]);
-}
+    /**
+     * If there was no title try to give a decent fallback.
+     * Eg. "this.nest.paddings" -> "Paddings"
+     *
+     * @param varName The variable name to convert.
+     */
+    public static varNameToTitle(varName: string): string {
+        const split = varName.split(".");
+        return this.titleCase(split[split.length - 1]);
+    }
 
-function titleCase(input: string): string {
-    const spaced = input.replace(/([A-Z])/g, " $1").trim();
-    return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-}
-
-function capitalizeFirstChar(input: string): string {
-    const first = input.slice(0, 1);
-    const rest = input.slice(1);
-    return first.toLocaleUpperCase() + rest;
+    private static titleCase(input: string): string {
+        const spaced = input.replace(/([A-Z])/g, " $1").trim();
+        return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+    }
 }

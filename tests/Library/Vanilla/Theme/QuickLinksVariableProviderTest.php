@@ -27,14 +27,6 @@ class QuickLinksVariableProviderTest extends SiteTestCase {
     /**
      * Setup.
      */
-    public static function setUpBeforeClass(): void {
-        self::$addons = ['vanilla'];
-        parent::setUpBeforeClass();
-    }
-
-    /**
-     * Setup.
-     */
     public function setUp(): void {
         parent::setUp();
         $this->quickLinksVariableProvider = self::container()->get(QuickLinksVariableProvider::class);

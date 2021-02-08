@@ -272,13 +272,36 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test the discussions index filtering by user and reaction type.
+     */
+    public function testGetDiscussionsByUserReaction() {
+        $type = 'Like';
+
+        $discussion1 = $this->createDiscussion(1, 'testGetDiscussionsByUserReaction');
+        $discussion2 = $this->createDiscussion(1, 'testGetDiscussionsByUserReactionPart2');
+
+        $user = $this->createReactionsTestUser(rand(1, 1000000));
+        \Gdn::session()->start($user['userID']);
+
+        $this->api()->post("/discussions/${discussion1['discussionID']}/reactions", [
+            'reactionType' => $type
+        ]);
+        $this->api()->post("/discussions/${discussion2['discussionID']}/reactions", [
+            'reactionType' => $type
+        ]);
+
+        $newLikedDiscussions = $this->api()->get("/discussions?reactionType=${type}&expand=reactions")->getBody();
+
+        $this->assertEquals(2, count($newLikedDiscussions));
+    }
+
+    /**
      * Test undoing a reaction to a discussion.
      *
      * @depends testGetCommentReactions
      */
     public function testDeleteDiscussionReaction() {
         $type = 'Like';
-
         $user = $this->createReactionsTestUser(rand(1, 100000));
         $userID = (int)$user['userID'];
         $this->api()->setUserID($userID);
@@ -288,7 +311,6 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         ]);
         $postResponse = $this->api()->get('/discussions/1/reactions');
         $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), $type, $postResponse->getBody()));
-
         $this->api()->delete("/discussions/1/reactions/{$userID}");
         $response = $this->api()->get('/discussions/1/reactions');
         $this->assertFalse($this->hasUserReaction($this->api()->getUserID(), $type, $response->getBody()));
@@ -301,7 +323,6 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         $getResponse = $this->api()->get('/discussions/1', ['expand' => 'reactions']);
         $getBody = $getResponse->getBody();
         $this->assertTrue($this->isReactionSummary($getBody['reactions']));
-
         $indexResponse = $this->api()->get('/discussions', ['expand' => 'reactions']);
         $indexBody = $indexResponse->getBody();
         $indexHasReactions = true;

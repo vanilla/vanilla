@@ -9,11 +9,15 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 
+/**
+ * @varGroup conversationList
+ * @description Variables affecting lists of conversations. This is often referred to as the Inbox.
+ */
 export const conversationListVariables = useThemeCache(() => {
     const makeVars = variableFactory("conversationList");
 
     /**
-     * @varGroup conversationListPage.contentBoxes
+     * @varGroup conversationList.contentBoxes
      * @description Content boxes for the conversations list page (or inbox).
      * @expand contentBoxes
      */

@@ -3332,7 +3332,11 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 }
             }
         }
-
+        // Apply
+        $newFeaturedSort = $this->calcFeaturedSort($CategoryID, $formPostValues);
+        if ($newFeaturedSort !== null) {
+            $formPostValues['SortFeatured'] = $newFeaturedSort;
+        }
         // Prep and fire event.
         $this->EventArguments['FormPostValues'] = &$formPostValues;
         $this->EventArguments['CategoryID'] = $CategoryID;
@@ -3560,6 +3564,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         if (isset($property['AllowedDiscussionTypes']) && is_array($property['AllowedDiscussionTypes'])) {
             $property['AllowedDiscussionTypes'] = dbencode($property['AllowedDiscussionTypes']);
         }
+        $newFeaturedSort = $this->calcFeaturedSort($rowID, $property);
+        if ($newFeaturedSort !== null) {
+            $property['SortFeatured'] = $newFeaturedSort;
+        }
 
         $this->SQL->put($this->Name, $property, ['CategoryID' => $rowID]);
 
@@ -3567,6 +3575,48 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         self::setCache($rowID, $property);
         $this->addDirtyRecord('category', $rowID);
         return $property;
+    }
+
+    /**
+     * Increment position of the last featured category.
+     *
+     * @param int|null $categoryID A category ID or slug.
+     * @param array $changedCategoryData The modified category fields.
+     *
+     * @return int|null The new sort value or null if nothing changed.
+     */
+    public function calcFeaturedSort(?int $categoryID, array $changedCategoryData): ?int {
+        if ($categoryID === null) {
+            return $this->getFeaturedSortIncrement();
+        }
+
+        $existingCategory = self::categories($categoryID);
+        $newIsFeatured = $changedCategoryData['Featured'] ?? null;
+        $existingIsFeatured = $existingCategory['Featured'] ?? null;
+        $didFeaturedChange = $existingIsFeatured !== $newIsFeatured;
+        if ($newIsFeatured === null || !$didFeaturedChange) {
+            // Nothing is changing here, no need to continue.
+            return null;
+        }
+
+        return $this->getFeaturedSortIncrement();
+    }
+
+    /**
+     * Get the next-highest featured sort value.
+     *
+     * @return int
+     */
+    private function getFeaturedSortIncrement(): int {
+        // Figure out what the featured count is.
+        $lastCategoryFeatured = $this->getWhere(
+            ['Featured' => true],
+            'SortFeatured',
+            'desc',
+            1
+        )->firstRow(DATASET_TYPE_ARRAY);
+
+        return $lastCategoryFeatured ? $lastCategoryFeatured['SortFeatured'] + 1 : 0;
     }
 
     /**

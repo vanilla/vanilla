@@ -4,7 +4,7 @@
  */
 
 import { ISearchForm, ISearchRequestQuery, ISearchResults } from "@library/search/searchTypes";
-import { IApiError } from "@vanilla/library/src/scripts/@types/api/core";
+import { IApiError } from "@library/@types/api/core";
 import { actionCreatorFactory } from "typescript-fsa";
 
 const createAction = actionCreatorFactory("@@search");

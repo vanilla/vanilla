@@ -10,6 +10,7 @@ namespace VanillaTests;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Fixtures\Request;
 
 /**
  * A utility base class for PHPUnit tests.
@@ -191,5 +192,20 @@ class VanillaTestCase extends TestCase {
             }
         }
         TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same: ".implode(', ', $fields));
+    }
+
+    /**
+     * Compare two URLs with only a subset of querystring parameters necessary.
+     *
+     * @param string|Request $expected
+     * @param string|Request $actual
+     * @param string $message
+     */
+    public function assertUrlSubset($expected, $actual, $message = ''): void {
+        $re = Request::box($expected);
+        $ra = Request::box($actual);
+
+        static::assertSame($re->getDomainAndPath(), $ra->getDomainAndPath(), $message);
+        static::assertArraySubsetRecursive($re->getQuery(), $ra->getQuery(), $message);
     }
 }

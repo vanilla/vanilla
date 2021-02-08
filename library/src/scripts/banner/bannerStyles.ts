@@ -54,6 +54,8 @@ export type SearchPlacement = "middle" | "bottom";
 /**
  * @varGroup banner
  * @commonTitle Banner
+ * @description The banner is a common component made up a background image and various pieces of configurable content.
+ * Defaults include a title, description, and a searchbar.
  */
 export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altName?: string) => {
     const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, !!altName);

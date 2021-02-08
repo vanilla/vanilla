@@ -9,11 +9,15 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 
+/**
+ * @varGroup discussionList
+ * @description Variables affecting lists of discussions. Notably this is normally what you see when viewing a category.
+ */
 export const discussionListVariables = useThemeCache(() => {
     const makeVars = variableFactory("discussionList");
 
     /**
-     * @varGroup discussionListPage.contentBoxes
+     * @varGroup discussionList.contentBoxes
      * @description Content boxes for the discussion list page.
      * @expand contentBoxes
      */

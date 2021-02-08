@@ -9,11 +9,15 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 
+/**
+ * @varGroup conversation
+ * @description Variables affecting a single convesation made up of messages between 2 users.
+ */
 export const conversationVariables = useThemeCache(() => {
     const makeVars = variableFactory("conversation");
 
     /**
-     * @varGroup conversationPage.contentBoxes
+     * @varGroup conversation.contentBoxes
      * @description Content boxes for the conversation page (or messages page).
      * @expand contentBoxes
      */

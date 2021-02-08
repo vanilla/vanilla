@@ -107,7 +107,23 @@ trait CommunityApiTestTrait {
         ];
         $result = $this->api()->post('/discussions', $params)->getBody();
         $this->lastInsertedDiscussionID = $result['discussionID'];
+
+        if (isset($overrides['score'])) {
+            $this->setDiscussionScore($this->lastInsertedDiscussionID, $overrides['score']);
+        }
         return $result;
+    }
+
+    /**
+     * Give score to a discussion.
+     *
+     * @param int $discussionID
+     * @param int $score
+     */
+    public function setDiscussionScore(int $discussionID, int $score) {
+        /** @var \DiscussionModel $discussionModel */
+        $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
+        $discussionModel->setField($discussionID, 'Score', $score);
     }
 
     /**
@@ -131,7 +147,22 @@ trait CommunityApiTestTrait {
         ];
         $result = $this->api()->post('/comments', $params)->getBody();
         $this->lastInsertCommentID = $result['commentID'];
+        if (isset($overrides['score'])) {
+            $this->setCommentScore($this->lastInsertCommentID, $overrides['score']);
+        }
         return $result;
+    }
+
+    /**
+     * Give score to a discussion.
+     *
+     * @param int $commentID
+     * @param int $score
+     */
+    public function setCommentScore(int $commentID, int $score) {
+        /** @var \CommentModel $discussionModel */
+        $discussionModel = \Gdn::getContainer()->get(\CommentModel::class);
+        $discussionModel->setField($commentID, 'Score', $score);
     }
 
     /**

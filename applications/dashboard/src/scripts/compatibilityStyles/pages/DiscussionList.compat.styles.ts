@@ -15,9 +15,9 @@ export const discussionListCompatCSS = () => {
     const globalVars = globalVariables();
     const vars = discussionListVariables();
 
-    MixinsFoundation.contentBoxes(vars.contentBoxes, "DiscussionListPage");
+    MixinsFoundation.contentBoxes(vars.contentBoxes, "DiscussionList");
 
-    cssOut(".ItemDiscussion.ItemDiscussion", {
+    cssOut("li.ItemDiscussion.ItemDiscussion", {
         display: "flex",
         flexWrap: "wrap",
 
@@ -25,6 +25,17 @@ export const discussionListCompatCSS = () => {
             flex: 1,
         },
 
+        "& .Title": {
+            marginTop: -4,
+            display: "inline-block",
+        },
+
+        "& .Excerpt": {
+            marginTop: 0,
+        },
+    });
+
+    cssOut(".ItemDiscussion.ItemDiscussion", {
         "& > .ProfilePhoto, & > .userCardWrapper-photo, & > .idea-counter-module": {
             marginRight: 16,
         },
@@ -32,11 +43,6 @@ export const discussionListCompatCSS = () => {
         "& .AdminCheck": {
             height: "100%",
             marginTop: 6,
-        },
-
-        "& .Title": {
-            marginTop: -4,
-            display: "inline-block",
         },
 
         "& .Title a": {
@@ -49,10 +55,6 @@ export const discussionListCompatCSS = () => {
 
         "& .Title a:hover, & .Title a:active, & .Title a:focus": {
             ...Mixins.font(vars.item.title.fontState),
-        },
-
-        "& .Excerpt": {
-            marginTop: 0,
         },
     });
 };

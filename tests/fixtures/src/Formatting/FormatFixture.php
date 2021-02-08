@@ -103,6 +103,18 @@ class FormatFixture {
     /**
      * @return array|null
      */
+    public function getImageUrls(): ?array {
+        $json = $this->getFixtureContentsWithFileName('output-imageUrls.json');
+        if ($json) {
+            return json_decode($json, true);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array|null
+     */
     public function getAttachments(): ?array {
         $json = $this->getFixtureContentsWithFileName('output-attachments.json');
         if ($json) {

@@ -12,7 +12,7 @@ import Loader from "@library/loaders/Loader";
 import ModalSizes from "@library/modal/ModalSizes";
 import { mountModal } from "@library/modal/Modal";
 import { t } from "@vanilla/i18n";
-import gdn from "@vanilla/library/src/scripts/gdn";
+import gdn from "@library/gdn";
 
 /**
  * Get discussionID from ItemDiscussion

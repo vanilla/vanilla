@@ -1,0 +1,133 @@
+openapi: 3.0.2
+info:
+  description: API access to your community.
+  title: Vanilla API
+  version: '2.0'
+servers:
+  - url: /api/v2
+paths:
+  /authenticators/oauth2:
+    post:
+      summary: Add a new OAuth 2 connection.
+      tags:
+        - Authenticators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2AuthenticatorPost'
+      responses:
+        '201':
+          description: Created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OAuth2Authenticator'
+  '/authenticators/oauth2/{id}':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the authenticator.
+        schema:
+          type: integer
+    get:
+      summary: "Get an OAuth2 authenticator's information."
+      tags:
+        - Authenticators
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2Authenticator'
+    patch:
+      summary: "Update an OAuth2 authenticator's information."
+      tags:
+        - Authenticators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2AuthenticatorPatch'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2Authenticator'
+components:
+  schemas:
+    OAuth2AuthenticatorPost:
+        type: object
+        properties:
+          secret:
+            type: string
+          urls:
+            type: object
+            properties:
+              tokenUrl:
+                description: The URL on the OAuth server used to get the access token.
+                type: string
+                format: uri
+              profileUrl:
+                description: The URL on tge OAuth server used to get the user's profile information.
+                type: string
+                format: uri
+          authenticationRequest:
+            type: object
+            properties:
+              scope:
+                type: string
+                description: The scope to request from the OAuth server.
+                x-column: AcceptedScope
+              prompt:
+                type: string
+                description: Prompt Parameter to append to Authorize Url
+                example: consent login
+          useBearerToken:
+            type: boolean
+            description: |
+              When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]
+            default: true
+            x-column: BearerToken
+          allowAccessTokens:
+            type: boolean
+            description: |
+              Allow this connection to issue Vanilla API access tokens.
+            default: false
+          userMappings:
+            type: object
+            properties:
+              uniqueID:
+                description: The Key in the JSON array to designate UserID.
+                type: string
+                x-column: ProfileKeyUniqueID
+              email:
+                description: The Key in the JSON array to designate Emails.
+                type: string
+                x-column: ProfileKeyEmail
+              name:
+                description: The Key in the JSON array to designate Display Name.
+                type: string
+                x-column: ProfileKeyName
+              photoUrl:
+                description: The Key in the JSON array to designate Photo.
+                type: string
+                x-column: ProfileKeyPhoto
+              fullName:
+                description: The Key in the JSON array to designate Full Name.
+                type: string
+                x-column: ProfileKeyFullName
+              roles:
+                description: The Key in the JSON array to designate Roles.
+                type: string
+                x-column: ProfileKeyRoles
+    OAuth2AuthenticatorPatch:
+      $ref: '#/components/schemas/OAuth2AuthenticatorPost'
+    OAuth2Authenticator:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticatorFragment'
+        - $ref: '#/components/schemas/OAuth2AuthenticatorPost'

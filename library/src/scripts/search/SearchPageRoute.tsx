@@ -12,7 +12,7 @@ export function makeSearchUrl(): string {
 }
 
 export const SearchPageRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/search" */ "@vanilla/library/src/scripts/search/SearchPage"),
+    () => import(/* webpackChunkName: "pages/search" */ "@library/search/SearchPage"),
     makeSearchUrl(),
     makeSearchUrl,
     Loader,

@@ -10,7 +10,11 @@ export enum TagType {
 }
 
 export const tagVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("forumFonts");
+    /**
+     * @varGroup tags
+     * @description Variables affecting tags throughout the application.
+     */
+    const makeThemeVars = variableFactory("tags");
     const globalVars = globalVariables();
 
     const colorOverwrite = makeThemeVars("colorOverwrite", {
@@ -26,6 +30,10 @@ export const tagVariables = useThemeCache(() => {
         fg: globalVars.meta.text.color,
     });
 
+    /**
+     * @varGroup tags.tagItem
+     * @description Tag items are found in the tag cloud module.
+     */
     const tagItem = makeThemeVars("tagItem", {
         /**
          * @var forumFonts.tagItem.type

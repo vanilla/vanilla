@@ -133,4 +133,75 @@ class CategoryFeaturedTest extends AbstractAPIv2Test {
             'Cat 1.1',
         ], array_column($categories, 'name'));
     }
+
+    /**
+     * Test featured categories get order position.
+     */
+    public function testFeaturedCategoryGetOrderPosition() {
+        $this->resetTable('Category');
+        /** @var \CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(\CategoryModel::class);
+        $category1ID = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'Featured Category 1',
+            'UrlCode' => 'featured-cat1',
+            'DisplayAs' => 'Discussions',
+            'Featured' => true,
+        ]);
+        $category2ID = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'Featured Category 2',
+            'UrlCode' => 'featured-cat2',
+            'DisplayAs' => 'Discussions',
+            'Featured' => true,
+        ]);
+        $category1 = $categoryModel->getID($category1ID, DATASET_TYPE_ARRAY);
+        $category2 = $categoryModel->getID($category2ID, DATASET_TYPE_ARRAY);
+        $this->assertEquals(0, $category1['SortFeatured']);
+        $this->assertEquals(1, $category2['SortFeatured']);
+    }
+
+    /**
+     * Test sort featured categories.
+     */
+    public function testFeaturedCategoryOrder() {
+        $this->resetTable('Category');
+        // Test order on creation.
+        $categories = [];
+        $categories[] = $this->createCategory(['featured' => true]);
+        $categories[] = $this->createCategory(['featured' => true]);
+        $categories[] = $this->createCategory(['featured' => true]);
+        $categoryIDs = array_column($categories, 'categoryID');
+        $categoriesFeatured = $this->api()->get('/categories', [
+            'featured' => true,
+        ])->getBody();
+        $categoriesFeaturedIDs = array_column($categoriesFeatured, 'categoryID');
+
+        $this->assertEquals($categoryIDs, $categoriesFeaturedIDs);
+        // Test order after updating attribute.
+        $this->api()
+            ->patch('/categories/'.$categoriesFeatured[1]['categoryID'], ['featured' => false])
+            ->getBody();
+        $this->api()
+            ->patch('/categories/'.$categoriesFeatured[1]['categoryID'], ['featured' => true])
+            ->getBody();
+        $newCategoriesFeatured = $this->api()->get('/categories', [
+            'featured' => true,
+        ])->getBody();
+        $newCategoriesFeaturedIDs = array_column($newCategoriesFeatured, 'categoryID');
+        $newCategories = $categories;
+        $newCategories[1] = $categories[2];
+        $newCategories[2] = $categories[1];
+        $newCategoryIDs = array_column($newCategories, 'categoryID');
+        $this->assertEquals($newCategoryIDs, $newCategoriesFeaturedIDs);
+        // Test order after updating attribute with same value.
+        $this->api()
+            ->patch('/categories/'.$categoriesFeatured[1]['categoryID'], ['featured' => true])
+            ->getBody();
+        $categoriesFeaturedState = $this->api()->get('/categories', [
+            'featured' => true,
+        ])->getBody();
+        $newCategoryIDs = array_column($categoriesFeaturedState, 'categoryID');
+        $this->assertEquals($newCategoriesFeaturedIDs, $newCategoryIDs);
+    }
 }

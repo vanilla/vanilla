@@ -115,31 +115,6 @@ class MySQLDriverTest extends TestCase {
     }
 
     /**
-     * Test escapeField.
-     *
-     * @param string $input Input field
-     * @param string|array $expected Expected result
-     * @dataProvider provideEscapeData
-     */
-    public function testEscapeField(string $input, $expected): void {
-        $result = $this->sql->escapeField($input);
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * Provide data to escape.
-     *
-     * @return array
-     */
-    public function provideEscapeData(): array {
-        return [
-            ["abc_c", "abc\_c"],
-            ["abc%c", "abc\%c"],
-            ["ab\c", "ab\\\\c"],
-        ];
-    }
-
-    /**
      * Testing a basic where in expression.
      */
     public function testWhereIn() {

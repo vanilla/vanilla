@@ -17,6 +17,8 @@ if (is_array($this->ProfileFields)) {
             } else {
                 $Options = [null => t('Missing Dropdown. Number of labels does not match number of elements.')];
             }
+        } elseif ($Field['FormType'] == 'CheckBox') {
+            $Options = "";
         }
 
         if ($Field['FormType'] == 'TextBox' && !empty($Field['Options'])) {

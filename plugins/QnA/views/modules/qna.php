@@ -1,20 +1,24 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
 
+if (!defined('APPLICATION')) return;
 require_once PATH_APPLICATIONS . '/vanilla/views/discussions/helper_functions.php';
-
 $discussions = $this->data('discussions');
-
 $title = $this->data('title');
-if ($title) {
-    echo "<h2>" . htmlspecialchars($title) .  "</h2>";
-}
+?>
+<?php if ($title): ?>
+    <?php BoxThemeShim::startHeading(); ?>
+    <h2 class="H"><?php echo htmlspecialchars($title); ?></h2>
+    <?php BoxThemeShim::endHeading(); ?>
+<?php endif; ?>
 
-if (count($discussions) > 0 ) {
-    echo '<ul class="DataList Discussions">';
-    foreach ($discussions as $discussion) {
-        writeDiscussion($discussion, Gdn::controller(), Gdn::session());
-    }
-    echo '</ul>';
-} else {
-    echo '<div class="Empty">'.t('No discussions were found.').'</div>';
-}
+<?php if (count($discussions) > 0): ?>
+    <ul class="DataList Discussions pageBox">
+        <?php
+            foreach ($discussions as $discussion) {
+                writeDiscussion($discussion, Gdn::controller(), Gdn::session());
+            }
+        ?>
+    </ul>
+<?php else : ?>
+    <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+<? endif ?>

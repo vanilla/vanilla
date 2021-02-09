@@ -204,7 +204,7 @@ if (!function_exists('WriteDiscussionTable')) :
     function writeDiscussionTable() {
         $c = Gdn::controller();
         ?>
-        <div class="DataTableWrap pageBox">
+        <div class="DataTableWrap">
             <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
             <table class="DataTable DiscussionsTable">
                 <thead>

@@ -12,9 +12,9 @@ import { DashboardLegacyFormValue } from "@dashboard/forms/DashboardLegacyFormVa
 import { DashboardSelectLookup } from "@dashboard/forms/DashboardSelectLookup";
 import { WidgetFormGenerator } from "@dashboard/widgets/WidgetFormGenerator";
 import { t } from "@vanilla/i18n";
-import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
-import { ILookupApi } from "@vanilla/library/src/scripts/forms/select/SelectLookup";
-import { LoadingRectangle } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { ILookupApi } from "@library/forms/select/SelectLookup";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import React, { useEffect, useState } from "react";
 
 interface IProps {

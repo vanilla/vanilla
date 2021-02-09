@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { PlacesListingPlaceHolder } from "@library/search/PlacesListingPlaceHolder";
 import { PLACES_DOMAIN_NAME } from "@library/search/searchConstants";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";

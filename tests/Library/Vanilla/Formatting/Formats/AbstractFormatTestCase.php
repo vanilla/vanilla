@@ -183,6 +183,29 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider imageProvider
      */
+    public function testParseImages(string $input, array $expectedOutput) {
+        $format = $this->prepareFormatter();
+        $images = $format->parseImages($input);
+        $this->assertEquals($expectedOutput, $images);
+    }
+
+    /**
+     * PHPUnit data provider.
+     *
+     * @return array
+     */
+    public function imageUrlProvider(): array {
+        return $this->makeDataProvider('getImageUrls', 'Images');
+    }
+
+    /**
+     * Test heading parsing of the format against fixtures.
+     *
+     * @param string $input
+     * @param array $expectedOutput
+     *
+     * @dataProvider imageUrlProvider
+     */
     public function testParseImageUrls(string $input, array $expectedOutput) {
         $format = $this->prepareFormatter();
         $images = $format->parseImageUrls($input);

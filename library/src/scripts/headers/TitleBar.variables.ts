@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { BorderType } from "@library/styles/styleHelpers";
@@ -18,6 +24,8 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 /**
  * @varGroup titleBar
  * @title Title Bar
+ * @description The TitleBar is the sticky navigation bar, normally containing a logo,
+ * navigation links, a searchbar, and the mebox.
  */
 
 export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -164,7 +172,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             : 0;
 
     /**
-     * @varGroup swoop
+     * @varGroup titleBar.swoop
      * @title Banner - Swoop
      * @commonDescription The follow variables should be used together to fine your desired swoop.
      * - titleBar.spacings.paddings.top
@@ -264,6 +272,19 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     };
 
     const titleBarContainer = makeThemeVars("titleBarContainer", {
+        /**
+         * @var titleBar.titleBarContainer.maxWidth
+         * @description Set the maximum width of the titlebar.
+         * @type number
+         */
+        maxWidth: undefined as number | undefined,
+
+        /**
+         * @varGroup titleBar.titleBarContainer.gutterSpacing
+         * @description Gutters for the container of the titlebar.
+         * @expand spacing
+         */
+        gutterSpacing: Variables.spacing({}),
         border: Variables.border({
             left: {
                 ...clearBorder,

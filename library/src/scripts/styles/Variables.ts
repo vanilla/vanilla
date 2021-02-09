@@ -41,6 +41,8 @@ export class Variables {
             background: Variables.background(vars.background ?? {}),
             spacing: Variables.spacing(vars.spacing ?? {}),
             border: Variables.border(vars.border ?? {}),
+            itemSpacing: vars.itemSpacing ? vars.itemSpacing : 0,
+            itemSpacingOnAllItems: vars.itemSpacingOnAllItems ?? false,
             ...vars,
         };
     };

@@ -6,7 +6,7 @@
 import { SearchActions } from "@library/search/SearchActions";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext";
@@ -57,13 +57,15 @@ export const searchReducer = produce(
                 ...payload,
             };
 
-            if (!("page" in payload)) {
-                // Reset the page when switching some other filter.
-                nextState.form.page = 1;
-            }
+            if (!payload.initialized) {
+                // Only when the search form changes outside of initialization.
+                if (!("page" in payload)) {
+                    nextState.form.page = 1;
+                }
 
-            if ("domain" in payload) {
-                delete nextState.form.types;
+                if ("domain" in payload) {
+                    delete nextState.form.types;
+                }
             }
 
             return nextState;

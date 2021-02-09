@@ -9,6 +9,7 @@ namespace Vanilla\Web\JsInterpop;
 
 use Gdn_Module;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Web\TwigStaticRenderer;
 use Vanilla\Widgets\AbstractWidgetModule;
 
 /**
@@ -49,16 +50,9 @@ abstract class AbstractReactModule extends AbstractWidgetModule {
             if ($props === null) {
                 return "";
             }
-            return $this->renderTwigFromString(
-                '<div class="{{ class }}" data-react="{{ component }}" data-props="{{ props }}"></div>',
-                [
-                    'props' => json_encode($this->getProps(), JSON_UNESCAPED_UNICODE),
-                    'component' => $this->getComponentName(),
-                    'class' => trim($this->cssWrapperClass()),
-                ]
-            );
+            return TwigStaticRenderer::renderReactModule($this->getComponentName(), $this->getProps(), $this->cssWrapperClass());
         } catch (\Garden\Web\Exception\HttpException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            trigger_error($e->getMessage(), E_USER_NOTICE);
             return "";
         }
     }

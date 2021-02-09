@@ -12,14 +12,14 @@ import { cssRaw } from "@library/styles/styleShim";
  * Mixins for the foundation
  */
 export class MixinsFoundation {
-    public static contentBoxes(pageBoxes: IContentBoxes, section?: string) {
+    public static contentBoxes(pageBoxes: IContentBoxes, section?: string, contentSelector: string = ".Content") {
         function prefixedSelector(selector: string): string {
             return section ? `.Section-${section} ${selector}` : selector;
         }
         cssRaw({
-            [prefixedSelector(`.Content .pageBox`)]: Mixins.box(pageBoxes.depth1),
-            [prefixedSelector(`.Content .pageBox .pageBox`)]: Mixins.box(pageBoxes.depth2),
-            [prefixedSelector(`.Content .pageBox .pageBox .pageBox`)]: Mixins.box(pageBoxes.depth3),
+            [prefixedSelector(`${contentSelector} .pageBox`)]: Mixins.box(pageBoxes.depth1),
+            [prefixedSelector(`${contentSelector} .pageBox .pageBox`)]: Mixins.box(pageBoxes.depth2),
+            [prefixedSelector(`${contentSelector} .pageBox .pageBox .pageBox`)]: Mixins.box(pageBoxes.depth3),
         });
     }
 }

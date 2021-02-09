@@ -49,7 +49,7 @@ export class Mixins {
     }
 
     public static box = (boxOptions: IBoxOptions): CSSObject => {
-        let { background, borderType, spacing, border } = boxOptions;
+        let { background, borderType, spacing, border, itemSpacingOnAllItems } = boxOptions;
         const globalVars = globalVariables();
 
         border = {
@@ -65,11 +65,10 @@ export class Mixins {
         // Anything that makes the box stand out from the background on all side
         // Means we should apply some default behaviours, like paddings, and borderRadius.
         const hasFullOutline = [BorderType.BORDER, BorderType.SHADOW].includes(borderType) || hasBackground;
-
         if (!boxHasSetPaddings && hasFullOutline) {
             spacing = { horizontal: 16, vertical: borderType === BorderType.SEPARATOR ? 0 : 16 };
         }
-
+        let itemSpacing = boxOptions.itemSpacing || (hasFullOutline ? 16 : 0);
         return {
             // Resets
             padding: 0,
@@ -107,11 +106,10 @@ export class Mixins {
                 : {}),
             ...(hasFullOutline
                 ? {
-                      "& + .pageBox": {
-                          marginTop: 16,
-                      },
+                      "& + .pageBox": Mixins.margin({ top: itemSpacing }),
                   }
                 : {}),
+            ...(itemSpacingOnAllItems ? Mixins.margin({ vertical: itemSpacing }) : {}),
         };
     };
 

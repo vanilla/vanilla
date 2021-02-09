@@ -9,6 +9,7 @@ namespace VanillaTests\Storybook;
 
 use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -17,6 +18,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 class CommunityStorybookTest extends StorybookGenerationTestCase {
 
     use CommunityApiTestTrait;
+    use EventSpyTestTrait;
 
     /** @var string[] */
     public static $addons = ["IndexPhotos"];
@@ -35,20 +37,30 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'Feature.NewQuickLinks.Enabled' => true,
         ]);
 
-
         $customCat = $this->createCategory([
             'name' => 'My Custom Category',
             'description' => 'This is a category description',
         ])['categoryID'];
-        $this->createDiscussion(['name' => 'Hello Discussion 0']);
+        $this->createDiscussion(['name' => 'Hello Discussion 0', 'score' => 20]);
 
         $anotherCat = $this->createCategory([
             'name' => 'Another category',
             'description' => 'This is a category description',
         ]);
-        $this->createDiscussion(['name' => 'Hello Discussion 1']);
+        CurrentTimeStamp::mockTime('Dec 2 2019');
+        $this->createDiscussion([
+            'name' => 'Hello Discussion 1',
+            'score' => 150,
+            'body' => 'Dec 2 - 150 score'
+        ]);
         self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
-        $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
+
+        CurrentTimeStamp::mockTime('Dec 4 2019');
+        $this->createComment([
+            'name' => 'Hello comment',
+            'body' => 'This is a comment body. Hello world, ipsum lorem, etc, Dec 4 - 40 score',
+            'score' => 40,
+        ]);
 
         // Make a more complicated category tree.
 
@@ -62,7 +74,13 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'countComments' => 143,
             'displayAs' => 'heading',
         ])['categoryID'];
-        $this->createDiscussion(['name' => 'Hello Discussion 2']);
+
+        CurrentTimeStamp::mockTime('Dec 3 2019');
+        $this->createDiscussion([
+            'name' => 'Hello Discussion 2',
+            'score' => 100,
+            'body' => 'Dec 3 - 100 score'
+        ]);
         self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
         $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
         $headingDepth2b = $this->createCategory([
@@ -201,5 +219,24 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
                 'Discussion Comment List (Checkboxes)',
             ],
         ];
+    }
+
+    /**
+     * Test homepage rendering.
+     *
+     * @depends testSetup
+     */
+    public function testHomePage() {
+        $afterBanner = function () {
+            return \Gdn_Theme::module('PromotedContentModule', [
+                'asHomeWidget' => true,
+                'Selector' => 'score',
+                'Selection' => 30,
+                'Title' => 'This is promoted content',
+            ]);
+        };
+        $this->getEventManager()->bind('afterBanner', $afterBanner);
+        $this->generateStoryHtml('/', 'Home (Promoted Content)');
+        $this->getEventManager()->unbind('afterBanner', $afterBanner);
     }
 }

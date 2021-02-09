@@ -8,12 +8,15 @@
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Widgets\AbstractWidgetModule;
 
 /**
  * Question & Answer Module
  */
 class QnAModule extends AbstractWidgetModule {
+
+    const ALL_QUESTIONS = 'all';
 
     /** @var int limit */
     private $limit = 10;
@@ -22,9 +25,9 @@ class QnAModule extends AbstractWidgetModule {
     private $title = "";
 
     /**
-     * @var bool
+     * @var string
      */
-    private $acceptedAnswer = true;
+    private $questionFilter;
 
     /** @var DiscussionModel $discussionModel */
     private $discussionModel;
@@ -35,7 +38,7 @@ class QnAModule extends AbstractWidgetModule {
     /**
      * @param int $limit
      */
-    public function setLimit(int $limit): void {
+    public function setLimit(int $limit = 10): void {
         $this->limit = $limit;
     }
 
@@ -50,8 +53,16 @@ class QnAModule extends AbstractWidgetModule {
      * @param bool $acceptedAnswer
      */
     public function setAcceptedAnswer(bool $acceptedAnswer): void {
-        $this->acceptedAnswer = $acceptedAnswer;
+        $this->questionFilter = $acceptedAnswer ? QnaModel::ACCEPTED : QnaModel::UNANSWERED;
     }
+
+    /**
+     * @param string $questionFilter
+     */
+    public function setQuestionFilter(string $questionFilter = QnaModel::ACCEPTED): void {
+        $this->questionFilter = $questionFilter;
+    }
+
 
     /**
      * QnaAnswersModule constructor.
@@ -70,7 +81,9 @@ class QnAModule extends AbstractWidgetModule {
     public function getData() {
         $where = ['Type' => 'Question'];
 
-        $where['QnA'] = $this->acceptedAnswer ? 'Accepted' : ['Answered', 'Unanswered'];
+        if ($this->questionFilter !== self::ALL_QUESTIONS) {
+            $where['QnA'] = $this->questionFilter;
+        }
 
         $visibleCategoriesResult = $this->categoryModel->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
         if ($visibleCategoriesResult !== true) {
@@ -110,18 +123,26 @@ class QnAModule extends AbstractWidgetModule {
                 'type' => 'string',
                 'nullable' => true,
                 'minLength' => 0,
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
+                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.')),
             ],
-            'acceptedAnswer' => [
-                'type' => 'boolean',
-                'default' => true,
-                'x-control' => SchemaForm::toggle(
+            'questionFilter' => [
+                'type' => 'string',
+                'default' => 'Accepted',
+                'x-control' => SchemaForm::dropDown(
                     new FormOptions(
-                        'Answered questions only',
-                        'Show only answered questions'
+                        'Question filter',
+                        'Set the filter'
+                    ),
+                    new StaticFormChoices(
+                        [
+                            QnaModel::ACCEPTED => t('Accepted answer only'),
+                            QnaModel::ANSWERED => t('Answered questions only'),
+                            QnaModel::UNANSWERED => t('Unanswered questions only'),
+                            self::ALL_QUESTIONS => t('All'),
+                        ]
                     )
-                )
-            ]
+                ),
+            ],
         ]);
     }
 

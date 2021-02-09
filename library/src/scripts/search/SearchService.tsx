@@ -7,7 +7,6 @@
 import { ISearchForm, ISearchRequestQuery } from "@library/search/searchTypes";
 import React from "react";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { PLACES_SEARCH_LISTING_COMPONENT_NAME } from "@library/search/searchConstants";
 
 export class SearchService {
     private static _supportsExtensions = false;
@@ -23,13 +22,6 @@ export class SearchService {
             searchDomain: domain,
             filterNode,
         });
-    };
-    static elasticServiceComponents = new Map<string, React.ReactNode>();
-    static addElasticServiceComponent = (name: string, component: React.ReactNode) => {
-        SearchService.elasticServiceComponents.set(name, component);
-    };
-    static getHeadingComponent = () => {
-        return SearchService.elasticServiceComponents.get(PLACES_SEARCH_LISTING_COMPONENT_NAME) ?? null;
     };
 
     static pluggableDomains = [] as ISearchDomain[];

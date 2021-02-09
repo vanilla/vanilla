@@ -432,6 +432,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     public function discussionIndexSchema_init(Schema $schema) {
         $this->updateSchemaExpand($schema);
+        $schema->merge(Schema::parse([
+            'reactionType:s?'
+        ]));
     }
 
     /**
@@ -526,6 +529,39 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $result = $out->validate($rows);
         return $result;
+    }
+
+    /**
+     * Get the discussions a user has reacted to by discussion type and/or reaction type.
+     *
+     * @param array $where Where clause as array
+     * @param DiscussionsAPIController $controller
+     * @param Schema $inSchema
+     * @param array $query
+     * @return array Where clause as array
+     */
+    public function discussionsApiController_indexFilters(
+        array $where,
+        DiscussionsApiController $controller,
+        Schema $inSchema,
+        array $query
+    ) {
+        if (!isset($query['reactionType'])) {
+            return $where;
+        }
+
+        $userID = $controller->getSession()->UserID;
+
+        // If it's guest, they shouldn't get any discussions.
+        if ($userID === 0) {
+            $where['d.DiscussionID'] = [];
+        }
+
+        $reactedDiscussions = $this->reactionModel->getReactedDiscussionIDsByUser($userID, [$query['reactionType']]);
+
+        $where['d.DiscussionID'] = $reactedDiscussions;
+
+        return $where;
     }
 
     /**

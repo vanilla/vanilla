@@ -263,10 +263,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             }
         }
         if ($this->getBody() !== null && $this->getFormat() !== null) {
-            return [
-                'url' => \Gdn::formatService()->parseImages($this->getBody(), $this->getFormat())[0] ?? null,
-                'alt' => t('Untitled'),
-                ];
+            return \Gdn::formatService()->parseImages($this->getBody(), $this->getFormat())[0] ?? null;
         }
         return null;
     }

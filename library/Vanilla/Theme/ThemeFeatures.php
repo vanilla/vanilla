@@ -95,7 +95,8 @@ class ThemeFeatures implements \JsonSerializable {
         $configValues = [
             'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
         ];
-        $themeValues = $this->theme->getInfoValue('Features', []);
+        $rawThemeValues = $this->theme->getInfoValue('Features', []);
+        $themeValues = $rawThemeValues;
         if ($themeValues['DataDrivenTheme'] ?? false) {
             // Data driven themes automatically enables other theme features.
             $themeValues['DisableKludgedVars'] = true;
@@ -106,8 +107,11 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues['UserCards'] = true;
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
             $themeValues['EnhancedAccessibility'] = true;
-            $themeValues['QuickLinks'] = true;
+            $themeValues['NewQuickLinks'] = true;
         }
+
+        // If someone has explicitly opted out with a false we want that to apply.
+        $themeValues = array_merge($themeValues, $rawThemeValues);
 
         if (FeatureFlagHelper::featureEnabled('NewEventsPage')) {
             $themeValues['NewEventsPage'] = true;

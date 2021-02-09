@@ -122,6 +122,7 @@ class ComposerHelper {
         }
 
         $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
+        $buildDocsScript = realpath($vanillaRoot . "/build/scripts/variables/buildVariableDocs.ts");
         $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
         $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
 
@@ -137,6 +138,17 @@ class ComposerHelper {
         // The build no longer does any validation, however, so a new env variable has been added.
         // So, we check for both.
         $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
+        $docsCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildDocsScript -i $lowMemoryFlag";
+
+        printf("\nBuilding variable documentation\n");
+        printf("\n$docsCommand\n");
+        system($docsCommand, $buildResult);
+
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
+
         $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
 
         printf("\nBuilding frontend assets\n");

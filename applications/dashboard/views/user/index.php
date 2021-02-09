@@ -4,7 +4,7 @@ $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 
 helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or email, optionally using % as a wildcard. You can also search by user ID, the name of a role, or &ldquo;banned&rdquo;.'));
-helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'));
+helpAsset(t('Need More Help?'), anchor(t("Managing Users"), 'https://success.vanillaforums.com/kb/articles/27-moderation-overview#managing-users'));
 
 if (checkPermission('Garden.Users.Add')) {
     echo heading(t('Manage Users'), t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');

@@ -249,7 +249,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         $this->canonicalUrl(url(userUrl($this->User, '', 'connections'), true));
-        $this->title(t('Social'));
+        $this->title(t('Connections'));
         require_once $this->fetchViewLocation('connection_functions');
         $this->render();
     }
@@ -1787,7 +1787,13 @@ EOT;
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', ['class' => 'link-social']);
+                $module->addLink(
+                    'Options',
+                    sprite('SpConnection').' '.t('Connections'),
+                    '/profile/connections',
+                    'Garden.SignIn.Allow',
+                    ['class' => 'link-social link-connections']
+                );
             }
         }
 

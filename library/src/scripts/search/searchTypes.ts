@@ -5,8 +5,8 @@
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { PublishStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import { IUserFragment, IUser } from "@vanilla/library/src/scripts/@types/api/users";
+import { PublishStatus } from "@library/@types/api/core";
+import { IUserFragment, IUser } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export interface ISearchFormBase {

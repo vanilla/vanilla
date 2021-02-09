@@ -3,7 +3,7 @@
  * @license GPLv2-only
  */
 
-import { Format, ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { Format, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import { IRoleFragment } from "@dashboard/roles/roleTypes";
 

@@ -3179,6 +3179,17 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     }
 
     /**
+     * Escapes fields with \, _
+     *
+     * @param string $field
+     * @return string|string[]
+     */
+    private function escapeField(string $field) {
+        $field =  str_replace(['\\', '_'], ['\\\\', '\_'], $field);
+        return $field;
+    }
+
+    /**
      * Search users.
      *
      * @param array|string $filter
@@ -3251,7 +3262,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 ->orWhere('u.Name', $numericQuery)
                 ->endWhereGroup();
         } elseif ($keywords) {
-            $keywords = $this->SQL->escapeField($keywords);
+            $keywords = $this->escapeField($keywords);
             if ($optimize && !$isIPAddress) {
                 // An optimized search should only be done against name OR email.
                 if (strpos($keywords, '@') !== false) {
@@ -3414,7 +3425,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Preserve existing % by escaping.
         $name = trim($name);
-        $name = $this->SQL->escapeField($name);
+        $name = $this->escapeField($name);
         if ($wildcardSearch) {
             $name = rtrim($name, '*');
         }

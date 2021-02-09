@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";

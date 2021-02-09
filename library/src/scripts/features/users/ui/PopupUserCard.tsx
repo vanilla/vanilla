@@ -11,7 +11,7 @@ import DropDown, {
     DropDownPreferredOpenDirections,
     FlyoutType,
 } from "@library/flyouts/DropDown";
-import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { CloseCompactIcon } from "@library/icons/common";
 import Permission, { PermissionMode } from "@library/features/users/Permission";

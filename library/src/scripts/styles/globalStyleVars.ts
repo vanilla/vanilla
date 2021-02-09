@@ -52,7 +52,17 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const options = makeThemeVars("options", { preset: GlobalPreset.LIGHT });
+    const options = makeThemeVars(
+        "options",
+        /**
+         * @var global.options.preset
+         * @title  Options Preset
+         * @description Choose global preset
+         * @type string
+         * @enum light | dark
+         */
+        { preset: GlobalPreset.LIGHT },
+    );
 
     const elementaryColors = {
         black: color("#000"),
@@ -61,12 +71,58 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         transparent: rgba(0, 0, 0, 0),
     };
 
+    /**
+     * @varGroup global.mainColors
+     * @commonDescription Global main colors
+     */
     const initialMainColors = makeThemeVars("mainColors", {
+        /**
+         * @var global.mainColors.fg
+         * @title Main Colors - Foreground
+         * @description Sets the foreground color
+         * @type string
+         * @format hex-color
+         */
         fg: options.preset === GlobalPreset.LIGHT ? color("#555a62") : elementaryColors.white,
+        /**
+         * @var global.mainColors.bg
+         * @title Main Colors - Background
+         * @description Sets the background color
+         * @type string
+         * @format hex-color
+         */
         bg: options.preset === GlobalPreset.LIGHT ? elementaryColors.white : elementaryColors.almostBlack,
+        /**
+         * @var global.mainColors.primary
+         * @title Main Colors - Primary
+         * @description Sets the primary color
+         * @type string
+         * @format hex-color
+         */
         primary: colorPrimary,
+        /**
+         * @var global.mainColors.primaryContrast
+         * @title Main Colors - Primary Contrast
+         * @description Primary color for contrast
+         * @type string
+         * @format hex-color
+         */
         primaryContrast: elementaryColors.white, // for good contrast with text.
+        /**
+         * @var global.mainColors.secondary
+         * @title Main Colors - Secondary
+         * @description Sets the secondary color
+         * @type string
+         * @format hex-color
+         */
         secondary: colorPrimary,
+        /**
+         * @var global.mainColors.secondaryContrast
+         * @title Main Colors - Secondary Contrast
+         * @description Secondary color for contrast
+         * @type string
+         * @format hex-color
+         */
         secondaryContrast: elementaryColors.white, // for good contrast with text.
     });
 
@@ -83,8 +139,20 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const generatedMainColors = makeThemeVars("mainColors", {
         primaryContrast: ColorsUtils.isLightColor(colorPrimary) ? elementaryColors.almostBlack : elementaryColors.white, // High contrast color, for bg/fg or fg/bg contrast. Defaults to bg.
+        /**
+         * @var global.mainColors.statePrimary
+         * @title Main Colors - State Primary
+         * @type string
+         * @format hex-color
+         */
         statePrimary: ColorsUtils.offsetLightness(colorPrimary, 0.04), // Default state color change
         secondary: ColorsUtils.offsetLightness(colorPrimary, 0.05),
+        /**
+         * @var global.mainColors.stateSecondary
+         * @title Main Colors - State Secondary
+         * @type string
+         * @format hex-color
+         */
         stateSecondary: undefined, // Calculated below, but you can overwrite it here.
         secondaryContrast: ColorsUtils.isLightColor(colorSecondary)
             ? elementaryColors.almostBlack
@@ -108,24 +176,85 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         return mainColors.primary.mix(mainColors.bg, getRatioBasedOnBackgroundDarkness(weight)) as ColorHelper;
     };
 
+    /**
+     * @varGroup global.messageColors
+     * @commonDescription Global message colors
+     */
     const messageColors = makeThemeVars("messageColors", {
+        /**
+         * @varGroup global.messageColors.warning
+         * @commonDescription Message - Warning
+         */
         warning: {
+            /**
+             * @var global.messageColors.warning.fg
+             * @type string
+             * @format hex-color
+             */
             fg: color("#4b5057"),
+            /**
+             * @var global.messageColors.warning.bg
+             * @type string
+             * @format hex-color
+             */
             bg: color("#fff1ce"),
+            /**
+             * @var global.messageColors.warning.state
+             * @type string
+             * @format hex-color
+             */
             state: color("#e55a1c"),
         },
+        /**
+         * @varGroup global.messageColors.error
+         * @commonDescription Message - Error
+         */
         error: {
+            /**
+             * @var global.messageColors.error.fg
+             * @type string
+             * @format hex-color
+             */
             fg: color("#d0021b"),
+            /**
+             * @var global.messageColors.error.bg
+             * @type string
+             * @format hex-color
+             */
             bg: color("#FFF3D4"),
         },
+        /**
+         * @var global.messageColors.confirm
+         * @type string
+         * @format hex-color
+         */
         confirm: color("#60bd68"),
+        /**
+         * @varGroup global.messageColors.deleted
+         * @commonDescription Message - Deleted
+         */
         deleted: {
+            /**
+             * @var global.messageColors.deleted.fg
+             * @type string
+             * @format hex-color
+             */
             fg: color("#D0021B"),
+            /**
+             * @var global.messageColors.deleted.bg
+             * @type string
+             * @format hex-color
+             */
             bg: color("#D0021B"),
         },
     });
 
     const links = makeThemeVars("links", {
+        /**
+         * @varGroup global.links.colors
+         * @commonTitle Global Link Colors
+         * @expand clickable
+         */
         colors: {
             default: mainColors.secondary,
             hover: undefined,
@@ -154,16 +283,53 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     }
 
     const body: IBody = makeThemeVars("body", {
+        /**
+         * @varGroup global.body.backgroundImage
+         * @description Background variables for the page.
+         * @expand background
+         */
         backgroundImage: Variables.background({
             color: mainColors.bg,
         }),
     });
 
     const border = makeThemeVars("border", {
+        /**
+         * @var global.border.color
+         * @title Border Color
+         * @description Choose the color of the border.
+         * @type string
+         * @format hex-color
+         */
         color: mixBgAndFg(0.2),
+        /**
+         * @var global.border.width
+         * @title Border Hover Color
+         * @description Choose the hover color of the border.
+         * @type string
+         * @format hex-color
+         */
         colorHover: mixBgAndFg(0.4),
+        /**
+         * @var global.border.width
+         * @title Border Width
+         * @description Choose the width of the border.
+         * @type number|string
+         */
         width: 1,
+        /**
+         * @var global.border.style
+         * @title Border Style
+         * @description Choose the style of the border.
+         * @type number|string
+         */
         style: "solid",
+        /**
+         * @var global.border.radius
+         * @title  Border Radius
+         * @description Choose the radius of the border.
+         * @type number|string
+         */
         radius: 6, // Global default
     });
 
@@ -183,9 +349,22 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const gutterSize = 16;
     // @Deprecated - It's confusing that this gutter is 16 and the layout is 48.
     // TODO: Refactor
+    /**
+     * @varGroup global.gutter
+     * @commonTitle Global - Gutter
+     */
     const gutter = makeThemeVars("gutter", {
+        /**
+         * @var global.gutter.size
+         */
         size: gutterSize,
+        /**
+         * @var global.gutter.half
+         */
         half: gutterSize / 2,
+        /**
+         * @var global.gutter.quater
+         */
         quarter: gutterSize / 4,
     });
 
@@ -213,11 +392,30 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
     */
 
+    /**
+     * @varGroup global.lineHeight
+     * @commonTitle Global - Line Height
+     */
     const lineHeights = makeThemeVars("lineHeight", {
+        /**
+         * @var global.lineHeight.base
+         */
         base: 1.5,
+        /**
+         * @var global.lineHeight.condensed
+         */
         condensed: 1.25,
+        /**
+         * @var global.lineHeight.code
+         */
         code: 1.45,
+        /**
+         * @var global.lineHeight.excerpt
+         */
         excerpt: 1.4,
+        /**
+         * @var global.lineHeight.meta
+         */
         meta: 1.5,
     });
 
@@ -243,6 +441,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const widgetInit = makeThemeVars("widget", {
+        /**
+         * @var global.widget.padding
+         */
         padding: 10,
     });
 
@@ -252,6 +453,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const panelInit = makeThemeVars("panel", {
+        /**
+         * @var global.panel.width
+         */
         width: foundationalWidths.panelWidth,
     });
 
@@ -272,12 +476,34 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
     const fontsInit0 = makeThemeVars("fonts", {
+        /**
+         * @varGroup global.fonts.size
+         * @commonDescription Preset global font size
+         */
         size: {
+            /**
+             * @var global.fonts.size.large
+             */
             large: 16,
+            /**
+             * @var global.fonts.size.medium
+             */
             medium: 14,
+            /**
+             * @var global.fonts.size.small
+             */
             small: 12,
+            /**
+             * @var global.fonts.size.largeTitle
+             */
             largeTitle: 32,
+            /**
+             * @var global.fonts.size.title
+             */
             title: 22,
+            /**
+             * @var global.fonts.size.subTitle
+             */
             subTitle: 18,
         },
         sizeWeight: {
@@ -288,14 +514,35 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             title: undefined as undefined | number,
             subTitle: undefined as undefined | number,
         },
+
         mobile: {
+            /**
+             * @varGroup global.fonts.mobile.size
+             * @commonTitle Global - Mobile
+             */
             size: {
+                /**
+                 * @var global.mobile.size.title
+                 */
                 title: 26,
             },
         },
+        /**
+         * @varGroup global.fonts.weights
+         * @commonDescription Predefined global font weight
+         */
         weights: {
+            /**
+             * @var global.fonts.weights.normal
+             */
             normal: 400,
+            /**
+             * @var global.fonts.weights.semiBold
+             */
             semiBold: 600,
+            /**
+             * @var global.fonts.weights.bold
+             */
             bold: 700,
         },
         googleFontFamily: defaultFontFamily as undefined | string,
@@ -335,17 +582,49 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    /**
+     * @varGroup global.icon
+     * @commonDescription Sets size and color of icon
+     */
     const icon = makeThemeVars("icon", {
+        /**
+         * @varGroup global.icon.sizes
+         * @commonDescription Sets icon size
+         */
         sizes: {
+            /**
+             * @var global.sizes.large
+             */
             large: 32,
+            /**
+             * @var global.sizes.default
+             */
             default: 24,
+            /**
+             * @var global.sizes.small
+             */
             small: 16,
+            /**
+             * @var global.sizes.xSmall
+             */
             xSmall: 9.5,
         },
+        /**
+         * @var global.icon.color
+         * @title Icon - Color
+         * @description Sets the size of the icon
+         * @type string
+         * @format hex-color
+         */
         color: mixBgAndFg(0.18),
     });
 
     const spacer = makeThemeVars("spacer", {
+        /**
+         * @var global.spacer.size
+         * @description Sets the size of the spacing element
+         * @type number
+         */
         size: fonts.size.medium * lineHeights.base,
     });
 
@@ -354,44 +633,129 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         defaultEasing: "ease-out",
     });
 
+    /**
+     * @varGroup global.embed
+     * @commonDescription Global - Embed
+     */
     const embed = makeThemeVars("embed", {
+        /**
+         * @varGroup global.embed.error
+         * @commonDescription  Embed - Error
+         */
         error: {
+            /**
+             * @var global.embed.error.bg
+             */
             bg: messageColors.error,
         },
+        /**
+         * @varGroup global.embed.focus
+         * @commonDescription  Embed - Focus
+         */
         focus: {
+            /**
+             * @var global.embed.focus.color
+             */
             color: mainColors.primary,
         },
+        /**
+         * @varGroup global.embed.text
+         * @commonDescription  Embed - Text
+         */
         text: {
+            /**
+             * @var global.embed.text.padding
+             */
             padding: fonts.size.medium,
         },
+        /**
+         * @varGroup global.embed.sizing
+         * @commonDescription  Embed - Sizing
+         */
         sizing: {
+            /**
+             * @var global.embed.text.smallPadding
+             */
             smallPadding: 4,
+            /**
+             * @var global.embed.text.width
+             */
             width: 640,
         },
+        /**
+         * @varGroup global.embed.select
+         * @commonDescription  Embed - Select
+         */
         select: {
+            /**
+             * @var global.embed.select.borderWidth
+             */
             borderWidth: 2,
         },
+        /**
+         * @varGroup global.embed.overlay
+         * @commonDescription  Embed - Overlay
+         */
         overlay: {
+            /**
+             * @varGroup global.embed.overlay.hover
+             * @commonDescription  Embed - Overlay - Hover
+             */
             hover: {
+                /**
+                 * @var global.embed.overlay.hover.color
+                 */
                 color: mainColors.bg.fade(0.5),
             },
         },
     });
 
+    /**
+     * @varGroup global.meta
+     * @commonDescription Global meta
+     */
     const meta = makeThemeVars("meta", {
+        /**
+         * @varGroup global.meta.font
+         * @commonDescription Global meta font
+         * @expand font
+         */
         text: Variables.font({
             size: fonts.size.small,
             color: options.preset === GlobalPreset.LIGHT ? color("#767676") : elementaryColors.white,
             lineHeight: lineHeights.base,
         }),
+        /**
+         * @varGroup global.meta.spacing
+         * @commonDescription Global meta spacing
+         */
         spacing: {
+            /**
+             * @var global.meta.spacing.horizontalMargin
+             */
             horizontalMargin: 4,
+            /**
+             * @var global.meta.spacing.verticalMargin
+             */
             verticalMargin: 12,
+            /**
+             * @var global.meta.spacing.default
+             */
             default: 4,
         },
+        /**
+         * @varGroup global.meta.colors
+         * @commonDescription Global meta colors
+         */
         colors: {
+            /**
+             * @var global.meta.colors.fg
+             */
             fg: mixBgAndFg(0.85),
         },
+        /**
+         * @var global.meta.display
+         */
         display: "block",
     });
 
@@ -425,14 +789,35 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const overlayBg = ColorsUtils.modifyColorBasedOnLightness({ color: mainColors.fg, weight: 0.5 });
+
+    /**
+     * @varGroup global.overlay
+     * @commonDescription Global - OverLay
+     */
     const overlay = makeThemeVars("overlay", {
+        /**
+         * @var global.overlay.dropShadow
+         */
         dropShadow: `2px -2px 5px ${ColorsUtils.colorOut(overlayBg.fade(0.3))}`,
+        /**
+         * @var global.overlay.bg
+         */
         bg: overlayBg,
+        /**
+         * @varGroup global.overlay.border
+         * @expand border
+         */
         border: {
             color: border.color,
             radius: border.radius,
         },
+        /**
+         * @var global.overlay.fullPageHeadingSpacer
+         */
         fullPageHeadingSpacer: 32,
+        /**
+         * @var global.overlay.spacer
+         */
         spacer: 32,
     });
 
@@ -457,8 +842,21 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const buttonIconSize = 36;
+
+    /**
+     * @varGroup global.buttonIcon
+     * @commonDescription Controls icon in button
+     */
     const buttonIcon = makeThemeVars("buttonIcon", {
+        /**
+         * @var  global.buttonIcon.size
+         * @type number
+         */
         size: buttonIconSize,
+        /**
+         * @var  global.buttonIcon.offset
+         * @type number
+         */
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
@@ -469,8 +867,21 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         style: undefined as ButtonPreset | undefined,
     });
 
+    /**
+     * @varGroup global.separator
+     * @commonDescription Sets color and size of separator
+     */
     const separator = makeThemeVars("separator", {
+        /**
+         * @var global.separator.color
+         * @type string
+         * @format hex-color
+         */
         color: border.color,
+        /**
+         * @var global.separator.size
+         * @type number
+         */
         size: 1,
     });
 
@@ -577,6 +988,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const itemList = makeThemeVars("itemList", {
+        /**
+         * @varGroup global.itemList
+         * @commonTitle Global - Item List
+         * @expand spacing
+         */
         padding: Variables.spacing({
             top: 15,
             right: widget.padding,

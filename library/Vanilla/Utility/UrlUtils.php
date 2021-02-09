@@ -54,6 +54,23 @@ class UrlUtils {
     }
 
     /**
+     * Concatenate a query string to a URL with the proper '?' or '&' character.
+     *
+     * @param string $uri
+     * @param string|array $query
+     * @return string
+     */
+    public static function concatQuery(string $uri, $query): string {
+        if (empty($query)) {
+            return $uri;
+        } elseif (is_array($query)) {
+            $query = http_build_query($query);
+        }
+        $sep = strpos($uri, '?') === false ? '?' : '&';
+        return $uri.$sep.$query;
+    }
+
+    /**
      * URL encode a decoded path.
      *
      * @param string $path

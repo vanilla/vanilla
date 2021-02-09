@@ -1,10 +1,19 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import { JsonSchemaConverter } from "./parsers/JsonSchemaConverter";
-import { ITypeExpander, VariableParser } from "./parsers/VariableParser";
+import { JsonSchemaFlatAdapter, IVariableJsonSchema } from "./parsers/JsonSchemaFlatAdapter";
+import { ITypeExpander, VariableParser, IVariable, IVariableGroup } from "./parsers/VariableParser";
+import { JsonSchemaNestedAdapter } from "./parsers/JsonSchemaNestedAdapter";
 
-export { ITypeExpander, VariableParser, JsonSchemaConverter };
+export {
+    ITypeExpander,
+    VariableParser,
+    JsonSchemaFlatAdapter,
+    JsonSchemaNestedAdapter,
+    IVariableJsonSchema,
+    IVariable,
+    IVariableGroup,
+};

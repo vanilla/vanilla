@@ -6,7 +6,7 @@
 import React, { ReactNode } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { DeviceProvider } from "@library/layout/DeviceContext";

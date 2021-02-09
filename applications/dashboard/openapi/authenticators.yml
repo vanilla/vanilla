@@ -1,0 +1,164 @@
+openapi: 3.0.2
+info:
+  description: API access to your community.
+  title: Vanilla API
+  version: '2.0'
+servers:
+  - url: /api/v2
+paths:
+  /authenticators:
+    get:
+      summary: List the authenticators.
+      tags:
+        - Authenticators
+      parameters:
+        - name: type
+          description: Filter by one or more authenticator types.
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+            format: form
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          description: >
+            Maximum number of items to be included in the response. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthenticatorFragment'
+  '/authenticators/{id}':
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the authenticator to look up.
+        required: true
+        schema:
+          type: integer
+    delete:
+      summary: Delete an authenticator.
+      tags:
+        - Authenticators
+      responses:
+        '204':
+          description: Success
+    get:
+      summary: Get a single authenticator.
+      tags:
+        - Authenticators
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorFragment'
+    patch:
+      summary: Update an authenticator.
+      tags:
+        - Authenticators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                default:
+                  type: boolean
+                active:
+                  type: boolean
+                visible:
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatorFragment'
+components:
+  schemas:
+    AuthenticatorFragment:
+      type: object
+      properties:
+        authenticatorID:
+          type: integer
+          description: The authenticator's ID.
+        name:
+          type: string
+          description: A human readible name for the authenticator.
+        type:
+          type: string
+          description: The type of authenticator
+          example: oauth2
+        clientID:
+          type: string
+        default:
+          type: boolean
+        active:
+          type: boolean
+          example: true
+        visible:
+          type: boolean
+        urls:
+          type: object
+          properties:
+            signInUrl:
+              nullable: true
+              format: uri
+              type: string
+            signOutUrl:
+              nullable: true
+              format: uri
+              type: string
+            authenticateUrl:
+              nullable: true
+              format: uri
+              type: string
+            registerUrl:
+              nullable: true
+              format: uri
+              type: string
+            passwordUrl:
+              nullable: true
+              format: uri
+              type: string
+            profileUrl:
+              nullable: true
+              format: uri
+              type: string
+      required:
+        - authenticatorID
+        - name
+        - type
+        - clientID
+        - default
+        - active
+        - visible
+
+# AuthenticationKey           varchar(64)  - clientID
+# AuthenticationSchemeAlias   varchar(32)  - type
+# Name                        varchar(50)  - name
+# URL                         varchar(255)
+# AssociationSecret           text
+# AssociationHashMethod       varchar(20)
+# AuthenticateUrl             varchar(255) - urls.authenticateUrl
+# RegisterUrl                 varchar(255) - urls.registerUrl
+# SignInUrl                   varchar(255) - urls.signInUrl
+# SignOutUrl                  varchar(255) - urls.signOutUrl
+# PasswordUrl                 varchar(255) - urls.passwordUrl
+# ProfileUrl                  varchar(255) - urls.profileUrl
+# Attributes                  text
+# Active                      tinyint(4)   - active
+# IsDefault                   tinyint(4)   - default

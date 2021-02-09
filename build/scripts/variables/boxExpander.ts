@@ -14,9 +14,8 @@ export const boxExpander: ITypeExpander = {
         return [
             {
                 ...variable,
-                title: variable.title + " - " + "Border Type",
-                description:
-`Choose one of a few border types.
+                title: "Border Type",
+                description: `Choose one of a few border types.
 
 - none: Apply no styling on the box.
 - border: Apply a standard border around the item. Automatically applies spacing as well. See the \`global.border\` variables to change this border.
@@ -27,14 +26,31 @@ export const boxExpander: ITypeExpander = {
                 enum: ["border", "none", "shadow", "separator"],
                 type: "string",
             },
+            {
+                ...variable,
+                title: variable.title + " - " + "Item Spacing",
+                description: `For certain border types, there is space between in items. This is that space in pixels.`,
+                key: variable.key + ".itemSpacing",
+                type: "number",
+                default: "0",
+            },
+            {
+                ...variable,
+                title: variable.title + " - " + "Apply Item Spacing on all items ",
+                description: `Apply the item spacing even on the first and last items.`,
+                key: variable.key + ".itemSpacingOnAllItems",
+                type: "boolean",
+                default: "false",
+            },
             ...spacingExpander.expandType({
                 ...variable,
-                title: variable.title + " - " + "Spacing",
+                title: "Spacing",
+                key: variable.key + ".spacing",
                 commonDescription: "_This value will be defaulted based on the set borderType.",
             }),
             ...backgroundExpander.expandType({
                 ...variable,
-                title: variable.title + " - " + "Background",
+                title: "Background",
                 key: variable.key + ".background",
             }),
         ];

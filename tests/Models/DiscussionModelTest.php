@@ -367,6 +367,7 @@ class DiscussionModelTest extends SiteTestCase {
         $this->discussionModel->CountCommentWatch = $testDiscussionArray['CountCommentWatch'];
         $this->discussionModel->DateInserted = $testDiscussionArray['DateInserted'];
         $this->discussionModel->DateLastComment = $testDiscussionArray['DateLastComment'];
+        $this->discussionModel->Bookmarked = $testDiscussionArray['Bookmarked'];
         $actual = $this->discussionModel->calculateWatch($this->discussionModel, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted);
         $this->assertSame($expected, $actual);
     }
@@ -384,6 +385,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => null,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-17 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 0,
@@ -397,6 +399,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => null,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-18 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 0,
@@ -410,6 +413,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => null,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-19 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 0,
@@ -423,6 +427,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => 0,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-17 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 0,
@@ -436,6 +441,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => 5,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-19 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 5,
@@ -449,6 +455,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => 30,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-19 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 30,
@@ -462,6 +469,7 @@ class DiscussionModelTest extends SiteTestCase {
                     'CountCommentWatch' => 6,
                     'DateInserted' => '2020-01-17 19:20:02',
                     'DateLastComment' => '2020-01-18 19:20:02',
+                    'Bookmarked' => 0,
                 ],
                 30,
                 5,
@@ -469,6 +477,20 @@ class DiscussionModelTest extends SiteTestCase {
                 'DateLastComment' => '2020-01-18 19:20:02',
                 [5, '2020-01-18 19:20:02', 'update'],
             ],
+            'Discussion Bookmarked Before Viewed' => [
+                [
+                    'DateLastViewed' => null,
+                    'CountCommentWatch' => null,
+                    'DateInserted' => '2020-01-17 19:20:02',
+                    'DateLastComment' => '2020-01-18 19:20:02',
+                    'Bookmarked' => 1,
+                ],
+                30,
+                0,
+                0,
+                'DateLastComment' => '2020-01-18 19:20:02',
+                [0, '2020-01-18 19:20:02', 'update'],
+            ]
         ];
 
         return $r;

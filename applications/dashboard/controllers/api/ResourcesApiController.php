@@ -16,6 +16,7 @@ use Vanilla\DateFilterSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelFactory;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\Controller;
 
 /**
@@ -57,13 +58,28 @@ class ResourcesApiController extends Controller {
             'recordTypes:a?' => [
                 'items' => ['type' => 'string'],
             ],
+            'dirtyRecords:b?' => [
+                'default' => false,
+            ],
         ]);
         $query = $in->validate($query);
 
+
+        $passThroughQueryParams = [];
+        if ($query['dirtyRecords'] ?? null) {
+            $passThroughQueryParams['dirtyRecords'] = $query['dirtyRecords'];
+        }
+
         if (isset($query['crawlable'])) {
             $models = $this->factory->getAllByInterface(CrawlableInterface::class, $query['crawlable']);
+            $passThroughQueryParams['expand'] = 'crawl';
         } else {
             $models = $this->factory->getAll();
+        }
+
+        $passthroughQuery = '';
+        if (!empty($passThroughQueryParams)) {
+            $passthroughQuery = http_build_query($passThroughQueryParams);
         }
 
         $r = [];
@@ -73,9 +89,13 @@ class ResourcesApiController extends Controller {
                 continue;
             }
 
+            $url = "/api/v2/resources/$recordType";
+            if ($passthroughQuery) {
+                $url .= '?' . $passthroughQuery;
+            }
             $r[] = [
                 'recordType' => $recordType,
-                'url' => \Gdn::request()->getSimpleUrl("/api/v2/resources/$recordType"),
+                'url' => \Gdn::request()->getSimpleUrl($url),
                 'crawlable' => ($model instanceof CrawlableInterface),
             ];
         }

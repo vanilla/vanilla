@@ -5,7 +5,7 @@
 
 module.exports = {
     parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "lodash"],
+    plugins: ["@typescript-eslint", "@vanilla", "react", "react-hooks", "jsx-a11y", "lodash"],
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
@@ -89,6 +89,9 @@ module.exports = {
         // React hooks
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn",
+
+        // Vanilla Custom
+        "@vanilla/no-unconventional-imports": "error",
 
         // Lodash
         // Ensure we always do single package lodash imports.

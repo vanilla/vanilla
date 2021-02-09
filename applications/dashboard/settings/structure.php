@@ -312,8 +312,24 @@ $Construct->table('UserAuthentication')
     ->column('UserID', 'int', false, 'key')
     ->set($Explicit, $Drop);
 
-$Construct->table('UserAuthenticationProvider')
-    ->column('AuthenticationKey', 'varchar(64)', false, 'primary')
+$Construct->table('UserAuthenticationProvider');
+
+if ($Construct->tableExists("UserAuthenticationProvider") && !$Construct->columnExists("UserAuthenticationProviderID")) {
+    $userAuthenticationProvider = $SQL->prefixTable("UserAuthenticationProvider");
+    $addAuthenticationProviderID = <<<SQL
+alter table {$userAuthenticationProvider}
+drop primary key,
+add `UserAuthenticationProviderID` int not null auto_increment primary key first
+SQL;
+
+    $Construct->executeQuery($addAuthenticationProviderID);
+    $Construct->reset();
+}
+
+$Construct
+    ->table('UserAuthenticationProvider')
+    ->primaryKey('UserAuthenticationProviderID')
+    ->column('AuthenticationKey', 'varchar(64)', false, 'unique')
     ->column('AuthenticationSchemeAlias', 'varchar(32)', false)
     ->column('Name', 'varchar(50)', true)
     ->column('URL', 'varchar(255)', true)
@@ -328,6 +344,7 @@ $Construct->table('UserAuthenticationProvider')
     ->column('Attributes', 'text', true)
     ->column('Active', 'tinyint', '1')
     ->column('IsDefault', 'tinyint', 0)
+    ->column('Visible', 'tinyint', 1)
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationNonce')

@@ -962,12 +962,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return array|null
      */
     private function getAllTimerHeaders(): ?array {
-        return array_merge(
-            $this->getTimerHeadersForKey('cacheRead'),
-            $this->getTimerHeadersForKey('cacheWrite'),
-            $this->getTimerHeadersForKey('dbRead'),
-            $this->getTimerHeadersForKey('dbWrite')
-        );
+        $headers = [];
+        foreach ($this->timers->getTimers() as $timer) {
+            $headers += $this->getTimerHeadersForKey($timer);
+        }
+        return $headers;
     }
 
     /**

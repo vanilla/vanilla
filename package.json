@@ -22,6 +22,7 @@
     "dependencies": {
         "@emotion/css": "^11.0.0",
         "@monaco-editor/react": "^3.7.5",
+        "@reach/accordion": "^0.13.0",
         "@reach/skip-nav": "^0.11.2",
         "@reach/tabs": "^0.6.4",
         "@reach/tooltip": "^0.3.0",
@@ -52,6 +53,7 @@
         "react-day-picker": "7.2.4",
         "react-dom": "^16.9.0",
         "react-loadable": "5.5.0",
+        "react-markdown": "^5.0.3",
         "react-mutation-observer": "^1.1.0",
         "react-redux": "^7.1.0",
         "react-relative-portal": "^1.8.0",
@@ -104,8 +106,8 @@
         "@types/optimize-css-assets-webpack-plugin": "^5.0.1",
         "@types/prop-types": "^15.7.1",
         "@types/qs": "6.9.4",
-        "@types/react": "^16.9.11",
-        "@types/react-dom": "^16.9.4",
+        "@types/react": "^16.9.46",
+        "@types/react-dom": "^16.9.8",
         "@types/react-loadable": "^5.5.1",
         "@types/react-redux": "^7.1.5",
         "@types/react-router-dom": "^5.1.2",
@@ -185,7 +187,9 @@
     },
     "resolutions": {
         "js-yaml": ">=3.13.1",
-        "tar": ">=4.4.2"
+        "tar": ">=4.4.2",
+        "@types/react": "^16.9.46",
+        "@types/react-dom": "^16.9.8"
     },
     "scripts": {
         "scaffold": "ts-node -P build/tsconfig.json build/scripts/scaffold/index.ts",
@@ -197,6 +201,7 @@
         "build:dev": "yarn run build:assets --mode=development",
         "build:analyze": "yarn run build:assets --mode=analyze",
         "build:variable-docs": "ts-node -P build/tsconfig.json build/scripts/variables/buildVariableDocs.ts",
+        "update:tsconfig": "node ./packages/updateTsconfig.js",
         "test": "yarn test:unit && yarn test:browser",
         "test:browser": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=test",
         "test:browser:watch": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=testwatch",

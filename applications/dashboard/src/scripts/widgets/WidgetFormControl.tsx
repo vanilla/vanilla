@@ -11,7 +11,7 @@ import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardSelectLookup } from "@dashboard/forms/DashboardSelectLookup";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { IFormControl, IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
-import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import React from "react";
 
 interface IProps {
@@ -30,12 +30,14 @@ export function WidgetFormControl(props: IProps) {
     switch (formControl.inputType) {
         case "textBox":
             const isMultiline = formControl.type === "textarea";
+            const type = formControl.type === "number" ? "number" : "text";
             return (
                 <DashboardInput
                     inputProps={{
                         value: value ?? "",
                         onChange: (event) => onChange(event.target.value),
                         maxLength: schema.type === "string" ? schema.maxLength : undefined,
+                        type: !isMultiline ? type : undefined,
                         placeholder: formControl.placeholder,
                         multiline: isMultiline ? true : false,
                     }}

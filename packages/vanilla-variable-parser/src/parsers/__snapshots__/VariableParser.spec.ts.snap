@@ -1,24 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`VariableParser applies varGroup prefixes and common descriptions: varGroupPrefixes expansions 1`] = `
-Array [
-  Object {
-    "description": "My Description
-DESCRIPTION",
-    "key": "thing.var1",
-    "title": "PREFIX - Variable 1",
-    "type": "string",
-  },
-  Object {
-    "description": "My Description 2
-DESCRIPTION",
-    "key": "thing.var2",
-    "title": "PREFIX - Variable 2",
-    "type": "string",
-  },
-]
-`;
-
 exports[`VariableParser can handle type expanders: font expansions 1`] = `
 Array [
   Object {
@@ -55,7 +36,7 @@ Object {
     Object {
       "description": "When disabled the banner will not appear at all.",
       "key": "banner.options.enabled",
-      "title": "Banner - Enabled",
+      "title": "Enabled",
       "type": "boolean",
     },
     Object {
@@ -66,7 +47,7 @@ Object {
         "right",
       ],
       "key": "banner.options.alignment",
-      "title": "Banner - Alignment",
+      "title": "Alignment",
       "type": "string",
     },
     Object {
@@ -77,25 +58,25 @@ Object {
         "right",
       ],
       "key": "banner.options.mobileAlignment",
-      "title": "Banner - Alignment (Mobile)",
+      "title": "Alignment (Mobile)",
       "type": "string",
     },
     Object {
       "description": undefined,
       "key": "banner.options.hideDescription",
-      "title": "Banner - Hide Description",
+      "title": "Hide Description",
       "type": "boolean",
     },
     Object {
       "description": undefined,
       "key": "banner.options.hideTitle",
-      "title": "Banner - Hide Title",
+      "title": "Hide Title",
       "type": "boolean",
     },
     Object {
       "description": undefined,
       "key": "banner.options.hideSearch",
-      "title": "Banner - Hide SearchBar",
+      "title": "Hide SearchBar",
       "type": "boolean",
     },
     Object {
@@ -105,13 +86,13 @@ Object {
         "bottom",
       ],
       "key": "banner.options.searchPlacement",
-      "title": "Banner - SearchBar Placement",
+      "title": "SearchBar Placement",
       "type": "string",
     },
     Object {
       "description": "When set turn the title into a link to this url.",
       "key": "banner.options.url",
-      "title": "Banner - Title Url",
+      "title": "Title Url",
       "type": "string",
     },
   ],

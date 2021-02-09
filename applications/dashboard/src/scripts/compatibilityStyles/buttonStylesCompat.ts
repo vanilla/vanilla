@@ -8,7 +8,7 @@
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { buttonUtilityClasses } from "@library/forms/buttonStyles";
-import { buttonGlobalVariables, buttonVariables } from "@vanilla/library/src/scripts/forms/Button.variables";
+import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { absolutePosition, importantUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";

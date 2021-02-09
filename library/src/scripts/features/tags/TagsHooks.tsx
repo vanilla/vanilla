@@ -4,7 +4,7 @@
  */
 
 import { useSelector } from "react-redux";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ITag, ITagsStateStoreState } from "@library/features/tags/TagsReducer";
 import { useEffect } from "react";
 import { useTagsActions } from "@library/features/tags/TagsAction";

@@ -4,7 +4,13 @@
  * @license gpl-2.0-only
  */
 
-import { JsonSchemaConverter, VariableParser } from "@vanilla/variable-parser";
+import {
+    IVariable,
+    IVariableGroup,
+    JsonSchemaFlatAdapter,
+    JsonSchemaNestedAdapter,
+    VariableParser,
+} from "@vanilla/variable-parser";
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
@@ -27,7 +33,7 @@ const parser = VariableParser.create()
     .addTypeExpander(boxExpander)
     .addTypeExpander(contentBoxesExpander);
 
-const pattern = "**/*{Styles,styles,variables,Variables}.{ts,tsx}";
+const pattern = "**/*{Styles,styles,variables,Variables,Vars}.{ts,tsx}";
 
 async function buildVariableDocs() {
     printSection("Parsing Variables");
@@ -35,12 +41,14 @@ async function buildVariableDocs() {
     print(`File pattern: ${chalk.yellow(pattern)}`);
     print("");
 
-    const resultVars: any[] = [];
+    const resultVars: IVariable[] = [];
+    const resultGroups: IVariableGroup[] = [];
 
     const noVarFiles: string[] = [];
     let hadError = false;
     for await (const [file, result] of parser.parseFiles(VANILLA_ROOT, pattern)) {
-        const { errors, variables } = result;
+        const { errors, variables, variableGroups } = result;
+        resultGroups.push(...variableGroups);
         resultVars.push(...variables);
         if (variables.length === 0) {
             noVarFiles.push(file);
@@ -74,19 +82,25 @@ async function buildVariableDocs() {
         // });
     }
 
-    // Write the file out.
+    // Write the files out.
     // Convert to JSON Schema.
     if (hadError) {
         printSection("Process Failed");
         printError("Refusing to write file due encountered parsing errors.");
         process.exit(1);
     } else {
-        const schema = JsonSchemaConverter.convertVariables(resultVars);
         printSection(`Writing JSON schema`);
-        const out = path.resolve(DIST_DIRECTORY, "variable-schema.json");
         print(`Variable Count: ${chalk.green(resultVars.length.toString())}`);
-        print(`Output Path: ${chalk.green(out)}`);
-        fs.writeFileSync(out, JSON.stringify(schema, null, 4));
+        const outFlat = path.resolve(DIST_DIRECTORY, "variable-schema.json");
+        const outNested = path.resolve(DIST_DIRECTORY, "variable-schema-nested.json");
+        print(`Output Path (flat): ${chalk.green(outFlat)}`);
+        print(`Output Path (nested): ${chalk.green(outNested)}`);
+
+        const flatAdapter = new JsonSchemaFlatAdapter(resultVars, resultGroups);
+        fs.writeFileSync(outFlat, JSON.stringify(flatAdapter.asJsonSchema(), null, 4));
+
+        const nestedAdapter = new JsonSchemaNestedAdapter(resultVars, resultGroups);
+        fs.writeFileSync(outNested, JSON.stringify(nestedAdapter.asJsonSchema(), null, 4));
     }
 }
 

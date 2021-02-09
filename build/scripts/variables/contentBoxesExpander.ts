@@ -13,17 +13,17 @@ export const contentBoxesExpander: ITypeExpander = {
         return [
             ...boxExpander.expandType({
                 ...variable,
-                title: variable.title + " - " + "Depth 1",
+                title: "Depth 1",
                 key: variable.key + ".depth1",
             }),
             ...boxExpander.expandType({
                 ...variable,
-                title: variable.title + " - " + "Depth 2",
+                title: "Depth 2",
                 key: variable.key + ".depth2",
             }),
             ...boxExpander.expandType({
                 ...variable,
-                title: variable.title + " - " + "Depth 3",
+                title: "Depth 3",
                 key: variable.key + ".depth3",
             }),
         ];

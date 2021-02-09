@@ -142,6 +142,14 @@ export const OpenSearchWithScope = storyWithConfig({ useWrappers: false }, () =>
     <StoryTitleBar title="Open Search" openSearch={true} scope={true} />
 ));
 
+export const CustomContainer = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: { titleBar: { titleBarContainer: { maxWidth: "100%", gutterSpacing: { horizontal: 60 } } } },
+    },
+    () => <StoryTitleBar title="Custom Container" />,
+);
+
 export const WithGradientAndSwoop = storyWithConfig(
     {
         useWrappers: false,

@@ -94,6 +94,7 @@ $Construct->primaryKey('CategoryID')
     ->column('AllowedDiscussionTypes', 'varchar(255)', null)
     ->column('DefaultDiscussionType', 'varchar(10)', null)
     ->column('Featured', 'tinyint', '0')
+    ->column('SortFeatured', 'int', '0', 'index')
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;

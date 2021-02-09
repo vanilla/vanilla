@@ -12,7 +12,7 @@ export const fontExpander: ITypeExpander = {
         return [
             {
                 ...variable,
-                title: variable.title + " - " + "Color",
+                title: "Color",
                 description:
                     "Sets the color the components's text. Hexidecimal colors preferred (Either #RRGGBB or #RRGGBBAA)",
                 key: variable.key + ".color",
@@ -21,7 +21,7 @@ export const fontExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Size",
+                title: "Size",
                 description:
                     "Indicates the desired height of glyphs in the applied font. Numerical units will be applied as pixels, for example '12' will be interpreted as '12px'.",
                 key: variable.key + ".size",
@@ -29,21 +29,21 @@ export const fontExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Weight",
+                title: "Weight",
                 description: "Specifies weight/boldness of glyphs in the applied font.",
                 key: variable.key + ".weight",
                 type: "number",
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Line Height",
+                title: "Line Height",
                 description: "Sets the distance between lines of text.",
                 key: variable.key + ".lineHeight",
                 type: ["number", "string"],
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Text Shadow",
+                title: "Text Shadow",
                 description:
                     "Enables shadow effects to be applied to the text of the element. Allows any formats of [the CSS 'text-shadow' property.](https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow)",
                 key: variable.key + ".shadow",
@@ -51,22 +51,22 @@ export const fontExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Alignment",
+                title: "Alignment",
                 description:
                     "Describes how text contents are horizontally aligned if the contents do not completely fill their container.",
                 key: variable.key + ".align",
-                type: ["number", "string"],
+                type: "string",
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Family",
+                title: "Family",
                 description: "Text alignment",
                 key: variable.key + ".family",
-                type: ["left", "right", "center"],
+                type: "string",
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Transform",
+                title: "Transform",
                 description:
                     "Specifies how to capitalize an element's text. It can be used to make text appear in all-uppercase or all-lowercase, or with each word capitalized. ",
                 key: variable.key + ".transform",
@@ -75,18 +75,18 @@ export const fontExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Letter Spacing",
+                title: "Letter Spacing",
                 description: "Sets the spacing behavior between text characters.",
                 key: variable.key + ".letterSpacing",
                 type: ["string", "number"],
             },
             {
                 ...variable,
-                title: variable.title + " - " + "Text Decoration",
+                title: "Text Decoration",
                 description: "Apply some decoration to the text.",
                 key: variable.key + ".textDecoration",
                 type: "string",
-                enum: ["none", "underline", "overline", "line-through"]
+                enum: ["none", "underline", "overline", "line-through"],
             },
         ];
     },

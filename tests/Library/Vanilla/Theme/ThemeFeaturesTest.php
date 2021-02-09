@@ -43,6 +43,17 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
     }
 
     /**
+     * Test that data driven themes can opt out of features.
+     */
+    public function testOverrideDataDrivenDefaults() {
+        $addon = new MockAddon('test', ['Features' => ['DataDrivenTheme' => true, 'NewQuickLinks' => false]]);
+        $features = new ThemeFeatures($this->getConfig(), $addon);
+        $this->assertTrue($features->useDataDrivenTheme());
+        $this->assertTrue($features->useSharedMasterView());
+        $this->assertFalse($features->useNewQuickLinks());
+    }
+
+    /**
      * Test that data driven theme forces most other features on.
      */
     public function testForcedItems() {

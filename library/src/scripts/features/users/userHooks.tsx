@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { IGetUserByIDQuery, IInviteUsersByGroupIDQuery, useUserActions } from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
 import { useEffect } from "react";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 export function useUser(query: IGetUserByIDQuery) {

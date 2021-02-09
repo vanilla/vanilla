@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
+import { ThemeDropDown } from "@library/forms/themeEditor/ThemeDropDown";
+import { useThemeBuilder } from "@library/forms/themeEditor/ThemeBuilderContext";
 
 export const fontKey = "global.fonts.googleFontFamily";
 

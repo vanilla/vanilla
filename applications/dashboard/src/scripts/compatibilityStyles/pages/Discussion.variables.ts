@@ -9,11 +9,16 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 
+/**
+ * @varGroup discussion
+ * @description Variables affecting a discussion page.
+ * This is generally a single discussion and the comments responding to it.
+ */
 export const discussionVariables = useThemeCache(() => {
     const makeVars = variableFactory("discussion");
 
     /**
-     * @varGroup discussionPage.contentBoxes
+     * @varGroup discussion.contentBoxes
      * @description Content boxes for the discussion page (or comment list).
      * @expand contentBoxes
      */

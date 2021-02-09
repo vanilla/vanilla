@@ -670,7 +670,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             // Look for at least one untreated answer/comment.
             $answeredComment = Gdn::sql()->getWhere(
                 'Comment',
-                ['DiscussionID' => val('DiscussionID', $discussion),
+                ['DiscussionID' => $discussionID,
                     'QnA is null' => ''],
                 '',
                 'asc',

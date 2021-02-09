@@ -6,6 +6,8 @@
  * @since 4.0
  */
 
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
@@ -1288,8 +1290,6 @@ if (!function_exists('redirectTo')) {
         if ($database instanceof Gdn_Database) {
             $database->closeConnection();
         }
-        // Clear out any previously sent content
-        @ob_end_clean();
 
         if (!in_array($statusCode, [301, 302])) {
             $statusCode = 302;
@@ -1298,6 +1298,13 @@ if (!function_exists('redirectTo')) {
         // Encode backslashes because most modern browsers convert backslashes to slashes.
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
+
+        if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+            throw new ResponseException(new Redirect($url, $statusCode));
+        }
+
+        // Clear out any previously sent content
+        @ob_end_clean();
 
         if ($statusCode === 302) {
             CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);

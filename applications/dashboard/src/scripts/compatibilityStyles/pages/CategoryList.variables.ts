@@ -9,11 +9,15 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 
+/**
+ * @varGroup categoryList
+ * @description Variables affecting lists of categories. These can appear on /categories or inside of nested type categories.
+ */
 export const categoryListVariables = useThemeCache(() => {
     const makeVars = variableFactory("categoryList");
 
     /**
-     * @varGroup categoryListPage.contentBoxes
+     * @varGroup categoryList.contentBoxes
      * @description Content boxes for the category list page.
      * @expand contentBoxes
      */

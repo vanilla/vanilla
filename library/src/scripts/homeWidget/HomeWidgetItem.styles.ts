@@ -66,6 +66,12 @@ export const homeWidgetItemVariables = useThemeCache(
         const makeVars = variableFactory("homeWidgetItem", itemVars);
         const globalVars = globalVariables(itemVars);
         const layoutVars = layoutVariables(itemVars);
+
+        /**
+         * @varGroup homeWidgetItem.options
+         * @commonTitle Options
+         * @description Within a HomeWidget, an item is an individual grid item. These items could represent a discussion, article, category etc.
+         */
         let options = makeVars(
             "options",
             {
@@ -140,12 +146,23 @@ export const homeWidgetItemVariables = useThemeCache(
         );
 
         const sizing = makeVars("sizing", {
+            /**
+             * @var homeWidgetItem.sizing.minWidth
+             * @title Minimum Width
+             * @type number
+             * @description Apply a minimum width to HomeWidgetItems.
+             */
             minWidth: layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5, // Min width allows 4 items to fit.
         });
 
         const hasBorder = [BorderType.BORDER, BorderType.SHADOW].includes(options.borderType);
 
         const spacing = makeVars("spacing", {
+            /**
+             * @varGroup homeWidgetItem.spacing.contentPadding
+             * @commonTitle Content Padding
+             * @expand spacing
+             */
             contentPadding: Variables.spacing({
                 vertical: hasBorder || hasImage ? 24 : 0,
                 top:
@@ -160,7 +177,20 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const iconContainer = makeVars("iconContainer", {
+            /**
+             * @var homeWidgetItem.iconContainer.padding
+             * @title IconContainer Padding
+             * @type number | string
+             * @expand spacing
+             */
             padding: iconPlacementLeft ? 8 : 24,
+
+            /**
+             * @var homeWidgetItem.iconContainer.borderRadius
+             * @title Homewidget Item IconContainer Border Radius
+             * @type number
+             * @description The border radius of icon container
+             */
             borderRadius: options.iconProps.background ? globalVars.border.radius : undefined,
             hoverBackgroundColor: options.iconProps.background.color
                 ? ColorsUtils.modifyColorBasedOnLightness({
@@ -171,16 +201,51 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const icon = makeVars("icon", {
+            /**
+             * @var homeWidgetItem.icon.size
+             * @title HomeWidgetItem Icon Size
+             * @type number | string
+             * @description Sets the size of homewidget icons i
+             */
             size: options.iconProps.size ? options.iconProps.size : iconPlacementLeft ? 48 : 72,
+            /**
+             * @varGroup homeWidgetItem.icon.background
+             * @description Background properties to apply to the icon of the widget item.
+             * @expand background
+             */
+            background: Variables.background({}),
+            /**
+             * @varGroup homeWidgetItem.icon.background
+             * @description Background properties to apply to the icon of the widget item when the item is hovered, focused or active.
+             * @expand background
+             */
+            backgroundState: Variables.background({}),
         });
 
         let background = makeVars("background", {
+            /**
+             * @varGroup homeWidgetItem.background.fg
+             * @title ForeGround Color
+             */
             fg: {
                 color: globalVars.elementaryColors.white,
             },
+
+            /**
+             * @varGroup homeWidgetItem.background.fg
+             * @title Background Color
+             * @expand background
+             */
             bg: Variables.background({}),
+
+            /**
+             * @varGroup homeWidgetItem.background.scrim
+             * @title Overlay Color
+             * @expand background
+             */
             scrim: Variables.background({}),
         });
+
         const isForegroundLight = background.fg.color.lightness() >= 0.5;
         background = makeVars("background", {
             ...background,
@@ -193,6 +258,10 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const name = makeVars("name", {
+            /**
+             * @varGroup homeWidgetItem.name.font
+             * @expand font
+             */
             font: Variables.font({
                 color: options.name.font.color ?? options.fg,
                 size: (() => {
@@ -213,10 +282,29 @@ export const homeWidgetItemVariables = useThemeCache(
                     return undefined;
                 })(),
             }),
+
+            /**
+             * @varGroup homeWidgetItem.name.background
+             * @commonTitle Name Background
+             * @expand background
+             */
             background: Variables.background({
                 color: color("#fff"),
             }),
+
+            /**
+             * @var homeWidgetItem.name.afterContent
+             * @description Indicates whether there is content that appears after the HomeWidget Name
+             * @type string
+             * @title AfterContent
+             */
             afterContent: hasChatBubble ? "triangle" : "none",
+
+            /**
+             * @varGroup homeWidgetItem.name.spacing
+             * @commonTitle Name Spacing
+             * @expand spacing
+             */
             spacing: hasChatBubble
                 ? Variables.spacing({
                       vertical: 50,
@@ -230,10 +318,21 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const callToAction = makeVars("callToAction", {
+            /**
+             * @varGroup homeWidgetItem.callToAction.padding
+             * @commonTitle Call To Action Padding
+             * @expand spacing
+             */
             padding: {
                 ...name.spacing,
                 top: 20,
             },
+
+            /**
+             * @varGroup homeWidgetItem.callToAction.font
+             * @commonTitle Call To Action Font
+             * @expand font
+             */
             font: Variables.font({
                 transform: "uppercase",
                 color: options.fg,
@@ -243,11 +342,22 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const description = makeVars("description", {
+            /**
+             * @varGroup homeWidgetItem.description.spacing
+             * @commonTitle Description Padding
+             * @expand spacing
+             */
             spacing: Variables.spacing({
                 ...name.spacing,
                 top: 0,
                 bottom: 0,
             }),
+
+            /**
+             * @varGroup homeWidgetItem.description.font
+             * @commonTitle Description Font
+             * @expand font
+             */
             font: Variables.font({
                 color: options.fg,
                 lineHeight: globalVars.lineHeights.base,
@@ -255,10 +365,35 @@ export const homeWidgetItemVariables = useThemeCache(
         });
 
         const image = makeVars("image", {
+            /**
+             * @var homeWidgetItem.image.ratio
+             * @description Aspect ratio of HomeWidgetItem image.
+             * @title Aspect Ratio
+             */
             ratio: {
+                /**
+                 * @var homeWidgetItem.image.ratio.height
+                 * @title Image Height
+                 * @description Height of HomeWidget Item Image
+                 * @type number
+                 */
                 height: hasBackground ? 16 : 9,
+
+                /**
+                 * @var homeWidgetItem.image.ratio.width
+                 * @title Image Width
+                 * @description Widtht of HomeWidget Item Image
+                 * @type number
+                 */
                 width: 16,
             },
+
+            /**
+             * @var homeWidgetItem.image.maxHeight
+             * @description The maximum height of the HomeWidgetItem image.
+             * @title Maximum Image Height
+             * @type number
+             */
             maxHeight: hasBackground ? 400 : 250,
         });
 
@@ -275,11 +410,14 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         switch (vars.options.borderType) {
             case BorderType.BORDER:
                 return {
-                    ...Mixins.border(),
+                    ...Mixins.border({
+                        radius: vars.options.borderRadius,
+                    }),
                     ...{
                         "&:hover, &:focus": {
                             ...Mixins.border({
                                 color: globalVars.border.colorHover,
+                                radius: vars.options.borderRadius,
                             }),
                         },
                     },
@@ -297,7 +435,9 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
             case BorderType.SHADOW_AS_BORDER:
             case BorderType.NONE:
             default:
-                return {};
+                return {
+                    borderRadius: vars.options.borderRadius,
+                };
         }
     })();
 
@@ -457,8 +597,12 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
 
     const icon = style("icon", {
         height: vars.icon.size,
+        ...Mixins.background(vars.icon.background),
         // Width not set so that the aspect ratio of wider icons is preserved.
         ...Mixins.border(vars.options.iconProps.border),
+        [`.${root}:hover &, .${root}:active &, .${root}:focus &`]: {
+            ...Mixins.background(vars.icon.backgroundState),
+        },
     });
 
     const iconLeftPadding = calc(

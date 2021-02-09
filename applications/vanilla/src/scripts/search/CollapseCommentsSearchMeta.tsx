@@ -4,21 +4,21 @@
  */
 
 import React, { useMemo, useState } from "react";
-import { searchResultClasses } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
-import { useLayout } from "@vanilla/library/src/scripts/layout/LayoutContext";
-import { TypeDiscussionsIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
+import { searchResultClasses } from "@library/features/search/searchResultsStyles";
+import { useLayout } from "@library/layout/LayoutContext";
+import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import classNames from "classnames";
-import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
+import SmartLink from "@library/routing/links/SmartLink";
 import { ResultMeta } from "@library/result/ResultMeta";
 import CollapseCommentsSearchMetaLoader from "@vanilla/addon-vanilla/search/CollapseCommentsSearchMetaLoader";
-import { ICountResult } from "@vanilla/library/src/scripts/search/searchTypes";
-import { useDiscussion } from "@vanilla/library/src/scripts/features/discussions/discussionHooks";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ICountResult } from "@library/search/searchTypes";
+import { useDiscussion } from "@library/features/discussions/discussionHooks";
+import { LoadStatus } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
-import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
-import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import qs from "qs";
-import { makeSearchUrl } from "@vanilla/library/src/scripts/search/SearchPageRoute";
+import { makeSearchUrl } from "@library/search/SearchPageRoute";
 
 interface IProps {
     discussionID: number;

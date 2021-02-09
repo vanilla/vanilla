@@ -362,7 +362,7 @@ class CategoriesApiController extends AbstractApiController {
 
                 $where['categoryID'] = $filterCategoryIDs;
             }
-            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+            [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'SortFeatured');
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $options = [];
             if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {

@@ -9,7 +9,7 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { WidgetFormControl } from "@dashboard/widgets/WidgetFormControl";
 import get from "lodash/get";
 import { IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
-import { t } from "@vanilla/library/src/scripts/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import { notEmpty } from "@vanilla/utils";
 
 interface IPartialProps {

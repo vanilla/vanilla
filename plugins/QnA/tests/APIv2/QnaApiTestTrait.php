@@ -127,10 +127,18 @@ trait QnaApiTestTrait {
     public function acceptAnswer(array $question, array $answer) {
         /** @var AnswerModel $model */
         $model = \Gdn::getContainer()->get(AnswerModel::class);
+        $model->updateCommentQnA($question, $answer, 'Accepted');
+        $this->recalculateDiscussionQnA($question);
+    }
+
+    /**
+     * Recalculate the QnA status of a discussion.
+     *
+     * @param array $question
+     */
+    public function recalculateDiscussionQnA(array $question) {
         /** @var \QnAPlugin $plugin */
         $plugin = \Gdn::getContainer()->get(\QnAPlugin::class);
-
-        $model->updateCommentQnA($question, $answer, 'Accepted');
         $plugin->recalculateDiscussionQnA($question);
     }
 }

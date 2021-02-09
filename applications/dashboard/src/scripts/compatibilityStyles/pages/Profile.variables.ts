@@ -14,6 +14,10 @@ export enum ProfilePhotoAlignment {
     CENTER = "center",
 }
 
+/**
+ * @varGroup profile
+ * @description Variables affecting the profile and edit profile pages.
+ */
 export const profileVariables = useThemeCache(() => {
     const makeVars = variableFactory("profile");
 

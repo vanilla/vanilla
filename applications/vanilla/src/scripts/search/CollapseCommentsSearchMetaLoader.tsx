@@ -4,11 +4,11 @@
  */
 
 import React from "react";
-import { LoadingRectangle, LoadingSpacer, LoadingCircle } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
-import ScreenReaderContent from "@vanilla/library/src/scripts/layout/ScreenReaderContent";
-import { t } from "@vanilla/library/src/scripts/utility/appUtils";
-import { useLayout } from "@vanilla/library/src/scripts/layout/LayoutContext";
-import { searchResultClasses } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
+import { LoadingRectangle, LoadingSpacer, LoadingCircle } from "@library/loaders/LoadingRectangle";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t } from "@library/utility/appUtils";
+import { useLayout } from "@library/layout/LayoutContext";
+import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import classNames from "classnames";
 
 interface IProps {

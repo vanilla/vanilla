@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import Tokens, { ITokenProps } from "@vanilla/library/src/scripts/forms/select/Tokens";
+import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
 import { useTagSearch } from "@library/features/tags/TagsHooks";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { LoadStatus } from "@library/@types/api/core";

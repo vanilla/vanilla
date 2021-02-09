@@ -12,6 +12,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSObject } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
+import { ISpacing } from "@library/styles/cssUtilsTypes";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();
@@ -71,7 +72,7 @@ export function containerMainMediaQueries() {
     });
 }
 
-export const containerClasses = useThemeCache(() => {
+export const containerClasses = useThemeCache((options?: { desktopSpacing?: ISpacing; maxWidth?: number }) => {
     const style = styleFactory("container");
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = containerVariables();
@@ -84,7 +85,9 @@ export const containerClasses = useThemeCache(() => {
             ...Mixins.padding({
                 horizontal: vars.spacing.padding * 2,
             }),
+            ...(options?.maxWidth ? { maxWidth: options.maxWidth } : {}),
         },
+        options?.desktopSpacing && Mixins.padding(options.desktopSpacing),
         mediaQueries.oneColumnDown({
             ...Mixins.padding({
                 horizontal: vars.spacing.mobile.padding * 2,

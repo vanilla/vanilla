@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { ITabData, Tabs } from "@vanilla/library/src/scripts/sectioning/Tabs";
+import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { mountReact } from "@vanilla/react-utils";
 import React from "react";
 

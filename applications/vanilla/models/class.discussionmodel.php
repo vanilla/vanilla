@@ -3069,17 +3069,19 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         if ($count === \Gdn_Cache::CACHEOP_FAILURE) {
             $sql = clone $this->SQL;
             $sql->reset();
+
             $sqlResult = $sql
-                ->select('c.DiscussionID', 'COUNT(DISTINCT(%s))', 'NumDiscussions')
+                ->select('c.DiscussionID', 'distinct', 'NumDiscussions')
                 ->from('Comment c')
                 ->where('c.InsertUserID', $userID)
-                ->groupBy('c.InsertUserID')
+                // We dont' do a full count here, because it can easily time out in MySQL.
+                ->groupBy('c.DiscussionID')
                 ->get();
 
             if (!($sqlResult instanceof Gdn_DataSet)) {
                 $count = 0;
             } else {
-                $count = $sqlResult->firstRow(DATASET_TYPE_ARRAY)['NumDiscussions'] ?? 0;
+                $count = $sqlResult->numRows();
             }
 
             $cache->store($key, $count, [
@@ -4065,7 +4067,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
 
         // This discussion looks familiar...
-        if ($discussion->CountCommentWatch > 0 | !is_null($discussion->DateLastViewed)) {
+        if ($discussion->CountCommentWatch > 0 | !is_null($discussion->DateLastViewed) | $discussion->Bookmarked) {
             if ($countWatch < $discussion->CountCommentWatch) {
                 $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
             }
@@ -4074,7 +4076,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
             }
 
-            if ($totalComments > $discussion->CountCommentWatch || $countWatch != $discussion->CountCommentWatch) {
+            if ($totalComments > $discussion->CountCommentWatch ||
+                $countWatch != $discussion->CountCommentWatch ||
+                is_null($discussion->DateLastViewed)) {
                 $newComments = true;
             }
 

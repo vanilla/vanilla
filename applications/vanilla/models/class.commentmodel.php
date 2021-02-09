@@ -1623,6 +1623,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     ->where('DiscussionID', $discussionID)
                     ->put();
             }
+            $this->addDirtyRecord('discussion', $discussionID);
         }
     }
 

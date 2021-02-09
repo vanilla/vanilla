@@ -237,6 +237,8 @@ export interface IBoxOptions {
     background: IBackground;
     spacing: ISpacing;
     border: ISimpleBorderStyle;
+    itemSpacing: number;
+    itemSpacingOnAllItems: boolean;
 }
 
 export interface IContentBoxes {

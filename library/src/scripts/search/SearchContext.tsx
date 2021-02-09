@@ -1,6 +1,6 @@
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE } from "@library/search/searchReducer";
 import { ISearchForm, ISearchResults, ISearchFormBase } from "@library/search/searchTypes";
-import { ILoadable } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable } from "@library/@types/api/core";
 import React, { useContext } from "react";
 import { ISearchDomain } from "./SearchService";
 

@@ -19,8 +19,8 @@ import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap"
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
-import InputTextBlock from "@library/forms/InputTextBlock";
+import { supportsFrames } from "@vanilla/library/src/scripts/embeddedContent/IFrameEmbed";
+import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { forceInt } from "@vanilla/utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df0ca7116bf22fd0503f981eeda4e0ab",
+    "content-hash": "25ccc1d1aba5d45bdb91e51773fac13e",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -2152,16 +2152,16 @@
         },
         {
             "name": "vanilla/cloud-interops",
-            "version": "v2.0.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/cloud-interops.git",
-                "reference": "9d475c1ac708d1bab04dad3c079a9ddb8e67c9af"
+                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/cloud-interops/zipball/9d475c1ac708d1bab04dad3c079a9ddb8e67c9af",
-                "reference": "9d475c1ac708d1bab04dad3c079a9ddb8e67c9af",
+                "url": "https://api.github.com/repos/vanilla/cloud-interops/zipball/370b91568c8628dfb33dcf9f9687f3664d718206",
+                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206",
                 "shasum": ""
             },
             "require": {
@@ -2178,7 +2178,7 @@
                 "GPL-2.0"
             ],
             "description": "Provides Vanilla Cloud contracts",
-            "time": "2021-02-03T14:03:20+00:00"
+            "time": "2020-08-17T21:51:54+00:00"
         },
         {
             "name": "vanilla/garden-cli",
@@ -6137,44 +6137,6 @@
             "time": "2020-07-12T23:59:07+00:00"
         },
         {
-            "name": "vanilla/garden-jsont",
-            "version": "v1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/garden-jsont.git",
-                "reference": "2486e1f9fe112baefcbc4d35fb32c4c001241c1b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-jsont/zipball/2486e1f9fe112baefcbc4d35fb32c4c001241c1b",
-                "reference": "2486e1f9fe112baefcbc4d35fb32c4c001241c1b",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7",
-                "vanilla/standards": "^1.3",
-                "vimeo/psalm": "^3.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Garden\\JSON\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Todd Burry",
-                    "email": "todd@vanillaforums.com"
-                }
-            ],
-            "description": "A little JSON transformation library.",
-            "time": "2020-02-23T00:24:25+00:00"
-        },
-        {
             "name": "vanilla/standards",
             "version": "1.3.1",
             "source": {
@@ -6413,12 +6375,12 @@
             "version": "4.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webmozarts/glob.git",
+                "url": "https://github.com/webmozart/glob.git",
                 "reference": "3cbf63d4973cf9d780b93d2da8eec7e4a9e63bbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/glob/zipball/3cbf63d4973cf9d780b93d2da8eec7e4a9e63bbe",
+                "url": "https://api.github.com/repos/webmozart/glob/zipball/3cbf63d4973cf9d780b93d2da8eec7e4a9e63bbe",
                 "reference": "3cbf63d4973cf9d780b93d2da8eec7e4a9e63bbe",
                 "shasum": ""
             },

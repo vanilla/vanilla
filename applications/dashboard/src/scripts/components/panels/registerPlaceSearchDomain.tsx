@@ -5,16 +5,16 @@
 
 import React from "react";
 import { SearchService } from "@library/search/SearchService";
-import { t, onReady } from "@library/utility/appUtils";
-import { TypePlacesIcon, TypeCategoriesIcon } from "@library/icons/searchIcons";
-import { ISearchForm, ISearchResult } from "@library/search/searchTypes";
+import { t, onReady } from "@vanilla/library/src/scripts/utility/appUtils";
+import { TypePlacesIcon, TypeCategoriesIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
+import { ISearchForm, ISearchResult } from "@vanilla/library/src/scripts/search/searchTypes";
 import { IPlaceSearchTypes } from "@dashboard/components/placeSearchType";
 import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFilterPanel";
-import Result from "@library/result/Result";
+import Result from "@vanilla/library/src/scripts/result/Result";
 import flatten from "lodash/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
-import { PLACES_CATEGORY_TYPE, PLACES_DOMAIN_NAME } from "@library/search/searchConstants";
-import { ResultMeta } from "@library/result/ResultMeta";
+import { PLACES_CATEGORY_TYPE, PLACES_DOMAIN_NAME } from "@vanilla/library/src/scripts/search/searchConstants";
+import { ResultMeta } from "@vanilla/library/src/scripts/result/ResultMeta";
 
 export function PlacesResultMeta(props: { searchResult: Partial<ISearchResult> }) {
     const { searchResult } = props;

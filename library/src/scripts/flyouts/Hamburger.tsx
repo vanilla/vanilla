@@ -16,7 +16,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useMemo, useState } from "react";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { INavigationTreeItem } from "@library/@types/api/core";
+import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { IPanelNavItemsProps } from "@library/flyouts/panelNav/PanelNavItems";

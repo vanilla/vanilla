@@ -3069,19 +3069,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         if ($count === \Gdn_Cache::CACHEOP_FAILURE) {
             $sql = clone $this->SQL;
             $sql->reset();
-
             $sqlResult = $sql
-                ->select('c.DiscussionID', 'distinct', 'NumDiscussions')
+                ->select('c.DiscussionID', 'COUNT(DISTINCT(%s))', 'NumDiscussions')
                 ->from('Comment c')
                 ->where('c.InsertUserID', $userID)
-                // We dont' do a full count here, because it can easily time out in MySQL.
-                ->groupBy('c.DiscussionID')
+                ->groupBy('c.InsertUserID')
                 ->get();
 
             if (!($sqlResult instanceof Gdn_DataSet)) {
                 $count = 0;
             } else {
-                $count = $sqlResult->numRows();
+                $count = $sqlResult->firstRow(DATASET_TYPE_ARRAY)['NumDiscussions'] ?? 0;
             }
 
             $cache->store($key, $count, [

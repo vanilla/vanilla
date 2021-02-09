@@ -13,7 +13,7 @@ import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayout
 import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { important, percent } from "csx";
-import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts/styles/metasStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";

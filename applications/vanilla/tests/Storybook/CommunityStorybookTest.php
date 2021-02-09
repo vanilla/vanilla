@@ -21,7 +21,7 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
     use EventSpyTestTrait;
 
     /** @var string[] */
-    public static $addons = ["IndexPhotos"];
+    public static $addons = ["DiscussionExcerpt", "IndexPhotos"];
 
     /** @var array */
     private static $commentedDiscussionID;

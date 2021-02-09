@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
 
 export interface ICommunitySearchTypes {
     categoryID?: number;

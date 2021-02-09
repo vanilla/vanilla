@@ -5,7 +5,7 @@
  */
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import TextEditor from "@library/textEditor/TextEditor";
+import TextEditor from "@vanilla/library/src/scripts/textEditor/TextEditor";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";
 import React, { useState } from "react";

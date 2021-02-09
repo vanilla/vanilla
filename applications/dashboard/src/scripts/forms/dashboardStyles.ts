@@ -5,7 +5,7 @@
 
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();

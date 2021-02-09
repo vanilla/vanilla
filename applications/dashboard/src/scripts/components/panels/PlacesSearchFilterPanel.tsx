@@ -4,10 +4,10 @@
  */
 
 import React from "react";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { FilterFrame } from "@vanilla/library/src/scripts/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchContext";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import { t } from "@library/utility/appUtils";
+import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
+import { t } from "@vanilla/library/src/scripts/utility/appUtils";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 
 interface IProps {}

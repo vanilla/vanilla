@@ -19,8 +19,8 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import React, { useState } from "react";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
-import { t } from "@library/utility/appUtils";
-import Translate from "@library/content/Translate";
+import { t } from "@vanilla/library/src/scripts/utility/appUtils";
+import Translate from "@vanilla/library/src/scripts/content/Translate";
 
 export default {
     title: "Dashboard/Forms",

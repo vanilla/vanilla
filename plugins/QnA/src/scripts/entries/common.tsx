@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import { onReady, t } from "@library/utility/appUtils";
+import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
 import { SearchService } from "@library/search/SearchService";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
+import { TypeQuestionIcon } from "@vanilla/library/src/scripts/icons/searchIcons";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 
 onReady(() => {

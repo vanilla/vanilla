@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 import { logWarning } from "@vanilla/utils";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { userContentClasses } from "@library/content/userContentStyles";
+import { userContentClasses } from "@vanilla/library/src/scripts/content/userContentStyles";
 import classNames from "classnames";
 
 interface IProps {

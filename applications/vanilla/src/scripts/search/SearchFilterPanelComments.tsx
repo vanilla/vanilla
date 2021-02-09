@@ -5,13 +5,13 @@
 
 import React from "react";
 import { useSearchForm } from "@library/search/SearchContext";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { t } from "@library/utility/appUtils";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
-import MultiUserInput from "@library/features/users/MultiUserInput";
-import DateRange from "@library/forms/DateRange";
+import { inputBlockClasses } from "@vanilla/library/src/scripts/forms/InputBlockStyles";
+import { dateRangeClasses } from "@vanilla/library/src/scripts/forms/dateRangeStyles";
+import { FilterFrame } from "@vanilla/library/src/scripts/search/panels/FilterFrame";
+import { t } from "@vanilla/library/src/scripts/utility/appUtils";
+import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
+import MultiUserInput from "@vanilla/library/src/scripts/features/users/MultiUserInput";
+import DateRange from "@vanilla/library/src/scripts/forms/DateRange";
 
 interface IProps {}
 

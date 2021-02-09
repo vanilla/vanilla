@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import Loader from "@library/loaders/Loader";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 
 /**
  * Custom layout for swagger-ui.

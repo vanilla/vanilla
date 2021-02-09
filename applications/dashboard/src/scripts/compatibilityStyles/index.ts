@@ -6,15 +6,15 @@
  */
 
 import { useThemeCache } from "@library/styles/themeCache";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
 import { importantUnit, negative, singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { calc, ColorHelper, important } from "csx";
-import { inputVariables } from "@library/forms/inputStyles";
-import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
+import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
+import { siteNavNodeClasses } from "@vanilla/library/src/scripts/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
 import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
@@ -35,11 +35,11 @@ import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
-import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
+import { searchResultsVariables } from "@vanilla/library/src/scripts/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
-import { dropDownVariables } from "@library/flyouts/dropDownStyles";
+import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { forumVariables } from "@library/forums/forumStyleVars";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";

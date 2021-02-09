@@ -7,7 +7,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import uniqueId from "lodash/uniqueId";
-import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";

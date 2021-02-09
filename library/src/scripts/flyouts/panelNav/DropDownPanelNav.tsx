@@ -8,7 +8,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import Heading from "@library/layout/Heading";
-import { INavigationTreeItem } from "@library/@types/api/core";
+import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";

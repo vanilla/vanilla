@@ -4,12 +4,12 @@
  */
 
 import React from "react";
-import CheckboxGroup from "@library/forms/CheckboxGroup";
+import CheckboxGroup from "@vanilla/library/src/scripts/forms/CheckboxGroup";
 import Checkbox from "@library/forms/Checkbox";
 import { useSearchForm } from "@library/search/SearchContext";
 import flatten from "lodash/flatten";
-import { onReady, t } from "@library/utility/appUtils";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
+import { inputBlockClasses } from "@vanilla/library/src/scripts/forms/InputBlockStyles";
 
 interface IProps {}
 

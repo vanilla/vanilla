@@ -11,7 +11,7 @@ import { t } from "@vanilla/i18n";
 import { uploadFile } from "@library/apiv2";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import ButtonLoader from "@library/loaders/ButtonLoader";
+import ButtonLoader from "@vanilla/library/src/scripts/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {

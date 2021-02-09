@@ -8,8 +8,7 @@ function writeConnection($row) {
         <div class="Connection-Header">
          <span class="IconWrap">
             <?php
-            $imgPath = !empty($row['Icon']) ? $row['Icon'] : asset('/applications/dashboard/design/images/connection-64.png');
-            echo '<img src="'.htmlspecialchars($imgPath, ENT_QUOTES).'" alt="'.$row['ProviderKey'].'" />';
+            echo img(val('Icon', $row, asset('/applications/dashboard/design/images/connection-64.png')));
             ?>
          </span>
          <span class="Connection-Name">

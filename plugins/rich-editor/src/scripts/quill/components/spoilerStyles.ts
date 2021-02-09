@@ -15,7 +15,7 @@ import { absolutePosition, userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
-import { buttonVariables } from "@library/forms/Button.variables";
+import { buttonVariables } from "@vanilla/library/src/scripts/forms/Button.variables";
 import { Mixins } from "@library/styles/Mixins";
 
 export const spoilerVariables = useThemeCache(() => {

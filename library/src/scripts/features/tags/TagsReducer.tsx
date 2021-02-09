@@ -5,7 +5,7 @@
 
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { TagsAction } from "@library/features/tags/TagsAction";
 import { useSelector } from "react-redux";
 

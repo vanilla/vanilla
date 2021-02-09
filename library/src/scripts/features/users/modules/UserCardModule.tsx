@@ -5,7 +5,7 @@
 
 import React from "react";
 import { useUser } from "@library/features/users/userHooks";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { logError } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { ButtonTypes } from "@library/forms/buttonTypes";

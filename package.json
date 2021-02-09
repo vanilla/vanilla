@@ -201,7 +201,6 @@
         "build:dev": "yarn run build:assets --mode=development",
         "build:analyze": "yarn run build:assets --mode=analyze",
         "build:variable-docs": "ts-node -P build/tsconfig.json build/scripts/variables/buildVariableDocs.ts",
-        "update:tsconfig": "node ./packages/updateTsconfig.js",
         "test": "yarn test:unit && yarn test:browser",
         "test:browser": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=test",
         "test:browser:watch": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=testwatch",

@@ -11,7 +11,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@vanilla/library/src/scripts/styles/shadowHelpers";
 import { percent } from "csx";
 
 export const embedMenuClasses = useThemeCache(() => {

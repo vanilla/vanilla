@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
+import Tokens, { ITokenProps } from "@vanilla/library/src/scripts/forms/select/Tokens";
 import { useRoles, useRoleSelectOptions } from "@dashboard/roles/roleHooks";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
 
 interface IProps extends Omit<ITokenProps, "options" | "isLoading" | "value" | "onChange"> {

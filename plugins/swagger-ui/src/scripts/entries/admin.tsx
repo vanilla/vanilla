@@ -5,7 +5,7 @@
 
 import React from "react";
 import { onReady, getMeta, formatUrl, siteUrl } from "@library/utility/appUtils";
-import { useSwaggerUI } from "@library/features/swagger/useSwaggerUI";
+import { useSwaggerUI } from "@vanilla/library/src/scripts/features/swagger/useSwaggerUI";
 import { mountReact } from "@vanilla/react-utils";
 
 onReady(async () => {

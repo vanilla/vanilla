@@ -6,7 +6,7 @@
 import { SearchActions } from "@library/search/SearchActions";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext";

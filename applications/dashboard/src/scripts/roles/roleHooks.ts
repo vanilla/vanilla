@@ -7,8 +7,8 @@ import { useRoleActions } from "@dashboard/roles/RoleActions";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IRoleStoreState } from "@dashboard/roles/roleReducer";
-import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { LoadStatus, ILoadable } from "@vanilla/library/src/scripts/@types/api/core";
+import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
 
 export function useRoles() {
     const { getAllRoles } = useRoleActions();

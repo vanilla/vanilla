@@ -11,11 +11,11 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import { t } from "@library/utility/appUtils";
 import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import Frame from "@library/layout/frame/Frame";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import Modal from "@library/modal/Modal";
-import ModalSizes from "@library/modal/ModalSizes";
-import { useUniqueID } from "@library/utility/idUtils";
+import Frame from "@vanilla/library/src/scripts/layout/frame/Frame";
+import FrameHeader from "@vanilla/library/src/scripts/layout/frame/FrameHeader";
+import Modal from "@vanilla/library/src/scripts/modal/Modal";
+import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 

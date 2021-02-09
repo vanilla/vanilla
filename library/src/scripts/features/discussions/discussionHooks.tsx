@@ -6,7 +6,7 @@
 import { IGetDiscussionByID, useDiscussionActions } from "@library/features/discussions/DiscussionActions";
 import { IDiscussionsStoreState } from "@library/features/discussions/discussionModel";
 import { useSelector } from "react-redux";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useEffect } from "react";
 
 export function useDiscussion(query: IGetDiscussionByID) {

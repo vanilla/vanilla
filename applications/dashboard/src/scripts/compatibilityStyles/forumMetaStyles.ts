@@ -12,7 +12,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { important } from "csx";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { metaContainerStyles } from "@library/styles/metasStyles";
+import { metaContainerStyles } from "@vanilla/library/src/scripts/styles/metasStyles";
 import trim from "validator/lib/trim";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { CSSObject } from "@emotion/css";

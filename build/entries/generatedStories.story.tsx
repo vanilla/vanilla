@@ -6,19 +6,19 @@
 
 import React, { useEffect } from "react";
 import { storiesOf } from "@storybook/react";
-import { useStoryConfig, NO_WRAPPER_CONFIG } from "@library/storybook/StoryContext";
+import { useStoryConfig, NO_WRAPPER_CONFIG } from "@vanilla/library/src/scripts/storybook/StoryContext";
 import classNames from "classnames";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import "../../addons/themes/theme-foundation/src/scss/custom.scss";
 import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
-import { initAllUserContent } from "@library/content";
-import { setMeta } from "@library/utility/appUtils";
-import { addComponent } from "@library/utility/componentRegistry";
-import { HomeWidget } from "@library/homeWidget/HomeWidget";
+import { initAllUserContent } from "@vanilla/library/src/scripts/content";
+import { setMeta } from "@vanilla/library/src/scripts/utility/appUtils";
+import { addComponent } from "../../library/src/scripts/utility/componentRegistry";
+import { HomeWidget } from "../../library/src/scripts/homeWidget/HomeWidget";
 
 ///
 /// These imports are just so that the files get loaded into storybook.

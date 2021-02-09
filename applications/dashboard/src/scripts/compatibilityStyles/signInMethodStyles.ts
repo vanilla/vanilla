@@ -6,13 +6,13 @@
  */
 
 import { useThemeCache } from "@library/styles/themeCache";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { calc, percent, quote } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
+import { buttonGlobalVariables, buttonVariables } from "@vanilla/library/src/scripts/forms/Button.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss

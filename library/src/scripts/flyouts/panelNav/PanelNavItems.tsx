@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useEffect } from "react";
-import { INavigationTreeItem } from "@library/@types/api/core";
+import { INavigationTreeItem } from "@vanilla/library/src/scripts/@types/api/core";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";

@@ -11,7 +11,7 @@ import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardSelectLookup } from "@dashboard/forms/DashboardSelectLookup";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { IFormControl, IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
-import { useUniqueID } from "@library/utility/idUtils";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import React from "react";
 
 interface IProps {

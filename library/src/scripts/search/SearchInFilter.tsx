@@ -6,7 +6,7 @@
 import { t } from "@vanilla/i18n";
 import React from "react";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
-import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
+import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
 import { searchInFilterClasses } from "@library/search/searchInFilter.styles";
 import { buttonClasses } from "@library/forms/buttonStyles";
 

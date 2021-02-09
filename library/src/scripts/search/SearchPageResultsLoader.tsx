@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
+import { LoadingRectangle, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { t } from "@vanilla/i18n/src";
 

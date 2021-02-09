@@ -10,8 +10,8 @@ import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { AxiosResponse } from "axios";
 import apiv2 from "@library/apiv2";
 import pDebounce from "p-debounce";
-import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
-import { ISearchRequestQuery, ISearchResult } from "@library/search/searchTypes";
+import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
+import { ISearchRequestQuery, ISearchResult } from "@vanilla/library/src/scripts/search/searchTypes";
 
 /**
  * Advanced Search implementation of autocomplete using sphinx.

@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { t } from "@library/utility/appUtils";
-import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
+import { EMBED_FOCUS_CLASS } from "@vanilla/library/src/scripts/embeddedContent/embedConstants";
 import { escapeHTML, setData, getData } from "@vanilla/dom-utils";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";

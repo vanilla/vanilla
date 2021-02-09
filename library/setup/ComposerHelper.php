@@ -106,6 +106,33 @@ class ComposerHelper {
         // We don't even run the linter as part of this process.
         // It even technically works but many packages that support node 10 only want to support the LTS version (10.13.x).
         passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
+        if ($installReturn !== 0) {
+            printf("Installing core node_modules failed\n");
+            exit($installReturn);
+        }
+
+        // Build bootstrap can be used to configure this build if env variables are not available.
+        $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
+        if (file_exists($buildBootstrap)) {
+            include $buildBootstrap;
+        }
+
+        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
+        $buildDocsScript = realpath($vanillaRoot . "/build/scripts/variables/buildVariableDocs.ts");
+        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
+        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
+        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
+        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
+
+        // Run build
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
+        printf("\nBuilding frontend assets\n");
+        printf("\n$buildCommand\n");
+        system($buildCommand, $buildResult);
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
 
         // Generate our vendor license file.
         $distDir = $vanillaRoot . '/dist';
@@ -116,44 +143,14 @@ class ComposerHelper {
         printf("\nGererating Vendor Licenses for build\n");
         passthru("yarn licenses generate-disclaimer --prod --ignore-engines > $licensePath");
 
-        if ($installReturn !== 0) {
-            printf("Installing core node_modules failed\n");
-            exit($installReturn);
-        }
-
-        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
-        $buildDocsScript = realpath($vanillaRoot . "/build/scripts/variables/buildVariableDocs.ts");
-        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
-        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
-
-        // Build bootstrap can be used to configure this build if env variables are not available.
-        $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
-        if (file_exists($buildBootstrap)) {
-            include $buildBootstrap;
-        }
-
-        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
-
         // The disable validation flag was used to enable low memory optimizations.
         // The build no longer does any validation, however, so a new env variable has been added.
         // So, we check for both.
-        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
         $docsCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildDocsScript -i $lowMemoryFlag";
 
         printf("\nBuilding variable documentation\n");
         printf("\n$docsCommand\n");
         system($docsCommand, $buildResult);
-
-        if ($buildResult !== 0) {
-            printf("The build failed with code $buildResult");
-            exit($buildResult);
-        }
-
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
-
-        printf("\nBuilding frontend assets\n");
-        printf("\n$buildCommand\n");
-        system($buildCommand, $buildResult);
 
         if ($buildResult !== 0) {
             printf("The build failed with code $buildResult");

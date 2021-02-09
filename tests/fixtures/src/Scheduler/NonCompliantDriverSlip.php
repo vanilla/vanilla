@@ -31,7 +31,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * @return string
      */
     public function getId(): string {
-        return HostedDriverSlip::LEGACY_NULL_STRING_VALUE;
+        return "null";
     }
 
     /**

@@ -596,20 +596,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             if (!is_array($AllFields) || !is_array($ProfileFields)) {
                 return;
             }
-
-            // DateOfBirth is special case that core won't handle
-            // Hack it in here instead
-            if (c('ProfileExtender.Fields.DateOfBirth.OnProfile')) {
-                // Do not use Gdn_Format::Date because it shifts to local timezone
-                $BirthdayStamp = Gdn_Format::toTimestamp($Sender->User->DateOfBirth);
-                if ($BirthdayStamp) {
-                    $ProfileFields['DateOfBirth'] = date(t('Birthday Format', 'F j, Y'), $BirthdayStamp);
-                    $AllFields['DateOfBirth'] = ['Label' => t('Birthday'), 'OnProfile' => true];
-                }
-            }
-
-            // CheckBox fields should display as "Yes" or "No"
+            
             foreach ($AllFields as $name => $data) {
+                // DateOfBirth is special case that core won't handle
+                // Hack it in here instead
+                if ($data['Name'] === 'DateOfBirth' && $data['OnProfile']) {
+                    // Do not use Gdn_Format::Date because it shifts to local timezone
+                    $BirthdayStamp = Gdn_Format::toTimestamp($Sender->User->DateOfBirth);
+                    if ($BirthdayStamp) {
+                        $ProfileFields['DateOfBirth'] = date(t('Birthday Format', 'F j, Y'), $BirthdayStamp);
+                    }
+                }
+                
+                // CheckBox fields should display as "Yes" or "No"
                 if ($data['FormType'] === 'CheckBox') {
                     $ProfileFields[$name] = $ProfileFields[$name] == "1" ? t('Profile.Yes', 'Yes') : t('Profile.No', 'No');
                 }

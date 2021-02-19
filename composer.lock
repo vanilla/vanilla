@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ee22f76bef4536418aa62eeb323853e",
+    "content-hash": "ba4bc460f3c02e658963b7a5e7ca87f6",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -895,16 +895,16 @@
         },
         {
             "name": "vanilla/cloud-interops",
-            "version": "v1.0.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/cloud-interops.git",
-                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206"
+                "reference": "9d475c1ac708d1bab04dad3c079a9ddb8e67c9af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/cloud-interops/zipball/370b91568c8628dfb33dcf9f9687f3664d718206",
-                "reference": "370b91568c8628dfb33dcf9f9687f3664d718206",
+                "url": "https://api.github.com/repos/vanilla/cloud-interops/zipball/9d475c1ac708d1bab04dad3c079a9ddb8e67c9af",
+                "reference": "9d475c1ac708d1bab04dad3c079a9ddb8e67c9af",
                 "shasum": ""
             },
             "require": {
@@ -921,7 +921,7 @@
                 "GPL-2.0"
             ],
             "description": "Provides Vanilla Cloud contracts",
-            "time": "2020-08-17T21:51:54+00:00"
+            "time": "2021-02-03T14:03:20+00:00"
         },
         {
             "name": "vanilla/garden-container",
@@ -3267,12 +3267,12 @@
             "version": "1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webmozart/assert.git",
+                "url": "https://github.com/webmozarts/assert.git",
                 "reference": "88e6d84706d09a236046d686bbea96f07b3a34f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/88e6d84706d09a236046d686bbea96f07b3a34f4",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/88e6d84706d09a236046d686bbea96f07b3a34f4",
                 "reference": "88e6d84706d09a236046d686bbea96f07b3a34f4",
                 "shasum": ""
             },

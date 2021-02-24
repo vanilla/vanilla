@@ -22,6 +22,7 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Community\CallToActionModule;
 use Vanilla\Community\CategoriesModule;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -486,6 +487,7 @@ class Bootstrap {
             ->addCall('registerWidget', [MockWidget3::class])
             ->addCall('registerWidget', [CategoriesModule::class])
             ->addCall('registerWidget', [TagModule::class])
+            ->addCall('registerWidget', [CallToActionModule::class])
         ;
 
         $container

@@ -10,7 +10,9 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Forum\Modules\DiscussionListModule;
 use Vanilla\Theme\ThemeSectionModel;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Vanilla's event handlers.

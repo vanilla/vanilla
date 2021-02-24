@@ -5,29 +5,40 @@
 
 import { IUserFragment } from "@library/@types/api/users";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
 
 export interface IDiscussion {
     discussionID: number;
-    type: string | null;
+    type: string;
     name: string;
-    body: string;
+    url: string;
     dateInserted: string;
-    dateUpdated: string | null;
     insertUserID: number;
-    score: number | null;
-    insertUser: IUserFragment;
-    lastUser: IUserFragment;
+    lastUserID?: number;
+    dateUpdated?: string;
+    dateLastComment?: string;
+
+    // Stats
     pinned: boolean;
     closed: boolean;
-    sink: boolean;
-    bookmarked: boolean;
-    unread: boolean;
-    countUnread: number;
-    url: string;
+    score: number;
+    sink?: boolean;
     countViews: number;
     countComments: number;
-    attributes: any;
+    attributes?: any;
+
+    // expands
+    lastUser?: IUserFragment; // expand;
+    insertUser?: IUserFragment; // expand;
     breadcrumbs?: ICrumb[];
+    category?: ICategoryFragment;
+    excerpt?: string;
+    body?: string;
+
+    // Per-session
+    unread?: boolean;
+    countUnread?: number;
+    bookmarked?: boolean;
 }
 
 export interface IDiscussionEdit {

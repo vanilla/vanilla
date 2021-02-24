@@ -5881,12 +5881,22 @@ fieldset[disabled] a.file-upload-browse {
   width: 9px;
 }
 
+.card-label-list {
+  width: 100%;
+}
+.card-label-list .card-label-list {
+  padding-left: 16px;
+  padding-top: 4px;
+}
 .card-label-list li {
   padding-bottom: 4px;
   padding-top: 4px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;

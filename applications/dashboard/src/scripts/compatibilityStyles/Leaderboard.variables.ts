@@ -125,7 +125,9 @@ export const leaderboardVariables = useThemeCache((forcedVars?: IThemeVariables)
          * @commonTitle Username - Font
          * @expand font
          */
-        font: Variables.font({}),
+        font: Variables.font({
+            textDecoration: "auto",
+        }),
         /**
          * @varGroup leaderboard.username.margin
          * @commonTitle Username - Margin

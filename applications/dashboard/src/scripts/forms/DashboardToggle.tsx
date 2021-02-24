@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import React, { useContext } from "react";
+import { FormGroupContext, useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpers";
@@ -20,7 +20,9 @@ interface IProps {
 }
 
 export function DashboardToggle(props: IProps) {
-    const { inputID, labelType } = useFormGroup();
+    const formGroup = useContext(FormGroupContext);
+
+    const { inputID, labelType } = formGroup || {};
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
     return (

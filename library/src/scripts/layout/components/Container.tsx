@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { containerClasses } from "@library/layout/components/containerStyles";
 import classNames from "classnames";
 import { ISpacing } from "@library/styles/cssUtilsTypes";
+import { cx } from "@emotion/css";
 
 export interface IContainer {
     className?: string;
@@ -24,20 +25,42 @@ export interface IContainer {
 /*
  * Implements "Container" component used to set max width of content of page.
  */
-export const Container = React.forwardRef(function Container(props: IContainer, ref: React.Ref<HTMLElement>) {
+export const Container = React.forwardRef(function Container(props: IContainer, ref: React.RefObject<HTMLElement>) {
     const { tag, children, className, fullGutter = false, narrow = false, style = {}, maxWidth, gutterSpacing } = props;
+    const classes = containerClasses({ maxWidth, desktopSpacing: gutterSpacing });
+    const ownRef = useRef<HTMLElement>(null);
+    ref = ref ?? ownRef;
+
+    const [hasParentContainer, setHasParentContainer] = useState(false);
+    useLayoutEffect(() => {
+        // Sometimes when mounting a legacy component we can end up inside of a legacy container that already gives us a gutter.
+        // In those cases, we don't actually want to render another one.
+        const closestParent = ref.current?.closest(".Container");
+        if (closestParent instanceof HTMLElement) {
+            setHasParentContainer(true);
+        }
+        // if (ref.current?.)
+    }, [ref]);
+
+    if (hasParentContainer) {
+        return <>{children}</>;
+    }
 
     if (children) {
-        const classes = containerClasses({ maxWidth, desktopSpacing: gutterSpacing });
         const Tag = tag || "div";
         return (
             <Tag
                 ref={ref}
                 style={style}
-                className={classNames(classes.root, className, {
-                    [classes.fullGutter]: fullGutter,
-                    isNarrow: narrow,
-                })}
+                className={cx(
+                    classes.root,
+                    {
+                        [classes.fullGutter]: fullGutter,
+                        isNarrow: narrow,
+                    },
+                    // Last it takes precedences
+                    className,
+                )}
             >
                 {children}
             </Tag>

@@ -756,6 +756,21 @@ class PromotedContentModule extends Gdn_Module {
     }
 
     /**
+     * Get the view all url if possible.
+     *
+     * @return string|null
+     */
+    private function getViewAllUrl(): ?string {
+        switch (strtolower($this->Selector)) {
+            case 'category':
+                return categoryUrl($this->Selection, true);
+            default:
+                // Other's not implemented or don't have pages available.
+                return null;
+        }
+    }
+
+    /**
      * Render.
      *
      * @return string
@@ -776,6 +791,12 @@ class PromotedContentModule extends Gdn_Module {
             $props = [
                 'title' => $this->getTitle(),
                 'itemData' => $cleanData,
+                'containerOptions' => [
+                    'maxColumnCount' => $this->Group,
+                    'viewAll' => [
+                        'to' => $this->getViewAllUrl(),
+                    ],
+                ]
             ];
 
             return TwigStaticRenderer::renderReactModule('HomeWidget', $props);

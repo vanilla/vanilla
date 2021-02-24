@@ -9,9 +9,9 @@ import { defaultTransition, userSelect, negative } from "@library/styles/styleHe
 import { Mixins } from "@library/styles/Mixins";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { tagVariables, TagType } from "@library/styles/tagStyles";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { tagVariables, TagType } from "@library/metas/Tag.variables";
 import { important, percent } from "csx";
+import { CSSObject, injectGlobal } from "@emotion/css";
 
 export const forumTagCSS = () => {
     const vars = tagVariables();
@@ -31,19 +31,22 @@ export const forumTagCSS = () => {
         },
     );
 
-    cssOut(".Panel.Panel li.TagCloud-Item.TagCloud-Item", {
+    cssOut("li.TagCloud-Item.TagCloud-Item.TagCloud-Item", {
         padding: 0,
+        margin: 0,
         width: tagItemWidth,
         maxWidth: percent(100),
-        ...Mixins.margin(vars.tagItem.margin),
         "& a": {
             ...tagItemListStyle,
+            ...Mixins.margin(vars.tagItem.margin),
             ...Mixins.font(vars.tagItem.font),
             ...Mixins.background(vars.tagItem.background),
+            ...Mixins.border(vars.tagItem.border),
         },
-        "&  a:hover, a:active, a:focus": {
+        "& a:hover, a:active, a:focus": {
             ...Mixins.font(vars.tagItem.fontState),
             ...Mixins.background(vars.tagItem.backgroundState),
+            ...Mixins.border(vars.tagItem.borderState),
         },
     });
 
@@ -51,40 +54,37 @@ export const forumTagCSS = () => {
         textDecoration: important("none"),
     });
 
-    mixinTag(`.TagCloud a`);
-    mixinTag(`.Tag`);
-    mixinTag(`.DataTableWrap a.Tag`);
-    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a.Tag`);
-    mixinTag(
-        `
+    injectGlobal({
+        [`.TagCloud a,
+        .Container .MessageList .ItemComment .MItem.RoleTracker a.Tag,
         .MessageList .ItemComment .MItem.RoleTracker a.Tag,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag
-        `,
-    );
+        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag`]: tagLinkStyle(),
+    });
 };
 
-function mixinTag(selector: string, overwrite?: {}) {
-    selector = trimTrailingCommas(selector);
-    const selectors = selector.split(",") || [];
-
-    if (selectors.length === 0) {
-        selectors.push(selector);
-    }
+export function tagStyle(): CSSObject {
     const vars = tagVariables();
-    selectors.map((s) => {
-        cssOut(selector, {
-            maxWidth: percent(100),
-            display: "inline-block",
-            whiteSpace: "normal",
-            textDecoration: important("none"),
-            textOverflow: "ellipsis",
-            ...userSelect(),
-            ...Mixins.padding(vars.padding),
-            ...Mixins.border(vars.border),
-            ...Mixins.font(vars.font),
-            ...defaultTransition("border"),
-            ...Mixins.margin(vars.margin),
-            ...vars.nested,
-        });
-    });
+
+    return {
+        maxWidth: percent(100),
+        display: "inline-block",
+        whiteSpace: "normal",
+        textDecoration: important("none"),
+        textOverflow: "ellipsis",
+        ...userSelect(),
+        ...Mixins.padding(vars.padding),
+        ...Mixins.border(vars.border),
+        ...Mixins.font(vars.font),
+        ...defaultTransition("border"),
+        ...Mixins.margin(vars.margin),
+    };
+}
+export function tagLinkStyle(): CSSObject {
+    const vars = tagVariables();
+
+    return {
+        ...tagStyle(),
+        borderColor: vars.nested.color,
+        ...vars.nested,
+    };
 }

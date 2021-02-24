@@ -5,7 +5,6 @@
  */
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import {
-    absolutePosition,
     appearance,
     singleBorder,
     singleLineEllipsis,
@@ -78,7 +77,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const iconWrap = style("iconWrap", {
         ...pointerEvents(),
         content: quote(``),
-        ...absolutePosition.middleOfParent(),
+        ...Mixins.absolute.middleOfParent(),
         width: styleUnit(vars.iconWrap.width),
         height: styleUnit(vars.iconWrap.width),
         ...Mixins.border({
@@ -362,7 +361,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     });
 
     const close = style("close", {
-        ...absolutePosition.middleRightOfParent(),
+        ...Mixins.absolute.middleRightOfParent(),
         ...userSelect(),
         ...appearance(),
         width: styleUnit(vars.menuButton.size),

@@ -15,6 +15,7 @@ use Garden\Web\Exception\NotFoundException;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
 use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
@@ -64,6 +65,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
     /** @var bool */
     public $pageCache;
+
+    /** @var array */
+    private $options;
 
     /**
      * @var CacheInterface Object used to store the FloodControl data.
@@ -466,7 +470,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         } else {
             $this->SQL->limit($limit, $offset);
         }
-
+        $this->fireEvent('BeforeGetByUser');
         $data = $this->SQL->get();
 
 
@@ -503,6 +507,28 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->fireEvent('AfterGet');
 
         return $data;
+    }
+
+    /**
+     * Set model option
+     *
+     * @param string $option
+     * @param mixed $value
+     */
+    public function setOption(string $option, $value) {
+        $this->options[$option] = $value;
+    }
+
+
+    /**
+     * Get model option
+     *
+     * @param string $option
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getOption(string $option, $default = null) {
+        return $this->options[$option] ?? $default;
     }
 
     /**
@@ -935,11 +961,14 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 'x-localize' => true,
             ],
             'categoryID:i?' => 'The ID of the category of the comment',
-            'body:s' => [
+            'body:s?' => [
                 'description' => 'The body of the comment.',
-                'x-localize' => true,
             ],
             'bodyRaw:s?',
+            'bodyPlainText:s?' => [
+                'description' => 'The body of the comment in plain text.',
+                'x-localize' => true,
+            ],
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
@@ -1378,6 +1407,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $result['recordCollapseID'] = "site{$this->ownSite->getSiteID()}_discussion{$result['discussionID']}";
             $result['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
             $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $result['bodyPlainText'] = \Gdn::formatService()->renderPlainText($rawBody, $format);
             $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
             $result['score'] = $row['Score'] ?? 0;
             $discussion = $this->discussionModel->getID($row['DiscussionID']);
@@ -1600,6 +1630,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     ->set('FirstCommentID', $data['FirstCommentID'])
                     ->set('LastCommentID', $data['LastCommentID'])
                     ->set('CountComments', $data['CountComments'])
+                    ->set('hot', ($discussion['Score'] ?? 0) + ($data['CountComments'] ?? 0))
                     ->where('DiscussionID', $discussionID)
                     ->put();
 
@@ -1879,7 +1910,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     public function getCrawlInfo(): array {
         $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            '/api/v2/comments?sort=-commentID&expand=crawl',
+            '/api/v2/comments?sort=-commentID&expand[]=crawl',
             'commentID'
         );
         return $r;

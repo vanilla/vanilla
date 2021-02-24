@@ -13,6 +13,7 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
@@ -449,84 +450,10 @@ class DiscussionsApiController extends AbstractApiController {
      */
     public function index(array $query) {
         $this->permission();
-
-        $in = $this->schema([
-            'discussionID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'd.discussionID']),
-            'categoryID:i?' => [
-                'description' => 'Filter by a category.',
-                'x-filter' => [
-                    'field' => 'd.CategoryID'
-                ],
-            ],
-            'dateInserted?' => new DateFilterSchema([
-                'description' => 'When the discussion was created.',
-                'x-filter' => [
-                    'field' => 'd.DateInserted',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'dateUpdated?' => new DateFilterSchema([
-                'description' => 'When the discussion was updated.',
-                'x-filter' => [
-                    'field' => 'd.DateUpdated',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'dateLastComment?' => new DateFilterSchema([
-                'description' => 'When the last comment was posted.',
-                'x-filter' => [
-                    'field' => 'd.DateLastComment',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'type:s?' => [
-                'description' => 'Filter by discussion type.',
-                'x-filter' => [
-                    'field' => 'd.Type'
-                ],
-            ],
-            'followed:b' => [
-                'default' => false,
-                'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
-            ],
-            'pinned:b?',
-            'pinOrder:s?' => [
-                'default' => 'first',
-                'enum' => ['first', 'mixed'],
-            ],
-            'dirtyRecords:b?',
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1
-            ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->discussionModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => ApiUtils::getMaxLimit(),
-            ],
-            'sort:s?' => [
-                'enum' => ApiUtils::sortEnum('dateLastComment', 'dateInserted', 'discussionID'),
-            ],
-            'insertUserID:i?' => [
-                'description' => 'Filter by author.',
-                'x-filter' => [
-                    'field' => 'd.InsertUserID',
-                ],
-            ],
-            'expand?' => ApiUtils::getExpandDefinition([
-                'category',
-                'insertUser',
-                'lastUser',
-                'lastPost',
-                'raw',
-                'lastPost.body',
-                'lastPost.insertUser',
-                'tagIDs',
-                'breadcrumbs',
-            ])
-        ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
+        $in = $this->schema(
+            new DiscussionsApiIndexSchema($this->discussionModel->getDefaultLimit()),
+            ['DiscussionIndex', 'in']
+        )->setDescription('List discussions.');
 
         $query = $in->validate($query);
         $query = $this->filterValues($query);

@@ -9,10 +9,10 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { fullBackgroundCompat } from "@library/layout/Backgrounds";
-import { importantUnit, negative, singleBorder } from "@library/styles/styleHelpers";
+import { negative } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
-import { calc, ColorHelper, important } from "csx";
+import { calc, important } from "csx";
 import { inputVariables } from "@library/forms/inputStyles";
 import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
@@ -40,18 +40,17 @@ import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
-import { forumVariables } from "@library/forums/forumStyleVars";
-import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { leaderboardCSS } from "@dashboard/compatibilityStyles/Leaderboard.styles";
 import { cssOut } from "./cssOut";
 import { pageBoxCompatStyles } from "@dashboard/compatibilityStyles/PageBox.compat.styles";
 import { profileCompatCSS } from "@dashboard/compatibilityStyles/pages/Profile.compat.styles";
 import { discussionCompatCSS } from "@dashboard/compatibilityStyles/pages/Discussion.compat.styles";
-import { discussionListCompatCSS } from "@dashboard/compatibilityStyles/pages/DiscussionList.compat.styles";
 import { categoryListCompatCSS } from "@dashboard/compatibilityStyles/pages/CategoryList.compat.styles";
 import { conversationListCompatCSS } from "@dashboard/compatibilityStyles/pages/ConversationList.compat.styles";
 import { conversationCompatCSS } from "@dashboard/compatibilityStyles/pages/Conversation.compat.styles";
+import { metasCSS } from "@dashboard/compatibilityStyles/Metas.compat.styles";
+import { discussionListCompatCSS } from "@library/features/discussions/DiscussionList.compat.styles";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -62,7 +61,6 @@ export { trimTrailingCommas } from "./trimTrailingCommas";
 export let compatibilityStyles: () => void;
 compatibilityStyles = useThemeCache(() => {
     const vars = globalVariables();
-    const formVars = forumVariables();
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = ColorsUtils.colorOut(mainColors.fg);
@@ -117,6 +115,7 @@ compatibilityStyles = useThemeCache(() => {
         minHeight: 0,
         display: "flex",
         opacity: 1,
+        ...Mixins.linkDecoration(),
     });
 
     cssOut(".Panel .ClearFix::after", {
@@ -142,6 +141,11 @@ compatibilityStyles = useThemeCache(() => {
                 all: 0,
                 left: styleUnit(12),
             }),
+
+            ".Count": {
+                textDecoration: "none",
+                display: "inline-block",
+            },
         },
     );
 
@@ -210,24 +214,6 @@ compatibilityStyles = useThemeCache(() => {
     // Items
     const resultVars = searchResultsVariables();
 
-    cssOut(
-        `
-        .DataList .Item,
-        .DataList .Empty,
-    `,
-        {
-            borderTop: singleBorder(),
-            borderBottom: singleBorder(),
-            ...Mixins.padding(resultVars.spacing.padding),
-            ...Mixins.margin(formVars.lists.spacing.margin),
-            backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.bg),
-        },
-    );
-
-    cssOut(`.DataList .Item + .Item`, {
-        borderTop: "none",
-    });
-
     cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
         marginTop: styleUnit(vars.gutter.size * 2.5),
         border: "none",
@@ -286,10 +272,6 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.DataList .Item:last-child, .MessageList .Item:last-child`, {
         borderTopColor: ColorsUtils.colorOut(vars.border.color),
-    });
-
-    cssOut(`.Author a:not(.PhotoWrap), .Author .${userCardClasses().link}`, {
-        fontWeight: vars.fonts.weights.bold,
     });
 
     cssOut(`.DataList.Discussions .Item .Title`, {
@@ -353,17 +335,6 @@ compatibilityStyles = useThemeCache(() => {
         }),
     });
 
-    cssOut(`.Item.Read`, {
-        backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.read.bg),
-        opacity: 1,
-        ...{
-            "&:hover, &:focus, &:active, &.focus-visible": {
-                backgroundColor: ColorsUtils.colorOut(formVars.lists.colors.read.bg),
-                opacity: 1,
-            },
-        },
-    });
-
     cssOut(".Bullet, .QuickSearch", {
         display: "none",
     });
@@ -406,12 +377,13 @@ compatibilityStyles = useThemeCache(() => {
     flyoutCSS();
     textLinkCSS();
     forumTagCSS();
-    forumMetaCSS();
     inputCSS();
     socialConnectCSS();
     reactionsCSS();
     paginationCSS();
     forumLayoutCSS();
+    metasCSS();
+    forumMetaCSS();
     fontCSS();
     categoriesCSS();
     bestOfCSS();

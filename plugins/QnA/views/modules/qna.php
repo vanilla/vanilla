@@ -21,4 +21,4 @@ $title = $this->data('title');
     </ul>
 <?php else : ?>
     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
-<? endif ?>
+<?php endif ?>

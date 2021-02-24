@@ -24,7 +24,7 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
      * @title Quick Links - Box
      * @expand box
      */
-    const box = makeThemeVars("box", Variables.box({}));
+    const box = makeThemeVars("box", Variables.box(globalVars.panelBoxes.depth2));
 
     const links: INavigationVariableItem[] = makeThemeVars("links", []);
     const counts: Record<string, number | null> = makeThemeVars("counts", {});
@@ -47,7 +47,7 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
          * @expand spacing
          */
         spacing: Variables.spacing({
-            bottom: 16,
+            ...globalVars.panelHeadingBox.spacing,
         }),
     });
 

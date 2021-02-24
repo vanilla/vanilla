@@ -2,6 +2,7 @@
 if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Theme\BoxThemeShim;
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
@@ -9,7 +10,9 @@ if (!function_exists('WriteModuleDiscussion')):
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
 
         ?>
-        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
+        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>"
+            class="<?php echo cssClass($discussion);?>  <?php BoxThemeShim::activeHtml("pageBox"); ?>">
+
             <?php if ($showPhotos) :
                 $firstUser = userBuilder($discussion, 'First');
                 echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);

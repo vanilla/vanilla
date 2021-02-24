@@ -4,54 +4,31 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@library/@types/api/users";
+import { IUser } from "@library/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
 import NumberFormatted from "@library/content/NumberFormatted";
 import DateTime from "@library/content/DateTime";
-import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { useLayout } from "@library/layout/LayoutContext";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
 
 interface IProps {
-    userCardInfo?: IUserCardInfo;
-}
-
-interface IInfoProps {
-    countPost: number;
-    dateLastActive: string;
-    isCompact: boolean;
-}
-
-interface IUserProps {
-    userInfo: IUserFragment;
-    countPost: number;
+    user: IUser;
 }
 
 export default function Member(props: IProps) {
-    const { userCardInfo } = props;
+    const { user } = props;
     const { isCompact } = useLayout();
-
-    if (!userCardInfo) {
-        return null;
-    }
-    const userInfo: IUserFragment = {
-        userID: userCardInfo.userID,
-        name: userCardInfo.name,
-        photoUrl: userCardInfo.photoUrl,
-        dateLastActive: userCardInfo.dateLastActive || null,
-        label: userCardInfo.label,
-    };
 
     const classes = memberListClasses();
     return (
         <tr className={classes.root}>
             <td className={classNames(classes.cell, classes.isLeft, classes.mainColumn)}>
                 <span className={classes.user}>
-                    <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={userInfo} />
+                    <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
                     <span
                         className={classNames(classes.mainContent, {
                             [classes.mainContentCompact]: isCompact,
@@ -60,19 +37,18 @@ export default function Member(props: IProps) {
                         <span className={classes.align}>
                             <ProfileLink
                                 className={classNames(classes.profileLink)}
-                                username={userInfo.name}
-                                userID={userInfo.userID}
+                                userFragment={user}
                                 buttonType={ButtonTypes.TEXT}
                             >
-                                {userInfo.name}
+                                {user.name}
                             </ProfileLink>
-                            {!isCompact && userInfo.label && (
-                                <span className={classes.label} dangerouslySetInnerHTML={{ __html: userInfo.label }} />
+                            {!isCompact && user.label && (
+                                <span className={classes.label} dangerouslySetInnerHTML={{ __html: user.label }} />
                             )}
                         </span>
                         {isCompact && (
                             <span className={classNames({ [classes.postsUserSection]: isCompact })}>
-                                <NumberFormatted value={userCardInfo.countComments || 0} />
+                                <NumberFormatted value={user.countComments || 0} />
                                 {` ${t("Posts")}`}
                             </span>
                         )}
@@ -82,20 +58,20 @@ export default function Member(props: IProps) {
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.posts, classes.postsColumn)}>
                     <span className={classes.minHeight}>
-                        <NumberFormatted value={userCardInfo.countComments || 0} />
+                        <NumberFormatted value={user.countComments || 0} />
                     </span>
                 </td>
             )}
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.date, classes.lastActiveColumn)}>
                     <span className={classes.minHeight}>
-                        <DateTime timestamp={userCardInfo.dateJoined || ""} />
+                        <DateTime timestamp={user.dateInserted || ""} />
                     </span>
                 </td>
             )}
             <td className={classNames(classes.cell, classes.date, classes.isRight, classes.lastActiveColumn)}>
                 <span className={classes.minHeight}>
-                    <DateTime timestamp={userCardInfo.dateLastActive || ""} />
+                    <DateTime timestamp={user.dateLastActive || ""} />
                 </span>
             </td>
         </tr>

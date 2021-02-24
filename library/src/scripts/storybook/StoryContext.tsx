@@ -8,7 +8,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
-import React, { useContext, useState, useLayoutEffect, useMemo, useCallback } from "react";
+import React, { useContext, useState, useLayoutEffect, useMemo, useCallback, useEffect } from "react";
 import { Provider } from "react-redux";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
@@ -27,6 +27,9 @@ import { userContentVariables } from "@library/content/userContentStyles";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
+import { CallToAction } from "@library/callToAction/CallToAction";
+import { listVariables } from "@library/lists/List.variables";
+import { listItemVariables } from "@library/lists/ListItem.variables";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -34,17 +37,21 @@ function ErrorComponent() {
     return <p>{errorMessage}</p>;
 }
 
+export interface IStoryTheme {
+    global?: DeepPartial<ReturnType<typeof globalVariables>>;
+    tiles?: DeepPartial<ReturnType<typeof tilesVariables>>;
+    tile?: DeepPartial<ReturnType<typeof tileVariables>>;
+    banner?: DeepPartial<ReturnType<typeof bannerVariables>>;
+    userContent?: DeepPartial<ReturnType<typeof userContentVariables>>;
+    quickLinks?: DeepPartial<ReturnType<typeof quickLinksVariables>>;
+    list?: DeepPartial<ReturnType<typeof listVariables>>;
+    listItem?: DeepPartial<ReturnType<typeof listItemVariables>>;
+    [key: string]: any;
+}
+
 interface IContext {
     storeState?: DeepPartial<ICoreStoreState>;
-    themeVars?: {
-        global?: DeepPartial<ReturnType<typeof globalVariables>>;
-        tiles?: DeepPartial<ReturnType<typeof tilesVariables>>;
-        tile?: DeepPartial<ReturnType<typeof tileVariables>>;
-        banner?: DeepPartial<ReturnType<typeof bannerVariables>>;
-        userContent?: DeepPartial<ReturnType<typeof userContentVariables>>;
-        quickLinks?: DeepPartial<ReturnType<typeof quickLinksVariables>>;
-        [key: string]: any;
-    };
+    themeVars?: IStoryTheme;
     useWrappers?: boolean;
     refreshKey?: string;
 }
@@ -61,7 +68,12 @@ export function useStoryConfig(value: Partial<IContext>) {
     const context = useContext(StoryContext);
     useLayoutEffect(() => {
         context.updateContext(value);
+        return () => {
+            // Clear the context.
+            context.updateContext({});
+        };
     }, [context, value]);
+
     return context.refreshKey;
 }
 
@@ -87,6 +99,7 @@ export function StoryContextProvider(props: { children?: React.ReactNode }) {
 
     useLayoutEffect(() => {
         addComponent("HomeWidget", HomeWidget, { overwrite: true, bypassPortalManager: true });
+        addComponent("CallToAction", CallToAction, { overwrite: true, bypassPortalManager: true });
         _mountComponents(document.body);
     });
 

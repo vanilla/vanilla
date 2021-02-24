@@ -169,6 +169,10 @@ export const buttonCSS = () => {
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
     mixinButton(".viewPollResults", ButtonTypes.STANDARD);
 
+    mixinButton(".FormWrapper .Buttons .Button.Cancel", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.DraftButton", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.PreviewButton", ButtonTypes.STANDARD);
+
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",
     });

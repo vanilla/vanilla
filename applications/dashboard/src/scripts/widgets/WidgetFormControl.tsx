@@ -85,7 +85,7 @@ export function WidgetFormControl(props: IProps) {
                 : [];
             return (
                 <DashboardSelect
-                    isClearable={false}
+                    isClearable={!props.isRequired}
                     value={options.find((opt) => {
                         let valueCompare: any = opt.value;
                         if (valueCompare === "true") {

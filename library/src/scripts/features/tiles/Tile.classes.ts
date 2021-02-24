@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { absolutePosition, defaultTransition, userSelect } from "@library/styles/styleHelpers";
+import { defaultTransition, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -141,7 +141,7 @@ export const tileClasses = useThemeCache(() => {
             height: styleUnit(vars.fallBackIcon.height),
             color: vars.fallBackIcon.fg.toString(),
         },
-        vars.options.alignment === TileAlignment.CENTER ? absolutePosition.middleOfParent() : {},
+        vars.options.alignment === TileAlignment.CENTER ? Mixins.absolute.middleOfParent() : {},
     );
 
     return {

@@ -25,11 +25,13 @@ import { inputVariables, inputMixin } from "@library/forms/inputStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { mixinTextLinkNoDefaultLinkAppearance } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const inputCSS = () => {
     wrapSelects();
 
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const inputVars = inputVariables();
     const formVars = formElementsVariables();
     const mainColors = globalVars.mainColors;
@@ -185,13 +187,15 @@ export const inputCSS = () => {
     // Token
     cssOut("li.token-input-token.token-input-token", {
         margin: 0,
-        padding: styleUnit(globalVars.meta.spacing.default),
+        ...Mixins.padding({
+            all: styleUnit(metasVars.spacing.horizontal),
+        }),
         marginBottom: styleUnit(verticalPadding),
-        lineHeight: styleUnit(globalVars.meta.text.lineHeight),
+        lineHeight: styleUnit(metasVars.font.lineHeight),
         minHeight: styleUnit(spaceWithoutPaddingInInput),
         ...Mixins.border({
             ...globalVars.borderType.formElements.default,
-            color: globalVars.meta.colors.fg,
+            color: metasVars.font.color, //FIXME: strange use of meta font color
         }),
         display: "inline-flex",
         alignItems: "center",
@@ -201,9 +205,10 @@ export const inputCSS = () => {
 
     // Text inside token
     cssOut("li.token-input-token.token-input-token p", {
-        fontSize: styleUnit(globalVars.meta.text.size),
-        lineHeight: styleUnit(globalVars.meta.text.lineHeight),
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ...Mixins.font({
+            ...metasVars.font,
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        }),
     });
 
     // "x" inside token
@@ -219,16 +224,16 @@ export const inputCSS = () => {
     cssOut(".Checkboxes.Inline", {
         display: "flex",
         flexWrap: "wrap",
-        width: calc(`100% + ${styleUnit(globalVars.meta.spacing.default * 2)}`),
-        marginLeft: styleUnit(negative(globalVars.meta.spacing.default)),
-        marginTop: styleUnit(globalVars.meta.spacing.default),
+        width: calc(`100% + ${styleUnit((metasVars.spacing.horizontal! as number) * 2)}`),
+        marginLeft: styleUnit(negative(metasVars.spacing.horizontal)),
+        marginTop: styleUnit(metasVars.spacing.horizontal),
         ...{
             ".CheckBoxLabel": {
                 cursor: "pointer",
                 ...Mixins.margin({
                     all: 0,
-                    right: styleUnit(globalVars.meta.spacing.default),
-                    bottom: styleUnit(globalVars.meta.spacing.default),
+                    right: styleUnit(metasVars.spacing.horizontal),
+                    bottom: styleUnit(metasVars.spacing.horizontal),
                 }),
             },
         },
@@ -246,10 +251,10 @@ export const inputCSS = () => {
     cssOut(`.js-datetime-picker`, {
         display: "flex",
         flexWrap: "wrap",
-        width: calc(`100% + ${styleUnit(globalVars.meta.spacing.default * 2)}`),
+        width: calc(`100% + ${styleUnit((metasVars.spacing.horizontal! as number) * 2)}`),
         ...Mixins.margin({
-            left: -globalVars.meta.spacing.default,
-            right: globalVars.meta.spacing.default,
+            left: negative(metasVars.spacing.horizontal),
+            right: metasVars.spacing.horizontal,
         }),
     });
 
@@ -263,7 +268,7 @@ export const inputCSS = () => {
         minWidth: styleUnit(200),
         maxWidth: percent(100),
         ...Mixins.margin({
-            all: globalVars.meta.spacing.default,
+            all: metasVars.spacing.horizontal,
         }),
     });
 

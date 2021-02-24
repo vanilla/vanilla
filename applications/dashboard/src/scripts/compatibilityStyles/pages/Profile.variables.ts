@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { BorderType } from "@library/styles/styleHelpers";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -37,6 +38,8 @@ export const profileVariables = useThemeCache(() => {
             },
         }),
     );
+
+    const panelBoxes = makeVars("panelBoxes", Variables.contentBoxes(globalVariables().panelBoxes));
 
     /**
      * @varGroup profile.badges
@@ -77,5 +80,5 @@ export const profileVariables = useThemeCache(() => {
         size: 220,
     });
 
-    return { contentBoxes, badges, photo };
+    return { contentBoxes, panelBoxes, badges, photo };
 });

@@ -176,6 +176,7 @@ export const storyBookClasses = useThemeCache(() => {
     const link = style("link", {});
 
     const containerOuter = style("containerOuter", {
+        minHeight: "100vh",
         position: "relative",
         display: "block",
         maxWidth: percent(100),

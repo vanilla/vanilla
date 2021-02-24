@@ -12,12 +12,16 @@ import { accessibleRoleButton } from "@vanilla/addon-vanilla/legacy/legacyAccess
 import { addComponent } from "@library/utility/componentRegistry";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { QuickLinks } from "@library/navigation/QuickLinks";
+import { CallToAction } from "@library/callToAction/CallToAction";
+import { DiscussionsListModule } from "@library/features/discussions/DiscussionListModule";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
 
 addComponent("HomeWidget", HomeWidget, { overwrite: true });
+addComponent("DiscussionListModule", DiscussionsListModule, { overwrite: true });
 addComponent("QuickLinks", QuickLinks, { overwrite: true });
+addComponent("CallToAction", CallToAction, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

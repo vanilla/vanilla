@@ -4,6 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -14,9 +15,10 @@ import { Mixins } from "@library/styles/Mixins";
 export const placesSearchListingVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("placesSearchListing");
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
 
     const colors = makeThemeVars("color", {
-        fg: globalVars.meta.text.color,
+        fg: metasVars.font.color,
         hover: {
             fg: globalVars.links.colors.active,
         },

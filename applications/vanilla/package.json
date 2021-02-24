@@ -3,7 +3,6 @@
     "version": "3.0.1",
     "private": true,
     "dependencies": {
-        "@vanilla/library": "^3.0.1",
         "@vanilla/utils": "^3.0.1"
     }
 }

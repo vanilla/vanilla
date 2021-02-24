@@ -8,7 +8,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { viewHeight } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { defaultTransition, absolutePosition } from "@library/styles/styleHelpers";
+import { defaultTransition } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 
@@ -81,7 +81,7 @@ export const textEditorClasses = useThemeCache(() => {
 
     const colorChangeOverlay = (theme) =>
         style("colorChangeOverlay", {
-            ...absolutePosition.fullSizeOfParent(),
+            ...Mixins.absolute.fullSizeOfParent(),
             backgroundColor:
                 theme === "vs-dark"
                     ? ColorsUtils.colorOut("#1E1E1E")

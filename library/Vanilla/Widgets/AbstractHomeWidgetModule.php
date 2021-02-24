@@ -19,6 +19,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
  */
 abstract class AbstractHomeWidgetModule extends AbstractReactModule {
 
+    use HomeWidgetContainerSchemaTrait;
+
     const CONTENT_TYPE_ICON = "title-description-icon";
     const CONTENT_TYPE_IMAGE = "title-description-image";
     const CONTENT_TYPE_BACKGROUND = "title-background";
@@ -264,42 +266,6 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      */
     public function setSubtitleContent(string $content) {
         $this->subtitle['content'] = $content;
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetTitleSchema(): Schema {
-        return Schema::parse([
-            'title:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
-            ],
-        ]);
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetDescriptionSchema(): Schema {
-        return Schema::parse([
-            'description:s?' => [
-                'x-control' => SchemaForm::textBox(
-                    new FormOptions('Description', 'Set a custom description.'),
-                    'textarea'
-                )
-            ],
-        ]);
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetSubtitleSchema(): Schema {
-        return Schema::parse([
-            'subtitleContent:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Subtitle', 'Set a custom sub-title.'))
-            ],
-        ]);
     }
 
     /**

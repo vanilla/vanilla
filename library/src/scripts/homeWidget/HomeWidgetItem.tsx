@@ -16,7 +16,7 @@ import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import classNames from "classnames";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";

@@ -296,8 +296,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
-        if (!c('Plugins.QnA.UseBigButtons')) {
+        $category = val('Category', $args);
+        if (empty($category) || !c('Plugins.QnA.UseBigButtons')) {
             $args['Types']['Question'] = [
+                'apiType' => 'question',
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
                 'AddUrl' => '/post/question',

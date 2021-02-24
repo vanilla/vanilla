@@ -10,17 +10,11 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
-import { userPhotoVariables, userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { BorderBottomProperty } from "csstype";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { TLength } from "@library/styles/styleShim";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { TextTransformProperty } from "csstype";
-import { IAllLayoutMediaQueries } from "@library/layout/types/interface.panelLayout";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { makeTestConfig } from "build/scripts/configs/makeTestConfig";
 
 export const memberListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("memberList", forcedVars);
@@ -74,6 +68,7 @@ export const memberListVariables = useThemeCache((forcedVars?: IThemeVariables) 
 export const memberListClasses = useThemeCache(() => {
     const style = styleFactory("memberList");
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const vars = memberListVariables();
 
     const root = style("root", {
@@ -81,7 +76,7 @@ export const memberListClasses = useThemeCache(() => {
         borderBottom: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
-        }) as BorderBottomProperty<TLength>,
+        }),
     });
 
     const infoColumn = style("infoColumn", {});
@@ -157,7 +152,7 @@ export const memberListClasses = useThemeCache(() => {
     const date = style("date", {
         ...Mixins.font({
             size: globalVars.fonts.size.large,
-            color: globalVars.meta.text.color,
+            color: metasVars.font.color,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         whiteSpace: "nowrap",
@@ -206,7 +201,7 @@ export const memberListClasses = useThemeCache(() => {
         borderBottom: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
-        }) as BorderBottomProperty<TLength>,
+        }),
     });
 
     const leftAlign = style("leftAlign", {

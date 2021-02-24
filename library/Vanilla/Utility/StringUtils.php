@@ -6,6 +6,8 @@
 
 namespace Vanilla\Utility;
 
+use Garden\Web\Exception\Pass;
+
 /**
  * A collection of string utilities.
  */

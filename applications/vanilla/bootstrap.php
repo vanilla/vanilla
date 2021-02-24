@@ -6,6 +6,7 @@
  */
 
 use Garden\Container\Reference;
+use Vanilla\Community\CallToActionModule;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
@@ -50,7 +51,6 @@ Gdn::getContainer()
     ->rule(QuickLinksVariableProvider::class)
     ->addCall('addQuickLinkProvider', [new Reference(ForumQuickLinksProvider::class)])
 ;
-
 
 if (Gdn::config('Tagging.Discussions.Enabled', false)) {
     Gdn::getContainer()

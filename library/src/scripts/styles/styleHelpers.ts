@@ -21,7 +21,11 @@ export * from "@library/styles/styleHelpersSpinner";
 export * from "@library/styles/styleHelpersTypography";
 export * from "@library/styles/styleHelpersVisibility";
 import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 export const unit = styleUnit;
+
+/** @deprecated Use Mixins.absolute instead */
+export const absolutePosition = Mixins.absolute;
 
 /*
  * Helper to generate human readable classes generated from TypeStyle

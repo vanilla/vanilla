@@ -7,7 +7,6 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    absolutePosition,
     allButtonStates,
     BorderType,
     flexHelper,
@@ -128,7 +127,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const bg1 = style("bg1", {
         willChange: "opacity",
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         backgroundColor: ColorsUtils.colorOut(vars.fullBleed.enabled ? vars.fullBleed.bgColor : vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
@@ -139,7 +138,7 @@ export const titleBarClasses = useThemeCache(() => {
 
     const bg2 = style("bg2", {
         willChange: "opacity",
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowAsBorder,
         overflow: "hidden",
@@ -156,7 +155,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const bgContainer = style("bgContainer", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         height: percent(100),
         width: percent(100),
         ...Mixins.padding(vars.spacing.padding),
@@ -165,7 +164,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const bgImage = style("bgImage", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
     });
 
@@ -615,8 +614,10 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const guestButton = style("guestButton", {
-        minWidth: styleUnit(vars.button.guest.minWidth),
-        borderRadius: styleUnit(vars.button.borderRadius),
+        "&&": {
+            minWidth: styleUnit(vars.button.guest.minWidth),
+            borderRadius: styleUnit(vars.button.borderRadius),
+        },
     });
 
     const desktopNavWrap = style("desktopNavWrap", {
@@ -626,7 +627,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const logoCenterer = style("logoCenterer", {
-        ...absolutePosition.middleOfParent(true),
+        ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -666,7 +667,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const overlay = style("overlay", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         background: vars.overlay.background,
     });
 
@@ -794,7 +795,6 @@ export const titleBarLogoClasses = useThemeCache(() => {
             display: "block",
             maxHeight: styleUnit(getLogoMaxHeight(vars, false)),
             maxWidth: styleUnit(vars.logo.maxWidth),
-            width: "auto",
             ...{
                 "&.isCentred": {
                     margin: "auto",
@@ -823,7 +823,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
     return {
         "&:after": {
-            ...absolutePosition.topRight(),
+            ...Mixins.absolute.topRight(),
             background: linearGradient(
                 "right",
                 `${ColorsUtils.colorOut(color.fade(0))} 0%`,
@@ -832,7 +832,7 @@ export const addGradientsToHintOverflow = (width: number | string, color: ColorH
             ),
         },
         "&:before": {
-            ...absolutePosition.topLeft(),
+            ...Mixins.absolute.topLeft(),
             background: linearGradient(
                 "left",
                 `${ColorsUtils.colorOut(color.fade(0))} 0%`,

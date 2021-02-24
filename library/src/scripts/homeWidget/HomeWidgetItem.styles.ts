@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { absolutePosition, BorderType, flexHelper } from "@library/styles/styleHelpers";
+import { BorderType, flexHelper } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ISimpleBorderStyle, IFont, IBackground } from "@library/styles/cssUtilsTypes";
 import { Variables } from "@library/styles/Variables";
@@ -273,6 +273,7 @@ export const homeWidgetItemVariables = useThemeCache(
                     // }
                     return undefined;
                 })(),
+                textDecoration: "none",
                 weight: (() => {
                     if (options.name.font.weight) {
                         return options.name.font.weight;
@@ -289,7 +290,7 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand background
              */
             background: Variables.background({
-                color: color("#fff"),
+                color: rgba(0, 0, 0, 0),
             }),
 
             /**
@@ -464,30 +465,21 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
               }
             : {};
 
-    const linkState = Mixins.clickable.itemState({
-        default: vars.name.font.color,
-        allStates: ColorsUtils.offsetLightness(vars.name.font.color!, 0.05),
-    });
-
-    const name = style(
-        "name",
-        {
-            ...Mixins.padding(vars.name.spacing),
-            ...Mixins.font(vars.name.font),
-            ...Mixins.background(vars.name.background),
-            marginBottom: isIconLeftAndDescriptionHidden
-                ? 0
-                : hasChatBubble
-                ? styleUnit(30)
-                : styleUnit(globalVars.gutter.half),
-            boxShadow: hasChatBubble ? "0 0px 15px rgba(0,0,0, .15)" : "none",
-            position: "relative",
-            ...{
-                "&:after": bubbleTriangle,
-            },
+    const name = style("name", {
+        ...Mixins.padding(vars.name.spacing),
+        ...Mixins.font(vars.name.font),
+        ...Mixins.background(vars.name.background),
+        marginBottom: isIconLeftAndDescriptionHidden
+            ? 0
+            : hasChatBubble
+            ? styleUnit(30)
+            : styleUnit(globalVars.gutter.half),
+        boxShadow: hasChatBubble ? "0 0px 15px rgba(0,0,0, .15)" : "none",
+        position: "relative",
+        ...{
+            "&:after": bubbleTriangle,
         },
-        linkState,
-    );
+    });
 
     const nestedStyles = buttonStateStyles;
 
@@ -523,7 +515,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     });
 
     const backgroundScrim = style("backgroundScrim", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         ...Mixins.background(vars.background.scrim),
     });
 
@@ -536,7 +528,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     );
 
     const absoluteContent = style("absoluteContent", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         ...(vars.options.alignment === "left" ? flexHelper().middleLeft() : flexHelper().middle()),
         flexDirection: "column",
         ...Mixins.padding(vars.spacing.contentPadding),
@@ -576,7 +568,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
     });
 
     const image = style("image", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
         objectPosition: "center center",
     });

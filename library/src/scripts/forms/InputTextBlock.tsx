@@ -10,7 +10,7 @@ import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { OverflowProperty, ResizeProperty } from "csstype";
+import { Property } from "csstype";
 import { TextareaAutosize } from "react-autosize-textarea/lib/TextareaAutosize";
 
 export enum InputTextBlockBaseClass {
@@ -47,8 +47,8 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
         rows?: number;
         maxRows?: number;
         async?: boolean;
-        resize?: ResizeProperty; // for textarea only
-        overflow?: OverflowProperty; // for textarea only
+        resize?: Property.Resize; // for textarea only
+        overflow?: Property.Overflow; // for textarea only
         className?: string;
     };
 }

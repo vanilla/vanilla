@@ -90,7 +90,7 @@ export class CommunityCategoryInput extends React.Component<IProps> {
                 }}
                 options={options}
                 label={this.props.label ?? t("Community Category")}
-                value={(options || [])[0]}
+                value={(this.props.value ?? [])[0]}
             />
         );
     }

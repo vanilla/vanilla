@@ -166,7 +166,8 @@ class DiscussionSearchType extends AbstractSearchType {
 
             $allTextQuery = $query->getQueryParameter('query');
             if ($allTextQuery) {
-                $query->whereText($allTextQuery, ['name', 'body'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $fields = $query->setQueryMatchFields(['name', 'body']);
+                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED, $locale);
             }
 
             if ($discussionID = $query->getQueryParameter('discussionID', false)) {

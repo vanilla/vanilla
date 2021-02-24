@@ -15,7 +15,6 @@ import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    absolutePosition,
     EMPTY_BORDER_RADIUS,
     ensureColorHelper,
     importantUnit,
@@ -27,9 +26,8 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { BackgroundColorProperty, PaddingProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color, viewWidth } from "csx";
-import { media, TLength } from "@library/styles/styleShim";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, viewWidth } from "csx";
+import { media } from "@library/styles/styleShim";
 import { CSSObject } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
@@ -37,12 +35,12 @@ import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { SearchBarPresets } from "./SearchBarPresets";
 import { IBorderRadiusOutput } from "@library/styles/cssUtilsTypes";
+import { Property } from "csstype";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -58,7 +56,7 @@ export type SearchPlacement = "middle" | "bottom";
  * Defaults include a title, description, and a searchbar.
  */
 export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altName?: string) => {
-    const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, !!altName);
+    const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, undefined, !!altName);
     const globalVars = globalVariables(forcedVars);
     const widgetVars = widgetVariables(forcedVars);
     const compactSearchVars = compactSearchVariables(forcedVars);
@@ -178,9 +176,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
     });
 
     const topPadding = 69;
-    const horizontalPadding = styleUnit(
-        widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter,
-    ) as PaddingProperty<TLength>;
+    const horizontalPadding = styleUnit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter);
 
     const spacing = makeThemeVars("spacing", {
         /**
@@ -587,9 +583,9 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     buttonBorderStyles.borderRadius = standardizeBorderRadius(buttonBorderStyles.borderRadius);
 
-    const searchButtonDropDown = makeThemeVars("searchButton", {
+    const searchButtonDropDown: IButtonType = makeThemeVars("searchButton", {
         name: "searchButton",
-        preset: { style: presets.button.preset },
+        presetName: presets.button.preset,
         spinnerColor: colors.primaryContrast,
         sizing: {
             minHeight: searchBar.sizing.height,
@@ -614,11 +610,11 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             weight: globalVars.fonts.weights.bold,
         },
         state: buttonStateStyles,
-    } as IButtonType);
+    });
 
-    const searchButtonType = {
+    const searchButtonType: IButtonType = {
         name: "searchButton",
-        preset: { style: presets.button.preset },
+        presetName: presets.button.preset,
         sizing: {
             minHeight: searchBar.sizing.height,
         },
@@ -640,14 +636,14 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         const buttonVars = buttonVariables();
         searchButton.state = {
             ...searchButton.state,
-            ...buttonVars.primary.state,
+            ...buttonVars.primary!.state,
         };
-        searchButton.colors = buttonVars.primary.colors;
-        searchButton.borders!.color = buttonVars.primary.borders.color;
+        searchButton.colors = buttonVars.primary!.colors;
+        searchButton.borders!.color = buttonVars.primary.borders!.color;
 
         searchButtonDropDown.state = buttonVars.primary.state;
         searchButtonDropDown.colors = buttonVars.primary.colors;
-        searchButtonDropDown.borders!.color = buttonVars.primary.borders.color;
+        searchButtonDropDown.borders!.color = buttonVars.primary.borders!.color;
     }
 
     const buttonShadow = makeThemeVars("shadow", {
@@ -666,7 +662,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             }),
         )
             .fade(0.1)
-            .toString() as BackgroundColorProperty,
+            .toString(),
     });
 
     /**
@@ -695,7 +691,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             bottom: 12,
         }),
         mobile: {
-            bg: undefined as BackgroundColorProperty | undefined,
+            bg: undefined as Property.BackgroundColor | undefined,
             minHeight: undefined as "string" | number | undefined,
             offset: undefined as "string" | number | undefined,
             padding: Variables.spacing({
@@ -836,7 +832,7 @@ export const bannerClasses = useThemeCache(
         });
 
         const defaultBannerSVG = style("defaultBannerSVG", {
-            ...absolutePosition.fullSizeOfParent(),
+            ...Mixins.absolute.fullSizeOfParent(),
         });
 
         const backgroundOverlay = style("backgroundOverlay", {
@@ -989,7 +985,7 @@ export const bannerClasses = useThemeCache(
             ...{
                 ".searchBar-actionButton:after": {
                     content: quote(""),
-                    ...absolutePosition.middleOfParent(),
+                    ...Mixins.absolute.middleOfParent(),
                     width: px(20),
                     height: px(20),
                     backgroundColor: ColorsUtils.colorOut(vars.buttonShadow.background),
@@ -1116,7 +1112,7 @@ export const bannerClasses = useThemeCache(
         const rightImage = style(
             "rightImage",
             {
-                ...absolutePosition.fullSizeOfParent(),
+                ...Mixins.absolute.fullSizeOfParent(),
                 minWidth: styleUnit(vars.rightImage.minWidth),
                 objectPosition: "100% 50%",
                 objectFit: "contain",
@@ -1160,7 +1156,7 @@ export const bannerClasses = useThemeCache(
 
         // Use this for cutting of the right image with overflow hidden.
         const overflowRightImageContainer = style("overflowRightImageContainer", {
-            ...absolutePosition.fullSizeOfParent(),
+            ...Mixins.absolute.fullSizeOfParent(),
             overflow: "hidden",
         });
 

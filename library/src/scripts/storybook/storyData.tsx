@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@library/@types/api/users";
+import { IUser, IUserFragment } from "@library/@types/api/users";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");
@@ -21,12 +21,27 @@ export const STORY_IPSUM_SHORT = STORY_IPSUM_LONG.slice(0, 50) + "…";
 
 export const STORY_DATE = "2019-05-05T15:51:23+00:00";
 
-export const STORY_USER: IUserFragment = {
+export const STORY_USER: IUser = {
     userID: 1,
-    name: "Joe",
+    name: "Joe Walsh",
     dateLastActive: "2016-07-25 17:51:15",
     photoUrl: "https://user-images.githubusercontent.com/1770056/74098133-6f625100-4ae2-11ea-8a9d-908d70030647.png",
-    label: "User Label",
+    label: "SuperModerator",
+    email: "joe.walsh@example.com",
+    countDiscussions: 207,
+    countComments: 3456,
+    emailConfirmed: true,
+    showEmail: true,
+    bypassSpam: false,
+    banned: 0,
+    dateInserted: "2012-07-25 17:51:15",
+    hidden: false,
+    roles: [
+        {
+            roleID: 0,
+            name: "Moderator",
+        },
+    ],
 };
 
 export const StoryTextContent = (props: { firstTitle?: string }) => {

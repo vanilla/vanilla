@@ -59,6 +59,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      */
     public function removeResultItem(int $key) {
          unset($this->resultItems[$key]);
+         $this->resultItems = array_values($this->resultItems);
          $this->totalCount--;
     }
 

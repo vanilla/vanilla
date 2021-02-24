@@ -7,12 +7,7 @@
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, translateX, translateY } from "csx";
-import {
-    absolutePosition,
-    negativeUnit,
-    textInputSizingFromFixedHeight,
-    userSelect,
-} from "@library/styles/styleHelpers";
+import { negativeUnit, textInputSizingFromFixedHeight, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -106,7 +101,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
     });
 
     const stepUp = style("stepUp", {
-        ...absolutePosition.topRight(),
+        ...Mixins.absolute.topRight(),
         ...Mixins.border({}, { fallbackBorderVariables: builderVariables.border as IGlobalBorderStyles }),
         ...userSelect(),
         borderTopLeftRadius: 0,
@@ -127,7 +122,7 @@ export const themeInputNumberClasses = useThemeCache(() => {
         },
     });
     const stepDown = style("stepDown", {
-        ...absolutePosition.bottomRight(),
+        ...Mixins.absolute.bottomRight(),
         ...Mixins.border({}, { fallbackBorderVariables: builderVariables.border }),
         ...userSelect(),
         borderTopLeftRadius: 0,

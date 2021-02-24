@@ -10,11 +10,30 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { CategoryIcon } from "@library/icons/common";
 import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
+import { storyWithConfig } from "@library/storybook/StoryContext";
 
-const story = storiesOf("Navigation", module);
+export default {
+    title: "Navigation/Breadcrumbs",
+};
 
-story.add("Breadcrumbs", () => {
-    return (
+export const Defaults = storyWithConfig(
+    {
+        themeVars: {
+            breadcrumbs: {
+                link: {
+                    font: {
+                        size: "14px",
+                    },
+                },
+                separator: {
+                    font: {
+                        size: "14px",
+                    },
+                },
+            },
+        },
+    },
+    () => (
         <>
             <StoryHeading depth={1}>Breadcrumbs</StoryHeading>
             <StoryHeading>Standard</StoryHeading>
@@ -39,5 +58,39 @@ story.add("Breadcrumbs", () => {
                 icon={<CategoryIcon className={"pageLocation-icon"} />}
             />
         </>
-    );
-});
+    ),
+);
+
+export const Theme = storyWithConfig(
+    {
+        themeVars: {
+            breadcrumbs: {
+                link: {
+                    font: {
+                        size: "16px",
+                        lineHeight: "24px",
+                        color: "#767676",
+                        transform: "capitalize",
+                    },
+                },
+                separator: {
+                    spacing: "28px",
+                    font: {
+                        size: "28px",
+                    },
+                },
+            },
+        },
+    },
+    () => (
+        <Breadcrumbs forceDisplay={true}>
+            {[
+                { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
+                {
+                    name: "Appearance (Theming)",
+                    url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
+                },
+            ]}
+        </Breadcrumbs>
+    ),
+);

@@ -10,14 +10,14 @@ import { pointerEvents } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
+import { Property } from "csstype";
 import { TLength } from "@library/styles/styleShim";
 
 interface IPathState {
-    stroke?: ColorHelper | StrokeProperty;
-    fill?: ColorHelper | FillProperty;
-    opacity?: OpacityProperty;
-    strokeWidth?: StrokeWidthProperty<TLength>;
+    stroke?: ColorHelper | Property.Stroke;
+    fill?: ColorHelper | Property.Fill;
+    opacity?: Property.Opacity;
+    strokeWidth?: Property.StrokeWidth<TLength>;
 }
 
 interface INestedPathState extends IPathState {
@@ -499,10 +499,10 @@ export const iconClasses = useThemeCache(() => {
 
         const {
             normalState = {
-                stroke: globalVars.mixPrimaryAndBg(0.7),
+                stroke: globalVars.mainColors.fg,
                 fill: "none",
                 state: {
-                    stroke: mainColors.primary,
+                    stroke: mainColors.statePrimary,
                 },
             },
             loadingState = {
@@ -517,32 +517,32 @@ export const iconClasses = useThemeCache(() => {
         } = props;
 
         return style("bookmark", {
-            width: styleUnit(vars.bookmarkIcon.width),
-            height: styleUnit(vars.bookmarkIcon.height),
-            opacity: 1,
-            display: "block",
-            position: "relative",
-            ...{
-                ".svgBookmark": {
-                    ...pointerEvents(),
-                },
-                ".svgBookmark-mainPath": svgStyles(normalState),
-                "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
-                "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:Bookmarking .svgBookmark-mainPath": svgStyles({
-                    fill: important("none"),
-                    opacity: loadingState.opacity,
-                }),
-                "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
-                ".svgBookmark-loadingPath": {
-                    display: "none",
-                },
-                "&.Bookmarking .svgBookmark-loadingPath": {
-                    display: "block",
-                    ...svgStyles(loadingState, true),
-                },
+            svg: {
+                width: styleUnit(vars.bookmarkIcon.width),
+                height: styleUnit(vars.bookmarkIcon.height),
+                opacity: 1,
+                display: "block",
+                position: "relative",
+            },
+            ".svgBookmark": {
+                ...pointerEvents(),
+            },
+            ".svgBookmark-mainPath": svgStyles(normalState),
+            "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
+            "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:Bookmarking .svgBookmark-mainPath": svgStyles({
+                fill: important("none"),
+                opacity: loadingState.opacity,
+            }),
+            "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
+            ".svgBookmark-loadingPath": {
+                display: "none",
+            },
+            "&.Bookmarking .svgBookmark-loadingPath": {
+                display: "block",
+                ...svgStyles(loadingState, true),
             },
         });
     };

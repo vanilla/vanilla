@@ -7,16 +7,19 @@ components:
       type: object
       properties:
         dateInserted:
-          type: integer
+          type: string
           format: date-time
           description: The date the record was inserted.
+          readOnly: true
         insertUserID:
           type: integer
           description: The user that inserted the record.
+          readOnly: true
         insertIPAddress:
           type: string
           format: ipv4
           description: The IP address the record was inserted from.
+          readOnly: true
       required:
         - dateInserted
         - insertUserID
@@ -24,14 +27,20 @@ components:
     UpdateInfo:
       type: object
       properties:
-        dateUpdateed:
-          type: integer
+        dateUpdated:
+          type: string
           format: date-time
           description: The date the record was updateed.
+          nullable: true
+          readOnly: true
         updateUserID:
           type: integer
           description: The user that updateed the record.
+          nullable: true
+          readOnly: true
         updateIPAddress:
           type: string
           format: ipv4
           description: The IP address the record was updateed from.
+          nullable: true
+          readOnly: true

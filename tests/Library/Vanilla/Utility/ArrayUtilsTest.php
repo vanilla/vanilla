@@ -163,6 +163,10 @@ class ArrayUtilsTest extends TestCase {
             "mixed" => [["foo" => "bar", "Hello world."], true],
             "empty" => [[], false],
             "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), true],
+            "string" => ["test", false],
+            "number" => [42, false],
+            "null" => [null, false],
+            "object" => [new \stdClass(), false],
         ];
 
         return $result;

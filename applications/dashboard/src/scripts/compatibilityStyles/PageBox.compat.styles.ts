@@ -18,6 +18,7 @@ export const pageBoxCompatStyles = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
 
     MixinsFoundation.contentBoxes(globalVars.contentBoxes);
+    MixinsFoundation.contentBoxes(globalVars.panelBoxes, undefined, ".Panel");
 
     // Apply heading boxes
 
@@ -73,6 +74,15 @@ export const pageBoxCompatStyles = useThemeCache(() => {
         },
         ".pageBox + .PageControls": {
             marginTop: 16,
+        },
+    });
+
+    cssRaw({
+        ".Panel .pageHeadingBox.pageHeadingBox.pageHeadingBox": {
+            ...Mixins.padding(globalVars.panelHeadingBox.spacing),
+            [allHeadings]: {
+                fontSize: globalVars.fonts.size.subTitle,
+            },
         },
     });
 });

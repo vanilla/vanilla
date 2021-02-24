@@ -125,7 +125,9 @@ final class ArrayUtils {
      * @return bool
      */
     public static function isAssociative($array): bool {
-        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+        if (!self::isArray($array)) {
+            return false;
+        }
         $result = false;
 
         if (is_array($array)) {
